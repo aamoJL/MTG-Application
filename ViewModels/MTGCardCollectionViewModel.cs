@@ -6,7 +6,6 @@ using MTG_builder;
 using System.Collections.Specialized;
 using MTGApplication.Charts;
 using MTGApplication.Models;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using static MTGApplication.Models.MTGCardCollectionModel;
@@ -16,7 +15,7 @@ using App1.API;
 
 namespace MTGApplication.ViewModels
 {
-    public class MTGCardCollectionViewModel : ViewModelBase
+  public partial class MTGCardCollectionViewModel : ViewModelBase
   {
     public MTGCardCollectionViewModel(MTGCardCollectionModel model)
     {
@@ -27,29 +26,29 @@ namespace MTGApplication.ViewModels
         new CMCChart(model.Cards),
         new SpellTypeChart(model.Cards)
       };
-
-      AddCommand = new RelayCommand<MTGCardModel>((model) => Add(model));
-      RemoveCommand = new RelayCommand<MTGCardModel>((model) => Remove(model));
-      ResetCommand = new RelayCommand(() => Reset());
-      DeleteDeckFileCommand = new RelayCommand(() => DeleteDeckFile());
-      ChangeSortDirectionCommand = new RelayCommand<string>((dir) => ChangeSortDirection(dir));
-      ChangeSortPropertyCommand = new RelayCommand<string>((prop) => ChangeSortProperty(prop));
-      SaveCommand = new RelayCommand<string>((name) => Save(name));
-      LoadCommand = new RelayCommand<string>(async (name) => await LoadAsync(name));
-      FetchCardsCommand = new RelayCommand<string>(async (query) => await FetchCards(query));
     }
 
     private MTGCardCollectionModel Model { get; }
-    public ObservableCollection<MTGCardViewModel> CardViewModels { get; } // Synced to Model.Cards
+    public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new(); // Synced to Model.Cards
     public MTGCardModelChart[] Charts { get; }
 
+    private int totalCount;
     private bool hasFile;
     private bool isLoading;
 
-    public int TotalCount => Model.TotalCount;
+    public int TotalCount
+    {
+      get => totalCount;
+      set
+      {
+        totalCount = value;
+        OnPropertyChanged(nameof(TotalCount));
+        OnPropertyChanged(nameof(CanSave));
+      }
+    }
     public SortProperty CollectionSortProperty { get; private set; } = SortProperty.Name;
     public SortDirection CollectionSortDirection { get; private set; } = SortDirection.ASC;
-    public bool UnsavedChanges { get; private set; }
+    public bool HasUnsavedChanges { get; private set; }
     public bool HasFile
     {
       get => hasFile;
@@ -69,46 +68,49 @@ namespace MTGApplication.ViewModels
       }
     }
     public string Name => Model.Name;
-
-    public ICommand AddCommand { get; }
-    public ICommand RemoveCommand { get; }
-    public ICommand ResetCommand { get; }
-    public ICommand DeleteDeckFileCommand { get; }
-    public ICommand ChangeSortDirectionCommand { get; }
-    public ICommand ChangeSortPropertyCommand { get; }
-    public ICommand SaveCommand { get; }
-    public ICommand LoadCommand { get; }
-    public ICommand FetchCardsCommand { get; }
-
-    private void Add(MTGCardModel model)
+    public ObservableCollection<MTGCardModel> CardModels => Model.Cards;
+    public bool CanSave
     {
+      get => Model.TotalCount > 0;
+    }
+
+    [RelayCommand]
+    public void AddAndSort(MTGCardModel model)
+    {
+      // TODO: insert instead of adding and sorting the whole collection
       Model.Add(model);
       Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
-      UnsavedChanges = true;
+      HasUnsavedChanges = true;
     }
-    private void Remove(MTGCardModel model)
+    [RelayCommand]
+    public void RemoveModel(MTGCardModel model)
     {
       Model.Remove(model);
-      UnsavedChanges = true;
+      HasUnsavedChanges = true;
     }
-    private void Remove(string id)
+    [RelayCommand]
+    public void RemoveViewModel(MTGCardViewModel viewModel)
     {
-      Model.Remove(Model.Cards.First(x => x.Info.Id == id));
-      UnsavedChanges = true;
+      if (viewModel?.CardInfo.Id == null) { return; }
+      Model.Remove(Model.Cards.First(x => x.Info.Id == viewModel.CardInfo.Id));
+      HasUnsavedChanges = true;
     }
-    private void Reset()
+    [RelayCommand]
+    public void Reset()
     {
       Model.Reset();
-      UnsavedChanges = true;
+      HasUnsavedChanges = false;
       HasFile = false;
     }
-    private void DeleteDeckFile()
+    [RelayCommand]
+    public void DeleteDeckFile()
     {
       if (Model.Name != "")
         IO.DeleteFile($"{IO.CollectionsPath}{Model.Name}.json");
       if (ResetCommand.CanExecute(null)) ResetCommand.Execute(null);
     }
-    private void ChangeSortDirection(string dir)
+    [RelayCommand]
+    public void ChangeSortDirection(string dir)
     {
       if (Enum.TryParse(dir, true, out SortDirection sortDirection))
       {
@@ -116,7 +118,8 @@ namespace MTGApplication.ViewModels
         Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
       }
     }
-    private void ChangeSortProperty(string prop)
+    [RelayCommand]
+    public void ChangeSortProperty(string prop)
     {
       if (Enum.TryParse(prop, true, out SortProperty sortProperty))
       {
@@ -124,7 +127,8 @@ namespace MTGApplication.ViewModels
         Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
       }
     }
-    private void Save(string name)
+    [RelayCommand]
+    public void Save(string name)
     {
       Model.Rename(name);
       IO.WriteTextToFile($"{IO.CollectionsPath}/{name}.json",
@@ -133,13 +137,14 @@ namespace MTGApplication.ViewModels
           x.Info.Id,
           x.Count
         })));
-      UnsavedChanges = false;
+      HasUnsavedChanges = false;
       HasFile = true;
     }
-    private async Task LoadAsync(string name)
+    [RelayCommand]
+    public async Task LoadAsync(string name)
     {
       IsLoading = true;
-      if (ResetCommand.CanExecute(null)) { ResetCommand.Execute(null); }
+      Reset();
       Model.Rename(name);
       var ids = JsonNode.Parse(IO.ReadTextFromFile(
         $"{IO.CollectionsPath}/{name}.json")).AsArray();
@@ -150,8 +155,7 @@ namespace MTGApplication.ViewModels
         Count = x["Count"].GetValue<int>()
       });
 
-
-      // Scryfall API allows to fetch only 75 cards at once
+      // Scryfall API allows to fetch only 75 cards at a time
       foreach (var chunk in IdObjects.Chunk(75))
       {
         // Fetch cards in chunks
@@ -174,7 +178,7 @@ namespace MTGApplication.ViewModels
       }
 
       Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
-      UnsavedChanges = false;
+      HasUnsavedChanges = false;
       HasFile = true;
       IsLoading = false;
     }
@@ -183,7 +187,8 @@ namespace MTGApplication.ViewModels
     /// </summary>
     /// <param name="query">API query parameters</param>
     /// <returns></returns>
-    private async Task FetchCards(string query)
+    
+    public async Task LoadFromAPIAsync(string query)
     {
       IsLoading = true;
       Reset();
@@ -192,13 +197,15 @@ namespace MTGApplication.ViewModels
         var cards = await ScryfallAPI.FetchCards(query);
         foreach (MTGCardModel card in cards)
         {
+          Model.Add(card);
           // TODO: dont sort, add range
-          Add(card);
         }
       }
+      HasUnsavedChanges = false;
       IsLoading = false;
     }
 
+    private void UpdateTotalCount() => TotalCount = Model.TotalCount;
     private void Model_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       // Sync Model.Cards and CardViewModels
@@ -208,7 +215,7 @@ namespace MTGApplication.ViewModels
       {
         case NotifyCollectionChangedAction.Add:
           modelCard = e.NewItems[0] as MTGCardModel;
-          var newViewModelCard = new MTGCardViewModel(modelCard) { RemoveRequestCommand = new RelayCommand<string>((id) => Remove(id)) };
+          var newViewModelCard = new MTGCardViewModel(modelCard) { RemoveRequestCommand = RemoveViewModelCommand };
           CardViewModels.Add(newViewModelCard);
           modelCard.PropertyChanged += ModelCard_PropertyChanged;
           break;
@@ -231,13 +238,14 @@ namespace MTGApplication.ViewModels
         default:
           break;
       }
+      UpdateTotalCount();
     }
     private void ModelCard_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(MTGCardModel.Count))
+      if (e.PropertyName == nameof(MTGCardModel.Count))
       {
-        OnPropertyChanged(nameof(TotalCount));
-        UnsavedChanges = true;
+        UpdateTotalCount();
+        HasUnsavedChanges = true;
       }
     }
   }

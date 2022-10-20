@@ -1,10 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace MTG_builder
 {
@@ -102,23 +99,6 @@ namespace MTG_builder
         return await HttpClient.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, "application/json")).Result.Content.ReadAsStringAsync();
       }
       catch (Exception) { return ""; }
-    }
-    #endregion
-
-    #region//--------------Dialogs--------------//
-    public static async Task<StorageFile> OpenFileDialog(string[] filters, object window)
-    {
-      FileOpenPicker fileOpenPicker = new();
-
-      var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
-      WinRT.Interop.InitializeWithWindow.Initialize(fileOpenPicker, hwnd);
-
-      foreach (string filter in filters)
-      {
-        fileOpenPicker.FileTypeFilter.Add(filter);
-      }
-
-      return await fileOpenPicker.PickSingleFileAsync();
     }
     #endregion
   }

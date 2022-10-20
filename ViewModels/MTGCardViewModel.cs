@@ -1,27 +1,28 @@
 ﻿using Microsoft.UI.Xaml.Media;
 using MTGApplication.Models;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
 using static MTGApplication.Models.MTGCardModel;
 using App1.API;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MTGApplication.ViewModels
 {
-    public class MTGCardViewModel : ViewModelBase
+  public partial class MTGCardViewModel : ViewModelBase
   {
     public MTGCardViewModel(MTGCardModel model)
     {
       Model = model;
-      FlipCardCommand = new RelayCommand(() =>
+      model.PropertyChanged += Model_PropertyChanged;
+    }
+
+    private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(Model.Count))
       {
-        SelectedFaceIndex = SelectedFaceIndex == 0 ? 1 : 0;
-      }, () =>
-      {
-        return Model.HasBackFace;
-      });
-      OpenAPIWebsiteCommand = new RelayCommand(async() => await ScryfallAPI.OpenAPICardWebsite(model));
-      IncreaseCountCommand = new RelayCommand(() => Count++);
-      DecreaseCountCommand = new RelayCommand(() => Count--);
+        OnPropertyChanged(nameof(CanDecreaseCount));
+        OnPropertyChanged(nameof(Count));
+      }
     }
 
     private int selectedFaceIndex = 0;
@@ -38,23 +39,36 @@ namespace MTGApplication.ViewModels
         OnPropertyChanged(nameof(SelectedFace));
       }
     }
-    public int Count
-    {
-      get => Model.Count;
-      set
-      {
-        Model.Count = value;
-        OnPropertyChanged(nameof(Count));
-      }
-    }
+    public int Count => Model.Count;
     public CardInfo CardInfo => Model.Info;
     public bool HasBackFace => Model.HasBackFace;
+    public bool CanDecreaseCount
+    {
+      get => Count > 1;
+    }
 
-    public ICommand FlipCardCommand { get; }
-    public ICommand OpenAPIWebsiteCommand { get; }
-    public ICommand DecreaseCountCommand { get; }
-    public ICommand IncreaseCountCommand { get; }
     public ICommand RemoveRequestCommand { get; init; }
+
+    [RelayCommand]
+    public void FlipCard()
+    {
+      if (HasBackFace) SelectedFaceIndex = SelectedFaceIndex == 0 ? 1 : 0;
+    }
+    [RelayCommand]
+    public async Task OpenAPIWebsite()
+    {
+      await ScryfallAPI.OpenAPICardWebsite(Model);
+    }
+    [RelayCommand]
+    public void IncreaseCount()
+    {
+      Model.Count++;
+    }
+    [RelayCommand]
+    public void DecreaseCount()
+    {
+      Model.Count--;
+    }
 
     public string ModelToJSON()
     {

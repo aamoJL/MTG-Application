@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using App1.API;
 
 namespace MTGApplication.Models
 {
@@ -46,16 +47,12 @@ namespace MTGApplication.Models
 
     public readonly struct CardFace
     {
-      public readonly int CMC;
       public readonly string[] Colors;
-      public readonly string FaceUri;
       public readonly string Name;
 
-      public CardFace(int cmc, string[] colors, string imageUri, string name)
+      public CardFace(string[] colors, string name)
       {
-        CMC = cmc;
         Colors = colors ?? throw new ArgumentNullException(nameof(colors));
-        FaceUri = imageUri ?? throw new ArgumentNullException(nameof(imageUri));
         Name = name ?? throw new ArgumentNullException(nameof(name));
       }
     }
@@ -69,11 +66,10 @@ namespace MTGApplication.Models
       public readonly string Rarity;
       public readonly string SetCode;
       public readonly string SetName;
-      public readonly string SetIconUri;
       public readonly float Price;
       public readonly string CollectorNumber;
 
-      public CardInfo(string id, CardFace[] cardFaces, int cmc, string name, string typeLine, string rarity, string setCode, string setName, string setIconUri, float price, string collectorNumber)
+      public CardInfo(string id, CardFace[] cardFaces, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber)
       {
         Id = id ?? throw new ArgumentNullException(nameof(id));
         CardFaces = cardFaces ?? throw new ArgumentNullException(nameof(cardFaces));
@@ -83,7 +79,6 @@ namespace MTGApplication.Models
         Rarity = rarity ?? throw new ArgumentNullException(nameof(rarity));
         SetCode = setCode ?? throw new ArgumentNullException(nameof(setCode));
         SetName = setName ?? throw new ArgumentNullException(nameof(setName));
-        SetIconUri = setIconUri ?? throw new ArgumentNullException(nameof(setIconUri));
         Price = price;
         CollectorNumber = collectorNumber ?? throw new ArgumentNullException(nameof(collectorNumber));
       }
@@ -141,11 +136,10 @@ namespace MTGApplication.Models
       else { return fFaceColor; }
     }
 
+    public event PropertyChangedEventHandler PropertyChanged;
+    
     private CardInfo info;
     private int count = 1;
-
-
-    public event PropertyChangedEventHandler PropertyChanged;
 
     public CardInfo Info
     {
@@ -153,9 +147,6 @@ namespace MTGApplication.Models
       private init
       {
         info = value;
-        FrontFaceImg = new BitmapImage(new Uri(info.CardFaces[0].FaceUri));
-        BackFaceImg = info.CardFaces.Length == 2 ? new BitmapImage(new Uri(info.CardFaces[1].FaceUri)) : null;
-        SetIcon = new SvgImageSource(new Uri(info.SetIconUri));
 
         ColorType = GetColorType(info.CardFaces);
         SpellTypes = GetSpellTypes(info.TypeLine);
@@ -177,10 +168,10 @@ namespace MTGApplication.Models
 
     public CardFace FrontFace => Info.CardFaces[0];
     public CardFace? BackFace => Info.CardFaces.Length == 2 ? Info.CardFaces[1] : null;
-
-    public ImageSource FrontFaceImg { get; init; }
-    public ImageSource BackFaceImg { get; init; }
-    public ImageSource SetIcon { get; init; }
+    // TODO: Move images to viewmodels
+    public ImageSource FrontFaceImg => new BitmapImage(new Uri(ScryfallAPI.GetFaceUri(Info.Id, false)));
+    public ImageSource BackFaceImg => info.CardFaces.Length == 2 ? new BitmapImage(new Uri(ScryfallAPI.GetFaceUri(Info.Id, true))) : null;
+    public ImageSource SetIcon => new SvgImageSource(new Uri(ScryfallAPI.GetSetIconUri(Info.SetCode)));
     public RarityTypes RarityType { get; init; }
     public string RarityCode { get; init; }
     public ColorTypes ColorType { get; init; }

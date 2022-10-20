@@ -12,6 +12,9 @@ namespace MTGApplication
   /// </summary>
   public partial class App : Application
   {
+    // Used for Dialogs
+    public static FrameworkElement MainRoot { get; private set; }
+    
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -30,6 +33,7 @@ namespace MTGApplication
     {
       m_window = new MainWindow();
       m_window.Activate();
+      MainRoot = m_window.Content as FrameworkElement;
 
       LiveCharts.Configure(config =>
         config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()

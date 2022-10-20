@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-  xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI" xmlns:local11="using:MTGApplication.ViewModels">
+  xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI" xmlns:viewmodels="using:MTGApplication.ViewModels">
 
   <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
     <Grid Margin="10 10 10 10" ColumnSpacing="10">
@@ -98,8 +98,7 @@
               CornerRadius="0 4 4 0" 
               BorderThickness="0 1 1 1" 
               Height="32"
-              Command="{x:Bind ViewModel.ScryfallCardViewModels.FetchCardsCommand}"
-              CommandParameter="{x:Bind ViewModel.SearchQuery}">
+              Command="{x:Bind ViewModel.SearchSubmitCommand}">
             <Button.KeyboardAccelerators>
               <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind ScryfallSearchBox}"/>
             </Button.KeyboardAccelerators>
@@ -119,12 +118,12 @@
             <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
               <AppBarButton.Flyout>
                 <MenuFlyout>
-                  <MenuFlyoutItem Text="Images" Click="ScryfallSearchImageDisplayBtn_Click">
+                  <MenuFlyoutItem Text="Images">
                     <MenuFlyoutItem.Icon>
                       <SymbolIcon Symbol="Pictures"/>
                     </MenuFlyoutItem.Icon>
                   </MenuFlyoutItem>
-                  <MenuFlyoutItem Text="List" Click="ScryfallSearchListDisplayBtn_Click">
+                  <MenuFlyoutItem Text="List">
                     <MenuFlyoutItem.Icon>
                       <SymbolIcon Symbol="List"/>
                     </MenuFlyoutItem.Icon>
@@ -133,14 +132,13 @@
               </AppBarButton.Flyout>
             </AppBarButton>
           </CommandBar>
-          <ProgressRing IsActive="{x:Bind Path=ViewModel.ScryfallCardViewModels.IsLoading, Mode=OneWay}"/>
+          <ProgressRing IsActive="{x:Bind ViewModel.ScryfallCardViewModels.IsLoading, Mode=OneWay}"/>
           <TextBlock Text="Card count:" VerticalAlignment="Bottom" Margin="0 0 4 0"/>
-          <TextBlock Text="{x:Bind Path=ViewModel.ScryfallCardViewModels.TotalCount, Mode=OneWay}" VerticalAlignment="Bottom"/>
+          <TextBlock Text="{x:Bind ViewModel.ScryfallCardViewModels.TotalCount, Mode=OneWay}" VerticalAlignment="Bottom"/>
         </StackPanel>
         <!--Scryfall Card view-->
         <Grid Grid.Row="2" BorderBrush="LightGray" BorderThickness="1">
           <GridView 
-              x:Name="CardGridView" 
               Background="White"
               Padding="10 10 10 10"
               ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
@@ -148,12 +146,14 @@
               CanDragItems="True"
               DragItemsStarting="CardGridView_DragItemsStarting">
             <GridView.ItemTemplate>
-              <DataTemplate x:DataType='local11:MTGCardViewModel'>
+              <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel CornerRadius="10">
                   <Image Height="{Binding ElementName=ScryfallSearchSizeSlider, Path=Value}" Source="{Binding SelectedFace}">
                     <Image.ContextFlyout>
                       <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                        <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip" IsEnabled="{Binding HasBackFace}"/>
+                        <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
                       </MenuFlyout>
                     </Image.ContextFlyout>
                   </Image>
@@ -180,11 +180,11 @@
               <AppBarButton Icon="OpenFile" Label="File">
                 <AppBarButton.Flyout>
                   <MenuFlyout>
-                    <MenuFlyoutItem Icon="NewFolder" Text="New" Click="CollectionControlNew_Click"/>
-                    <MenuFlyoutItem Icon="OpenFile" Text="Open..." Click="CollectionControlOpen_Click"/>
-                    <MenuFlyoutItem Icon="Save" Text="Save..." Click="CollectionControlSave_Click"/>
+                    <MenuFlyoutItem Command="{x:Bind ViewModel.ResetCollectionDialogCommand}" Icon="NewFolder" Text="New"/>
+                    <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCollectionDialogCommand}" Icon="OpenFile" Text="Open..."/>
+                    <MenuFlyoutItem Command="{x:Bind ViewModel.SaveCollectionDialogCommand}" IsEnabled="{x:Bind ViewModel.CollectionViewModel.CanSave, Mode=OneWay}" Icon="Save" Text="Save..."/>
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Background="IndianRed" Icon="Delete" Text="Delete" Click="CollectionControlDelete_Click" IsEnabled="{x:Bind ViewModel.CollectionViewModel.HasFile, Mode=OneWay}"/>
+                    <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteCollectionDialogCommand}" IsEnabled="{x:Bind ViewModel.CollectionViewModel.HasFile, Mode=OneWay}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                   </MenuFlyout>
                 </AppBarButton.Flyout>
               </AppBarButton>
@@ -199,12 +199,12 @@
               <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
                 <AppBarButton.Flyout>
                   <MenuFlyout>
-                    <MenuFlyoutItem Text="Images" Click="CollectionImageDisplayBtn_Click">
+                    <MenuFlyoutItem Text="Images">
                       <MenuFlyoutItem.Icon>
                         <SymbolIcon Symbol="Pictures"/>
                       </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
-                    <MenuFlyoutItem Text="List" Click="CollectionListDisplayBtn_Click">
+                    <MenuFlyoutItem Text="List">
                       <MenuFlyoutItem.Icon>
                         <SymbolIcon Symbol="List"/>
                       </MenuFlyoutItem.Icon>
@@ -229,10 +229,10 @@
             </CommandBar>
             <ProgressRing IsActive="{x:Bind Path=ViewModel.CollectionViewModel.IsLoading, Mode=OneWay}"/>
           </StackPanel>
-          <!--Collection List View-->
+          <!--Collection Grid View-->
           <Grid Grid.Row="1" BorderBrush="LightGray" BorderThickness="1">
             <GridView
-            x:Name="CollectionGridView" 
+            ItemContainerTransitions="{x:Null}"
             Background="White"
             Padding="10 10 10 10"
             AllowDrop="True"
@@ -241,25 +241,26 @@
             DragOver="CollectionListView_DragOver"
             Drop="CollectionListView_Drop">
               <GridView.ItemTemplate>
-                <DataTemplate x:DataType="local11:MTGCardViewModel">
-                  <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="ScryfallCard_PointerEntered" PointerExited="ScryfallCard_PointerExited">
+                <!--TODO: show on hover-->
+                <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                  <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical">
                     <Image Height="{Binding ElementName=CollectionSizeSlider, Path=Value}" Source="{Binding SelectedFace}">
                       <Image.ContextFlyout>
                         <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                          <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip" IsEnabled="{Binding HasBackFace}"/>
+                          <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
                           <MenuFlyoutSeparator />
-                          <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Scryfall"/>
+                          <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
                           <MenuFlyoutSeparator />
-                          <MenuFlyoutItem Command="{Binding RemoveRequestCommand}" CommandParameter="{Binding CardInfo.Id}" Icon="delete" Text="Delete"/>
+                          <MenuFlyoutItem CommandParameter="{Binding}" Command="{Binding RemoveRequestCommand}" Icon="delete" Text="Delete"/>
                         </MenuFlyout>
                       </Image.ContextFlyout>
                     </Image>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                      <Button Command="{Binding DecreaseCountCommand}" Visibility="{Binding PointerIsOver}">
+                      <Button Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}">
                         <SymbolIcon Symbol="Back" />
                       </Button>
                       <TextBlock Text="{Binding Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="24"/>
-                      <Button Command="{Binding IncreaseCountCommand}" Visibility="{Binding PointerIsOver}">
+                      <Button Command="{Binding IncreaseCountCommand}">
                         <SymbolIcon Symbol="Forward" />
                       </Button>
                     </StackPanel>

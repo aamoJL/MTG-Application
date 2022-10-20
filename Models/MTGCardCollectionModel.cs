@@ -57,9 +57,9 @@ namespace MTGApplication.Models
         Cards.Move(Cards.IndexOf(newList[i]), i);
       }
     }
-    public void Add(MTGCardModel model, bool combineArt = true)
+    public void Add(MTGCardModel model, bool combineName = true)
     {
-      if (combineArt)
+      if (combineName)
       {
         var existingModelName = Cards.FirstOrDefault(x => x.Info.Name == model.Info.Name);
         if (existingModelName != null)
@@ -68,13 +68,11 @@ namespace MTGApplication.Models
         }
         else
         {
-          //model.RemoveRequestCommand = new RelayCommand(() => Remove(viewModel));
           Cards.Add(model);
         }
       }
       else
       {
-        //model.RemoveRequestCommand = new RelayCommand(() => Remove(viewModel));
         Cards.Add(model);
       }
     }
