@@ -283,7 +283,7 @@
           </StackPanel>
           <StackPanel Grid.Row="1" Orientation="Vertical">
             <TextBlock Text="Mana curve" TextAlignment="Center"/>
-            <lvc:CartesianChart Height="200" x:Name="CollectionCmcChart" DataContext="{x:Bind ViewModel.CollectionViewModel.Charts[0]}" Series="{Binding Series}"/>
+            <lvc:CartesianChart Height="250" x:Name="CollectionCmcChart" DataContext="{x:Bind ViewModel.CollectionViewModel.Charts[0]}" Series="{Binding Series}"/>
           </StackPanel>
           <StackPanel Grid.Row="2" Orientation="Vertical">
             <TextBlock Text="Type Chart" TextAlignment="Center"/>

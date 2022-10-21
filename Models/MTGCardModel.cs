@@ -45,30 +45,34 @@ namespace MTGApplication.Models
       Other
     }
 
+    [Serializable]
     public readonly struct CardFace
     {
-      public readonly string[] Colors;
-      public readonly string Name;
+      public readonly string[] Colors { get; }
+      public readonly string Name { get; }
 
+      [JsonConstructor]
       public CardFace(string[] colors, string name)
       {
         Colors = colors ?? throw new ArgumentNullException(nameof(colors));
         Name = name ?? throw new ArgumentNullException(nameof(name));
       }
     }
+    [Serializable]
     public readonly struct CardInfo
     {
-      public readonly string Id;
-      public readonly CardFace[] CardFaces;
-      public readonly int CMC;
-      public readonly string Name;
-      public readonly string TypeLine;
-      public readonly string Rarity;
-      public readonly string SetCode;
-      public readonly string SetName;
-      public readonly float Price;
-      public readonly string CollectorNumber;
+      public readonly string Id { get; }
+      public readonly CardFace[] CardFaces { get; }
+      public readonly int CMC { get; }
+      public readonly string Name { get; }
+      public readonly string TypeLine { get; }
+      public readonly string Rarity { get; }
+      public readonly string SetCode { get; }
+      public readonly string SetName { get; }
+      public readonly float Price { get; }
+      public readonly string CollectorNumber { get; }
 
+      [JsonConstructor]
       public CardInfo(string id, CardFace[] cardFaces, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber)
       {
         Id = id ?? throw new ArgumentNullException(nameof(id));
@@ -137,16 +141,18 @@ namespace MTGApplication.Models
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-    
+
     private CardInfo info;
     private int count = 1;
 
     public CardInfo Info
     {
-      get => info; 
+      get => info;
       private init
       {
         info = value;
+
+        if(info.Id == "" || info.Id == null) { return; }
 
         ColorType = GetColorType(info.CardFaces);
         SpellTypes = GetSpellTypes(info.TypeLine);

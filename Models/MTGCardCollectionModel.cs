@@ -17,7 +17,7 @@ namespace MTGApplication.Models
 
     public ObservableCollection<MTGCardModel> Cards { get; } = new();
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = "";
     public int TotalCount { get => Cards.Sum(x => x.Count); }
 
     public void Rename(string name)

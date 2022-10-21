@@ -86,7 +86,6 @@ namespace MTGApplication
     #endregion
 
     #region //--------------------- Drag & Drop -----------------------------//
-    // TODO: MVVM Drag and Drop
     private void CardGridView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
       MTGCardViewModel viewModel = (e.Items[0] as MTGCardViewModel);
@@ -96,6 +95,7 @@ namespace MTGApplication
         e.Data.RequestedOperation = DataPackageOperation.Copy;
       }
     }
+
     private void CollectionListView_DragOver(object sender, DragEventArgs e)
     {
       if (e.DataView.Contains(StandardDataFormats.Text))
@@ -103,17 +103,22 @@ namespace MTGApplication
         e.AcceptedOperation = DataPackageOperation.Copy;
       }
     }
+
     private async void CollectionListView_Drop(object sender, DragEventArgs e)
     {
       if (e.DataView.Contains(StandardDataFormats.Text))
       {
         DragOperationDeferral def = e.GetDeferral();
         string data = await e.DataView.GetTextAsync();
-        MTGCardModel model = JsonSerializer.Deserialize<MTGCardModel>(data);
-        if (model != null && ViewModel.CollectionViewModel.AddAndSortCommand.CanExecute(null))
+
+        try
         {
-          ViewModel.CollectionViewModel.AddAndSortCommand.Execute(new MTGCardViewModel(model));
+          var model = JsonSerializer.Deserialize<MTGCardModel>(data);
+          if(model.Info.Id == string.Empty || model.Info.Id == null) { throw new Exception(); }
+          ViewModel.CollectionViewModel.AddAndSort(model);
         }
+        catch (Exception) { }
+
         e.AcceptedOperation = DataPackageOperation.Copy;
         def.Complete();
       }
