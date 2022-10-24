@@ -12,7 +12,7 @@ namespace MTGApplication.Models
     }
     public enum SortProperty
     {
-      CMC, Name, Rarity, Color, Set
+      CMC, Name, Rarity, Color, Set, Count
     }
 
     public ObservableCollection<MTGCardModel> Cards { get; } = new();
@@ -36,6 +36,7 @@ namespace MTGApplication.Models
           SortProperty.Rarity => Cards.OrderBy(x => (int)x.RarityType).ToList(),
           SortProperty.Color => Cards.OrderBy(x => (int)x.ColorType).ToList(),
           SortProperty.Set => Cards.OrderBy(x => x.Info.SetName).ToList(),
+          SortProperty.Count => Cards.OrderBy(x => x.Count).ToList(),
           _ => Cards.OrderBy(x => x.Info.Name).ToList(),
         };
       }
@@ -48,6 +49,7 @@ namespace MTGApplication.Models
           SortProperty.Rarity => Cards.OrderByDescending(x => (int)x.RarityType).ToList(),
           SortProperty.Color => Cards.OrderByDescending(x => (int)x.ColorType).ToList(),
           SortProperty.Set => Cards.OrderByDescending(x => x.Info.SetName).ToList(),
+          SortProperty.Count => Cards.OrderByDescending(x => x.Count).ToList(),
           _ => Cards.OrderByDescending(x => x.Info.Name).ToList(),
         };
       }

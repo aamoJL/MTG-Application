@@ -223,6 +223,7 @@
                     <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
                     <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
                     <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
+                    <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
                   </MenuFlyout>
                 </AppBarButton.Flyout>
               </AppBarButton>
@@ -241,7 +242,6 @@
             DragOver="CollectionListView_DragOver"
             Drop="CollectionListView_Drop">
               <GridView.ItemTemplate>
-                <!--TODO: show on hover-->
                 <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                   <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical">
                     <Image Height="{Binding ElementName=CollectionSizeSlider, Path=Value}" Source="{Binding SelectedFace}">

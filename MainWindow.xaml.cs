@@ -45,9 +45,8 @@ namespace MTGApplication
       };
     }
 
-    #region //-----------Scryfall search controls-----------//
     // TODO: use same view on both list types
-    #endregion
+    // TODO: show increase/decrease only on pointer hover
     
     #region //----------------Card pointer events---------------//
     private void ScryfallCardName_PointerEntered(object sender, PointerRoutedEventArgs e)
