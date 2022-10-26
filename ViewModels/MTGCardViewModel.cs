@@ -29,6 +29,7 @@ namespace MTGApplication.ViewModels
 
     private MTGCardModel Model { get; }
     public ImageSource SelectedFace => SelectedFaceIndex == 0 ? Model.FrontFaceImg : Model.BackFaceImg;
+    public ImageSource SetIcon => Model.SetIcon;
     public int SelectedFaceIndex
     {
       get => selectedFaceIndex;
@@ -47,7 +48,7 @@ namespace MTGApplication.ViewModels
       get => Count > 1;
     }
 
-    public ICommand RemoveRequestCommand { get; init; }
+    public ICommand RemoveRequestCommand { get; set; }
 
     [RelayCommand]
     public void FlipCard()

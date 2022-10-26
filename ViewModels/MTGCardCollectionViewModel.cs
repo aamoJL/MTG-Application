@@ -17,6 +17,11 @@ namespace MTGApplication.ViewModels
 {
   public partial class MTGCardCollectionViewModel : ViewModelBase
   {
+    public enum DisplayTypes
+    {
+      List, Images
+    }
+
     public MTGCardCollectionViewModel(MTGCardCollectionModel model)
     {
       Model = model;
@@ -26,6 +31,8 @@ namespace MTGApplication.ViewModels
         new CMCChart(model.Cards),
         new SpellTypeChart(model.Cards)
       };
+
+      _ = LoadAsync("Ostoslista");
     }
 
     private MTGCardCollectionModel Model { get; }
@@ -35,6 +42,7 @@ namespace MTGApplication.ViewModels
     private int totalCount;
     private bool hasFile;
     private bool isLoading;
+    private DisplayTypes displayType = DisplayTypes.Images;
 
     public int TotalCount
     {
@@ -72,6 +80,15 @@ namespace MTGApplication.ViewModels
     public bool CanSave
     {
       get => Model.TotalCount > 0;
+    }
+    public DisplayTypes DisplayType
+    {
+      get => displayType;
+      set
+      {
+        displayType = value;
+        OnPropertyChanged(nameof(DisplayType));
+      }
     }
 
     [RelayCommand]
@@ -125,6 +142,14 @@ namespace MTGApplication.ViewModels
       {
         CollectionSortProperty = sortProperty;
         Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
+      }
+    }
+    [RelayCommand]
+    public void ChangeDisplayType(string type)
+    {
+      if (Enum.TryParse(type, true, out DisplayTypes dt))
+      {
+        DisplayType = dt;
       }
     }
     [RelayCommand]
