@@ -11,7 +11,6 @@ using System;
 using static MTGApplication.Models.MTGCardCollectionModel;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using App1.API;
 
 namespace MTGApplication.ViewModels
 {
@@ -192,7 +191,7 @@ namespace MTGApplication.ViewModels
           })
         });
 
-        var cardCollection = await ScryfallAPI.FetchCollection(identifiersJson);
+        var cardCollection = await App.CardAPI.FetchCollection(identifiersJson);
         foreach (var item in cardCollection)
         {
           // Update counts to the fetched cards
@@ -218,7 +217,7 @@ namespace MTGApplication.ViewModels
       Reset();
       if (query != "")
       {
-        var cards = await ScryfallAPI.FetchCards(query);
+        var cards = await App.CardAPI.FetchCards(query);
         foreach (MTGCardModel card in cards)
         {
           Model.Add(card);

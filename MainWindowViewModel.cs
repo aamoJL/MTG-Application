@@ -8,7 +8,6 @@ namespace MTGApplication
 {
   public partial class MainWindowViewModel : ViewModelBase
   {
-    // TODO: Use generic API interface instead of Scryfall
     public MainWindowViewModel() { }
 
     public readonly MTGCardCollectionViewModel ScryfallCardViewModels = new(new());

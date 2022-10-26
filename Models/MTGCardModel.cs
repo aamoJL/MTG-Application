@@ -175,9 +175,9 @@ namespace MTGApplication.Models
     public CardFace FrontFace => Info.CardFaces[0];
     public CardFace? BackFace => Info.CardFaces.Length == 2 ? Info.CardFaces[1] : null;
     // TODO: Move images to viewmodels
-    public ImageSource FrontFaceImg => new BitmapImage(new Uri(ScryfallAPI.GetFaceUri(Info.Id, false)));
-    public ImageSource BackFaceImg => info.CardFaces.Length == 2 ? new BitmapImage(new Uri(ScryfallAPI.GetFaceUri(Info.Id, true))) : null;
-    public ImageSource SetIcon => new SvgImageSource(new Uri(ScryfallAPI.GetSetIconUri(Info.SetCode)));
+    public ImageSource FrontFaceImg => new BitmapImage(new Uri(App.CardAPI.GetFaceUri(Info.Id, false)));
+    public ImageSource BackFaceImg => info.CardFaces.Length == 2 ? new BitmapImage(new Uri(App.CardAPI.GetFaceUri(Info.Id, true))) : null;
+    public ImageSource SetIcon => new SvgImageSource(new Uri(App.CardAPI.GetSetIconUri(Info.SetCode)));
     public RarityTypes RarityType { get; init; }
     public string RarityCode { get; init; }
     public ColorTypes ColorType { get; init; }

@@ -7,20 +7,20 @@ using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Windows.System;
-using System.Globalization;
+using MTGApplication.API;
 
 namespace App1.API
 {
   /// <summary>
   /// Scryfall API calls and helper functions
   /// </summary>
-  public static class ScryfallAPI
+  public class ScryfallAPI : MTGCardAPI
   {
-    private static readonly string WEB_URL = "https://scryfall.com";
-    private static readonly string API_URL = "https://api.scryfall.com";
+    private readonly string WEB_URL = "https://scryfall.com";
+    private readonly string API_URL = "https://api.scryfall.com";
     //private static readonly string FILE_URL = "https://c2.scryfall.com/file";
-    private static readonly string CARD_FACE_URL = "https://cards.scryfall.io/normal";
-    private static readonly string SET_ICON_URL = "https://svgs.scryfall.io";
+    private readonly string CARD_FACE_URL = "https://cards.scryfall.io/normal";
+    private readonly string SET_ICON_URL = "https://svgs.scryfall.io";
 
     /// <summary>
     /// Fetches cards from Scryfall API using given parameters
@@ -28,7 +28,7 @@ namespace App1.API
     /// <param name="searchParams">Scryfall API search parameters</param>
     /// <param name="pageLimit">Maximum page count to fetch the cards, one page has 175 cards</param>
     /// <returns></returns>
-    public static async Task<ObservableCollection<MTGCardModel>> FetchCards(string searchParams, int pageLimit = 3)
+    public override async Task<ObservableCollection<MTGCardModel>> FetchCards(string searchParams, int pageLimit)
     {
       ObservableCollection<MTGCardModel> cards = new();
 
@@ -67,7 +67,7 @@ namespace App1.API
     /// </summary>
     /// <param name="identifiersJson">List of card identifiers. Maximum lenght is 75 cards. The list must be in JSON format.</param>
     /// <returns></returns>
-    public static async Task<List<MTGCardModel>> FetchCollection(string identifiersJson)
+    public override async Task<List<MTGCardModel>> FetchCollection(string identifiersJson)
     {
       List<MTGCardModel> cards = new();
       var fetchResult = await IO.FetchStringFromURLPost($"{API_URL}/cards/collection", identifiersJson);
@@ -85,13 +85,13 @@ namespace App1.API
 
       return cards;
     }
-    public static async Task<bool> OpenAPICardWebsite(MTGCardModel card)
+    public override async Task<bool> OpenAPICardWebsite(MTGCardModel card)
     {
       // \u0027 = '
       return await Launcher.LaunchUriAsync(new($"{WEB_URL}/card/{card.Info.SetCode}/{card.Info.CollectorNumber}/{card.Info.Name.Replace(' ', '-').Trim('\u0027')}?utm_source=api"));
     }
 
-    public static MTGCardModel GetMTGCardModelFromJson(JsonNode cardObject)
+    public override MTGCardModel GetMTGCardModelFromJson(JsonNode cardObject)
     {
       if(cardObject == null || cardObject["object"]?.GetValue<string>() != "card") { return null; }
 
@@ -150,15 +150,14 @@ namespace App1.API
         price: price,
         collectorNumber: collectorNumber));
     }
-    public static string GetFaceUri(string id, bool back)
+    public override string GetFaceUri(string id, bool back)
     {
       var side = back ? "back" : "front";
       return $"{CARD_FACE_URL}/{side}/{id[..1]}/{id[1..2]}/{id}.jpg";
     }
-    public static string GetSetIconUri(string setCode)
+    public override string GetSetIconUri(string setCode)
     {
       return $"{SET_ICON_URL}/sets/{setCode}.svg";
     }
-
   }
 }

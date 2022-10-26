@@ -4,6 +4,8 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
 using MTG_builder;
+using MTGApplication.API;
+using App1.API;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -17,6 +19,7 @@ namespace MTGApplication
   {
     // Used for Dialogs
     public static FrameworkElement MainRoot { get; private set; }
+    public static MTGCardAPI CardAPI { get; private set; } = new ScryfallAPI();
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code

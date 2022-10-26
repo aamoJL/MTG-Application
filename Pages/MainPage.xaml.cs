@@ -10,13 +10,10 @@ using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace MTGApplication.Pages
 {
   /// <summary>
-  /// An empty page that can be used on its own or navigated to within a Frame.
+  /// Main Page
   /// </summary>
   public sealed partial class MainPage : Page
   {
@@ -44,8 +41,7 @@ namespace MTGApplication.Pages
       };
     }
 
-    // Hover image on MTGCardGridView
-    // TODO: show increase/decrease only on pointer hover
+    //TODO: Hover image on MTGCardGridView
 
     #region //----------------Card pointer events---------------//
     private void ScryfallCardName_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -72,14 +68,6 @@ namespace MTGApplication.Pages
     private void CardListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
     {
       PreviewImage.Visibility = Visibility.Collapsed;
-    }
-    private void ScryfallCard_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-      //pointerOverCard = true;
-    }
-    private void ScryfallCard_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-      //pointerOverCard = false;
     }
     #endregion
 

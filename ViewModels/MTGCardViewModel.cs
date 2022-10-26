@@ -2,7 +2,6 @@
 using MTGApplication.Models;
 using System.Windows.Input;
 using static MTGApplication.Models.MTGCardModel;
-using App1.API;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 
@@ -68,7 +67,7 @@ namespace MTGApplication.ViewModels
     [RelayCommand]
     public async Task OpenAPIWebsite()
     {
-      await ScryfallAPI.OpenAPICardWebsite(Model);
+      await App.CardAPI.OpenAPICardWebsite(Model);
     }
     [RelayCommand]
     public void IncreaseCount()
