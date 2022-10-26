@@ -26,6 +26,7 @@ namespace MTGApplication.ViewModels
     }
 
     private int selectedFaceIndex = 0;
+    private bool controlsVisible;
 
     private MTGCardModel Model { get; }
     public ImageSource SelectedFace => SelectedFaceIndex == 0 ? Model.FrontFaceImg : Model.BackFaceImg;
@@ -46,6 +47,15 @@ namespace MTGApplication.ViewModels
     public bool CanDecreaseCount
     {
       get => Count > 1;
+    }
+    public bool ControlsVisible
+    {
+      get => controlsVisible;
+      set
+      {
+        controlsVisible = value;
+        OnPropertyChanged(nameof(ControlsVisible));
+      }
     }
 
     public ICommand RemoveRequestCommand { get; set; }

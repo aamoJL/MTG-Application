@@ -14,7 +14,7 @@ namespace MTGApplication.Controls
       this.InitializeComponent();
       DisplayType = DisplayTypes.List;
       DesiredImageWidth = 250;
-      ControlsVisibility = Visibility.Visible;
+      InformationVisibility = Visibility.Visible;
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -68,14 +68,14 @@ namespace MTGApplication.Controls
         SetValue(DesiredImageWidthProperty, value);
       }
     }
-    public Visibility ControlsVisibility
+    public Visibility InformationVisibility
     {
-      get { return (Visibility)GetValue(HideControlsProperty); }
-      set { SetValue(HideControlsProperty, value); }
+      get {return (Visibility)GetValue(InformationVisibilityProperty);}
+      set { SetValue(InformationVisibilityProperty, value); }
     }
 
-    public static readonly DependencyProperty HideControlsProperty =
-        DependencyProperty.Register(nameof(ControlsVisibility), typeof(Visibility), typeof(MTGCardGridView), new PropertyMetadata(Visibility.Visible));
+    public static readonly DependencyProperty InformationVisibilityProperty =
+        DependencyProperty.Register(nameof(InformationVisibility), typeof(Visibility), typeof(MTGCardGridView), new PropertyMetadata(Visibility.Visible));
 
     public static readonly DependencyProperty DisplayTypeProperty =
         DependencyProperty.Register(nameof(DisplayType), typeof(DisplayTypes), typeof(MTGCardGridView), new PropertyMetadata(DisplayTypes.List));
@@ -85,5 +85,20 @@ namespace MTGApplication.Controls
 
     public static readonly DependencyProperty DesiredImageWidthProperty =
         DependencyProperty.Register(nameof(DesiredImageWidth), typeof(int), typeof(MTGCardGridView), new PropertyMetadata(250));
+
+    private void GridItem_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+      if (InformationVisibility == Visibility.Visible && (sender as FrameworkElement)?.DataContext is MTGCardViewModel item)
+      {
+        item.ControlsVisible = true;
+      }
+    }
+    private void GridItem_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+      if (InformationVisibility == Visibility.Visible && (sender as FrameworkElement)?.DataContext is MTGCardViewModel item)
+      {
+        item.ControlsVisible = false;
+      }
+    }
   }
 }

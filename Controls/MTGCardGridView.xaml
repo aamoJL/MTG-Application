@@ -7,7 +7,6 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:viewmodels="using:MTGApplication.ViewModels" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
   d:DataContext="{d:DesignInstance Type=viewmodels:MTGCardCollectionViewModel}"
   mc:Ignorable="d">
 
@@ -16,24 +15,24 @@
     <x:Double x:Key="GridViewItemMinHeight">20</x:Double>
 
     <DataTemplate x:Name="ImageTemplate" x:Key="MTGCardCollectionViewModelImageDisplayTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical">
+      <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="GridItem_PointerEntered" PointerExited="GridItem_PointerExited">
         <Image Source="{Binding SelectedFace}">
           <Image.ContextFlyout>
             <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
               <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
               <MenuFlyoutSeparator />
               <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
-              <MenuFlyoutSeparator Visibility="{Binding ElementName=Control, Path=ControlsVisibility, Mode=OneWay}" />
-              <MenuFlyoutItem Visibility="{Binding ElementName=Control, Path=ControlsVisibility, Mode=OneWay}" CommandParameter="{Binding}" Command="{Binding RemoveRequestCommand}" Icon="delete" Text="Delete"/>
+              <MenuFlyoutSeparator Visibility="{Binding ElementName=Control, Path=InformationVisibility, Mode=OneWay}" />
+              <MenuFlyoutItem Visibility="{Binding ElementName=Control, Path=InformationVisibility, Mode=OneWay}" CommandParameter="{Binding}" Command="{Binding RemoveRequestCommand}" Icon="delete" Text="Delete"/>
             </MenuFlyout>
           </Image.ContextFlyout>
         </Image>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding ElementName=Control, Path=ControlsVisibility, Mode=OneWay}">
-          <Button Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding ElementName=Control, Path=InformationVisibility, Mode=TwoWay}">
+          <Button Visibility="{Binding ControlsVisible}" Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}">
             <SymbolIcon Symbol="Back" />
           </Button>
           <TextBlock Text="{Binding Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="24"/>
-          <Button Command="{Binding IncreaseCountCommand}">
+          <Button Visibility="{Binding ControlsVisible}" Command="{Binding IncreaseCountCommand}">
             <SymbolIcon Symbol="Forward" />
           </Button>
         </StackPanel>
@@ -47,8 +46,8 @@
             <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
             <MenuFlyoutSeparator />
             <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
-            <MenuFlyoutSeparator Visibility="{Binding ElementName=Control, Path=ControlsVisibility, Mode=OneWay}" />
-            <MenuFlyoutItem Visibility="{Binding ElementName=Control, Path=ControlsVisibility, Mode=OneWay}" CommandParameter="{Binding}" Command="{Binding RemoveRequestCommand}" Icon="delete" Text="Delete"/>
+            <MenuFlyoutSeparator Visibility="{Binding ElementName=Control, Path=InformationVisibility, Mode=OneWay}" />
+            <MenuFlyoutItem Visibility="{Binding ElementName=Control, Path=InformationVisibility, Mode=OneWay}" CommandParameter="{Binding}" Command="{Binding RemoveRequestCommand}" Icon="delete" Text="Delete"/>
           </MenuFlyout>
         </StackPanel.ContextFlyout>
         <Image Width="20" Source="{Binding SetIcon}"/>
@@ -64,7 +63,6 @@
     SelectionMode="None"
     DesiredWidth="{x:Bind DesiredImageWidth, Mode=OneWay}"
     ItemsSource="{x:Bind ItemsSource}"
-    ItemTemplate="{x:Bind SelectedTemplate, Mode=OneWay}"
-    >
+    ItemTemplate="{x:Bind SelectedTemplate, Mode=OneWay}">
   </controls:AdaptiveGridView>
 </UserControl>

@@ -6,7 +6,6 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:local="using:MTGApplication" 
   xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
-  xmlns:viewmodels="using:MTGApplication.ViewModels" 
   xmlns:controls="using:MTGApplication.Controls" 
   xmlns:converters="using:MTGApplication.Converters"
   d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
@@ -15,20 +14,6 @@
 
   <Page.Resources>
     <converters:DoubleToIntConverter x:Key="DoubleToIntConverter"/>
-
-    <DataTemplate x:Key="MTGCardSearchViewModelTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel CornerRadius="10">
-        <Image Height="{Binding ElementName=ScryfallSearchSizeSlider, Path=Value}" Source="{Binding SelectedFace}">
-          <Image.ContextFlyout>
-            <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-              <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
-              <MenuFlyoutSeparator/>
-              <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
-            </MenuFlyout>
-          </Image.ContextFlyout>
-        </Image>
-      </StackPanel>
-    </DataTemplate>
   </Page.Resources>
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -164,7 +149,7 @@
           <controls:MTGCardGridView 
             ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}" 
             DisplayType="{x:Bind ViewModel.ScryfallCardViewModels.DisplayType, Mode=OneWay}"
-            ControlsVisibility="Collapsed"/>
+            InformationVisibility="Collapsed"/>
         </Grid>
       </Grid>
       <!--Collection-->

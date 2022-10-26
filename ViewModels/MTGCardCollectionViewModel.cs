@@ -212,7 +212,6 @@ namespace MTGApplication.ViewModels
     /// </summary>
     /// <param name="query">API query parameters</param>
     /// <returns></returns>
-    
     public async Task LoadFromAPIAsync(string query)
     {
       IsLoading = true;

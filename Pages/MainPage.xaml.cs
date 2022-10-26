@@ -44,6 +44,7 @@ namespace MTGApplication.Pages
       };
     }
 
+    // Hover image on MTGCardGridView
     // TODO: show increase/decrease only on pointer hover
 
     #region //----------------Card pointer events---------------//
