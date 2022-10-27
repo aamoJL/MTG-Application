@@ -4,6 +4,8 @@ using System.Windows.Input;
 using static MTGApplication.Models.MTGCardModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System;
 
 namespace MTGApplication.ViewModels
 {
@@ -28,8 +30,10 @@ namespace MTGApplication.ViewModels
     private bool controlsVisible;
 
     private MTGCardModel Model { get; }
-    public ImageSource SelectedFace => SelectedFaceIndex == 0 ? Model.FrontFaceImg : Model.BackFaceImg;
-    public ImageSource SetIcon => Model.SetIcon;
+    public ImageSource FrontFaceImg => new BitmapImage(new Uri(App.CardAPI.GetFaceUri(Model.Info.Id, false)));
+    public ImageSource BackFaceImg => Model.Info.CardFaces.Length == 2 ? new BitmapImage(new Uri(App.CardAPI.GetFaceUri(Model.Info.Id, true))) : null;
+    public ImageSource SetIcon => new SvgImageSource(new Uri(App.CardAPI.GetSetIconUri(Model.Info.SetCode)));
+    public ImageSource SelectedFace => SelectedFaceIndex == 0 ? FrontFaceImg : BackFaceImg;
     public int SelectedFaceIndex
     {
       get => selectedFaceIndex;
