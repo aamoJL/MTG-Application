@@ -5,15 +5,29 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
-  xmlns:controls="using:MTGApplication.Controls" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:converters="using:MTGApplication.Converters" 
   xmlns:viewmodels="using:MTGApplication.ViewModels"
-  d:DataContext="{d:DesignInstance Type=viewmodels:MainPageViewModel}"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Page.Resources>
     <converters:DoubleToIntConverter x:Key="DoubleToIntConverter"/>
+    <converters:DisplayTypeToVisibilityConverter x:Key="DisplayTypeToVisibilityConverter" />
+    <x:Double x:Key="ListViewItemMinHeight">25</x:Double>
+
+    <MenuFlyout x:Key="CardSearchItemFlyoutTemplate" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+      <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
+      <MenuFlyoutSeparator />
+      <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
+    </MenuFlyout>
+    <MenuFlyout x:Key="CardCollectionItemFlyoutTemplate" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+      <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
+      <MenuFlyoutSeparator />
+      <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
+      <MenuFlyoutSeparator />
+      <MenuFlyoutItem Command="{Binding RemoveRequestCommand}" CommandParameter="{Binding}" Icon="delete" Text="Delete"/>
+    </MenuFlyout>
   </Page.Resources>
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -119,7 +133,7 @@
             <AppBarButton Icon="ZoomIn" Label="Zoom">
               <AppBarButton.Flyout>
                 <Flyout>
-                  <Slider x:Name="ScryfallSearchSizeSlider" Header="Card size" Value="350" Width="200" HorizontalAlignment="Left" Maximum="500" Minimum="200" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside"/>
+                  <Slider x:Name="ScryfallSearchSizeSlider" Header="Card size" Value="250" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside"/>
                 </Flyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -146,10 +160,36 @@
         </StackPanel>
         <!--Scryfall Card view-->
         <Grid Grid.Row="2" BorderBrush="LightGray" BorderThickness="1" Background="white">
-          <controls:MTGCardGridView 
-            ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}" 
-            DisplayType="{x:Bind ViewModel.ScryfallCardViewModels.DisplayType, Mode=OneWay}"
-            InformationVisibility="Collapsed"/>
+          <controls:AdaptiveGridView
+            ItemContainerTransitions="{x:Null}"
+            SelectionMode="None"
+            DesiredWidth="{x:Bind ScryfallSearchSizeSlider.Value, Mode=OneWay}"
+            ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
+            Margin="10 10 5 10"
+            Visibility="{x:Bind ViewModel.ScryfallCardViewModels.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=Images}">
+            <controls:AdaptiveGridView.ItemTemplate>
+              <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical">
+                  <Image Source="{Binding SelectedFace}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" />
+                </StackPanel>
+              </DataTemplate>
+            </controls:AdaptiveGridView.ItemTemplate>
+          </controls:AdaptiveGridView>
+          <!--List view-->
+          <ListView
+            ItemContainerTransitions="{x:Null}"
+            SelectionMode="None"
+            ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
+            Visibility="{x:Bind ViewModel.ScryfallCardViewModels.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=List}">
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="5" Background="Transparent" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}">
+                  <Image Width="20" Source="{Binding SetIcon}"/>
+                  <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListView.ItemTemplate>
+          </ListView>
         </Grid>
       </Grid>
       <!--Collection-->
@@ -221,10 +261,45 @@
           </StackPanel>
           <!--Collection Grid View-->
           <Grid Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Background="White">
-            <controls:MTGCardGridView 
-              ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}" 
-              DisplayType="{x:Bind ViewModel.CollectionViewModel.DisplayType, Mode=OneWay}"
-              DesiredImageWidth="{x:Bind CollectionSizeSlider.Value, Converter={StaticResource DoubleToIntConverter}, Mode=OneWay}"/>
+            <controls:AdaptiveGridView
+              ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
+              ItemContainerTransitions="{x:Null}"
+              SelectionMode="None"
+              DesiredWidth="{x:Bind CollectionSizeSlider.Value, Mode=OneWay}"
+              Margin="10 10 5 10"
+              Visibility="{x:Bind ViewModel.CollectionViewModel.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=Images}">
+              <controls:AdaptiveGridView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                  <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
+                    <Image Source="{Binding SelectedFace}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                      <Button Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
+                        <SymbolIcon Symbol="Back" />
+                      </Button>
+                      <TextBlock Text="{Binding Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="24"/>
+                      <Button Command="{Binding IncreaseCountCommand}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
+                        <SymbolIcon Symbol="Forward" />
+                      </Button>
+                    </StackPanel>
+                  </StackPanel>
+                </DataTemplate>
+              </controls:AdaptiveGridView.ItemTemplate>
+            </controls:AdaptiveGridView>
+            <!--List View-->
+            <ListView
+              ItemContainerTransitions="{x:Null}"
+              SelectionMode="None"
+              ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
+              Visibility="{x:Bind ViewModel.CollectionViewModel.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=List}">
+              <ListView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                  <StackPanel Orientation="Horizontal" Spacing="5" Background="Transparent" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}">
+                    <Image Width="20" Source="{Binding SetIcon}"/>
+                    <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                  </StackPanel>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
           </Grid>
         </Grid>
         <!--Collection info content-->

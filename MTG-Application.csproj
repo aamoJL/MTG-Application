@@ -11,6 +11,7 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsPackageType>None</WindowsPackageType>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\ColorIcons\A.W.O.L..url" />
@@ -29,7 +30,6 @@
     <None Remove="Assets\ColorIcons\R.svg" />
     <None Remove="Assets\ColorIcons\U.svg" />
     <None Remove="Assets\ColorIcons\W.svg" />
-    <None Remove="Controls\MTGCardGridView.xaml" />
     <None Remove="Pages\MainPage.xaml" />
   </ItemGroup>
 
@@ -49,7 +49,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.514" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.220930.4-preview2" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25227-preview" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25231-preview" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -80,11 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Pages\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Controls\MTGCardGridView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

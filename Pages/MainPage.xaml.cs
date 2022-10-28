@@ -110,5 +110,21 @@ namespace MTGApplication.Pages
       }
     }
     #endregion
+
+    private void CollectionGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+      if((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      {
+        cardVM.ControlsVisible = true;
+      }
+    }
+
+    private void CollectionGridViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      {
+        cardVM.ControlsVisible = false;
+      }
+    }
   }
 }
