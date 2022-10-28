@@ -1,5 +1,4 @@
 ﻿using MTGApplication.Models;
-using MTG_builder;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,9 +6,8 @@ using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Windows.System;
-using MTGApplication.API;
 
-namespace App1.API
+namespace MTGApplication.API
 {
   /// <summary>
   /// Scryfall API calls and helper functions

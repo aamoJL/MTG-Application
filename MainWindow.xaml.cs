@@ -1,6 +1,4 @@
-﻿using MTGApplication.Models;
-using MTGApplication.ViewModels;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 
 namespace MTGApplication
 {

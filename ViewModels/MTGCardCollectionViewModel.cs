@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using MTG_builder;
 using System.Collections.Specialized;
 using MTGApplication.Charts;
 using MTGApplication.Models;
@@ -170,40 +169,45 @@ namespace MTGApplication.ViewModels
       IsLoading = true;
       Reset();
       Model.Rename(name);
-      var ids = JsonNode.Parse(IO.ReadTextFromFile(
+
+      try
+      {
+        var ids = JsonNode.Parse(IO.ReadTextFromFile(
         $"{IO.CollectionsPath}/{name}.json")).AsArray();
 
-      var IdObjects = ids.Select(x => new
-      {
-        Id = x["Id"].GetValue<string>(),
-        Count = x["Count"].GetValue<int>()
-      });
-
-      // Scryfall API allows to fetch only 75 cards at a time
-      foreach (var chunk in IdObjects.Chunk(75))
-      {
-        // Fetch cards in chunks
-        var identifiersJson = JsonSerializer.Serialize(new
+        var IdObjects = ids.Select(x => new
         {
-          identifiers = chunk.Select(x => new
-          {
-            id = x.Id
-          })
+          Id = x["Id"].GetValue<string>(),
+          Count = x["Count"].GetValue<int>()
         });
 
-        var cardCollection = await App.CardAPI.FetchCollection(identifiersJson);
-        foreach (var item in cardCollection)
+        // Scryfall API allows to fetch only 75 cards at a time
+        foreach (var chunk in IdObjects.Chunk(75))
         {
-          // Update counts to the fetched cards
-          item.Count = chunk.First(x => x.Id == item.Info.Id).Count;
+          // Fetch cards in chunks
+          var identifiersJson = JsonSerializer.Serialize(new
+          {
+            identifiers = chunk.Select(x => new
+            {
+              id = x.Id
+            })
+          });
 
-          Model.Add(item);
+          var cardCollection = await App.CardAPI.FetchCollection(identifiersJson);
+          foreach (var item in cardCollection)
+          {
+            // Update counts to the fetched cards
+            item.Count = chunk.First(x => x.Id == item.Info.Id).Count;
+
+            Model.Add(item);
+          }
         }
+        Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
+        HasUnsavedChanges = false;
+        HasFile = true;
       }
+      catch (Exception) { }
 
-      Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
-      HasUnsavedChanges = false;
-      HasFile = true;
       IsLoading = false;
     }
     /// <summary>

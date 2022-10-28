@@ -3,12 +3,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
-using MTG_builder;
 using MTGApplication.API;
-using App1.API;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace MTGApplication
 {

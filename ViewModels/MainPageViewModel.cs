@@ -1,14 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using MTG_builder;
-using MTGApplication.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication
+namespace MTGApplication.ViewModels
 {
-  public partial class MainWindowViewModel : ViewModelBase
+  public partial class MainPageViewModel : ViewModelBase
   {
-    public MainWindowViewModel() { }
+    public MainPageViewModel() { }
 
     public readonly MTGCardCollectionViewModel ScryfallCardViewModels = new(new());
     public readonly MTGCardCollectionViewModel CollectionViewModel = new(new());
@@ -182,7 +181,7 @@ namespace MTGApplication
         content: $"Deleting '{CollectionViewModel.Name}'. Are you sure?",
         noButtonText: string.Empty);
 
-      if(confirmed is true)
+      if (confirmed is true)
       {
         CollectionViewModel.DeleteDeckFile();
       }

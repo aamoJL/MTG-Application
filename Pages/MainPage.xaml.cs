@@ -17,7 +17,7 @@ namespace MTGApplication.Pages
   /// </summary>
   public sealed partial class MainPage : Page
   {
-    public MainWindowViewModel ViewModel = new();
+    public MainPageViewModel ViewModel = new();
 
     public MainPage()
     {
