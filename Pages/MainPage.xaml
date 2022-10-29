@@ -9,6 +9,7 @@
   xmlns:converters="using:MTGApplication.Converters" 
   xmlns:viewmodels="using:MTGApplication.ViewModels"
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -182,16 +183,8 @@
             <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
               <AppBarButton.Flyout>
                 <MenuFlyout>
-                  <RadioMenuFlyoutItem x:Name="CardSearchImagesCheck" Text="Images" GroupName="CardSearchDisplayCheck" IsChecked="True">
-                    <MenuFlyoutItem.Icon>
-                      <SymbolIcon Symbol="Pictures"/>
-                    </MenuFlyoutItem.Icon>
-                  </RadioMenuFlyoutItem>
-                  <RadioMenuFlyoutItem x:Name="CardSearchListCheck" Text="List" GroupName="CardSearchDisplayCheck">
-                    <MenuFlyoutItem.Icon>
-                      <SymbolIcon Symbol="List"/>
-                    </MenuFlyoutItem.Icon>
-                  </RadioMenuFlyoutItem>
+                  <RadioMenuFlyoutItem x:Name="CardSearchImagesCheck" Text="Images" GroupName="CardSearchDisplayCheck" IsChecked="True" Icon="{ui:SymbolIcon Symbol=Pictures}" />
+                  <RadioMenuFlyoutItem x:Name="CardSearchListCheck" Text="List" GroupName="CardSearchDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -281,16 +274,8 @@
               <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
                 <AppBarButton.Flyout>
                   <MenuFlyout>
-                    <RadioMenuFlyoutItem x:Name="CollectionImagesCheck" Text="Images" GroupName="CollectionDisplayCheck" IsChecked="True">
-                      <MenuFlyoutItem.Icon>
-                        <SymbolIcon Symbol="Pictures"/>
-                      </MenuFlyoutItem.Icon>
-                    </RadioMenuFlyoutItem>
-                    <RadioMenuFlyoutItem x:Name="CollectionListCheck" Text="List" GroupName="CollectionDisplayCheck">
-                      <MenuFlyoutItem.Icon>
-                        <SymbolIcon Symbol="List"/>
-                      </MenuFlyoutItem.Icon>
-                    </RadioMenuFlyoutItem>
+                    <RadioMenuFlyoutItem x:Name="CollectionImagesCheck" Text="Images" GroupName="CollectionDisplayCheck" IsChecked="True" Icon="{ui:SymbolIcon Symbol=Pictures}" />
+                    <RadioMenuFlyoutItem x:Name="CollectionListCheck" Text="List" GroupName="CollectionDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                   </MenuFlyout>
                 </AppBarButton.Flyout>
               </AppBarButton>
