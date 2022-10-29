@@ -213,9 +213,9 @@
             Visibility="Collapsed">
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical">
+                <Border CornerRadius="10">
                   <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" />
-                </StackPanel>
+                </Border>
               </DataTemplate>
             </controls:AdaptiveGridView.ItemTemplate>
           </controls:AdaptiveGridView>
@@ -326,7 +326,9 @@
               <controls:AdaptiveGridView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                   <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
-                    <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" />
+                    <Border CornerRadius="10">
+                      <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"/>
+                    </Border>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                       <Button x:Name="DecreaseButton" Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
                         <SymbolIcon Symbol="Back" />

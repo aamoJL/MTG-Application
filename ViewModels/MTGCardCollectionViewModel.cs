@@ -24,8 +24,6 @@ namespace MTGApplication.ViewModels
         new CMCChart(model.Cards),
         new SpellTypeChart(model.Cards)
       };
-
-      _ = LoadAsync("Ostoslista");
     }
 
     private MTGCardCollectionModel Model { get; }

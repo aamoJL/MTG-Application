@@ -85,9 +85,10 @@ namespace MTGApplication.API
     }
     public override async Task<bool> OpenAPICardWebsite(MTGCardModel card)
     {
-      // TODO: remove slashes from multi face card names
       // \u0027 = '
-      return await Launcher.LaunchUriAsync(new($"{WEB_URL}/card/{card.Info.SetCode}/{card.Info.CollectorNumber}/{card.Info.Name.Replace(' ', '-').Trim('\u0027')}?utm_source=api"));
+      return await Launcher.LaunchUriAsync(
+        new($"{WEB_URL}/card/{card.Info.SetCode}/{card.Info.CollectorNumber}/" +
+        $"{card.Info.Name.Replace(" // ", "-").Replace(' ', '-').Trim('\u0027')}?utm_source=api"));
     }
 
     public override MTGCardModel GetMTGCardModelFromJson(JsonNode cardObject)
