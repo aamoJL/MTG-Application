@@ -8,14 +8,16 @@
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:converters="using:MTGApplication.Converters" 
   xmlns:viewmodels="using:MTGApplication.ViewModels"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Page.Resources>
     <converters:DoubleToIntConverter x:Key="DoubleToIntConverter"/>
-    <converters:DisplayTypeToVisibilityConverter x:Key="DisplayTypeToVisibilityConverter" />
+    <!--Override list item height-->
     <x:Double x:Key="ListViewItemMinHeight">25</x:Double>
 
+    <!--List item flyouts-->
     <MenuFlyout x:Key="CardSearchItemFlyoutTemplate" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
       <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
       <MenuFlyoutSeparator />
@@ -31,6 +33,46 @@
   </Page.Resources>
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <VisualStateManager.VisualStateGroups>
+      <!--Card List States-->
+      <VisualStateGroup x:Name="CollectionDisplayStates">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{Binding ElementName=CollectionImagesCheck, Path=IsChecked, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="CollectionImagesDisplay.Visibility" Value="Visible"/>
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{Binding ElementName=CollectionListCheck, Path=IsChecked, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="CollectionListDisplay.Visibility" Value="Visible"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+      <VisualStateGroup x:Name="CardSearchDisplayStates">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{Binding ElementName=CardSearchImagesCheck, Path=IsChecked, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="CardSearchImagesDisplay.Visibility" Value="Visible"/>
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{Binding ElementName=CardSearchListCheck, Path=IsChecked, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="CardSearchListDisplay.Visibility" Value="Visible"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    
     <Grid Margin="10 10 10 10" ColumnSpacing="10">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*"/>
@@ -140,16 +182,16 @@
             <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
               <AppBarButton.Flyout>
                 <MenuFlyout>
-                  <MenuFlyoutItem Text="Images" Command="{x:Bind ViewModel.ScryfallCardViewModels.ChangeDisplayTypeCommand}" CommandParameter="Images">
+                  <RadioMenuFlyoutItem x:Name="CardSearchImagesCheck" Text="Images" GroupName="CardSearchDisplayCheck" IsChecked="True">
                     <MenuFlyoutItem.Icon>
                       <SymbolIcon Symbol="Pictures"/>
                     </MenuFlyoutItem.Icon>
-                  </MenuFlyoutItem>
-                  <MenuFlyoutItem Text="List" Command="{x:Bind ViewModel.ScryfallCardViewModels.ChangeDisplayTypeCommand}" CommandParameter="List">
+                  </RadioMenuFlyoutItem>
+                  <RadioMenuFlyoutItem x:Name="CardSearchListCheck" Text="List" GroupName="CardSearchDisplayCheck">
                     <MenuFlyoutItem.Icon>
                       <SymbolIcon Symbol="List"/>
                     </MenuFlyoutItem.Icon>
-                  </MenuFlyoutItem>
+                  </RadioMenuFlyoutItem>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -161,29 +203,40 @@
         <!--Scryfall Card view-->
         <Grid Grid.Row="2" BorderBrush="LightGray" BorderThickness="1" Background="white">
           <controls:AdaptiveGridView
+            x:Name="CardSearchImagesDisplay"
             ItemContainerTransitions="{x:Null}"
             SelectionMode="None"
+            StretchContentForSingleRow="False"
             DesiredWidth="{x:Bind ScryfallSearchSizeSlider.Value, Mode=OneWay}"
             ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
             Margin="10 10 5 10"
-            Visibility="{x:Bind ViewModel.ScryfallCardViewModels.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=Images}">
+            Visibility="Collapsed">
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical">
-                  <Image Source="{Binding SelectedFace}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" />
+                  <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" />
                 </StackPanel>
               </DataTemplate>
             </controls:AdaptiveGridView.ItemTemplate>
           </controls:AdaptiveGridView>
           <!--List view-->
           <ListView
+            x:Name="CardSearchListDisplay"
             ItemContainerTransitions="{x:Null}"
             SelectionMode="None"
             ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
-            Visibility="{x:Bind ViewModel.ScryfallCardViewModels.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=List}">
+            Visibility="Collapsed">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                <StackPanel Orientation="Horizontal" Spacing="5" Background="Transparent" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}">
+                <StackPanel 
+                  Orientation="Horizontal" 
+                  Spacing="5" 
+                  Background="Transparent" 
+                  ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}"
+                  Height="25"
+                  PointerEntered="CollectionListViewItem_PointerEntered"
+                  PointerExited="CollectionListViewItem_PointerExited"
+                  PointerMoved="CollecitonListViewItem_PointerMoved">
                   <Image Width="20" Source="{Binding SetIcon}"/>
                   <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
                 </StackPanel>
@@ -228,16 +281,16 @@
               <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
                 <AppBarButton.Flyout>
                   <MenuFlyout>
-                    <MenuFlyoutItem Text="Images" Command="{x:Bind ViewModel.CollectionViewModel.ChangeDisplayTypeCommand}" CommandParameter="Images">
+                    <RadioMenuFlyoutItem x:Name="CollectionImagesCheck" Text="Images" GroupName="CollectionDisplayCheck" IsChecked="True">
                       <MenuFlyoutItem.Icon>
                         <SymbolIcon Symbol="Pictures"/>
                       </MenuFlyoutItem.Icon>
-                    </MenuFlyoutItem>
-                    <MenuFlyoutItem Text="List" Command="{x:Bind ViewModel.CollectionViewModel.ChangeDisplayTypeCommand}" CommandParameter="List">
+                    </RadioMenuFlyoutItem>
+                    <RadioMenuFlyoutItem x:Name="CollectionListCheck" Text="List" GroupName="CollectionDisplayCheck">
                       <MenuFlyoutItem.Icon>
                         <SymbolIcon Symbol="List"/>
                       </MenuFlyoutItem.Icon>
-                    </MenuFlyoutItem>
+                    </RadioMenuFlyoutItem>
                   </MenuFlyout>
                 </AppBarButton.Flyout>
               </AppBarButton>
@@ -262,18 +315,20 @@
           <!--Collection Grid View-->
           <Grid Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Background="White">
             <controls:AdaptiveGridView
+              x:Name="CollectionImagesDisplay"
               ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
+              StretchContentForSingleRow="False"
               ItemContainerTransitions="{x:Null}"
               SelectionMode="None"
               DesiredWidth="{x:Bind CollectionSizeSlider.Value, Mode=OneWay}"
               Margin="10 10 5 10"
-              Visibility="{x:Bind ViewModel.CollectionViewModel.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=Images}">
+              Visibility="Collapsed">
               <controls:AdaptiveGridView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                   <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
-                    <Image Source="{Binding SelectedFace}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" />
+                    <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                      <Button Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
+                      <Button x:Name="DecreaseButton" Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
                         <SymbolIcon Symbol="Back" />
                       </Button>
                       <TextBlock Text="{Binding Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="24"/>
@@ -287,13 +342,22 @@
             </controls:AdaptiveGridView>
             <!--List View-->
             <ListView
+              x:Name="CollectionListDisplay"
               ItemContainerTransitions="{x:Null}"
               SelectionMode="None"
               ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
-              Visibility="{x:Bind ViewModel.CollectionViewModel.DisplayType, Mode=OneWay, Converter={StaticResource DisplayTypeToVisibilityConverter}, ConverterParameter=List}">
+              Visibility="Collapsed">
               <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                  <StackPanel Orientation="Horizontal" Spacing="5" Background="Transparent" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}">
+                  <StackPanel 
+                    Height="25"
+                    Orientation="Horizontal" 
+                    Spacing="5" 
+                    Background="Transparent" 
+                    ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
+                    PointerEntered="CollectionListViewItem_PointerEntered"
+                    PointerExited="CollectionListViewItem_PointerExited"
+                    PointerMoved="CollecitonListViewItem_PointerMoved">
                     <Image Width="20" Source="{Binding SetIcon}"/>
                     <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
                   </StackPanel>
@@ -325,7 +389,7 @@
       </Grid>
     </Grid>
     <Canvas>
-      <Image DataContext="{x:Bind ViewModel, Mode=TwoWay}" x:Name="PreviewImage" Visibility="Collapsed" Height="350" IsHitTestVisible="False" Source="{Binding PreviewCardViewModel.SelectedFace}"/>
+      <Image x:Name="PreviewImage" Visibility="Collapsed"  Height="350" IsHitTestVisible="False"/>
     </Canvas>
   </Grid>
 </Page>

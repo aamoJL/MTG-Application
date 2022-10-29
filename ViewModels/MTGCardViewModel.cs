@@ -1,11 +1,8 @@
-﻿using Microsoft.UI.Xaml.Media;
-using MTGApplication.Models;
+﻿using MTGApplication.Models;
 using System.Windows.Input;
 using static MTGApplication.Models.MTGCardModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Xaml.Media.Imaging;
-using System;
 
 namespace MTGApplication.ViewModels
 {
@@ -30,18 +27,19 @@ namespace MTGApplication.ViewModels
     private bool controlsVisible;
 
     private MTGCardModel Model { get; }
-    public ImageSource FrontFaceImg => new BitmapImage(new Uri(App.CardAPI.GetFaceUri(Model.Info.Id, false)));
-    public ImageSource BackFaceImg => Model.Info.CardFaces.Length == 2 ? new BitmapImage(new Uri(App.CardAPI.GetFaceUri(Model.Info.Id, true))) : null;
-    public ImageSource SetIcon => new SvgImageSource(new Uri(App.CardAPI.GetSetIconUri(Model.Info.SetCode)));
-    public ImageSource SelectedFace => SelectedFaceIndex == 0 ? FrontFaceImg : BackFaceImg;
+    public string FrontFaceImg => App.CardAPI.GetFaceUri(Model.Info.Id, false);
+    public string BackFaceImg => Model.Info.CardFaces.Length == 2 ? App.CardAPI.GetFaceUri(Model.Info.Id, true) : null;
+    public string SetIcon => App.CardAPI.GetSetIconUri(Model.Info.SetCode);
+    public string SelectedFaceUri => selectedFaceIndex == 0 ? FrontFaceImg : BackFaceImg;
     public int SelectedFaceIndex
     {
       get => selectedFaceIndex;
       set
       {
+        if(value > 0 && !HasBackFace) { value = 0; }
         selectedFaceIndex = value;
         OnPropertyChanged(nameof(SelectedFaceIndex));
-        OnPropertyChanged(nameof(SelectedFace));
+        OnPropertyChanged(nameof(SelectedFaceUri));
       }
     }
     public int Count => Model.Count;

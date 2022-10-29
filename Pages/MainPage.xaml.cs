@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
@@ -41,33 +42,45 @@ namespace MTGApplication.Pages
       };
     }
 
-    //TODO: Hover image on MTGCardGridView
-
     #region //----------------Card pointer events---------------//
-    private void ScryfallCardName_PointerEntered(object sender, PointerRoutedEventArgs e)
+    // -----------List view
+    private void CollectionListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
       // Change card preview image to hovered item
-      PreviewImage.Visibility = Visibility.Visible;
-      FrameworkElement ListElement = sender as FrameworkElement;
-      if (ListElement != null)
+      if((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
       {
-        MTGCardViewModel cardViewModel = ListElement.DataContext as MTGCardViewModel;
-        ViewModel.PreviewCardViewModel = cardViewModel;
+        PreviewImage.Visibility = Visibility.Visible;
+        PreviewImage.Source = new BitmapImage(new(cardVM.SelectedFaceUri));
       }
     }
-    private void CardListView_PointerMoved(object sender, PointerRoutedEventArgs e)
+    private void CollecitonListViewItem_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
       // Move card preview image to mouse position when hovering over on list view item.
-      // Position is clamped to window size
-      Point offset = new(50, -100);
-      Point pointerPosition = e.GetCurrentPoint(null).Position;
-      //Rect windowBounds = this.Bounds;
-      //PreviewImage.SetValue(Canvas.LeftProperty, Math.Clamp(pointerPosition.X + offset.X, 0, windowBounds.Width - PreviewImage.ActualWidth));
-      //PreviewImage.SetValue(Canvas.TopProperty, Math.Clamp(pointerPosition.Y + offset.Y, 0, windowBounds.Height - PreviewImage.ActualHeight));
+      // The position is clamped to window size
+      var offset = new Point(50, -100);
+      var pointerPosition = e.GetCurrentPoint(null).Position;
+      var windowBounds = ActualSize;
+      PreviewImage.SetValue(Canvas.LeftProperty, Math.Clamp(pointerPosition.X + offset.X, 0, windowBounds.X - PreviewImage.ActualWidth));
+      PreviewImage.SetValue(Canvas.TopProperty, Math.Clamp(pointerPosition.Y + offset.Y, 0, windowBounds.Y - PreviewImage.ActualHeight));
     }
-    private void CardListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
+    private void CollectionListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
     {
       PreviewImage.Visibility = Visibility.Collapsed;
+    }
+    // -----------Grid view
+    private void CollectionGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+      if((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      {
+        cardVM.ControlsVisible = true;
+      }
+    }
+    private void CollectionGridViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      {
+        cardVM.ControlsVisible = false;
+      }
     }
     #endregion
 
@@ -111,20 +124,5 @@ namespace MTGApplication.Pages
     }
     #endregion
 
-    private void CollectionGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-      if((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
-      {
-        cardVM.ControlsVisible = true;
-      }
-    }
-
-    private void CollectionGridViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
-      {
-        cardVM.ControlsVisible = false;
-      }
-    }
   }
 }
