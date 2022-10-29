@@ -64,6 +64,17 @@ namespace MTGApplication
         return "";
       }
     }
+    public static async Task<string> ReadTextFromFileAsync(string path)
+    {
+      try
+      {
+        return await File.ReadAllTextAsync(path);
+      }
+      catch (Exception)
+      {
+        return "";
+      }
+    }
     /// <summary>
     /// Deletes file from path
     /// </summary>

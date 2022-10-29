@@ -10,6 +10,8 @@ using System;
 using static MTGApplication.Models.MTGCardCollectionModel;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
 
 namespace MTGApplication.ViewModels
 {
@@ -143,12 +145,11 @@ namespace MTGApplication.ViewModels
     {
       IsLoading = true;
       Reset();
-      Model.Rename(name);
 
       try
       {
-        var ids = JsonNode.Parse(IO.ReadTextFromFile(
-        $"{IO.CollectionsPath}/{name}.json")).AsArray();
+        var jsonString = await IO.ReadTextFromFileAsync($"{IO.CollectionsPath}/{name}.json");
+        var ids = JsonNode.Parse(jsonString).AsArray();
 
         var IdObjects = ids.Select(x => new
         {
@@ -156,27 +157,35 @@ namespace MTGApplication.ViewModels
           Count = x["Count"].GetValue<int>()
         });
 
-        // Scryfall API allows to fetch only 75 cards at a time
+        //Scryfall API allows to fetch only 75 cards at a time
         foreach (var chunk in IdObjects.Chunk(75))
         {
           // Fetch cards in chunks
-          var identifiersJson = JsonSerializer.Serialize(new
-          {
-            identifiers = chunk.Select(x => new
-            {
-              id = x.Id
-            })
-          });
 
-          var cardCollection = await App.CardAPI.FetchCollection(identifiersJson);
+          var identifiersJson = string.Empty;
+
+          using (var stream = new MemoryStream())
+          {
+            await JsonSerializer.SerializeAsync(stream, new {
+              identifiers = chunk.Select(x => new
+              {
+                id = x.Id
+              })
+            });
+            stream.Position = 0;
+            using var reader = new StreamReader(stream);
+            identifiersJson = await reader.ReadToEndAsync();
+          }
+
+          var cardCollection = await App.CardAPI.FetchCollectionAsync(identifiersJson);
           foreach (var item in cardCollection)
           {
             // Update counts to the fetched cards
             item.Count = chunk.First(x => x.Id == item.Info.Id).Count;
-
             Model.Add(item);
           }
         }
+        Model.Rename(name);
         Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
         HasUnsavedChanges = false;
         HasFile = true;

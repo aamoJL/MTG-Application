@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI.Controls;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -94,7 +95,6 @@ namespace MTGApplication.ViewModels
     [RelayCommand]
     public async Task OpenCollectionDialog()
     {
-      // TODO: dont block UI. Loading ring does not work
       if (CollectionViewModel.HasUnsavedChanges)
       {
         // Collection has unsaved changes

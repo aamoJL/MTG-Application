@@ -65,7 +65,7 @@ namespace MTGApplication.API
     /// </summary>
     /// <param name="identifiersJson">List of card identifiers. Maximum lenght is 75 cards. The list must be in JSON format.</param>
     /// <returns></returns>
-    public override async Task<List<MTGCardModel>> FetchCollection(string identifiersJson)
+    public override async Task<List<MTGCardModel>> FetchCollectionAsync(string identifiersJson)
     {
       List<MTGCardModel> cards = new();
       var fetchResult = await IO.FetchStringFromURLPost($"{API_URL}/cards/collection", identifiersJson);
@@ -104,8 +104,7 @@ namespace MTGApplication.API
       var setName = cardObject["set_name"].GetValue<string>();
       var collectorNumber = cardObject["collector_number"].GetValue<string>();
 
-      var price = 0f;
-      float.TryParse(cardObject["prices"]["eur"]?.GetValue<string>(), out price);
+      _ = float.TryParse(cardObject["prices"]["eur"]?.GetValue<string>(), out float price);
 
       // https://scryfall.com/docs/api/layouts
       var twoFaceLayouts = new string[] { "transform", "modal_dfc", "double_faced_token", "art_series", "reversible_card" };

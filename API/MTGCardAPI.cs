@@ -12,7 +12,7 @@ namespace MTGApplication.API
   public abstract class MTGCardAPI
   {
     public abstract Task<ObservableCollection<MTGCardModel>> FetchCards(string searchParams, int pageLimit = 3);
-    public abstract Task<List<MTGCardModel>> FetchCollection(string identifiersJson);
+    public abstract Task<List<MTGCardModel>> FetchCollectionAsync(string identifiersJson);
     public abstract Task<bool> OpenAPICardWebsite(MTGCardModel card);
 
     public abstract MTGCardModel GetMTGCardModelFromJson(JsonNode cardObject);
