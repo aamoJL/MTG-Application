@@ -1,7 +1,6 @@
 ﻿using MTGApplication.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -26,9 +25,9 @@ namespace MTGApplication.API
     /// <param name="searchParams">Scryfall API search parameters</param>
     /// <param name="pageLimit">Maximum page count to fetch the cards, one page has 175 cards</param>
     /// <returns></returns>
-    public override async Task<ObservableCollection<MTGCardModel>> FetchCards(string searchParams, int pageLimit)
+    public override async Task<MTGCardModel[]> FetchCards(string searchParams, int pageLimit)
     {
-      ObservableCollection<MTGCardModel> cards = new();
+      List<MTGCardModel> cards = new();
 
       string searchUri = $"{API_URL}/cards/search?q={searchParams}+game:paper";
       var pageCount = 1;
@@ -58,14 +57,14 @@ namespace MTGApplication.API
         else { break; }
       }
 
-      return cards;
+      return cards.ToArray();
     }
     /// <summary>
     /// Fetches maximum of 75 MTGCardModel objects of the given identifiers using Scryfall API
     /// </summary>
     /// <param name="identifiersJson">List of card identifiers. Maximum lenght is 75 cards. The list must be in JSON format.</param>
     /// <returns></returns>
-    public override async Task<List<MTGCardModel>> FetchCollectionAsync(string identifiersJson)
+    public override async Task<MTGCardModel[]> FetchCollectionAsync(string identifiersJson)
     {
       List<MTGCardModel> cards = new();
       var fetchResult = await IO.FetchStringFromURLPost($"{API_URL}/cards/collection", identifiersJson);
@@ -81,7 +80,7 @@ namespace MTGApplication.API
         }
       }
 
-      return cards;
+      return cards.ToArray();
     }
     public override async Task<bool> OpenAPICardWebsite(MTGCardModel card)
     {

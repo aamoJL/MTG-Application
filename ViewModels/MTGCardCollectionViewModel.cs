@@ -10,7 +10,6 @@ using System;
 using static MTGApplication.Models.MTGCardCollectionModel;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.IO;
 
 namespace MTGApplication.ViewModels
@@ -46,8 +45,8 @@ namespace MTGApplication.ViewModels
         OnPropertyChanged(nameof(CanSave));
       }
     }
-    public SortProperty CollectionSortProperty { get; private set; } = SortProperty.Name;
-    public SortDirection CollectionSortDirection { get; private set; } = SortDirection.ASC;
+    public SortProperty CollectionSortProperty { get; set; } = SortProperty.Name;
+    public SortDirection CollectionSortDirection { get; set; } = SortDirection.ASC;
     public bool HasUnsavedChanges { get; private set; }
     public bool HasFile
     {
@@ -75,11 +74,11 @@ namespace MTGApplication.ViewModels
     }
 
     [RelayCommand]
-    public void AddAndSort(MTGCardModel model)
+    public void AddAndSort(MTGCardModel newModel)
     {
-      // TODO: insert instead of adding and sorting the whole collection
-      Model.Add(model);
+      Model.Add(newModel);
       Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
+
       HasUnsavedChanges = true;
     }
     [RelayCommand]
@@ -206,10 +205,9 @@ namespace MTGApplication.ViewModels
       if (query != "")
       {
         var cards = await App.CardAPI.FetchCards(query);
-        foreach (MTGCardModel card in cards)
+        foreach (var item in cards)
         {
-          Model.Add(card);
-          // TODO: dont sort, add range
+          Model.Add(item);
         }
       }
       HasUnsavedChanges = false;
