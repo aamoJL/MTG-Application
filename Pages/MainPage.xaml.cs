@@ -85,25 +85,22 @@ namespace MTGApplication.Pages
     #endregion
 
     #region //--------------------- Drag & Drop -----------------------------//
-    private void CardGridView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
+    private void CollectionView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
-      MTGCardViewModel viewModel = (e.Items[0] as MTGCardViewModel);
-      if (viewModel != null)
+      if (e.Items[0] is MTGCardViewModel viewModel)
       {
         e.Data.SetText(viewModel.ModelToJSON());
         e.Data.RequestedOperation = DataPackageOperation.Copy;
       }
     }
-
-    private void CollectionListView_DragOver(object sender, DragEventArgs e)
+    private void CollectionView_DragOver(object sender, DragEventArgs e)
     {
       if (e.DataView.Contains(StandardDataFormats.Text))
       {
         e.AcceptedOperation = DataPackageOperation.Copy;
       }
     }
-
-    private async void CollectionListView_Drop(object sender, DragEventArgs e)
+    private async void CollectionView_Drop(object sender, DragEventArgs e)
     {
       if (e.DataView.Contains(StandardDataFormats.Text))
       {
@@ -118,7 +115,6 @@ namespace MTGApplication.Pages
         }
         catch (Exception) { }
 
-        e.AcceptedOperation = DataPackageOperation.Copy;
         def.Complete();
       }
     }

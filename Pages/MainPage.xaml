@@ -170,7 +170,7 @@
             <SymbolIcon Symbol="Find"/>
           </Button>
         </Grid>
-        <!--Scryfall Card view controlbar-->
+        <!--Scryfall controlbar-->
         <StackPanel Orientation="Horizontal" Grid.Row="1">
           <CommandBar Background="Transparent" IsOpen="False" DefaultLabelPosition="Right" HorizontalAlignment="Left">
             <AppBarButton Icon="ZoomIn" Label="Zoom">
@@ -203,7 +203,9 @@
             DesiredWidth="{x:Bind ScryfallSearchSizeSlider.Value, Mode=OneWay}"
             ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
             Margin="10 10 5 10"
-            Visibility="Collapsed">
+            Visibility="Collapsed"
+            CanDragItems="True"
+            DragItemsStarting="CollectionView_DragItemsStarting">
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <Border CornerRadius="10">
@@ -218,7 +220,9 @@
             ItemContainerTransitions="{x:Null}"
             SelectionMode="None"
             ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
-            Visibility="Collapsed">
+            Visibility="Collapsed"
+            CanDragItems="True"
+            DragItemsStarting="CollectionView_DragItemsStarting">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel 
@@ -307,7 +311,10 @@
               SelectionMode="None"
               DesiredWidth="{x:Bind CollectionSizeSlider.Value, Mode=OneWay}"
               Margin="10 10 5 10"
-              Visibility="Collapsed">
+              Visibility="Collapsed"
+              AllowDrop="True"
+              DragOver="CollectionView_DragOver"
+              Drop="CollectionView_Drop">
               <controls:AdaptiveGridView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                   <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
@@ -333,7 +340,10 @@
               ItemContainerTransitions="{x:Null}"
               SelectionMode="None"
               ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
-              Visibility="Collapsed">
+              Visibility="Collapsed"
+              AllowDrop="True"
+              DragOver="CollectionView_DragOver"
+              Drop="CollectionView_Drop">
               <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                   <StackPanel 
