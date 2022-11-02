@@ -77,7 +77,7 @@
         </VisualState>
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
-    
+
     <Grid ColumnSpacing="16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" MinWidth="550"/>
@@ -257,7 +257,10 @@
                   <MenuFlyoutItem Command="{x:Bind ViewModel.ResetCollectionDialogCommand}" Icon="NewFolder" Text="New"/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCollectionDialogCommand}" Icon="OpenFile" Text="Open..."/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.SaveCollectionDialogCommand}" IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}" Icon="Save" Text="Save..."/>
-                  <MenuFlyoutSeparator />
+                  <MenuFlyoutSeparator/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import..."/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export..." IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}"/>
+                  <MenuFlyoutSeparator/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteCollectionDialogCommand}" IsEnabled="{x:Bind helpers:Comparison.NotNullOrEmpty(ViewModel.CollectionViewModel.Name), Mode=OneWay}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
@@ -396,5 +399,12 @@
     <Canvas>
       <Image x:Name="PreviewImage" Visibility="Collapsed"  Height="350" IsHitTestVisible="False"/>
     </Canvas>
+    <controls:InAppNotification 
+      x:Name="PopupAppNotification"
+      ShowDismissButton="True"
+      AnimationDuration="00:00:00.0400000"
+      VerticalOffset="100"
+      HorizontalOffset="0"
+      StackMode="Replace"/>
   </Grid>
 </Page>

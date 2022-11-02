@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication
 {
@@ -20,6 +21,17 @@ namespace MTGApplication
     {
       _ = Directory.CreateDirectory(CollectionsPath);
     }
+
+    #region//--------------Clipboard----------//
+    public static void CopyToClipboard(string text)
+    {
+      DataPackage dataPackage = new();
+      dataPackage.SetText(text);
+      Clipboard.SetContent(dataPackage);
+
+      Notifications.RaiseCopied(text);
+    }
+    #endregion
 
     #region//-----------------File-------------------//
     /// <summary>

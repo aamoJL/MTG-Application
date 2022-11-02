@@ -66,13 +66,53 @@ namespace MTGApplication
       {
         AcceptsReturn = false,
         Text = defaultText,
-        SelectionStart = defaultText.Length
+        SelectionStart = defaultText.Length,
       };
       var dialog = new ContentDialog
       {
         Content = inputTextBox,
         Title = title,
         IsSecondaryButtonEnabled = true,
+        PrimaryButtonText = okButtonText,
+        SecondaryButtonText = cancelButtonText,
+        XamlRoot = element.XamlRoot,
+        RequestedTheme = element.ActualTheme,
+        DefaultButton = ContentDialogButton.Primary
+      };
+
+      if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+      {
+        return inputTextBox.Text;
+      }
+      else
+      {
+        return string.Empty;
+      }
+    }
+
+    public static async Task<string> TextAreaInputDialogAsync(
+     this FrameworkElement element,
+     string title,
+     string inputPlaceholder = "",
+     string inputHeader = null,
+     string defaultText = "",
+     string okButtonText = "OK",
+     string cancelButtonText = "Cancel")
+    {
+      var inputTextBox = new TextBox
+      {
+        PlaceholderText = inputPlaceholder,
+        IsSpellCheckEnabled = false,
+        Header = inputHeader,
+        AcceptsReturn = true,
+        Text = defaultText,
+        Height = 600,
+        Width = 800,
+      };
+      var dialog = new ContentDialog
+      {
+        Content = inputTextBox,
+        Title = title,
         PrimaryButtonText = okButtonText,
         SecondaryButtonText = cancelButtonText,
         XamlRoot = element.XamlRoot,
@@ -124,5 +164,14 @@ namespace MTGApplication
         return string.Empty;
       }
     }
+  }
+
+  public static class Notifications
+  {
+    public static event EventHandler<string> OnCopied;
+    public static event EventHandler<string> OnError;
+
+    public static void RaiseCopied(string text) => OnCopied?.Invoke(null, text);
+    public static void RaiseError(string text) => OnError?.Invoke(null, text);
   }
 }

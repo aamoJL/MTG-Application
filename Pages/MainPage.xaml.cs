@@ -18,6 +18,8 @@ namespace MTGApplication.Pages
   /// </summary>
   public sealed partial class MainPage : Page
   {
+    private int notificationDuration = 3000;
+
     public MainPageViewModel ViewModel = new();
 
     public MainPage()
@@ -40,7 +42,23 @@ namespace MTGApplication.Pages
           TextSize = 10
         }
       };
+
+      PopupAppNotification.XamlRoot = this.XamlRoot;
+      Notifications.OnCopied += Notifications_OnCopied;
+      Notifications.OnError += Notifications_OnError;
     }
+
+
+    #region Notifications
+    private void Notifications_OnError(object sender, string error)
+    {
+      PopupAppNotification.Show(error, notificationDuration);
+    }
+    private void Notifications_OnCopied(object sender, string e)
+    {
+      PopupAppNotification.Show("Copied", notificationDuration);
+    }
+    #endregion
 
     #region //----------------Card pointer events---------------//
     // -----------List view

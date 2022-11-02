@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI.Controls;
 using MTGApplication.Charts;
 using System;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MTGApplication.ViewModels
@@ -193,6 +192,38 @@ namespace MTGApplication.ViewModels
       if (confirmed is true)
       {
         CollectionViewModel.DeleteDeckFile();
+      }
+    }
+    [RelayCommand]
+    public async Task ImportCollectionDialog()
+    {
+      var response = await App.MainRoot.TextAreaInputDialogAsync(
+            title: "Import cards",
+            inputPlaceholder: "Example:\n2 Black Lotus\nMox Ruby",
+            okButtonText: "Add to Collection");
+
+      if (!string.IsNullOrEmpty(response))
+      {
+        await CollectionViewModel.ImportFromString(response);
+      }
+    }
+    [RelayCommand]
+    public async Task ExportCollectionDialog()
+    {
+      StringBuilder stringBuilder = new();
+      foreach (var item in CollectionViewModel.CardModels)
+      {
+        stringBuilder.AppendLine($"{item.Count} {item.Info.Name}");
+      }
+
+      var response = await App.MainRoot.TextAreaInputDialogAsync(
+            title: "Export deck",
+            defaultText: stringBuilder.ToString(),
+            okButtonText: "Copy to Clipboard");
+
+      if (!string.IsNullOrEmpty(response))
+      {
+        IO.CopyToClipboard(response);
       }
     }
   }

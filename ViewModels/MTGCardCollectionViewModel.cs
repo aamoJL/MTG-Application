@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace MTGApplication.ViewModels
 {
@@ -122,7 +123,6 @@ namespace MTGApplication.ViewModels
         foreach (var chunk in IdObjects.Chunk(75))
         {
           // Fetch cards in chunks
-
           var identifiersJson = string.Empty;
 
           using (var stream = new MemoryStream())
@@ -174,13 +174,69 @@ namespace MTGApplication.ViewModels
       HasUnsavedChanges = false;
       IsLoading = false;
     }
+    /// <summary>
+    /// Imports cards from formatted text.
+    /// <code>Format example:
+    /// 4 Black Lotus
+    /// Mox Ruby</code>
+    /// </summary>
+    public async Task ImportFromString(string text)
+    {
+      var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+      var IdObjects = lines.Select(line =>
+      {
+        var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
+        var match = regexGroups.Match(line);
+
+        var countMatch = match.Groups["Count"]?.Value;
+        var nameMatch = match.Groups["Name"]?.Value;
+
+        if (string.IsNullOrEmpty(nameMatch)) { return null; }
+
+        return new
+        {
+          Count = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+          Name = nameMatch,
+        };
+      });
+
+      foreach (var chunk in IdObjects.Chunk(75))
+      {
+        // Fetch cards in chunks
+        var identifiersJson = string.Empty;
+
+        using (var stream = new MemoryStream())
+        {
+          await JsonSerializer.SerializeAsync(stream, new
+          {
+            identifiers = chunk.Select(x => new
+            {
+              name = x.Name
+            })
+          });
+          stream.Position = 0;
+          using var reader = new StreamReader(stream);
+          identifiersJson = await reader.ReadToEndAsync();
+        }
+
+        var newCards = await App.CardAPI.FetchCollectionAsync(identifiersJson);
+        foreach (var item in newCards)
+        {
+          // Update counts to the fetched cards
+          var found = chunk.FirstOrDefault(x => item.Info.Name.Contains(x.Name));
+          if(found != null) item.Count = found.Count;
+          Model.Add(item);
+        }
+      }
+    }
 
     private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       switch (e.PropertyName)
       {
         case nameof(Model.Name): OnPropertyChanged(nameof(Name)); break;
-        case nameof(Model.Cards): OnPropertyChanged(nameof(Name)); break;
+        case nameof(Model.Cards): OnPropertyChanged(nameof(CardModels)); break;
         case nameof(Model.TotalCount):
           if(SelectedSortProperty == SortProperty.Count) { Model.SortCollection(SelectedSortDirection, SelectedSortProperty); }
           OnPropertyChanged(nameof(TotalCount));

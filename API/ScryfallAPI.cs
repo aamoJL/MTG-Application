@@ -70,7 +70,10 @@ namespace MTGApplication.API
       List<MTGCardModel> cards = new();
       var fetchResult = await IO.FetchStringFromURLPost($"{API_URL}/cards/collection", identifiersJson);
       var json = JsonNode.Parse(fetchResult);
-      //var notFound = json["not_found"]?.AsArray().Select(x => x.GetValue<string>()).ToArray();
+      var notFound = json["not_found"]?.AsArray();
+
+      if(notFound.Count > 0) Notifications.RaiseError($"{notFound.Count} cards was not found!");
+      
       var data = json["data"]?.AsArray();
 
       if (data != null)
