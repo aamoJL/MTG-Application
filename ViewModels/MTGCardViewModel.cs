@@ -58,6 +58,7 @@ namespace MTGApplication.ViewModels
         OnPropertyChanged(nameof(ControlsVisible));
       }
     }
+    public float Price => Model.Info.Price;
 
     public ICommand RemoveRequestCommand { get; set; }
 

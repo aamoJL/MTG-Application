@@ -1,17 +1,26 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
+using MTGApplication.Charts;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MTGApplication.ViewModels
 {
   public partial class MainPageViewModel : ViewModelBase
   {
-    public MainPageViewModel() { }
+    public MainPageViewModel() 
+    {
+      CMCChart = new CMCChart(CollectionViewModel.CardModels);
+      SpellTypeChart = new SpellTypeChart(CollectionViewModel.CardModels);
+    }
 
     public readonly MTGCardCollectionViewModel ScryfallCardViewModels = new(new());
     public readonly MTGCardCollectionViewModel CollectionViewModel = new(new());
+
+    public CMCChart CMCChart { get; set; }
+    public SpellTypeChart SpellTypeChart { get; set; }
 
     private MTGCardViewModel previewCardViewModel;
 
@@ -174,7 +183,7 @@ namespace MTGApplication.ViewModels
     [RelayCommand]
     public async Task DeleteCollectionDialog()
     {
-      if (!CollectionViewModel.HasFile) { return; }
+      if (string.IsNullOrEmpty(CollectionViewModel.Name)) { return; }
 
       var confirmed = await App.MainRoot.ConfirmationDialogAsync(
         title: "Delete deck?",

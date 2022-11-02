@@ -39,7 +39,7 @@ namespace MTGApplication.Charts
         OnPropertyChanged(nameof(PrimaryValue));
       }
     }
-    public virtual double SecondaryValue { get; }
+    public virtual double SecondaryValue { get; protected set; }
 
     public MTGCardModelSeries(MTGCardModel model)
     {
@@ -139,10 +139,12 @@ namespace MTGApplication.Charts
   }
   public class MTGCardModelCMCSeries : MTGCardModelSeries
   {
-    public MTGCardModelCMCSeries(MTGCardModel model) : base(model) { }
+    public MTGCardModelCMCSeries(MTGCardModel model) : base(model) 
+    {
+      SecondaryValue = model.Info.CMC;
+    }
 
     public override double PrimaryValue { get => base.PrimaryValue; set => base.PrimaryValue = value; }
-    public override double SecondaryValue => Models[0].Info.CMC;
 
     protected override void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {

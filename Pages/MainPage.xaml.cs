@@ -111,7 +111,7 @@ namespace MTGApplication.Pages
         {
           var model = JsonSerializer.Deserialize<MTGCardModel>(data);
           if (model.Info.Id == string.Empty || model.Info.Id == null) { throw new Exception(); }
-          ViewModel.CollectionViewModel.AddAndSort(model);
+          ViewModel.CollectionViewModel.AddAndCombineAndSort(model);
         }
         catch (Exception) { }
 

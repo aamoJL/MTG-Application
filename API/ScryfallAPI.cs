@@ -1,6 +1,7 @@
 ﻿using MTGApplication.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -102,8 +103,7 @@ namespace MTGApplication.API
       var setCode = cardObject["set"].GetValue<string>();
       var setName = cardObject["set_name"].GetValue<string>();
       var collectorNumber = cardObject["collector_number"].GetValue<string>();
-
-      _ = float.TryParse(cardObject["prices"]["eur"]?.GetValue<string>(), out float price);
+      _ = float.TryParse(cardObject["prices"]?["eur"]?.GetValue<string>(), NumberStyles.Float, CultureInfo.InvariantCulture, out float price);
 
       // https://scryfall.com/docs/api/layouts
       var twoFaceLayouts = new string[] { "transform", "modal_dfc", "double_faced_token", "art_series", "reversible_card" };

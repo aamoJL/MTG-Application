@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MTGApplication.Models
 {
-  public class MTGCardCollectionModel
+  [ObservableObject]
+  public partial class MTGCardCollectionModel
   {
     public enum SortDirection
     {
@@ -12,18 +15,14 @@ namespace MTGApplication.Models
     }
     public enum SortProperty
     {
-      CMC, Name, Rarity, Color, Set, Count
+      CMC, Name, Rarity, Color, Set, Count, Price
     }
 
+    [ObservableProperty]
+    private string name = "";
     public ObservableCollection<MTGCardModel> Cards { get; } = new();
-
-    public string Name { get; private set; } = "";
     public int TotalCount { get => Cards.Sum(x => x.Count); }
 
-    public void Rename(string name)
-    {
-      Name = name;
-    }
     public void SortCollection(SortDirection dir, SortProperty prop)
     {
       List<MTGCardModel> newList = new();
@@ -37,7 +36,8 @@ namespace MTGApplication.Models
           SortProperty.Color => Cards.OrderBy(x => (int)x.ColorType).ToList(),
           SortProperty.Set => Cards.OrderBy(x => x.Info.SetName).ToList(),
           SortProperty.Count => Cards.OrderBy(x => x.Count).ToList(),
-          _ => Cards.OrderBy(x => x.Info.Name).ToList(),
+          SortProperty.Price => Cards.OrderBy(x => x.Info.Price).ToList(),
+          _ => throw new NotImplementedException(),
         };
       }
       else
@@ -50,7 +50,8 @@ namespace MTGApplication.Models
           SortProperty.Color => Cards.OrderByDescending(x => (int)x.ColorType).ToList(),
           SortProperty.Set => Cards.OrderByDescending(x => x.Info.SetName).ToList(),
           SortProperty.Count => Cards.OrderByDescending(x => x.Count).ToList(),
-          _ => Cards.OrderByDescending(x => x.Info.Name).ToList(),
+          SortProperty.Price => Cards.OrderByDescending(x => x.Info.Price).ToList(),
+          _ => throw new NotImplementedException(),
         };
       }
 
@@ -71,21 +72,33 @@ namespace MTGApplication.Models
         else
         {
           Cards.Add(model);
+          model.PropertyChanged += Card_PropertyChanged;
         }
       }
       else
       {
         Cards.Add(model);
+        model.PropertyChanged += Card_PropertyChanged;
       }
+
+      OnPropertyChanged(nameof(TotalCount));
     }
     public void Remove(MTGCardModel model)
     {
       Cards.Remove(model);
+      model.PropertyChanged -= Card_PropertyChanged;
+      OnPropertyChanged(nameof(TotalCount));
     }
     public void Reset()
     {
       Name = "";
       Cards.Clear();
+      OnPropertyChanged(nameof(TotalCount));
+    }
+
+    private void Card_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      OnPropertyChanged(nameof(TotalCount));
     }
   }
 }

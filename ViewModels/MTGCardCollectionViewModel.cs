@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Collections.Specialized;
-using MTGApplication.Charts;
 using MTGApplication.Models;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -11,6 +10,7 @@ using static MTGApplication.Models.MTGCardCollectionModel;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MTGApplication.ViewModels
 {
@@ -20,116 +20,79 @@ namespace MTGApplication.ViewModels
     {
       Model = model;
       model.Cards.CollectionChanged += Model_CollectionChanged;
-
-      Charts = new MTGCardModelChart[]{
-        new CMCChart(model.Cards),
-        new SpellTypeChart(model.Cards)
-      };
+      model.PropertyChanged += Model_PropertyChanged;
     }
 
     private MTGCardCollectionModel Model { get; }
     public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new(); // Synced to Model.Cards
-    public MTGCardModelChart[] Charts { get; }
 
-    private int totalCount;
-    private bool hasFile;
-    private bool isLoading;
-
-    public int TotalCount
-    {
-      get => totalCount;
-      set
-      {
-        totalCount = value;
-        OnPropertyChanged(nameof(TotalCount));
-        OnPropertyChanged(nameof(CanSave));
-      }
-    }
-    public SortProperty CollectionSortProperty { get; set; } = SortProperty.Name;
-    public SortDirection CollectionSortDirection { get; set; } = SortDirection.ASC;
-    public bool HasUnsavedChanges { get; private set; }
-    public bool HasFile
-    {
-      get => hasFile;
-      set
-      {
-        hasFile = value;
-        OnPropertyChanged(nameof(HasFile));
-      }
-    }
-    public bool IsLoading
-    {
-      get => isLoading;
-      set
-      {
-        isLoading = value;
-        OnPropertyChanged(nameof(IsLoading));
-      }
-    }
+    // Model properties
     public string Name => Model.Name;
+    public int TotalCount => Model.TotalCount;
     public ObservableCollection<MTGCardModel> CardModels => Model.Cards;
-    public bool CanSave
-    {
-      get => Model.TotalCount > 0;
-    }
+
+    // ViewModel properties
+    [ObservableProperty]
+    private bool isLoading;
+    [ObservableProperty]
+    private SortProperty selectedSortProperty = SortProperty.Name;
+    [ObservableProperty]
+    private SortDirection selectedSortDirection = SortDirection.ASC;
+    [ObservableProperty]
+    private bool hasUnsavedChanges;
 
     [RelayCommand]
-    public void AddAndSort(MTGCardModel newModel)
+    public void AddAndCombineAndSort(MTGCardModel newModel)
     {
       Model.Add(newModel);
-      Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
-
-      HasUnsavedChanges = true;
+      Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
     }
     [RelayCommand]
     public void RemoveModel(MTGCardModel model)
     {
       Model.Remove(model);
-      HasUnsavedChanges = true;
     }
     [RelayCommand]
     public void RemoveViewModel(MTGCardViewModel viewModel)
     {
-      if (viewModel?.CardInfo.Id == null) { return; }
-      Model.Remove(Model.Cards.First(x => x.Info.Id == viewModel.CardInfo.Id));
-      HasUnsavedChanges = true;
+      if (string.IsNullOrEmpty(viewModel?.CardInfo.Id)) { return; }
+      RemoveModel(Model.Cards.First(x => x.Info.Id == viewModel.CardInfo.Id));
     }
     [RelayCommand]
     public void Reset()
     {
       Model.Reset();
       HasUnsavedChanges = false;
-      HasFile = false;
     }
     [RelayCommand]
     public void DeleteDeckFile()
     {
-      if (Model.Name != "")
-        IO.DeleteFile($"{IO.CollectionsPath}{Model.Name}.json");
-      if (ResetCommand.CanExecute(null)) ResetCommand.Execute(null);
+      if (Name != "")
+        IO.DeleteFile($"{IO.CollectionsPath}{Name}.json");
+      Reset();
     }
     [RelayCommand]
-    public void ChangeSortDirection(string dir)
+    public void ChangeSortDirectionAndSort(string dir)
     {
       if (Enum.TryParse(dir, true, out SortDirection sortDirection))
       {
-        CollectionSortDirection = sortDirection;
-        Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
+        SelectedSortDirection = sortDirection;
+        Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
       }
     }
     [RelayCommand]
-    public void ChangeSortProperty(string prop)
+    public void ChangeSortPropertyAndSort(string prop)
     {
       if (Enum.TryParse(prop, true, out SortProperty sortProperty))
       {
-        CollectionSortProperty = sortProperty;
-        Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
+        SelectedSortProperty = sortProperty;
+        Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
       }
     }
     [RelayCommand]
     public void Save(string name)
     {
-      Model.Rename(name);
+      Model.Name = name;
       IO.WriteTextToFile($"{IO.CollectionsPath}/{name}.json",
         JsonSerializer.Serialize(Model.Cards.Select(x => new
         {
@@ -137,7 +100,6 @@ namespace MTGApplication.ViewModels
           x.Count
         })));
       HasUnsavedChanges = false;
-      HasFile = true;
     }
     [RelayCommand]
     public async Task LoadAsync(string name)
@@ -184,10 +146,9 @@ namespace MTGApplication.ViewModels
             Model.Add(item);
           }
         }
-        Model.Rename(name);
-        Model.SortCollection(CollectionSortDirection, CollectionSortProperty);
+        Model.Name = name;
+        Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
         HasUnsavedChanges = false;
-        HasFile = true;
       }
       catch (Exception) { }
 
@@ -202,7 +163,7 @@ namespace MTGApplication.ViewModels
     {
       IsLoading = true;
       Reset();
-      if (query != "")
+      if (!string.IsNullOrEmpty(query))
       {
         var cards = await App.CardAPI.FetchCards(query);
         foreach (var item in cards)
@@ -214,7 +175,19 @@ namespace MTGApplication.ViewModels
       IsLoading = false;
     }
 
-    private void UpdateTotalCount() => TotalCount = Model.TotalCount;
+    private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      switch (e.PropertyName)
+      {
+        case nameof(Model.Name): OnPropertyChanged(nameof(Name)); break;
+        case nameof(Model.Cards): OnPropertyChanged(nameof(Name)); break;
+        case nameof(Model.TotalCount):
+          if(SelectedSortProperty == SortProperty.Count) { Model.SortCollection(SelectedSortDirection, SelectedSortProperty); }
+          OnPropertyChanged(nameof(TotalCount));
+          HasUnsavedChanges = true; break;
+        default: break;
+      }
+    }
     private void Model_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       // Sync Model.Cards and CardViewModels
@@ -226,18 +199,11 @@ namespace MTGApplication.ViewModels
           modelCard = e.NewItems[0] as MTGCardModel;
           var newViewModelCard = new MTGCardViewModel(modelCard) { RemoveRequestCommand = RemoveViewModelCommand };
           CardViewModels.Add(newViewModelCard);
-          modelCard.PropertyChanged += ModelCard_PropertyChanged;
           break;
         case NotifyCollectionChangedAction.Remove:
-          modelCard = e.OldItems[0] as MTGCardModel;
           CardViewModels.RemoveAt(e.OldStartingIndex);
-          modelCard.PropertyChanged -= ModelCard_PropertyChanged;
           break;
         case NotifyCollectionChangedAction.Reset:
-          foreach (var card in Model.Cards)
-          {
-            card.PropertyChanged -= ModelCard_PropertyChanged;
-          }
           CardViewModels.Clear();
           break;
         case NotifyCollectionChangedAction.Move:
@@ -246,15 +212,6 @@ namespace MTGApplication.ViewModels
         case NotifyCollectionChangedAction.Replace:
         default:
           break;
-      }
-      UpdateTotalCount();
-    }
-    private void ModelCard_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-      if (e.PropertyName == nameof(MTGCardModel.Count))
-      {
-        UpdateTotalCount();
-        HasUnsavedChanges = true;
       }
     }
   }
