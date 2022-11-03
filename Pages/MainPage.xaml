@@ -259,7 +259,7 @@
                   <MenuFlyoutItem Command="{x:Bind ViewModel.SaveCollectionDialogCommand}" IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}" Icon="Save" Text="Save..."/>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import..."/>
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export..." IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionViewModel}" Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export..." IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}"/>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteCollectionDialogCommand}" IsEnabled="{x:Bind helpers:Comparison.NotNullOrEmpty(ViewModel.CollectionViewModel.Name), Mode=OneWay}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
@@ -301,34 +301,138 @@
           <ProgressRing IsActive="{x:Bind Path=ViewModel.CollectionViewModel.IsLoading, Mode=OneWay}"/>
         </StackPanel>
         <!--Collection info content-->
-        <StackPanel controls:DockPanel.Dock="Right" Width="250" Padding="5">
-          <TextBlock Text="{x:Bind ViewModel.CollectionViewModel.Name, Mode=OneWay}" FontWeight="Bold"/>
-          <TextBlock Text="{x:Bind sys:String.Format('Cards: {0}', ViewModel.CollectionViewModel.TotalCount), Mode=OneWay}"/>
-          <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-          <StackPanel Orientation="Vertical">
+        <controls:DockPanel controls:DockPanel.Dock="Right" Width="250" Padding="5 0 0 0" LastChildFill="True">
+          <!--Info-->
+          <StackPanel controls:DockPanel.Dock="Top" Orientation="Vertical">
+            <TextBlock Text="{x:Bind ViewModel.CollectionViewModel.Name, Mode=OneWay}" FontWeight="Bold"/>
+            <TextBlock Text="{x:Bind sys:String.Format('Cards: {0}', ViewModel.CollectionViewModel.TotalCount), Mode=OneWay}"/>
+            <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
+          </StackPanel>
+          <!--Charts-->
+          <StackPanel controls:DockPanel.Dock="Top" Orientation="Vertical">
             <TextBlock Text="Mana curve" TextAlignment="Center"/>
             <lvc:CartesianChart Height="250" x:Name="CollectionCmcChart" DataContext="{x:Bind ViewModel.CMCChart}" Series="{Binding Series}"/>
+            <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
           </StackPanel>
-          <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-          <StackPanel Orientation="Vertical">
+          <StackPanel controls:DockPanel.Dock="Top" Orientation="Vertical">
             <TextBlock Text="Type Chart" TextAlignment="Center"/>
             <lvc:PieChart Height="170" x:Name="CollectionTypeChart" DataContext="{x:Bind ViewModel.SpellTypeChart}" Series="{Binding Series}"/>
+            <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
           </StackPanel>
-        </StackPanel>
+          <!--Maybe and wishlists-->
+          <Grid controls:DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+              <TextBlock Grid.Row="0" Text="Maybe" TextAlignment="Center"/>
+              <Button Grid.Row="0" Content="Export..." FontSize="10" Padding="5 0 5 0" HorizontalAlignment="Right"
+                      IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionMaybeViewModel.TotalCount,0), Mode=OneWay}"
+                      Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionMaybeViewModel}"/>
+              <ListView
+                DataContext="{x:Bind ViewModel.CollectionMaybeViewModel}"
+                BorderBrush="LightGray"
+                Background="White"
+                BorderThickness="1"
+                Grid.Row="1"
+                x:Name="CollectionMaybeDisplay"
+                ItemContainerTransitions="{x:Null}"
+                SelectionMode="Single"
+                ItemsSource="{Binding CardViewModels}"
+                CanDragItems="True"
+                AllowDrop="True"
+                DragOver="CollectionView_DragOver"
+                Drop="CollectionView_Drop"
+                DragItemsStarting="CollectionView_DragItemsStarting"
+                DragItemsCompleted="CollectionView_DragItemsCompleted">
+                <ListView.ItemTemplate>
+                  <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                    <StackPanel 
+                    Height="25"
+                    Orientation="Horizontal" 
+                    Spacing="10" 
+                    Background="Transparent" 
+                    ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
+                    PointerEntered="CollectionListViewItem_PointerEntered"
+                    PointerExited="CollectionListViewItem_PointerExited"
+                    PointerMoved="CollecitonListViewItem_PointerMoved">
+                      <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
+                      <Image Width="20" Source="{Binding SetIcon}"/>
+                      <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </ListView.ItemTemplate>
+              </ListView>
+            </Grid>
+            <Grid Grid.Row="1">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+              <TextBlock Grid.Row="0" Text="Wishlist" TextAlignment="Center"/>
+              <Button Grid.Row="0" Content="Export..." FontSize="10" Padding="5 0 5 0" HorizontalAlignment="Right"
+                      IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionWishlistViewModel.TotalCount,0), Mode=OneWay}"
+                      Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionWishlistViewModel}"/>
+              <ListView
+                DataContext="{x:Bind ViewModel.CollectionWishlistViewModel}"
+                BorderBrush="LightGray"
+                Background="White"
+                BorderThickness="1"
+                Grid.Row="1"
+                x:Name="CollectionWishlistDisplay"
+                ItemContainerTransitions="{x:Null}"
+                SelectionMode="Single"
+                ItemsSource="{Binding CardViewModels}"
+                CanDragItems="True"
+                AllowDrop="True"
+                DragOver="CollectionView_DragOver"
+                Drop="CollectionView_Drop"
+                DragItemsStarting="CollectionView_DragItemsStarting"
+                DragItemsCompleted="CollectionView_DragItemsCompleted">
+                <ListView.ItemTemplate>
+                  <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                    <StackPanel 
+                    Height="25"
+                    Orientation="Horizontal" 
+                    Spacing="10" 
+                    Background="Transparent" 
+                    ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
+                    PointerEntered="CollectionListViewItem_PointerEntered"
+                    PointerExited="CollectionListViewItem_PointerExited"
+                    PointerMoved="CollecitonListViewItem_PointerMoved">
+                      <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
+                      <Image Width="20" Source="{Binding SetIcon}"/>
+                      <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </ListView.ItemTemplate>
+              </ListView>
+            </Grid>
+          </Grid>
+        </controls:DockPanel>
         <!--Collection Grid View-->
         <Grid controls:DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="1" Background="White">
           <controls:AdaptiveGridView
-              x:Name="CollectionImagesDisplay"
-              ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
-              StretchContentForSingleRow="False"
-              ItemContainerTransitions="{x:Null}"
-              SelectionMode="None"
-              DesiredWidth="{x:Bind CollectionSizeSlider.Value, Mode=OneWay}"
-              Margin="10 10 5 10"
-              Visibility="Collapsed"
-              AllowDrop="True"
-              DragOver="CollectionView_DragOver"
-              Drop="CollectionView_Drop">
+            DataContext="{x:Bind ViewModel.CollectionViewModel}"
+            x:Name="CollectionImagesDisplay"
+            ItemsSource="{Binding CardViewModels}"
+            StretchContentForSingleRow="False"
+            ItemContainerTransitions="{x:Null}"
+            SelectionMode="None"
+            DesiredWidth="{x:Bind CollectionSizeSlider.Value, Mode=OneWay}"
+            Margin="10 10 5 10"
+            Visibility="Collapsed"
+            CanDragItems="True"
+            AllowDrop="True"
+            DragOver="CollectionView_DragOver"
+            Drop="CollectionView_Drop"
+            DragItemsStarting="CollectionView_DragItemsStarting"
+            DragItemsCompleted="CollectionView_DragItemsCompleted">
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
@@ -353,14 +457,18 @@
           </controls:AdaptiveGridView>
           <!--List View-->
           <ListView
-              x:Name="CollectionListDisplay"
-              ItemContainerTransitions="{x:Null}"
-              SelectionMode="Single"
-              ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
-              Visibility="Collapsed"
-              AllowDrop="True"
-              DragOver="CollectionView_DragOver"
-              Drop="CollectionView_Drop">
+            DataContext="{x:Bind ViewModel.CollectionViewModel}"
+            x:Name="CollectionListDisplay"
+            ItemContainerTransitions="{x:Null}"
+            SelectionMode="Single"
+            ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
+            Visibility="Collapsed"
+            CanDragItems="True"
+            AllowDrop="True"
+            DragOver="CollectionView_DragOver"
+            Drop="CollectionView_Drop"
+            DragItemsStarting="CollectionView_DragItemsStarting"
+            DragItemsCompleted="CollectionView_DragItemsCompleted">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel 
@@ -397,12 +505,11 @@
       </controls:GridSplitter>
     </Grid>
     <Canvas>
-      <Image x:Name="PreviewImage" Visibility="Collapsed"  Height="350" IsHitTestVisible="False"/>
+      <Image x:Name="PreviewImage" Visibility="Collapsed" Height="350" IsHitTestVisible="False"/>
     </Canvas>
     <controls:InAppNotification 
       x:Name="PopupAppNotification"
       ShowDismissButton="True"
-      AnimationDuration="00:00:00.0400000"
       VerticalOffset="100"
       HorizontalOffset="0"
       StackMode="Replace"/>

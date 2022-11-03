@@ -13,6 +13,8 @@ namespace MTGApplication
   {
     public static readonly HttpClient HttpClient = new();
     public static readonly string CollectionsPath = "Resources/Collections/";
+    public static readonly string CollectionsMaybePath = "Resources/Collections/Maybes";
+    public static readonly string CollectionsWishlistPath = "Resources/Collections/Wishlists";
 
     /// <summary>
     /// Create directories if they do not exist
@@ -20,6 +22,8 @@ namespace MTGApplication
     public static void InitDirectories()
     {
       _ = Directory.CreateDirectory(CollectionsPath);
+      _ = Directory.CreateDirectory(CollectionsMaybePath);
+      _ = Directory.CreateDirectory(CollectionsWishlistPath);
     }
 
     #region//--------------Clipboard----------//

@@ -18,6 +18,9 @@ namespace MTGApplication.ViewModels
     public readonly MTGCardCollectionViewModel ScryfallCardViewModels = new(new());
     public readonly MTGCardCollectionViewModel CollectionViewModel = new(new());
 
+    public readonly MTGCardCollectionViewModel CollectionMaybeViewModel = new(new());
+    public readonly MTGCardCollectionViewModel CollectionWishlistViewModel = new(new());
+
     public CMCChart CMCChart { get; set; }
     public SpellTypeChart SpellTypeChart { get; set; }
 
@@ -92,13 +95,13 @@ namespace MTGApplication.ViewModels
               else if (overrideConfirmed is true)
               {
                 // User wants to override save
-                CollectionViewModel.Save(saveName);
+                SaveCollections(saveName);
               }
             }
           }
         }
       }
-      CollectionViewModel.Reset();
+      ResetCollections();
     }
     [RelayCommand]
     public async Task OpenCollectionDialog()
@@ -135,7 +138,7 @@ namespace MTGApplication.ViewModels
               else if (overrideConfirmed is true)
               {
                 // User wants to override save
-                CollectionViewModel.Save(saveName);
+                SaveCollections(saveName);
               }
             }
           }
@@ -152,7 +155,7 @@ namespace MTGApplication.ViewModels
 
       if (openName != string.Empty)
       {
-        await CollectionViewModel.LoadAsync(openName);
+        await LoadCollections(openName);
       }
     }
     [RelayCommand]
@@ -177,7 +180,8 @@ namespace MTGApplication.ViewModels
           if (overrideConfirmed == null) { return; }
         }
       }
-      CollectionViewModel.Save(saveName);
+
+      SaveCollections(saveName);
     }
     [RelayCommand]
     public async Task DeleteCollectionDialog()
@@ -208,10 +212,10 @@ namespace MTGApplication.ViewModels
       }
     }
     [RelayCommand]
-    public async Task ExportCollectionDialog()
+    public async Task ExportCollectionDialog(MTGCardCollectionViewModel collectionVM)
     {
       StringBuilder stringBuilder = new();
-      foreach (var item in CollectionViewModel.CardModels)
+      foreach (var item in collectionVM.CardModels)
       {
         stringBuilder.AppendLine($"{item.Count} {item.Info.Name}");
       }
@@ -225,6 +229,25 @@ namespace MTGApplication.ViewModels
       {
         IO.CopyToClipboard(response);
       }
+    }
+
+    private void SaveCollections(string saveName)
+    {
+      CollectionViewModel.Save(IO.CollectionsPath, saveName);
+      CollectionMaybeViewModel.Save(IO.CollectionsMaybePath, saveName);
+      CollectionWishlistViewModel.Save(IO.CollectionsWishlistPath, saveName);
+    }
+    private async Task LoadCollections(string openName)
+    {
+      await CollectionViewModel.LoadAsync(IO.CollectionsPath, openName);
+      await CollectionMaybeViewModel.LoadAsync(IO.CollectionsMaybePath, openName);
+      await CollectionWishlistViewModel.LoadAsync(IO.CollectionsWishlistPath, openName);
+    } 
+    private void ResetCollections()
+    {
+      CollectionViewModel.Reset();
+      CollectionMaybeViewModel.Reset();
+      CollectionWishlistViewModel.Reset();
     }
   }
 }

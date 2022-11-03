@@ -90,11 +90,10 @@ namespace MTGApplication.ViewModels
         Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
       }
     }
-    [RelayCommand]
-    public void Save(string name)
+    public void Save(string path, string name)
     {
       Model.Name = name;
-      IO.WriteTextToFile($"{IO.CollectionsPath}/{name}.json",
+      IO.WriteTextToFile($"{path}/{name}.json",
         JsonSerializer.Serialize(Model.Cards.Select(x => new
         {
           x.Info.Id,
@@ -102,15 +101,14 @@ namespace MTGApplication.ViewModels
         })));
       HasUnsavedChanges = false;
     }
-    [RelayCommand]
-    public async Task LoadAsync(string name)
+    public async Task LoadAsync(string path, string name)
     {
       IsLoading = true;
       Reset();
 
       try
       {
-        var jsonString = await IO.ReadTextFromFileAsync($"{IO.CollectionsPath}/{name}.json");
+        var jsonString = await IO.ReadTextFromFileAsync($"{path}/{name}.json");
         var ids = JsonNode.Parse(jsonString).AsArray();
 
         var IdObjects = ids.Select(x => new

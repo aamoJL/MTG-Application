@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
 
 namespace MTGApplication.Pages
 {
@@ -18,8 +17,6 @@ namespace MTGApplication.Pages
   /// </summary>
   public sealed partial class MainPage : Page
   {
-    private int notificationDuration = 3000;
-
     public MainPageViewModel ViewModel = new();
 
     public MainPage()
@@ -43,13 +40,13 @@ namespace MTGApplication.Pages
         }
       };
 
-      PopupAppNotification.XamlRoot = this.XamlRoot;
       Notifications.OnCopied += Notifications_OnCopied;
       Notifications.OnError += Notifications_OnError;
     }
 
-
-    #region Notifications
+    #region //-----Notifications-----//
+    private readonly int notificationDuration = 3000;
+    
     private void Notifications_OnError(object sender, string error)
     {
       PopupAppNotification.Show(error, notificationDuration);
@@ -60,7 +57,7 @@ namespace MTGApplication.Pages
     }
     #endregion
 
-    #region //----------------Card pointer events---------------//
+    #region //-----Card pointer events-----//
     // -----------List view
     private void CollectionListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
@@ -75,11 +72,15 @@ namespace MTGApplication.Pages
     {
       // Move card preview image to mouse position when hovering over on list view item.
       // The position is clamped to window size
-      var offset = new Point(50, -100);
-      var pointerPosition = e.GetCurrentPoint(null).Position;
       var windowBounds = ActualSize;
-      PreviewImage.SetValue(Canvas.LeftProperty, Math.Clamp(pointerPosition.X + offset.X, 0, windowBounds.X - PreviewImage.ActualWidth));
-      PreviewImage.SetValue(Canvas.TopProperty, Math.Clamp(pointerPosition.Y + offset.Y, 0, windowBounds.Y - PreviewImage.ActualHeight));
+      var pointerPosition = e.GetCurrentPoint(null).Position;
+
+      // Offsets from pointer
+      var xOffset = (windowBounds.X - pointerPosition.X) > PreviewImage.ActualWidth ? 50 : -50 - PreviewImage.ActualWidth;
+      var yOffset = -100;
+
+      PreviewImage.SetValue(Canvas.LeftProperty, Math.Clamp(pointerPosition.X + xOffset, 0, windowBounds.X - PreviewImage.ActualWidth));
+      PreviewImage.SetValue(Canvas.TopProperty, Math.Clamp(pointerPosition.Y + yOffset, 0, windowBounds.Y - PreviewImage.ActualHeight));
     }
     private void CollectionListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
     {
@@ -102,25 +103,31 @@ namespace MTGApplication.Pages
     }
     #endregion
 
-    #region //--------------------- Drag & Drop -----------------------------//
+    #region //-----Drag & Drop-----//
+    public object draggedElement;
+    
     private void CollectionView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
       if (e.Items[0] is MTGCardViewModel viewModel)
       {
         e.Data.SetText(viewModel.ModelToJSON());
-        e.Data.RequestedOperation = DataPackageOperation.Copy;
+        e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
+        draggedElement = sender;
       }
     }
     private void CollectionView_DragOver(object sender, DragEventArgs e)
     {
-      if (e.DataView.Contains(StandardDataFormats.Text))
+      if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
       {
-        e.AcceptedOperation = DataPackageOperation.Copy;
+        // Change operation to 'Move' if the shift key is down
+        e.AcceptedOperation = 
+          (e.Modifiers & Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) == Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift 
+          ? DataPackageOperation.Move : DataPackageOperation.Copy;
       }
     }
     private async void CollectionView_Drop(object sender, DragEventArgs e)
     {
-      if (e.DataView.Contains(StandardDataFormats.Text))
+      if (e.DataView.Contains(StandardDataFormats.Text) && (sender as FrameworkElement).DataContext is MTGCardCollectionViewModel collectionVM)
       {
         DragOperationDeferral def = e.GetDeferral();
         string data = await e.DataView.GetTextAsync();
@@ -129,11 +136,22 @@ namespace MTGApplication.Pages
         {
           var model = JsonSerializer.Deserialize<MTGCardModel>(data);
           if (model.Info.Id == string.Empty || model.Info.Id == null) { throw new Exception(); }
-          ViewModel.CollectionViewModel.AddAndCombineAndSort(model);
+          collectionVM.AddAndCombineAndSort(model);
         }
         catch (Exception) { }
 
         def.Complete();
+      }
+      else { throw new Exception("DataContext is not MTGCardCollectionViewModel"); }
+    }
+    private void CollectionView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+      // Remove original item if the operation was 'Move'
+      if((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move 
+        && args.Items[0] is MTGCardViewModel cardVM &&
+        sender.DataContext is MTGCardCollectionViewModel collectionVM)
+      {
+        collectionVM.RemoveViewModel(cardVM);
       }
     }
     #endregion

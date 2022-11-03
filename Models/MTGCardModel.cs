@@ -20,6 +20,7 @@ namespace MTGApplication.Models
       Special = 4,
       Bonus = 5,
     }
+    // TODO: use flags
     public enum ColorTypes
     {
       W = 0,
@@ -30,6 +31,7 @@ namespace MTGApplication.Models
       M = 5,
       C = 6,
     }
+    // TODO: use flags
     public enum SpellType
     {
       Land,
