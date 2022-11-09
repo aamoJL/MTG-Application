@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Charts;
 using System;
 using System.IO;
@@ -8,6 +9,23 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.ViewModels
 {
+  public enum MTGSearchFormatTypes
+  {
+    Any, Modern, Standard, Commander,
+  }
+  public enum MTGSearchUniqueTypes
+  {
+    Cards, Prints, Art
+  }
+  public enum MTGSearchOrderTypes
+  {
+    Released, Set, CMC, Name, Rarity, Color
+  }
+  public enum MTGSearchDirectionTypes
+  {
+    Asc, Desc
+  }
+
   public partial class MainPageViewModel : ViewModelBase
   {
     public MainPageViewModel() 
@@ -31,8 +49,7 @@ namespace MTGApplication.ViewModels
     public CMCChart CMCChart { get; }
     public SpellTypeChart SpellTypeChart { get; }
 
-    // TODO: change to Enums
-    public string SearchQuery
+    private string SearchQuery
     {
       get
       {
@@ -44,11 +61,16 @@ namespace MTGApplication.ViewModels
         $"format:{SearchFormat}";
       }
     }
-    public string SearchText { get; set; } = "";
-    public string SearchFormat { get; set; } = "Any";
-    public string SearchUnique { get; set; } = "Cards";
-    public string SearchOrder { get; set; } = "Released";
-    public string SearchDirection { get; set; } = "Asc";
+    [ObservableProperty]
+    private string searchText;
+    [ObservableProperty]
+    private MTGSearchFormatTypes searchFormat;
+    [ObservableProperty]
+    private MTGSearchUniqueTypes searchUnique;
+    [ObservableProperty]
+    private MTGSearchOrderTypes searchOrder;
+    [ObservableProperty]
+    private MTGSearchDirectionTypes searchDirection;
 
     [RelayCommand]
     public async void SearchSubmit()

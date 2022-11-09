@@ -1,6 +1,4 @@
 ﻿using MTGApplication.Models;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 

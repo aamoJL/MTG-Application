@@ -106,45 +106,32 @@
           </TextBox>
           <StackPanel Grid.Column="1" Orientation="Horizontal">
             <ComboBox
-                Header="Format"
-                VerticalAlignment="Bottom" 
-                HorizontalAlignment="Stretch"
-                CornerRadius="0" 
-                BorderThickness="0 1 1 1" 
-                Width="85"
-                SelectedValue="{x:Bind ViewModel.SearchFormat, Mode=TwoWay}">
-              <x:String>Any</x:String>
-              <x:String>Modern</x:String>
-              <x:String>Standard</x:String>
-              <x:String>Commander</x:String>
-            </ComboBox>
+              Header="Format"
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
+              Width="85"
+              ItemsSource="{ui:EnumValues Type=viewmodels:MTGSearchFormatTypes}"
+              SelectedItem="{x:Bind ViewModel.SearchFormat, Mode=TwoWay}"/>
             <ComboBox
-                Header="Unique"
-                VerticalAlignment="Bottom" 
-                HorizontalAlignment="Stretch"
-                CornerRadius="0" 
-                BorderThickness="0 1 1 1" 
-                Width="85"
-              SelectedValue="{x:Bind ViewModel.SearchUnique, Mode=TwoWay}">
-              <x:String>Cards</x:String>
-              <x:String>Prints</x:String>
-              <x:String>Art</x:String>
-            </ComboBox>
+              Header="Unique"
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
+              Width="85"
+              ItemsSource="{ui:EnumValues Type=viewmodels:MTGSearchUniqueTypes}"
+              SelectedItem="{x:Bind ViewModel.SearchUnique, Mode=TwoWay}"/>
             <ComboBox
-                Header="Order" 
-                VerticalAlignment="Bottom" 
-                HorizontalAlignment="Stretch"
-                CornerRadius="0" 
-                BorderThickness="0 1 1 1" 
+              Header="Order" 
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
               Width="105"
-              SelectedValue="{x:Bind ViewModel.SearchOrder, Mode=TwoWay}">
-              <x:String>Released</x:String>
-              <x:String>Set</x:String>
-              <x:String>CMC</x:String>
-              <x:String>Name</x:String>
-              <x:String>Rarity</x:String>
-              <x:String>Color</x:String>
-            </ComboBox>
+              ItemsSource="{ui:EnumValues Type=viewmodels:MTGSearchOrderTypes}"
+              SelectedItem="{x:Bind ViewModel.SearchOrder, Mode=TwoWay}" />
             <ComboBox
               Header="Direction" 
               VerticalAlignment="Bottom" 
@@ -152,10 +139,8 @@
               CornerRadius="0" 
               BorderThickness="0 1 1 1" 
               Width="80"
-              SelectedValue="{x:Bind ViewModel.SearchDirection, Mode=TwoWay}">
-              <x:String>Asc</x:String>
-              <x:String>Desc</x:String>
-            </ComboBox>
+              ItemsSource="{ui:EnumValues Type=viewmodels:MTGSearchDirectionTypes}"
+              SelectedItem="{x:Bind ViewModel.SearchDirection, Mode=TwoWay}" />
           </StackPanel>
           <Button
             Grid.Column="2" 
