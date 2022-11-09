@@ -22,14 +22,59 @@ namespace MTGApplication.ViewModels
       Model = model;
       model.Cards.CollectionChanged += Model_CollectionChanged;
       model.PropertyChanged += Model_PropertyChanged;
+
+      Name = model.Name;
+      TotalCount = model.TotalCount;
     }
 
     private MTGCardCollectionModel Model { get; }
     public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new(); // Synced to Model.Cards
 
+    private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      switch (e.PropertyName)
+      {
+        case nameof(Model.Name): Name = Model.Name; break;
+        case nameof(Model.Cards): OnPropertyChanged(nameof(CardModels)); break;
+        case nameof(Model.TotalCount):
+          TotalCount = Model.TotalCount;
+          if (SelectedSortProperty == SortProperty.Count) { Model.SortCollection(SelectedSortDirection, SelectedSortProperty); }
+          HasUnsavedChanges = true; break;
+        default: break;
+      }
+    }
+    private void Model_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+      // Sync Model.Cards and CardViewModels
+      MTGCardModel modelCard;
+
+      switch (e.Action)
+      {
+        case NotifyCollectionChangedAction.Add:
+          modelCard = e.NewItems[0] as MTGCardModel;
+          var newViewModelCard = new MTGCardViewModel(modelCard) { RemoveRequestCommand = new RelayCommand(() => RemoveModel(modelCard)) };
+          CardViewModels.Add(newViewModelCard);
+          break;
+        case NotifyCollectionChangedAction.Remove:
+          CardViewModels.RemoveAt(e.OldStartingIndex);
+          break;
+        case NotifyCollectionChangedAction.Reset:
+          CardViewModels.Clear();
+          break;
+        case NotifyCollectionChangedAction.Move:
+          CardViewModels.Move(e.OldStartingIndex, e.NewStartingIndex);
+          break;
+        case NotifyCollectionChangedAction.Replace:
+        default:
+          break;
+      }
+    }
+
     // Model properties
-    public string Name => Model.Name;
-    public int TotalCount => Model.TotalCount;
+    [ObservableProperty]
+    private string name;
+    [ObservableProperty]
+    private int totalCount;
     public ObservableCollection<MTGCardModel> CardModels => Model.Cards;
 
     // ViewModel properties
@@ -43,37 +88,7 @@ namespace MTGApplication.ViewModels
     private bool hasUnsavedChanges;
 
     [RelayCommand]
-    public void AddAndCombineAndSort(MTGCardModel newModel)
-    {
-      Model.Add(newModel);
-      Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
-    }
-    [RelayCommand]
-    public void RemoveModel(MTGCardModel model)
-    {
-      Model.Remove(model);
-    }
-    [RelayCommand]
-    public void RemoveViewModel(MTGCardViewModel viewModel)
-    {
-      if (string.IsNullOrEmpty(viewModel?.CardInfo.Id)) { return; }
-      RemoveModel(Model.Cards.First(x => x.Info.Id == viewModel.CardInfo.Id));
-    }
-    [RelayCommand]
-    public void Reset()
-    {
-      Model.Reset();
-      HasUnsavedChanges = false;
-    }
-    [RelayCommand]
-    public void DeleteDeckFile()
-    {
-      if (Name != "")
-        IO.DeleteFile($"{IO.CollectionsPath}{Name}.json");
-      Reset();
-    }
-    [RelayCommand]
-    public void ChangeSortDirectionAndSort(string dir)
+    public void SortByDirection(string dir)
     {
       if (Enum.TryParse(dir, true, out SortDirection sortDirection))
       {
@@ -82,13 +97,45 @@ namespace MTGApplication.ViewModels
       }
     }
     [RelayCommand]
-    public void ChangeSortPropertyAndSort(string prop)
+    public void SortByProperty(string prop)
     {
       if (Enum.TryParse(prop, true, out SortProperty sortProperty))
       {
         SelectedSortProperty = sortProperty;
         Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
       }
+    }
+
+    public void AddModel(MTGCardModel newModel)
+    {
+      Model.Add(newModel);
+      Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
+    }
+    [RelayCommand]
+    public void AddViewModel(MTGCardViewModel newViewModel)
+    {
+      var newModel = new MTGCardModel(newViewModel.CardInfo, newViewModel.Count);
+      AddModel(newModel);
+    }
+    public void RemoveModel(MTGCardModel model)
+    {
+      Model.Remove(model);
+    }
+    public void RemoveViewModel(MTGCardViewModel viewModel)
+    {
+      if (string.IsNullOrEmpty(viewModel?.CardInfo.Id)) { return; }
+      RemoveModel(Model.Cards.First(x => x.Info.Id == viewModel.CardInfo.Id));
+    }
+    public void Reset()
+    {
+      Model.Reset();
+      HasUnsavedChanges = false;
+    }
+    public void DeleteDeckFile()
+    {
+      if (Name != "")
+        IO.DeleteFile($"{IO.CollectionsPath}{Name}.json");
+      Reset();
     }
     public void Save(string path, string name)
     {
@@ -226,46 +273,6 @@ namespace MTGApplication.ViewModels
           if(found != null) item.Count = found.Count;
           Model.Add(item);
         }
-      }
-    }
-
-    private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-      switch (e.PropertyName)
-      {
-        case nameof(Model.Name): OnPropertyChanged(nameof(Name)); break;
-        case nameof(Model.Cards): OnPropertyChanged(nameof(CardModels)); break;
-        case nameof(Model.TotalCount):
-          if(SelectedSortProperty == SortProperty.Count) { Model.SortCollection(SelectedSortDirection, SelectedSortProperty); }
-          OnPropertyChanged(nameof(TotalCount));
-          HasUnsavedChanges = true; break;
-        default: break;
-      }
-    }
-    private void Model_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-      // Sync Model.Cards and CardViewModels
-      MTGCardModel modelCard;
-
-      switch (e.Action)
-      {
-        case NotifyCollectionChangedAction.Add:
-          modelCard = e.NewItems[0] as MTGCardModel;
-          var newViewModelCard = new MTGCardViewModel(modelCard) { RemoveRequestCommand = RemoveViewModelCommand };
-          CardViewModels.Add(newViewModelCard);
-          break;
-        case NotifyCollectionChangedAction.Remove:
-          CardViewModels.RemoveAt(e.OldStartingIndex);
-          break;
-        case NotifyCollectionChangedAction.Reset:
-          CardViewModels.Clear();
-          break;
-        case NotifyCollectionChangedAction.Move:
-          CardViewModels.Move(e.OldStartingIndex, e.NewStartingIndex);
-          break;
-        case NotifyCollectionChangedAction.Replace:
-        default:
-          break;
       }
     }
   }

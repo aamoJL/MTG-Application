@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
@@ -46,7 +47,7 @@ namespace MTGApplication.Pages
 
     #region //-----Notifications-----//
     private readonly int notificationDuration = 3000;
-    
+
     private void Notifications_OnError(object sender, string error)
     {
       PopupAppNotification.Show(error, notificationDuration);
@@ -62,10 +63,11 @@ namespace MTGApplication.Pages
     private void CollectionListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
       // Change card preview image to hovered item
-      if((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
       {
         PreviewImage.Visibility = Visibility.Visible;
-        PreviewImage.Source = new BitmapImage(new(cardVM.SelectedFaceUri));
+        var imgSource = new BitmapImage(new(cardVM.SelectedFaceUri));
+        PreviewImage.Source = imgSource;
       }
     }
     private void CollecitonListViewItem_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -85,11 +87,12 @@ namespace MTGApplication.Pages
     private void CollectionListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
     {
       PreviewImage.Visibility = Visibility.Collapsed;
+      PreviewImage.PlaceholderSource = PreviewImage.Source as ImageSource; // Reduces flickering
     }
     // -----------Grid view
     private void CollectionGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-      if((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
       {
         cardVM.ControlsVisible = true;
       }
@@ -105,7 +108,7 @@ namespace MTGApplication.Pages
 
     #region //-----Drag & Drop-----//
     public object draggedElement;
-    
+
     private void CollectionView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
       if (e.Items[0] is MTGCardViewModel viewModel)
@@ -120,8 +123,8 @@ namespace MTGApplication.Pages
       if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
       {
         // Change operation to 'Move' if the shift key is down
-        e.AcceptedOperation = 
-          (e.Modifiers & Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) == Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift 
+        e.AcceptedOperation =
+          (e.Modifiers & Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) == Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
           ? DataPackageOperation.Move : DataPackageOperation.Copy;
       }
     }
@@ -136,7 +139,7 @@ namespace MTGApplication.Pages
         {
           var model = JsonSerializer.Deserialize<MTGCardModel>(data);
           if (model.Info.Id == string.Empty || model.Info.Id == null) { throw new Exception(); }
-          collectionVM.AddAndCombineAndSort(model);
+          collectionVM.AddModel(model);
         }
         catch (Exception) { }
 
@@ -147,7 +150,7 @@ namespace MTGApplication.Pages
     private void CollectionView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
       // Remove original item if the operation was 'Move'
-      if((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move 
+      if ((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move
         && args.Items[0] is MTGCardViewModel cardVM &&
         sender.DataContext is MTGCardCollectionViewModel collectionVM)
       {
@@ -156,5 +159,11 @@ namespace MTGApplication.Pages
     }
     #endregion
 
+    private void SearchButton_Click(object sender, RoutedEventArgs e)
+    {
+      // Select the search box text so the user doesn't need to click the search box again to write the next search.
+      ScryfallSearchBox.Focus(FocusState.Programmatic);
+      ScryfallSearchBox.SelectAll();
+    }
   }
 }

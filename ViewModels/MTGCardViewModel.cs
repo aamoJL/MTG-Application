@@ -3,6 +3,7 @@ using System.Windows.Input;
 using static MTGApplication.Models.MTGCardModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MTGApplication.ViewModels
 {
@@ -12,16 +13,21 @@ namespace MTGApplication.ViewModels
     {
       Model = model;
       model.PropertyChanged += Model_PropertyChanged;
+
+      Count = model.Count;
     }
 
     private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       if (e.PropertyName == nameof(Model.Count))
       {
-        OnPropertyChanged(nameof(CanDecreaseCount));
-        OnPropertyChanged(nameof(Count));
+        Count = Model.Count;
       }
     }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DecreaseCountCommand))]
+    private int count;
 
     private int selectedFaceIndex = 0;
     private bool controlsVisible;
@@ -42,13 +48,8 @@ namespace MTGApplication.ViewModels
         OnPropertyChanged(nameof(SelectedFaceUri));
       }
     }
-    public int Count => Model.Count;
     public CardInfo CardInfo => Model.Info;
     public bool HasBackFace => Model.HasBackFace;
-    public bool CanDecreaseCount
-    {
-      get => Count > 1;
-    }
     public bool ControlsVisible
     {
       get => controlsVisible;
@@ -61,8 +62,7 @@ namespace MTGApplication.ViewModels
     public float Price => Model.Info.Price;
 
     public ICommand RemoveRequestCommand { get; set; }
-
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasBackFace))]
     public void FlipCard()
     {
       if (HasBackFace) SelectedFaceIndex = SelectedFaceIndex == 0 ? 1 : 0;
@@ -77,7 +77,7 @@ namespace MTGApplication.ViewModels
     {
       Model.Count++;
     }
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanDecreaseCount))]
     public void DecreaseCount()
     {
       Model.Count--;
@@ -87,5 +87,7 @@ namespace MTGApplication.ViewModels
     {
       return Model.ToJSON();
     }
+
+    private bool CanDecreaseCount() => Count > 1;
   }
 }

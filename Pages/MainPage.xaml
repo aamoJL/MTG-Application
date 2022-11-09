@@ -1,5 +1,7 @@
 ﻿<Page
   x:Class="MTGApplication.Pages.MainPage"
+  x:Name="MainPageContainer"
+  DataContext="{x:Bind ViewModel}"
   xmlns:sys="using:System"
   xmlns:helpers="using:MTGApplication.BindingHelpers"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -22,12 +24,12 @@
 
     <!--List item flyouts-->
     <MenuFlyout x:Key="CardSearchItemFlyoutTemplate" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-      <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
+      <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip"/>
       <MenuFlyoutSeparator />
       <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="Website"/>
     </MenuFlyout>
     <MenuFlyout x:Key="CardCollectionItemFlyoutTemplate" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-      <MenuFlyoutItem Command="{Binding FlipCardCommand}" IsEnabled="{Binding HasBackFace}" Icon="sync" Text="Flip"/>
+      <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip"/>
       <MenuFlyoutItem Command="{Binding IncreaseCountCommand}" Icon="Add" Text="Add"/>
       <MenuFlyoutItem Command="{Binding DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
       <MenuFlyoutSeparator />
@@ -156,13 +158,14 @@
             </ComboBox>
           </StackPanel>
           <Button
-              Grid.Column="2" 
-              VerticalAlignment="Bottom"
-              HorizontalAlignment="Stretch"
-              CornerRadius="0 4 4 0" 
-              BorderThickness="0 1 1 1" 
-              Height="32"
-              Command="{x:Bind ViewModel.SearchSubmitCommand}">
+            Grid.Column="2" 
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Stretch"
+            CornerRadius="0 4 4 0" 
+            BorderThickness="0 1 1 1" 
+            Height="32"
+            Click="SearchButton_Click"
+            Command="{x:Bind ViewModel.SearchSubmitCommand}">
             <Button.KeyboardAccelerators>
               <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind ScryfallSearchBox}"/>
             </Button.KeyboardAccelerators>
@@ -198,23 +201,29 @@
           <!--Grid view-->
           <controls:AdaptiveGridView
             x:Name="CardSearchImagesDisplay"
+            DataContext="{x:Bind ViewModel.ScryfallCardViewModels}"
             ItemContainerTransitions="{x:Null}"
             SelectionMode="None"
             StretchContentForSingleRow="False"
             DesiredWidth="{x:Bind ScryfallSearchSizeSlider.Value, Mode=OneWay}"
-            ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
+            ItemsSource="{Binding CardViewModels}"
             Margin="10 10 5 10"
             Visibility="Collapsed"
             CanDragItems="True"
             DragItemsStarting="CollectionView_DragItemsStarting">
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                <Border CornerRadius="10">
-                  <StackPanel Orientation="Vertical">
-                    <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" />
-                    <TextBlock Text="{x:Bind helpers:Comparison.EuroToString(Price)}" HorizontalAlignment="Center" FontSize="11"/>
-                  </StackPanel>
-                </Border>
+                <StackPanel Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
+                  <Grid>
+                    <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
+                    <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10" Visibility="{Binding ControlsVisible}">
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xECC8;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionMaybeViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                    </StackPanel>
+                  </Grid>
+                  <TextBlock Text="{x:Bind helpers:Format.EuroToString(Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
+                </StackPanel>
               </DataTemplate>
             </controls:AdaptiveGridView.ItemTemplate>
           </controls:AdaptiveGridView>
@@ -222,7 +231,7 @@
           <ListView
             x:Name="CardSearchListDisplay"
             ItemContainerTransitions="{x:Null}"
-            SelectionMode="None"
+            SelectionMode="Single"
             ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
             Visibility="Collapsed"
             CanDragItems="True"
@@ -256,12 +265,12 @@
                 <MenuFlyout>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.ResetCollectionDialogCommand}" Icon="NewFolder" Text="New"/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCollectionDialogCommand}" Icon="OpenFile" Text="Open..."/>
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.SaveCollectionDialogCommand}" IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}" Icon="Save" Text="Save..."/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.SaveCollectionDialogCommand}" Icon="Save" Text="Save..."/>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import..."/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionViewModel}" Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export..." IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}"/>
                   <MenuFlyoutSeparator/>
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteCollectionDialogCommand}" IsEnabled="{x:Bind helpers:Comparison.NotNullOrEmpty(ViewModel.CollectionViewModel.Name), Mode=OneWay}" Background="IndianRed" Icon="Delete" Text="Delete"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteCollectionDialogCommand}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -284,16 +293,16 @@
             <AppBarButton Icon="Sort" ToolTipService.ToolTip="Order" Label="Sort" AutomationProperties.Name="Order">
               <AppBarButton.Flyout>
                 <MenuFlyout>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortDirectionAndSortCommand}" CommandParameter="ASC" Text="Asc" GroupName="DirectionGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortDirectionAndSortCommand}" CommandParameter="DESC" Text="Desc" GroupName="DirectionGroup" />
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Asc" GroupName="DirectionGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Desc" GroupName="DirectionGroup" />
                   <MenuFlyoutSeparator/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.ChangeSortPropertyAndSortCommand}" CommandParameter="Price" Text="Price" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Price" Text="Price" GroupName="TypeGroup"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -436,13 +445,11 @@
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
-                  <Border CornerRadius="10">
-                    <Image Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"/>
-                  </Border>
+                  <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
                   <Grid>
-                    <TextBlock Text="{x:Bind helpers:Comparison.EuroToString(Price)}" HorizontalAlignment="Right" FontSize="11"/>
+                    <TextBlock Text="{x:Bind helpers:Format.EuroToString(Price)}" HorizontalAlignment="Right" FontSize="11"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                      <Button x:Name="DecreaseButton" Command="{x:Bind DecreaseCountCommand}" IsEnabled="{x:Bind CanDecreaseCount, Mode=OneWay}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
+                      <Button x:Name="DecreaseButton" Command="{x:Bind DecreaseCountCommand}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
                         <SymbolIcon Symbol="Back" />
                       </Button>
                       <TextBlock Text="{Binding Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
@@ -474,7 +481,7 @@
                 <StackPanel 
                   Height="25"
                   Orientation="Horizontal" 
-                  Spacing="10" 
+                  Spacing="15" 
                   Background="Transparent" 
                   ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
                   PointerEntered="CollectionListViewItem_PointerEntered"
@@ -482,7 +489,9 @@
                   PointerMoved="CollecitonListViewItem_PointerMoved">
                   <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
                   <Image Width="20" Source="{Binding SetIcon}"/>
-                  <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                  <TextBlock Width="200" VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                  <TextBlock Width="200" VerticalAlignment="Center" Text="{Binding CardInfo.TypeLine}"/>
+                  <TextBlock Width="200" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(CardInfo.Price)}"/>
                 </StackPanel>
               </DataTemplate>
             </ListView.ItemTemplate>
@@ -505,7 +514,7 @@
       </controls:GridSplitter>
     </Grid>
     <Canvas>
-      <Image x:Name="PreviewImage" Visibility="Collapsed" Height="350" IsHitTestVisible="False"/>
+      <controls:ImageEx x:Name="PreviewImage" Height="350" IsHitTestVisible="False" CornerRadius="10" Visibility="Collapsed" PlaceholderStretch="Fill" CacheMode="BitmapCache" IsCacheEnabled="True" Style="{StaticResource PreviewImagePlaceholderStyle}"/>
     </Canvas>
     <controls:InAppNotification 
       x:Name="PopupAppNotification"

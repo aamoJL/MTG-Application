@@ -30,7 +30,14 @@
     <None Remove="Assets\ColorIcons\R.svg" />
     <None Remove="Assets\ColorIcons\U.svg" />
     <None Remove="Assets\ColorIcons\W.svg" />
+    <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Pages\MainPage.xaml" />
+    <None Remove="README.md" />
+    <None Remove="ResourceDictionary1.xaml" />
+    <None Remove="Styles\PreviewImagePlaceholderImageStyle.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="ResourceDictionary1.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +69,15 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="README.md" />
+    <Resource Include="ResourceDictionary1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Assets\back.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\ColorIcons\B.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -77,6 +93,15 @@
     <Content Update="Assets\ColorIcons\W.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Styles\PreviewImagePlaceholderImageStyle.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Styles\CustomPlaceholderImageStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Pages\MainPage.xaml">

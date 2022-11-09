@@ -11,30 +11,24 @@ namespace MTGApplication.ViewModels
   {
     public MainPageViewModel() 
     {
+      CollectionViewModel.PropertyChanged += CollectionViewModel_PropertyChanged;
+
       CMCChart = new CMCChart(CollectionViewModel.CardModels);
       SpellTypeChart = new SpellTypeChart(CollectionViewModel.CardModels);
     }
 
-    public readonly MTGCardCollectionViewModel ScryfallCardViewModels = new(new());
-    public readonly MTGCardCollectionViewModel CollectionViewModel = new(new());
-
-    public readonly MTGCardCollectionViewModel CollectionMaybeViewModel = new(new());
-    public readonly MTGCardCollectionViewModel CollectionWishlistViewModel = new(new());
-
-    public CMCChart CMCChart { get; set; }
-    public SpellTypeChart SpellTypeChart { get; set; }
-
-    private MTGCardViewModel previewCardViewModel;
-
-    public MTGCardViewModel PreviewCardViewModel
+    private void CollectionViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      get => previewCardViewModel;
-      set
-      {
-        previewCardViewModel = value;
-        OnPropertyChanged(nameof(PreviewCardViewModel));
-      }
+      if(e.PropertyName == nameof(MTGCardCollectionViewModel.TotalCount)) { SaveCollectionDialogCommand.NotifyCanExecuteChanged(); }
+      else if(e.PropertyName == nameof(MTGCardCollectionViewModel.Name)) { DeleteCollectionDialogCommand.NotifyCanExecuteChanged(); }
     }
+
+    public MTGCardCollectionViewModel ScryfallCardViewModels { get; } = new(new());
+    public MTGCardCollectionViewModel CollectionViewModel { get; } = new(new());
+    public MTGCardCollectionViewModel CollectionMaybeViewModel { get; } = new(new());
+    public MTGCardCollectionViewModel CollectionWishlistViewModel { get; } = new(new());
+    public CMCChart CMCChart { get; }
+    public SpellTypeChart SpellTypeChart { get; }
 
     public string SearchQuery
     {
@@ -48,7 +42,6 @@ namespace MTGApplication.ViewModels
         $"format:{SearchFormat}";
       }
     }
-
     public string SearchText { get; set; } = "";
     public string SearchFormat { get; set; } = "Any";
     public string SearchUnique { get; set; } = "Cards";
@@ -158,7 +151,7 @@ namespace MTGApplication.ViewModels
         await LoadCollections(openName);
       }
     }
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSaveCollection))]
     public async Task SaveCollectionDialog()
     {
       var saveName = await App.MainRoot.InputStringDialogAsync(
@@ -183,7 +176,7 @@ namespace MTGApplication.ViewModels
 
       SaveCollections(saveName);
     }
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanDeleteCollection))]
     public async Task DeleteCollectionDialog()
     {
       if (string.IsNullOrEmpty(CollectionViewModel.Name)) { return; }
@@ -211,7 +204,7 @@ namespace MTGApplication.ViewModels
         await CollectionViewModel.ImportFromString(response);
       }
     }
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExportCollection))]
     public async Task ExportCollectionDialog(MTGCardCollectionViewModel collectionVM)
     {
       StringBuilder stringBuilder = new();
@@ -249,5 +242,9 @@ namespace MTGApplication.ViewModels
       CollectionMaybeViewModel.Reset();
       CollectionWishlistViewModel.Reset();
     }
+    // Command CanExecute functions
+    private bool CanSaveCollection() => CollectionViewModel.TotalCount > 0;
+    private bool CanDeleteCollection() => CollectionViewModel.Name != string.Empty;
+    private bool CanExportCollection() => CollectionViewModel.TotalCount > 0;
   }
 }
