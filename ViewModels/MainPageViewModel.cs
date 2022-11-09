@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Charts;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace MTGApplication.ViewModels
     public CMCChart CMCChart { get; }
     public SpellTypeChart SpellTypeChart { get; }
 
+    // TODO: change to Enums
     public string SearchQuery
     {
       get
@@ -59,31 +61,19 @@ namespace MTGApplication.ViewModels
       if (CollectionViewModel.HasUnsavedChanges)
       {
         // Collection has unsaved changes
-        var wantSaveConfirmed = await App.MainRoot.ConfirmationDialogAsync(
-          title: "Save unsaved changes?",
-          content: "Would you like to save unsaved changes?",
-          yesButtonText: "Save");
-
+        var wantSaveConfirmed = await GetUnsavedDialog();
         if (wantSaveConfirmed == null) { return; }
         else if (wantSaveConfirmed is true)
         {
           // User wants to save the unsaved changes
-          var saveName = await App.MainRoot.InputStringDialogAsync(
-            title: "Save your deck?",
-            defaultText: CollectionViewModel.Name,
-            okButtonText: "Save");
-
+          var saveName = await GetSaveDialog(CollectionViewModel.Name);
           if (saveName == string.Empty) { return; }
           else
           {
             if (saveName != CollectionViewModel.Name && IO.GetJsonFileNames(IO.CollectionsPath).Contains(saveName))
             {
               // File exists already
-              var overrideConfirmed = await App.MainRoot.ConfirmationDialogAsync(
-                title: "Override existing deck?",
-                content: $"Deck '{saveName}' already exist. Would you like to override the deck?",
-                noButtonText: string.Empty);
-
+              var overrideConfirmed = await GetOverrideDialog(saveName);
               if (overrideConfirmed == null) { return; }
               else if (overrideConfirmed is true)
               {
@@ -102,31 +92,19 @@ namespace MTGApplication.ViewModels
       if (CollectionViewModel.HasUnsavedChanges)
       {
         // Collection has unsaved changes
-        var wantSaveConfirmed = await App.MainRoot.ConfirmationDialogAsync(
-          title: "Save unsaved changes?",
-          content: "Would you like to save unsaved changes?",
-          yesButtonText: "Save");
-
+        var wantSaveConfirmed = await GetUnsavedDialog();
         if (wantSaveConfirmed == null) { return; }
         else if (wantSaveConfirmed is true)
         {
           // User wants to save the unsaved changes
-          var saveName = await App.MainRoot.InputStringDialogAsync(
-            title: "Save your deck?",
-            defaultText: CollectionViewModel.Name,
-            okButtonText: "Save");
-
+          var saveName = await GetSaveDialog(CollectionViewModel.Name);
           if (saveName == string.Empty) { return; }
           else
           {
             if (saveName != CollectionViewModel.Name && IO.GetJsonFileNames(IO.CollectionsPath).Contains(saveName))
             {
               // File exists already
-              var overrideConfirmed = await App.MainRoot.ConfirmationDialogAsync(
-                title: "Override existing deck?",
-                content: $"Deck '{saveName}' already exist. Would you like to override the deck?",
-                noButtonText: string.Empty);
-
+              var overrideConfirmed = await GetOverrideDialog(saveName);
               if (overrideConfirmed == null) { return; }
               else if (overrideConfirmed is true)
               {
@@ -139,13 +117,7 @@ namespace MTGApplication.ViewModels
       }
 
       var jsonNames = IO.GetJsonFileNames(IO.CollectionsPath);
-      var openName = await App.MainRoot.ComboboxDialogAsync(
-        title: "Open deck",
-        okButtonText: "Open",
-        items: jsonNames,
-        header: "Name"
-        );
-
+      var openName = await GetOpenDialog(jsonNames);
       if (openName != string.Empty)
       {
         await LoadCollections(openName);
@@ -154,23 +126,14 @@ namespace MTGApplication.ViewModels
     [RelayCommand(CanExecute = nameof(CanSaveCollection))]
     public async Task SaveCollectionDialog()
     {
-      var saveName = await App.MainRoot.InputStringDialogAsync(
-        title: "Save your deck?",
-        defaultText: CollectionViewModel.Name,
-        okButtonText: "Save");
-
+      var saveName = await GetSaveDialog(CollectionViewModel.Name);
       if (saveName == string.Empty) { return; }
       else
       {
         if (saveName != CollectionViewModel.Name && IO.GetJsonFileNames(IO.CollectionsPath).Contains(saveName))
         {
           // File exists already
-          var overrideConfirmed = await App.MainRoot.ConfirmationDialogAsync(
-            title: "Override existing deck?",
-            content: $"Deck '{saveName}' already exist. Would you like to override the deck?",
-            noButtonText: string.Empty);
-
-          if (overrideConfirmed == null) { return; }
+          if (GetOverrideDialog(saveName) == null) { return; }
         }
       }
 
@@ -180,13 +143,7 @@ namespace MTGApplication.ViewModels
     public async Task DeleteCollectionDialog()
     {
       if (string.IsNullOrEmpty(CollectionViewModel.Name)) { return; }
-
-      var confirmed = await App.MainRoot.ConfirmationDialogAsync(
-        title: "Delete deck?",
-        content: $"Deleting '{CollectionViewModel.Name}'. Are you sure?",
-        noButtonText: string.Empty);
-
-      if (confirmed is true)
+      if (await GetDeleteDialog(CollectionViewModel.Name) is true)
       {
         CollectionViewModel.DeleteDeckFile();
       }
@@ -194,11 +151,7 @@ namespace MTGApplication.ViewModels
     [RelayCommand]
     public async Task ImportCollectionDialog()
     {
-      var response = await App.MainRoot.TextAreaInputDialogAsync(
-            title: "Import cards",
-            inputPlaceholder: "Example:\n2 Black Lotus\nMox Ruby",
-            okButtonText: "Add to Collection");
-
+      var response = await GetImportDialog();
       if (!string.IsNullOrEmpty(response))
       {
         await CollectionViewModel.ImportFromString(response);
@@ -213,15 +166,65 @@ namespace MTGApplication.ViewModels
         stringBuilder.AppendLine($"{item.Count} {item.Info.Name}");
       }
 
-      var response = await App.MainRoot.TextAreaInputDialogAsync(
-            title: "Export deck",
-            defaultText: stringBuilder.ToString(),
-            okButtonText: "Copy to Clipboard");
-
+      var response = await GetExportDialog(stringBuilder.ToString());
       if (!string.IsNullOrEmpty(response))
       {
         IO.CopyToClipboard(response);
       }
+    }
+
+    // Dialogs
+    private static async Task<bool?> GetUnsavedDialog()
+    {
+      return await App.MainRoot.ConfirmationDialogAsync(
+          title: "Save unsaved changes?",
+          content: "Would you like to save unsaved changes?",
+          yesButtonText: "Save");
+    }
+    private static async Task<string> GetSaveDialog(string collectionName)
+    {
+      return await App.MainRoot.InputStringDialogAsync(
+        title: "Save your deck?",
+        defaultText: collectionName,
+        okButtonText: "Save",
+        invalidCharacters: Path.GetInvalidFileNameChars());
+    }
+    private static async Task<bool?> GetOverrideDialog(string saveName)
+    {
+      return await App.MainRoot.ConfirmationDialogAsync(
+            title: "Override existing deck?",
+            content: $"Deck '{saveName}' already exist. Would you like to override the deck?",
+            noButtonText: string.Empty);
+    }
+    private static async Task<string> GetOpenDialog(string[] fileNames)
+    {
+      return await App.MainRoot.ComboboxDialogAsync(
+        title: "Open deck",
+        okButtonText: "Open",
+        items: fileNames,
+        header: "Name"
+        );
+    }
+    private static async Task<bool?> GetDeleteDialog(string collectionName)
+    {
+      return await App.MainRoot.ConfirmationDialogAsync(
+        title: "Delete deck?",
+        content: $"Deleting '{collectionName}'. Are you sure?",
+        noButtonText: string.Empty);
+    }
+    private static async Task<string> GetImportDialog()
+    {
+      return await App.MainRoot.TextAreaInputDialogAsync(
+            title: "Import cards",
+            inputPlaceholder: "Example:\n2 Black Lotus\nMox Ruby",
+            okButtonText: "Add to Collection");
+    }
+    private static async Task<string> GetExportDialog(string text)
+    {
+      return await App.MainRoot.TextAreaInputDialogAsync(
+            title: "Export deck",
+            defaultText: text,
+            okButtonText: "Copy to Clipboard");
     }
 
     private void SaveCollections(string saveName)

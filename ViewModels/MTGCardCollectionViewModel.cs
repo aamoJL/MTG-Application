@@ -105,17 +105,16 @@ namespace MTGApplication.ViewModels
         Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
       }
     }
-
-    public void AddModel(MTGCardModel newModel)
-    {
-      Model.Add(newModel);
-      Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
-    }
     [RelayCommand]
     public void AddViewModel(MTGCardViewModel newViewModel)
     {
       var newModel = new MTGCardModel(newViewModel.CardInfo, newViewModel.Count);
       AddModel(newModel);
+    }
+    public void AddModel(MTGCardModel newModel)
+    {
+      Model.Add(newModel);
+      Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
     }
     public void RemoveModel(MTGCardModel model)
     {

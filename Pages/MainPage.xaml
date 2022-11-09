@@ -445,7 +445,13 @@
             <controls:AdaptiveGridView.ItemTemplate>
               <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
                 <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
-                  <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
+                  <Grid>
+                    <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
+                    <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10" Visibility="{Binding ControlsVisible}">
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionMaybeViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                    </StackPanel>
+                  </Grid>
                   <Grid>
                     <TextBlock Text="{x:Bind helpers:Format.EuroToString(Price)}" HorizontalAlignment="Right" FontSize="11"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

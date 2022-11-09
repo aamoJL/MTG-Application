@@ -1,6 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication
@@ -60,7 +62,8 @@ namespace MTGApplication
      string title,
      string defaultText = "",
      string okButtonText = "OK",
-     string cancelButtonText = "Cancel")
+     string cancelButtonText = "Cancel",
+     char[] invalidCharacters = null)
     {
       var inputTextBox = new TextBox
       {
@@ -79,6 +82,21 @@ namespace MTGApplication
         RequestedTheme = element.ActualTheme,
         DefaultButton = ContentDialogButton.Primary
       };
+
+      if(invalidCharacters != null)
+      {
+        inputTextBox.TextChanging += (TextBox sender, TextBoxTextChangingEventArgs args) =>
+        {
+          var text = sender.Text;
+          foreach (var c in Path.GetInvalidFileNameChars())
+          {
+            text = text.Replace(c.ToString(), string.Empty);
+          }
+          var oldSelectionStart = sender.SelectionStart;
+          sender.Text = text;
+          sender.Select(oldSelectionStart, 0);
+        };
+      }
 
       if (await dialog.ShowAsync() == ContentDialogResult.Primary)
       {
