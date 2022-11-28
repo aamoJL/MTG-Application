@@ -212,7 +212,7 @@ namespace MTGApplication.ViewModels
         var cards = await App.CardAPI.FetchCards(query);
         foreach (var item in cards)
         {
-          Model.Add(item);
+          Model.Add(item, false);
         }
       }
       HasUnsavedChanges = false;

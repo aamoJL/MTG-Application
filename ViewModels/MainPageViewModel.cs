@@ -19,7 +19,7 @@ namespace MTGApplication.ViewModels
   }
   public enum MTGSearchOrderTypes
   {
-    Released, Set, CMC, Name, Rarity, Color
+    Released, Set, CMC, Name, Rarity, Color, Eur
   }
   public enum MTGSearchDirectionTypes
   {

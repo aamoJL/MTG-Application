@@ -201,7 +201,7 @@
                 <StackPanel Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
                   <Grid>
                     <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
-                    <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10" Visibility="{Binding ControlsVisible}">
+                    <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10 45 20 10" Visibility="{Binding ControlsVisible}">
                       <Button Background="White" Content="{ui:FontIcon Glyph=&#xECC8;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
                       <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionMaybeViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
                       <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
@@ -432,7 +432,7 @@
                 <StackPanel x:Name="CollectionGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CollectionGridViewItem_PointerEntered" PointerExited="CollectionGridViewItem_PointerExited">
                   <Grid>
                     <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
-                    <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10" Visibility="{Binding ControlsVisible}">
+                    <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10 45 20 10" Visibility="{Binding ControlsVisible}">
                       <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionMaybeViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
                       <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
                     </StackPanel>
