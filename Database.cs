@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MTGApplication
 {
@@ -46,7 +47,7 @@ namespace MTGApplication
       public int CardListId { get; set; }
       public ListOfCards CardList { get; set; }
     }
-
+    
     public class CardDeck
     {
       [Key]
@@ -64,6 +65,12 @@ namespace MTGApplication
       [ForeignKey(nameof(Maybelist))]
       public int? MaybelistId { get; set; }
       public ListOfCards Maybelist { get; set; }
+
+      public static bool Exists(string name)
+      {
+        using var db = new CardCollectionContext();
+        return db.CardDecks.SingleOrDefault(x => x.Name == name) != null;
+      }
     }
 
     public class ListOfCards

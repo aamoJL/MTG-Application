@@ -30,22 +30,44 @@ namespace MTGApplication.ViewModels
   {
     public MainPageViewModel() 
     {
-      CollectionViewModel.PropertyChanged += CollectionViewModel_PropertyChanged;
+      DeckViewModel.PropertyChanged += DeckViewModel_PropertyChanged;
+      DeckMaybelistViewModel.PropertyChanged += DeckMaybelistViewModel_PropertyChanged;
+      DeckWishlistViewModel.PropertyChanged += DeckWishlistViewModel_PropertyChanged;
 
-      CMCChart = new CMCChart(CollectionViewModel.CardModels);
-      SpellTypeChart = new SpellTypeChart(CollectionViewModel.CardModels);
+      CMCChart = new CMCChart(DeckViewModel.CardModels);
+      SpellTypeChart = new SpellTypeChart(DeckViewModel.CardModels);
     }
 
-    private void CollectionViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void DeckWishlistViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(MTGCardCollectionViewModel.TotalCount)) { SaveCollectionDialogCommand.NotifyCanExecuteChanged(); }
-      else if(e.PropertyName == nameof(MTGCardCollectionViewModel.Name)) { DeleteCollectionDialogCommand.NotifyCanExecuteChanged(); }
+      // Check if deck commands can execute when the deck changes
+      if (e.PropertyName == nameof(MTGDeckViewModel.TotalCount))
+      {
+        ExportCollectionDialogCommand.NotifyCanExecuteChanged();
+      }
+    }
+    private void DeckMaybelistViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      // Check if deck commands can execute when the deck changes
+      if (e.PropertyName == nameof(MTGDeckViewModel.TotalCount))
+      {
+        ExportCollectionDialogCommand.NotifyCanExecuteChanged();
+      }
+    }
+    private void DeckViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      // Check if deck commands can execute when the deck changes
+      if(e.PropertyName == nameof(MTGDeckViewModel.TotalCount)) { 
+        SaveCollectionDialogCommand.NotifyCanExecuteChanged();
+        ExportCollectionDialogCommand.NotifyCanExecuteChanged();
+      }
+      else if(e.PropertyName == nameof(MTGDeckViewModel.Name)) { DeleteCollectionDialogCommand.NotifyCanExecuteChanged(); }
     }
 
-    public MTGCardCollectionViewModel ScryfallCardViewModels { get; } = new(new());
-    public MTGCardCollectionViewModel CollectionViewModel { get; } = new(new());
-    public MTGCardCollectionViewModel CollectionMaybeViewModel { get; } = new(new());
-    public MTGCardCollectionViewModel CollectionWishlistViewModel { get; } = new(new());
+    public APISearchCardCollectionViewModel APISearchCollectionViewModel { get; } = new(new());
+    public MTGDeckViewModel DeckViewModel { get; } = new(new());
+    public MTGWishlistViewModel DeckWishlistViewModel { get; } = new(new());
+    public MTGMaybelistViewModel DeckMaybelistViewModel { get; } = new(new());
     public CMCChart CMCChart { get; }
     public SpellTypeChart SpellTypeChart { get; }
 
@@ -75,12 +97,12 @@ namespace MTGApplication.ViewModels
     [RelayCommand]
     public async void SearchSubmit()
     {
-      await ScryfallCardViewModels.LoadFromAPIAsync(SearchQuery);
+      await APISearchCollectionViewModel.Search(SearchQuery);
     }
     [RelayCommand]
     public async Task ResetCollectionDialog()
     {
-      if (CollectionViewModel.HasUnsavedChanges)
+      if (DeckViewModel.HasUnsavedChanges)
       {
         // Collection has unsaved changes
         var wantSaveConfirmed = await GetUnsavedDialog();
@@ -88,11 +110,11 @@ namespace MTGApplication.ViewModels
         else if (wantSaveConfirmed is true)
         {
           // User wants to save the unsaved changes
-          var saveName = await GetSaveDialog(CollectionViewModel.Name);
+          var saveName = await GetSaveDialog(DeckViewModel.Name);
           if (saveName == string.Empty) { return; }
           else
           {
-            if (saveName != CollectionViewModel.Name && IO.GetJsonFileNames(IO.CollectionsPath).Contains(saveName))
+            if (saveName != DeckViewModel.Name && Database.CardDeck.Exists(saveName))
             {
               // File exists already
               var overrideConfirmed = await GetOverrideDialog(saveName);
@@ -111,7 +133,7 @@ namespace MTGApplication.ViewModels
     [RelayCommand]
     public async Task OpenCollectionDialog()
     {
-      if (CollectionViewModel.HasUnsavedChanges)
+      if (DeckViewModel.HasUnsavedChanges)
       {
         // Collection has unsaved changes
         var wantSaveConfirmed = await GetUnsavedDialog();
@@ -119,11 +141,11 @@ namespace MTGApplication.ViewModels
         else if (wantSaveConfirmed is true)
         {
           // User wants to save the unsaved changes
-          var saveName = await GetSaveDialog(CollectionViewModel.Name);
+          var saveName = await GetSaveDialog(DeckViewModel.Name);
           if (saveName == string.Empty) { return; }
           else
           {
-            if (saveName != CollectionViewModel.Name && IO.GetJsonFileNames(IO.CollectionsPath).Contains(saveName))
+            if (saveName != DeckViewModel.Name && Database.CardDeck.Exists(saveName))
             {
               // File exists already
               var overrideConfirmed = await GetOverrideDialog(saveName);
@@ -138,21 +160,23 @@ namespace MTGApplication.ViewModels
         }
       }
 
-      var jsonNames = IO.GetJsonFileNames(IO.CollectionsPath);
-      var openName = await GetOpenDialog(jsonNames);
+      using var db = new Database.CardCollectionContext();
+
+      var deckNames = db.CardDecks.Select(x => x.Name).ToArray();
+      var openName = await GetOpenDialog(deckNames);
       if (openName != string.Empty)
       {
-        await LoadCollections(openName);
+        LoadCollections(openName);
       }
     }
     [RelayCommand(CanExecute = nameof(CanSaveCollection))]
     public async Task SaveCollectionDialog()
     {
-      var saveName = await GetSaveDialog(CollectionViewModel.Name);
+      var saveName = await GetSaveDialog(DeckViewModel.Name);
       if (saveName == string.Empty) { return; }
       else
       {
-        if (saveName != CollectionViewModel.Name && IO.GetJsonFileNames(IO.CollectionsPath).Contains(saveName))
+        if (saveName != DeckViewModel.Name && Database.CardDeck.Exists(saveName))
         {
           // File exists already
           if (GetOverrideDialog(saveName) == null) { return; }
@@ -164,19 +188,22 @@ namespace MTGApplication.ViewModels
     [RelayCommand(CanExecute = nameof(CanDeleteCollection))]
     public async Task DeleteCollectionDialog()
     {
-      if (string.IsNullOrEmpty(CollectionViewModel.Name)) { return; }
-      if (await GetDeleteDialog(CollectionViewModel.Name) is true)
+      if (string.IsNullOrEmpty(DeckViewModel.Name)) { return; }
+      if (await GetDeleteDialog(DeckViewModel.Name) is true)
       {
-        CollectionViewModel.DeleteDeckFile();
+        if(await DeckViewModel.DeleteDeckAsync())
+        {
+          ResetCollections();
+        }
       }
     }
     [RelayCommand]
-    public async Task ImportCollectionDialog()
+    public async Task ImportCollectionDialog(MTGCardCollectionViewModel collectionVM)
     {
       var response = await GetImportDialog();
       if (!string.IsNullOrEmpty(response))
       {
-        await CollectionViewModel.ImportFromString(response);
+        _ = collectionVM.ImportFromStringAsync(response);
       }
     }
     [RelayCommand(CanExecute = nameof(CanExportCollection))]
@@ -251,25 +278,30 @@ namespace MTGApplication.ViewModels
 
     private void SaveCollections(string saveName)
     {
-      CollectionViewModel.Save(IO.CollectionsPath, saveName);
-      CollectionMaybeViewModel.Save(IO.CollectionsMaybePath, saveName);
-      CollectionWishlistViewModel.Save(IO.CollectionsWishlistPath, saveName);
+      _ = DeckViewModel.Save(saveName);
+      _ = DeckWishlistViewModel.Save(saveName);
+      _ = DeckMaybelistViewModel.Save(saveName);
     }
-    private async Task LoadCollections(string openName)
+    private void LoadCollections(string openName)
     {
-      await CollectionViewModel.LoadAsync(IO.CollectionsPath, openName);
-      await CollectionMaybeViewModel.LoadAsync(IO.CollectionsMaybePath, openName);
-      await CollectionWishlistViewModel.LoadAsync(IO.CollectionsWishlistPath, openName);
-    } 
+      _ = DeckViewModel.LoadAsync(openName);
+      _ = DeckWishlistViewModel.LoadAsync(openName);
+      _ = DeckMaybelistViewModel.LoadAsync(openName);
+    }
     private void ResetCollections()
     {
-      CollectionViewModel.Reset();
-      CollectionMaybeViewModel.Reset();
-      CollectionWishlistViewModel.Reset();
+      DeckViewModel.Reset();
+      DeckWishlistViewModel.Reset();
+      DeckMaybelistViewModel.Reset();
     }
+    
     // Command CanExecute functions
-    private bool CanSaveCollection() => CollectionViewModel.TotalCount > 0;
-    private bool CanDeleteCollection() => CollectionViewModel.Name != string.Empty;
-    private bool CanExportCollection() => CollectionViewModel.TotalCount > 0;
+    private bool CanSaveCollection() => DeckViewModel.TotalCount > 0;
+    private bool CanDeleteCollection() => DeckViewModel.Name != string.Empty;
+    private bool CanExportCollection(MTGCardCollectionViewModel collectionVM)
+    {
+      if(collectionVM == null) { return false; }
+      return collectionVM.TotalCount > 0;
+    }
   }
 }

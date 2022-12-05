@@ -9,7 +9,10 @@ namespace MTGApplication.API
   /// </summary>
   public abstract class MTGCardAPI
   {
+    public abstract int MaxFetchIdentifierCount { get; }
+
     public abstract Task<MTGCardModel[]> FetchCards(string searchParams, int pageLimit = 3);
+    public abstract Task<MTGCardModel[]> FetchCollectionAsync(Database.Card[] cards);
     public abstract Task<MTGCardModel[]> FetchCollectionAsync(string identifiersJson);
     public abstract Task<bool> OpenAPICardWebsite(MTGCardModel card);
 
