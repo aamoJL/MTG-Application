@@ -6,3 +6,4 @@ Old and deprecated WPF version of this application: [MTG-builder-WPF](https://gi
 # Frameworks
 
 * C# WinUI 3
+* EntityFramework Core (SQLite database)
