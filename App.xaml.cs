@@ -4,6 +4,7 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
 using MTGApplication.API;
+using Microsoft.EntityFrameworkCore;
 
 namespace MTGApplication
 {
@@ -32,6 +33,11 @@ namespace MTGApplication
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+      using (var db = new Database.CardCollectionContext())
+      {
+        db.Database.Migrate();
+      }
+
       m_window = new MainWindow();
       
       Frame rootFrame = new();

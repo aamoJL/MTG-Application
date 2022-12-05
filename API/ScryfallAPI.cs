@@ -1,8 +1,11 @@
-﻿using MTGApplication.Models;
+﻿using CommunityToolkit.WinUI.UI.Controls;
+using MTGApplication.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Windows.System;
@@ -19,6 +22,8 @@ namespace MTGApplication.API
     //private static readonly string FILE_URL = "https://c2.scryfall.com/file";
     private readonly string CARD_FACE_URL = "https://cards.scryfall.io/normal";
     private readonly string SET_ICON_URL = "https://svgs.scryfall.io";
+
+    public override int MaxFetchIdentifierCount => 75;
 
     /// <summary>
     /// Fetches cards from Scryfall API using given parameters
@@ -60,6 +65,44 @@ namespace MTGApplication.API
 
       return cards.ToArray();
     }
+    public override async Task<MTGCardModel[]> FetchCollectionAsync(Database.Card[] cards)
+    {
+      if (cards.Length < 0) return Array.Empty<MTGCardModel>();
+
+      var fetchedCards = new List<MTGCardModel>();
+
+      //Scryfall API allows to fetch only 75 cards at a time
+      foreach (var chunk in cards.Chunk(75))
+      {
+        // Fetch cards in chunks
+        var identifiersJson = string.Empty;
+
+        using (var stream = new MemoryStream())
+        {
+          await JsonSerializer.SerializeAsync(stream, new
+          {
+            identifiers = chunk.Select(x => new
+            {
+              id = x.ScryfallId
+            })
+          });
+          stream.Position = 0;
+          using var reader = new StreamReader(stream);
+          identifiersJson = await reader.ReadToEndAsync();
+        }
+
+        var cardCollection = await FetchCollectionAsync(identifiersJson);
+        
+        foreach (var item in cardCollection)
+        {
+          // Update counts to the fetched cards
+          item.Count = chunk.First(x => x.ScryfallId == item.Info.Id).Count;
+          fetchedCards.Add(item);
+        }
+      }
+
+      return fetchedCards.ToArray();
+    }
     /// <summary>
     /// Fetches maximum of 75 MTGCardModel objects of the given identifiers using Scryfall API
     /// </summary>
@@ -70,9 +113,7 @@ namespace MTGApplication.API
       List<MTGCardModel> cards = new();
       var fetchResult = await IO.FetchStringFromURLPost($"{API_URL}/cards/collection", identifiersJson);
       var json = JsonNode.Parse(fetchResult);
-      var notFound = json["not_found"]?.AsArray();
-
-      if(notFound.Count > 0) Notifications.RaiseError($"{notFound.Count} cards was not found!");
+      //var notFound = json["not_found"]?.AsArray();
       
       var data = json["data"]?.AsArray();
 

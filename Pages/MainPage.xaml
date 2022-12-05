@@ -177,16 +177,16 @@
                 </AppBarButton.Flyout>
               </AppBarButton>
             </CommandBar>
-            <ProgressRing IsActive="{x:Bind ViewModel.ScryfallCardViewModels.IsLoading, Mode=OneWay}"/>
+            <ProgressRing IsActive="{x:Bind ViewModel.APISearchCollectionViewModel.IsBusy, Mode=OneWay}"/>
           </StackPanel>
-          <TextBlock Text="{x:Bind sys:String.Format('{0} cards', ViewModel.ScryfallCardViewModels.TotalCount), Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+          <TextBlock Text="{x:Bind sys:String.Format('{0} cards', ViewModel.APISearchCollectionViewModel.TotalCount), Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
         </Grid>
         <!--Scryfall Card view-->
         <Grid controls:DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="1" Background="white">
           <!--Grid view-->
           <controls:AdaptiveGridView
             x:Name="CardSearchImagesDisplay"
-            DataContext="{x:Bind ViewModel.ScryfallCardViewModels}"
+            DataContext="{x:Bind ViewModel.APISearchCollectionViewModel}"
             ItemContainerTransitions="{x:Null}"
             SelectionMode="None"
             StretchContentForSingleRow="False"
@@ -202,9 +202,9 @@
                   <Grid>
                     <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardSearchItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
                     <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10 45 20 10" Visibility="{Binding ControlsVisible}">
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xECC8;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionMaybeViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xECC8;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckMaybelistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
                     </StackPanel>
                   </Grid>
                   <TextBlock Text="{x:Bind helpers:Format.EuroToString(Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
@@ -217,7 +217,7 @@
             x:Name="CardSearchListDisplay"
             ItemContainerTransitions="{x:Null}"
             SelectionMode="Single"
-            ItemsSource="{x:Bind ViewModel.ScryfallCardViewModels.CardViewModels}"
+            ItemsSource="{x:Bind ViewModel.APISearchCollectionViewModel.CardViewModels}"
             Visibility="Collapsed"
             CanDragItems="True"
             DragItemsStarting="CollectionView_DragItemsStarting">
@@ -252,8 +252,8 @@
                   <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCollectionDialogCommand}" Icon="OpenFile" Text="Open..."/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.SaveCollectionDialogCommand}" Icon="Save" Text="Save..."/>
                   <MenuFlyoutSeparator/>
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import..."/>
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionViewModel}" Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export..." IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionViewModel.TotalCount,0) , Mode=OneWay}"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckViewModel}" Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import..."/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckViewModel}" Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export..."/>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteCollectionDialogCommand}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
@@ -278,28 +278,28 @@
             <AppBarButton Icon="Sort" ToolTipService.ToolTip="Order" Label="Sort" AutomationProperties.Name="Order">
               <AppBarButton.Flyout>
                 <MenuFlyout>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Asc" GroupName="DirectionGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Desc" GroupName="DirectionGroup" />
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Asc" GroupName="DirectionGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Desc" GroupName="DirectionGroup" />
                   <MenuFlyoutSeparator/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.CollectionViewModel.SortByPropertyCommand}" CommandParameter="Price" Text="Price" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.SortByPropertyCommand}" CommandParameter="Price" Text="Price" GroupName="TypeGroup"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
           </CommandBar>
-          <ProgressRing IsActive="{x:Bind Path=ViewModel.CollectionViewModel.IsLoading, Mode=OneWay}"/>
+          <ProgressRing IsActive="{x:Bind Path=ViewModel.DeckViewModel.IsBusy, Mode=OneWay}"/>
         </StackPanel>
         <!--Collection info content-->
         <controls:DockPanel controls:DockPanel.Dock="Right" Width="250" Padding="5 0 0 0" LastChildFill="True">
           <!--Info-->
           <StackPanel controls:DockPanel.Dock="Top" Orientation="Vertical">
-            <TextBlock Text="{x:Bind ViewModel.CollectionViewModel.Name, Mode=OneWay}" FontWeight="Bold"/>
-            <TextBlock Text="{x:Bind sys:String.Format('Cards: {0}', ViewModel.CollectionViewModel.TotalCount), Mode=OneWay}"/>
+            <TextBlock Text="{x:Bind ViewModel.DeckViewModel.Name, Mode=OneWay}" FontWeight="Bold"/>
+            <TextBlock Text="{x:Bind sys:String.Format('Cards: {0}', ViewModel.DeckViewModel.TotalCount), Mode=OneWay}"/>
             <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
           </StackPanel>
           <!--Charts-->
@@ -324,12 +324,15 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
               </Grid.RowDefinitions>
-              <TextBlock Grid.Row="0" Text="Maybe" TextAlignment="Center"/>
-              <Button Grid.Row="0" Content="Export..." FontSize="10" Padding="5 0 5 0" HorizontalAlignment="Right"
-                      IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionMaybeViewModel.TotalCount,0), Mode=OneWay}"
-                      Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionMaybeViewModel}"/>
+              <TextBlock Grid.Row="0" Text="Maybe"/>
+              <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Export..." FontSize="10" Padding="5 0 5 0"
+                        Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckMaybelistViewModel}"/>
+                <Button Content="Import..." FontSize="10" Padding="5 0 5 0"
+                        Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckMaybelistViewModel}"/>
+              </StackPanel>
               <ListView
-                DataContext="{x:Bind ViewModel.CollectionMaybeViewModel}"
+                DataContext="{x:Bind ViewModel.DeckMaybelistViewModel}"
                 BorderBrush="LightGray"
                 Background="White"
                 BorderThickness="1"
@@ -368,12 +371,15 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
               </Grid.RowDefinitions>
-              <TextBlock Grid.Row="0" Text="Wishlist" TextAlignment="Center"/>
-              <Button Grid.Row="0" Content="Export..." FontSize="10" Padding="5 0 5 0" HorizontalAlignment="Right"
-                      IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CollectionWishlistViewModel.TotalCount,0), Mode=OneWay}"
-                      Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.CollectionWishlistViewModel}"/>
+              <TextBlock Grid.Row="0" Text="Wishlist"/>
+              <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Export..." FontSize="10" Padding="5 0 5 0"
+                        Command="{x:Bind ViewModel.ExportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckWishlistViewModel}"/>
+                <Button Content="Import..." FontSize="10" Padding="5 0 5 0"
+                        Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckWishlistViewModel}"/>
+              </StackPanel>
               <ListView
-                DataContext="{x:Bind ViewModel.CollectionWishlistViewModel}"
+                DataContext="{x:Bind ViewModel.DeckWishlistViewModel}"
                 BorderBrush="LightGray"
                 Background="White"
                 BorderThickness="1"
@@ -409,10 +415,10 @@
             </Grid>
           </Grid>
         </controls:DockPanel>
-        <!--Collection Grid View-->
+        <!--Deck Grid View-->
         <Grid controls:DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="1" Background="White">
           <controls:AdaptiveGridView
-            DataContext="{x:Bind ViewModel.CollectionViewModel}"
+            DataContext="{x:Bind ViewModel.DeckViewModel}"
             x:Name="CollectionImagesDisplay"
             ItemsSource="{Binding CardViewModels}"
             StretchContentForSingleRow="False"
@@ -433,8 +439,8 @@
                   <Grid>
                     <controls:ImageEx CornerRadius="10" Source="{Binding SelectedFaceUri}" ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}" IsCacheEnabled="True" PlaceholderSource="/Assets/back.jpg" PlaceholderStretch="Fill" Style="{StaticResource PlaceholderImageStyle}"/>
                     <StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10 45 20 10" Visibility="{Binding ControlsVisible}">
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionMaybeViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.CollectionWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckMaybelistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
+                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
                     </StackPanel>
                   </Grid>
                   <Grid>
@@ -453,13 +459,13 @@
               </DataTemplate>
             </controls:AdaptiveGridView.ItemTemplate>
           </controls:AdaptiveGridView>
-          <!--List View-->
+          <!--Deck List View-->
           <ListView
-            DataContext="{x:Bind ViewModel.CollectionViewModel}"
+            DataContext="{x:Bind ViewModel.DeckViewModel}"
             x:Name="CollectionListDisplay"
             ItemContainerTransitions="{x:Null}"
             SelectionMode="Single"
-            ItemsSource="{x:Bind ViewModel.CollectionViewModel.CardViewModels}"
+            ItemsSource="{x:Bind ViewModel.DeckViewModel.CardViewModels}"
             Visibility="Collapsed"
             CanDragItems="True"
             AllowDrop="True"

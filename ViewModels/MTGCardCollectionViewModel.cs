@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Collections.Specialized;
 using MTGApplication.Models;
 using CommunityToolkit.Mvvm.Input;
@@ -12,6 +11,7 @@ using System.Threading.Tasks;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace MTGApplication.ViewModels
 {
@@ -22,28 +22,23 @@ namespace MTGApplication.ViewModels
       Model = model;
       model.Cards.CollectionChanged += Model_CollectionChanged;
       model.PropertyChanged += Model_PropertyChanged;
-
-      Name = model.Name;
-      TotalCount = model.TotalCount;
     }
 
-    private MTGCardCollectionModel Model { get; }
+    protected virtual MTGCardCollectionModel Model { get; }
     public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new(); // Synced to Model.Cards
 
-    private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected virtual void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       switch (e.PropertyName)
       {
-        case nameof(Model.Name): Name = Model.Name; break;
         case nameof(Model.Cards): OnPropertyChanged(nameof(CardModels)); break;
         case nameof(Model.TotalCount):
-          TotalCount = Model.TotalCount;
-          if (SelectedSortProperty == SortProperty.Count) { Model.SortCollection(SelectedSortDirection, SelectedSortProperty); }
-          HasUnsavedChanges = true; break;
+          OnPropertyChanged(nameof(TotalCount));
+          if (SelectedSortProperty == SortProperty.Count) { Model.SortCollection(SelectedSortDirection, SelectedSortProperty); } break;
         default: break;
       }
     }
-    private void Model_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    protected virtual void Model_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       // Sync Model.Cards and CardViewModels
       MTGCardModel modelCard;
@@ -69,23 +64,17 @@ namespace MTGApplication.ViewModels
           break;
       }
     }
-
-    // Model properties
-    [ObservableProperty]
-    private string name;
-    [ObservableProperty]
-    private int totalCount;
+    
+    public int TotalCount => Model.TotalCount;
     public ObservableCollection<MTGCardModel> CardModels => Model.Cards;
 
     // ViewModel properties
     [ObservableProperty]
-    private bool isLoading;
+    protected bool isBusy;
     [ObservableProperty]
-    private SortProperty selectedSortProperty = SortProperty.Name;
+    protected SortProperty selectedSortProperty = SortProperty.Name;
     [ObservableProperty]
-    private SortDirection selectedSortDirection = SortDirection.ASC;
-    [ObservableProperty]
-    private bool hasUnsavedChanges;
+    protected SortDirection selectedSortDirection = SortDirection.ASC;
 
     [RelayCommand]
     public void SortByDirection(string dir)
@@ -125,111 +114,24 @@ namespace MTGApplication.ViewModels
       if (string.IsNullOrEmpty(viewModel?.CardInfo.Id)) { return; }
       RemoveModel(Model.Cards.First(x => x.Info.Id == viewModel.CardInfo.Id));
     }
-    public void Reset()
-    {
-      Model.Reset();
-      HasUnsavedChanges = false;
-    }
-    public void DeleteDeckFile()
-    {
-      if (Name != "")
-        IO.DeleteFile($"{IO.CollectionsPath}{Name}.json");
-      Reset();
-    }
-    public void Save(string path, string name)
-    {
-      Model.Name = name;
-      IO.WriteTextToFile($"{path}/{name}.json",
-        JsonSerializer.Serialize(Model.Cards.Select(x => new
-        {
-          x.Info.Id,
-          x.Count
-        })));
-      HasUnsavedChanges = false;
-    }
-    public async Task LoadAsync(string path, string name)
-    {
-      IsLoading = true;
-      Reset();
+    public virtual void Clear() => Model.Clear();
 
-      try
-      {
-        var jsonString = await IO.ReadTextFromFileAsync($"{path}/{name}.json");
-        var ids = JsonNode.Parse(jsonString).AsArray();
-
-        var IdObjects = ids.Select(x => new
-        {
-          Id = x["Id"].GetValue<string>(),
-          Count = x["Count"].GetValue<int>()
-        });
-
-        //Scryfall API allows to fetch only 75 cards at a time
-        foreach (var chunk in IdObjects.Chunk(75))
-        {
-          // Fetch cards in chunks
-          var identifiersJson = string.Empty;
-
-          using (var stream = new MemoryStream())
-          {
-            await JsonSerializer.SerializeAsync(stream, new {
-              identifiers = chunk.Select(x => new
-              {
-                id = x.Id
-              })
-            });
-            stream.Position = 0;
-            using var reader = new StreamReader(stream);
-            identifiersJson = await reader.ReadToEndAsync();
-          }
-
-          var cardCollection = await App.CardAPI.FetchCollectionAsync(identifiersJson);
-          foreach (var item in cardCollection)
-          {
-            // Update counts to the fetched cards
-            item.Count = chunk.First(x => x.Id == item.Info.Id).Count;
-            Model.Add(item);
-          }
-        }
-        Model.Name = name;
-        Model.SortCollection(SelectedSortDirection, SelectedSortProperty);
-        HasUnsavedChanges = false;
-      }
-      catch (Exception) { }
-
-      IsLoading = false;
-    }
-    /// <summary>
-    /// Fetches cards from API and changes cards to the fetched cards
-    /// </summary>
-    /// <param name="query">API query parameters</param>
-    /// <returns></returns>
-    public async Task LoadFromAPIAsync(string query)
-    {
-      IsLoading = true;
-      Reset();
-      if (!string.IsNullOrEmpty(query))
-      {
-        var cards = await App.CardAPI.FetchCards(query);
-        foreach (var item in cards)
-        {
-          Model.Add(item, false);
-        }
-      }
-      HasUnsavedChanges = false;
-      IsLoading = false;
-    }
     /// <summary>
     /// Imports cards from formatted text.
     /// <code>Format example:
     /// 4 Black Lotus
     /// Mox Ruby</code>
     /// </summary>
-    public async Task ImportFromString(string text)
+    public virtual async Task ImportFromStringAsync(string text)
     {
+      IsBusy = true;
+
       var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
       var IdObjects = lines.Select(line =>
       {
+        // Format: {Count (optional)} {Name}
+        // Stops at '/' so only the first name will be used for multiface cards
         var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
         var match = regexGroups.Match(line);
 
@@ -241,11 +143,11 @@ namespace MTGApplication.ViewModels
         return new
         {
           Count = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
-          Name = nameMatch,
+          Name = nameMatch.Trim(),
         };
       });
 
-      foreach (var chunk in IdObjects.Chunk(75))
+      List<Task<MTGCardModel[]>> chunkTasks = new(IdObjects.Chunk(App.CardAPI.MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
       {
         // Fetch cards in chunks
         var identifiersJson = string.Empty;
@@ -264,15 +166,28 @@ namespace MTGApplication.ViewModels
           identifiersJson = await reader.ReadToEndAsync();
         }
 
-        var newCards = await App.CardAPI.FetchCollectionAsync(identifiersJson);
-        foreach (var item in newCards)
+        MTGCardModel[] fetchedCards = await App.CardAPI.FetchCollectionAsync(identifiersJson);
+        foreach (var item in fetchedCards)
         {
-          // Update counts to the fetched cards
-          var found = chunk.FirstOrDefault(x => item.Info.Name.Contains(x.Name));
-          if(found != null) item.Count = found.Count;
-          Model.Add(item);
+          //Update counts to the fetched cards
+          var found = chunk.FirstOrDefault(x => item.Info.CardFaces[0].Name == x.Name);
+          if (found != null) { item.Count = found.Count; }
+        }
+
+        return fetchedCards;
+      })));
+
+      var fetchedCardLists = await Task.WhenAll(chunkTasks);
+
+      foreach (var list in fetchedCardLists)
+      {
+        foreach (var card in list)
+        {
+          Model.Add(card);
         }
       }
+      
+      IsBusy = false;
     }
   }
 }

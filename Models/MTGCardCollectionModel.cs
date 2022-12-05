@@ -18,8 +18,36 @@ namespace MTGApplication.Models
       CMC, Name, Rarity, Color, Set, Count, Price
     }
 
-    [ObservableProperty]
-    private string name = "";
+    public MTGCardCollectionModel()
+    {
+      Cards.CollectionChanged += Cards_CollectionChanged;
+    }
+
+    private void Cards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+      switch (e.Action)
+      {
+        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+          (e.NewItems[0] as MTGCardModel).PropertyChanged += MTGCardCollectionModel_PropertyChanged; 
+          OnPropertyChanged(nameof(TotalCount)); break;
+        case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+          (e.OldItems[0] as MTGCardModel).PropertyChanged -= MTGCardCollectionModel_PropertyChanged; 
+          OnPropertyChanged(nameof(TotalCount)); break;
+        case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+          OnPropertyChanged(nameof(TotalCount)); break;
+        case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+          break;
+        case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+        default:
+          throw new NotImplementedException();
+      }
+    }
+    private void MTGCardCollectionModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if(e.PropertyName == nameof(MTGCardModel.Count))
+        OnPropertyChanged(nameof(TotalCount));
+    }
+
     public ObservableCollection<MTGCardModel> Cards { get; } = new();
     public int TotalCount { get => Cards.Sum(x => x.Count); }
 
@@ -64,41 +92,15 @@ namespace MTGApplication.Models
     {
       if (combineName)
       {
-        var existingModelName = Cards.FirstOrDefault(x => x.Info.Name == model.Info.Name);
-        if (existingModelName != null)
+        if (Cards.FirstOrDefault(x => x.Info.Name == model.Info.Name) is MTGCardModel existingModel)
         {
-          existingModelName.Count += model.Count;
+          existingModel.Count += model.Count;
         }
-        else
-        {
-          Cards.Add(model);
-          model.PropertyChanged += Card_PropertyChanged;
-        }
+        else { Cards.Add(model); }
       }
-      else
-      {
-        Cards.Add(model);
-        model.PropertyChanged += Card_PropertyChanged;
-      }
-
-      OnPropertyChanged(nameof(TotalCount));
+      else { Cards.Add(model); }
     }
-    public void Remove(MTGCardModel model)
-    {
-      Cards.Remove(model);
-      model.PropertyChanged -= Card_PropertyChanged;
-      OnPropertyChanged(nameof(TotalCount));
-    }
-    public void Reset()
-    {
-      Name = "";
-      Cards.Clear();
-      OnPropertyChanged(nameof(TotalCount));
-    }
-
-    private void Card_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      OnPropertyChanged(nameof(TotalCount));
-    }
+    public void Remove(MTGCardModel model) => Cards.Remove(model);
+    public void Clear() => Cards.Clear();
   }
 }
