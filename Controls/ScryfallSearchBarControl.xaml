@@ -1,0 +1,79 @@
+<UserControl
+    x:Class="MTGApplication.Controls.ScryfallSearchBarControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:controls="using:MTGApplication.Controls"
+    mc:Ignorable="d">
+  <Grid ColumnSpacing="0">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="auto"/>
+      <ColumnDefinition Width="auto"/>
+    </Grid.ColumnDefinitions>
+    <TextBox x:Name="ScryfallSearchBox" Grid.Column="0" PlaceholderText="Search..."  IsSpellCheckEnabled="False" CornerRadius="4 0 0 4" Text="{x:Bind SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+      <TextBox.HeaderTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Scryfall search" VerticalAlignment="Center" />
+            <HyperlinkButton Content="syntax?" NavigateUri="https://scryfall.com/docs/syntax" Padding="5 0 5 0" Margin="5 0 5 0"/>
+          </StackPanel>
+        </DataTemplate>
+      </TextBox.HeaderTemplate>
+    </TextBox>
+    <StackPanel Grid.Column="1" Orientation="Horizontal">
+      <ComboBox
+              Header="Format"
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
+              Width="85"
+              ItemsSource="{ui:EnumValues Type=controls:MTGSearchFormatTypes}"
+              SelectedItem="{x:Bind SearchFormat, Mode=TwoWay}"/>
+      <ComboBox
+              Header="Unique"
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
+              Width="85"
+              ItemsSource="{ui:EnumValues Type=controls:MTGSearchUniqueTypes}"
+              SelectedItem="{x:Bind SearchUnique, Mode=TwoWay}"/>
+      <ComboBox
+              Header="Order" 
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
+              Width="105"
+              ItemsSource="{ui:EnumValues Type=controls:MTGSearchOrderTypes}"
+              SelectedItem="{x:Bind SearchOrder, Mode=TwoWay}" />
+      <ComboBox
+              Header="Direction" 
+              VerticalAlignment="Bottom" 
+              HorizontalAlignment="Stretch"
+              CornerRadius="0" 
+              BorderThickness="0 1 1 1" 
+              Width="80"
+              ItemsSource="{ui:EnumValues Type=controls:MTGSearchDirectionTypes}"
+              SelectedItem="{x:Bind SearchDirection, Mode=TwoWay}" />
+    </StackPanel>
+    <Button
+            Grid.Column="2" 
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Stretch"
+            CornerRadius="0 4 4 0" 
+            BorderThickness="0 1 1 1" 
+            Height="32"
+            Click="SearchButton_Click"
+            Command="{x:Bind SearchSubmitCommand}">
+      <Button.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind ScryfallSearchBox}"/>
+      </Button.KeyboardAccelerators>
+      <SymbolIcon Symbol="Find"/>
+    </Button>
+  </Grid>
+</UserControl>

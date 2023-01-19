@@ -158,12 +158,5 @@ namespace MTGApplication.Pages
       }
     }
     #endregion
-
-    private void SearchButton_Click(object sender, RoutedEventArgs e)
-    {
-      // Select the search box text so the user doesn't need to click the search box again to write the next search.
-      ScryfallSearchBox.Focus(FocusState.Programmatic);
-      ScryfallSearchBox.SelectAll();
-    }
   }
 }
