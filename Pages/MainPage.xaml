@@ -38,6 +38,13 @@
       <MenuFlyoutSeparator />
       <MenuFlyoutItem Command="{Binding RemoveRequestCommand}" CommandParameter="{Binding}" Icon="delete" Text="Delete"/>
     </MenuFlyout>
+
+    <!--Styles-->
+    <Style x:Key="GridViewStyle" TargetType="Grid">
+      <Setter Property="Background" Value="white"/>
+      <Setter Property="BorderBrush" Value="LightGray"/>
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
   </Page.Resources>
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -114,7 +121,7 @@
           <TextBlock Text="{x:Bind sys:String.Format('{0} cards', ViewModel.APISearchCollectionViewModel.TotalCount), Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
         </Grid>
         <!--Scryfall Card view-->
-        <Grid controls:DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="1" Background="white">
+        <Grid controls:DockPanel.Dock="Top" Style="{StaticResource GridViewStyle}">
           <!--Grid view-->
           <controls:AdaptiveGridView
             x:Name="CardSearchImagesDisplay"
@@ -124,7 +131,7 @@
             StretchContentForSingleRow="False"
             DesiredWidth="{x:Bind ScryfallSearchSizeSlider.Value, Mode=OneWay}"
             ItemsSource="{Binding CardViewModels}"
-            Margin="10 10 5 10"
+            Padding="10 10 5 10"
             Visibility="Collapsed"
             CanDragItems="True"
             DragItemsStarting="CollectionView_DragItemsStarting">
@@ -263,40 +270,38 @@
                 <Button Content="Import..." FontSize="10" Padding="5 0 5 0"
                         Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckMaybelistViewModel}"/>
               </StackPanel>
-              <ListView
-                DataContext="{x:Bind ViewModel.DeckMaybelistViewModel}"
-                BorderBrush="LightGray"
-                Background="White"
-                BorderThickness="1"
-                Grid.Row="1"
-                x:Name="CollectionMaybeDisplay"
-                ItemContainerTransitions="{x:Null}"
-                SelectionMode="Single"
-                ItemsSource="{Binding CardViewModels}"
-                CanDragItems="True"
-                AllowDrop="True"
-                DragOver="CollectionView_DragOver"
-                Drop="CollectionView_Drop"
-                DragItemsStarting="CollectionView_DragItemsStarting"
-                DragItemsCompleted="CollectionView_DragItemsCompleted">
-                <ListView.ItemTemplate>
-                  <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                    <StackPanel 
-                    Height="25"
-                    Orientation="Horizontal" 
-                    Spacing="10" 
-                    Background="Transparent" 
-                    ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
-                    PointerEntered="CollectionListViewItem_PointerEntered"
-                    PointerExited="CollectionListViewItem_PointerExited"
-                    PointerMoved="CollecitonListViewItem_PointerMoved">
-                      <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
-                      <Image Width="20" Source="{Binding SetIcon}"/>
-                      <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
-                    </StackPanel>
-                  </DataTemplate>
-                </ListView.ItemTemplate>
-              </ListView>
+              <Grid Grid.Row="1" Style="{StaticResource GridViewStyle}">
+                <ListView
+                  DataContext="{x:Bind ViewModel.DeckMaybelistViewModel}"
+                  x:Name="CollectionMaybeDisplay"
+                  ItemContainerTransitions="{x:Null}"
+                  SelectionMode="Single"
+                  ItemsSource="{Binding CardViewModels}"
+                  CanDragItems="True"
+                  AllowDrop="True"
+                  DragOver="CollectionView_DragOver"
+                  Drop="CollectionView_Drop"
+                  DragItemsStarting="CollectionView_DragItemsStarting"
+                  DragItemsCompleted="CollectionView_DragItemsCompleted">
+                  <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                      <StackPanel 
+                      Height="25"
+                      Orientation="Horizontal" 
+                      Spacing="10" 
+                      Background="Transparent" 
+                      ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
+                      PointerEntered="CollectionListViewItem_PointerEntered"
+                      PointerExited="CollectionListViewItem_PointerExited"
+                      PointerMoved="CollecitonListViewItem_PointerMoved">
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
+                        <Image Width="20" Source="{Binding SetIcon}"/>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                      </StackPanel>
+                    </DataTemplate>
+                  </ListView.ItemTemplate>
+                </ListView>
+              </Grid>
             </Grid>
             <Grid Grid.Row="1">
               <Grid.RowDefinitions>
@@ -310,45 +315,43 @@
                 <Button Content="Import..." FontSize="10" Padding="5 0 5 0"
                         Command="{x:Bind ViewModel.ImportCollectionDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckWishlistViewModel}"/>
               </StackPanel>
-              <ListView
-                DataContext="{x:Bind ViewModel.DeckWishlistViewModel}"
-                BorderBrush="LightGray"
-                Background="White"
-                BorderThickness="1"
-                Grid.Row="1"
-                x:Name="CollectionWishlistDisplay"
-                ItemContainerTransitions="{x:Null}"
-                SelectionMode="Single"
-                ItemsSource="{Binding CardViewModels}"
-                CanDragItems="True"
-                AllowDrop="True"
-                DragOver="CollectionView_DragOver"
-                Drop="CollectionView_Drop"
-                DragItemsStarting="CollectionView_DragItemsStarting"
-                DragItemsCompleted="CollectionView_DragItemsCompleted">
-                <ListView.ItemTemplate>
-                  <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                    <StackPanel 
-                    Height="25"
-                    Orientation="Horizontal" 
-                    Spacing="10" 
-                    Background="Transparent" 
-                    ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
-                    PointerEntered="CollectionListViewItem_PointerEntered"
-                    PointerExited="CollectionListViewItem_PointerExited"
-                    PointerMoved="CollecitonListViewItem_PointerMoved">
-                      <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
-                      <Image Width="20" Source="{Binding SetIcon}"/>
-                      <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
-                    </StackPanel>
-                  </DataTemplate>
-                </ListView.ItemTemplate>
-              </ListView>
+              <Grid Grid.Row="1" Style="{StaticResource GridViewStyle}">
+                <ListView
+                  DataContext="{x:Bind ViewModel.DeckWishlistViewModel}"
+                  x:Name="CollectionWishlistDisplay"
+                  ItemContainerTransitions="{x:Null}"
+                  SelectionMode="Single"
+                  ItemsSource="{Binding CardViewModels}"
+                  CanDragItems="True"
+                  AllowDrop="True"
+                  DragOver="CollectionView_DragOver"
+                  Drop="CollectionView_Drop"
+                  DragItemsStarting="CollectionView_DragItemsStarting"
+                  DragItemsCompleted="CollectionView_DragItemsCompleted">
+                  <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                      <StackPanel 
+                      Height="25"
+                      Orientation="Horizontal" 
+                      Spacing="10" 
+                      Background="Transparent" 
+                      ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
+                      PointerEntered="CollectionListViewItem_PointerEntered"
+                      PointerExited="CollectionListViewItem_PointerExited"
+                      PointerMoved="CollecitonListViewItem_PointerMoved">
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
+                        <Image Width="20" Source="{Binding SetIcon}"/>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+                      </StackPanel>
+                    </DataTemplate>
+                  </ListView.ItemTemplate>
+                </ListView>
+              </Grid>
             </Grid>
           </Grid>
         </controls:DockPanel>
         <!--Deck Grid View-->
-        <Grid controls:DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="1" Background="White">
+        <Grid controls:DockPanel.Dock="Top" Style="{StaticResource GridViewStyle}">
           <controls:AdaptiveGridView
             DataContext="{x:Bind ViewModel.DeckViewModel}"
             x:Name="CollectionImagesDisplay"
@@ -357,7 +360,7 @@
             ItemContainerTransitions="{x:Null}"
             SelectionMode="None"
             DesiredWidth="{x:Bind CollectionSizeSlider.Value, Mode=OneWay}"
-            Margin="10 10 5 10"
+            Padding="10 10 5 10"
             Visibility="Collapsed"
             CanDragItems="True"
             AllowDrop="True"
