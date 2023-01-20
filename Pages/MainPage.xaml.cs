@@ -1,4 +1,5 @@
-﻿using LiveChartsCore.SkiaSharpView;
+﻿using CommunityToolkit.WinUI.UI.Controls;
+using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -158,5 +159,18 @@ namespace MTGApplication.Pages
       }
     }
     #endregion
+
+    private void GridSplitter_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+      // Collapse the splitter when double tapped
+      GridSplitter splitter = (GridSplitter)sender;
+      Grid grid = (Grid)splitter.Parent;
+
+      int colIndex = (int)(splitter.GetValue(Grid.ColumnProperty)) - 1;
+      if (colIndex < 0) { return; }
+
+      grid.ColumnDefinitions[colIndex].Width = new GridLength(16);
+      VisualStateManager.GoToState(splitter, "Normal", true); // Pointer released event does not trigger, so the state needs to be changed manually.
+    }
   }
 }

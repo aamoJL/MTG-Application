@@ -23,6 +23,23 @@
     <!--Override list item height-->
     <x:Double x:Key="ListViewItemMinHeight">25</x:Double>
 
+    <!--Data Templates-->
+    <DataTemplate x:Key="CollectionSideListViewTemplate" x:DataType="viewmodels:MTGCardViewModel">
+      <StackPanel 
+          Height="25"
+          Orientation="Horizontal" 
+          Spacing="10" 
+          Background="Transparent" 
+          ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
+          PointerEntered="CollectionListViewItem_PointerEntered"
+          PointerExited="CollectionListViewItem_PointerExited"
+          PointerMoved="CollecitonListViewItem_PointerMoved">
+        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
+        <Image Width="20" Source="{Binding SetIcon}"/>
+        <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
+      </StackPanel>
+    </DataTemplate>
+
     <!--List item flyouts-->
     <MenuFlyout x:Key="CardSearchItemFlyoutTemplate" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
       <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -90,7 +107,7 @@
 
     <Grid ColumnSpacing="16">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" MinWidth="550"/>
+        <ColumnDefinition Width="*" MinWidth="16"/>
         <ColumnDefinition Width="1.3*" MinWidth="550"/>
       </Grid.ColumnDefinitions>
       <!--Search-->
@@ -123,7 +140,9 @@
         <!--Scryfall Card view-->
         <Grid controls:DockPanel.Dock="Top" Style="{StaticResource GridViewStyle}">
           <!--Grid view-->
+          <!--Min Width must be over 0, otherwise the program crashes when the view expands from 0 using GripSplitter-->
           <controls:AdaptiveGridView
+            MinWidth="100"
             x:Name="CardSearchImagesDisplay"
             DataContext="{x:Bind ViewModel.APISearchCollectionViewModel}"
             ItemContainerTransitions="{x:Null}"
@@ -282,25 +301,8 @@
                   DragOver="CollectionView_DragOver"
                   Drop="CollectionView_Drop"
                   DragItemsStarting="CollectionView_DragItemsStarting"
-                  DragItemsCompleted="CollectionView_DragItemsCompleted">
-                  <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                      <StackPanel 
-                      Height="25"
-                      Orientation="Horizontal" 
-                      Spacing="10" 
-                      Background="Transparent" 
-                      ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
-                      PointerEntered="CollectionListViewItem_PointerEntered"
-                      PointerExited="CollectionListViewItem_PointerExited"
-                      PointerMoved="CollecitonListViewItem_PointerMoved">
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
-                        <Image Width="20" Source="{Binding SetIcon}"/>
-                        <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListView.ItemTemplate>
-                </ListView>
+                  DragItemsCompleted="CollectionView_DragItemsCompleted"
+                  ItemTemplate="{StaticResource CollectionSideListViewTemplate}"/>
               </Grid>
             </Grid>
             <Grid Grid.Row="1">
@@ -327,25 +329,8 @@
                   DragOver="CollectionView_DragOver"
                   Drop="CollectionView_Drop"
                   DragItemsStarting="CollectionView_DragItemsStarting"
-                  DragItemsCompleted="CollectionView_DragItemsCompleted">
-                  <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
-                      <StackPanel 
-                      Height="25"
-                      Orientation="Horizontal" 
-                      Spacing="10" 
-                      Background="Transparent" 
-                      ContextFlyout="{StaticResource CardCollectionItemFlyoutTemplate}"
-                      PointerEntered="CollectionListViewItem_PointerEntered"
-                      PointerExited="CollectionListViewItem_PointerExited"
-                      PointerMoved="CollecitonListViewItem_PointerMoved">
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}"/>
-                        <Image Width="20" Source="{Binding SetIcon}"/>
-                        <TextBlock VerticalAlignment="Center" Text="{Binding CardInfo.Name}"/>
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListView.ItemTemplate>
-                </ListView>
+                  DragItemsCompleted="CollectionView_DragItemsCompleted"
+                  ItemTemplate="{StaticResource CollectionSideListViewTemplate}"/>
               </Grid>
             </Grid>
           </Grid>
@@ -438,11 +423,11 @@
             ResizeDirection="Auto"
             ResizeBehavior="BasedOnAlignment"
             CursorBehavior="ChangeOnSplitterHover"
-            Width="16">
+            Width="16"
+            DoubleTapped="GridSplitter_DoubleTapped">
         <controls:GridSplitter.RenderTransform>
           <TranslateTransform X="-16" />
         </controls:GridSplitter.RenderTransform>
-
       </controls:GridSplitter>
     </Grid>
     <Canvas>
