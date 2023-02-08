@@ -2,7 +2,9 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using Windows.UI.Notifications;
 
 namespace MTGApplication
 {
@@ -186,10 +188,22 @@ namespace MTGApplication
 
   public static class Notifications
   {
-    public static event EventHandler<string> OnCopied;
-    public static event EventHandler<string> OnError;
+    public enum NotificationType { Info, Error, Warning, Success }
 
-    public static void RaiseCopied(string text) => OnCopied?.Invoke(null, text);
-    public static void RaiseError(string text) => OnError?.Invoke(null, text);
+    public class NotificationEventArgs : EventArgs
+    {
+      public NotificationType Type { get; set; }
+      public string Text { get; set; }
+
+      public NotificationEventArgs(NotificationType type, string text)
+      {
+        Type = type;
+        Text = text;
+      }
+    }
+
+    public static event EventHandler<NotificationEventArgs> OnNotification;
+
+    public static void RaiseNotification(NotificationType type, string text) => OnNotification?.Invoke(null, new NotificationEventArgs(type, text));
   }
 }

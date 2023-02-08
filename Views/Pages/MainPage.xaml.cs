@@ -1,16 +1,6 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using LiveChartsCore.SkiaSharpView;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using MTGApplication.Models;
-using MTGApplication.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using Windows.ApplicationModel.DataTransfer;
+using Windows.UI;
 
 namespace MTGApplication.Pages
 {
@@ -19,25 +9,31 @@ namespace MTGApplication.Pages
   /// </summary>
   public sealed partial class MainPage : Page
   {
+    private readonly int notificationDuration = 4000;
+    
     public MainPage()
     {
       this.InitializeComponent();
 
-      Notifications.OnCopied += Notifications_OnCopied;
-      Notifications.OnError += Notifications_OnError;
+      Notifications.OnNotification += Notifications_OnNotification;
     }
 
-    #region //-----Notifications-----//
-    private readonly int notificationDuration = 3000;
+    private void Notifications_OnNotification(object sender, Notifications.NotificationEventArgs e)
+    {
+      switch (e.Type)
+      {
+        case Notifications.NotificationType.Error:
+          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)); break;
+        case Notifications.NotificationType.Warning:
+          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)); break;
+        case Notifications.NotificationType.Success:
+          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)); break;
+        case Notifications.NotificationType.Info:
+        default: 
+          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)); break;
+      }
 
-    private void Notifications_OnError(object sender, string error)
-    {
-      PopupAppNotification.Show(error, notificationDuration);
+      PopupAppNotification.Show(e.Text, notificationDuration);
     }
-    private void Notifications_OnCopied(object sender, string e)
-    {
-      PopupAppNotification.Show("Copied", notificationDuration);
-    }
-    #endregion
   }
 }

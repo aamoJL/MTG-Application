@@ -311,9 +311,21 @@
                 <AppBarButton Icon="OpenFile" Label="File">
                   <AppBarButton.Flyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.NewDeckDialogCommand}" Icon="NewFolder" Text="New"/>
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.LoadDeckDialogCommand}" Icon="OpenFile" Text="Open..."/>
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.SaveDeckDialogCommand}" Icon="Save" Text="Save..."/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.NewDeckDialogCommand}" Icon="NewFolder" Text="New">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                          <KeyboardAccelerator Key="N" Modifiers="Control"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
+                      </MenuFlyoutItem>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.LoadDeckDialogCommand}" Icon="OpenFile" Text="Open...">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                          <KeyboardAccelerator Key="O" Modifiers="Control"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
+                      </MenuFlyoutItem>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.SaveDeckDialogCommand}" Icon="Save" Text="Save...">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                          <KeyboardAccelerator Key="S" Modifiers="Control" IsEnabled="True"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
+                      </MenuFlyoutItem>
                       <MenuFlyoutSeparator/>
                       <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import...">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCardsDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards, Mode=OneWay}" Text="Deck"/>

@@ -61,7 +61,7 @@ namespace MTGApplication.ViewModels
         switch (e.Action)
         {
           case NotifyCollectionChangedAction.Add:
-            //await SortCardViewModels(MaybelistViewModels, SelectedSortProperty, SelectedSortDirection); break;
+            await SortCardViewModels(MaybelistViewModels, SelectedSortProperty, SelectedSortDirection); break;
           default: break;
         }
       }
@@ -70,7 +70,7 @@ namespace MTGApplication.ViewModels
         switch (e.Action)
         {
           case NotifyCollectionChangedAction.Add:
-            //await SortCardViewModels(WishlistViewModels, SelectedSortProperty, SelectedSortDirection); break;
+            await SortCardViewModels(WishlistViewModels, SelectedSortProperty, SelectedSortDirection); break;
           default: break;
         }
       }
@@ -79,7 +79,7 @@ namespace MTGApplication.ViewModels
         switch (e.Action)
         {
           case NotifyCollectionChangedAction.Add:
-            //await SortCardViewModels(DeckCardsViewModels, SelectedSortProperty, SelectedSortDirection); break;
+            await SortCardViewModels(DeckCardsViewModels, SelectedSortProperty, SelectedSortDirection); break;
           default: break;
         }
       }
@@ -215,11 +215,9 @@ namespace MTGApplication.ViewModels
         {
           CardDeck = savedDeck;
           HasUnsavedChanges = false;
+          Notifications.RaiseNotification(Notifications.NotificationType.Success, "Deck saved successfully");
         }
-        else
-        {
-          // TODO: notification
-        }
+        else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Could not save the deck."); }
         IsBusy = false;
       }
       
@@ -235,11 +233,9 @@ namespace MTGApplication.ViewModels
         {
           CardDeck = newDeck;
           HasUnsavedChanges = false;
+          Notifications.RaiseNotification(Notifications.NotificationType.Success, "Deck loaded successfully.");
         }
-        else
-        {
-          // TODO: notification
-        }
+        else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Could not load the deck."); }
         IsBusy = false;
       }
 
@@ -249,14 +245,8 @@ namespace MTGApplication.ViewModels
       public async Task DeleteDeck()
       {
         IsBusy = true;
-        if(await Task.Run(() => MTGCardDeck.DeleteDeck(CardDeck)))
-        {
-          NewDeck();
-        }
-        else
-        {
-          // TODO: notification
-        }
+        if(await Task.Run(() => MTGCardDeck.DeleteDeck(CardDeck))) { NewDeck(); Notifications.RaiseNotification(Notifications.NotificationType.Success, "Deck deleted successfully."); }
+        else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Could not delete the deck.");}
         IsBusy = false;
       }
       
@@ -283,6 +273,8 @@ namespace MTGApplication.ViewModels
           {
             cardlist.Add(item);
           }
+          // TODO: not found count
+          Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{cards.Length} cards imported successfully.");
         }
         IsBusy = false;
       }

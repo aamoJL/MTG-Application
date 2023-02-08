@@ -147,7 +147,6 @@ namespace MTGApplication.Views
         && args.Items[0] is MTGCardViewModel cardVM &&
         sender.DataContext is ObservableCollection<MTGCard> cardlist)
       {
-        // TODO: use command
         cardlist.Remove(cardVM.Model);
       }
     }

@@ -31,7 +31,7 @@ namespace MTGApplication
       dataPackage.SetText(text);
       Clipboard.SetContent(dataPackage);
 
-      Notifications.RaiseCopied(text);
+      Notifications.RaiseNotification(Notifications.NotificationType.Info, "Copied to clipboard.");
     }
     #endregion
 
