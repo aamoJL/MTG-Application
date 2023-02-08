@@ -2,8 +2,7 @@
 
 namespace MTGApplication.ViewModels
 {
-  [ObservableObject]
-  public partial class ViewModelBase
+  public class ViewModelBase : ObservableObject
   {
   }
 }

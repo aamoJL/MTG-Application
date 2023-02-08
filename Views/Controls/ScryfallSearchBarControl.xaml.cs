@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Windows.Input;
 
-namespace MTGApplication.Controls
+namespace MTGApplication.Views.Controls
 {
   public enum MTGSearchFormatTypes
   {

@@ -8,7 +8,7 @@ using SkiaSharp;
 using System.ComponentModel;
 using System.Collections.Specialized;
 using MTGApplication.ViewModels;
-using static MTGApplication.Models.MTGCardModel;
+using static MTGApplication.Models.MTGCard;
 using MTGApplication.Models;
 
 namespace MTGApplication.Charts
@@ -27,7 +27,7 @@ namespace MTGApplication.Charts
   #region Series
   public abstract class MTGCardModelSeries : ViewModelBase
   {
-    protected ObservableCollection<MTGCardModel> Models { get; }
+    protected ObservableCollection<MTGCard> Models { get; }
     protected double primaryValue;
 
     public virtual double PrimaryValue
@@ -41,7 +41,7 @@ namespace MTGApplication.Charts
     }
     public virtual double SecondaryValue { get; protected set; }
 
-    public MTGCardModelSeries(MTGCardModel model)
+    public MTGCardModelSeries(MTGCard model)
     {
       Models = new();
       Models.CollectionChanged += Models_CollectionChanged;
@@ -49,14 +49,14 @@ namespace MTGApplication.Charts
       AddItem(model);
     }
 
-    public virtual void AddItem(MTGCardModel model)
+    public virtual void AddItem(MTGCard model)
     {
       if (Models.Contains(model)) { return; }
       Models.Add(model);
 
       model.PropertyChanged += Model_PropertyChanged;
     }
-    public virtual void RemoveItem(MTGCardModel model)
+    public virtual void RemoveItem(MTGCard model)
     {
       if (!Models.Contains(model)) { return; }
       Models.Remove(model);
@@ -139,7 +139,7 @@ namespace MTGApplication.Charts
   }
   public class MTGCardModelCMCSeries : MTGCardModelSeries
   {
-    public MTGCardModelCMCSeries(MTGCardModel model) : base(model) 
+    public MTGCardModelCMCSeries(MTGCard model) : base(model) 
     {
       SecondaryValue = model.Info.CMC;
     }
@@ -164,7 +164,7 @@ namespace MTGApplication.Charts
   }
   public class MTGCardModelSpellTypeSeries : MTGCardModelSeries
   {
-    public MTGCardModelSpellTypeSeries(MTGCardModel model) : base(model) { }
+    public MTGCardModelSpellTypeSeries(MTGCard model) : base(model) { }
 
     protected override void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -187,11 +187,15 @@ namespace MTGApplication.Charts
   #region Charts
   public abstract class MTGCardModelChart
   {
-    public ObservableCollection<ISeries> Series { get; }
+    public ObservableCollection<ISeries> Series { get; } = new();
 
-    public MTGCardModelChart(ObservableCollection<MTGCardModel> models)
+    public MTGCardModelChart(ObservableCollection<MTGCard> models)
     {
-      Series = new();
+      foreach (var model in models)
+      {
+        AddToChartSeries(model);
+      }
+
       models.CollectionChanged += Models_CollectionChanged;
     }
 
@@ -199,22 +203,15 @@ namespace MTGApplication.Charts
     {
       switch (e.Action)
       {
-        case NotifyCollectionChangedAction.Add:
-          AddToChartSeries(e.NewItems[0] as MTGCardModel);
-          break;
-        case NotifyCollectionChangedAction.Remove:
-          RemoveFromChartSeries(e.OldItems[0] as MTGCardModel);
-          break;
-        case NotifyCollectionChangedAction.Reset:
-          Series.Clear();
-          break;
-        default:
-          break;
+        case NotifyCollectionChangedAction.Add: AddToChartSeries(e.NewItems[0] as MTGCard); break;
+        case NotifyCollectionChangedAction.Remove: RemoveFromChartSeries(e.OldItems[0] as MTGCard); break;
+        case NotifyCollectionChangedAction.Reset: Series.Clear(); break;
+        default: break;
       }
     }
 
-    public abstract void AddToChartSeries(MTGCardModel model);
-    public abstract void RemoveFromChartSeries(MTGCardModel model);
+    public abstract void AddToChartSeries(MTGCard model);
+    public abstract void RemoveFromChartSeries(MTGCard model);
     public virtual void ClearChart()
     {
       Series.Clear();
@@ -222,18 +219,18 @@ namespace MTGApplication.Charts
   }
   public class CMCChart : MTGCardModelChart
   {
-    public CMCChart(ObservableCollection<MTGCardModel> models) : base(models) { }
+    public CMCChart(ObservableCollection<MTGCard> models) : base(models) { }
 
-    public override void AddToChartSeries(MTGCardModel model)
+    public override void AddToChartSeries(MTGCard model)
     {
       // Don't count Lands as a color
-      if (model.SpellTypes.Contains(SpellType.Land)) { return; }
+      if (model.Info.SpellTypes.Contains(SpellType.Land)) { return; }
 
       // Find Color series
-      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(model.ColorType)) is not StackedColumnSeries<MTGCardModelSeries> colorSeries)
+      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(model.Info.ColorType)) is not StackedColumnSeries<MTGCardModelSeries> colorSeries)
       {
         // Create new series group if it does not exist
-        colorSeries = MTGCardModelSeries.CreateSeriesGroupByColor(model.ColorType);
+        colorSeries = MTGCardModelSeries.CreateSeriesGroupByColor(model.Info.ColorType);
         Series.Add(colorSeries);
       }
 
@@ -251,13 +248,13 @@ namespace MTGApplication.Charts
         (colorSeries.Values as ObservableCollection<MTGCardModelSeries>).Add(cmcObject);
       }
     }
-    public override void RemoveFromChartSeries(MTGCardModel model)
+    public override void RemoveFromChartSeries(MTGCard model)
     {
       // Don't count Lands as a color
-      if (model.SpellTypes.Contains(SpellType.Land)) { return; }
+      if (model.Info.SpellTypes.Contains(SpellType.Land)) { return; }
 
       // Find Color series
-      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(model.ColorType)) is not StackedColumnSeries<MTGCardModelSeries> colorSeries)
+      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(model.Info.ColorType)) is not StackedColumnSeries<MTGCardModelSeries> colorSeries)
       {
         return; // Returns if color series does not exist
       }
@@ -272,11 +269,11 @@ namespace MTGApplication.Charts
   }
   public class SpellTypeChart : MTGCardModelChart
   {
-    public SpellTypeChart(ObservableCollection<MTGCardModel> models) : base(models) { }
+    public SpellTypeChart(ObservableCollection<MTGCard> models) : base(models) { }
 
-    public override void AddToChartSeries(MTGCardModel model)
+    public override void AddToChartSeries(MTGCard model)
     {
-      foreach (var spellType in model.SpellTypes)
+      foreach (var spellType in model.Info.SpellTypes)
       {
         // Find series
         if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not PieSeries<MTGCardModelSeries> typeSeries)
@@ -296,9 +293,9 @@ namespace MTGApplication.Charts
         }
       }
     }
-    public override void RemoveFromChartSeries(MTGCardModel model)
+    public override void RemoveFromChartSeries(MTGCard model)
     {
-      foreach (var spellType in model.SpellTypes)
+      foreach (var spellType in model.Info.SpellTypes)
       {
         // Find series
         if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not PieSeries<MTGCardModelSeries> typeSeries)

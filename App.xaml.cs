@@ -5,13 +5,14 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
 using MTGApplication.API;
 using Microsoft.EntityFrameworkCore;
+using MTGApplication.Database;
 
 namespace MTGApplication
 {
-  /// <summary>
-  /// Provides application-specific behavior to supplement the default Application class.
-  /// </summary>
-  public partial class App : Application
+    /// <summary>
+    /// Provides application-specific behavior to supplement the default Application class.
+    /// </summary>
+    public partial class App : Application
   {
     // Used for Dialogs
     public static FrameworkElement MainRoot { get; private set; }
@@ -33,7 +34,7 @@ namespace MTGApplication
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-      using (var db = new Database.CardCollectionContext())
+      using (var db = new CardDatabaseContext())
       {
         db.Database.Migrate();
       }

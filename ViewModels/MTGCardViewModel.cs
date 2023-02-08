@@ -1,6 +1,5 @@
 ﻿using MTGApplication.Models;
-using System.Windows.Input;
-using static MTGApplication.Models.MTGCardModel;
+using static MTGApplication.Models.MTGCard;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,85 +8,79 @@ namespace MTGApplication.ViewModels
 {
   public partial class MTGCardViewModel : ViewModelBase
   {
-    public MTGCardViewModel(MTGCardModel model)
+    public MTGCardViewModel(MTGCard model)
     {
       Model = model;
       model.PropertyChanged += Model_PropertyChanged;
-
-      Count = model.Count;
+      PropertyChanged += MTGCardViewModel_PropertyChanged;
     }
 
+    private void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if(e.PropertyName == nameof(SelectedFace)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
+    }
     private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if (e.PropertyName == nameof(Model.Count))
-      {
-        Count = Model.Count;
-      }
+      if (e.PropertyName == nameof(Model.Count)) { DecreaseCountCommand.NotifyCanExecuteChanged(); }
     }
+
+    public MTGCard Model { get; }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DecreaseCountCommand))]
-    private int count;
-
-    private int selectedFaceIndex = 0;
-    private bool controlsVisible;
-
-    private MTGCardModel Model { get; }
-    public string FrontFaceImg => App.CardAPI.GetFaceUri(Model.Info.Id, false);
-    public string BackFaceImg => Model.Info.CardFaces.Length == 2 ? App.CardAPI.GetFaceUri(Model.Info.Id, true) : null;
-    public string SetIcon => App.CardAPI.GetSetIconUri(Model.Info.SetCode);
-    public string SelectedFaceUri => selectedFaceIndex == 0 ? FrontFaceImg : BackFaceImg;
-    public int SelectedFaceIndex
+    private CardSide selectedFace;
+    public string SelectedFaceUri
     {
-      get => selectedFaceIndex;
-      set
+      get
       {
-        if(value > 0 && !HasBackFace) { value = 0; }
-        selectedFaceIndex = value;
-        OnPropertyChanged(nameof(SelectedFaceIndex));
-        OnPropertyChanged(nameof(SelectedFaceUri));
+        return SelectedFace == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
       }
     }
-    public CardInfo CardInfo => Model.Info;
-    public bool HasBackFace => Model.HasBackFace;
-    public bool ControlsVisible
-    {
-      get => controlsVisible;
-      set
-      {
-        controlsVisible = value;
-        OnPropertyChanged(nameof(ControlsVisible));
-      }
-    }
-    public float Price => Model.Info.Price;
+    public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
+    //private bool controlsVisible;
+    //public bool ControlsVisible
+    //{
+    //  get => controlsVisible;
+    //  set
+    //  {
+    //    controlsVisible = value;
+    //    OnPropertyChanged(nameof(ControlsVisible));
+    //  }
+    //}
 
-    public ICommand RemoveRequestCommand { get; set; }
+    //public ICommand RemoveRequestCommand { get; set; }
     [RelayCommand(CanExecute = nameof(HasBackFace))]
     public void FlipCard()
     {
-      if (HasBackFace) SelectedFaceIndex = SelectedFaceIndex == 0 ? 1 : 0;
+      if (HasBackFace) SelectedFace = SelectedFace == CardSide.Front ? CardSide.Back : CardSide.Front;
     }
     [RelayCommand]
     public async Task OpenAPIWebsite()
     {
-      await App.CardAPI.OpenAPICardWebsite(Model);
+      await IO.OpenUri(Model.Info.APIWebsiteUri);
+    }
+    [RelayCommand]
+    public async Task OpenCardmarketWebsite()
+    {
+      await IO.OpenUri(Model.Info.CardMarketUri);
     }
     [RelayCommand]
     public void IncreaseCount()
     {
       Model.Count++;
     }
-    [RelayCommand(CanExecute = nameof(CanDecreaseCount))]
+    [RelayCommand(CanExecute = nameof(CanExecuteDecreaseCountCommand))]
     public void DecreaseCount()
     {
       Model.Count--;
     }
-
-    public string ModelToJSON()
+    [RelayCommand]
+    public void DeleteCard()
     {
-      return Model.ToJSON();
+      Model.MTGCardDeckDeckCards?.DeckCards.Remove(Model);
+      Model.MTGCardDeckWishlist?.Wishlist.Remove(Model);
+      Model.MTGCardDeckMaybelist?.Maybelist.Remove(Model);
     }
 
-    private bool CanDecreaseCount() => Count > 1;
+    private bool CanExecuteDecreaseCountCommand() => Model.Count > 1;
   }
 }

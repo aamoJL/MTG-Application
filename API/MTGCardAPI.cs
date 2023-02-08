@@ -1,6 +1,6 @@
 ﻿using MTGApplication.Models;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using static MTGApplication.Models.MTGCard;
 
 namespace MTGApplication.API
 {
@@ -9,15 +9,9 @@ namespace MTGApplication.API
   /// </summary>
   public abstract class MTGCardAPI
   {
-    public abstract int MaxFetchIdentifierCount { get; }
-
-    public abstract Task<MTGCardModel[]> FetchCards(string searchParams, int pageLimit = 3);
-    public abstract Task<MTGCardModel[]> FetchCollectionAsync(Database.Card[] cards);
-    public abstract Task<MTGCardModel[]> FetchCollectionAsync(string identifiersJson);
-    public abstract Task<bool> OpenAPICardWebsite(MTGCardModel card);
-
-    public abstract MTGCardModel GetMTGCardModelFromJson(JsonNode cardObject);
-    public abstract string GetFaceUri(string id, bool back);
-    public abstract string GetSetIconUri(string setCode);
+    public abstract Task<MTGCard[]> FetchCards(string searchParams, int countLimit = 700);
+    public abstract Task<MTGCard[]> FetchImportedCards(string importText);
+    
+    public abstract Task<bool> PopulateMTGCardInfosAsync(MTGCard[] cards);
   }
 }

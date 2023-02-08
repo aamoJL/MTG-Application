@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 
 namespace MTGApplication
 {
@@ -12,18 +13,15 @@ namespace MTGApplication
   internal static class IO
   {
     public static readonly HttpClient HttpClient = new();
-    public static readonly string CollectionsPath = "Resources/Collections/";
-    public static readonly string CollectionsMaybePath = "Resources/Collections/Maybes";
-    public static readonly string CollectionsWishlistPath = "Resources/Collections/Wishlists";
 
     /// <summary>
     /// Create directories if they do not exist
     /// </summary>
     public static void InitDirectories()
     {
-      _ = Directory.CreateDirectory(CollectionsPath);
-      _ = Directory.CreateDirectory(CollectionsMaybePath);
-      _ = Directory.CreateDirectory(CollectionsWishlistPath);
+      //_ = Directory.CreateDirectory(CollectionsPath);
+      //_ = Directory.CreateDirectory(CollectionsMaybePath);
+      //_ = Directory.CreateDirectory(CollectionsWishlistPath);
     }
 
     #region//--------------Clipboard----------//
@@ -126,6 +124,10 @@ namespace MTGApplication
         return await HttpClient.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, "application/json")).Result.Content.ReadAsStringAsync();
       }
       catch (Exception) { return ""; }
+    }
+    public static async Task<bool> OpenUri(string uri)
+    {
+      return await Launcher.LaunchUriAsync(new(uri));
     }
     #endregion
   }

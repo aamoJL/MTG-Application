@@ -31,12 +31,15 @@
     <None Remove="Assets\ColorIcons\R.svg" />
     <None Remove="Assets\ColorIcons\U.svg" />
     <None Remove="Assets\ColorIcons\W.svg" />
-    <None Remove="Controls\ScryfallSearchBarControl.xaml" />
+    <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
-    <None Remove="Pages\MainPage.xaml" />
+    <None Remove="Views\DeckBuilderView.xaml" />
+    <None Remove="Views\Pages\MainPage.xaml" />
     <None Remove="README.md" />
     <None Remove="ResourceDictionary1.xaml" />
-    <None Remove="Styles\PreviewImagePlaceholderImageStyle.xaml" />
+    <None Remove="Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
+    <None Remove="Views\Styles\CustomListViewStyle.xaml" />
+    <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Page Remove="ResourceDictionary1.xaml" />
@@ -53,16 +56,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.700" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
@@ -102,21 +105,45 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Styles\PreviewImagePlaceholderImageStyle.xaml">
+    <Page Update="Views\Pages\Tabs\DeckBuilderView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Styles\CustomListViewStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\DeckBuilderView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\ScryfallSearchBarControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Styles\CustomPlaceholderImageStyle.xaml">
+    <Page Update="Views\Pages\MainPage.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Styles\CustomPlaceholderImageStyle.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Styles\PreviewImagePlaceholderImageStyle.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Pages\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Controls\ScryfallSearchBarControl.xaml">
+    <Page Update="Views\Styles\CustomAdaptiveGridViewStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

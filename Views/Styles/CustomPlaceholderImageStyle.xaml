@@ -78,5 +78,9 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
+    <Setter Property="CornerRadius" Value="10"/>
+    <Setter Property="IsCacheEnabled" Value="True"/>
+    <Setter Property="PlaceholderSource" Value="/Assets/back.jpg"/>
+    <Setter Property="PlaceholderStretch" Value="Fill"/>
   </Style>
 </ResourceDictionary>

@@ -1,0 +1,32 @@
+﻿<Page
+  x:Class="MTGApplication.Pages.MainPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+  xmlns:views="using:MTGApplication.Views"
+  mc:Ignorable="d"
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+  <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <TabView IsAddTabButtonVisible="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+      <TabView.TabItems>
+        <TabViewItem Header="Deck Builder" IsClosable="False">
+          <views:DeckBuilderView/>
+        </TabViewItem>
+        <TabViewItem Header="Collections" IsClosable="False">
+          <!--TODO-->
+        </TabViewItem>
+      </TabView.TabItems>
+    </TabView>
+
+    <controls:InAppNotification
+      x:Name="PopupAppNotification"
+      ShowDismissButton="True"
+      VerticalOffset="100"
+      HorizontalOffset="0"
+      StackMode="Replace"/>
+  </Grid>
+</Page>

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTG-Application", "MTG-Application.csproj", "{BA3ED0CE-1A94-4CD4-9CF0-6026B0679FE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGApplication", "MTGApplication.csproj", "{BA3ED0CE-1A94-4CD4-9CF0-6026B0679FE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTG-ApplicationTests", "..\MTG-ApplicationTests1\MTG-ApplicationTests.csproj", "{8C2108E6-F078-42B0-9458-25A82A9675C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGApplicationTests", "..\MTG-ApplicationTests1\MTGApplicationTests.csproj", "{8C2108E6-F078-42B0-9458-25A82A9675C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

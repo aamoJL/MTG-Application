@@ -2,11 +2,11 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication
 {
+  // TODO: Separate the UI from the methods with interfaces
   public static class Dialogs
   {
     public static async Task MessageDialogAsync(this FrameworkElement element, string title, string message)
@@ -173,7 +173,7 @@ namespace MTGApplication
         DefaultButton = ContentDialogButton.Primary
       };
 
-      if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+      if (await dialog.ShowAsync() == ContentDialogResult.Primary && inputComboBox.SelectedValue != null)
       {
         return inputComboBox.SelectedValue.ToString();
       }
