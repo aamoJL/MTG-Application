@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI.UI.Controls.TextToolbarSymbols;
-using Microsoft.EntityFrameworkCore;
 using MTGApplication.Database;
 using System;
 using System.Collections.Generic;
@@ -12,10 +10,12 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Models
 {
+  
   public partial class MTGCardDeck : ObservableObject
   {
     public enum SortDirection { ASC, DESC }
     public enum SortProperty { CMC, Name, Rarity, Color, Set, Count, Price }
+    public enum CardlistType { Deck, Wishlist, Maybelist }
 
     public MTGCardDeck()
     {
@@ -111,6 +111,28 @@ namespace MTGApplication.Models
     public int WishlistSize => Wishlist.Sum(x => x.Count);
     public int MaybelistSize => Maybelist.Sum(x => x.Count);
 
+    public void AddToCardlist(CardlistType listType, MTGCard card)
+    {
+      ObservableCollection<MTGCard> collection = null;
+
+      switch (listType)
+      {
+        case CardlistType.Deck: collection = DeckCards; break;
+        case CardlistType.Wishlist: collection = Wishlist; break;
+        case CardlistType.Maybelist: collection = Maybelist; break;
+        default: return;
+      }
+
+      if(collection.FirstOrDefault(x => x.ScryfallId == card.ScryfallId) is MTGCard existingCard)
+      {
+        existingCard.Count += card.Count;
+      }
+      else
+      {
+        collection.Add(card);
+      }
+    }
+
     public static bool Exists(string name)
     {
       using var db = new CardDatabaseContext();
@@ -141,34 +163,40 @@ namespace MTGApplication.Models
       {
         // New deck
         deck.Name = name;
-        savedDeck = db.Add(deck).Entity;
+        savedDeck = await Task.Run(() => { return db.Add(deck).Entity; });
       }
       else if (deck.Name == name)
       {
         // Same deck
         // Remove from the database the cards that are no longer in the deck
-        List<int> validCardIds = new();
-        validCardIds.AddRange(deck.DeckCards.Select(x => x.MTGCardId).ToList());
-        validCardIds.AddRange(deck.Wishlist.Select(x => x.MTGCardId).ToList());
-        validCardIds.AddRange(deck.Maybelist.Select(x => x.MTGCardId).ToList());
+        savedDeck = await Task.Run(() =>
+        {
+          List<int> validCardIds = new();
+          validCardIds.AddRange(deck.DeckCards.Select(x => x.MTGCardId).ToList());
+          validCardIds.AddRange(deck.Wishlist.Select(x => x.MTGCardId).ToList());
+          validCardIds.AddRange(deck.Maybelist.Select(x => x.MTGCardId).ToList());
 
-        List<MTGCard> missingCards = new();
-        missingCards.AddRange(db.MTGCards.Where(card => card.MTGCardDeckDeckCardsId == deck.MTGCardDeckId && !validCardIds.Contains(card.MTGCardId)).ToList());
-        missingCards.AddRange(db.MTGCards.Where(card => card.MTGCardDeckWishlistId == deck.MTGCardDeckId && !validCardIds.Contains(card.MTGCardId)).ToList());
-        missingCards.AddRange(db.MTGCards.Where(card => card.MTGCardDeckMaybelistId == deck.MTGCardDeckId && !validCardIds.Contains(card.MTGCardId)).ToList());
+          List<MTGCard> missingCards = new();
+          missingCards.AddRange(db.MTGCards.Where(card => card.MTGCardDeckDeckCardsId == deck.MTGCardDeckId && !validCardIds.Contains(card.MTGCardId)).ToList());
+          missingCards.AddRange(db.MTGCards.Where(card => card.MTGCardDeckWishlistId == deck.MTGCardDeckId && !validCardIds.Contains(card.MTGCardId)).ToList());
+          missingCards.AddRange(db.MTGCards.Where(card => card.MTGCardDeckMaybelistId == deck.MTGCardDeckId && !validCardIds.Contains(card.MTGCardId)).ToList());
 
-        db.MTGCards.RemoveRange(missingCards);
-        savedDeck = db.Update(deck).Entity;
+          db.MTGCards.RemoveRange(missingCards);
+          return db.Update(deck).Entity;
+        });
       }
       else
       {
         // New deck, keep old deck (Rename)
-        MTGCardDeck newDeck = new();
-        foreach (var item in deck.DeckCards) { newDeck.DeckCards.Add(new(item.Info, item.Count)); }
-        foreach (var item in deck.Wishlist) { newDeck.Wishlist.Add(new(item.Info, item.Count)); }
-        foreach (var item in deck.Maybelist) { newDeck.Maybelist.Add(new(item.Info, item.Count)); }
-        newDeck.Name = name;
-        savedDeck = db.Update(newDeck).Entity;
+        savedDeck = await Task.Run(() =>
+        {
+          MTGCardDeck newDeck = new();
+          foreach (var item in deck.DeckCards) { newDeck.DeckCards.Add(new(item.Info, item.Count)); }
+          foreach (var item in deck.Wishlist) { newDeck.Wishlist.Add(new(item.Info, item.Count)); }
+          foreach (var item in deck.Maybelist) { newDeck.Maybelist.Add(new(item.Info, item.Count)); }
+          newDeck.Name = name;
+          return db.Update(newDeck).Entity;
+        });
       }
 
       return await db.SaveChangesAsync() > 0 ? savedDeck : null;

@@ -36,43 +36,55 @@ namespace MTGApplication.ViewModels
       }
     }
     public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
-    //private bool controlsVisible;
-    //public bool ControlsVisible
-    //{
-    //  get => controlsVisible;
-    //  set
-    //  {
-    //    controlsVisible = value;
-    //    OnPropertyChanged(nameof(ControlsVisible));
-    //  }
-    //}
 
-    //public ICommand RemoveRequestCommand { get; set; }
+    /// <summary>
+    /// Changes selected face image if possible
+    /// </summary>
     [RelayCommand(CanExecute = nameof(HasBackFace))]
     public void FlipCard()
     {
       if (HasBackFace) SelectedFace = SelectedFace == CardSide.Front ? CardSide.Back : CardSide.Front;
     }
+    
+    /// <summary>
+    /// Opens card's API Website in web browser
+    /// </summary>
     [RelayCommand]
     public async Task OpenAPIWebsite()
     {
       await IO.OpenUri(Model.Info.APIWebsiteUri);
     }
+    
+    /// <summary>
+    /// Opens card's Cardmarket page in web browser
+    /// </summary>    
     [RelayCommand]
     public async Task OpenCardmarketWebsite()
     {
       await IO.OpenUri(Model.Info.CardMarketUri);
     }
+    
+    /// <summary>
+    /// Increases count by one
+    /// </summary>
     [RelayCommand]
     public void IncreaseCount()
     {
       Model.Count++;
     }
+    
+    /// <summary>
+    /// Decreases count by one if possible
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanExecuteDecreaseCountCommand))]
     public void DecreaseCount()
     {
-      Model.Count--;
+      if(Model.Count > 0) { Model.Count--; }
     }
+    
+    /// <summary>
+    /// Deletes card from the model's cardlists
+    /// </summary>
     [RelayCommand]
     public void DeleteCard()
     {

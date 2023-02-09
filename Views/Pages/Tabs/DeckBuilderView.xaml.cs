@@ -41,19 +41,6 @@ namespace MTGApplication.Views
     #region Pointer Events
     private object draggedElement;
 
-    private void GridSplitter_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-    {
-      // Collapse the splitter when double tapped
-      GridSplitter splitter = (GridSplitter)sender;
-      Grid grid = (Grid)splitter.Parent;
-
-      int colIndex = (int)(splitter.GetValue(Grid.ColumnProperty)) - 1;
-      if (colIndex < 0) { return; }
-
-      grid.ColumnDefinitions[colIndex].Width = new GridLength(16);
-      VisualStateManager.GoToState(splitter, "Normal", true); // Pointer released event does not trigger, so the state needs to be changed manually.
-    }
-    
     private void CardGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
       if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
@@ -101,7 +88,6 @@ namespace MTGApplication.Views
       // Change placeholder image to the old hovered card's image so the placeholder won't flicker
       PreviewImage.PlaceholderSource = PreviewImage.Source as ImageSource;
     }
-    
     private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
       if (e.Items[0] is MTGCardViewModel vm)
@@ -121,9 +107,9 @@ namespace MTGApplication.Views
           ? DataPackageOperation.Move : DataPackageOperation.Copy;
       }
     }
-    private async void CardView_Drop(object sender, DragEventArgs e)
+    private async void DeckMaybeDisplay_Drop(object sender, DragEventArgs e)
     {
-      if (e.DataView.Contains(StandardDataFormats.Text) && (sender as FrameworkElement).DataContext is ObservableCollection<MTGCard> cardlist)
+      if (e.DataView.Contains(StandardDataFormats.Text))
       {
         DragOperationDeferral def = e.GetDeferral();
         string data = await e.DataView.GetTextAsync();
@@ -132,24 +118,60 @@ namespace MTGApplication.Views
         {
           var card = JsonSerializer.Deserialize<MTGCard>(data);
           if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
-          cardlist.Add(card);
+          ViewModel.AddToMaybelist(card);
         }
         catch (Exception) { }
 
         def.Complete();
       }
-      else { throw new Exception($"DataContext is not {nameof(ObservableCollection<MTGCard>)}"); }
+    }
+    private async void DeckWishlistDisplay_Drop(object sender, DragEventArgs e)
+    {
+      if (e.DataView.Contains(StandardDataFormats.Text))
+      {
+        DragOperationDeferral def = e.GetDeferral();
+        string data = await e.DataView.GetTextAsync();
+
+        try
+        {
+          var card = JsonSerializer.Deserialize<MTGCard>(data);
+          if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
+          ViewModel.AddToWishlist(card);
+        }
+        catch (Exception) { }
+
+        def.Complete();
+      }
+    }
+    private async void DeckDisplay_Drop(object sender, DragEventArgs e)
+    {
+      if (e.DataView.Contains(StandardDataFormats.Text))
+      {
+        DragOperationDeferral def = e.GetDeferral();
+        string data = await e.DataView.GetTextAsync();
+
+        try
+        {
+          var card = JsonSerializer.Deserialize<MTGCard>(data);
+          if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
+          ViewModel.AddToDeckCards(card);
+        }
+        catch (Exception) { }
+
+        def.Complete();
+      }
     }
     private void CardView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
       // Remove original item if the operation is 'Move'
       if ((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move
-        && args.Items[0] is MTGCardViewModel cardVM &&
-        sender.DataContext is ObservableCollection<MTGCard> cardlist)
+        && args.Items[0] is MTGCardViewModel cardVM
+        && sender.DataContext is ObservableCollection<MTGCard> cardlist)
       {
         cardlist.Remove(cardVM.Model);
       }
     }
     #endregion
+
   }
 }

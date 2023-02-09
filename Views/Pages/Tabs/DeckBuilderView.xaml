@@ -263,14 +263,14 @@
                   <ListView
                     Grid.Row="1"
                     x:Name="DeckMaybeDisplay"
-                    DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.Maybelist, Mode=OneWay}"
+                    DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.Maybelist,Mode=OneWay}"
                     ItemsSource="{x:Bind ViewModel.DeckBuilder.MaybelistViewModels, Mode=OneWay}"
                     Style="{StaticResource MTGListViewStyle}"
                     SelectionMode="Single"
                     CanDragItems="True"
                     AllowDrop="True"
                     DragOver="CardView_DragOver"
-                    Drop="CardView_Drop"
+                    Drop="DeckMaybeDisplay_Drop"
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted" 
                     ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
@@ -278,14 +278,14 @@
                   <ListView
                     Grid.Row="3"
                     x:Name="DeckWishlistDisplay"
-                    DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.Wishlist, Mode=OneWay}"
+                    DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.Wishlist,Mode=OneWay}"
                     ItemsSource="{x:Bind ViewModel.DeckBuilder.WishlistViewModels, Mode=OneWay}"
                     Style="{StaticResource MTGListViewStyle}"
                     SelectionMode="Single"
                     CanDragItems="True"
                     AllowDrop="True"
                     DragOver="CardView_DragOver"
-                    Drop="CardView_Drop"
+                    Drop="DeckWishlistDisplay_Drop"
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted"
                     ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
@@ -328,9 +328,9 @@
                       </MenuFlyoutItem>
                       <MenuFlyoutSeparator/>
                       <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCardsDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards, Mode=OneWay}" Text="Deck"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCardsDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.Maybelist, Mode=OneWay}" Text="Maybe"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCardsDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.Wishlist, Mode=OneWay}" Text="Wishlist"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportToDeckCardsDialogCommand}" Text="Deck"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportToMaybelistDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.Maybelist, Mode=OneWay}" Text="Maybe"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportToWishlistDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.Wishlist, Mode=OneWay}" Text="Wishlist"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export...">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.ExportCardsDialogCommand}" CommandParameter="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards, Mode=OneWay}" Text="Deck"/>
@@ -388,7 +388,7 @@
             <controls:AdaptiveGridView
               x:Name="DeckImagesDisplay"
               Style="{StaticResource MTGAdaptiveGridViewStyle}"
-              DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards, Mode=OneWay}"
+              DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards,Mode=OneWay}"
               ItemsSource="{x:Bind ViewModel.DeckBuilder.DeckCardsViewModels, Mode=OneWay}"
               DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
               SelectionMode="None"
@@ -396,21 +396,21 @@
               CanDragItems="True"
               AllowDrop="True"
               DragOver="CardView_DragOver"
-              Drop="CardView_Drop"
+              Drop="DeckDisplay_Drop"
               DragItemsStarting="CardView_DragItemsStarting"
               DragItemsCompleted="CardView_DragItemsCompleted" 
               ItemTemplate="{StaticResource DeckImageViewItemTemplate}"/>
             <ListView
               x:Name="DeckListDisplay"
               Style="{StaticResource MTGListViewStyle}"
-              SelectionMode="Single"
-              DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards, Mode=OneWay}"
+              DataContext="{x:Bind ViewModel.DeckBuilder.CardDeck.DeckCards,Mode=OneWay}"
               ItemsSource="{x:Bind ViewModel.DeckBuilder.DeckCardsViewModels, Mode=OneWay}"
+              SelectionMode="Single"
               Visibility="Collapsed"
               CanDragItems="True"
               AllowDrop="True"
               DragOver="CardView_DragOver"
-              Drop="CardView_Drop"
+              Drop="DeckDisplay_Drop"
               DragItemsStarting="CardView_DragItemsStarting"
               DragItemsCompleted="CardView_DragItemsCompleted" 
               ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>

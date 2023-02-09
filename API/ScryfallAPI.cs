@@ -31,6 +31,7 @@ namespace MTGApplication.API
     /// <returns></returns>
     public override async Task<MTGCard[]> FetchCards(string searchParams, int countLimit)
     {
+      if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
       List<CardInfo> cardInfos = new();
       string searchUri = $"{CARDS_URL}/search?q={searchParams}+game:paper";
       var pageCount = 1;
