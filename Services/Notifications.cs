@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace MTGApplication
+namespace MTGApplication.Services
 {
-  // TODO: move to service?
   public static class Notifications
   {
     public enum NotificationType { Info, Error, Warning, Success }

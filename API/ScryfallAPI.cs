@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static MTGApplication.Interfaces.ICardAPI<MTGApplication.Models.MTGCard>;
 using static MTGApplication.Models.MTGCard;
 
 namespace MTGApplication.API
@@ -23,51 +25,6 @@ namespace MTGApplication.API
     private static string COLLECTION_URL => $"{CARDS_URL}/collection";
     private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
     private static int MaxFetchIdentifierCount => 75;
-
-    // TODO: remove?
-    ///// <summary>
-    ///// Updates <see cref="MTGCard.Info"/> property of the given cards from the API
-    ///// </summary>
-    //public async Task<bool> PopulateMTGCardInfosAsync(MTGCard[] cards)
-    //{
-    //  List<CardInfo> cardInfos = new();
-
-    //  foreach (var chunk in cards.Chunk(MaxFetchIdentifierCount))
-    //  {
-    //    // Fetch cards in chunks
-    //    var identifiersJson = string.Empty;
-
-    //    using var stream = new MemoryStream();
-    //    await JsonSerializer.SerializeAsync(stream, new
-    //    {
-    //      identifiers = chunk.Select(x => new
-    //      {
-    //        id = x.Info.ScryfallId
-    //      })
-    //    });
-    //    stream.Position = 0;
-    //    using var reader = new StreamReader(stream);
-    //    identifiersJson = await reader.ReadToEndAsync();
-
-    //    // Fetch Scryfall JSON for the chunk
-    //    var json = JsonNode.Parse(await IO.FetchStringFromURLPost(COLLECTION_URL, identifiersJson));
-    //    var data = json["data"]?.AsArray();
-
-    //    // Loop through json and populate infos to the cards
-    //    foreach (var item in data)
-    //    {
-    //      var cardInfo = GetCardInfoFromJSON(item);
-    //      if(cardInfo == null) { continue; }
-    //      foreach (var card in cards)
-    //      {
-    //        if (!string.IsNullOrEmpty(card.Info.ScryfallId)) { continue; } // Card already has info
-    //        if(card.Info.ScryfallId == cardInfo?.ScryfallId) { card.Info = (CardInfo)cardInfo; break; }
-    //      }
-    //    }
-    //  }
-
-    //  return true;
-    //}
 
     /// <summary>
     /// Fetches cards from Scryfall API using given parameters
@@ -115,7 +72,7 @@ namespace MTGApplication.API
 
       return cards.ToArray();
     }
-    
+
     /// <summary>
     /// Converts <paramref name="importText"/> to <see cref="MTGCard"/> array using the API.
     /// <paramref name="importText"/> needs to be formatted like this:
@@ -124,7 +81,7 @@ namespace MTGApplication.API
     /// {count (optional)} {name} 
     /// </code>
     /// </summary>
-    public async Task<MTGCard[]> FetchImportedCards(string importText)
+    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchImportedCards(string importText)
     {
       var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -149,9 +106,10 @@ namespace MTGApplication.API
       });
 
       // Loop through the scryfall objects in chunks because scryfall API limits how many cards can be searched at once
-      var chunkTasks = scryfallObjects.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
+      var chunkImportResults = scryfallObjects.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
       {
         List<MTGCard> fetchedCards = new();
+        int notFoundCount = 0;
         var identifiersJson = string.Empty;
 
         // Convert the chunk to JSON text
@@ -174,6 +132,7 @@ namespace MTGApplication.API
         {
           var rootNode = JsonNode.Parse(await IO.FetchStringFromURLPost(COLLECTION_URL, identifiersJson));
           JsonNode dataNode = rootNode?["data"];
+          notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
           if (dataNode != null)
           {
             foreach (JsonNode item in dataNode.AsArray())
@@ -189,18 +148,12 @@ namespace MTGApplication.API
         }
         catch (Exception) { throw; }
 
-        return fetchedCards.ToArray();
+        return (Found: fetchedCards.ToArray(), NotFoundCount: notFoundCount);
       }));
 
-      var fetchedCardLists = await Task.WhenAll(chunkTasks);
-      List<MTGCard> cards = new();
+      var importResults = await Task.WhenAll(chunkImportResults);
 
-      foreach (var list in fetchedCardLists)
-      {
-        cards.AddRange(list);
-      }
-
-      return cards.ToArray();
+      return (importResults.SelectMany(x => x.Found).ToArray(), importResults.Sum(x => x.NotFoundCount));
     }
 
     /// <summary>

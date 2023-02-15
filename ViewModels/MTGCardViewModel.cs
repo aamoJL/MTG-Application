@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Input;
+using MTGApplication.Services;
 
 namespace MTGApplication.ViewModels
 {
-  public partial class MTGCardViewModel : ViewModelBase
+    public partial class MTGCardViewModel : ViewModelBase
   {
     public MTGCardViewModel(MTGCard model)
     {

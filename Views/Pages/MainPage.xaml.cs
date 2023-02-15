@@ -1,13 +1,14 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using MTGApplication.Services;
 using Windows.UI;
 
 namespace MTGApplication.Pages
 {
-  /// <summary>
-  /// Main Page
-  /// </summary>
-  public sealed partial class MainPage : Page
+    /// <summary>
+    /// Main Page
+    /// </summary>
+    public sealed partial class MainPage : Page
   {
     private readonly int notificationDuration = 4000;
     

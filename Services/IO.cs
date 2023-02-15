@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
-namespace MTGApplication
+namespace MTGApplication.Services
 {
   /// <summary>
   /// Functions that uses files and networking
@@ -18,7 +18,7 @@ namespace MTGApplication
       {
         DataPackage dataPackage = new();
         dataPackage.SetText(text);
-        Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+        Clipboard.SetContent(dataPackage);
 
         Notifications.RaiseNotification(Notifications.NotificationType.Info, "Copied to clipboard.");
       }

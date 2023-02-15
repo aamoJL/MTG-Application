@@ -40,7 +40,7 @@
             <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
           </StackPanel>-->
         </Grid>
-        <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
+        <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Center" FontSize="11"/>
       </StackPanel>
     </DataTemplate>
     
@@ -59,7 +59,9 @@
           </MenuFlyout>
         </StackPanel.ContextFlyout>
         <Image Width="20" Source="{x:Bind Model.Info.SetIconUri}"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine}" Width="250"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
       </StackPanel>
     </DataTemplate>
 
@@ -82,9 +84,11 @@
             <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
           </MenuFlyout>
         </StackPanel.ContextFlyout>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}" Width="30"/>
         <Image Width="20" Source="{x:Bind Model.Info.SetIconUri}"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine}" Width="250"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
       </StackPanel>
     </DataTemplate>
 

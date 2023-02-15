@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Charts;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
@@ -17,7 +16,7 @@ using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels
 {
-  public partial class DeckBuilderViewModel : ViewModelBase
+    public partial class DeckBuilderViewModel : ViewModelBase
   {
     public class DeckBuilderViewDialogs
     {
@@ -230,13 +229,18 @@ namespace MTGApplication.ViewModels
         if (!string.IsNullOrEmpty(importText))
         {
           IsBusy = true;
-          var cards = await CardAPI.FetchImportedCards(importText);
+          var (Found, NotFoundCount) = await CardAPI.FetchImportedCards(importText);
+          var cards = Found;
           foreach (var item in cards)
           {
             CardDeck.AddToCardlist(ListType, item);
           }
-          // TODO: not found count
-          Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{cards.Length} cards imported successfully.");
+          if (NotFoundCount == 0)
+            Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{NotFoundCount + cards.Length} cards imported successfully.");
+          else if (Found.Length == 0)
+            Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
+          else
+            Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{cards.Length}/{NotFoundCount + cards.Length} cards imported successfully. {NotFoundCount} cards were not found.");
         }
         IsBusy = false;
       }
@@ -477,13 +481,21 @@ namespace MTGApplication.ViewModels
       if(await Task.Run(() => DeckService.AddOrUpdate(CardDeck)))
       {
         HasUnsavedChanges = false;
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was saved successfully.");
       }
+      else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not save the deck."); }
       IsBusy = false;
     }
     private async Task LoadDeck(string name)
     {
       IsBusy = true;
-      CardDeck = await Task.Run(() => DeckService.Get(name));
+      var loadedDeck = await Task.Run(() => DeckService.Get(name));
+      if(loadedDeck != null )
+      {
+        CardDeck = loadedDeck;
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was loaded successfully.");
+      }
+      else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not load the deck."); }
       IsBusy = false;
     }
     private async Task DeleteDeck()
@@ -492,7 +504,9 @@ namespace MTGApplication.ViewModels
       if (await Task.Run(() => DeckService.Remove(CardDeck))) 
       { 
         CardDeck = new();
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was deleted successfully.");
       }
+      else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not delete the deck."); }
       IsBusy = false;
     }
     private async Task<bool> ShowUnsavedDialogs()

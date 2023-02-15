@@ -4,6 +4,7 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
 using MTGApplication.API;
+using MTGApplication.Services;
 
 namespace MTGApplication
 {
