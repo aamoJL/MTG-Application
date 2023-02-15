@@ -5,7 +5,6 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
   xmlns:views="using:MTGApplication.Views"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -14,7 +13,7 @@
     <TabView IsAddTabButtonVisible="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
       <TabView.TabItems>
         <TabViewItem Header="Deck Builder" IsClosable="False">
-          <views:DeckBuilderView/>
+          <views:DeckBuilderTabView/>
         </TabViewItem>
         <TabViewItem Header="Collections" IsClosable="False">
           <!--TODO-->

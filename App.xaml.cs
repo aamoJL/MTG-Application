@@ -4,8 +4,6 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
 using MTGApplication.API;
-using Microsoft.EntityFrameworkCore;
-using MTGApplication.Database;
 
 namespace MTGApplication
 {
@@ -16,7 +14,6 @@ namespace MTGApplication
   {
     // Used for Dialogs
     public static FrameworkElement MainRoot { get; private set; }
-    public static MTGCardAPI CardAPI { get; private set; } = new ScryfallAPI();
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -32,12 +29,12 @@ namespace MTGApplication
     /// will be used such as when the application is launched to open a specific file.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-      using (var db = new CardDatabaseContext())
-      {
-        db.Database.Migrate();
-      }
+      //using (var db = new CardDatabaseContext())
+      //{
+      //  db.Database.Migrate();
+      //}
 
       m_window = new MainWindow();
       

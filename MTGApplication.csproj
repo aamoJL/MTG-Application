@@ -105,7 +105,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\Tabs\DeckBuilderView.xaml">
+    <Page Update="Views\Pages\Tabs\DeckBuilderTabView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>

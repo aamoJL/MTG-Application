@@ -1,4 +1,3 @@
-using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -12,18 +11,21 @@ using MTGApplication.Models;
 using System.Text.Json;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
+using MTGApplication.API;
+using MTGApplication.Services;
 
 namespace MTGApplication.Views
 {
   [ObservableObject]
-  public sealed partial class DeckBuilderView : UserControl
+  public sealed partial class DeckBuilderTabView : UserControl
   {
-    public DeckBuilderView()
+    public DeckBuilderTabView()
     {
       this.InitializeComponent();
     }
 
-    public DeckBuilderViewModel ViewModel = new();
+    public MTGSearchViewModel SearchViewModel = new(new ScryfallAPI());
+    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new InMemoryMTGDeckService());
 
     [ObservableProperty]
     private double searchDesiredItemWidth = 250;
@@ -33,30 +35,28 @@ namespace MTGApplication.Views
     private double deckDesiredItemWidth = 250;
 
     [RelayCommand]
-    public void SwitchSearchPanel()
-    {
-      SearchPanelOpen = !SearchPanelOpen;
-    }
+    public void SwitchSearchPanel() => SearchPanelOpen = !SearchPanelOpen;
 
     #region Pointer Events
     private object draggedElement;
 
     private void CardGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
-      {
-        // TODO: hovered item to this viewmodel instead of the cardVM
-        //cardVM.ControlsVisible = true;
-      }
+      //if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      //{
+      //  // TODO: hovered item to this viewmodel instead of the cardVM
+      //  //cardVM.ControlsVisible = true;
+      //}
     }
     private void CardGridViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
-      {
-        // TODO: hovered item to this viewmodel instead of the cardVM
-        //cardVM.ControlsVisible = false;
-      }
+      //if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      //{
+      //  // TODO: hovered item to this viewmodel instead of the cardVM
+      //  //cardVM.ControlsVisible = false;
+      //}
     }
+
     private void CardListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
       // Change card preview image to hovered item
@@ -107,7 +107,7 @@ namespace MTGApplication.Views
           ? DataPackageOperation.Move : DataPackageOperation.Copy;
       }
     }
-    private async void DeckMaybeDisplay_Drop(object sender, DragEventArgs e)
+    private async void CardView_Drop(object sender, DragEventArgs e)
     {
       if (e.DataView.Contains(StandardDataFormats.Text))
       {
@@ -116,45 +116,16 @@ namespace MTGApplication.Views
 
         try
         {
-          var card = JsonSerializer.Deserialize<MTGCard>(data);
-          if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
-          ViewModel.AddToMaybelist(card);
-        }
-        catch (Exception) { }
-
-        def.Complete();
-      }
-    }
-    private async void DeckWishlistDisplay_Drop(object sender, DragEventArgs e)
-    {
-      if (e.DataView.Contains(StandardDataFormats.Text))
-      {
-        DragOperationDeferral def = e.GetDeferral();
-        string data = await e.DataView.GetTextAsync();
-
-        try
-        {
-          var card = JsonSerializer.Deserialize<MTGCard>(data);
-          if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
-          ViewModel.AddToWishlist(card);
-        }
-        catch (Exception) { }
-
-        def.Complete();
-      }
-    }
-    private async void DeckDisplay_Drop(object sender, DragEventArgs e)
-    {
-      if (e.DataView.Contains(StandardDataFormats.Text))
-      {
-        DragOperationDeferral def = e.GetDeferral();
-        string data = await e.DataView.GetTextAsync();
-
-        try
-        {
-          var card = JsonSerializer.Deserialize<MTGCard>(data);
-          if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
-          ViewModel.AddToDeckCards(card);
+          if((sender as FrameworkElement)?.DataContext is DeckBuilderViewModel.Cardlist cardlist)
+          {
+            var card = JsonSerializer.Deserialize<MTGCard>(data);
+            if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
+            
+            if (cardlist.AddToCardlistCommand.CanExecute(card))
+            {
+              cardlist.AddToCardlistCommand.Execute(card);
+            }
+          }
         }
         catch (Exception) { }
 
@@ -166,12 +137,14 @@ namespace MTGApplication.Views
       // Remove original item if the operation is 'Move'
       if ((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move
         && args.Items[0] is MTGCardViewModel cardVM
-        && sender.DataContext is ObservableCollection<MTGCard> cardlist)
+        && (sender as FrameworkElement)?.DataContext is DeckBuilderViewModel.Cardlist cardlist)
       {
-        cardlist.Remove(cardVM.Model);
+        if (cardlist.RemoveFromCardlistCommand.CanExecute(cardVM.Model))
+        {
+          cardlist.RemoveFromCardlistCommand.Execute(cardVM.Model);
+        }
       }
     }
     #endregion
-
   }
 }

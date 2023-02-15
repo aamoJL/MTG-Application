@@ -20,19 +20,13 @@ namespace MTGApplication.Pages
 
     private void Notifications_OnNotification(object sender, Notifications.NotificationEventArgs e)
     {
-      switch (e.Type)
+      PopupAppNotification.Background = e.Type switch
       {
-        case Notifications.NotificationType.Error:
-          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)); break;
-        case Notifications.NotificationType.Warning:
-          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)); break;
-        case Notifications.NotificationType.Success:
-          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)); break;
-        case Notifications.NotificationType.Info:
-        default: 
-          PopupAppNotification.Background = new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)); break;
-      }
-
+        Notifications.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+        Notifications.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+        Notifications.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+        _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
+      };
       PopupAppNotification.Show(e.Text, notificationDuration);
     }
   }
