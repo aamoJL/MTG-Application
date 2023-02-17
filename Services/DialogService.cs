@@ -8,177 +8,178 @@ using System.IO;
 namespace MTGApplication.Services
 {
   public static class Dialogs
+  {
+    public static async Task MessageDialogAsync(this FrameworkElement element, string title, string message, string buttonText)
     {
-      public static async Task MessageDialogAsync(this FrameworkElement element, string title, string message, string buttonText)
+      var dialog = new ContentDialog
       {
-        var dialog = new ContentDialog
-        {
-          Title = title,
-          Content = message,
-          CloseButtonText = buttonText,
-          XamlRoot = element.XamlRoot,
-          RequestedTheme = element.ActualTheme,
-        };
+        Title = title,
+        Content = message,
+        CloseButtonText = buttonText,
+        XamlRoot = element.XamlRoot,
+        RequestedTheme = element.ActualTheme,
+      };
 
-        await dialog.ShowAsync();
+      await dialog.ShowAsync();
+    }
+
+    public static async Task<bool?> ConfirmationDialogAsync(
+     this FrameworkElement element,
+     string title,
+     object content,
+     string yesButtonText = "Yes",
+     string noButtonText = "No",
+     string cancelButtonText = "Cancel")
+    {
+      var dialog = new ContentDialog
+      {
+        Title = title,
+        PrimaryButtonText = yesButtonText,
+        SecondaryButtonText = noButtonText,
+        CloseButtonText = cancelButtonText,
+        XamlRoot = element.XamlRoot,
+        RequestedTheme = element.ActualTheme,
+        Content = content,
+        DefaultButton = ContentDialogButton.Primary
+      };
+      var result = await dialog.ShowAsync();
+
+      if (result == ContentDialogResult.None)
+      {
+        return null;
       }
 
-      public static async Task<bool?> ConfirmationDialogAsync(
-       this FrameworkElement element,
-       string title,
-       object content,
-       string yesButtonText = "Yes",
-       string noButtonText = "No",
-       string cancelButtonText = "Cancel")
+      return result == ContentDialogResult.Primary;
+    }
+
+    public static async Task<string> InputStringDialogAsync(
+     this FrameworkElement element,
+     string title,
+     string defaultText = "",
+     string okButtonText = "OK",
+     string cancelButtonText = "Cancel",
+     char[] invalidCharacters = null)
+    {
+      var inputTextBox = new TextBox
       {
-        var dialog = new ContentDialog
-        {
-          Title = title,
-          PrimaryButtonText = yesButtonText,
-          SecondaryButtonText = noButtonText,
-          CloseButtonText = cancelButtonText,
-          XamlRoot = element.XamlRoot,
-          RequestedTheme = element.ActualTheme,
-          Content = content,
-          DefaultButton = ContentDialogButton.Primary
-        };
-        var result = await dialog.ShowAsync();
-
-        if (result == ContentDialogResult.None)
-        {
-          return null;
-        }
-
-        return result == ContentDialogResult.Primary;
-      }
-
-      public static async Task<string> InputStringDialogAsync(
-       this FrameworkElement element,
-       string title,
-       string defaultText = "",
-       string okButtonText = "OK",
-       string cancelButtonText = "Cancel",
-       char[] invalidCharacters = null)
+        AcceptsReturn = false,
+        Text = defaultText,
+        SelectionStart = defaultText.Length,
+      };
+      var dialog = new ContentDialog
       {
-        var inputTextBox = new TextBox
-        {
-          AcceptsReturn = false,
-          Text = defaultText,
-          SelectionStart = defaultText.Length,
-        };
-        var dialog = new ContentDialog
-        {
-          Content = inputTextBox,
-          Title = title,
-          IsSecondaryButtonEnabled = true,
-          PrimaryButtonText = okButtonText,
-          SecondaryButtonText = cancelButtonText,
-          XamlRoot = element.XamlRoot,
-          RequestedTheme = element.ActualTheme,
-          DefaultButton = ContentDialogButton.Primary
-        };
+        Content = inputTextBox,
+        Title = title,
+        IsSecondaryButtonEnabled = true,
+        PrimaryButtonText = okButtonText,
+        SecondaryButtonText = cancelButtonText,
+        XamlRoot = element.XamlRoot,
+        RequestedTheme = element.ActualTheme,
+        DefaultButton = ContentDialogButton.Primary
+      };
 
-        if (invalidCharacters != null)
+      if (invalidCharacters != null)
+      {
+        inputTextBox.TextChanging += (sender, args) =>
         {
-          inputTextBox.TextChanging += (sender, args) =>
+          var text = sender.Text;
+          foreach (var c in Path.GetInvalidFileNameChars())
           {
-            var text = sender.Text;
-            foreach (var c in Path.GetInvalidFileNameChars())
-            {
-              text = text.Replace(c.ToString(), string.Empty);
-            }
-            var oldSelectionStart = sender.SelectionStart;
-            sender.Text = text;
-            sender.Select(oldSelectionStart, 0);
-          };
-        }
-
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-        {
-          return inputTextBox.Text;
-        }
-        else
-        {
-          return null;
-        }
+            text = text.Replace(c.ToString(), string.Empty);
+          }
+          var oldSelectionStart = sender.SelectionStart;
+          sender.Text = text;
+          sender.Select(oldSelectionStart, 0);
+        };
       }
 
-      public static async Task<string> TextAreaInputDialogAsync(
-       this FrameworkElement element,
-       string title,
-       string inputPlaceholder = "",
-       string inputHeader = null,
-       string defaultText = "",
-       string okButtonText = "OK",
-       string cancelButtonText = "Cancel")
+      if (await dialog.ShowAsync() == ContentDialogResult.Primary)
       {
-        var inputTextBox = new TextBox
-        {
-          PlaceholderText = inputPlaceholder,
-          IsSpellCheckEnabled = false,
-          Header = inputHeader,
-          AcceptsReturn = true,
-          Text = defaultText,
-          Height = 600,
-          Width = 800,
-        };
-        var dialog = new ContentDialog
-        {
-          Content = inputTextBox,
-          Title = title,
-          PrimaryButtonText = okButtonText,
-          SecondaryButtonText = cancelButtonText,
-          XamlRoot = element.XamlRoot,
-          RequestedTheme = element.ActualTheme,
-          DefaultButton = ContentDialogButton.Primary
-        };
-
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-        {
-          return inputTextBox.Text;
-        }
-        else
-        {
-          return string.Empty;
-        }
+        return inputTextBox.Text;
       }
-
-      public static async Task<string> ComboboxDialogAsync(
-       this FrameworkElement element,
-       string title,
-       string[] items,
-       string header = "",
-       string okButtonText = "OK",
-       string cancelButtonText = "Cancel")
+      else
       {
-        var inputComboBox = new ComboBox
-        {
-          ItemsSource = items,
-          Header = header
-        };
-        var dialog = new ContentDialog
-        {
-          Content = inputComboBox,
-          Title = title,
-          IsSecondaryButtonEnabled = true,
-          PrimaryButtonText = okButtonText,
-          SecondaryButtonText = cancelButtonText,
-          XamlRoot = element.XamlRoot,
-          RequestedTheme = element.ActualTheme,
-          DefaultButton = ContentDialogButton.Primary
-        };
-
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary && inputComboBox.SelectedValue != null)
-        {
-          return inputComboBox.SelectedValue.ToString();
-        }
-        else
-        {
-          return string.Empty;
-        }
+        return null;
       }
     }
-  
+
+    public static async Task<string> TextAreaInputDialogAsync(
+     this FrameworkElement element,
+     string title,
+     string inputPlaceholder = "",
+     string inputHeader = null,
+     string defaultText = "",
+     string okButtonText = "OK",
+     string cancelButtonText = "Cancel")
+    {
+      var inputTextBox = new TextBox
+      {
+        PlaceholderText = inputPlaceholder,
+        IsSpellCheckEnabled = false,
+        Header = inputHeader,
+        AcceptsReturn = true,
+        Text = defaultText,
+        Height = 500,
+        Width = 800,
+      };
+
+      var dialog = new ContentDialog
+      {
+        Content = inputTextBox,
+        Title = title,
+        PrimaryButtonText = okButtonText,
+        SecondaryButtonText = cancelButtonText,
+        XamlRoot = element.XamlRoot,
+        RequestedTheme = element.ActualTheme,
+        DefaultButton = ContentDialogButton.Primary
+      };
+
+      if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+      {
+        return inputTextBox.Text;
+      }
+      else
+      {
+        return string.Empty;
+      }
+    }
+
+    public static async Task<string> ComboboxDialogAsync(
+     this FrameworkElement element,
+     string title,
+     string[] items,
+     string header = "",
+     string okButtonText = "OK",
+     string cancelButtonText = "Cancel")
+    {
+      var inputComboBox = new ComboBox
+      {
+        ItemsSource = items,
+        Header = header
+      };
+      var dialog = new ContentDialog
+      {
+        Content = inputComboBox,
+        Title = title,
+        IsSecondaryButtonEnabled = true,
+        PrimaryButtonText = okButtonText,
+        SecondaryButtonText = cancelButtonText,
+        XamlRoot = element.XamlRoot,
+        RequestedTheme = element.ActualTheme,
+        DefaultButton = ContentDialogButton.Primary
+      };
+
+      if (await dialog.ShowAsync() == ContentDialogResult.Primary && inputComboBox.SelectedValue != null)
+      {
+        return inputComboBox.SelectedValue.ToString();
+      }
+      else
+      {
+        return string.Empty;
+      }
+    }
+  }
+
   public class DialogService
   {
     public class MessageDialog : IDialog<object>
@@ -240,7 +241,7 @@ namespace MTGApplication.Services
     {
       public string Title { get; set; } = "Title";
       public string InputPlaceholder { get; set; } = string.Empty;
-      public string InputHeader { get; set; } = "Input Header";
+      public string InputHeader { get; set; } = string.Empty;
       public string DefaultText { get; set; } = string.Empty;
       public string OkButtonText { get; set; } = "OK";
       public string CancelButtonText { get; set; } = "Cancel";

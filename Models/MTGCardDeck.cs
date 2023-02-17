@@ -1,13 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MTGApplication.Interfaces;
+using MTGApplication.Models.Converters;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Threading.Tasks;
 using static MTGApplication.Enums;
 
 namespace MTGApplication.Models
 {
-  public partial class MTGCardDeck : ObservableObject
+    public partial class MTGCardDeck : ObservableObject
   {
     [ObservableProperty]
     private string name = "";
@@ -51,30 +55,31 @@ namespace MTGApplication.Models
 
   public class MTGCardDeckDTO
   {
+    private MTGCardDeckDTO() { }
     public MTGCardDeckDTO(MTGCardDeck deck)
     {
       Name = deck.Name;
-      DeckCards.AddRange(deck.DeckCards);
-      WishlistCards.AddRange(deck.Wishlist);
-      MaybelistCards.AddRange(deck.Maybelist);
+      DeckCards.AddRange(deck.DeckCards.Select(x => new CardDTO(x)));
+      WishlistCards.AddRange(deck.Wishlist.Select(x => new CardDTO(x)));
+      MaybelistCards.AddRange(deck.Maybelist.Select(x => new CardDTO(x)));
     }
 
     [Key]
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public List<MTGCard> DeckCards { get; set; } = new();
-    public List<MTGCard> WishlistCards { get; set; } = new();
-    public List<MTGCard> MaybelistCards { get; set; } = new();
+    public int Id { get; init; }
+    public string Name { get; init; }
 
-    public MTGCardDeck AsMTGCardDeck()
+    [InverseProperty(nameof(CardDTO.DeckCards))]
+    public List<CardDTO> DeckCards { get; init; } = new();
+    
+    [InverseProperty(nameof(CardDTO.DeckWishlist))]
+    public List<CardDTO> WishlistCards { get; init; } = new();
+    
+    [InverseProperty(nameof(CardDTO.DeckMaybelist))]
+    public List<CardDTO> MaybelistCards { get; init; } = new();
+
+    public async Task<MTGCardDeck> AsMTGCardDeck(ICardAPI<MTGCard> api)
     {
-      return new()
-      {
-        Name = Name,
-        DeckCards = new ObservableCollection<MTGCard>(DeckCards),
-        Wishlist = new ObservableCollection<MTGCard>(WishlistCards),
-        Maybelist = new ObservableCollection<MTGCard>(MaybelistCards),
-      };
+      return await MTGCardDeckDTOConverter.Convert(this, api);
     }
   }
 }

@@ -229,7 +229,7 @@ namespace MTGApplication.ViewModels
         if (!string.IsNullOrEmpty(importText))
         {
           IsBusy = true;
-          var (Found, NotFoundCount) = await CardAPI.FetchImportedCards(importText);
+          var (Found, NotFoundCount) = await CardAPI.FetchFromString(importText);
           var cards = Found;
           foreach (var item in cards)
           {
@@ -240,7 +240,7 @@ namespace MTGApplication.ViewModels
           else if (Found.Length == 0)
             Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
           else
-            Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{cards.Length}/{NotFoundCount + cards.Length} cards imported successfully. {NotFoundCount} cards were not found.");
+            Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{cards.Length} / {NotFoundCount + cards.Length} cards imported successfully.{Environment.NewLine}{NotFoundCount} cards were not found.");
         }
         IsBusy = false;
       }
@@ -269,9 +269,9 @@ namespace MTGApplication.ViewModels
       }
     }
 
-    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckService<MTGCardDeck> deckService, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
+    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckService, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
     {
-      DeckService = deckService;
+      DeckRepository = deckService;
       CardAPI = cardAPI;
       CMCChart = new CMCChart(CardDeck.DeckCards);
       SpellTypeChart = new SpellTypeChart(CardDeck.DeckCards);
@@ -324,7 +324,7 @@ namespace MTGApplication.ViewModels
 
     private MTGCardDeck cardDeck = new();
 
-    private IDeckService<MTGCardDeck> DeckService { get; }
+    private IDeckRepository<MTGCardDeck> DeckRepository { get; }
     private ICardAPI<MTGCard> CardAPI { get; }
     private MTGCardDeck CardDeck
     {
@@ -396,7 +396,7 @@ namespace MTGApplication.ViewModels
     {
       if(await ShowUnsavedDialogs())
       {
-        var loadName = await Dialogs.GetLoadDialog((await DeckService.Get()).Select(x => x.Name).ToArray()).Show();
+        var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).ToArray()).Show();
         if (loadName != string.Empty)
         {
           await LoadDeck(loadName);
@@ -414,7 +414,7 @@ namespace MTGApplication.ViewModels
       if (string.IsNullOrEmpty(saveName)) { return; }
       else
       {
-        if (saveName != CardDeck.Name && await DeckService.Exists(saveName))
+        if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
         {
           // Deck exists already
           if (await Dialogs.GetOverrideDialog(saveName).Show() == null) { return; }
@@ -430,7 +430,7 @@ namespace MTGApplication.ViewModels
     [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckDialogCommand))]
     public async Task DeleteDeckDialog()
     {
-      if (!await DeckService.Exists(CardDeck.Name)) { return; }
+      if (!await DeckRepository.Exists(CardDeck.Name)) { return; }
       if (await Dialogs.GetDeleteDialog(CardDeck.Name).Show() is true)
       {
         await DeleteDeck();
@@ -477,9 +477,16 @@ namespace MTGApplication.ViewModels
     private async Task SaveDeck(string name)
     {
       IsBusy = true;
-      CardDeck.Name = name;
-      if(await Task.Run(() => DeckService.AddOrUpdate(CardDeck)))
+      var saveDeck = new MTGCardDeck()
       {
+        Name = name,
+        DeckCards = CardDeck.DeckCards,
+        Maybelist = CardDeck.Maybelist,
+        Wishlist = CardDeck.Wishlist,
+      };
+      if(await Task.Run(() => DeckRepository.AddOrUpdate(saveDeck)))
+      {
+        CardDeck.Name = name;
         HasUnsavedChanges = false;
         Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was saved successfully.");
       }
@@ -489,7 +496,7 @@ namespace MTGApplication.ViewModels
     private async Task LoadDeck(string name)
     {
       IsBusy = true;
-      var loadedDeck = await Task.Run(() => DeckService.Get(name));
+      var loadedDeck = await Task.Run(() => DeckRepository.Get(name));
       if(loadedDeck != null )
       {
         CardDeck = loadedDeck;
@@ -501,7 +508,7 @@ namespace MTGApplication.ViewModels
     private async Task DeleteDeck()
     {
       IsBusy = true;
-      if (await Task.Run(() => DeckService.Remove(CardDeck))) 
+      if (await Task.Run(() => DeckRepository.Remove(CardDeck))) 
       { 
         CardDeck = new();
         Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was deleted successfully.");
@@ -523,7 +530,7 @@ namespace MTGApplication.ViewModels
           if (string.IsNullOrEmpty(saveName)) { return false; }
           else
           {
-            if (saveName != CardDeck.Name && await DeckService.Exists(saveName))
+            if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
             {
               // Deck exists already
               var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).Show();

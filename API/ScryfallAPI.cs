@@ -4,13 +4,11 @@ using MTGApplication.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static MTGApplication.Interfaces.ICardAPI<MTGApplication.Models.MTGCard>;
 using static MTGApplication.Models.MTGCard;
 
 namespace MTGApplication.API
@@ -20,11 +18,76 @@ namespace MTGApplication.API
   /// </summary>
   public class ScryfallAPI : ICardAPI<MTGCard>
   {
+    /// <summary>
+    /// Scryfall collection fetch identifier object.
+    /// Scryfall documentation: <see href="https://scryfall.com/docs/api/cards/collection"/>
+    /// </summary>
+    public readonly struct ScryfallIdentifier
+    {
+      public enum IdentifierSchema
+      {
+        ID, ILLUSTRATION_ID, NAME, NAME_SET
+      }
+
+      public ScryfallIdentifier() { }
+      public ScryfallIdentifier(CardDTO card)
+      {
+        if (card != null)
+        {
+          ScryfallId = card.ScryfallId;
+          Name = card.Name;
+          CardCount = card.Count;
+        }
+      }
+
+      public Guid ScryfallId { get; init; } = Guid.Empty;
+      public int CardCount { get; init; } = 1;
+      public string Name { get; init; } = string.Empty;
+      public Guid IllustrationId { get; init; } = Guid.Empty;
+      public string SetCode { get; init; } = string.Empty;
+      public IdentifierSchema PreferedSchema { get; init; } = IdentifierSchema.ID;
+
+      /// <summary>
+      /// Return object that contains the scryfall API identifier variables. This method should only be used for JSON serialization.
+      /// </summary>
+      public object ToObject()
+      {
+        switch (PreferedSchema)
+        {
+          case IdentifierSchema.ID:
+            if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
+            break;
+          case IdentifierSchema.ILLUSTRATION_ID:
+            if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
+            break;
+          case IdentifierSchema.NAME:
+            if (Name != string.Empty) { return new { name = Name }; }
+            break;
+          case IdentifierSchema.NAME_SET:
+            if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
+            break;
+          default: break;
+        }
+
+        // If prefered schema does not work, select secondary if possible
+        if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
+        else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
+        else if (Name != string.Empty) { return new { name = Name }; }
+        else if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
+        else { return string.Empty; }
+      }
+    }
+
     private readonly static string API_URL = "https://api.scryfall.com";
     private static string CARDS_URL => $"{API_URL}/cards";
     private static string COLLECTION_URL => $"{CARDS_URL}/collection";
     private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
     private static int MaxFetchIdentifierCount => 75;
+
+    /// <summary>
+    /// Converts search parameters to Scryfall API search uri
+    /// </summary>
+    public static string GetSearchUri(string searchParams) => $"{CARDS_URL}/search?q={searchParams}+game:paper";
 
     /// <summary>
     /// Fetches cards from Scryfall API using given parameters
@@ -35,7 +98,7 @@ namespace MTGApplication.API
     public async Task<MTGCard[]> FetchCards(string searchParams, int countLimit)
     {
       if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
-      List<CardInfo> cardInfos = new();
+      List<MTGCardInfo> cardInfos = new();
       string searchUri = GetSearchUri(searchParams);
       var pageCount = 1;
 
@@ -54,7 +117,7 @@ namespace MTGApplication.API
 
           foreach (var itemInfo in await Task.WhenAll(infos))
           {
-            if (itemInfo != null) cardInfos.Add((CardInfo)itemInfo);
+            if (itemInfo != null) cardInfos.Add((MTGCardInfo)itemInfo);
           }
 
           searchUri = rootNode["has_more"]!.GetValue<bool>() ? rootNode["next_page"]?.GetValue<string>() : "";
@@ -81,12 +144,12 @@ namespace MTGApplication.API
     /// {count (optional)} {name} 
     /// </code>
     /// </summary>
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchImportedCards(string importText)
+    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromString(string importText)
     {
       var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-      // Convert each line to scryfall search objects
-      var scryfallObjects = lines.Select(line =>
+      // Convert each line to scryfall identifier objects
+      var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>
       {
         // Format: {Count (optional)} {Name}
         // Stops at '/' so only the first name will be used for multiface cards
@@ -96,70 +159,15 @@ namespace MTGApplication.API
         var countMatch = match.Groups["Count"]?.Value;
         var nameMatch = match.Groups["Name"]?.Value;
 
-        if (string.IsNullOrEmpty(nameMatch)) { return null; }
-
-        return new
+        return new ScryfallIdentifier()
         {
-          Count = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
           Name = nameMatch.Trim(),
+          CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
         };
-      });
+      })));
 
-      // Loop through the scryfall objects in chunks because scryfall API limits how many cards can be searched at once
-      var chunkImportResults = scryfallObjects.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
-      {
-        List<MTGCard> fetchedCards = new();
-        int notFoundCount = 0;
-        var identifiersJson = string.Empty;
-
-        // Convert the chunk to JSON text
-        using (var stream = new MemoryStream())
-        {
-          await JsonSerializer.SerializeAsync(stream, new
-          {
-            identifiers = chunk.Select(x => new
-            {
-              name = x.Name
-            })
-          });
-          stream.Position = 0;
-          using var reader = new StreamReader(stream);
-          identifiersJson = await reader.ReadToEndAsync();
-        }
-
-        // Fetch and covert the JSON to card objects
-        try
-        {
-          var rootNode = JsonNode.Parse(await IO.FetchStringFromURLPost(COLLECTION_URL, identifiersJson));
-          JsonNode dataNode = rootNode?["data"];
-          notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
-          if (dataNode != null)
-          {
-            foreach (JsonNode item in dataNode.AsArray())
-            {
-              CardInfo? cardInfo = GetCardInfoFromJSON(item);
-              var count = chunk.FirstOrDefault(x => string.Equals(cardInfo?.FrontFace.Name, x.Name, StringComparison.OrdinalIgnoreCase))?.Count; // Chunk has only frontface name
-              if (cardInfo != null && count != null)
-              {
-                fetchedCards.Add(new((CardInfo)cardInfo, (int)count));
-              }
-            }
-          }
-        }
-        catch (Exception) { throw; }
-
-        return (Found: fetchedCards.ToArray(), NotFoundCount: notFoundCount);
-      }));
-
-      var importResults = await Task.WhenAll(chunkImportResults);
-
-      return (importResults.SelectMany(x => x.Found).ToArray(), importResults.Sum(x => x.NotFoundCount));
+      return await FetchWithIdentifiers(identifiers);
     }
-
-    /// <summary>
-    /// Converts search parameters to Scryfall API search uri
-    /// </summary>
-    public static string GetSearchUri(string searchParams) => $"{CARDS_URL}/search?q={searchParams}+game:paper";
 
     /// <summary>
     /// Fetches json object that contains list of MTG cards using the Scryfall API
@@ -174,14 +182,23 @@ namespace MTGApplication.API
     }
 
     /// <summary>
-    /// Converts Scryfall API Json object to <see cref="CardInfo"/> object
+    /// Fetches MTGCards from the API using the given CardDTO objects.
     /// </summary>
-    public static CardInfo? GetCardInfoFromJSON(JsonNode json)
+    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray)
+    {
+      var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x));
+      return await FetchWithIdentifiers(identifiers.ToArray());
+    }
+
+    /// <summary>
+    /// Converts Scryfall API Json object to <see cref="MTGCardInfo"/> object
+    /// </summary>
+    private static MTGCardInfo? GetCardInfoFromJSON(JsonNode json)
     {
       // TODO: add tokens if available
       if (json == null || json["object"]?.GetValue<string>() != "card") { return null; }
 
-      var scryfallId = json["id"].GetValue<string>();
+      var scryfallId = json["id"].GetValue<Guid>();
       var cmc = (int)json["cmc"].GetValue<float>();
       var name = json["name"].GetValue<string>();
       var typeLine = json["type_line"].GetValue<string>();
@@ -231,7 +248,7 @@ namespace MTGApplication.API
         backFace = null;
       }
 
-      return new CardInfo(
+      return new MTGCardInfo(
         scryfallId: scryfallId,
         frontFace: frontFace,
         backFace: backFace,
@@ -246,6 +263,48 @@ namespace MTGApplication.API
         apiWebsiteUri: apiWebsiteUri,
         setIconUri: setIconUri
         );
+    }
+
+    /// <summary>
+    /// Fetches MTGCards from the API using the given identifier objects
+    /// </summary>
+    private static async Task<(MTGCard[] Found, int NotFoundCount)> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
+    {
+      var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
+      {
+        var identifiersJson = JsonSerializer.Serialize(new
+        {
+          identifiers = chunk.Select(x => x.ToObject())
+        });
+
+        List<MTGCard> fetchedCards = new();
+        int notFoundCount = 0;
+
+        // Fetch and covert the JSON to card objects
+        try
+        {
+          var rootNode = JsonNode.Parse(await IO.FetchStringFromURLPost(COLLECTION_URL, identifiersJson));
+          JsonNode dataNode = rootNode?["data"];
+          notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
+          if (dataNode != null)
+          {
+            foreach (JsonNode item in dataNode.AsArray())
+            {
+              MTGCardInfo? cardInfo = GetCardInfoFromJSON(item);
+              var count = chunk.FirstOrDefault(x => string.Equals(cardInfo?.FrontFace.Name, x.Name, StringComparison.OrdinalIgnoreCase)).CardCount;
+              if (cardInfo != null)
+              {
+                fetchedCards.Add(new((MTGCardInfo)cardInfo, count));
+              }
+            }
+          }
+        }
+        catch (Exception) { throw; }
+
+        return (Found: fetchedCards.ToArray(), NotFoundCount: notFoundCount);
+      })));
+
+      return (fetchResults.SelectMany(x => x.Found).ToArray(), fetchResults.Sum(x => x.NotFoundCount));
     }
   }
 }

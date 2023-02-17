@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using MTGApplication.Models;
+using System.Threading.Tasks;
 
 namespace MTGApplication.Interfaces
 {
@@ -9,6 +10,7 @@ namespace MTGApplication.Interfaces
   public interface ICardAPI<T>
   { 
     public Task<T[]> FetchCards(string searchParams, int countLimit = 700);
-    public Task<(T[] Found, int NotFoundCount)> FetchImportedCards(string importText);
+    public Task<(T[] Found, int NotFoundCount)> FetchFromString(string importText);
+    public Task<(T[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray);
   }
 }

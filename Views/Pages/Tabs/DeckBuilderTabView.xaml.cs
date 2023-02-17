@@ -9,10 +9,9 @@ using Windows.ApplicationModel.DataTransfer;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MTGApplication.Models;
 using System.Text.Json;
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.API;
-using MTGApplication.Services;
+using MTGApplication.Database.Repositories;
 
 namespace MTGApplication.Views
 {
@@ -25,7 +24,7 @@ namespace MTGApplication.Views
     }
 
     public MTGSearchViewModel SearchViewModel = new(new ScryfallAPI());
-    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new InMemoryMTGDeckService());
+    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new InMemoryMTGDeckRepository(new ScryfallAPI()));
 
     [ObservableProperty]
     private double searchDesiredItemWidth = 250;

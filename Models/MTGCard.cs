@@ -54,9 +54,9 @@ namespace MTGApplication.Models
       }
     }
     [Serializable]
-    public readonly struct CardInfo
+    public readonly struct MTGCardInfo
     {
-      public string ScryfallId { get; }
+      public Guid ScryfallId { get; }
       public string Name { get; }
       public int CMC { get; }
       public string TypeLine { get; }
@@ -80,7 +80,7 @@ namespace MTGApplication.Models
       /// Constructor for JSON deserialization
       /// </summary>
       [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-      public CardInfo(string scryfallId, string name, int cMC, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, string rarityCode, ColorTypes colorType, SpellType[] spellTypes, string cardMarketUri)
+      public MTGCardInfo(Guid scryfallId, string name, int cMC, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, string rarityCode, ColorTypes colorType, SpellType[] spellTypes, string cardMarketUri)
       {
         ScryfallId = scryfallId;
         Name = name;
@@ -101,7 +101,7 @@ namespace MTGApplication.Models
         SpellTypes = spellTypes;
         CardMarketUri = cardMarketUri;
       }
-      public CardInfo(string scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri)
+      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri)
       {
         ScryfallId = scryfallId;
         Name = name;
@@ -130,7 +130,7 @@ namespace MTGApplication.Models
     #endregion
 
     [JsonConstructor]
-    public MTGCard(CardInfo info, int count = 1)
+    public MTGCard(MTGCardInfo info, int count = 1)
     {
       Info = info;
       Count = count;
@@ -138,7 +138,7 @@ namespace MTGApplication.Models
 
     protected int count = 1;
 
-    public CardInfo Info { get; set; }
+    public MTGCardInfo Info { get; set; }
     public int Count
     {
       get => count;
@@ -207,18 +207,24 @@ namespace MTGApplication.Models
     }
   }
 
-  public class MTGCardDTO
+  public class CardDTO
   {
-    public MTGCardDTO(MTGCard card)
+    private CardDTO() { }
+    public CardDTO(MTGCard card)
     {
       Name = card.Info.Name;
       ScryfallId = card.Info.ScryfallId;
+      Count = card.Count;
     }
 
     [Key]
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string ScryfallId { get; set; }
-    public int Count { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; }
+    public Guid ScryfallId { get; init; }
+    public int Count { get; init; }
+
+    public MTGCardDeckDTO DeckCards { get; set; }
+    public MTGCardDeckDTO DeckWishlist { get; set; }
+    public MTGCardDeckDTO DeckMaybelist { get; set; }
   }
 }

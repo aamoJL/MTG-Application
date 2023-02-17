@@ -3,8 +3,9 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Pages;
-using MTGApplication.API;
 using MTGApplication.Services;
+using MTGApplication.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace MTGApplication
 {
@@ -32,10 +33,10 @@ namespace MTGApplication
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-      //using (var db = new CardDatabaseContext())
-      //{
-      //  db.Database.Migrate();
-      //}
+      using (var db = new CardDbContext())
+      {
+        db.Database.Migrate();
+      }
 
       m_window = new MainWindow();
       
