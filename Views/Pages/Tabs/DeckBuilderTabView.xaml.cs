@@ -24,7 +24,7 @@ namespace MTGApplication.Views
     }
 
     public MTGSearchViewModel SearchViewModel = new(new ScryfallAPI());
-    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new InMemoryMTGDeckRepository(new ScryfallAPI()));
+    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new SQLiteMTGDeckRepository(new ScryfallAPI(), new Database.CardDbContextFactory()));
 
     [ObservableProperty]
     private double searchDesiredItemWidth = 250;

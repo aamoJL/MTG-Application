@@ -16,7 +16,7 @@ using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels
 {
-    public partial class DeckBuilderViewModel : ViewModelBase
+  public partial class DeckBuilderViewModel : ViewModelBase
   {
     public class DeckBuilderViewDialogs
     {
@@ -107,18 +107,20 @@ namespace MTGApplication.ViewModels
         PropertyChanged += Cardlist_PropertyChanged;
         OnPropertyChanged(nameof(CardDeck));
       }
-      
+
       private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
       {
-        if(e.PropertyName == nameof(CardDeck))
+        if (e.PropertyName == nameof(CardDeck))
         {
           CardDeck.GetCardlist(ListType).CollectionChanged += Cards_CollectionChanged;
           CardViewModels.Clear();
-          foreach (var card in CardDeck.GetCardlist(ListType)) 
+          foreach (var card in CardDeck.GetCardlist(ListType))
           {
             card.PropertyChanged += Card_PropertyChanged;
             CardViewModels.Add(new(card) { DeleteCardCommand = new RelayCommand<MTGCard>(RemoveFromCardlist) });
           }
+          OnPropertyChanged(nameof(CardlistSize));
+          SortCardViewModels();
           HasUnsavedChanges = false;
         }
         else if (e.PropertyName == nameof(SortDirection) || e.PropertyName == nameof(SortProperty))
@@ -128,8 +130,8 @@ namespace MTGApplication.ViewModels
       }
       private void Card_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
       {
-        if(e.PropertyName == nameof(MTGCard.Count)) 
-        { 
+        if (e.PropertyName == nameof(MTGCard.Count))
+        {
           OnPropertyChanged(nameof(CardlistSize));
           HasUnsavedChanges = true;
         }
@@ -296,18 +298,18 @@ namespace MTGApplication.ViewModels
 
     private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(Cardlist.IsBusy))
+      if (e.PropertyName == nameof(Cardlist.IsBusy))
       {
         IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
       }
     }
     private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(CardDeck.Name)) { OnPropertyChanged(nameof(CardDeckName)); }
+      if (e.PropertyName == nameof(CardDeck.Name)) { OnPropertyChanged(nameof(CardDeckName)); }
     }
     private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(CardDeck))
+      if (e.PropertyName == nameof(CardDeck))
       {
         CardDeck.PropertyChanged += CardDeck_PropertyChanged;
 
@@ -345,7 +347,7 @@ namespace MTGApplication.ViewModels
     public Cardlist MaybelistCards { get; set; }
     public CMCChart CMCChart { get; set; }
     public SpellTypeChart SpellTypeChart { get; set; }
-    
+
     public SortMTGProperty SelectedSortProperty
     {
       set
@@ -378,23 +380,23 @@ namespace MTGApplication.ViewModels
       }
     }
     public string CardDeckName => CardDeck.Name;
-    
+
     /// <summary>
     /// Shows UnsavedChanges dialog and clear current card deck
     /// </summary>
     [RelayCommand]
     public async Task NewDeckDialog()
     {
-      if(await ShowUnsavedDialogs()) await NewDeck();
+      if (await ShowUnsavedDialogs()) await NewDeck();
     }
-    
+
     /// <summary>
     /// Shows dialog with names of the saved decks and changes current deck to the selected deck from the database
     /// </summary>
     [RelayCommand]
     public async Task LoadDeckDialog()
     {
-      if(await ShowUnsavedDialogs())
+      if (await ShowUnsavedDialogs())
       {
         var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).ToArray()).Show();
         if (loadName != string.Empty)
@@ -403,7 +405,7 @@ namespace MTGApplication.ViewModels
         }
       }
     }
-    
+
     /// <summary>
     /// Shows dialog that asks name for the deck and saves current deck to the database with the given name
     /// </summary>
@@ -423,7 +425,7 @@ namespace MTGApplication.ViewModels
 
       await SaveDeck(saveName);
     }
-    
+
     /// <summary>
     /// Deletes current deck from the database
     /// </summary>
@@ -467,7 +469,7 @@ namespace MTGApplication.ViewModels
     private bool CanExecuteSaveDeckDialogCommand() => DeckCards.CardlistSize > 0;
     private bool CanExecuteDeleteDeckDialogCommand() => !string.IsNullOrEmpty(CardDeck.Name);
     #endregion
-    
+
     private async Task NewDeck()
     {
       IsBusy = true;
@@ -484,7 +486,7 @@ namespace MTGApplication.ViewModels
         Maybelist = CardDeck.Maybelist,
         Wishlist = CardDeck.Wishlist,
       };
-      if(await Task.Run(() => DeckRepository.AddOrUpdate(saveDeck)))
+      if (await Task.Run(() => DeckRepository.AddOrUpdate(saveDeck)))
       {
         CardDeck.Name = name;
         HasUnsavedChanges = false;
@@ -496,8 +498,7 @@ namespace MTGApplication.ViewModels
     private async Task LoadDeck(string name)
     {
       IsBusy = true;
-      var loadedDeck = await Task.Run(() => DeckRepository.Get(name));
-      if(loadedDeck != null )
+      if(await Task.Run(() => DeckRepository.Get(name)) is MTGCardDeck loadedDeck)
       {
         CardDeck = loadedDeck;
         Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was loaded successfully.");
@@ -508,8 +509,8 @@ namespace MTGApplication.ViewModels
     private async Task DeleteDeck()
     {
       IsBusy = true;
-      if (await Task.Run(() => DeckRepository.Remove(CardDeck))) 
-      { 
+      if (await Task.Run(() => DeckRepository.Remove(CardDeck)))
+      {
         CardDeck = new();
         Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was deleted successfully.");
       }

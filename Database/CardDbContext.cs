@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.Models;
-using System;
-using System.IO;
 
 namespace MTGApplication.Database
 {
@@ -12,20 +10,7 @@ namespace MTGApplication.Database
     public DbSet<MTGCardDeckDTO> MTGDecks { get; set; }
     public DbSet<CardDTO> MTGCards { get; set; }
 
-    public string DbFileName { get; } = "database.db";
-    public string DbPath { get; }
-
-    public CardDbContext()
-    {
-      var folder = Environment.SpecialFolder.LocalApplicationData;
-      var path = Environment.GetFolderPath(folder);
-      DbPath = Path.Join(path, DbFileName);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-      optionsBuilder.UseSqlite($"Data Source={DbPath}");
-    }
+    public CardDbContext(DbContextOptions options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

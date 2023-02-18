@@ -221,7 +221,7 @@ namespace MTGApplication.Models
     public int Id { get; init; }
     public string Name { get; init; }
     public Guid ScryfallId { get; init; }
-    public int Count { get; init; }
+    public int Count { get; set; }
 
     public MTGCardDeckDTO DeckCards { get; set; }
     public MTGCardDeckDTO DeckWishlist { get; set; }
