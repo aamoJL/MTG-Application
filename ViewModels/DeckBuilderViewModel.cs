@@ -1,309 +1,552 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Charts;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static MTGApplication.Models.MTGCardDeck;
+using static MTGApplication.Enums;
+using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels
 {
   public partial class DeckBuilderViewModel : ViewModelBase
   {
-    public DeckBuilderViewModel()
+    public class DeckBuilderViewDialogs
     {
-      DeckBuilder.PropertyChanged += DeckBuilder_PropertyChanged;
-      CMCChart = new CMCChart(DeckBuilder.CardDeck.DeckCards);
-      SpellTypeChart = new SpellTypeChart(DeckBuilder.CardDeck.DeckCards);
-    }
-
-    private void DeckBuilder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      if(e.PropertyName == nameof(DeckBuilder.CardDeck))
+      #region Dialogs
+      public virtual ConfirmationDialog SaveUnsavedDialog { protected get; init; } = new()
       {
-        CMCChart = new CMCChart(DeckBuilder.CardDeck.DeckCards);
-        SpellTypeChart = new SpellTypeChart(DeckBuilder.CardDeck.DeckCards);
-        OnPropertyChanged(nameof(CMCChart));
-        OnPropertyChanged(nameof(SpellTypeChart));
+        Title = "Save unsaved changes?",
+        Content = "Would you like to save unsaved changes?",
+        YesButtonText = "Save",
+      };
+      public virtual ConfirmationDialog OverrideDialog { protected get; init; } = new()
+      {
+        Title = "Override existing deck?",
+        NoButtonText = string.Empty,
+      };
+      public virtual ConfirmationDialog DeleteDialog { protected get; init; } = new()
+      {
+        Title = "Delete deck?",
+        NoButtonText = string.Empty,
+      };
+      public virtual InputStringDialog SaveDialog { protected get; init; } = new()
+      {
+        Title = "Save your deck?",
+        OkButtonText = "Save",
+        InvalidCharacters = Path.GetInvalidFileNameChars(),
+      };
+      public virtual ComboboxDialog LoadDialog { protected get; init; } = new()
+      {
+        Title = "Open deck",
+        OkButtonText = "Open",
+        Header = "Name"
+      };
+      public virtual InputTextAreaDialog ImportDialog { protected get; init; } = new()
+      {
+        Title = "Import cards",
+        InputPlaceholder = "Example:\n2 Black Lotus\nMox Ruby",
+        OkButtonText = "Add to Collection",
+      };
+      public virtual InputTextAreaDialog ExportDialog { protected get; init; } = new()
+      {
+        Title = "Export deck",
+        OkButtonText = "Copy to Clipboard",
+      };
+      #endregion
+
+      #region Getters
+      public ConfirmationDialog GetSaveUnsavedDialog() => SaveUnsavedDialog;
+      public ConfirmationDialog GetOverrideDialog(string name)
+      {
+        OverrideDialog.Content = $"Deck '{name}' already exist. Would you like to override the deck?";
+        return OverrideDialog;
+      }
+      public ConfirmationDialog GetDeleteDialog(string name)
+      {
+        DeleteDialog.Content = $"Are you sure you want to delete '{name}'?";
+        return DeleteDialog;
+      }
+      public InputStringDialog GetSaveDialog(string name)
+      {
+        SaveDialog.DefaultText = name;
+        return SaveDialog;
+      }
+      public ComboboxDialog GetLoadDialog(string[] names)
+      {
+        LoadDialog.Items = names;
+        return LoadDialog;
+      }
+      public InputTextAreaDialog GetImportDialog() => ImportDialog;
+      public InputTextAreaDialog GetExportDialog(string text)
+      {
+        ExportDialog.DefaultText = text;
+        return ExportDialog;
+      }
+      #endregion
+    }
+    public partial class Cardlist : ObservableObject
+    {
+      public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, SortMTGProperty sortProp = SortMTGProperty.CMC, SortDirection sortDir = SortDirection.ASC, IO.ClipboardService clipboardService = null)
+      {
+        CardDeck = deck;
+        ListType = listType;
+        Dialogs = dialogs;
+        CardAPI = cardAPI;
+        SortDirection = sortDir;
+        SortProperty = sortProp;
+        ClipboardService = clipboardService ?? new();
+
+        PropertyChanged += Cardlist_PropertyChanged;
+        OnPropertyChanged(nameof(CardDeck));
+      }
+
+      private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+      {
+        if (e.PropertyName == nameof(CardDeck))
+        {
+          CardDeck.GetCardlist(ListType).CollectionChanged += Cards_CollectionChanged;
+          CardViewModels.Clear();
+          foreach (var card in CardDeck.GetCardlist(ListType))
+          {
+            card.PropertyChanged += Card_PropertyChanged;
+            CardViewModels.Add(new(card) { DeleteCardCommand = new RelayCommand<MTGCard>(RemoveFromCardlist) });
+          }
+          OnPropertyChanged(nameof(CardlistSize));
+          SortCardViewModels();
+          HasUnsavedChanges = false;
+        }
+        else if (e.PropertyName == nameof(SortDirection) || e.PropertyName == nameof(SortProperty))
+        {
+          SortCardViewModels();
+        }
+      }
+      private void Card_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+      {
+        if (e.PropertyName == nameof(MTGCard.Count))
+        {
+          OnPropertyChanged(nameof(CardlistSize));
+          HasUnsavedChanges = true;
+        }
+      }
+      private void Cards_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+      {
+        // Sync models and viewmodels
+        switch (e.Action)
+        {
+          case NotifyCollectionChangedAction.Add:
+            var newCard = e.NewItems[0] as MTGCard;
+            CardViewModels.Add(new(newCard) { DeleteCardCommand = new RelayCommand<MTGCard>(RemoveFromCardlist) });
+            newCard.PropertyChanged += Card_PropertyChanged;
+            SortCardViewModels();
+            break;
+          case NotifyCollectionChangedAction.Remove:
+            var oldCard = e.OldItems[0] as MTGCard;
+            CardViewModels.Remove(CardViewModels.FirstOrDefault(x => x.Model == oldCard));
+            oldCard.PropertyChanged -= Card_PropertyChanged;
+            break;
+          case NotifyCollectionChangedAction.Reset:
+            CardViewModels.Clear(); break;
+          default: break;
+        }
+        OnPropertyChanged(nameof(CardlistSize));
+        HasUnsavedChanges = true;
+      }
+
+      [ObservableProperty]
+      private bool isBusy;
+      [ObservableProperty]
+      private MTGCardDeck cardDeck;
+      [ObservableProperty]
+      private SortMTGProperty sortProperty;
+      [ObservableProperty]
+      private SortDirection sortDirection;
+
+      private IO.ClipboardService ClipboardService { get; }
+      private CardlistType ListType { get; }
+      private DeckBuilderViewDialogs Dialogs { get; }
+      private ICardAPI<MTGCard> CardAPI { get; }
+
+      public bool HasUnsavedChanges { get; set; }
+      public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
+      public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
+
+      /// <summary>
+      /// Asks cards to import and imports them to the deck
+      /// </summary>
+      [RelayCommand]
+      public async Task ImportToCardlistDialog()
+      {
+        await ImportCards();
+      }
+      /// <summary>
+      /// Shows dialog with formatted text of the cardlist cards
+      /// </summary>
+      [RelayCommand]
+      public async Task ExportDeckCardsDialog()
+      {
+        await ExportCards();
+      }
+      /// <summary>
+      /// Adds given card to the deck cardlist
+      /// </summary>
+      [RelayCommand]
+      public void AddToCardlist(MTGCard card)
+      {
+        CardDeck.AddToCardlist(ListType, card);
+      }
+      /// <summary>
+      /// Removes given card from the deck cardlist
+      /// </summary>
+      [RelayCommand]
+      public void RemoveFromCardlist(MTGCard card)
+      {
+        CardDeck.RemoveFromCardlist(ListType, card);
+      }
+
+      private async Task ExportCards()
+      {
+        StringBuilder stringBuilder = new();
+        foreach (var item in CardViewModels)
+        {
+          stringBuilder.AppendLine($"{item.Model.Count} {item.Model.Info.Name}");
+        }
+
+        var response = await Dialogs.GetExportDialog(stringBuilder.ToString()).Show();
+        if (!string.IsNullOrEmpty(response))
+        {
+          ClipboardService.Copy(response);
+        }
+      }
+      private async Task ImportCards()
+      {
+        var importText = await Dialogs.GetImportDialog().Show();
+        if (!string.IsNullOrEmpty(importText))
+        {
+          IsBusy = true;
+          var (Found, NotFoundCount) = await CardAPI.FetchFromString(importText);
+          var cards = Found;
+          foreach (var item in cards)
+          {
+            CardDeck.AddToCardlist(ListType, item);
+          }
+          if (NotFoundCount == 0)
+            Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{NotFoundCount + cards.Length} cards imported successfully.");
+          else if (Found.Length == 0)
+            Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
+          else
+            Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{cards.Length} / {NotFoundCount + cards.Length} cards imported successfully.{Environment.NewLine}{NotFoundCount} cards were not found.");
+        }
+        IsBusy = false;
+      }
+      private void SortCardViewModels()
+      {
+        List<MTGCardViewModel> tempList = new();
+        var prop = SortProperty;
+        var dir = SortDirection;
+
+        tempList = prop switch
+        {
+          SortMTGProperty.CMC => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.CMC).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.CMC).ToList(),
+          SortMTGProperty.Name => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Name).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Name).ToList(),
+          SortMTGProperty.Rarity => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.RarityType).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.RarityType).ToList(),
+          SortMTGProperty.Color => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.ColorType).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.ColorType).ToList(),
+          SortMTGProperty.Set => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.SetName).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.SetName).ToList(),
+          SortMTGProperty.Count => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Count).ToList() : CardViewModels.OrderByDescending(x => x.Model.Count).ToList(),
+          SortMTGProperty.Price => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Price).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Price).ToList(),
+          _ => throw new NotImplementedException(),
+        };
+
+        for (int i = 0; i < tempList.Count; i++)
+        {
+          CardViewModels.Move(CardViewModels.IndexOf(tempList[i]), i);
+        }
       }
     }
 
-    public MTGSearch Search { get; set; } = new();
-    public MTGDeckBuilder DeckBuilder { get; set; } = new();
+    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckService, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
+    {
+      DeckRepository = deckService;
+      CardAPI = cardAPI;
+      CMCChart = new CMCChart(CardDeck.DeckCards);
+      SpellTypeChart = new SpellTypeChart(CardDeck.DeckCards);
+      Dialogs = dialogs ?? new();
+
+      PropertyChanged += DeckBuilderViewModel_PropertyChanged;
+      CardDeck.PropertyChanged += CardDeck_PropertyChanged;
+
+      clipboardService ??= new();
+      DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService: clipboardService);
+      WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService: clipboardService);
+      MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService);
+
+      DeckCards.PropertyChanged += Cardlist_PropertyChanged;
+      WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
+      MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
+
+
+      SelectedSortDirection = SortDirection.ASC;
+      SelectedSortProperty = SortMTGProperty.CMC;
+    }
+
+    private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(Cardlist.IsBusy))
+      {
+        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
+      }
+    }
+    private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(CardDeck.Name)) { OnPropertyChanged(nameof(CardDeckName)); }
+    }
+    private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(CardDeck))
+      {
+        CardDeck.PropertyChanged += CardDeck_PropertyChanged;
+
+        DeckCards.CardDeck = CardDeck;
+        WishlistCards.CardDeck = CardDeck;
+        MaybelistCards.CardDeck = CardDeck;
+        CMCChart = new CMCChart(CardDeck.DeckCards);
+        SpellTypeChart = new SpellTypeChart(CardDeck.DeckCards);
+        OnPropertyChanged(nameof(CMCChart));
+        OnPropertyChanged(nameof(SpellTypeChart));
+        OnPropertyChanged(nameof(CardDeckName));
+      }
+    }
+
+    private MTGCardDeck cardDeck = new();
+
+    private IDeckRepository<MTGCardDeck> DeckRepository { get; }
+    private ICardAPI<MTGCard> CardAPI { get; }
+    private MTGCardDeck CardDeck
+    {
+      get => cardDeck;
+      set
+      {
+        cardDeck = value;
+        OnPropertyChanged(nameof(CardDeck));
+      }
+    }
+    private DeckBuilderViewDialogs Dialogs { get; }
+
+    [ObservableProperty]
+    private bool isBusy;
+
+    public Cardlist DeckCards { get; set; }
+    public Cardlist WishlistCards { get; set; }
+    public Cardlist MaybelistCards { get; set; }
     public CMCChart CMCChart { get; set; }
     public SpellTypeChart SpellTypeChart { get; set; }
 
-    /// <summary>
-    /// Fetches cards using API and adds them to the search cardlist
-    /// </summary>
-    [RelayCommand]
-    public async Task SearchSubmit()
+    public SortMTGProperty SelectedSortProperty
     {
-      await Search.Search();
+      set
+      {
+        DeckCards.SortProperty = value;
+        WishlistCards.SortProperty = value;
+        MaybelistCards.SortProperty = value;
+      }
     }
-    
+    public SortDirection SelectedSortDirection
+    {
+      set
+      {
+        DeckCards.SortDirection = value;
+        WishlistCards.SortDirection = value;
+        MaybelistCards.SortDirection = value;
+      }
+    }
+    public bool HasUnsavedChanges
+    {
+      get
+      {
+        return DeckCards.HasUnsavedChanges || WishlistCards.HasUnsavedChanges || MaybelistCards.HasUnsavedChanges;
+      }
+      set
+      {
+        DeckCards.HasUnsavedChanges = value;
+        WishlistCards.HasUnsavedChanges = value;
+        MaybelistCards.HasUnsavedChanges = value;
+      }
+    }
+    public string CardDeckName => CardDeck.Name;
+
     /// <summary>
     /// Shows UnsavedChanges dialog and clear current card deck
     /// </summary>
     [RelayCommand]
     public async Task NewDeckDialog()
     {
-      if (DeckBuilder.HasUnsavedChanges)
-      {
-        // Deck has unsaved changes
-        var wantSaveConfirmed = await GetUnsavedDialog();
-        if (wantSaveConfirmed == null) { return; }
-        else if (wantSaveConfirmed is true)
-        {
-          // User wants to save the unsaved changes
-          var saveName = await GetSaveDialog(DeckBuilder.CardDeck.Name);
-          if (saveName == string.Empty) { return; }
-          else
-          {
-            if (saveName != DeckBuilder.CardDeck.Name && MTGCardDeck.Exists(saveName))
-            {
-              // Deck exists already
-              var overrideConfirmed = await GetOverrideDialog(saveName);
-              if (overrideConfirmed == null) { return; }
-              else if (overrideConfirmed is true)
-              {
-                // User wants to override the deck
-                await DeckBuilder.SaveDeck(saveName);
-              }
-            }
-          }
-        }
-      }
-      DeckBuilder.NewDeck();
+      if (await ShowUnsavedDialogs()) await NewDeck();
     }
-    
+
     /// <summary>
     /// Shows dialog with names of the saved decks and changes current deck to the selected deck from the database
     /// </summary>
     [RelayCommand]
     public async Task LoadDeckDialog()
     {
-      if (DeckBuilder.HasUnsavedChanges)
+      if (await ShowUnsavedDialogs())
       {
-        // Collection has unsaved changes
-        var wantSaveConfirmed = await GetUnsavedDialog();
-        if (wantSaveConfirmed == null) { return; }
-        else if (wantSaveConfirmed is true)
+        var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).ToArray()).Show();
+        if (loadName != string.Empty)
         {
-          // User wants to save the unsaved changes
-          var saveName = await GetSaveDialog(DeckBuilder.CardDeck.Name);
-          if (saveName == string.Empty) { return; }
-          else
-          {
-            if (saveName != DeckBuilder.CardDeck.Name && MTGCardDeck.Exists(saveName))
-            {
-              // Deck exists already
-              var overrideConfirmed = await GetOverrideDialog(saveName);
-              if (overrideConfirmed == null) { return; }
-              else if (overrideConfirmed is true)
-              {
-                // User wants to override the deck
-                await DeckBuilder.SaveDeck(saveName);
-              }
-            }
-          }
+          await LoadDeck(loadName);
         }
       }
-
-      using var db = new Database.CardDatabaseContext();
-
-      var deckNames = db.MTGCardDecks.Select(x => x.Name).ToArray();
-      var loadName = await GetLoadDialog(deckNames);
-      if (loadName != string.Empty)
-      {
-        await DeckBuilder.LoadDeck(loadName);
-      }
     }
-    
+
     /// <summary>
     /// Shows dialog that asks name for the deck and saves current deck to the database with the given name
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckDialogCommand))]
     public async Task SaveDeckDialog()
     {
-      var saveName = await GetSaveDialog(DeckBuilder.CardDeck.Name);
-      if (saveName == string.Empty) { return; }
+      var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).Show();
+      if (string.IsNullOrEmpty(saveName)) { return; }
       else
       {
-        if (saveName != DeckBuilder.CardDeck.Name && Exists(saveName))
+        if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
         {
           // Deck exists already
-          if (await GetOverrideDialog(saveName) == null) { return; }
+          if (await Dialogs.GetOverrideDialog(saveName).Show() == null) { return; }
         }
       }
 
-      await DeckBuilder.SaveDeck(saveName);
+      await SaveDeck(saveName);
     }
-    
+
     /// <summary>
     /// Deletes current deck from the database
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckDialogCommand))]
     public async Task DeleteDeckDialog()
     {
-      if (!MTGCardDeck.Exists(DeckBuilder.CardDeck.Name)) { return; }
-      if (await GetDeleteDialog(DeckBuilder.CardDeck.Name) is true)
+      if (!await DeckRepository.Exists(CardDeck.Name)) { return; }
+      if (await Dialogs.GetDeleteDialog(CardDeck.Name).Show() is true)
       {
-        await DeckBuilder.DeleteDeck();
+        await DeleteDeck();
       }
     }
 
-    /// 
-    /// <summary> Asks cards to import and imports them to the deck
-    /// 
-    [RelayCommand]
-    public async Task ImportToDeckCardsDialog()
-    {
-        var response = await GetImportDialog();
-        await DeckBuilder.ImportCards(CardlistType.Deck, response);
-    }
-    
-    /// 
-    /// <summary> Asks cards to import and imports them to the deck
-    /// 
-    [RelayCommand]
-    public async Task ImportToWishlistDialog()
-    {
-      var response = await GetImportDialog();
-      await DeckBuilder.ImportCards(CardlistType.Wishlist, response);
-    }
-    
-    /// 
-    /// <summary> Asks cards to import and imports them to the deck
-    /// 
-    [RelayCommand]
-    public async Task ImportToMaybelistDialog()
-    {
-      var response = await GetImportDialog();
-      await DeckBuilder.ImportCards(CardlistType.Maybelist, response);
-    }
-
-    /// <summary>
-    /// Shows dialog with formatted text of the given cardlist cards
-    /// </summary>
-    [RelayCommand]
-    public static async Task ExportCardsDialog(ObservableCollection<MTGCard> cardlist)
-    {
-      StringBuilder stringBuilder = new();
-      foreach (var item in cardlist)
-      {
-        stringBuilder.AppendLine($"{item.Count} {item.Info.Name}");
-      }
-
-      var response = await GetExportDialog(stringBuilder.ToString());
-      if (!string.IsNullOrEmpty(response))
-      {
-        IO.CopyToClipboard(response);
-      }
-    }
-    
     /// <summary>
     /// Sorts selected card deck by selected property using given direction
     /// </summary>
     /// <param name="dir">Sorting direction, NOT case-sensitive</param>
     [RelayCommand]
-    public async Task SortByDirection(string dir)
+    public void SortByDirection(string dir)
     {
       if (Enum.TryParse(dir, true, out SortDirection sortDirection))
       {
-        DeckBuilder.SelectedSortDirection = sortDirection;
-        await DeckBuilder.SortDeck();
+        SelectedSortDirection = sortDirection;
       }
     }
-    
+
     /// <summary>
     /// Sorts selected card deck by given property
     /// </summary>
     /// <param name="prop">Name of the property, NOT case-sensitive</param>
     [RelayCommand]
-    public async Task SortByProperty(string prop)
+    public void SortByProperty(string prop)
     {
-      if (Enum.TryParse(prop, true, out SortProperty sortProperty))
+      if (Enum.TryParse(prop, true, out SortMTGProperty sortProperty))
       {
-        DeckBuilder.SelectedSortProperty = sortProperty;
-        await DeckBuilder.SortDeck();
+        SelectedSortProperty = sortProperty;
       }
     }
 
-    public void AddToDeckCards(MTGCard card)
-    {
-      DeckBuilder.CardDeck.AddToCardlist(CardlistType.Deck, card);
-    }
-    public void AddToWishlist(MTGCard card)
-    {
-      DeckBuilder.CardDeck.AddToCardlist(CardlistType.Wishlist, card);
-    }
-    public void AddToMaybelist(MTGCard card)
-    {
-      DeckBuilder.CardDeck.AddToCardlist(CardlistType.Maybelist, card);
-    }
-
-    #region Dialogs
-    private static async Task<bool?> GetUnsavedDialog()
-    {
-      return await App.MainRoot.ConfirmationDialogAsync(
-          title: "Save unsaved changes?",
-          content: "Would you like to save unsaved changes?",
-          yesButtonText: "Save");
-    }
-    private static async Task<string> GetSaveDialog(string collectionName)
-    {
-      return await App.MainRoot.InputStringDialogAsync(
-        title: "Save your deck?",
-        defaultText: collectionName,
-        okButtonText: "Save",
-        invalidCharacters: Path.GetInvalidFileNameChars());
-    }
-    private static async Task<bool?> GetOverrideDialog(string saveName)
-    {
-      return await App.MainRoot.ConfirmationDialogAsync(
-            title: "Override existing deck?",
-            content: $"Deck '{saveName}' already exist. Would you like to override the deck?",
-            noButtonText: string.Empty);
-    }
-    private static async Task<string> GetLoadDialog(string[] fileNames)
-    {
-      return await App.MainRoot.ComboboxDialogAsync(
-        title: "Open deck",
-        okButtonText: "Open",
-        items: fileNames,
-        header: "Name"
-        );
-    }
-    private static async Task<bool?> GetDeleteDialog(string collectionName)
-    {
-      return await App.MainRoot.ConfirmationDialogAsync(
-        title: "Delete deck?",
-        content: $"Deleting '{collectionName}'. Are you sure?",
-        noButtonText: string.Empty);
-    }
-    private static async Task<string> GetImportDialog()
-    {
-      return await App.MainRoot.TextAreaInputDialogAsync(
-            title: "Import cards",
-            inputPlaceholder: "Example:\n2 Black Lotus\nMox Ruby",
-            okButtonText: "Add to Collection");
-    }
-    private static async Task<string> GetExportDialog(string text)
-    {
-      return await App.MainRoot.TextAreaInputDialogAsync(
-            title: "Export deck",
-            defaultText: text,
-            okButtonText: "Copy to Clipboard");
-    }
-    #endregion
-
     #region CanExecuteCommand Methods
-    private bool CanExecuteSaveDeckDialogCommand() => DeckBuilder.CardDeck.DeckSize > 0;
-    private bool CanExecuteDeleteDeckDialogCommand() => DeckBuilder.CardDeck.MTGCardDeckId != 0;
+    private bool CanExecuteSaveDeckDialogCommand() => DeckCards.CardlistSize > 0;
+    private bool CanExecuteDeleteDeckDialogCommand() => !string.IsNullOrEmpty(CardDeck.Name);
     #endregion
+
+    private async Task NewDeck()
+    {
+      IsBusy = true;
+      CardDeck = await Task.Run(() => new MTGCardDeck());
+      IsBusy = false;
+    }
+    private async Task SaveDeck(string name)
+    {
+      IsBusy = true;
+      var saveDeck = new MTGCardDeck()
+      {
+        Name = name,
+        DeckCards = CardDeck.DeckCards,
+        Maybelist = CardDeck.Maybelist,
+        Wishlist = CardDeck.Wishlist,
+      };
+      if (await Task.Run(() => DeckRepository.AddOrUpdate(saveDeck)))
+      {
+        CardDeck.Name = name;
+        HasUnsavedChanges = false;
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was saved successfully.");
+      }
+      else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not save the deck."); }
+      IsBusy = false;
+    }
+    private async Task LoadDeck(string name)
+    {
+      IsBusy = true;
+      if(await Task.Run(() => DeckRepository.Get(name)) is MTGCardDeck loadedDeck)
+      {
+        CardDeck = loadedDeck;
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was loaded successfully.");
+      }
+      else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not load the deck."); }
+      IsBusy = false;
+    }
+    private async Task DeleteDeck()
+    {
+      IsBusy = true;
+      if (await Task.Run(() => DeckRepository.Remove(CardDeck)))
+      {
+        CardDeck = new();
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, "The deck was deleted successfully.");
+      }
+      else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not delete the deck."); }
+      IsBusy = false;
+    }
+    private async Task<bool> ShowUnsavedDialogs()
+    {
+      if (HasUnsavedChanges)
+      {
+        // Deck has unsaved changes
+        var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().Show();
+        if (wantSaveConfirmed == null) { return false; }
+        else if (wantSaveConfirmed is true)
+        {
+          // User wants to save the unsaved changes
+          var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).Show();
+          if (string.IsNullOrEmpty(saveName)) { return false; }
+          else
+          {
+            if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
+            {
+              // Deck exists already
+              var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).Show();
+              if (overrideConfirmed == null) { return false; }
+              else if (overrideConfirmed is true)
+              {
+                // User wants to override the deck
+                await SaveDeck(saveName);
+              }
+            }
+            else { await SaveDeck(saveName); }
+          }
+        }
+      }
+      return true;
+    }
   }
 }

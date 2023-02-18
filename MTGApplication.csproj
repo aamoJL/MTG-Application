@@ -13,6 +13,8 @@
     <WindowsPackageType>None</WindowsPackageType>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Authors>aamo</Authors>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\ColorIcons\A.W.O.L..url" />
@@ -36,13 +38,9 @@
     <None Remove="Views\DeckBuilderView.xaml" />
     <None Remove="Views\Pages\MainPage.xaml" />
     <None Remove="README.md" />
-    <None Remove="ResourceDictionary1.xaml" />
     <None Remove="Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
     <None Remove="Views\Styles\CustomListViewStyle.xaml" />
     <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Remove="ResourceDictionary1.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,9 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="README.md" />
-    <Resource Include="ResourceDictionary1.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\back.jpg">
@@ -105,7 +100,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\Tabs\DeckBuilderView.xaml">
+    <Page Update="Views\Pages\Tabs\DeckBuilderTabView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>

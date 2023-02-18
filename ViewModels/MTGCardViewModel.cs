@@ -3,10 +3,12 @@ using static MTGApplication.Models.MTGCard;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Input;
+using MTGApplication.Services;
 
 namespace MTGApplication.ViewModels
 {
-  public partial class MTGCardViewModel : ViewModelBase
+    public partial class MTGCardViewModel : ViewModelBase
   {
     public MTGCardViewModel(MTGCard model)
     {
@@ -28,6 +30,7 @@ namespace MTGApplication.ViewModels
 
     [ObservableProperty]
     private CardSide selectedFace;
+    
     public string SelectedFaceUri
     {
       get
@@ -36,6 +39,8 @@ namespace MTGApplication.ViewModels
       }
     }
     public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
+
+    public ICommand DeleteCardCommand { get; set; }
 
     /// <summary>
     /// Changes selected face image if possible
@@ -80,17 +85,6 @@ namespace MTGApplication.ViewModels
     public void DecreaseCount()
     {
       if(Model.Count > 0) { Model.Count--; }
-    }
-    
-    /// <summary>
-    /// Deletes card from the model's cardlists
-    /// </summary>
-    [RelayCommand]
-    public void DeleteCard()
-    {
-      Model.MTGCardDeckDeckCards?.DeckCards.Remove(Model);
-      Model.MTGCardDeckWishlist?.Wishlist.Remove(Model);
-      Model.MTGCardDeckMaybelist?.Maybelist.Remove(Model);
     }
 
     private bool CanExecuteDecreaseCountCommand() => Model.Count > 1;

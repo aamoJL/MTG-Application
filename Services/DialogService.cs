@@ -1,21 +1,14 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 using System;
-using System.IO;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
-using Windows.UI.Notifications;
+using MTGApplication.Interfaces;
+using System.IO;
 
-namespace MTGApplication
+namespace MTGApplication.Services
 {
-  // TODO: Separate the UI from the methods with interfaces
   public static class Dialogs
   {
-    public static async Task MessageDialogAsync(this FrameworkElement element, string title, string message)
-    {
-      await MessageDialogAsync(element, title, message, "OK");
-    }
-
     public static async Task MessageDialogAsync(this FrameworkElement element, string title, string message, string buttonText)
     {
       var dialog = new ContentDialog
@@ -56,7 +49,7 @@ namespace MTGApplication
         return null;
       }
 
-      return (result == ContentDialogResult.Primary);
+      return result == ContentDialogResult.Primary;
     }
 
     public static async Task<string> InputStringDialogAsync(
@@ -85,9 +78,9 @@ namespace MTGApplication
         DefaultButton = ContentDialogButton.Primary
       };
 
-      if(invalidCharacters != null)
+      if (invalidCharacters != null)
       {
-        inputTextBox.TextChanging += (TextBox sender, TextBoxTextChangingEventArgs args) =>
+        inputTextBox.TextChanging += (sender, args) =>
         {
           var text = sender.Text;
           foreach (var c in Path.GetInvalidFileNameChars())
@@ -106,7 +99,7 @@ namespace MTGApplication
       }
       else
       {
-        return string.Empty;
+        return null;
       }
     }
 
@@ -126,9 +119,10 @@ namespace MTGApplication
         Header = inputHeader,
         AcceptsReturn = true,
         Text = defaultText,
-        Height = 600,
+        Height = 500,
         Width = 800,
       };
+
       var dialog = new ContentDialog
       {
         Content = inputTextBox,
@@ -186,24 +180,76 @@ namespace MTGApplication
     }
   }
 
-  public static class Notifications
+  public class DialogService
   {
-    public enum NotificationType { Info, Error, Warning, Success }
-
-    public class NotificationEventArgs : EventArgs
+    public class MessageDialog : IDialog<object>
     {
-      public NotificationType Type { get; set; }
-      public string Text { get; set; }
+      public string Title { get; set; } = "Title";
+      public string Message { get; set; } = "Message text";
+      public string ButtonText { get; set; } = "OK";
 
-      public NotificationEventArgs(NotificationType type, string text)
+      public async virtual Task<object> Show()
       {
-        Type = type;
-        Text = text;
+        await App.MainRoot.MessageDialogAsync(Title, Message, ButtonText);
+        return null;
       }
     }
 
-    public static event EventHandler<NotificationEventArgs> OnNotification;
+    public class ComboboxDialog : IDialog<string>
+    {
+      public string Title { get; set; } = "Title";
+      public string[] Items { get; set; } = Array.Empty<string>();
+      public string Header { get; set; } = "Header";
+      public string OkButtonText { get; set; } = "OK";
+      public string CancelButtonText { get; set; } = "Cancel";
 
-    public static void RaiseNotification(NotificationType type, string text) => OnNotification?.Invoke(null, new NotificationEventArgs(type, text));
+      public async virtual Task<string> Show()
+      {
+        return await App.MainRoot.ComboboxDialogAsync(Title, Items, Header, OkButtonText, CancelButtonText);
+      }
+    }
+
+    public class InputStringDialog : IDialog<string>
+    {
+      public string Title { get; set; } = "Title";
+      public string DefaultText { get; set; } = string.Empty;
+      public string OkButtonText { get; set; } = "OK";
+      public string CancelButtonText { get; set; } = "Cancel";
+      public char[] InvalidCharacters { get; set; } = Array.Empty<char>();
+
+      public async virtual Task<string> Show()
+      {
+        return await App.MainRoot.InputStringDialogAsync(Title, DefaultText, OkButtonText, CancelButtonText, InvalidCharacters);
+      }
+    }
+
+    public class ConfirmationDialog : IDialog<bool?>
+    {
+      public string Title { get; set; } = "Title";
+      public object Content { get; set; } = null;
+      public string YesButtonText { get; set; } = "Yes";
+      public string NoButtonText { get; set; } = "No";
+      public string CancelButtonText { get; set; } = "Cancel";
+
+      public async virtual Task<bool?> Show()
+      {
+        return await App.MainRoot.ConfirmationDialogAsync(Title, Content, YesButtonText, NoButtonText, CancelButtonText);
+      }
+    }
+
+    public class InputTextAreaDialog : IDialog<string>
+    {
+      public string Title { get; set; } = "Title";
+      public string InputPlaceholder { get; set; } = string.Empty;
+      public string InputHeader { get; set; } = string.Empty;
+      public string DefaultText { get; set; } = string.Empty;
+      public string OkButtonText { get; set; } = "OK";
+      public string CancelButtonText { get; set; } = "Cancel";
+
+      public async virtual Task<string> Show()
+      {
+        return await App.MainRoot.TextAreaInputDialogAsync(Title, InputPlaceholder, InputHeader, DefaultText, OkButtonText, CancelButtonText);
+      }
+    }
   }
 }

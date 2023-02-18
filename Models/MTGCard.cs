@@ -1,12 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using MTGApplication.Database;
+using System.ComponentModel.DataAnnotations;
 
 namespace MTGApplication.Models
 {
@@ -44,9 +41,9 @@ namespace MTGApplication.Models
     [Serializable]
     public readonly struct CardFace
     {
-      public readonly string[] Colors { get; }
-      public readonly string Name { get; }
-      public readonly string ImageUri { get; }
+      public string[] Colors { get; }
+      public string Name { get; }
+      public string ImageUri { get; }
 
       [JsonConstructor]
       public CardFace(string[] colors, string name, string imageUri)
@@ -57,36 +54,58 @@ namespace MTGApplication.Models
       }
     }
     [Serializable]
-    public readonly struct CardInfo
+    public readonly struct MTGCardInfo
     {
-      public readonly string ScryfallId { get; }
-      public readonly string Name { get; }
-      public readonly int CMC { get; }
-      public readonly string TypeLine { get; }
-      public readonly string Rarity { get; }
-      public readonly string SetCode { get; }
-      public readonly string SetName { get; }
-      public readonly float Price { get; }
-      public readonly string CollectorNumber { get; }
-      public readonly string APIWebsiteUri { get; }
+      public Guid ScryfallId { get; }
+      public string Name { get; }
+      public int CMC { get; }
+      public string TypeLine { get; }
+      public string Rarity { get; }
+      public string SetCode { get; }
+      public string SetName { get; }
+      public float Price { get; }
+      public string CollectorNumber { get; }
+      public string APIWebsiteUri { get; }
+      public string SetIconUri { get; } 
+      public CardFace FrontFace { get; }
+      public CardFace? BackFace { get; }
 
-      public readonly CardFace FrontFace { get; }
-      public readonly CardFace? BackFace { get; }
-      public readonly RarityTypes RarityType { get; }
-      public readonly string RarityCode { get; }
-      public readonly ColorTypes ColorType { get; }
-      public readonly SpellType[] SpellTypes { get; }
-      public readonly string CardMarketUri { get; }
-      public readonly string SetIconUri { get; }
+      public RarityTypes RarityType { get; }
+      public string RarityCode { get; }
+      public ColorTypes ColorType { get; }
+      public SpellType[] SpellTypes { get; }
+      public string CardMarketUri { get; }
 
-      [JsonConstructor]
-      public CardInfo(string scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri)
+      /// <summary>
+      /// Constructor for JSON deserialization
+      /// </summary>
+      [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
+      public MTGCardInfo(Guid scryfallId, string name, int cMC, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, string rarityCode, ColorTypes colorType, SpellType[] spellTypes, string cardMarketUri)
       {
         ScryfallId = scryfallId;
+        Name = name;
+        CMC = cMC;
+        TypeLine = typeLine;
+        Rarity = rarity;
+        SetCode = setCode;
+        SetName = setName;
+        Price = price;
+        CollectorNumber = collectorNumber;
+        APIWebsiteUri = aPIWebsiteUri;
+        SetIconUri = setIconUri;
         FrontFace = frontFace;
         BackFace = backFace;
-        CMC = cmc;
+        RarityType = rarityType;
+        RarityCode = rarityCode;
+        ColorType = colorType;
+        SpellTypes = spellTypes;
+        CardMarketUri = cardMarketUri;
+      }
+      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri)
+      {
+        ScryfallId = scryfallId;
         Name = name;
+        CMC = cmc;
         TypeLine = typeLine;
         Rarity = rarity;
         SetCode = setCode;
@@ -95,39 +114,31 @@ namespace MTGApplication.Models
         CollectorNumber = collectorNumber;
         APIWebsiteUri = apiWebsiteUri;
         SetIconUri = setIconUri;
-
-        CardMarketUri = $"https://www.cardmarket.com/en/Magic/Products/Search?searchString={Name.Replace(" // ", "-").Replace(' ', '-').Trim('\u0027')}"; // '\u0027' == '
-        ColorType = GetColorType(FrontFace, BackFace);
-        SpellTypes = GetSpellTypes(TypeLine);
+        
+        FrontFace = frontFace;
+        BackFace = backFace;
 
         if (Enum.TryParse(Rarity, true, out RarityTypes type)) { RarityType = type; }
         else { RarityType = RarityTypes.Common; }
         RarityCode = RarityType.ToString()[..1];
+        ColorType = GetColorType(FrontFace, BackFace);
+        SpellTypes = GetSpellTypes(TypeLine);
+        CardMarketUri = $"https://www.cardmarket.com/en/Magic/Products/Search?searchString={Name.Replace(" // ", "-").Replace(' ', '-').Trim('\u0027')}"; // '\u0027' == '
+
       }
     }
     #endregion
 
-    public MTGCard() { }
     [JsonConstructor]
-    public MTGCard(CardInfo info, int count)
+    public MTGCard(MTGCardInfo info, int count = 1)
     {
       Info = info;
       Count = count;
     }
-    public MTGCard(CardInfo info)
-    {
-      Info = info;
-    }
 
     protected int count = 1;
-    protected CardInfo info;
 
-    [Key]
-    public int MTGCardId { get; private set; }
-    [Required]
-    public string Name { get; private set; }
-    [Column(TypeName = "varchar(36)")]
-    public string ScryfallId { get; private set; }
+    public MTGCardInfo Info { get; set; }
     public int Count
     {
       get => count;
@@ -137,28 +148,6 @@ namespace MTGApplication.Models
         OnPropertyChanged(nameof(Count));
       }
     }
-    [NotMapped]
-    public CardInfo Info
-    {
-      get => info;
-      set
-      {
-        info = value;
-        Name = info.Name;
-        ScryfallId = info.ScryfallId;
-        OnPropertyChanged(nameof(Info));
-        OnPropertyChanged(nameof(Info));
-      }
-    }
-
-    public int? MTGCardDeckDeckCardsId { get; set; }
-    public MTGCardDeck MTGCardDeckDeckCards { get; set; }
-
-    public int? MTGCardDeckMaybelistId { get; set; }
-    public MTGCardDeck MTGCardDeckMaybelist { get; set; }
-
-    public int? MTGCardDeckWishlistId { get; set; }
-    public MTGCardDeck MTGCardDeckWishlist { get; set; }
 
     public string ToJSON()
     {
@@ -168,12 +157,11 @@ namespace MTGApplication.Models
         Count
       });
     }
-
     public static SpellType[] GetSpellTypes(string typeLine)
     {
       List<SpellType> types = new();
 
-      string[] typeStrings = typeLine.Split('\u0020');
+      string[] typeStrings = typeLine.Split('\u0020'); // 'Space'
 
       foreach (string typeString in typeStrings)
       {
@@ -217,5 +205,26 @@ namespace MTGApplication.Models
       else if (fFaceColor != bFaceColor) { return ColorTypes.M; }
       else { return fFaceColor; }
     }
+  }
+
+  public class CardDTO
+  {
+    private CardDTO() { }
+    public CardDTO(MTGCard card)
+    {
+      Name = card.Info.Name;
+      ScryfallId = card.Info.ScryfallId;
+      Count = card.Count;
+    }
+
+    [Key]
+    public int Id { get; init; }
+    public string Name { get; init; }
+    public Guid ScryfallId { get; init; }
+    public int Count { get; set; }
+
+    public MTGCardDeckDTO DeckCards { get; set; }
+    public MTGCardDeckDTO DeckWishlist { get; set; }
+    public MTGCardDeckDTO DeckMaybelist { get; set; }
   }
 }

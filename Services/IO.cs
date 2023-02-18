@@ -5,13 +5,25 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
-namespace MTGApplication
+namespace MTGApplication.Services
 {
   /// <summary>
   /// Functions that uses files and networking
   /// </summary>
-  internal static class IO
+  public static class IO
   {
+    public class ClipboardService
+    {
+      public virtual void Copy(string text)
+      {
+        DataPackage dataPackage = new();
+        dataPackage.SetText(text);
+        Clipboard.SetContent(dataPackage);
+
+        Notifications.RaiseNotification(Notifications.NotificationType.Info, "Copied to clipboard.");
+      }
+    }
+
     public static readonly HttpClient HttpClient = new();
 
     /// <summary>
@@ -23,17 +35,6 @@ namespace MTGApplication
       //_ = Directory.CreateDirectory(CollectionsMaybePath);
       //_ = Directory.CreateDirectory(CollectionsWishlistPath);
     }
-
-    #region//--------------Clipboard----------//
-    public static void CopyToClipboard(string text)
-    {
-      DataPackage dataPackage = new();
-      dataPackage.SetText(text);
-      Clipboard.SetContent(dataPackage);
-
-      Notifications.RaiseNotification(Notifications.NotificationType.Info, "Copied to clipboard.");
-    }
-    #endregion
 
     #region//-----------------File-------------------//
     /// <summary>
