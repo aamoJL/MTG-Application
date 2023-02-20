@@ -168,13 +168,14 @@ namespace MTGApplication.ViewModels
       private SortMTGProperty sortProperty;
       [ObservableProperty]
       private SortDirection sortDirection;
+      [ObservableProperty]
+      private bool hasUnsavedChanges;
 
       private IO.ClipboardService ClipboardService { get; }
       private CardlistType ListType { get; }
       private DeckBuilderViewDialogs Dialogs { get; }
       private ICardAPI<MTGCard> CardAPI { get; }
 
-      public bool HasUnsavedChanges { get; set; }
       public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
       public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
 
@@ -261,6 +262,7 @@ namespace MTGApplication.ViewModels
           SortMTGProperty.Set => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.SetName).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.SetName).ToList(),
           SortMTGProperty.Count => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Count).ToList() : CardViewModels.OrderByDescending(x => x.Model.Count).ToList(),
           SortMTGProperty.Price => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Price).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Price).ToList(),
+          SortMTGProperty.Type => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.SpellTypes[0]).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.SpellTypes[0]).ToList(),
           _ => throw new NotImplementedException(),
         };
 
@@ -302,6 +304,7 @@ namespace MTGApplication.ViewModels
       {
         IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
       }
+      else if(e.PropertyName == nameof(HasUnsavedChanges)) { OnPropertyChanged(nameof(HasUnsavedChanges)); }
     }
     private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {

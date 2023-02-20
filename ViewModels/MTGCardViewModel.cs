@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Input;
 using MTGApplication.Services;
+using MTGApplication.Interfaces;
 
 namespace MTGApplication.ViewModels
 {
@@ -39,6 +40,7 @@ namespace MTGApplication.ViewModels
       }
     }
     public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
+    public string ModelAPIName => ICardAPI<MTGCard>.GetAPIName(Model);
 
     public ICommand DeleteCardCommand { get; set; }
 

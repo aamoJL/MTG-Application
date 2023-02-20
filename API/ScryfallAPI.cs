@@ -78,6 +78,8 @@ namespace MTGApplication.API
       }
     }
 
+    public readonly static string APIName = "Scryfall";
+
     private readonly static string API_URL = "https://api.scryfall.com";
     private static string CARDS_URL => $"{API_URL}/cards";
     private static string COLLECTION_URL => $"{CARDS_URL}/collection";

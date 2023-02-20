@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MTGApplication.Models
 {
@@ -173,7 +174,7 @@ namespace MTGApplication.Models
 
       if (types.Count == 0) { types.Add(SpellType.Other); }
 
-      return types.ToArray();
+      return types.OrderBy(x => x).ToArray();
     }
     public static string GetColorTypeName(ColorTypes color)
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
+using MTGApplication.Services;
 using System.IO;
 
 namespace MTGApplication.Database
@@ -9,10 +9,7 @@ namespace MTGApplication.Database
   {
     public CardDbContext CreateDbContext(string[] args)
     {
-      var folder = Environment.SpecialFolder.LocalApplicationData;
-      var path = Environment.GetFolderPath(folder);
-      var DbFileName = "database.db";
-      var dbPath = Path.Join(path, DbFileName);
+      var dbPath = Path.Join(IO.GetAppDataPath(), CardDbContextFactory.DbFileName);
       var connectionString = $"Data Source={dbPath}";
 
       DbContextOptions options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;

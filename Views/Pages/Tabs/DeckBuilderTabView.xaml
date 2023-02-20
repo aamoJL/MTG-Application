@@ -29,7 +29,7 @@
               <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="API Website"/>
+                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
                 <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
               </MenuFlyout>
             </controls:ImageEx.ContextFlyout>
@@ -43,7 +43,6 @@
         <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Center" FontSize="11"/>
       </StackPanel>
     </DataTemplate>
-    
     <DataTemplate x:Key="SearchListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel 
         Style="{StaticResource MTGListViewItemStyle}"
@@ -54,7 +53,7 @@
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="API Website"/>
+            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
             <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
           </MenuFlyout>
         </StackPanel.ContextFlyout>
@@ -64,7 +63,6 @@
         <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
       </StackPanel>
     </DataTemplate>
-
     <!--Deck-->
     <DataTemplate x:Key="DeckListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel 
@@ -78,7 +76,7 @@
             <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
             <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="API Website"/>
+            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
             <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
             <MenuFlyoutSeparator />
             <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
@@ -91,7 +89,6 @@
         <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
       </StackPanel>
     </DataTemplate>
-
     <DataTemplate x:Key="DeckImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CardGridViewItem_PointerEntered" PointerExited="CardGridViewItem_PointerExited">
         <Grid>
@@ -102,7 +99,7 @@
                 <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
                 <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="API Website"/>
+                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
                 <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
@@ -133,6 +130,7 @@
 
   <Grid>
     <VisualStateManager.VisualStateGroups>
+      
       <VisualStateGroup x:Name="CardSearchDisplayStates">
         <VisualState>
           <VisualState.StateTriggers>
@@ -151,6 +149,7 @@
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
+      
       <VisualStateGroup x:Name="DeckDisplayStates">
         <VisualState>
           <VisualState.StateTriggers>
@@ -169,6 +168,18 @@
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
+      
+      <VisualStateGroup x:Name="DeckNameTitleSaveStatus">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedDeckNameTitle.Foreground" Value="Red"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+      
     </VisualStateManager.VisualStateGroups>
 
     <SplitView PaneBackground="Transparent" IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" OpenPaneLength="780" CompactPaneLength="48" DisplayMode="CompactInline">
@@ -368,6 +379,7 @@
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup" IsChecked="True"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Type" Text="Type" GroupName="TypeGroup"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
@@ -380,7 +392,7 @@
             </StackPanel>
             <!--Info-->
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-              <TextBlock Text="{x:Bind DeckBuilderViewModel.CardDeckName, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
+              <TextBlock x:Name="SelectedDeckNameTitle" Text="{x:Bind DeckBuilderViewModel.CardDeckName, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
               <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckCards.CardlistSize), Mode=OneWay}" HorizontalAlignment="Right"/>
             </StackPanel>
           </Grid>

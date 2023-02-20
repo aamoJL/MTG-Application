@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
@@ -36,6 +37,16 @@ namespace MTGApplication.Services
       //_ = Directory.CreateDirectory(CollectionsWishlistPath);
     }
 
+    public static string GetAppDataPath()
+    {
+      var path = System.Diagnostics.Debugger.IsAttached ? Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.CompanyName, "DEBUG",
+          Assembly.GetCallingAssembly().GetName().Name) : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.CompanyName, 
+          Assembly.GetCallingAssembly().GetName().Name);
+      
+      Directory.CreateDirectory(path);
+      return path;
+    }
+
     #region//-----------------File-------------------//
     /// <summary>
     /// Returns array of json file names from a path
@@ -52,6 +63,7 @@ namespace MTGApplication.Services
 
       return fileNames;
     }
+    
     /// <summary>
     /// Writes text to file
     /// </summary>
@@ -63,6 +75,7 @@ namespace MTGApplication.Services
       }
       catch (Exception) { }
     }
+    
     /// <summary>
     /// Reads text from a file
     /// </summary>
@@ -79,6 +92,7 @@ namespace MTGApplication.Services
         return "";
       }
     }
+    
     public static async Task<string> ReadTextFromFileAsync(string path)
     {
       try
@@ -90,6 +104,7 @@ namespace MTGApplication.Services
         return "";
       }
     }
+    
     /// <summary>
     /// Deletes file from path
     /// </summary>
