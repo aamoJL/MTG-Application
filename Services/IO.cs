@@ -39,8 +39,8 @@ namespace MTGApplication.Services
 
     public static string GetAppDataPath()
     {
-      var path = System.Diagnostics.Debugger.IsAttached ? Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.CompanyName, "DEBUG",
-          Assembly.GetCallingAssembly().GetName().Name) : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.CompanyName, 
+      var path = System.Diagnostics.Debugger.IsAttached ? Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.CompanyName,
+          Assembly.GetCallingAssembly().GetName().Name, "Debug") : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.CompanyName, 
           Assembly.GetCallingAssembly().GetName().Name);
       
       Directory.CreateDirectory(path);

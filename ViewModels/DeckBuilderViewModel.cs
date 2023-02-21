@@ -185,7 +185,7 @@ namespace MTGApplication.ViewModels
       [RelayCommand]
       public async Task ImportToCardlistDialog()
       {
-        await ImportCards();
+        await ImportCards(await Dialogs.GetImportDialog().Show());
       }
       /// <summary>
       /// Shows dialog with formatted text of the cardlist cards
@@ -226,9 +226,8 @@ namespace MTGApplication.ViewModels
           ClipboardService.Copy(response);
         }
       }
-      private async Task ImportCards()
+      public async Task ImportCards(string importText)
       {
-        var importText = await Dialogs.GetImportDialog().Show();
         if (!string.IsNullOrEmpty(importText))
         {
           IsBusy = true;
@@ -520,7 +519,12 @@ namespace MTGApplication.ViewModels
       else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not delete the deck."); }
       IsBusy = false;
     }
-    private async Task<bool> ShowUnsavedDialogs()
+    
+    /// <summary>
+    /// Asks user if they want to save the deck's unsaved changes.
+    /// </summary>
+    /// <returns><see langword="true"/>, if user does not cancel any of the dialogs</returns>
+    public async Task<bool> ShowUnsavedDialogs()
     {
       if (HasUnsavedChanges)
       {

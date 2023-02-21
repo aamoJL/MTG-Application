@@ -21,6 +21,22 @@ namespace MTGApplication.Views
     public DeckBuilderTabView()
     {
       this.InitializeComponent();
+      App.MainWindow.Closed += MainWindow_Closed;
+    }
+
+    private async void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+      if (DeckBuilderViewModel.HasUnsavedChanges)
+      {
+        args.Handled = true;
+        if(await DeckBuilderViewModel.ShowUnsavedDialogs())
+        {
+          // UnsavedChanges needs to be set to false, otherwise the window would not close
+          // until the used saves the deck.
+          DeckBuilderViewModel.HasUnsavedChanges = false;
+          App.MainWindow.Close();
+        }
+      }
     }
 
     public MTGSearchViewModel SearchViewModel = new(new ScryfallAPI());
@@ -113,21 +129,34 @@ namespace MTGApplication.Views
         DragOperationDeferral def = e.GetDeferral();
         string data = await e.DataView.GetTextAsync();
 
-        try
+        if ((sender as FrameworkElement)?.DataContext is DeckBuilderViewModel.Cardlist cardlist)
         {
-          if((sender as FrameworkElement)?.DataContext is DeckBuilderViewModel.Cardlist cardlist)
+          var card = new Func<MTGCard>(() =>
           {
-            var card = JsonSerializer.Deserialize<MTGCard>(data);
-            if (string.IsNullOrEmpty(card.Info.Name)) { throw new Exception(); }
-            
+            // Try to import from JSON
+            try
+            {
+              var card = JsonSerializer.Deserialize<MTGCard>(data);
+              if (string.IsNullOrEmpty(card?.Info.Name)) { throw new Exception("Card does not have name"); }
+              return card;
+            }
+            catch { return null; }
+          })();
+
+          if (card != null)
+          {
+            // Card was dragged from MTGApplication
             if (cardlist.AddToCardlistCommand.CanExecute(card))
             {
               cardlist.AddToCardlistCommand.Execute(card);
             }
           }
+          else
+          {
+            // Try to import from string
+            await cardlist.ImportCards(data);
+          }
         }
-        catch (Exception) { }
-
         def.Complete();
       }
     }

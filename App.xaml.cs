@@ -14,6 +14,7 @@ namespace MTGApplication
   /// </summary>
   public partial class App : Application
   {
+    public static Window MainWindow { get; private set; }
     // Used for Dialogs
     public static FrameworkElement MainRoot { get; private set; }
     // Used for AppData subfolder
@@ -40,22 +41,23 @@ namespace MTGApplication
         db.Database.Migrate();
       }
 
-      m_window = new MainWindow();
+      MainWindow = new MainWindow
+      {
+        Title = "MTG Application",
+      };
 
       Frame rootFrame = new();
-      m_window.Content = rootFrame;
+      MainWindow.Content = rootFrame;
       rootFrame.Navigate(typeof(MainPage), args.Arguments);
 
-      m_window.Activate();
+      MainWindow.Activate();
 
-      MainRoot = m_window.Content as FrameworkElement;
+      MainRoot = MainWindow.Content as FrameworkElement;
 
       IO.InitDirectories();
       LiveCharts.Configure(config =>
         config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()
       );
     }
-
-    private Window m_window;
   }
 }
