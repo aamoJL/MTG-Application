@@ -305,14 +305,22 @@
               </TabViewItem>
               <TabViewItem Header="Charts" IsClosable="False">
                 <!--Charts-->
-                <StackPanel Margin="0 5 0 0" Orientation="Vertical">
-                  <TextBlock Text="Mana Curve" TextAlignment="Center"/>
-                  <lvc:CartesianChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" Series="{Binding Series}"/>
-                  <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-                  <TextBlock Text="Type Chart" TextAlignment="Center"/>
-                  <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series}"/>
-                  <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                  <StackPanel Margin="0 5 0 0" Orientation="Vertical">
+                    <TextBlock Text="Mana Curve" TextAlignment="Center"/>
+                    <lvc:CartesianChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
+                    <TextBlock Text="Type Chart" TextAlignment="Center"/>
+                    <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
+                    <TextBlock Text="Mana production Chart" TextAlignment="Center"/>
+                    <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
+                    <TextBlock Text="Color Chart" TextAlignment="Center"/>
+                    <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
+                  </StackPanel>
+                </ScrollViewer>
               </TabViewItem>
             </TabView.TabItems>
           </TabView>

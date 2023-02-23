@@ -257,7 +257,7 @@ namespace MTGApplication.ViewModels
           SortMTGProperty.CMC => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.CMC).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.CMC).ToList(),
           SortMTGProperty.Name => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Name).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Name).ToList(),
           SortMTGProperty.Rarity => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.RarityType).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.RarityType).ToList(),
-          SortMTGProperty.Color => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.ColorType).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.ColorType).ToList(),
+          SortMTGProperty.Color => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Colors).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Colors).ToList(),
           SortMTGProperty.Set => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.SetName).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.SetName).ToList(),
           SortMTGProperty.Count => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Count).ToList() : CardViewModels.OrderByDescending(x => x.Model.Count).ToList(),
           SortMTGProperty.Price => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Price).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Price).ToList(),
@@ -276,8 +276,6 @@ namespace MTGApplication.ViewModels
     {
       DeckRepository = deckService;
       CardAPI = cardAPI;
-      CMCChart = new CMCChart(CardDeck.DeckCards);
-      SpellTypeChart = new SpellTypeChart(CardDeck.DeckCards);
       Dialogs = dialogs ?? new();
 
       PropertyChanged += DeckBuilderViewModel_PropertyChanged;
@@ -292,9 +290,9 @@ namespace MTGApplication.ViewModels
       WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
       MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
 
-
       SelectedSortDirection = SortDirection.ASC;
       SelectedSortProperty = SortMTGProperty.CMC;
+      UpdateCharts();
     }
 
     private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -318,10 +316,7 @@ namespace MTGApplication.ViewModels
         DeckCards.CardDeck = CardDeck;
         WishlistCards.CardDeck = CardDeck;
         MaybelistCards.CardDeck = CardDeck;
-        CMCChart = new CMCChart(CardDeck.DeckCards);
-        SpellTypeChart = new SpellTypeChart(CardDeck.DeckCards);
-        OnPropertyChanged(nameof(CMCChart));
-        OnPropertyChanged(nameof(SpellTypeChart));
+        UpdateCharts();
         OnPropertyChanged(nameof(CardDeckName));
       }
     }
@@ -347,8 +342,10 @@ namespace MTGApplication.ViewModels
     public Cardlist DeckCards { get; set; }
     public Cardlist WishlistCards { get; set; }
     public Cardlist MaybelistCards { get; set; }
-    public CMCChart CMCChart { get; set; }
-    public SpellTypeChart SpellTypeChart { get; set; }
+    public MTGCMCStackedColumnChart CMCChart { get; set; }
+    public MTGSpellTypePieChart SpellTypeChart { get; set; }
+    public MTGManaProductionPieChart ManaProductionChart { get; set; }
+    public MTGColorPieChart ColorChart { get; set; }
 
     public SortMTGProperty SelectedSortProperty
     {
@@ -518,6 +515,17 @@ namespace MTGApplication.ViewModels
       }
       else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not delete the deck."); }
       IsBusy = false;
+    }
+    private void UpdateCharts()
+    {
+      CMCChart = new MTGCMCStackedColumnChart(CardDeck.DeckCards);
+      SpellTypeChart = new MTGSpellTypePieChart(CardDeck.DeckCards);
+      ManaProductionChart = new MTGManaProductionPieChart(CardDeck.DeckCards);
+      ColorChart = new MTGColorPieChart(CardDeck.DeckCards);
+      OnPropertyChanged(nameof(CMCChart));
+      OnPropertyChanged(nameof(SpellTypeChart));
+      OnPropertyChanged(nameof(ManaProductionChart));
+      OnPropertyChanged(nameof(ColorChart));
     }
     
     /// <summary>

@@ -204,7 +204,6 @@ namespace MTGApplication.API
       var cmc = (int)json["cmc"].GetValue<float>();
       var name = json["name"].GetValue<string>();
       var typeLine = json["type_line"].GetValue<string>();
-      var rarity = json["rarity"].GetValue<string>();
       var setCode = json["set"].GetValue<string>();
       var setName = json["set_name"].GetValue<string>();
       var collectorNumber = json["collector_number"].GetValue<string>();
@@ -222,32 +221,46 @@ namespace MTGApplication.API
       if (twoSideLayouts.Contains(layout))
       {
         frontFace = new CardFace(
-            colors: json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray(),
+            colors: GetColors(json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
             name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>(),
             imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>());
         backFace = new CardFace(
-            colors: json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray(),
+            colors: GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()),
             name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>(),
             imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>());
       }
       else if (twoPartLayouts.Contains(layout))
       {
         frontFace = new CardFace(
-          colors: json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray(),
+          colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
           name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>(),
           imageUri: json["image_uris"]?["normal"]?.GetValue<string>());
         backFace = new CardFace(
-          colors: json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray(),
+          colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
           name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>(),
           imageUri: null);
       }
       else
       {
         frontFace = new CardFace(
-            colors: json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray(),
+            colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
             name: json["name"]?.GetValue<string>(),
             imageUri: json["image_uris"]?["normal"]?.GetValue<string>());
         backFace = null;
+      }
+
+      var rarityString = json["rarity"].GetValue<string>();
+      var rarityType = RarityTypes.Common;
+      if (Enum.TryParse(rarityString, true, out RarityTypes type)) { rarityType = type; }
+
+      var producedManaStringArray = json["produced_mana"]?.AsArray().Select(x => x.GetValue<string>()).ToArray();
+      var producedManaList = new List<ColorTypes>();
+      if(producedManaStringArray != null)
+      {
+        foreach (var colorString in producedManaStringArray)
+        {
+          if(Enum.TryParse(colorString, true, out ColorTypes color)) { producedManaList.Add(color); }
+        }
       }
 
       return new MTGCardInfo(
@@ -257,13 +270,14 @@ namespace MTGApplication.API
         cmc: cmc,
         name: name,
         typeLine: typeLine,
-        rarity: rarity,
         setCode: setCode,
         setName: setName,
         price: price,
         collectorNumber: collectorNumber,
         apiWebsiteUri: apiWebsiteUri,
-        setIconUri: setIconUri
+        setIconUri: setIconUri,
+        rarityType: rarityType,
+        producedMana: producedManaList.ToArray()
         );
     }
 
@@ -307,6 +321,20 @@ namespace MTGApplication.API
       })));
 
       return (fetchResults.SelectMany(x => x.Found).ToArray(), fetchResults.Sum(x => x.NotFoundCount));
+    }
+    private static ColorTypes[] GetColors(string[] colorArray)
+    {
+      var colors = new List<ColorTypes>();
+
+      foreach (var color in colorArray)
+      {
+        if(Enum.TryParse(color, true, out ColorTypes colorType))
+        {
+          colors.Add(colorType);
+        }
+      }
+
+      return colors.ToArray();
     }
   }
 }

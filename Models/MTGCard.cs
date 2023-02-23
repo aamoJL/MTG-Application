@@ -42,12 +42,12 @@ namespace MTGApplication.Models
     [Serializable]
     public readonly struct CardFace
     {
-      public string[] Colors { get; }
+      public ColorTypes[] Colors { get; }
       public string Name { get; }
       public string ImageUri { get; }
 
       [JsonConstructor]
-      public CardFace(string[] colors, string name, string imageUri)
+      public CardFace(ColorTypes[] colors, string name, string imageUri)
       {
         Colors = colors;
         Name = name;
@@ -61,7 +61,6 @@ namespace MTGApplication.Models
       public string Name { get; }
       public int CMC { get; }
       public string TypeLine { get; }
-      public string Rarity { get; }
       public string SetCode { get; }
       public string SetName { get; }
       public float Price { get; }
@@ -72,22 +71,21 @@ namespace MTGApplication.Models
       public CardFace? BackFace { get; }
 
       public RarityTypes RarityType { get; }
-      public string RarityCode { get; }
-      public ColorTypes ColorType { get; }
+      public ColorTypes[] Colors { get; }
       public SpellType[] SpellTypes { get; }
       public string CardMarketUri { get; }
+      public ColorTypes[] ProducedMana { get; }
 
       /// <summary>
       /// Constructor for JSON deserialization
       /// </summary>
       [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-      public MTGCardInfo(Guid scryfallId, string name, int cMC, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, string rarityCode, ColorTypes colorType, SpellType[] spellTypes, string cardMarketUri)
+      public MTGCardInfo(Guid scryfallId, string name, int cMC, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colorTypes, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana)
       {
         ScryfallId = scryfallId;
         Name = name;
         CMC = cMC;
         TypeLine = typeLine;
-        Rarity = rarity;
         SetCode = setCode;
         SetName = setName;
         Price = price;
@@ -97,35 +95,32 @@ namespace MTGApplication.Models
         FrontFace = frontFace;
         BackFace = backFace;
         RarityType = rarityType;
-        RarityCode = rarityCode;
-        ColorType = colorType;
+        Colors = colorTypes;
         SpellTypes = spellTypes;
         CardMarketUri = cardMarketUri;
+        ProducedMana = producedMana;
       }
-      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string rarity, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri)
+      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType)
       {
         ScryfallId = scryfallId;
         Name = name;
         CMC = cmc;
         TypeLine = typeLine;
-        Rarity = rarity;
         SetCode = setCode;
         SetName = setName;
         Price = price;
         CollectorNumber = collectorNumber;
         APIWebsiteUri = apiWebsiteUri;
         SetIconUri = setIconUri;
-        
+        RarityType = rarityType;
+
         FrontFace = frontFace;
         BackFace = backFace;
 
-        if (Enum.TryParse(Rarity, true, out RarityTypes type)) { RarityType = type; }
-        else { RarityType = RarityTypes.Common; }
-        RarityCode = RarityType.ToString()[..1];
-        ColorType = GetColorType(FrontFace, BackFace);
+        Colors = GetColors(FrontFace, BackFace);
         SpellTypes = GetSpellTypes(TypeLine);
         CardMarketUri = $"https://www.cardmarket.com/en/Magic/Products/Search?searchString={Name.Replace(" // ", "-").Replace(' ', '-').Trim('\u0027')}"; // '\u0027' == '
-
+        ProducedMana = producedMana;
       }
     }
     #endregion
@@ -189,22 +184,27 @@ namespace MTGApplication.Models
         _ => "Colorless",
       };
     }
-    public static ColorTypes GetColorType(CardFace frontFace, CardFace? backFace)
+    public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
     {
-      ColorTypes fFaceColor =
-        frontFace.Colors.Length == 0 ? ColorTypes.C :
-        frontFace.Colors.Length > 1 ? ColorTypes.M :
-        (ColorTypes)Enum.Parse(typeof(ColorTypes), frontFace.Colors[0]);
-      ColorTypes? bFaceColor = backFace == null ? null :
-        backFace?.Colors.Length == 0 ? ColorTypes.C :
-        backFace?.Colors.Length > 1 ? ColorTypes.M :
-        (ColorTypes)Enum.Parse(typeof(ColorTypes), backFace?.Colors[0], true);
+      var colors = new List<ColorTypes>();
 
-      if (bFaceColor == null) { return fFaceColor; }
-      else if (fFaceColor == ColorTypes.C) { return (ColorTypes)bFaceColor; }
-      else if (bFaceColor == ColorTypes.C) { return fFaceColor; }
-      else if (fFaceColor != bFaceColor) { return ColorTypes.M; }
-      else { return fFaceColor; }
+      foreach (var color in frontFace.Colors)
+      {
+        if (!colors.Contains(color)) { colors.Add(color); }
+      }
+
+      if(backFace != null)
+      {
+        foreach (var color in backFace?.Colors)
+        {
+          if (!colors.Contains(color)) { colors.Add(color); }
+        }
+      }
+
+      // Card is colorless if it has no other colors
+      if(colors.Count == 0) { colors.Add(ColorTypes.C); }
+
+      return colors.ToArray();
     }
   }
 
