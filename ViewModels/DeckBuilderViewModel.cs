@@ -228,22 +228,26 @@ namespace MTGApplication.ViewModels
       }
       public async Task ImportCards(string importText)
       {
+        var notFoundCount = 0;
+        var found = Array.Empty<MTGCard>();
+
         if (!string.IsNullOrEmpty(importText))
         {
           IsBusy = true;
-          var (Found, NotFoundCount) = await CardAPI.FetchFromString(importText);
-          var cards = Found;
-          foreach (var item in cards)
+          (found, notFoundCount) = await CardAPI.FetchFromString(importText);
+          foreach (var card in found)
           {
-            CardDeck.AddToCardlist(ListType, item);
+            CardDeck.AddToCardlist(ListType, card);
           }
-          if (NotFoundCount == 0)
-            Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{NotFoundCount + cards.Length} cards imported successfully.");
-          else if (Found.Length == 0)
-            Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
-          else
-            Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{cards.Length} / {NotFoundCount + cards.Length} cards imported successfully.{Environment.NewLine}{NotFoundCount} cards were not found.");
         }
+
+        if (notFoundCount == 0 && found.Length > 0)
+          Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{notFoundCount + found.Length} cards imported successfully.");
+        else if(found.Length > 0 && notFoundCount > 0)
+          Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found.");
+        else if (found.Length == 0)
+          Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
+
         IsBusy = false;
       }
       private void SortCardViewModels()

@@ -153,8 +153,17 @@ namespace MTGApplication.Views
           }
           else
           {
-            // Try to import from string
-            await cardlist.ImportCards(data);
+            // Try to import from EDHREC URL
+            if(Uri.TryCreate(data, UriKind.Absolute, out Uri uri) && uri.Host == "edhrec.com")
+            {
+              var cardName = uri.Segments[^1];
+              await cardlist.ImportCards(cardName);
+            }
+            else
+            {
+              // Try to import from string
+              await cardlist.ImportCards(data);
+            }
           }
         }
         def.Complete();
