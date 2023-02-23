@@ -80,11 +80,11 @@ namespace MTGApplication.Models
       /// Constructor for JSON deserialization
       /// </summary>
       [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-      public MTGCardInfo(Guid scryfallId, string name, int cMC, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colorTypes, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana)
+      public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana)
       {
         ScryfallId = scryfallId;
         Name = name;
-        CMC = cMC;
+        CMC = cmc;
         TypeLine = typeLine;
         SetCode = setCode;
         SetName = setName;
@@ -95,7 +95,7 @@ namespace MTGApplication.Models
         FrontFace = frontFace;
         BackFace = backFace;
         RarityType = rarityType;
-        Colors = colorTypes;
+        Colors = colors;
         SpellTypes = spellTypes;
         CardMarketUri = cardMarketUri;
         ProducedMana = producedMana;
