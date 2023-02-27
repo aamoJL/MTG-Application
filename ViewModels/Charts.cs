@@ -10,7 +10,7 @@ using System.Collections.Specialized;
 using static MTGApplication.Models.MTGCard;
 using MTGApplication.Models;
 using System;
-using System.Xml.Linq;
+using System.Collections.Generic;
 
 namespace MTGApplication.ViewModels
 {
@@ -68,6 +68,7 @@ namespace MTGApplication.ViewModels
     protected virtual void Model_PropertyChanged(object sender, PropertyChangedEventArgs e) { }
     protected virtual void Models_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { }
 
+    // TODO: change to factory pattern
     public static StackedColumnSeries<MTGCardModelSeries> CreateStackedColumnSeriesByColor(ColorTypes color)
     {
       return new StackedColumnSeries<MTGCardModelSeries>
@@ -124,7 +125,7 @@ namespace MTGApplication.ViewModels
         {
           point.PrimaryValue = value.PrimaryValue;
           point.SecondaryValue = value.SecondaryValue;
-        }
+        },
       };
     }
     public static PieSeries<MTGCardModelSeries> CreateSeriesGroupBySpellType(SpellType spellType)
@@ -188,17 +189,25 @@ namespace MTGApplication.ViewModels
   #region Charts
   public abstract class MTGCardModelChart
   {
+    protected ObservableCollection<MTGCard> models = new();
+    
     public ObservableCollection<ISeries> Series { get; } = new();
-
-    public MTGCardModelChart(ObservableCollection<MTGCard> models)
+    public ObservableCollection<MTGCard> Models
     {
-      foreach (var model in models)
+      get => models;
+      init
       {
-        AddToChartSeries(model);
-      }
+        models = value;
+        foreach (var model in models)
+        {
+          AddToChartSeries(model);
+        }
 
-      models.CollectionChanged += Models_CollectionChanged;
+        models.CollectionChanged += Models_CollectionChanged;
+      }
     }
+
+    public MTGCardModelChart() { }
 
     protected virtual void Models_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
@@ -211,34 +220,51 @@ namespace MTGApplication.ViewModels
       }
     }
 
-    public abstract void AddToChartSeries(MTGCard model);
-    public abstract void RemoveFromChartSeries(MTGCard model);
-    public virtual void ClearChart()
+    protected void AddAndSortSeries(ISeries series)
+    {
+      Series.Add(series);
+      SortSeries();
+    }
+    protected abstract void AddToChartSeries(MTGCard model);
+    protected abstract void RemoveFromChartSeries(MTGCard model);
+    protected virtual void ClearChart()
     {
       Series.Clear();
     }
+    protected void SortSeries()
+    {
+      List<ISeries> tempList = Series.OrderBy(x => x.Name).ToList();
+
+      for (int i = 0; i < tempList.Count; i++)
+      {
+        Series.Move(Series.IndexOf(tempList[i]), i);
+      }
+    }
   }
   
+  /// <summary>
+  /// Stacked column chart that shows MTG cardlist CMC distribution, separated by card color
+  /// </summary>
   public class MTGCMCStackedColumnChart : MTGCardModelChart
   {
-    public MTGCMCStackedColumnChart(ObservableCollection<MTGCard> models) : base(models) { }
+    public MTGCMCStackedColumnChart() { }
 
-    public override void AddToChartSeries(MTGCard model)
+    protected override void AddToChartSeries(MTGCard model)
     {
       // Don't count Lands as a color
       if (model.Info.SpellTypes.Contains(SpellType.Land)) { return; }
 
       // Find Color series
       ColorTypes color = model.Info.Colors.Length > 1 ? ColorTypes.M : model.Info.Colors[0];
-      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(color)) is not StackedColumnSeries<MTGCardModelSeries> colorSeries)
+      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(color)) is not StackedColumnSeries<MTGCardModelSeries> series)
       {
         // Create new series group if it does not exist
-        colorSeries = MTGCardModelSeries.CreateStackedColumnSeriesByColor(color);
-        Series.Add(colorSeries);
+        series = MTGCardModelSeries.CreateStackedColumnSeriesByColor(color);
+        AddAndSortSeries(series);
       }
 
       // Find series' cmc object
-      MTGCardModelSeries cmcObject = colorSeries.Values.FirstOrDefault(x => x.SecondaryValue == model.Info.CMC);
+      MTGCardModelSeries cmcObject = series.Values.FirstOrDefault(x => x.SecondaryValue == model.Info.CMC);
       if (cmcObject != null)
       {
         // Add to existing object
@@ -248,78 +274,84 @@ namespace MTGApplication.ViewModels
       {
         // Create new cmc object
         cmcObject = new MTGCardModelCMCSeries(model);
-        (colorSeries.Values as ObservableCollection<MTGCardModelSeries>).Add(cmcObject);
+        (series.Values as ObservableCollection<MTGCardModelSeries>).Add(cmcObject);
       }
     }
-    public override void RemoveFromChartSeries(MTGCard model)
+    protected override void RemoveFromChartSeries(MTGCard model)
     {
       // Don't count Lands as a color
       if (model.Info.SpellTypes.Contains(SpellType.Land)) { return; }
 
       // Find Color series
       ColorTypes color = model.Info.Colors.Length > 1 ? ColorTypes.M : model.Info.Colors[0];
-      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(color)) is not StackedColumnSeries<MTGCardModelSeries> colorSeries)
+      if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(color)) is not StackedColumnSeries<MTGCardModelSeries> series)
       {
         return; // Returns if color series does not exist
       }
 
       // Find series' cmc object
-      if (colorSeries.Values.FirstOrDefault(x => x.SecondaryValue == model.Info.CMC) is MTGCardModelSeries valueObject)
+      if (series.Values.FirstOrDefault(x => x.SecondaryValue == model.Info.CMC) is MTGCardModelSeries valueObject)
       {
         valueObject.RemoveItem(model);
-        if (valueObject.PrimaryValue == 0) { (colorSeries.Values as ObservableCollection<MTGCardModelSeries>).Remove(valueObject); } // Remove cmcObject if its count is zero
+        if (valueObject.PrimaryValue == 0) { (series.Values as ObservableCollection<MTGCardModelSeries>).Remove(valueObject); } // Remove cmcObject if its count is zero
       }
     }
   }
   
+  /// <summary>
+  /// Pie chart that shows MTG cardlist spell type distribution
+  /// </summary>
   public class MTGSpellTypePieChart : MTGCardModelChart
   {
-    public MTGSpellTypePieChart(ObservableCollection<MTGCard> models) : base(models) { }
+    public MTGSpellTypePieChart() { }
 
-    public override void AddToChartSeries(MTGCard model)
+    protected override void AddToChartSeries(MTGCard model)
     {
       foreach (var spellType in model.Info.SpellTypes)
       {
         // Find series
-        if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not PieSeries<MTGCardModelSeries> typeSeries)
+        if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not PieSeries<MTGCardModelSeries> series)
         {
           // Create new series group if it does not exist
-          typeSeries = MTGCardModelSeries.CreateSeriesGroupBySpellType(spellType);
-          Series.Add(typeSeries);
+          series = MTGCardModelSeries.CreateSeriesGroupBySpellType(spellType);
+          AddAndSortSeries(series);
 
           // Create new value object to the series
-          (typeSeries.Values as ObservableCollection<MTGCardModelSeries>).Add(new MTGCardModelCountSeries(model));
+          (series.Values as ObservableCollection<MTGCardModelSeries>).Add(new MTGCardModelCountSeries(model));
         }
         else
         {
           // Add model to the value object
-          MTGCardModelSeries valueObject = (typeSeries.Values as ObservableCollection<MTGCardModelSeries>)[0];
+          MTGCardModelSeries valueObject = (series.Values as ObservableCollection<MTGCardModelSeries>)[0];
           valueObject.AddItem(model);
         }
       }
     }
-    public override void RemoveFromChartSeries(MTGCard model)
+    protected override void RemoveFromChartSeries(MTGCard model)
     {
       foreach (var spellType in model.Info.SpellTypes)
       {
         // Find series
-        if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not PieSeries<MTGCardModelSeries> typeSeries)
+        if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not PieSeries<MTGCardModelSeries> series)
         {
           return; // Returns if color series does not exist
         }
-        var valueObject = (typeSeries.Values as ObservableCollection<MTGCardModelSeries>)[0];
+        var valueObject = (series.Values as ObservableCollection<MTGCardModelSeries>)[0];
         valueObject.RemoveItem(model);
 
-        if (valueObject.PrimaryValue == 0) { Series.Remove(typeSeries); }
+        if (valueObject.PrimaryValue == 0) { Series.Remove(series); }
       }
     }
   }
 
+  /// <summary>
+  /// Pie chart that shows MTG cardlist mana production color distribution
+  /// </summary>
   public class MTGManaProductionPieChart : MTGCardModelChart
   {
-    public MTGManaProductionPieChart(ObservableCollection<MTGCard> models) : base(models) { }
+    public MTGManaProductionPieChart() { }
 
-    public override void AddToChartSeries(MTGCard model)
+    protected override void AddToChartSeries(MTGCard model)
     {
       // Combine together mana producers that can produce all colors
       var producedManas = model.Info.ProducedMana.Length == 5 ? new ColorTypes[] { ColorTypes.M } : model.Info.ProducedMana;
@@ -327,24 +359,26 @@ namespace MTGApplication.ViewModels
       foreach (var producedMana in producedManas)
       {
         // Find series
-        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(producedMana)) is not PieSeries<MTGCardModelSeries> manaSeries)
+        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(producedMana)) is not PieSeries<MTGCardModelSeries> series)
         {
           // Create new series group if it does not exist
-          manaSeries = MTGCardModelSeries.CreatePieSeriesByColor(producedMana);
-          Series.Add(manaSeries);
+          series = MTGCardModelSeries.CreatePieSeriesByColor(producedMana);
+          series.DataLabelsSize = 0;
+          series.HoverPushout = 0;
+          AddAndSortSeries(series);
 
           // Create new value object to the series
-          (manaSeries.Values as ObservableCollection<MTGCardModelSeries>).Add(new MTGCardModelCountSeries(model));
+          (series.Values as ObservableCollection<MTGCardModelSeries>).Add(new MTGCardModelCountSeries(model));
         }
         else
         {
           // Add model to the value object
-          MTGCardModelSeries valueObject = (manaSeries.Values as ObservableCollection<MTGCardModelSeries>)[0];
+          MTGCardModelSeries valueObject = (series.Values as ObservableCollection<MTGCardModelSeries>)[0];
           valueObject.AddItem(model);
         }
       }
     }
-    public override void RemoveFromChartSeries(MTGCard model)
+    protected override void RemoveFromChartSeries(MTGCard model)
     {
       // Combine together mana producers that can produce all colors
       var producedManas = model.Info.ProducedMana.Length == 5 ? new ColorTypes[] { ColorTypes.M } : model.Info.ProducedMana;
@@ -352,23 +386,28 @@ namespace MTGApplication.ViewModels
       foreach (var colorType in producedManas)
       {
         // Find series
-        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(colorType)) is not PieSeries<MTGCardModelSeries> typeSeries)
+        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(colorType)) is not PieSeries<MTGCardModelSeries> series)
         {
           return; // Returns if color series does not exist
         }
-        var valueObject = (typeSeries.Values as ObservableCollection<MTGCardModelSeries>)[0];
+        var valueObject = (series.Values as ObservableCollection<MTGCardModelSeries>)[0];
         valueObject.RemoveItem(model);
 
-        if (valueObject.PrimaryValue == 0) { Series.Remove(typeSeries); }
+        if (valueObject.PrimaryValue == 0) { Series.Remove(series); }
       }
     }
   }
 
+  /// <summary>
+  /// Pie chart that shows MTG cardlist color distribution
+  /// </summary>
   public class MTGColorPieChart : MTGCardModelChart
   {
-    public MTGColorPieChart(ObservableCollection<MTGCard> models) : base(models) { }
+    public int InnerRadius { get; }
 
-    public override void AddToChartSeries(MTGCard model)
+    public MTGColorPieChart(int innerRadius = 0) { InnerRadius = innerRadius; }
+
+    protected override void AddToChartSeries(MTGCard model)
     {
       // Exclude lands
       if(model.Info.SpellTypes.Contains(SpellType.Land)) { return; }
@@ -376,36 +415,39 @@ namespace MTGApplication.ViewModels
       foreach (var colorType in model.Info.Colors)
       {
         // Find series
-        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(colorType)) is not PieSeries<MTGCardModelSeries> manaSeries)
+        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(colorType)) is not PieSeries<MTGCardModelSeries> series)
         {
           // Create new series group if it does not exist
-          manaSeries = MTGCardModelSeries.CreatePieSeriesByColor(colorType);
-          Series.Add(manaSeries);
+          series = MTGCardModelSeries.CreatePieSeriesByColor(colorType);
+          series.InnerRadius = InnerRadius;
+          series.DataLabelsSize = 0;
+          series.HoverPushout = 0;
+          AddAndSortSeries(series);
 
           // Create new value object to the series
-          (manaSeries.Values as ObservableCollection<MTGCardModelSeries>).Add(new MTGCardModelCountSeries(model));
+          (series.Values as ObservableCollection<MTGCardModelSeries>).Add(new MTGCardModelCountSeries(model));
         }
         else
         {
           // Add model to the value object
-          MTGCardModelSeries valueObject = (manaSeries.Values as ObservableCollection<MTGCardModelSeries>)[0];
+          MTGCardModelSeries valueObject = (series.Values as ObservableCollection<MTGCardModelSeries>)[0];
           valueObject.AddItem(model);
         }
       }
     }
-    public override void RemoveFromChartSeries(MTGCard model)
+    protected override void RemoveFromChartSeries(MTGCard model)
     {
       foreach (var colorType in model.Info.Colors)
       {
         // Find series
-        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(colorType)) is not PieSeries<MTGCardModelSeries> typeSeries)
+        if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(colorType)) is not PieSeries<MTGCardModelSeries> series)
         {
           return; // Returns if color series does not exist
         }
-        var valueObject = (typeSeries.Values as ObservableCollection<MTGCardModelSeries>)[0];
+        var valueObject = (series.Values as ObservableCollection<MTGCardModelSeries>)[0];
         valueObject.RemoveItem(model);
 
-        if (valueObject.PrimaryValue == 0) { Series.Remove(typeSeries); }
+        if (valueObject.PrimaryValue == 0) { Series.Remove(series); }
       }
     }
   }

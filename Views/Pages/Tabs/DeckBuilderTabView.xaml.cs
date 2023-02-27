@@ -53,6 +53,7 @@ namespace MTGApplication.Views
     public void SwitchSearchPanel() => SearchPanelOpen = !SearchPanelOpen;
 
     #region Pointer Events
+    // Prevents dropping to the same element as the element that started the dragging
     private object draggedElement;
 
     private void CardGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -181,6 +182,7 @@ namespace MTGApplication.Views
           cardlist.RemoveFromCardlistCommand.Execute(cardVM.Model);
         }
       }
+      draggedElement = null;
     }
     #endregion
   }

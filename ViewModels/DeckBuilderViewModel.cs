@@ -127,6 +127,7 @@ namespace MTGApplication.ViewModels
         {
           SortCardViewModels();
         }
+        else if(e.PropertyName == nameof(CardlistSize)) { OnPropertyChanged(nameof(EuroPrice)); }
       }
       private void Card_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
       {
@@ -178,6 +179,7 @@ namespace MTGApplication.ViewModels
 
       public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
       public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
+      public float EuroPrice => (float)Math.Round(CardViewModels.Sum(x => x.Model.Info.Price), 0);
 
       /// <summary>
       /// Asks cards to import and imports them to the deck
@@ -185,7 +187,10 @@ namespace MTGApplication.ViewModels
       [RelayCommand]
       public async Task ImportToCardlistDialog()
       {
-        await ImportCards(await Dialogs.GetImportDialog().Show());
+        if(await Dialogs.GetImportDialog().Show() is string importText)
+        {
+          await ImportCards(importText);
+        }
       }
       /// <summary>
       /// Shows dialog with formatted text of the cardlist cards
@@ -342,14 +347,18 @@ namespace MTGApplication.ViewModels
 
     [ObservableProperty]
     private bool isBusy;
+    [ObservableProperty]
+    private MTGCMCStackedColumnChart cMCChart;
+    [ObservableProperty]
+    private MTGSpellTypePieChart spellTypeChart;
+    [ObservableProperty]
+    private MTGManaProductionPieChart manaProductionChart;
+    [ObservableProperty]
+    private MTGColorPieChart colorChart;
 
     public Cardlist DeckCards { get; set; }
     public Cardlist WishlistCards { get; set; }
     public Cardlist MaybelistCards { get; set; }
-    public MTGCMCStackedColumnChart CMCChart { get; set; }
-    public MTGSpellTypePieChart SpellTypeChart { get; set; }
-    public MTGManaProductionPieChart ManaProductionChart { get; set; }
-    public MTGColorPieChart ColorChart { get; set; }
 
     public SortMTGProperty SelectedSortProperty
     {
@@ -522,14 +531,10 @@ namespace MTGApplication.ViewModels
     }
     private void UpdateCharts()
     {
-      CMCChart = new MTGCMCStackedColumnChart(CardDeck.DeckCards);
-      SpellTypeChart = new MTGSpellTypePieChart(CardDeck.DeckCards);
-      ManaProductionChart = new MTGManaProductionPieChart(CardDeck.DeckCards);
-      ColorChart = new MTGColorPieChart(CardDeck.DeckCards);
-      OnPropertyChanged(nameof(CMCChart));
-      OnPropertyChanged(nameof(SpellTypeChart));
-      OnPropertyChanged(nameof(ManaProductionChart));
-      OnPropertyChanged(nameof(ColorChart));
+      CMCChart = new MTGCMCStackedColumnChart() { Models = CardDeck.DeckCards };
+      SpellTypeChart = new MTGSpellTypePieChart() { Models = CardDeck.DeckCards };
+      ManaProductionChart = new MTGManaProductionPieChart() { Models = CardDeck.DeckCards };
+      ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
     }
     
     /// <summary>

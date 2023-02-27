@@ -271,7 +271,14 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
-                  <TextBlock Grid.Row="0" Text="Maybe"/>
+                  <TextBlock Grid.Row="0" Text="Maybe">
+                    <TextBlock.ContextFlyout>
+                      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" Text="Export..."/>
+                      </MenuFlyout>
+                    </TextBlock.ContextFlyout>
+                  </TextBlock>
                   <ListView
                     Grid.Row="1"
                     x:Name="DeckMaybeDisplay"
@@ -286,7 +293,14 @@
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted" 
                     ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
-                  <TextBlock Grid.Row="2" Text="Wishlist"></TextBlock>
+                  <TextBlock Grid.Row="2" Text="Wishlist">
+                    <TextBlock.ContextFlyout>
+                      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" Text="Export..."/>
+                      </MenuFlyout>
+                    </TextBlock.ContextFlyout>
+                  </TextBlock>
                   <ListView
                     Grid.Row="3"
                     x:Name="DeckWishlistDisplay"
@@ -303,21 +317,26 @@
                     ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
                 </Grid>
               </TabViewItem>
-              <TabViewItem Header="Charts" IsClosable="False">
-                <!--Charts-->
+              <TabViewItem Header="Info" IsClosable="False">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                   <StackPanel Margin="0 5 0 0" Orientation="Vertical">
+                    <TextBlock>
+                        <Run Text="Price:" />
+                        <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckCards.EuroPrice), Mode=OneWay}" />
+                    </TextBlock>
+                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
+                    <!--Charts-->
                     <TextBlock Text="Mana Curve" TextAlignment="Center"/>
                     <lvc:CartesianChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" Series="{Binding Series}"/>
                     <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
                     <TextBlock Text="Type Chart" TextAlignment="Center"/>
                     <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series}"/>
                     <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-                    <TextBlock Text="Mana production Chart" TextAlignment="Center"/>
-                    <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series}"/>
-                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-                    <TextBlock Text="Color Chart" TextAlignment="Center"/>
-                    <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    <TextBlock Text="Color &amp; Mana Chart" TextAlignment="Center"/>
+                    <Grid Height="170" Width="170" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 10">
+                      <lvc:PieChart DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series}"/>
+                      <lvc:PieChart Height="110" Width="110" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    </Grid>
                     <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
                   </StackPanel>
                 </ScrollViewer>

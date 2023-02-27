@@ -140,7 +140,7 @@ namespace MTGApplication.Services
       }
       else
       {
-        return string.Empty;
+        return null;
       }
     }
 
