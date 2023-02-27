@@ -227,7 +227,7 @@
                 </CommandBar>
                 <ProgressRing IsActive="{x:Bind SearchViewModel.IsBusy, Mode=OneWay}"/>
               </StackPanel>
-              <TextBlock Text="{x:Bind sys:String.Format('{0} cards', SearchViewModel.SearchCards.Count), Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+              <TextBlock Text="{x:Bind sys:String.Format('{0} cards', SearchViewModel.TotalCardCount), Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
             </Grid>
             <!--Scryfall Card view-->
             <Grid controls:DockPanel.Dock="Top">
@@ -237,7 +237,7 @@
                 Style="{StaticResource MTGAdaptiveGridViewStyle}"
                 SelectionMode="None"
                 DesiredWidth="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}"
-                ItemsSource="{x:Bind SearchViewModel.SearchCards}"
+                ItemsSource="{x:Bind SearchViewModel.SearchCards, Mode=OneWay}"
                 Visibility="Collapsed"
                 CanDragItems="True"
                 DragItemsStarting="CardView_DragItemsStarting"
@@ -247,7 +247,7 @@
                 x:Name="CardSearchListDisplay"
                 Style="{StaticResource MTGListViewStyle}"
                 SelectionMode="Single"
-                ItemsSource="{x:Bind SearchViewModel.SearchCards}"
+                ItemsSource="{x:Bind SearchViewModel.SearchCards, Mode=OneWay}"
                 Visibility="Collapsed"
                 CanDragItems="True"
                 DragItemsStarting="CardView_DragItemsStarting"
