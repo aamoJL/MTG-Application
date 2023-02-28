@@ -56,23 +56,6 @@ namespace MTGApplication.Views
     // Prevents dropping to the same element as the element that started the dragging
     private object draggedElement;
 
-    private void CardGridViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-      //if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
-      //{
-      //  // TODO: hovered item to this viewmodel instead of the cardVM
-      //  //cardVM.ControlsVisible = true;
-      //}
-    }
-    private void CardGridViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-      //if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
-      //{
-      //  // TODO: hovered item to this viewmodel instead of the cardVM
-      //  //cardVM.ControlsVisible = false;
-      //}
-    }
-
     private void CardListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
       // Change card preview image to hovered item

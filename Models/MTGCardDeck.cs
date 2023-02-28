@@ -11,8 +11,13 @@ using static MTGApplication.Enums;
 
 namespace MTGApplication.Models
 {
-    public partial class MTGCardDeck : ObservableObject
+  public partial class MTGCardDeck : ObservableObject
   {
+    public enum CombineProperty
+    {
+      Name, Id
+    }
+
     [ObservableProperty]
     private string name = "";
 
@@ -30,14 +35,24 @@ namespace MTGApplication.Models
         _ => null,
       };
     }
-    public void AddToCardlist(CardlistType listType, MTGCard card)
+    
+    /// <summary>
+    /// Adds card to given <paramref name="listType"/>.
+    /// Card will be combined to a card with the same name, if <paramref name="combineName"/> is <see langword="true"/>, otherwise
+    /// the card will be combined to a card with the same ID.
+    /// </summary>
+    public void AddToCardlist(CardlistType listType, MTGCard card, CombineProperty combineProperty = CombineProperty.Name)
     {
       ObservableCollection<MTGCard> collection = GetCardlist(listType);
-      if(collection == null) { return; }
+      if (collection == null) { return; }
 
-      if(collection.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is MTGCard existingCard)
+      if(combineProperty == CombineProperty.Name && collection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard existingNameCard)
       {
-        existingCard.Count += card.Count;
+        existingNameCard.Count += card.Count;
+      }
+      else if(combineProperty == CombineProperty.Id && collection.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is MTGCard existingIdCard)
+      {
+        existingIdCard.Count += card.Count;
       }
       else
       {
@@ -47,7 +62,7 @@ namespace MTGApplication.Models
     public void RemoveFromCardlist(CardlistType listType, MTGCard card)
     {
       ObservableCollection<MTGCard> collection = GetCardlist(listType);
-      if(collection == null) { return; }
+      if (collection == null) { return; }
 
       collection.Remove(card);
     }
@@ -70,10 +85,10 @@ namespace MTGApplication.Models
 
     [InverseProperty(nameof(CardDTO.DeckCards))]
     public List<CardDTO> DeckCards { get; init; } = new();
-    
+
     [InverseProperty(nameof(CardDTO.DeckWishlist))]
     public List<CardDTO> WishlistCards { get; init; } = new();
-    
+
     [InverseProperty(nameof(CardDTO.DeckMaybelist))]
     public List<CardDTO> MaybelistCards { get; init; } = new();
 

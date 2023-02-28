@@ -17,8 +17,6 @@ namespace MTGApplication
     public static Window MainWindow { get; private set; }
     // Used for Dialogs
     public static FrameworkElement MainRoot { get; private set; }
-    // Used for AppData subfolder
-    public static string CompanyName { get; } = "aamo"; // TODO: Move to somewhere
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -36,6 +34,8 @@ namespace MTGApplication
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+      AppConfig.Init();
+
       using (var db = new CardDbContextFactory().CreateDbContext())
       {
         db.Database.Migrate();

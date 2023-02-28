@@ -18,9 +18,7 @@
     <!--Search-->
     <DataTemplate x:Key="SearchImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel 
-        Orientation="Vertical" 
-        PointerEntered="CardGridViewItem_PointerEntered" 
-        PointerExited="CardGridViewItem_PointerExited">
+        Orientation="Vertical">
         <Grid>
           <controls:ImageEx 
             Source="{x:Bind SelectedFaceUri, Mode=OneWay}"
@@ -34,11 +32,6 @@
               </MenuFlyout>
             </controls:ImageEx.ContextFlyout>
           </controls:ImageEx>
-          <!--<StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10 45 20 10" Visibility="{Binding ControlsVisible}">
-            <Button Background="White" Content="{ui:FontIcon Glyph=&#xECC8;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-            <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckMaybelistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-            <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-          </StackPanel>-->
         </Grid>
         <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Center" FontSize="11"/>
       </StackPanel>
@@ -90,7 +83,7 @@
       </StackPanel>
     </DataTemplate>
     <DataTemplate x:Key="DeckImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" PointerEntered="CardGridViewItem_PointerEntered" PointerExited="CardGridViewItem_PointerExited">
+      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical">
         <Grid>
           <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
             <controls:ImageEx.ContextFlyout>

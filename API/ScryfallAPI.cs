@@ -322,6 +322,10 @@ namespace MTGApplication.API
 
       return (fetchResults.SelectMany(x => x.Found).ToArray(), fetchResults.Sum(x => x.NotFoundCount));
     }
+
+    /// <summary>
+    /// Converts the <paramref name="colorArray"/> to <see cref="ColorTypes"/> array
+    /// </summary>
     private static ColorTypes[] GetColors(string[] colorArray)
     {
       var colors = new List<ColorTypes>();
