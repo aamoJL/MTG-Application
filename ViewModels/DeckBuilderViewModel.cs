@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
+using MTGApplication.ViewModels.Charts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
