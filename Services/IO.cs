@@ -19,9 +19,14 @@ namespace MTGApplication.Services
       {
         DataPackage dataPackage = new();
         dataPackage.SetText(text);
-        Clipboard.SetContent(dataPackage);
+        SetClipboardContent(dataPackage);
 
         Notifications.RaiseNotification(Notifications.NotificationType.Info, "Copied to clipboard.");
+      }
+
+      protected virtual void SetClipboardContent(DataPackage dataPackage)
+      {
+        Clipboard.SetContent(dataPackage);
       }
     }
 
