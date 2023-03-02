@@ -84,6 +84,7 @@ namespace MTGApplication.API
     private static string CARDS_URL => $"{API_URL}/cards";
     private static string COLLECTION_URL => $"{CARDS_URL}/collection";
     private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
+
     private static int MaxFetchIdentifierCount => 75;
 
     /// <summary>
@@ -91,24 +92,22 @@ namespace MTGApplication.API
     /// </summary>
     public static string GetSearchUri(string searchParams) => $"{CARDS_URL}/search?q={searchParams}+game:paper";
 
-    /// <summary>
-    /// Fetches cards from Scryfall API using given parameters
-    /// </summary>
-    /// <param name="searchParams">Scryfall API search parameters</param>
-    /// <param name="countLimit">Maximum page count to fetch the cards, one page has 175 cards</param>
-    /// <returns></returns>
-    public async Task<MTGCard[]> FetchCards(string searchParams, int countLimit)
+    public async Task<MTGCard[]> FetchCardsWithParameters(string searchParams, int countLimit = 700)
     {
       if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
-      List<MTGCardInfo> cardInfos = new();
       string searchUri = GetSearchUri(searchParams);
+      return await FetchCardsFromUri(searchUri, countLimit);
+    }
+    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue)
+    {
+      List<MTGCardInfo> cardInfos = new();
       var pageCount = 1;
 
       // Loop through API pages
-      while (searchUri != "" && cardInfos.Count < countLimit)
+      while (uri != "" && cardInfos.Count < countLimit)
       {
         // TODO: enumeration
-        JsonNode rootNode = await FetchScryfallJsonObject(searchUri);
+        JsonNode rootNode = await FetchScryfallJsonObject(uri);
         if (rootNode == null) { break; }
 
         JsonNode dataNode = rootNode?["data"];
@@ -122,7 +121,7 @@ namespace MTGApplication.API
             if (itemInfo != null) cardInfos.Add((MTGCardInfo)itemInfo);
           }
 
-          searchUri = rootNode["has_more"]!.GetValue<bool>() ? rootNode["next_page"]?.GetValue<string>() : "";
+          uri = rootNode["has_more"]!.GetValue<bool>() ? rootNode["next_page"]?.GetValue<string>() : "";
           pageCount++;
         }
         else { break; }
@@ -137,15 +136,6 @@ namespace MTGApplication.API
 
       return cards.ToArray();
     }
-
-    /// <summary>
-    /// Converts <paramref name="importText"/> to <see cref="MTGCard"/> array using the API.
-    /// <paramref name="importText"/> needs to be formatted like this:
-    /// <code> 
-    /// {count (optional)} {name} 
-    /// {count (optional)} {name} 
-    /// </code>
-    /// </summary>
     public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromString(string importText)
     {
       var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -170,6 +160,11 @@ namespace MTGApplication.API
 
       return await FetchWithIdentifiers(identifiers);
     }
+    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray)
+    {
+      var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x));
+      return await FetchWithIdentifiers(identifiers.ToArray());
+    }
 
     /// <summary>
     /// Fetches json object that contains list of MTG cards using the Scryfall API
@@ -181,15 +176,6 @@ namespace MTGApplication.API
         return JsonNode.Parse(await IO.FetchStringFromURL(searchUri));
       }
       catch (Exception) { return null; }
-    }
-
-    /// <summary>
-    /// Fetches MTGCards from the API using the given CardDTO objects.
-    /// </summary>
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray)
-    {
-      var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x));
-      return await FetchWithIdentifiers(identifiers.ToArray());
     }
 
     /// <summary>
@@ -210,6 +196,7 @@ namespace MTGApplication.API
       _ = float.TryParse(json["prices"]?["eur"]?.GetValue<string>(), NumberStyles.Float, CultureInfo.InvariantCulture, out float price);
       var apiWebsiteUri = json["scryfall_uri"]?.GetValue<string>();
       var setIconUri = $"{SET_ICON_URL}/{setCode}.svg";
+      var printSearchUri = json["prints_search_uri"]?.GetValue<string>();
 
       // https://scryfall.com/docs/api/layouts
       var twoSideLayouts = new string[] { "transform", "modal_dfc", "double_faced_token", "art_series", "reversible_card" };
@@ -277,7 +264,8 @@ namespace MTGApplication.API
         apiWebsiteUri: apiWebsiteUri,
         setIconUri: setIconUri,
         rarityType: rarityType,
-        producedMana: producedManaList.ToArray()
+        producedMana: producedManaList.ToArray(),
+        printSearchUri: printSearchUri
         );
     }
 

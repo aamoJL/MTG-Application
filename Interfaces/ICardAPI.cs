@@ -14,8 +14,13 @@ namespace MTGApplication.Interfaces
     /// <summary>
     /// Fetch cards from the API using API search parameters
     /// </summary>
-    public Task<T[]> FetchCards(string searchParams, int countLimit = 700);
-    
+    public Task<T[]> FetchCardsWithParameters(string searchParams, int countLimit = int.MaxValue);
+
+    /// <summary>
+    /// Fetch cards from the API using API search uri
+    /// </summary>
+    public Task<T[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue);
+
     /// <summary>
     /// Fetch cards from the API using formatted text
     /// </summary>

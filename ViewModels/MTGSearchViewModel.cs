@@ -56,7 +56,7 @@ namespace MTGApplication.ViewModels
     public async Task SearchSubmit()
     {
       IsBusy = true;
-      var cards = await Task.Run(() => cardAPI.FetchCards(SearchQuery));
+      var cards = await Task.Run(() => cardAPI.FetchCardsWithParameters(SearchQuery));
       SearchCards = new(new MTGCardSource(cards));
       TotalCardCount = cards.Length;
       IsBusy = false;

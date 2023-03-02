@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static MTGApplication.Enums;
-using static MTGApplication.Services.DialogService;
+using static MTGApplication.Views.Dialogs;
 
 namespace MTGApplication.ViewModels
 {
@@ -22,77 +22,76 @@ namespace MTGApplication.ViewModels
     public class DeckBuilderViewDialogs
     {
       #region Dialogs
-      public virtual ConfirmationDialog SaveUnsavedDialog { protected get; init; } = new()
-      {
-        Title = "Save unsaved changes?",
-        Content = "Would you like to save unsaved changes?",
-        YesButtonText = "Save",
-      };
-      public virtual ConfirmationDialog OverrideDialog { protected get; init; } = new()
-      {
-        Title = "Override existing deck?",
-        NoButtonText = string.Empty,
-      };
-      public virtual ConfirmationDialog DeleteDialog { protected get; init; } = new()
-      {
-        Title = "Delete deck?",
-        NoButtonText = string.Empty,
-      };
-      public virtual InputStringDialog SaveDialog { protected get; init; } = new()
-      {
-        Title = "Save your deck?",
-        OkButtonText = "Save",
-        InvalidCharacters = Path.GetInvalidFileNameChars(),
-      };
-      public virtual ComboboxDialog LoadDialog { protected get; init; } = new()
-      {
-        Title = "Open deck",
-        OkButtonText = "Open",
-        Header = "Name"
-      };
-      public virtual InputTextAreaDialog ImportDialog { protected get; init; } = new()
-      {
-        Title = "Import cards",
-        InputPlaceholder = "Example:\n2 Black Lotus\nMox Ruby",
-        OkButtonText = "Add to Collection",
-      };
-      public virtual InputTextAreaDialog ExportDialog { protected get; init; } = new()
-      {
-        Title = "Export deck",
-        OkButtonText = "Copy to Clipboard",
-      };
+      public virtual ConfirmationDialog SaveUnsavedDialog { protected get; init; } = new ConfirmationDialog("Save unsaved changes?");
+      public virtual ConfirmationDialog OverrideDialog { protected get; init; } = new ConfirmationDialog("Override existing deck?");
+      public virtual ConfirmationDialog DeleteDialog { protected get; init; } = new ConfirmationDialog("Delete deck?");
+      public virtual TextBoxDialog SaveDialog { protected get; init; } = new TextBoxDialog("Save your deck?");
+      public virtual ComboBoxDialog LoadDialog { protected get; init; } = new ComboBoxDialog("Open deck");
+      public virtual TextAreaDialog ImportDialog { protected get; init; } = new TextAreaDialog("Import cards");
+      public virtual TextAreaDialog ExportDialog { protected get; init; } = new TextAreaDialog("Export deck");
+      public virtual GridViewDialog CardPrintDialog { protected get; init; } = new GridViewDialog("Change card print");
       #endregion
 
       #region Getters
-      public ConfirmationDialog GetSaveUnsavedDialog() => SaveUnsavedDialog;
+      public ConfirmationDialog GetSaveUnsavedDialog()
+      {
+        SaveUnsavedDialog.Message = "Would you like to save unsaved changes?";
+        SaveUnsavedDialog.PrimaryButtonText = "Save";
+        return SaveUnsavedDialog;
+      }
       public ConfirmationDialog GetOverrideDialog(string name)
       {
-        OverrideDialog.Content = $"Deck '{name}' already exist. Would you like to override the deck?";
+        OverrideDialog.SecondaryButtonText = string.Empty;
+        OverrideDialog.Message = $"Deck '{name}' already exist. Would you like to override the deck?";
         return OverrideDialog;
       }
       public ConfirmationDialog GetDeleteDialog(string name)
       {
-        DeleteDialog.Content = $"Are you sure you want to delete '{name}'?";
+        DeleteDialog.SecondaryButtonText = string.Empty;
+        DeleteDialog.Message = $"Are you sure you want to delete '{name}'?";
         return DeleteDialog;
       }
-      public InputStringDialog GetSaveDialog(string name)
+      public TextBoxDialog GetSaveDialog(string name)
       {
-        SaveDialog.DefaultText = name;
+        SaveDialog.PrimaryButtonText = "Save";
+        SaveDialog.SecondaryButtonText = string.Empty;
+        SaveDialog.InvalidInputCharacters = Path.GetInvalidFileNameChars();
+        SaveDialog.InputDefaultText = name;
         return SaveDialog;
       }
-      public ComboboxDialog GetLoadDialog(string[] names)
+      public ComboBoxDialog GetLoadDialog(string[] names)
       {
+        LoadDialog.PrimaryButtonText = "Open";
+        LoadDialog.SecondaryButtonText = string.Empty;
+        LoadDialog.InputHeader = "Name";
         LoadDialog.Items = names;
         return LoadDialog;
       }
-      public InputTextAreaDialog GetImportDialog() => ImportDialog;
-      public InputTextAreaDialog GetExportDialog(string text)
+      public TextAreaDialog GetImportDialog()
       {
-        ExportDialog.DefaultText = text;
+        ImportDialog.InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby";
+        ImportDialog.SecondaryButtonText = string.Empty;
+        ImportDialog.PrimaryButtonText = "Add to Collection";
+        return ImportDialog;
+      }
+      public TextAreaDialog GetExportDialog(string text)
+      {
+        ExportDialog.PrimaryButtonText = "Copy to Clipboard";
+        ExportDialog.SecondaryButtonText = string.Empty;
+        ExportDialog.InputDefaultText = text;
         return ExportDialog;
+      }
+      public GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      {
+        CardPrintDialog.Items = printViewModels;
+        CardPrintDialog.SecondaryButtonText = string.Empty;
+        CardPrintDialog.GridViewStyleName = "MTGAdaptiveGridViewStyle";
+        CardPrintDialog.ItemTemplateName = "MTGPrintGridViewItemTemplate";
+        return CardPrintDialog;
       }
       #endregion
     }
+
     public partial class Cardlist : ObservableObject
     {
       public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, SortMTGProperty sortProp = SortMTGProperty.CMC, SortDirection sortDir = SortDirection.ASC, IO.ClipboardService clipboardService = null)
@@ -118,7 +117,7 @@ namespace MTGApplication.ViewModels
           foreach (var card in CardDeck.GetCardlist(ListType))
           {
             card.PropertyChanged += Card_PropertyChanged;
-            CardViewModels.Add(new(card) { DeleteCardCommand = new RelayCommand<MTGCard>(RemoveFromCardlist) });
+            CardViewModels.Add(new(card) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand });
           }
           OnPropertyChanged(nameof(CardlistSize));
           SortCardViewModels();
@@ -145,7 +144,7 @@ namespace MTGApplication.ViewModels
         {
           case NotifyCollectionChangedAction.Add:
             var newCard = e.NewItems[0] as MTGCard;
-            CardViewModels.Add(new(newCard) { DeleteCardCommand = new RelayCommand<MTGCard>(RemoveFromCardlist) });
+            CardViewModels.Add(new(newCard) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand });
             newCard.PropertyChanged += Card_PropertyChanged;
             SortCardViewModels();
             break;
@@ -188,7 +187,7 @@ namespace MTGApplication.ViewModels
       [RelayCommand]
       public async Task ImportToCardlistDialog()
       {
-        if(await Dialogs.GetImportDialog().Show() is string importText)
+        if(await Dialogs.GetImportDialog().ShowAsync(App.MainRoot) is string importText)
         {
           await ImportCards(importText);
         }
@@ -220,13 +219,7 @@ namespace MTGApplication.ViewModels
 
       private async Task ExportCards()
       {
-        StringBuilder stringBuilder = new();
-        foreach (var item in CardViewModels)
-        {
-          stringBuilder.AppendLine($"{item.Model.Count} {item.Model.Info.Name}");
-        }
-
-        var response = await Dialogs.GetExportDialog(stringBuilder.ToString()).Show();
+        var response = await Dialogs.GetExportDialog(GetExportString()).ShowAsync(App.MainRoot);
         if (!string.IsNullOrEmpty(response))
         {
           ClipboardService.Copy(response);
@@ -280,11 +273,35 @@ namespace MTGApplication.ViewModels
           CardViewModels.Move(CardViewModels.IndexOf(tempList[i]), i);
         }
       }
+      public string GetExportString()
+      {
+        StringBuilder stringBuilder = new();
+        foreach (var item in CardViewModels)
+        {
+          stringBuilder.AppendLine($"{item.Model.Count} {item.Model.Info.Name}");
+        }
+
+        return stringBuilder.ToString();
+      }
+
+      [RelayCommand]
+      public async Task ChangePrintDialog(MTGCard card)
+      {
+        // Get prints
+        var prints = await CardAPI.FetchCardsFromUri(card.Info.PrintSearchUri);
+        var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
+
+        if (await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(App.MainRoot) is MTGCardViewModel print)
+        {
+          // Replace card
+          //await ImportCards(importText);
+        }
+      }
     }
 
-    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckService, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
+    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckRepository, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
     {
-      DeckRepository = deckService;
+      DeckRepository = deckRepository;
       CardAPI = cardAPI;
       Dialogs = dialogs ?? new();
 
@@ -411,8 +428,8 @@ namespace MTGApplication.ViewModels
     {
       if (await ShowUnsavedDialogs())
       {
-        var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).ToArray()).Show();
-        if (loadName != string.Empty)
+        var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).ToArray()).ShowAsync(App.MainRoot);
+        if (loadName != null)
         {
           await LoadDeck(loadName);
         }
@@ -425,14 +442,14 @@ namespace MTGApplication.ViewModels
     [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckDialogCommand))]
     public async Task SaveDeckDialog()
     {
-      var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).Show();
+      var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync(App.MainRoot);
       if (string.IsNullOrEmpty(saveName)) { return; }
       else
       {
         if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
         {
           // Deck exists already
-          if (await Dialogs.GetOverrideDialog(saveName).Show() == null) { return; }
+          if (await Dialogs.GetOverrideDialog(saveName).ShowAsync(App.MainRoot) == null) { return; }
         }
       }
 
@@ -446,7 +463,7 @@ namespace MTGApplication.ViewModels
     public async Task DeleteDeckDialog()
     {
       if (!await DeckRepository.Exists(CardDeck.Name)) { return; }
-      if (await Dialogs.GetDeleteDialog(CardDeck.Name).Show() is true)
+      if (await Dialogs.GetDeleteDialog(CardDeck.Name).ShowAsync(App.MainRoot) is true)
       {
         await DeleteDeck();
       }
@@ -547,19 +564,19 @@ namespace MTGApplication.ViewModels
       if (HasUnsavedChanges)
       {
         // Deck has unsaved changes
-        var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().Show();
+        var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(App.MainRoot);
         if (wantSaveConfirmed == null) { return false; }
         else if (wantSaveConfirmed is true)
         {
           // User wants to save the unsaved changes
-          var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).Show();
+          var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync(App.MainRoot);
           if (string.IsNullOrEmpty(saveName)) { return false; }
           else
           {
             if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
             {
               // Deck exists already
-              var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).Show();
+              var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync(App.MainRoot);
               if (overrideConfirmed == null) { return false; }
               else if (overrideConfirmed is true)
               {

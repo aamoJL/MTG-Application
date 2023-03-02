@@ -69,6 +69,7 @@
             <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
             <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
             <MenuFlyoutSeparator />
+            <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
             <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
             <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
             <MenuFlyoutSeparator />
@@ -92,29 +93,19 @@
                 <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
                 <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
+                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
+                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
                 <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
               </MenuFlyout>
             </controls:ImageEx.ContextFlyout>
           </controls:ImageEx>
-
-          <!--<StackPanel Spacing="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10 45 20 10" Visibility="{Binding ControlsVisible}">
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xF142;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckMaybelistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-                      <Button Background="White" Content="{ui:FontIcon Glyph=&#xE7BF;}" Command="{Binding ElementName=MainPageContainer, Path=DataContext.DeckWishlistViewModel.AddViewModelCommand}" CommandParameter="{Binding}"/>
-                    </StackPanel>-->
         </Grid>
         <Grid>
           <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Right" FontSize="11"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <!--<Button x:Name="DecreaseButton" Command="{x:Bind DecreaseCountCommand}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
-                        <SymbolIcon Symbol="Back" />
-                      </Button>-->
             <TextBlock Text="{Binding Model.Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
-            <!--<Button Command="{Binding IncreaseCountCommand}" Visibility="{Binding ControlsVisible, Mode=OneWay}">
-                        <SymbolIcon Symbol="Forward" />
-                      </Button>-->
           </StackPanel>
         </Grid>
       </StackPanel>

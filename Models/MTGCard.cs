@@ -69,6 +69,7 @@ namespace MTGApplication.Models
       public string SetIconUri { get; } 
       public CardFace FrontFace { get; }
       public CardFace? BackFace { get; }
+      public string PrintSearchUri { get; }
 
       public RarityTypes RarityType { get; }
       public ColorTypes[] Colors { get; }
@@ -80,7 +81,7 @@ namespace MTGApplication.Models
       /// Constructor for JSON deserialization
       /// </summary>
       [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-      public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana)
+      public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri)
       {
         ScryfallId = scryfallId;
         Name = name;
@@ -99,8 +100,9 @@ namespace MTGApplication.Models
         SpellTypes = spellTypes;
         CardMarketUri = cardMarketUri;
         ProducedMana = producedMana;
+        PrintSearchUri = printSearchUri;
       }
-      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType)
+      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri)
       {
         ScryfallId = scryfallId;
         Name = name;
@@ -113,6 +115,7 @@ namespace MTGApplication.Models
         APIWebsiteUri = apiWebsiteUri;
         SetIconUri = setIconUri;
         RarityType = rarityType;
+        PrintSearchUri = printSearchUri;
 
         FrontFace = frontFace;
         BackFace = backFace;

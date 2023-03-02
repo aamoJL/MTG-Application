@@ -9,7 +9,7 @@ using MTGApplication.Interfaces;
 
 namespace MTGApplication.ViewModels
 {
-    public partial class MTGCardViewModel : ViewModelBase
+  public partial class MTGCardViewModel : ViewModelBase
   {
     public MTGCardViewModel(MTGCard model)
     {
@@ -20,7 +20,7 @@ namespace MTGApplication.ViewModels
 
     private void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(SelectedFace)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
+      if (e.PropertyName == nameof(SelectedFace)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
     }
     private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -31,7 +31,7 @@ namespace MTGApplication.ViewModels
 
     [ObservableProperty]
     private CardSide selectedFace;
-    
+
     public string SelectedFaceUri
     {
       get
@@ -43,6 +43,7 @@ namespace MTGApplication.ViewModels
     public string ModelAPIName => ICardAPI<MTGCard>.GetAPIName(Model);
 
     public ICommand DeleteCardCommand { get; set; }
+    public ICommand ChangePrintDialogCommand { get; set; }
 
     /// <summary>
     /// Changes selected face image if possible
@@ -52,7 +53,7 @@ namespace MTGApplication.ViewModels
     {
       if (HasBackFace) SelectedFace = SelectedFace == CardSide.Front ? CardSide.Back : CardSide.Front;
     }
-    
+
     /// <summary>
     /// Opens card's API Website in web browser
     /// </summary>
@@ -61,7 +62,7 @@ namespace MTGApplication.ViewModels
     {
       await IO.OpenUri(Model.Info.APIWebsiteUri);
     }
-    
+
     /// <summary>
     /// Opens card's Cardmarket page in web browser
     /// </summary>    
@@ -70,7 +71,7 @@ namespace MTGApplication.ViewModels
     {
       await IO.OpenUri(Model.Info.CardMarketUri);
     }
-    
+
     /// <summary>
     /// Increases count by one
     /// </summary>
@@ -79,14 +80,14 @@ namespace MTGApplication.ViewModels
     {
       Model.Count++;
     }
-    
+
     /// <summary>
     /// Decreases count by one if possible
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanExecuteDecreaseCountCommand))]
     public void DecreaseCount()
     {
-      if(Model.Count > 0) { Model.Count--; }
+      if (Model.Count > 0) { Model.Count--; }
     }
 
     private bool CanExecuteDecreaseCountCommand() => Model.Count > 1;

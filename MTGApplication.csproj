@@ -27,6 +27,7 @@
     <None Remove="Assets\ColorIcons\W.svg" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
+    <None Remove="Views\Controls\CardPrintDialog.xaml" />
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
@@ -34,6 +35,7 @@
     <None Remove="README.md" />
     <None Remove="Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
     <None Remove="Views\Styles\CustomListViewStyle.xaml" />
+    <None Remove="Views\Styles\MTGPrintGridViewItemTemplate.xaml" />
     <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
   </ItemGroup>
 
@@ -105,6 +107,16 @@
     <Content Update="Assets\Icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Styles\MTGPrintGridViewItemTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\CardPrintDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\Tabs\DeckBuilderTabView.xaml">

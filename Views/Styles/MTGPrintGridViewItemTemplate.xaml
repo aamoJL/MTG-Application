@@ -1,0 +1,32 @@
+<ResourceDictionary
+  x:Class="MTGApplication.Views.Styles.MTGPrintGridViewItemTemplate"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
+  xmlns:viewmodels="using:MTGApplication.ViewModels" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
+  mc:Ignorable="d">
+
+  <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
+    <StackPanel Orientation="Vertical">
+      <Grid>
+        <controls:ImageEx
+          Source="{Binding SelectedFaceUri, Mode=OneWay}"
+          Style="{StaticResource PlaceholderImageStyle}">
+          <controls:ImageEx.ContextFlyout>
+            <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+              <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip"/>
+              <MenuFlyoutSeparator />
+              <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="{Binding ModelAPIName}"/>
+              <MenuFlyoutItem Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+            </MenuFlyout>
+          </controls:ImageEx.ContextFlyout>
+        </controls:ImageEx>
+      </Grid>
+      <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Center" FontSize="11"/>
+    </StackPanel>
+  </DataTemplate>
+</ResourceDictionary>

@@ -7,13 +7,17 @@ namespace MTGApplication
   {
     private static IConfigurationRoot configurationRoot;
 
+    public static string CompanyName { get; set; }
+
     public static void Init()
     {
       var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false);
       configurationRoot = builder.Build();
+
+      CompanyName = GetCompanyName();
     }
 
-    public static string GetCompanyName()
+    private static string GetCompanyName()
     {
       var config = configurationRoot.GetSection("AppInformation").GetChildren();
       return config.First(x => x.Key == "Company").Value;
