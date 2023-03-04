@@ -136,6 +136,11 @@ namespace MTGApplication.ViewModels
           OnPropertyChanged(nameof(CardlistSize));
           HasUnsavedChanges = true;
         }
+        else if(e.PropertyName == nameof(MTGCard.Info))
+        {
+          OnPropertyChanged(nameof(EuroPrice));
+          HasUnsavedChanges = true;
+        }
       }
       private void Cards_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
       {
@@ -143,15 +148,15 @@ namespace MTGApplication.ViewModels
         switch (e.Action)
         {
           case NotifyCollectionChangedAction.Add:
-            var newCard = e.NewItems[0] as MTGCard;
-            CardViewModels.Add(new(newCard) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand });
-            newCard.PropertyChanged += Card_PropertyChanged;
+            var addedCard = e.NewItems[0] as MTGCard;
+            CardViewModels.Add(new(addedCard) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand });
+            addedCard.PropertyChanged += Card_PropertyChanged;
             SortCardViewModels();
             break;
           case NotifyCollectionChangedAction.Remove:
-            var oldCard = e.OldItems[0] as MTGCard;
-            CardViewModels.Remove(CardViewModels.FirstOrDefault(x => x.Model == oldCard));
-            oldCard.PropertyChanged -= Card_PropertyChanged;
+            var removedCard = e.OldItems[0] as MTGCard;
+            CardViewModels.Remove(CardViewModels.FirstOrDefault(x => x.Model == removedCard));
+            removedCard.PropertyChanged -= Card_PropertyChanged;
             break;
           case NotifyCollectionChangedAction.Reset:
             CardViewModels.Clear(); break;
@@ -179,7 +184,7 @@ namespace MTGApplication.ViewModels
 
       public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
       public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
-      public float EuroPrice => (float)Math.Round(CardViewModels.Sum(x => x.Model.Info.Price), 0);
+      public float EuroPrice => (float)Math.Round(CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count), 0);
 
       /// <summary>
       /// Asks cards to import and imports them to the deck
@@ -215,6 +220,27 @@ namespace MTGApplication.ViewModels
       public void RemoveFromCardlist(MTGCard card)
       {
         CardDeck.RemoveFromCardlist(ListType, card);
+      }
+      /// <summary>
+      /// Shows a dialog with cards prints and changes the cards print to the selected print
+      /// </summary>
+      [RelayCommand]
+      public async Task ChangePrintDialog(MTGCard card)
+      {
+        // Get prints
+        var prints = await CardAPI.FetchCardsFromUri(card.Info.PrintSearchUri);
+        var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
+
+        if (await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(App.MainRoot) is MTGCardViewModel newPrint)
+        {
+          // Replace card
+          var cardlist = CardDeck.GetCardlist(ListType);
+          int index = cardlist.IndexOf(card);
+          if (index > -1)
+          {
+            cardlist[index].Info = newPrint.Model.Info;
+          }
+        }
       }
 
       private async Task ExportCards()
@@ -284,19 +310,6 @@ namespace MTGApplication.ViewModels
         return stringBuilder.ToString();
       }
 
-      [RelayCommand]
-      public async Task ChangePrintDialog(MTGCard card)
-      {
-        // Get prints
-        var prints = await CardAPI.FetchCardsFromUri(card.Info.PrintSearchUri);
-        var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
-
-        if (await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(App.MainRoot) is MTGCardViewModel print)
-        {
-          // Replace card
-          //await ImportCards(importText);
-        }
-      }
     }
 
     public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckRepository, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)

@@ -25,6 +25,10 @@ namespace MTGApplication.ViewModels
     private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       if (e.PropertyName == nameof(Model.Count)) { DecreaseCountCommand.NotifyCanExecuteChanged(); }
+      else if(e.PropertyName == nameof(Model.Info))
+      {
+        OnPropertyChanged(nameof(SelectedFaceUri));
+      }
     }
 
     public MTGCard Model { get; }

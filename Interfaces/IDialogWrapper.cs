@@ -11,6 +11,9 @@ namespace MTGApplication.Interfaces
   {
     public ContentDialog Dialog { get; set; }
 
+    /// <summary>
+    /// Shows the dialog
+    /// </summary>
     public Task<ContentDialogResult> ShowAsync();
   }
 }

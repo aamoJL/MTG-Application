@@ -3,16 +3,16 @@ using System;
 
 namespace MTGApplication.Views.BindingHelpers.Converters
 {
-  public class DoubleToIntConverter : IValueConverter
+  public class FloatToEuroStringConverter : IValueConverter
   {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-      return (int)(double)value;
+      return Format.EuroToString((float)value);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-      return (double)value;
+      throw new NotImplementedException();
     }
   }
 }

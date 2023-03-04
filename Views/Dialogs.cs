@@ -295,7 +295,7 @@ namespace MTGApplication.Views
         };
       }
 
-      public object GetInputValue() => gridView.SelectedValue;
+      public virtual object GetInputValue() => gridView.SelectedValue;
     }
   }
 }

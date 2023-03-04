@@ -6,12 +6,14 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:ui="using:CommunityToolkit.WinUI.UI" 
   xmlns:viewmodels="using:MTGApplication.ViewModels" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-  xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:converters="using:MTGApplication.Views.BindingHelpers.Converters"
   mc:Ignorable="d">
 
+  <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
+
   <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-    <StackPanel Orientation="Vertical">
+    <StackPanel Orientation="Vertical" Padding="5">
       <Grid>
         <controls:ImageEx
           Source="{Binding SelectedFaceUri, Mode=OneWay}"
@@ -26,7 +28,7 @@
           </controls:ImageEx.ContextFlyout>
         </controls:ImageEx>
       </Grid>
-      <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Center" FontSize="11"/>
+      <TextBlock Text="{Binding Model.Info.Price, Converter={StaticResource FloatToEuroStringConverter}}" HorizontalAlignment="Center" FontSize="15"/>
     </StackPanel>
   </DataTemplate>
 </ResourceDictionary>

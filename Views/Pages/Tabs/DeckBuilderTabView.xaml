@@ -93,17 +93,17 @@
                 <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
                 <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
+                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
                 <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
                 <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
+                <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Text="Delete"/>
               </MenuFlyout>
             </controls:ImageEx.ContextFlyout>
           </controls:ImageEx>
         </Grid>
         <Grid>
-          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Right" FontSize="11"/>
+          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="{Binding Model.Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
           </StackPanel>

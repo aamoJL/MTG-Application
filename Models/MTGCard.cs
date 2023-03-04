@@ -11,7 +11,7 @@ namespace MTGApplication.Models
   /// <summary>
   /// MTG card model
   /// </summary>
-  public class MTGCard : ObservableObject
+  public partial class MTGCard : ObservableObject
   {
     #region Enums
     public enum RarityTypes
@@ -136,8 +136,10 @@ namespace MTGApplication.Models
     }
 
     protected int count = 1;
+    
+    [ObservableProperty]
+    private MTGCardInfo info;
 
-    public MTGCardInfo Info { get; set; }
     public int Count
     {
       get => count;
