@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
@@ -94,8 +94,80 @@ namespace MTGApplication.ViewModels
 
     public partial class Cardlist : ObservableObject
     {
-      public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, SortMTGProperty sortProp = SortMTGProperty.CMC, SortDirection sortDir = SortDirection.ASC, IO.ClipboardService clipboardService = null)
+      public partial class CardFilters : ObservableObject
       {
+        [ObservableProperty]
+        private string nameText = string.Empty;
+        [ObservableProperty]
+        private string typeText = string.Empty;
+        [ObservableProperty]
+        private bool white = true;
+        [ObservableProperty]
+        private bool blue = true;
+        [ObservableProperty]
+        private bool black = true;
+        [ObservableProperty]
+        private bool red = true;
+        [ObservableProperty]
+        private bool green = true;
+        [ObservableProperty]
+        private bool colorless = true;
+
+        /// <summary>
+        /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
+        /// </summary>
+        public bool FiltersApplied
+        {
+          get
+          {
+            if (string.IsNullOrEmpty(NameText) && string.IsNullOrEmpty(TypeText) && White && Blue && Black && Red && Green && Colorless)
+            {
+              return false;
+            }
+            else { return true; }
+          }
+        }
+
+        /// <summary>
+        /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
+        /// </summary>
+        public bool CardValidation(MTGCardViewModel cardViewModel)
+        {
+          if (cardViewModel.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
+            && cardViewModel.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)
+            && (White || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.W))
+            && (Blue || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.U))
+            && (Black || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.B))
+            && (Red || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.R))
+            && (Green || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.G))
+            && (Colorless || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.C))) { return true; }
+          else { return false; };
+        }
+        /// <summary>
+        /// Reset filter properties to the default values
+        /// </summary>
+        [RelayCommand]
+        public void Reset()
+        {
+          NameText = string.Empty;
+          TypeText = string.Empty;
+          White = true;
+          Blue = true;
+          Black = true;
+          Red = true;
+          Green = true;
+          Colorless = true;
+        }
+      }
+
+      public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, SortMTGProperty sortProp = SortMTGProperty.CMC, SortDirection sortDir = SortDirection.Ascending, IO.ClipboardService clipboardService = default)
+      {
+        CardViewModels = new();
+        FilteredAndSortedCardViewModels = new(CardViewModels, true);
+        FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(sortProp), sortDir));
+        FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(SortMTGProperty.Name), sortDir));
+        Filters = new();
+
         CardDeck = deck;
         ListType = listType;
         Dialogs = dialogs;
@@ -104,86 +176,85 @@ namespace MTGApplication.ViewModels
         SortProperty = sortProp;
         ClipboardService = clipboardService ?? new();
 
+        Filters.PropertyChanged += Filters_PropertyChanged;
         PropertyChanged += Cardlist_PropertyChanged;
+        CardViewModels.CollectionChanged += CardViewModels_CollectionChanged;
         OnPropertyChanged(nameof(CardDeck));
       }
 
+      private void CardViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+      {
+        OnPropertyChanged(nameof(CardlistSize));
+      }
+      private void Filters_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+      {
+        FilterViewModels();
+      }
+      private void CardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+      {
+        switch (e.PropertyName)
+        {
+          case nameof(MTGCardViewModel.Count): OnPropertyChanged(nameof(CardlistSize)); HasUnsavedChanges = true; break;
+          case nameof(MTGCardViewModel.Price): OnPropertyChanged(nameof(EuroPrice)); HasUnsavedChanges = true; break;
+          default: break;
+        }
+      }
       private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
       {
-        if (e.PropertyName == nameof(CardDeck))
+        switch (e.PropertyName)
         {
-          CardDeck.GetCardlist(ListType).CollectionChanged += Cards_CollectionChanged;
-          CardViewModels.Clear();
-          foreach (var card in CardDeck.GetCardlist(ListType))
-          {
-            card.PropertyChanged += Card_PropertyChanged;
-            CardViewModels.Add(new(card) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand });
-          }
-          OnPropertyChanged(nameof(CardlistSize));
-          SortCardViewModels();
-          HasUnsavedChanges = false;
-        }
-        else if (e.PropertyName == nameof(SortDirection) || e.PropertyName == nameof(SortProperty))
-        {
-          SortCardViewModels();
-        }
-        else if(e.PropertyName == nameof(CardlistSize)) { OnPropertyChanged(nameof(EuroPrice)); }
-      }
-      private void Card_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-      {
-        if (e.PropertyName == nameof(MTGCard.Count))
-        {
-          OnPropertyChanged(nameof(CardlistSize));
-          HasUnsavedChanges = true;
-        }
-        else if(e.PropertyName == nameof(MTGCard.Info))
-        {
-          OnPropertyChanged(nameof(EuroPrice));
-          HasUnsavedChanges = true;
+          case nameof(CardDeck):
+            CardDeck.GetCardlist(ListType).CollectionChanged += CardModels_CollectionChanged;
+            CardViewModels.Clear();
+            AddCardViewModels(CardDeck.GetCardlist(ListType).ToArray());
+            HasUnsavedChanges = false; break;
+          case nameof(SortDirection):
+          case nameof(SortProperty):
+            FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(sortProperty), sortDirection); break;
+          case nameof(CardlistSize): OnPropertyChanged(nameof(EuroPrice)); break;
+          default: break;
         }
       }
-      private void Cards_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+      private void CardModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
       {
         // Sync models and viewmodels
         switch (e.Action)
         {
-          case NotifyCollectionChangedAction.Add:
-            var addedCard = e.NewItems[0] as MTGCard;
-            CardViewModels.Add(new(addedCard) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand });
-            addedCard.PropertyChanged += Card_PropertyChanged;
-            SortCardViewModels();
-            break;
-          case NotifyCollectionChangedAction.Remove:
-            var removedCard = e.OldItems[0] as MTGCard;
-            CardViewModels.Remove(CardViewModels.FirstOrDefault(x => x.Model == removedCard));
-            removedCard.PropertyChanged -= Card_PropertyChanged;
-            break;
-          case NotifyCollectionChangedAction.Reset:
-            CardViewModels.Clear(); break;
+          case NotifyCollectionChangedAction.Add: AddCardViewModels(e.NewItems[0] as MTGCard); break;
+          case NotifyCollectionChangedAction.Remove: RemoveCardViewModel(e.OldItems[0] as MTGCard); break;
+          case NotifyCollectionChangedAction.Reset: CardViewModels.Clear(); break;
           default: break;
         }
-        OnPropertyChanged(nameof(CardlistSize));
         HasUnsavedChanges = true;
       }
 
-      [ObservableProperty]
-      private bool isBusy;
-      [ObservableProperty]
-      private MTGCardDeck cardDeck;
       [ObservableProperty]
       private SortMTGProperty sortProperty;
       [ObservableProperty]
       private SortDirection sortDirection;
       [ObservableProperty]
       private bool hasUnsavedChanges;
+      [ObservableProperty]
+      private MTGCardDeck cardDeck;
+      [ObservableProperty]
+      private bool isBusy;
 
+      private ObservableCollection<MTGCardViewModel> CardViewModels { get; }
       private IO.ClipboardService ClipboardService { get; }
-      private CardlistType ListType { get; }
       private DeckBuilderViewDialogs Dialogs { get; }
       private ICardAPI<MTGCard> CardAPI { get; }
+      private CardlistType ListType { get; }
 
-      public ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
+      public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
+      public CardFilters Filters { get; }
+      
+      /// <summary>
+      /// Returns total card count of the cardlist cards
+      /// </summary>
       public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
+      /// <summary>
+      /// Returns total euro price of the cardlist cards
+      /// </summary>
       public float EuroPrice => (float)Math.Round(CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count), 0);
 
       /// <summary>
@@ -243,6 +314,56 @@ namespace MTGApplication.ViewModels
         }
       }
 
+      /// <summary>
+      /// Adds given <paramref name="cards"/> to <see cref="CardViewModels"/> list as a <see cref="MTGCardViewModel"/>
+      /// </summary>
+      private void AddCardViewModels(MTGCard[] cards)
+      {
+        foreach (var card in cards)
+        {
+          var vm = new MTGCardViewModel(card) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand };
+          vm.PropertyChanged += CardViewModel_PropertyChanged;
+          CardViewModels.Add(vm);
+        }
+      }
+      /// <summary>
+      /// Adds given <paramref name="card"/> to <see cref="CardViewModels"/> list as a <see cref="MTGCardViewModel"/>
+      /// </summary>
+      private void AddCardViewModels(MTGCard card)
+      {
+        var vm = new MTGCardViewModel(card) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand };
+        vm.PropertyChanged += CardViewModel_PropertyChanged;
+        CardViewModels.Add(vm);
+      }
+      /// <summary>
+      /// Removes given <paramref name="card"/> from the <see cref="CardViewModels"/> list
+      /// </summary>
+      private void RemoveCardViewModel(MTGCard card)
+      {
+        var vm = CardViewModels.FirstOrDefault(x => x.Model == card);
+        if (vm != null)
+        {
+          vm.PropertyChanged -= CardViewModel_PropertyChanged;
+          CardViewModels.Remove(vm);
+        }
+      }
+      /// <summary>
+      /// Filters <see cref="FilteredAndSortedCardViewModels"/> list with the given <paramref name="filterText"/>
+      /// </summary>
+      private void FilterViewModels()
+      {
+        if (Filters.FiltersApplied)
+        {
+          FilteredAndSortedCardViewModels.Filter = x =>
+          {
+            var vm = (MTGCardViewModel)x;
+            return Filters.CardValidation(vm);
+          };
+          FilteredAndSortedCardViewModels.RefreshFilter();
+        }
+        else { FilteredAndSortedCardViewModels.Filter = null; }
+      }
+
       private async Task ExportCards()
       {
         var response = await Dialogs.GetExportDialog(GetExportString()).ShowAsync(App.MainRoot);
@@ -275,30 +396,6 @@ namespace MTGApplication.ViewModels
 
         IsBusy = false;
       }
-      private void SortCardViewModels()
-      {
-        List<MTGCardViewModel> tempList = new();
-        var prop = SortProperty;
-        var dir = SortDirection;
-
-        tempList = prop switch
-        {
-          SortMTGProperty.CMC => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.CMC).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.CMC).ToList(),
-          SortMTGProperty.Name => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Name).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Name).ToList(),
-          SortMTGProperty.Rarity => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.RarityType).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.RarityType).ToList(),
-          SortMTGProperty.Color => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Colors).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Colors).ToList(),
-          SortMTGProperty.Set => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.SetName).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.SetName).ToList(),
-          SortMTGProperty.Count => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Count).ToList() : CardViewModels.OrderByDescending(x => x.Model.Count).ToList(),
-          SortMTGProperty.Price => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.Price).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.Price).ToList(),
-          SortMTGProperty.Type => dir == SortDirection.ASC ? CardViewModels.OrderBy(x => x.Model.Info.SpellTypes[0]).ToList() : CardViewModels.OrderByDescending(x => x.Model.Info.SpellTypes[0]).ToList(),
-          _ => throw new NotImplementedException(),
-        };
-
-        for (int i = 0; i < tempList.Count; i++)
-        {
-          CardViewModels.Move(CardViewModels.IndexOf(tempList[i]), i);
-        }
-      }
       public string GetExportString()
       {
         StringBuilder stringBuilder = new();
@@ -309,7 +406,6 @@ namespace MTGApplication.ViewModels
 
         return stringBuilder.ToString();
       }
-
     }
 
     public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckRepository, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
@@ -330,7 +426,7 @@ namespace MTGApplication.ViewModels
       WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
       MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
 
-      SelectedSortDirection = SortDirection.ASC;
+      SelectedSortDirection = SortDirection.Ascending;
       SelectedSortProperty = SortMTGProperty.CMC;
       UpdateCharts();
     }
@@ -508,10 +604,8 @@ namespace MTGApplication.ViewModels
       }
     }
 
-    #region CanExecuteCommand Methods
     private bool CanExecuteSaveDeckDialogCommand() => DeckCards.CardlistSize > 0;
     private bool CanExecuteDeleteDeckDialogCommand() => !string.IsNullOrEmpty(CardDeck.Name);
-    #endregion
 
     private async Task NewDeck()
     {

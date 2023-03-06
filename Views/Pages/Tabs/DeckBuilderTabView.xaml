@@ -267,7 +267,7 @@
                     Grid.Row="1"
                     x:Name="DeckMaybeDisplay"
                     DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
-                    ItemsSource="{Binding CardViewModels}"
+                    ItemsSource="{Binding FilteredAndSortedCardViewModels}"
                     Style="{StaticResource MTGListViewStyle}"
                     SelectionMode="Single"
                     CanDragItems="True"
@@ -289,7 +289,7 @@
                     Grid.Row="3"
                     x:Name="DeckWishlistDisplay"
                     DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
-                    ItemsSource="{Binding CardViewModels}"
+                    ItemsSource="{Binding FilteredAndSortedCardViewModels}"
                     Style="{StaticResource MTGListViewStyle}"
                     SelectionMode="Single"
                     CanDragItems="True"
@@ -381,11 +381,11 @@
                     </MenuFlyout>
                   </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarButton Icon="Sort" ToolTipService.ToolTip="Order" Label="Sort" AutomationProperties.Name="Order">
+                <AppBarButton Icon="Sort" Label="Sort" AutomationProperties.Name="Order">
                   <AppBarButton.Flyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Asc" GroupName="DirectionGroup" IsChecked="True"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Desc" GroupName="DirectionGroup" />
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Descending" GroupName="DirectionGroup" />
                       <MenuFlyoutSeparator/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup" IsChecked="True"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup"/>
@@ -398,8 +398,29 @@
                     </MenuFlyout>
                   </AppBarButton.Flyout>
                 </AppBarButton>
+                <AppBarButton Icon="Filter" Label="Filter" AllowFocusOnInteraction="True">
+                  <AppBarButton.Flyout>
+                    <Flyout AreOpenCloseAnimationsEnabled="False">
+                      <StackPanel Orientation="Vertical" Spacing="10">
+                        <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ResetCommand}"/>
+                        <TextBox Text="{x:Bind DeckBuilderViewModel.DeckCards.Filters.NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter name..."/>
+                        <TextBox Text="{x:Bind DeckBuilderViewModel.DeckCards.Filters.TypeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter type..."/>
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                          <ToggleButton Content="W" ToolTipService.ToolTip="White" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.White, Mode=TwoWay}"/>
+                          <ToggleButton Content="U" ToolTipService.ToolTip="Blue" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Blue, Mode=TwoWay}"/>
+                          <ToggleButton Content="B" ToolTipService.ToolTip="Black" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Black, Mode=TwoWay}"/>
+                          <ToggleButton Content="R" ToolTipService.ToolTip="Red" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Red, Mode=TwoWay}"/>
+                          <ToggleButton Content="G" ToolTipService.ToolTip="Green" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Green, Mode=TwoWay}"/>
+                          <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Colorless, Mode=TwoWay}"/>
+                        </StackPanel>
+                      </StackPanel>
+                    </Flyout>
+                  </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarElementContainer VerticalAlignment="Center">
+                  <ProgressRing IsActive="{x:Bind Path=DeckBuilderViewModel.IsBusy, Mode=OneWay}" Margin="5 0 5 0"/>
+                </AppBarElementContainer>
               </CommandBar>
-              <ProgressRing IsActive="{x:Bind Path=DeckBuilderViewModel.IsBusy, Mode=OneWay}"/>
             </StackPanel>
             <!--Info-->
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
@@ -413,7 +434,7 @@
               x:Name="DeckImagesDisplay"
               Style="{StaticResource MTGAdaptiveGridViewStyle}"
               DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
-              ItemsSource="{Binding CardViewModels}"
+              ItemsSource="{Binding FilteredAndSortedCardViewModels}"
               DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
               SelectionMode="None"
               Visibility="Collapsed"
@@ -428,7 +449,7 @@
               x:Name="DeckListDisplay"
               Style="{StaticResource MTGListViewStyle}"
               DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
-              ItemsSource="{Binding CardViewModels}"
+              ItemsSource="{Binding FilteredAndSortedCardViewModels}"
               SelectionMode="Single"
               Visibility="Collapsed"
               CanDragItems="True"
