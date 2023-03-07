@@ -25,6 +25,9 @@ namespace MTGApplication.Models
     public ObservableCollection<MTGCard> Wishlist { get; set; } = new();
     public ObservableCollection<MTGCard> Maybelist { get; set; } = new();
 
+    /// <summary>
+    /// Returns the cardlist that is associated with the given <paramref name="listType"/>
+    /// </summary>
     public ObservableCollection<MTGCard> GetCardlist(CardlistType listType)
     {
       return listType switch
@@ -59,6 +62,10 @@ namespace MTGApplication.Models
         collection.Add(card);
       }
     }
+    
+    /// <summary>
+    /// Removes <paramref name="card"/> from the cardlist that is assiciated with the <paramref name="listType"/>
+    /// </summary>
     public void RemoveFromCardlist(CardlistType listType, MTGCard card)
     {
       ObservableCollection<MTGCard> collection = GetCardlist(listType);

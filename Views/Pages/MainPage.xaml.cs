@@ -10,7 +10,7 @@ namespace MTGApplication.Pages
     /// </summary>
     public sealed partial class MainPage : Page
   {
-    private readonly int notificationDuration = 4000;
+    private readonly int notificationDuration = 5000;
     
     public MainPage()
     {

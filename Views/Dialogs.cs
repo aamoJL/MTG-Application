@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.IO;
 using CommunityToolkit.WinUI.UI.Controls;
 using MTGApplication.Interfaces;
+using Windows.ApplicationModel.Calls;
+using System.Data.SqlTypes;
 
 namespace MTGApplication.Views
 {
@@ -123,6 +125,53 @@ namespace MTGApplication.Views
       }
     }
 
+    public class CheckBoxDialog : DialogBase<(bool? answer, bool? isChecked)>, IInputDialog<bool?>
+    {
+      protected CheckBox checkBox;
+
+      public string Message = string.Empty;
+      public string InputText { get; set; } = string.Empty;
+      public bool InputDefaultValue { get; set; } = false;
+
+      public CheckBoxDialog(string title) : base(title) { }
+
+      protected virtual CheckBox CreateCheckBox()
+      {
+        return new CheckBox
+        {
+          IsChecked = InputDefaultValue,
+          Content = InputText,
+        };
+      }
+
+      protected override IDialogWrapper CreateDialog(FrameworkElement root)
+      {
+        var dialog = base.CreateDialog(root);
+        checkBox = CreateCheckBox();
+        dialog.Dialog.Content = new StackPanel() 
+        { 
+          Orientation = Orientation.Vertical,
+          Children =
+          {
+            new TextBlock() { Text = Message },
+            checkBox
+          }
+        };
+        return dialog;
+      }
+
+      protected override (bool? answer, bool? isChecked) ProcessResult(ContentDialogResult result)
+      {
+        return result switch
+        {
+          ContentDialogResult.Primary => (answer: true, isChecked: GetInputValue()),
+          _ => (answer: null, isChecked: GetInputValue()),
+        };
+      }
+
+      public virtual bool? GetInputValue() => checkBox.IsChecked;
+    }
+
     /// <summary>
     /// Dialog with a textbox input
     /// </summary>
@@ -156,9 +205,7 @@ namespace MTGApplication.Views
       protected override IDialogWrapper CreateDialog(FrameworkElement root)
       {
         var dialog = base.CreateDialog(root);
-
         textBox = CreateTextBox();
-
         dialog.Dialog.Content = textBox;
 
         if (InvalidInputCharacters.Length > 0)

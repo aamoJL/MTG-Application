@@ -22,22 +22,41 @@ namespace MTGApplication.ViewModels
     public class DeckBuilderViewDialogs
     {
       #region Dialogs
+      public virtual CheckBoxDialog MultipleCardsAlreadyInDeckDialog { protected get; init; } = new CheckBoxDialog("Card already in the deck");
+      public virtual ConfirmationDialog CardAlreadyInDeckDialog { protected get; init; } = new ConfirmationDialog("Card already in the deck");
       public virtual ConfirmationDialog SaveUnsavedDialog { protected get; init; } = new ConfirmationDialog("Save unsaved changes?");
       public virtual ConfirmationDialog OverrideDialog { protected get; init; } = new ConfirmationDialog("Override existing deck?");
       public virtual ConfirmationDialog DeleteDialog { protected get; init; } = new ConfirmationDialog("Delete deck?");
-      public virtual TextBoxDialog SaveDialog { protected get; init; } = new TextBoxDialog("Save your deck?");
-      public virtual ComboBoxDialog LoadDialog { protected get; init; } = new ComboBoxDialog("Open deck");
+      public virtual GridViewDialog CardPrintDialog { protected get; init; } = new GridViewDialog("Change card print");
       public virtual TextAreaDialog ImportDialog { protected get; init; } = new TextAreaDialog("Import cards");
       public virtual TextAreaDialog ExportDialog { protected get; init; } = new TextAreaDialog("Export deck");
-      public virtual GridViewDialog CardPrintDialog { protected get; init; } = new GridViewDialog("Change card print");
+      public virtual TextBoxDialog SaveDialog { protected get; init; } = new TextBoxDialog("Save your deck?");
+      public virtual ComboBoxDialog LoadDialog { protected get; init; } = new ComboBoxDialog("Open deck");
       #endregion
 
       #region Getters
-      public ConfirmationDialog GetSaveUnsavedDialog()
+      public GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       {
-        SaveUnsavedDialog.Message = "Would you like to save unsaved changes?";
-        SaveUnsavedDialog.PrimaryButtonText = "Save";
-        return SaveUnsavedDialog;
+        CardPrintDialog.Items = printViewModels;
+        CardPrintDialog.SecondaryButtonText = string.Empty;
+        CardPrintDialog.GridViewStyleName = "MTGAdaptiveGridViewStyle";
+        CardPrintDialog.ItemTemplateName = "MTGPrintGridViewItemTemplate";
+        return CardPrintDialog;
+      }
+      public CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
+      {
+        MultipleCardsAlreadyInDeckDialog.SecondaryButtonText = string.Empty;
+        MultipleCardsAlreadyInDeckDialog.Message = $"Card '{name}' is already in the deck. Do you still want to add it?";
+        MultipleCardsAlreadyInDeckDialog.CloseButtonText = "No";
+        MultipleCardsAlreadyInDeckDialog.InputText = "Same for all cards.";
+        return MultipleCardsAlreadyInDeckDialog;
+      }
+      public ConfirmationDialog GetCardAlreadyInDeckDialog(string name)
+      {
+        CardAlreadyInDeckDialog.SecondaryButtonText = string.Empty;
+        CardAlreadyInDeckDialog.Message = $"Card '{name}' is already in the deck. Do you still want to add it?";
+        CardAlreadyInDeckDialog.CloseButtonText = "No";
+        return CardAlreadyInDeckDialog;
       }
       public ConfirmationDialog GetOverrideDialog(string name)
       {
@@ -51,14 +70,6 @@ namespace MTGApplication.ViewModels
         DeleteDialog.Message = $"Are you sure you want to delete '{name}'?";
         return DeleteDialog;
       }
-      public TextBoxDialog GetSaveDialog(string name)
-      {
-        SaveDialog.PrimaryButtonText = "Save";
-        SaveDialog.SecondaryButtonText = string.Empty;
-        SaveDialog.InvalidInputCharacters = Path.GetInvalidFileNameChars();
-        SaveDialog.InputDefaultText = name;
-        return SaveDialog;
-      }
       public ComboBoxDialog GetLoadDialog(string[] names)
       {
         LoadDialog.PrimaryButtonText = "Open";
@@ -67,13 +78,6 @@ namespace MTGApplication.ViewModels
         LoadDialog.Items = names;
         return LoadDialog;
       }
-      public TextAreaDialog GetImportDialog()
-      {
-        ImportDialog.InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby";
-        ImportDialog.SecondaryButtonText = string.Empty;
-        ImportDialog.PrimaryButtonText = "Add to Collection";
-        return ImportDialog;
-      }
       public TextAreaDialog GetExportDialog(string text)
       {
         ExportDialog.PrimaryButtonText = "Copy to Clipboard";
@@ -81,13 +85,26 @@ namespace MTGApplication.ViewModels
         ExportDialog.InputDefaultText = text;
         return ExportDialog;
       }
-      public GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      public ConfirmationDialog GetSaveUnsavedDialog()
       {
-        CardPrintDialog.Items = printViewModels;
-        CardPrintDialog.SecondaryButtonText = string.Empty;
-        CardPrintDialog.GridViewStyleName = "MTGAdaptiveGridViewStyle";
-        CardPrintDialog.ItemTemplateName = "MTGPrintGridViewItemTemplate";
-        return CardPrintDialog;
+        SaveUnsavedDialog.Message = "Would you like to save unsaved changes?";
+        SaveUnsavedDialog.PrimaryButtonText = "Save";
+        return SaveUnsavedDialog;
+      }
+      public TextBoxDialog GetSaveDialog(string name)
+      {
+        SaveDialog.PrimaryButtonText = "Save";
+        SaveDialog.SecondaryButtonText = string.Empty;
+        SaveDialog.InvalidInputCharacters = Path.GetInvalidFileNameChars();
+        SaveDialog.InputDefaultText = name;
+        return SaveDialog;
+      }
+      public TextAreaDialog GetImportDialog()
+      {
+        ImportDialog.InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby";
+        ImportDialog.SecondaryButtonText = string.Empty;
+        ImportDialog.PrimaryButtonText = "Add to Collection";
+        return ImportDialog;
       }
       #endregion
     }
@@ -280,9 +297,16 @@ namespace MTGApplication.ViewModels
       /// Adds given card to the deck cardlist
       /// </summary>
       [RelayCommand]
-      public void AddToCardlist(MTGCard card)
+      public async Task AddToCardlist(MTGCard card)
       {
-        CardDeck.AddToCardlist(ListType, card);
+        if(CardDeck.GetCardlist(ListType).FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
+        {
+          if((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync(App.MainRoot)) is true)
+          {
+            CardDeck.AddToCardlist(ListType, card);
+          }
+        }
+        else { CardDeck.AddToCardlist(ListType, card); }
       }
       /// <summary>
       /// Removes given card from the deck cardlist
@@ -312,6 +336,50 @@ namespace MTGApplication.ViewModels
             cardlist[index].Info = newPrint.Model.Info;
           }
         }
+      }
+      /// <summary>
+      /// Imports cards from the card API using the <paramref name="importText"/>
+      /// Shows a dialog that asks the user if they want to skip already existing cards.
+      /// </summary>
+      [RelayCommand]
+      public async Task ImportCards(string importText)
+      {
+        var notFoundCount = 0;
+        var found = Array.Empty<MTGCard>();
+        var notImportedCount = 0;
+
+        if (!string.IsNullOrEmpty(importText))
+        {
+          IsBusy = true;
+          bool? import = true;
+          bool? skipDialog = false;
+          (found, notFoundCount) = await CardAPI.FetchFromString(importText);
+          foreach (var card in found)
+          {
+            if (CardDeck.GetCardlist(ListType).FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
+            {
+              // Card exist in the deck, ask if want to import, unless user has checked the dialog skip checkbox in the dialog
+              if (skipDialog is not true)
+              {
+                (import, skipDialog) = await Dialogs.GetMultipleCardsAlreadyInDeckDialog(card.Info.Name).ShowAsync(App.MainRoot);
+              }
+
+              if (import is true) { CardDeck.AddToCardlist(ListType, card); }
+              else { notImportedCount++; }
+            }
+            else { CardDeck.AddToCardlist(ListType, card); }
+          }
+        }
+
+        if (notFoundCount == 0 && found.Length > 0)
+          Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+        else if(found.Length > 0 && notFoundCount > 0)
+          Notifications.RaiseNotification(Notifications.NotificationType.Warning,
+            $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+        else if (found.Length == 0)
+          Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
+
+        IsBusy = false;
       }
 
       /// <summary>
@@ -371,30 +439,6 @@ namespace MTGApplication.ViewModels
         {
           ClipboardService.Copy(response);
         }
-      }
-      public async Task ImportCards(string importText)
-      {
-        var notFoundCount = 0;
-        var found = Array.Empty<MTGCard>();
-
-        if (!string.IsNullOrEmpty(importText))
-        {
-          IsBusy = true;
-          (found, notFoundCount) = await CardAPI.FetchFromString(importText);
-          foreach (var card in found)
-          {
-            CardDeck.AddToCardlist(ListType, card);
-          }
-        }
-
-        if (notFoundCount == 0 && found.Length > 0)
-          Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{notFoundCount + found.Length} cards imported successfully.");
-        else if(found.Length > 0 && notFoundCount > 0)
-          Notifications.RaiseNotification(Notifications.NotificationType.Warning, $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found.");
-        else if (found.Length == 0)
-          Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
-
-        IsBusy = false;
       }
       public string GetExportString()
       {
