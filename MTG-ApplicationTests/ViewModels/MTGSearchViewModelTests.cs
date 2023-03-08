@@ -28,7 +28,7 @@ namespace MTGApplicationTests.ViewModels
 
       vm.SearchQuery = string.Empty;
       await vm.SearchSubmit();
-      Assert.IsTrue(vm.TotalCardCount == 0);
+      Assert.AreEqual(0, vm.TotalCardCount);
     }
   }
 }

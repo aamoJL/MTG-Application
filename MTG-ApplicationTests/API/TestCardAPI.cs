@@ -16,6 +16,8 @@ namespace MTGApplicationTests.API
     public MTGCard[]? ExpectedCards { get; set; }
     public int NotFoundCount { get; set; }
 
+    public int PageSize => 40;
+
     public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue)
     {
       return await FetchCardsWithParameters(uri, countLimit);
@@ -41,6 +43,12 @@ namespace MTGApplicationTests.API
     {
       return await Task.Run(() => (ExpectedCards ?? Array.Empty<MTGCard>(), NotFoundCount));
     }
+    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri)
+    {
+      var cards = string.IsNullOrEmpty(pageUri) ? Array.Empty<MTGCard>() : ExpectedCards ?? Array.Empty<MTGCard>();
+      return await Task.Run(() => (cards,  string.Empty, cards.Length));
+    }
+    public string GetSearchUri(string searchParams) => searchParams;
   }
 
   [TestClass]

@@ -24,6 +24,17 @@ namespace MTGApplicationTests.API
     }
 
     [TestMethod]
+    public async Task FetchCardsTest_Empty()
+    {
+      var api = new ScryfallAPI();
+      string searchQuery = "";
+
+      var fetchedCards = await api.FetchCardsWithParameters(searchQuery);
+
+      Assert.AreEqual(0, fetchedCards.Length);
+    }
+
+    [TestMethod]
     public async Task FetchFromStringTest()
     {
       var api = new ScryfallAPI();
@@ -46,7 +57,8 @@ namespace MTGApplicationTests.API
     [TestMethod]
     public void FetchScryfallJsonObjectTest()
     {
-      string searchUri = GetSearchUri("asd");
+      var api = new ScryfallAPI();
+      string searchUri = api.GetSearchUri("asd");
 
       Assert.IsNotNull(FetchScryfallJsonObject(searchUri));
     }
@@ -69,7 +81,40 @@ namespace MTGApplicationTests.API
       Assert.AreEqual(cards[2].Info.Name, Found[2].Info.Name);
     }
 
+    [TestMethod]
+    public async Task FetchCardsFromPageTest_Empty()
+    {
+      var api = new ScryfallAPI();
+      string pageUri = "";
+      var (cards, nextPageUri, totalCount) = await api.FetchCardsFromPage(pageUri);
+
+      Assert.AreEqual(0, totalCount);
+      Assert.AreEqual(0, cards.Length);
+      Assert.AreEqual(string.Empty, nextPageUri);
+    }
+
+    [TestMethod]
+    public async Task FetchCardsFromPageTest()
+    {
+      var api = new ScryfallAPI();
+      string pageUri = 
+        "https://api.scryfall.com/cards/search?dir=asc&format=json&include_extras=false&include_multilingual=false&include_variations=false&order=released&page=2&q=set%3Aneo+unique%3Acards+order%3Areleased+direction%3Aasc+format%3Aany+game%3Apaper&unique=cards";
+      var (cards, nextPageUri, totalCount) = await api.FetchCardsFromPage(pageUri);
+
+      Assert.IsTrue(totalCount > 0);
+      Assert.IsTrue(cards.Length > 0);
+      Assert.AreEqual(string.Empty, nextPageUri);
+    }
+
+    [TestMethod]
+    public void GetSearchUriTest_Empty()
+    {
+      var api = new ScryfallAPI();
+      Assert.AreEqual(string.Empty, api.GetSearchUri(""));
+    }
+
     #region Identifier
+    
     [TestMethod]
     public void ScryfallIdentifier_ToObjectTest_ID()
     {
@@ -153,6 +198,7 @@ namespace MTGApplicationTests.API
 
       Assert.AreEqual(expected, result);
     }
+    
     #endregion
   }
 }

@@ -58,7 +58,7 @@
     </DataTemplate>
     <!--Deck-->
     <DataTemplate x:Key="DeckImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="10">
+      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
         <Grid>
           <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
             <controls:ImageEx.ContextFlyout>
@@ -77,7 +77,7 @@
           </controls:ImageEx>
         </Grid>
         <Grid>
-          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11"/>
+          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11" Padding="0 0 5 0"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="{Binding Model.Count}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
           </StackPanel>
@@ -211,7 +211,10 @@
                 </CommandBar>
                 <ProgressRing IsActive="{x:Bind SearchViewModel.IsBusy, Mode=OneWay}"/>
               </StackPanel>
-              <TextBlock Text="{x:Bind sys:String.Format('{0} cards', SearchViewModel.TotalCardCount), Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+              <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Run Text="{x:Bind sys:String.Format('{0} /', SearchViewModel.SearchCards.Count), Mode=OneWay}"/>
+                <Run Text="{x:Bind sys:String.Format('{0} cards', SearchViewModel.TotalCardCount), Mode=OneWay}"/>
+              </TextBlock>
             </Grid>
             <!--Scryfall Card view-->
             <Grid controls:DockPanel.Dock="Top">
@@ -225,7 +228,7 @@
                 Visibility="Collapsed"
                 CanDragItems="True"
                 DragItemsStarting="CardView_DragItemsStarting"
-                ItemTemplate="{StaticResource SearchImageViewItemTemplate}" />
+                ItemTemplate="{StaticResource SearchImageViewItemTemplate}"/>
               <!--List view-->
               <ListView
                 x:Name="CardSearchListDisplay"
@@ -235,7 +238,7 @@
                 Visibility="Collapsed"
                 CanDragItems="True"
                 DragItemsStarting="CardView_DragItemsStarting"
-                ItemTemplate="{StaticResource SearchListViewItemTemplate}" />
+                ItemTemplate="{StaticResource SearchListViewItemTemplate}"/>
             </Grid>
           </controls:DockPanel>
         </controls:DockPanel>

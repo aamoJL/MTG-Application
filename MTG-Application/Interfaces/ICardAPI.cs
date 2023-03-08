@@ -11,10 +11,23 @@ namespace MTGApplication.Interfaces
   /// <typeparam name="T">Card type</typeparam>
   public interface ICardAPI<T>
   {
+    public int PageSize { get; }
+
+    // TODO: Result class that contains found cards, next page, not found cards etc.
+    /// <summary>
+    /// Converts <paramref name="searchParams"/> to API search uri
+    /// </summary>
+    public string GetSearchUri(string searchParams);
+
     /// <summary>
     /// Fetch cards from the API using API search parameters
     /// </summary>
     public Task<T[]> FetchCardsWithParameters(string searchParams, int countLimit = int.MaxValue);
+
+    /// <summary>
+    /// Fetches cards from the given <paramref name="pageUri"/>
+    /// </summary>
+    public Task<(T[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri);
 
     /// <summary>
     /// Fetch cards from the API using API search uri
