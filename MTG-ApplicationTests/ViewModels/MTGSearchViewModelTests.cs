@@ -1,0 +1,34 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Models;
+using MTGApplication.ViewModels;
+using MTGApplicationTests.API;
+using MTGApplicationTests.Services;
+
+namespace MTGApplicationTests.ViewModels
+{
+  [TestClass]
+  public partial class MTGSearchViewModelTests
+  {
+    [TestMethod]
+    public async Task SearchSubmitCommandTest()
+    {
+      MTGSearchViewModel vm = new(new TestCardAPI()
+      {
+        ExpectedCards = new MTGCard[]
+        {
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First"),
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Seconds"),
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
+        }
+      });
+
+      vm.SearchQuery = "NotEmpty";
+      await vm.SearchSubmit();
+      Assert.IsTrue(vm.TotalCardCount > 0);
+
+      vm.SearchQuery = string.Empty;
+      await vm.SearchSubmit();
+      Assert.IsTrue(vm.TotalCardCount == 0);
+    }
+  }
+}

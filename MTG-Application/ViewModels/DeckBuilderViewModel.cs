@@ -504,6 +504,7 @@ namespace MTGApplication.ViewModels
     private MTGCardDeck cardDeck = new();
 
     private IDeckRepository<MTGCardDeck> DeckRepository { get; }
+    private DeckBuilderViewDialogs Dialogs { get; }
     private ICardAPI<MTGCard> CardAPI { get; }
     private MTGCardDeck CardDeck
     {
@@ -514,7 +515,6 @@ namespace MTGApplication.ViewModels
         OnPropertyChanged(nameof(CardDeck));
       }
     }
-    private DeckBuilderViewDialogs Dialogs { get; }
 
     [ObservableProperty]
     private bool isBusy;
