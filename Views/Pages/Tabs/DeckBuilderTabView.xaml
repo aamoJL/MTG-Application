@@ -57,6 +57,33 @@
       </StackPanel>
     </DataTemplate>
     <!--Deck-->
+    <DataTemplate x:Key="DeckImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
+      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="10">
+        <Grid>
+          <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
+            <controls:ImageEx.ContextFlyout>
+              <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+                <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
+                <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
+                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
+                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Text="Delete"/>
+              </MenuFlyout>
+            </controls:ImageEx.ContextFlyout>
+          </controls:ImageEx>
+        </Grid>
+        <Grid>
+          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="{Binding Model.Count}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </DataTemplate>
     <DataTemplate x:Key="DeckListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel 
         Style="{StaticResource MTGListViewItemStyle}"
@@ -81,33 +108,6 @@
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine}" Width="250"/>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
-      </StackPanel>
-    </DataTemplate>
-    <DataTemplate x:Key="DeckImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical">
-        <Grid>
-          <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
-            <controls:ImageEx.ContextFlyout>
-              <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
-                <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
-                <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
-                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Text="Delete"/>
-              </MenuFlyout>
-            </controls:ImageEx.ContextFlyout>
-          </controls:ImageEx>
-        </Grid>
-        <Grid>
-          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11"/>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="{Binding Model.Count}" Margin="20 5 20 10" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
-          </StackPanel>
-        </Grid>
       </StackPanel>
     </DataTemplate>
   </UserControl.Resources>
@@ -276,7 +276,9 @@
                     Drop="CardView_Drop"
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted" 
-                    ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
+                    ItemTemplate="{StaticResource DeckListViewItemTemplate}"
+                    KeyDown="CardView_KeyDown"
+                    LosingFocus="CardView_LosingFocus"/>
                   <TextBlock Grid.Row="2" Text="Wishlist">
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False">
@@ -298,7 +300,9 @@
                     Drop="CardView_Drop"
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted"
-                    ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
+                    ItemTemplate="{StaticResource DeckListViewItemTemplate}"
+                    KeyDown="CardView_KeyDown"
+                    LosingFocus="CardView_LosingFocus"/>
                 </Grid>
               </TabViewItem>
               <TabViewItem Header="Info" IsClosable="False">
@@ -436,7 +440,7 @@
               DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
               ItemsSource="{Binding FilteredAndSortedCardViewModels}"
               DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
-              SelectionMode="None"
+              SelectionMode="Single"
               Visibility="Collapsed"
               CanDragItems="True"
               AllowDrop="True"
@@ -444,7 +448,9 @@
               Drop="CardView_Drop"
               DragItemsStarting="CardView_DragItemsStarting"
               DragItemsCompleted="CardView_DragItemsCompleted" 
-              ItemTemplate="{StaticResource DeckImageViewItemTemplate}"/>
+              ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
+              KeyDown="CardView_KeyDown"
+              LosingFocus="CardView_LosingFocus"/>
             <ListView
               x:Name="DeckListDisplay"
               Style="{StaticResource MTGListViewStyle}"
@@ -458,7 +464,9 @@
               Drop="CardView_Drop"
               DragItemsStarting="CardView_DragItemsStarting"
               DragItemsCompleted="CardView_DragItemsCompleted" 
-              ItemTemplate="{StaticResource DeckListViewItemTemplate}"/>
+              ItemTemplate="{StaticResource DeckListViewItemTemplate}"
+              KeyDown="CardView_KeyDown"
+              LosingFocus="CardView_LosingFocus"/>
           </Grid>
         </controls:DockPanel>
       </Grid>

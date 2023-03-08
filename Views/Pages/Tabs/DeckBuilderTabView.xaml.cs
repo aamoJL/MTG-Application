@@ -12,6 +12,7 @@ using System.Text.Json;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.API;
 using MTGApplication.Database.Repositories;
+using CommunityToolkit.WinUI.UI;
 
 namespace MTGApplication.Views
 {
@@ -29,7 +30,7 @@ namespace MTGApplication.Views
       if (DeckBuilderViewModel.HasUnsavedChanges)
       {
         args.Handled = true;
-        if(await DeckBuilderViewModel.ShowUnsavedDialogs())
+        if (await DeckBuilderViewModel.ShowUnsavedDialogs())
         {
           // UnsavedChanges needs to be set to false, otherwise the window would not close
           // until the used saves the deck.
@@ -138,7 +139,7 @@ namespace MTGApplication.Views
           else
           {
             // Try to import from EDHREC URL
-            if(Uri.TryCreate(data, UriKind.Absolute, out Uri uri) && uri.Host == "edhrec.com")
+            if (Uri.TryCreate(data, UriKind.Absolute, out Uri uri) && uri.Host == "edhrec.com")
             {
               var cardName = uri.Segments[^1];
               await cardlist.ImportCards(cardName);
@@ -168,5 +169,17 @@ namespace MTGApplication.Views
       draggedElement = null;
     }
     #endregion
+
+    private void CardView_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+      if (e.Key == Windows.System.VirtualKey.Delete && sender is ListViewBase element && element.SelectedItem is MTGCardViewModel cardVM)
+      {
+        if (cardVM.DeleteCardCommand.CanExecute(null)) { cardVM.DeleteCardCommand.Execute(cardVM.Model); }
+      }
+    }
+    private void CardView_LosingFocus(object sender, RoutedEventArgs e)
+    {
+      if(sender is ListViewBase element) { element.DeselectAll(); }
+    }
   }
 }
