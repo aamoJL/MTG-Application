@@ -280,7 +280,7 @@ namespace MTGApplicationTests.ViewModels
       await repo.Add(dbDeck);
 
       vm.SelectedSortDirection = SortDirection.Ascending;
-      vm.SelectedSortProperty = SortMTGProperty.CMC;
+      vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;
       var sortedDbCards = dbDeck.DeckCards.OrderBy(x => x.Info.CMC);
 
       await vm.LoadDeckDialog();
@@ -633,7 +633,7 @@ namespace MTGApplicationTests.ViewModels
       var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1);
       var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3);
 
-      vm.SelectedSortProperty = SortMTGProperty.CMC;
+      vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;
       vm.SelectedSortDirection = SortDirection.Ascending;
       await vm.DeckCards.AddToCardlist(secondCard);
       await vm.DeckCards.AddToCardlist(thirdCard);
@@ -641,13 +641,35 @@ namespace MTGApplicationTests.ViewModels
       // The viewmodels should be sorted when cards are added to the deck
       CollectionAssert.AreEqual(new[] { secondCard, firstCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
-      vm.SortByProperty(SortMTGProperty.Name.ToString());
+      vm.SetPrimarySortProperty(MTGSortProperty.Name.ToString());
       CollectionAssert.AreEqual(new[] { firstCard, secondCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
       vm.SortByDirection(SortDirection.Descending.ToString());
       CollectionAssert.AreEqual(new[] { thirdCard, secondCard, firstCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
     }
-    
+
+    [TestMethod]
+    public async Task SortDeckCommandTest_SecondaryProperty()
+    {
+      DeckBuilderViewModel vm = new(null, null);
+
+      var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[]{ ColorTypes.W }));
+      var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
+      var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
+
+      vm.SelectedPrimarySortProperty = MTGSortProperty.Color;
+      vm.SelectedSecondarySortProperty = MTGSortProperty.Name;
+      vm.SelectedSortDirection = SortDirection.Ascending;
+      await vm.DeckCards.AddToCardlist(secondCard);
+      await vm.DeckCards.AddToCardlist(thirdCard);
+      await vm.DeckCards.AddToCardlist(firstCard);
+      // The viewmodels should be sorted by name when added, because they are the same color
+      CollectionAssert.AreEqual(new[] { firstCard, secondCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+
+      vm.SetSecondarySortProperty(MTGSortProperty.CMC.ToString());
+      CollectionAssert.AreEqual(new[] { secondCard, firstCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+    }
+
     [TestMethod]
     public async Task DeckFilterTest()
     {

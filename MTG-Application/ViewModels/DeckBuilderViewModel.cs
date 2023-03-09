@@ -177,20 +177,18 @@ namespace MTGApplication.ViewModels
         }
       }
 
-      public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, SortMTGProperty sortProp = SortMTGProperty.CMC, SortDirection sortDir = SortDirection.Ascending, IO.ClipboardService clipboardService = default)
+      public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IO.ClipboardService clipboardService = default)
       {
         CardViewModels = new();
         FilteredAndSortedCardViewModels = new(CardViewModels, true);
-        FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(sortProp), sortDir));
-        FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(SortMTGProperty.Name), sortDir));
+        FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(primarySortProperty), sortDirection));
+        FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(secondarySortProperty), sortDirection));
         Filters = new();
 
         CardDeck = deck;
         ListType = listType;
         Dialogs = dialogs;
         CardAPI = cardAPI;
-        SortDirection = sortDir;
-        SortProperty = sortProp;
         ClipboardService = clipboardService ?? new();
 
         Filters.PropertyChanged += Filters_PropertyChanged;
@@ -226,8 +224,10 @@ namespace MTGApplication.ViewModels
             AddCardViewModels(CardDeck.GetCardlist(ListType).ToArray());
             HasUnsavedChanges = false; break;
           case nameof(SortDirection):
-          case nameof(SortProperty):
-            FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(sortProperty), sortDirection); break;
+          case nameof(PrimarySortProperty):
+          case nameof(SecondarySortProperty):
+            FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(PrimarySortProperty), sortDirection);
+            FilteredAndSortedCardViewModels.SortDescriptions[1] = new SortDescription(MTGCardViewModel.GetPropertyName(SecondarySortProperty), sortDirection); break;
           case nameof(CardlistSize): OnPropertyChanged(nameof(EuroPrice)); break;
           default: break;
         }
@@ -246,9 +246,11 @@ namespace MTGApplication.ViewModels
       }
 
       [ObservableProperty]
-      private SortMTGProperty sortProperty;
+      private MTGSortProperty primarySortProperty = MTGSortProperty.CMC;
       [ObservableProperty]
-      private SortDirection sortDirection;
+      private MTGSortProperty secondarySortProperty = MTGSortProperty.Name;
+      [ObservableProperty]
+      private SortDirection sortDirection = SortDirection.Ascending;
       [ObservableProperty]
       private bool hasUnsavedChanges;
       [ObservableProperty]
@@ -471,7 +473,7 @@ namespace MTGApplication.ViewModels
       MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
 
       SelectedSortDirection = SortDirection.Ascending;
-      SelectedSortProperty = SortMTGProperty.CMC;
+      SelectedPrimarySortProperty = MTGSortProperty.CMC;
       UpdateCharts();
     }
 
@@ -517,27 +519,36 @@ namespace MTGApplication.ViewModels
     }
 
     [ObservableProperty]
-    private bool isBusy;
-    [ObservableProperty]
-    private MTGCMCStackedColumnChart cMCChart;
+    private MTGManaProductionPieChart manaProductionChart;
     [ObservableProperty]
     private MTGSpellTypePieChart spellTypeChart;
     [ObservableProperty]
-    private MTGManaProductionPieChart manaProductionChart;
+    private MTGCMCStackedColumnChart cMCChart;
     [ObservableProperty]
     private MTGColorPieChart colorChart;
+    [ObservableProperty]
+    private bool isBusy;
 
     public Cardlist DeckCards { get; set; }
     public Cardlist WishlistCards { get; set; }
     public Cardlist MaybelistCards { get; set; }
 
-    public SortMTGProperty SelectedSortProperty
+    public MTGSortProperty SelectedPrimarySortProperty
     {
       set
       {
-        DeckCards.SortProperty = value;
-        WishlistCards.SortProperty = value;
-        MaybelistCards.SortProperty = value;
+        DeckCards.PrimarySortProperty = value;
+        WishlistCards.PrimarySortProperty = value;
+        MaybelistCards.PrimarySortProperty = value;
+      }
+    }
+    public MTGSortProperty SelectedSecondarySortProperty
+    {
+      set
+      {
+        DeckCards.SecondarySortProperty = value;
+        WishlistCards.SecondarySortProperty = value;
+        MaybelistCards.SecondarySortProperty = value;
       }
     }
     public SortDirection SelectedSortDirection
@@ -636,15 +647,26 @@ namespace MTGApplication.ViewModels
     }
 
     /// <summary>
-    /// Sorts selected card deck by given property
+    /// Sets <see cref="SelectedPrimarySortProperty"/> to the given property
     /// </summary>
-    /// <param name="prop">Name of the property, NOT case-sensitive</param>
     [RelayCommand]
-    public void SortByProperty(string prop)
+    public void SetPrimarySortProperty(string prop)
     {
-      if (Enum.TryParse(prop, true, out SortMTGProperty sortProperty))
+      if (Enum.TryParse(prop, true, out MTGSortProperty sortProperty))
       {
-        SelectedSortProperty = sortProperty;
+        SelectedPrimarySortProperty = sortProperty;
+      }
+    }
+    
+    /// <summary>
+    /// Sets <see cref="SelectedSecondarySortProperty"/> to the given property
+    /// </summary>
+    [RelayCommand]
+    public void SetSecondarySortProperty(string prop)
+    {
+      if (Enum.TryParse(prop, true, out MTGSortProperty sortProperty))
+      {
+        SelectedSecondarySortProperty = sortProperty;
       }
     }
 

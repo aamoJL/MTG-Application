@@ -115,18 +115,18 @@ namespace MTGApplication.ViewModels
 
     private bool CanExecuteDecreaseCountCommand() => Model.Count > 1;
 
-    public static string GetPropertyName(SortMTGProperty prop)
+    public static string GetPropertyName(MTGSortProperty prop)
     {
       return prop switch
       {
-        SortMTGProperty.CMC => nameof(CMC),
-        SortMTGProperty.Name => nameof(Name),
-        SortMTGProperty.Rarity => nameof(Rarity),
-        SortMTGProperty.Color => nameof(ColorType),
-        SortMTGProperty.Set => nameof(SetName),
-        SortMTGProperty.Count => nameof(Count),
-        SortMTGProperty.Price => nameof(Price),
-        SortMTGProperty.Type => nameof(PrimaryType),
+        MTGSortProperty.CMC => nameof(CMC),
+        MTGSortProperty.Name => nameof(Name),
+        MTGSortProperty.Rarity => nameof(Rarity),
+        MTGSortProperty.Color => nameof(ColorType),
+        MTGSortProperty.Set => nameof(SetName),
+        MTGSortProperty.Count => nameof(Count),
+        MTGSortProperty.Price => nameof(Price),
+        MTGSortProperty.Type => nameof(PrimaryType),
         _ => string.Empty,
       };
     }

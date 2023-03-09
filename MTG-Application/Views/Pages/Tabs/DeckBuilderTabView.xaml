@@ -394,14 +394,17 @@
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Descending" GroupName="DirectionGroup" />
                       <MenuFlyoutSeparator/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="TypeGroup" IsChecked="True"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="TypeGroup"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="TypeGroup"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Type" Text="Type" GroupName="TypeGroup"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="TypeGroup"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="TypeGroup"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="TypeGroup"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByPropertyCommand}" CommandParameter="Price" Text="Price" GroupName="TypeGroup"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Type" Text="Type" GroupName="PrimaryDeckSortProperty"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>
+                      <MenuFlyoutSeparator />
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
                     </MenuFlyout>
                   </AppBarButton.Flyout>
                 </AppBarButton>
