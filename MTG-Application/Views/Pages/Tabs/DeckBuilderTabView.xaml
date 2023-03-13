@@ -262,7 +262,10 @@
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                         <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" Text="Export..."/>
+                        <MenuFlyoutSubItem Text="Export...">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                        </MenuFlyoutSubItem>
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
@@ -286,7 +289,10 @@
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                         <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" Text="Export..."/>
+                        <MenuFlyoutSubItem Text="Export...">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                        </MenuFlyoutSubItem>
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
@@ -358,14 +364,23 @@
                       </MenuFlyoutItem>
                       <MenuFlyoutSeparator/>
                       <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import...">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" Text="Deck"/>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Maybe"/>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Wishlist"/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" CommandParameter="Id" Text="To Deck"/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" CommandParameter="Id" Text="To Maybelist"/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" CommandParameter="Id" Text="To Wishlist"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" Text="Deck"/>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" Text="Maybe"/>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" Text="Wishlist"/>
+                        <MenuFlyoutSubItem Text="Deck...">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                        </MenuFlyoutSubItem>
+                        <MenuFlyoutSubItem Text="Maybelist...">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                        </MenuFlyoutSubItem>
+                        <MenuFlyoutSubItem Text="Wishlist...">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                        </MenuFlyoutSubItem>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutSeparator/>
                       <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeleteDeckDialogCommand}" Background="IndianRed" Icon="Delete" Text="Delete"/>

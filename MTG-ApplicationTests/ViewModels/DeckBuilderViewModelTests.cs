@@ -536,7 +536,7 @@ namespace MTGApplicationTests.ViewModels
         Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
       };
 
-      DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null, dialogs: new DeckBuilderViewModel.DeckBuilderViewDialogs()
+      DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null, dialogs: new DeckBuilderViewDialogs()
       {
         ImportDialog = new TestTextAreaDialog(ContentDialogResult.Primary, nameof(importedCards)),
       });
@@ -608,7 +608,7 @@ namespace MTGApplicationTests.ViewModels
           Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", count: 3),
         }
       };
-      var cardlist = new DeckBuilderViewModel.Cardlist(deck, CardlistType.Deck, null, null);
+      var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
       var expectedText = cardlist.GetExportString();
 
 

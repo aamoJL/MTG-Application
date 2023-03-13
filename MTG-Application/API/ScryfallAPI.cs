@@ -3,6 +3,7 @@ using MTGApplication.Models;
 using MTGApplication.Services;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -72,9 +73,17 @@ namespace MTGApplication.API
         // If prefered schema does not work, select secondary if possible
         if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
         else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
-        else if (Name != string.Empty) { return new { name = Name }; }
         else if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
+        else if (Name != string.Empty) { return new { name = Name }; }
         else { return string.Empty; }
+      }
+
+      public bool Compare(MTGCardInfo? info)
+      {
+        if (ScryfallId != Guid.Empty) { return info?.ScryfallId == ScryfallId; }
+        else if (Name != string.Empty && SetCode != string.Empty) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }
+        else if (Name != string.Empty) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase); }
+        else { return false; }
       }
     }
 
@@ -116,7 +125,7 @@ namespace MTGApplication.API
       // Convert each line to scryfall identifier objects
       var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>
       {
-        // Format: {Count (optional)} {Name}
+        // Format: {Count (optional)} {Name} OR {Count (optional)} {Scryfall Id}
         // Stops at '/' so only the first name will be used for multiface cards
         var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
         var match = regexGroups.Match(line);
@@ -124,11 +133,22 @@ namespace MTGApplication.API
         var countMatch = match.Groups["Count"]?.Value;
         var nameMatch = match.Groups["Name"]?.Value;
 
-        return new ScryfallIdentifier()
+        if(Guid.TryParse(nameMatch, out Guid id))
         {
-          Name = nameMatch.Trim(),
-          CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
-        };
+          return new ScryfallIdentifier()
+          {
+            ScryfallId = id,
+            CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+          };
+        }
+        else
+        {
+          return new ScryfallIdentifier()
+          {
+            Name = nameMatch.Trim(),
+            CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+          };
+        }
       })));
 
       return await FetchWithIdentifiers(identifiers);
@@ -308,9 +328,9 @@ namespace MTGApplication.API
             foreach (JsonNode item in dataNode.AsArray())
             {
               MTGCardInfo? cardInfo = GetCardInfoFromJSON(item);
-              var count = chunk.FirstOrDefault(x => string.Equals(cardInfo?.FrontFace.Name, x.Name, StringComparison.OrdinalIgnoreCase)).CardCount;
               if (cardInfo != null)
               {
+                var count = chunk.FirstOrDefault(x => x.Compare(cardInfo)).CardCount;
                 fetchedCards.Add(new((MTGCardInfo)cardInfo, count));
               }
             }

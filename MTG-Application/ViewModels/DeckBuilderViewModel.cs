@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
@@ -22,16 +24,16 @@ namespace MTGApplication.ViewModels
     public class DeckBuilderViewDialogs
     {
       #region Dialogs
-      public virtual CheckBoxDialog MultipleCardsAlreadyInDeckDialog { protected get; init; } = new CheckBoxDialog("Card already in the deck");
-      public virtual ConfirmationDialog CardAlreadyInDeckDialog { protected get; init; } = new ConfirmationDialog("Card already in the deck");
-      public virtual ConfirmationDialog SaveUnsavedDialog { protected get; init; } = new ConfirmationDialog("Save unsaved changes?");
-      public virtual ConfirmationDialog OverrideDialog { protected get; init; } = new ConfirmationDialog("Override existing deck?");
-      public virtual ConfirmationDialog DeleteDialog { protected get; init; } = new ConfirmationDialog("Delete deck?");
-      public virtual GridViewDialog CardPrintDialog { protected get; init; } = new GridViewDialog("Change card print");
-      public virtual TextAreaDialog ImportDialog { protected get; init; } = new TextAreaDialog("Import cards");
-      public virtual TextAreaDialog ExportDialog { protected get; init; } = new TextAreaDialog("Export deck");
-      public virtual TextBoxDialog SaveDialog { protected get; init; } = new TextBoxDialog("Save your deck?");
-      public virtual ComboBoxDialog LoadDialog { protected get; init; } = new ComboBoxDialog("Open deck");
+      public CheckBoxDialog MultipleCardsAlreadyInDeckDialog { protected get; set; } = new CheckBoxDialog("Card already in the deck");
+      public ConfirmationDialog CardAlreadyInDeckDialog { protected get; set; } = new ConfirmationDialog("Card already in the deck");
+      public ConfirmationDialog SaveUnsavedDialog { protected get; set; } = new ConfirmationDialog("Save unsaved changes?");
+      public ConfirmationDialog OverrideDialog { protected get; set; } = new ConfirmationDialog("Override existing deck?");
+      public ConfirmationDialog DeleteDialog { protected get; set; } = new ConfirmationDialog("Delete deck?");
+      public GridViewDialog CardPrintDialog { protected get; set; } = new GridViewDialog("Change card print");
+      public TextAreaDialog ImportDialog { protected get; set; } = new TextAreaDialog("Import cards");
+      public TextAreaDialog ExportDialog { protected get; set; } = new TextAreaDialog("Export deck");
+      public TextBoxDialog SaveDialog { protected get; set; } = new TextBoxDialog("Save your deck?");
+      public ComboBoxDialog LoadDialog { protected get; set; } = new ComboBoxDialog("Open deck");
       #endregion
 
       #region Getters
@@ -290,10 +292,11 @@ namespace MTGApplication.ViewModels
       /// <summary>
       /// Shows dialog with formatted text of the cardlist cards
       /// </summary>
+      /// <param name="exportProperty">'Name' or 'Id'</param>
       [RelayCommand]
-      public async Task ExportDeckCardsDialog()
+      public async Task ExportDeckCardsDialog(string exportProperty = "Name")
       {
-        await ExportCards();
+        await ExportCards(exportProperty);
       }
       /// <summary>
       /// Adds given card to the deck cardlist
@@ -436,20 +439,28 @@ namespace MTGApplication.ViewModels
         else { FilteredAndSortedCardViewModels.Filter = null; }
       }
 
-      private async Task ExportCards()
+      private async Task ExportCards(string exportProperty)
       {
-        var response = await Dialogs.GetExportDialog(GetExportString()).ShowAsync(App.MainRoot);
+        var response = await Dialogs.GetExportDialog(GetExportString(exportProperty)).ShowAsync(App.MainRoot);
         if (!string.IsNullOrEmpty(response))
         {
           ClipboardService.Copy(response);
         }
       }
-      public string GetExportString()
+
+      public string GetExportString(string exportProperty = "Name")
       {
         StringBuilder stringBuilder = new();
         foreach (var item in CardViewModels)
         {
-          stringBuilder.AppendLine($"{item.Model.Count} {item.Model.Info.Name}");
+          if (exportProperty == "Name")
+          {
+            stringBuilder.AppendLine($"{item.Model.Count} {item.Model.Info.Name}");
+          }
+          else if (exportProperty == "Id")
+          {
+            stringBuilder.AppendLine($"{item.Model.Count} {item.Model.Info.ScryfallId}");
+          }
         }
 
         return stringBuilder.ToString();

@@ -46,12 +46,13 @@ namespace MTGApplicationTests.API
         _____ Bird Gets the Worm
         Katerina of Myra's Marvels
         Wear // Tear
+        2 57e547cd-eba4-4a75-9c4e-8eeb6e00ddc4
         ";
 
       var (Found, NotFoundCount) = await api.FetchFromString(importString);
       Assert.IsNotNull(Found);
-      Assert.AreEqual(6, Found.Length);
-      Assert.AreEqual(9, Found.Sum(x => x.Count));
+      Assert.AreEqual(7, Found.Length);
+      Assert.AreEqual(11, Found.Sum(x => x.Count));
     }
 
     [TestMethod]
