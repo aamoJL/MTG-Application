@@ -79,7 +79,9 @@ namespace MTGApplication.ViewModels.Charts
     protected override ColorTypes[] GetPrimaryItems(MTGCard model)
     {
       // Combine together mana producers that can produce all colors
-      return model.Info.ProducedMana.Length == 5 ? new ColorTypes[] { ColorTypes.M } : model.Info.ProducedMana;
+      var producedMana = model.Info.ProducedMana;
+      if(producedMana.Length == 6 || (producedMana.Length == 5 && !producedMana.Contains(ColorTypes.C))) { return new ColorTypes[] { ColorTypes.M }; }
+      else { return producedMana; }
     }
   }
 

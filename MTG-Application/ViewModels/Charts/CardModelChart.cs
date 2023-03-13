@@ -1,24 +1,12 @@
 ﻿using LiveChartsCore;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SkiaSharp;
 using System.Collections.Specialized;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MTGApplication.ViewModels.Charts
 {
-  public static class ColorPalette
-  {
-    public static readonly SKColor White = new(235, 235, 235, 100);
-    public static readonly SKColor Blue = new(80, 130, 186, 100);
-    public static readonly SKColor Black = new(80, 80, 80, 100);
-    public static readonly SKColor Red = new(186, 80, 80, 100);
-    public static readonly SKColor Green = new(80, 186, 80, 100);
-    public static readonly SKColor Multicolor = new(186, 186, 80, 100);
-    public static readonly SKColor Colorless = new(186, 186, 186, 100);
-  }
-
   /// <summary>
   /// Base class for MTG card charts
   /// </summary>

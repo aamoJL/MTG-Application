@@ -214,6 +214,7 @@ namespace MTGApplication.Views
           Header = InputHeaderText,
           AcceptsReturn = multiline,
           IsSpellCheckEnabled = IsSpellCheckEnabled,
+          PlaceholderText = InputPlaceholderText,
           Text = InputDefaultText,
           SelectionStart = InputDefaultText.Length,
         };

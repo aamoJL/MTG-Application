@@ -107,7 +107,38 @@
         <Image Width="20" Source="{x:Bind Model.Info.SetIconUri}"/>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine}" Width="250"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+      </StackPanel>
+    </DataTemplate>
+    <!--Sidelists-->
+    <DataTemplate x:Key="SideListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
+      <StackPanel
+        PointerEntered="CardListViewItem_PointerEntered"
+        PointerExited="CardListViewItem_PointerExited"
+        PointerMoved="CardListViewItem_PointerMoved">
+        <StackPanel.ContextFlyout>
+          <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+            <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+            <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
+            <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
+            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
+            <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
+          </MenuFlyout>
+        </StackPanel.ContextFlyout>
+        <Grid HorizontalAlignment="Stretch" ColumnSpacing="10">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
+          <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" TextTrimming="CharacterEllipsis"/>
+          <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+        </Grid>
       </StackPanel>
     </DataTemplate>
   </UserControl.Resources>
@@ -156,6 +187,16 @@
       <VisualStateGroup x:Name="DeckNameTitleSaveStatus">
         <VisualState>
           <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.CardDeckName, Mode=OneWay}" To="{x:Bind sys:String.Empty}"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedDeckNameTitle.Text" Value="Unsaved"/>
+            <Setter Target="SelectedDeckNameTitle.FontStyle" Value="Italic"/>
+            <Setter Target="SelectedDeckNameTitle.Foreground" Value="LightGray"/>
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState>
+          <VisualState.StateTriggers>
             <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
@@ -178,8 +219,8 @@
               Label="Search"
               Width="50"
               CornerRadius="0" 
-              Margin="0 0 0 0" 
-              Padding="0 0 0 0" 
+              Margin="0" 
+              Padding="0" 
               BorderThickness="0">
               <AppBarButton.Icon>
                 <FontIcon Glyph="&#xE721;"/>
@@ -282,7 +323,7 @@
                     Drop="CardView_Drop"
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted" 
-                    ItemTemplate="{StaticResource DeckListViewItemTemplate}"
+                    ItemTemplate="{StaticResource SideListViewItemTemplate}"
                     KeyDown="CardView_KeyDown"
                     LosingFocus="CardView_LosingFocus"/>
                   <TextBlock Grid.Row="2" Text="Wishlist">
@@ -309,7 +350,7 @@
                     Drop="CardView_Drop"
                     DragItemsStarting="CardView_DragItemsStarting"
                     DragItemsCompleted="CardView_DragItemsCompleted"
-                    ItemTemplate="{StaticResource DeckListViewItemTemplate}"
+                    ItemTemplate="{StaticResource SideListViewItemTemplate}"
                     KeyDown="CardView_KeyDown"
                     LosingFocus="CardView_LosingFocus"/>
                 </Grid>
@@ -451,6 +492,15 @@
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
               <TextBlock x:Name="SelectedDeckNameTitle" Text="{x:Bind DeckBuilderViewModel.CardDeckName, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
               <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckCards.CardlistSize), Mode=OneWay}" HorizontalAlignment="Right"/>
+              <StackPanel.ContextFlyout>
+                <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                  <MenuFlyoutSubItem Text="Export...">
+                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                  </MenuFlyoutSubItem>
+                </MenuFlyout>
+              </StackPanel.ContextFlyout>
             </StackPanel>
           </Grid>
           <!--Deck View-->

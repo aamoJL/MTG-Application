@@ -103,7 +103,7 @@ namespace MTGApplication.ViewModels
       }
       public TextAreaDialog GetImportDialog()
       {
-        ImportDialog.InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby";
+        ImportDialog.InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd";
         ImportDialog.SecondaryButtonText = string.Empty;
         ImportDialog.PrimaryButtonText = "Add to Collection";
         return ImportDialog;
