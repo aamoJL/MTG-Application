@@ -96,18 +96,18 @@ namespace MTGApplication.API
       string searchUri = GetSearchUri(searchParams);
       return await FetchCardsFromUri(searchUri, countLimit);
     }
-    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue)
+    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false)
     {
       List<MTGCard> cards = new();
 
       // Loop through API pages
       while (uri != "" && cards.Count < countLimit)
       {
-        (var fetchedCards, uri, _) = await FetchCardsFromPage(uri);
+        (var fetchedCards, uri, _) = await FetchCardsFromPage(uri, paperOnly);
         cards.AddRange(fetchedCards);
       }
 
-      return cards.GetRange(0, countLimit).ToArray();
+      return cards.GetRange(0, Math.Min(countLimit, cards.Count)).ToArray();
     }
     public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromString(string importText)
     {
@@ -138,14 +138,14 @@ namespace MTGApplication.API
       var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x));
       return await FetchWithIdentifiers(identifiers.ToArray());
     }
-    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri)
+    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri, bool paperOnly = false)
     {
       List<MTGCard> cards = new();
 
       JsonNode rootNode = await FetchScryfallJsonObject(pageUri);
       if (rootNode == null) { return (cards.ToArray(), string.Empty, 0); }
 
-      cards.AddRange(await GetCardsFromJsonObject(rootNode));
+      cards.AddRange(await GetCardsFromJsonObject(rootNode, paperOnly));
       var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
       var totalCount = rootNode["total_cards"]?.GetValue<int>();
 
@@ -155,7 +155,7 @@ namespace MTGApplication.API
     /// <summary>
     /// Returns <see cref="MTGCard"/> array from the given <paramref name="jsonNode"/>
     /// </summary>
-    private static async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode)
+    private static async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
     {
       var cards = new List<MTGCard>();
       if (jsonNode == null) { return cards.ToArray(); }
@@ -163,7 +163,7 @@ namespace MTGApplication.API
       JsonNode dataNode = jsonNode?["data"];
       if (dataNode != null)
       {
-        var infos = dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x)));
+        var infos = dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x, paperOnly)));
 
         foreach (var itemInfo in await Task.WhenAll(infos))
         {
@@ -193,10 +193,11 @@ namespace MTGApplication.API
     /// <summary>
     /// Converts Scryfall API Json object to <see cref="MTGCardInfo"/> object
     /// </summary>
-    private static MTGCardInfo? GetCardInfoFromJSON(JsonNode json)
+    private static MTGCardInfo? GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
     {
       // TODO: add tokens if available
       if (json == null || json["object"]?.GetValue<string>() != "card") { return null; }
+      if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null) { return null; }
 
       var scryfallId = json["id"].GetValue<Guid>();
       var cmc = (int)json["cmc"].GetValue<float>();

@@ -325,8 +325,10 @@ namespace MTGApplication.ViewModels
       public async Task ChangePrintDialog(MTGCard card)
       {
         // Get prints
-        var prints = await CardAPI.FetchCardsFromUri(card.Info.PrintSearchUri);
+        IsBusy = true;
+        var prints = await CardAPI.FetchCardsFromUri(card.Info.PrintSearchUri, paperOnly: true);
         var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
+        IsBusy = false;
 
         if (await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(App.MainRoot) is MTGCardViewModel newPrint)
         {

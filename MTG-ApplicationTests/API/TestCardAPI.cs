@@ -18,7 +18,7 @@ namespace MTGApplicationTests.API
 
     public int PageSize => 40;
 
-    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue)
+    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false)
     {
       return await FetchCardsWithParameters(uri, countLimit);
     }
@@ -43,7 +43,7 @@ namespace MTGApplicationTests.API
     {
       return await Task.Run(() => (ExpectedCards ?? Array.Empty<MTGCard>(), NotFoundCount));
     }
-    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri)
+    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri, bool paperOnly = false)
     {
       var cards = string.IsNullOrEmpty(pageUri) ? Array.Empty<MTGCard>() : ExpectedCards ?? Array.Empty<MTGCard>();
       return await Task.Run(() => (cards,  string.Empty, cards.Length));

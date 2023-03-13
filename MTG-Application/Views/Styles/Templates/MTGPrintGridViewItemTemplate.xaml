@@ -13,7 +13,7 @@
   <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
 
   <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-    <StackPanel Orientation="Vertical" Padding="5">
+    <StackPanel Orientation="Vertical" Padding="5" ToolTipService.ToolTip="{Binding Model.Info.SetName}">
       <Grid>
         <controls:ImageEx
           Source="{Binding SelectedFaceUri, Mode=OneWay}"
@@ -28,7 +28,14 @@
           </controls:ImageEx.ContextFlyout>
         </controls:ImageEx>
       </Grid>
-      <TextBlock Text="{Binding Model.Info.Price, Converter={StaticResource FloatToEuroStringConverter}}" HorizontalAlignment="Center" FontSize="15"/>
+      <Grid HorizontalAlignment="Stretch" ColumnSpacing="20">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="{Binding Model.Info.SetName}" HorizontalAlignment="Left" FontSize="15" TextTrimming="CharacterEllipsis"/>
+        <TextBlock Grid.Column="1" Text="{Binding Model.Info.Price, Converter={StaticResource FloatToEuroStringConverter}}" HorizontalAlignment="Right" FontSize="15"/>
+      </Grid>
     </StackPanel>
   </DataTemplate>
 </ResourceDictionary>

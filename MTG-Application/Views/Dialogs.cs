@@ -2,11 +2,10 @@
 using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using System.IO;
 using CommunityToolkit.WinUI.UI.Controls;
 using MTGApplication.Interfaces;
-using Windows.ApplicationModel.Calls;
-using System.Data.SqlTypes;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Automation.Peers;
 
 namespace MTGApplication.Views
 {
@@ -22,6 +21,24 @@ namespace MTGApplication.Views
       public ContentDialogWrapper(ContentDialog dialog)
       {
         Dialog = dialog;
+
+        // Add event to close the dialog when user clicks outside of the dialog.
+        Dialog.Loaded += (sender, e) =>
+        {
+          var root = VisualTreeHelper.GetParent(Dialog);
+          var smokeLayer = FindByName(root, "SmokeLayerBackground") as FrameworkElement;
+          var pressed = false;
+
+          smokeLayer.PointerPressed += (sender, e) =>
+          {
+            pressed = true;
+          };
+          smokeLayer.PointerReleased += (sender, e) =>
+          {
+            if(pressed == true) { Dialog.Hide(); }
+            pressed = false;
+          };
+        };
       }
 
       public async Task<ContentDialogResult> ShowAsync()
@@ -213,7 +230,7 @@ namespace MTGApplication.Views
           textBox.TextChanging += (sender, args) =>
           {
             var text = sender.Text;
-            foreach (var c in Path.GetInvalidFileNameChars())
+            foreach (var c in System.IO.Path.GetInvalidFileNameChars())
             {
               text = text.Replace(c.ToString(), string.Empty);
             }
@@ -329,7 +346,22 @@ namespace MTGApplication.Views
       {
         var dialog = base.CreateDialog(root);
         gridView = CreateGridView();
+
         dialog.Dialog.Content = gridView;
+
+        dialog.Dialog.Loaded += (sender, e) =>
+        {
+          var root = VisualTreeHelper.GetParent(dialog.Dialog);
+          var primaryButton = FindByName(root, "PrimaryButton") as Button;
+
+          // Add event to click the primary button when selected item has been double tapped.
+          (dialog.Dialog.Content as GridView).DoubleTapped += (sender, e) =>
+          {
+            var feap = FrameworkElementAutomationPeer.FromElement(primaryButton) as ButtonAutomationPeer;
+            feap.Invoke(); // Click the primary button
+          };
+        };
+
         return dialog;
       }
 
@@ -343,6 +375,35 @@ namespace MTGApplication.Views
       }
 
       public virtual object GetInputValue() => gridView.SelectedValue;
+    }
+
+    /// <summary>
+    /// Returns <see cref="DependencyObject"/> from the <paramref name="root"/> that has the given <paramref name="name"/>
+    /// Searches every child element and child of the children elements
+    /// </summary>
+    private static DependencyObject FindByName(DependencyObject root, string name)
+    {
+      var childCount = VisualTreeHelper.GetChildrenCount(root);
+      for (int i = 0; i < childCount; i++)
+      {
+        var child = VisualTreeHelper.GetChild(root, i);
+        if (child is not null)
+        {
+          if (child.GetValue(FrameworkElement.NameProperty) is string value && value == name)
+          {
+            return child;
+          }
+          else
+          {
+            var recursiveResult = FindByName(child, name);
+            if (recursiveResult is not null && recursiveResult.GetValue(FrameworkElement.NameProperty) is string recValue && recValue == name)
+            {
+              return recursiveResult;
+            }
+          }
+        }
+      }
+      return null;
     }
   }
 }

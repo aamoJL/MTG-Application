@@ -113,8 +113,29 @@ namespace MTGApplicationTests.API
       Assert.AreEqual(string.Empty, api.GetSearchUri(""));
     }
 
+    [TestMethod]
+    public async Task FetchCardsFromUriTest()
+    {
+      var api = new ScryfallAPI();
+      var uri = 
+        "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A48e603a2-b965-4fbc-ad57-4388bce5ac8b&unique=prints";
+
+      var cards = await api.FetchCardsFromUri(uri);
+      Assert.IsTrue(cards.Length > 0);
+    }
+
+    [TestMethod]
+    public async Task FetchCardsFromUriTest_Empty()
+    {
+      var api = new ScryfallAPI();
+      var uri = string.Empty;
+
+      var cards = await api.FetchCardsFromUri(uri);
+      Assert.AreEqual(0, cards.Length);
+    }
+
     #region Identifier
-    
+
     [TestMethod]
     public void ScryfallIdentifier_ToObjectTest_ID()
     {

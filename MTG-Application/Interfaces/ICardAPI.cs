@@ -15,7 +15,7 @@ namespace MTGApplication.Interfaces
 
     // TODO: Result class that contains found cards, next page, not found cards etc.
     /// <summary>
-    /// Converts <paramref name="searchParams"/> to API search uri
+    /// Returns API search URI with the <paramref name="searchParams"/>
     /// </summary>
     public string GetSearchUri(string searchParams);
 
@@ -27,12 +27,12 @@ namespace MTGApplication.Interfaces
     /// <summary>
     /// Fetches cards from the given <paramref name="pageUri"/>
     /// </summary>
-    public Task<(T[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri);
+    public Task<(T[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri, bool paperOnly = false);
 
     /// <summary>
     /// Fetch cards from the API using API search uri
     /// </summary>
-    public Task<T[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue);
+    public Task<T[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false);
 
     /// <summary>
     /// Fetch cards from the API using formatted text
