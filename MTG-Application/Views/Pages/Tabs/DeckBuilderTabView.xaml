@@ -113,6 +113,8 @@
     <!--Sidelists-->
     <DataTemplate x:Key="SideListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel
+        Background="Transparent"
+        Height="25"
         PointerEntered="CardListViewItem_PointerEntered"
         PointerExited="CardListViewItem_PointerExited"
         PointerMoved="CardListViewItem_PointerMoved">
