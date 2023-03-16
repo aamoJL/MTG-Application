@@ -5,13 +5,13 @@ using Windows.UI;
 
 namespace MTGApplication.Pages
 {
-    /// <summary>
-    /// Main Page
-    /// </summary>
-    public sealed partial class MainPage : Page
+  /// <summary>
+  /// Main Page
+  /// </summary>
+  public sealed partial class MainPage : Page
   {
     private readonly int notificationDuration = 5000;
-    
+
     public MainPage()
     {
       this.InitializeComponent();

@@ -27,7 +27,7 @@ namespace MTGApplicationTests.API
       if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
       return await Task.Run(() => ExpectedCards ?? Array.Empty<MTGCard>());
     }
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray)
+    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(MTGCardDTO[] dtoArray)
     {
       var cards = dtoArray.Select(x => Mocker.MTGCardModelMocker.FromDTO(x)).ToArray();
 
@@ -84,7 +84,7 @@ namespace MTGApplicationTests.API
         Mocker.MTGCardModelMocker.CreateMTGCardModel(),
       };
       //No expected cards
-      var dtos = cards.Select(x => new CardDTO(x)).ToArray();
+      var dtos = cards.Select(x => new MTGCardDTO(x)).ToArray();
       Assert.AreEqual(3, (await api.FetchFromDTOs(dtos)).Found.Length);
 
       // Expected cards are same as DTOs

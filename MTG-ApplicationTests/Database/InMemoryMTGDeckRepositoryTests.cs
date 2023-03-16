@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 
 namespace MTGApplicationTests.Database
@@ -8,52 +10,49 @@ namespace MTGApplicationTests.Database
   [TestClass]
   public class InMemoryMTGDeckRepositoryTests
   {
-    public class TestInMemoryMTGDeckRepository : IDeckRepository<MTGCardDeck>, IDisposable
+    public class TestInMemoryMTGDeckRepository : InMemoryMTGDeckRepository, IDisposable
     {
-      public bool WillFail { get; init; }
-      protected static List<MTGCardDeck> Decks { get; } = new();
+      public TestInMemoryMTGDeckRepository(ICardAPI<MTGCard>? cardAPI = default) : base(cardAPI)
+      {
+        CardAPI ??= new TestCardAPI();
+      }
 
-      public async Task<bool> Add(MTGCardDeck deck)
+      public bool WillFail { get; init; }
+
+      public override async Task<bool> Add(MTGCardDeck item)
       {
         if (WillFail) { return false; }
-        if (!await Exists(deck.Name))
-        {
-          Decks.Add(deck);
-          return true;
-        }
-        else { return false; }
+        return await base.Add(item);
       }
-      public async Task<bool> AddOrUpdate(MTGCardDeck deck)
+      public override async Task<bool> AddOrUpdate(MTGCardDeck item)
       {
         if (WillFail) { return false; }
-        if (await Exists(deck.Name)) { return await Update(deck); }
-        else { return await Add(deck); }
+        return await base.AddOrUpdate(item);
       }
-      public async Task<bool> Exists(string name)
+      public override async Task<bool> Exists(string name)
       {
         if (WillFail) { return false; }
-        return await Task.Run(() => Decks.FirstOrDefault(x => x.Name == name) != null);
+        return await base.Exists(name);
       }
-      public async Task<IEnumerable<MTGCardDeck>> Get()
+      public override async Task<IEnumerable<MTGCardDeck>> Get()
       {
         if (WillFail) { return new List<MTGCardDeck>(); }
-        return await Task.Run(() => Decks);
+        return await base.Get();
       }
-      public async Task<MTGCardDeck> Get(string name)
+      public override async Task<MTGCardDeck> Get(string name)
       {
         if (WillFail) { return null; }
-        return await Task.Run(() => Decks.FirstOrDefault(x => x.Name == name));
+        return await base.Get(name);
       }
-      public async Task<bool> Remove(MTGCardDeck deck)
-      {
-        return await Task.Run(() => Decks.Remove(Decks.FirstOrDefault(x => x.Name == deck.Name)));
-      }
-      public async Task<bool> Update(MTGCardDeck deck)
+      public override async Task<bool> Remove(MTGCardDeck item)
       {
         if (WillFail) { return false; }
-        var index = await Task.Run(() => Decks.FindIndex(x => x.Name == deck.Name));
-        if (index >= 0) { Decks[index] = deck; return true; }
-        else { return false; }
+        return await base.Remove(item);
+      }
+      public override async Task<bool> Update(MTGCardDeck item)
+      {
+        if (WillFail) { return false; }
+        return await base.Update(item);
       }
 
       public void Dispose()
@@ -69,7 +68,7 @@ namespace MTGApplicationTests.Database
       var firstDeckName = "First";
       var secondDeckName = "Second";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
 
       await repo.Add(new MTGCardDeck() { Name = firstDeckName });
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
@@ -84,7 +83,7 @@ namespace MTGApplicationTests.Database
       var firstDeckName = "First";
       var secondDeckName = "Second";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
       
       await repo.Add(new MTGCardDeck() { Name = firstDeckName });
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
@@ -98,7 +97,7 @@ namespace MTGApplicationTests.Database
       var firstDeckName = "First";
       var secondDeckName = "Second";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
       
       await repo.Add(new MTGCardDeck() { Name = firstDeckName });
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
@@ -115,7 +114,7 @@ namespace MTGApplicationTests.Database
       var firstDeckName = "First";
       var secondDeckName = "Second";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
 
       await repo.Add(new MTGCardDeck() { Name = firstDeckName });
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
@@ -130,7 +129,7 @@ namespace MTGApplicationTests.Database
       var firstDeckName = "First";
       var secondDeckName = "Second";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
 
       await repo.Add(new MTGCardDeck() { Name = firstDeckName });
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
@@ -145,7 +144,7 @@ namespace MTGApplicationTests.Database
     {
       var firstDeckName = "First";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
 
       var deck = new MTGCardDeck() { Name = firstDeckName };
       await repo.Add(deck);
@@ -167,7 +166,7 @@ namespace MTGApplicationTests.Database
     {
       var firstDeckName = "First";
 
-      using var repo = new TestInMemoryMTGDeckRepository();
+      using var repo = new TestInMemoryMTGDeckRepository(new TestCardAPI());
 
       var deck = new MTGCardDeck() { Name = firstDeckName };
       await repo.AddOrUpdate(deck);

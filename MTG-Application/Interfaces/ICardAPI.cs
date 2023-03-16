@@ -40,9 +40,9 @@ namespace MTGApplication.Interfaces
     public Task<(T[] Found, int NotFoundCount)> FetchFromString(string importText);
     
     /// <summary>
-    /// Fetch cards from the API using <see cref="CardDTO"/> array
+    /// Fetch cards from the API using <see cref="MTGCardDTO"/> array
     /// </summary>
-    public Task<(T[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray);
+    public Task<(T[] Found, int NotFoundCount)> FetchFromDTOs(MTGCardDTO[] dtoArray);
 
     /// <summary>
     /// Returns the API's name that was used to fetch the given card

@@ -31,7 +31,7 @@ namespace MTGApplication.API
       }
 
       public ScryfallIdentifier() { }
-      public ScryfallIdentifier(CardDTO card)
+      public ScryfallIdentifier(MTGCardDTO card)
       {
         if (card != null)
         {
@@ -153,7 +153,7 @@ namespace MTGApplication.API
 
       return await FetchWithIdentifiers(identifiers);
     }
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(CardDTO[] dtoArray)
+    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(MTGCardDTO[] dtoArray)
     {
       var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x));
       return await FetchWithIdentifiers(identifiers.ToArray());

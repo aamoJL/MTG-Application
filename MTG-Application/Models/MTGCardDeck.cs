@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MTGApplication.Interfaces;
-using MTGApplication.Models.Converters;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
@@ -81,27 +80,33 @@ namespace MTGApplication.Models
     public MTGCardDeckDTO(MTGCardDeck deck)
     {
       Name = deck.Name;
-      DeckCards.AddRange(deck.DeckCards.Select(x => new CardDTO(x)));
-      WishlistCards.AddRange(deck.Wishlist.Select(x => new CardDTO(x)));
-      MaybelistCards.AddRange(deck.Maybelist.Select(x => new CardDTO(x)));
+      DeckCards = deck.DeckCards.Select(x => new MTGCardDTO(x)).ToList();
+      WishlistCards = deck.Wishlist.Select(x => new MTGCardDTO(x)).ToList();
+      MaybelistCards = deck.Maybelist.Select(x => new MTGCardDTO(x)).ToList();
     }
 
     [Key]
     public int Id { get; init; }
     public string Name { get; init; }
 
-    [InverseProperty(nameof(CardDTO.DeckCards))]
-    public List<CardDTO> DeckCards { get; init; } = new();
+    [InverseProperty(nameof(MTGCardDTO.DeckCards))]
+    public List<MTGCardDTO> DeckCards { get; init; } = new();
 
-    [InverseProperty(nameof(CardDTO.DeckWishlist))]
-    public List<CardDTO> WishlistCards { get; init; } = new();
+    [InverseProperty(nameof(MTGCardDTO.DeckWishlist))]
+    public List<MTGCardDTO> WishlistCards { get; init; } = new();
 
-    [InverseProperty(nameof(CardDTO.DeckMaybelist))]
-    public List<CardDTO> MaybelistCards { get; init; } = new();
+    [InverseProperty(nameof(MTGCardDTO.DeckMaybelist))]
+    public List<MTGCardDTO> MaybelistCards { get; init; } = new();
 
     public async Task<MTGCardDeck> AsMTGCardDeck(ICardAPI<MTGCard> api)
     {
-      return await MTGCardDeckDTOConverter.Convert(this, api);
+      return new MTGCardDeck()
+      {
+        Name = Name,
+        DeckCards = new((await api.FetchFromDTOs(DeckCards.ToArray())).Found),
+        Wishlist = new((await api.FetchFromDTOs(WishlistCards.ToArray())).Found),
+        Maybelist = new((await api.FetchFromDTOs(MaybelistCards.ToArray())).Found),
+      };
     }
   }
 }

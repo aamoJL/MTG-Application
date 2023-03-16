@@ -75,7 +75,7 @@ namespace MTGApplicationTests.API
         Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Apostle of Invasion", scryfallId: Guid.Parse("8a973487-5def-4771-bb77-5748cbd2f469")),
       };
 
-      var (Found, NotFoundCount) = await api.FetchFromDTOs(cards.Select(x => new CardDTO(x)).ToArray());
+      var (Found, NotFoundCount) = await api.FetchFromDTOs(cards.Select(x => new MTGCardDTO(x)).ToArray());
 
       Assert.AreEqual(cards[0].Info.Name, Found[0].Info.Name);
       Assert.AreEqual(cards[1].Info.Name, Found[1].Info.Name);

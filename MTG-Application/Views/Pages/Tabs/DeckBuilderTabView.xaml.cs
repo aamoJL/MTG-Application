@@ -14,7 +14,7 @@ using MTGApplication.API;
 using MTGApplication.Database.Repositories;
 using CommunityToolkit.WinUI.UI;
 
-namespace MTGApplication.Views
+namespace MTGApplication.Views.Pages.Tabs
 {
   [ObservableObject]
   public sealed partial class DeckBuilderTabView : UserControl
@@ -41,7 +41,7 @@ namespace MTGApplication.Views
     }
 
     public MTGSearchViewModel SearchViewModel = new(new ScryfallAPI());
-    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new SQLiteMTGDeckRepository(new ScryfallAPI(), new Database.CardDbContextFactory()));
+    public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new SQLiteMTGDeckRepository(new ScryfallAPI(), new()));
 
     [ObservableProperty]
     private double searchDesiredItemWidth = 250;

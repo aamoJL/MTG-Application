@@ -69,9 +69,9 @@ namespace MTGApplicationTests.Services
       }
 
       /// <summary>
-      /// Returns a mock <see cref="MTGCard"/> object from the given <see cref="CardDTO"/> object
+      /// Returns a mock <see cref="MTGCard"/> object from the given <see cref="MTGCardDTO"/> object
       /// </summary>
-      public static MTGCard FromDTO(CardDTO dto)
+      public static MTGCard FromDTO(MTGCardDTO dto)
       {
         return CreateMTGCardModel(
           name: dto.Name,
