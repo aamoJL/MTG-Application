@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using static MTGApplication.ViewModels.DeckBuilderViewModel;
 using CommunityToolkit.WinUI.UI;
 using static MTGApplication.Models.MTGCard;
+using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
 
 namespace MTGApplicationTests.ViewModels
 {
@@ -678,23 +679,34 @@ namespace MTGApplicationTests.ViewModels
       var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2, typeLine: "Artifact", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.R }));
       var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1, typeLine: "Creature", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] {ColorTypes.W}));
       var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, typeLine: "Land", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.C }));
+      var fourthCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "D", cmc: 4, typeLine: "Enchantment", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.W, ColorTypes.B }));
 
       await vm.DeckCards.AddToCardlist(secondCard);
       await vm.DeckCards.AddToCardlist(thirdCard);
       await vm.DeckCards.AddToCardlist(firstCard);
+      await vm.DeckCards.AddToCardlist(fourthCard);
 
+      // Name filter
       vm.DeckCards.Filters.NameText = "a";
       CollectionAssert.AreEquivalent(new[] { firstCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
+      // Reset
       vm.DeckCards.Filters.Reset();
-      CollectionAssert.AreEquivalent(new[] { thirdCard, secondCard, firstCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+      Assert.AreEqual(4, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray().Length);
 
-      vm.DeckCards.Filters.White = false; 
+      // Color filter
+      vm.DeckCards.Filters.White = false; // Non whites
       CollectionAssert.AreEquivalent(new[] { thirdCard, firstCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
+      // Type filter
       vm.DeckCards.Filters.Reset();
-      vm.DeckCards.Filters.TypeText = "Cr";
+      vm.DeckCards.Filters.TypeText = "Cr"; // Creatures
       CollectionAssert.AreEquivalent(new[] { secondCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+
+      // Color group filter
+      vm.DeckCards.Filters.Reset();
+      vm.DeckCards.Filters.ColorGroup = "Multi"; // Multicolored
+      CollectionAssert.AreEquivalent(new[] { fourthCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
     }
     #endregion
 

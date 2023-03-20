@@ -1,8 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
@@ -131,6 +129,8 @@ namespace MTGApplication.ViewModels
         private bool green = true;
         [ObservableProperty]
         private bool colorless = true;
+        [ObservableProperty]
+        private string colorGroup = "All"; // All, Mono, Multi
 
         /// <summary>
         /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
@@ -139,11 +139,7 @@ namespace MTGApplication.ViewModels
         {
           get
           {
-            if (string.IsNullOrEmpty(NameText) && string.IsNullOrEmpty(TypeText) && White && Blue && Black && Red && Green && Colorless)
-            {
-              return false;
-            }
-            else { return true; }
+            return !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != "All";
           }
         }
 
@@ -159,9 +155,13 @@ namespace MTGApplication.ViewModels
             && (Black || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.B))
             && (Red || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.R))
             && (Green || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.G))
-            && (Colorless || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.C))) { return true; }
+            && (Colorless || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.C))
+            && (ColorGroup == "All" 
+              || ColorGroup == "Mono" && cardViewModel.Colors.Length == 1 
+              || (ColorGroup == "Multi" && cardViewModel.Colors.Length > 1))) { return true; }
           else { return false; };
         }
+        
         /// <summary>
         /// Reset filter properties to the default values
         /// </summary>
@@ -176,6 +176,14 @@ namespace MTGApplication.ViewModels
           Red = true;
           Green = true;
           Colorless = true;
+          ColorGroup = "All";
+        }
+
+        [RelayCommand]
+        public void ChangeColorGroup(string group)
+        {
+          if (!new string[] {"All", "Mono", "Multi" }.Contains(group)) { throw new NotImplementedException(); }
+          ColorGroup = group;
         }
       }
 

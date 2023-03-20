@@ -481,6 +481,11 @@
                           <ToggleButton Content="G" ToolTipService.ToolTip="Green" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Green, Mode=TwoWay}"/>
                           <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Colorless, Mode=TwoWay}"/>
                         </StackPanel>
+                        <RadioButtons Header="Color group" MaxColumns="3" SelectedIndex="0">
+                          <RadioButton Content="All" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ChangeColorGroupCommand}" CommandParameter="All"/>
+                          <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ChangeColorGroupCommand}" CommandParameter="Mono"/>
+                          <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ChangeColorGroupCommand}" CommandParameter="Multi"/>
+                        </RadioButtons>
                       </StackPanel>
                     </Flyout>
                   </AppBarButton.Flyout>
