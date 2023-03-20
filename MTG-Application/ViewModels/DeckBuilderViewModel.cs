@@ -228,8 +228,8 @@ namespace MTGApplication.ViewModels
           case nameof(SortDirection):
           case nameof(PrimarySortProperty):
           case nameof(SecondarySortProperty):
-            FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(PrimarySortProperty), sortDirection);
-            FilteredAndSortedCardViewModels.SortDescriptions[1] = new SortDescription(MTGCardViewModel.GetPropertyName(SecondarySortProperty), sortDirection); break;
+            FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(PrimarySortProperty), SortDirection);
+            FilteredAndSortedCardViewModels.SortDescriptions[1] = new SortDescription(MTGCardViewModel.GetPropertyName(SecondarySortProperty), SortDirection); break;
           case nameof(CardlistSize): OnPropertyChanged(nameof(EuroPrice)); break;
           default: break;
         }

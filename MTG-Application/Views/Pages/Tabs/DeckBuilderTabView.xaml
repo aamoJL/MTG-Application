@@ -449,8 +449,8 @@
                 <AppBarButton Icon="Sort" Label="Sort" AutomationProperties.Name="Order">
                   <AppBarButton.Flyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="ASC" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
-                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="DESC" Text="Descending" GroupName="DirectionGroup" />
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
+                      <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
                       <MenuFlyoutSeparator/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
