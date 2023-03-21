@@ -19,11 +19,11 @@ namespace MTGApplication.ViewModels
       PropertyChanged += MTGCardViewModel_PropertyChanged;
     }
 
-    private void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    protected void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       if (e.PropertyName == nameof(SelectedFace)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
     }
-    private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       if (e.PropertyName == nameof(Model.Count)) 
       { 
@@ -40,7 +40,7 @@ namespace MTGApplication.ViewModels
     public MTGCard Model { get; }
 
     [ObservableProperty]
-    private CardSide selectedFace;
+    protected CardSide selectedFace;
 
     public string SelectedFaceUri
     {
@@ -113,7 +113,7 @@ namespace MTGApplication.ViewModels
       if (Model.Count > 0) { Model.Count--; }
     }
 
-    private bool CanExecuteDecreaseCountCommand() => Model.Count > 1;
+    protected bool CanExecuteDecreaseCountCommand() => Model.Count > 1;
 
     public static string GetPropertyName(MTGSortProperty prop)
     {
@@ -129,6 +129,20 @@ namespace MTGApplication.ViewModels
         MTGSortProperty.Type => nameof(PrimaryType),
         _ => string.Empty,
       };
+    }
+  }
+
+  public partial class MTGCardCollectionCardViewModel : MTGCardViewModel
+  {
+    public MTGCardCollectionCardViewModel(MTGCard model) : base(model) { }
+
+    [ObservableProperty]
+    private bool isOwned;
+
+    [RelayCommand]
+    public void SwitchOwned()
+    {
+      IsOwned = !IsOwned;
     }
   }
 }

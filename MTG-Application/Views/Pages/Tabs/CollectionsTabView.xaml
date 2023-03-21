@@ -12,12 +12,18 @@
   mc:Ignorable="d">
 
   <UserControl.Resources>
-    <DataTemplate x:Key="CardViewModelItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
+    <DataTemplate x:Key="CardViewModelItemTemplate" x:DataType="viewmodels:MTGCardCollectionCardViewModel">
+      <StackPanel x:Name="GridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
         <Grid>
-          <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
+          <controls:ImageEx x:Name="GridViewItemImage" 
+                            Style="{StaticResource PlaceholderImageStyle}" 
+                            Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
+                            Opacity="{x:Bind helpers:MTGCardViewModel.OwnedToOpacity(IsOwned), Mode=OneWay}" 
+                            DoubleTapped="GridViewItemImage_DoubleTapped" 
+                            Tapped="GridViewItemImage_Tapped">
             <controls:ImageEx.ContextFlyout>
               <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+                <MenuFlyoutItem Command="{x:Bind SwitchOwnedCommand}" Icon="switch" Text="Switch owned"/>
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
@@ -98,6 +104,7 @@
           <TextBlock Text="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" VerticalAlignment="Center" Margin="10 0 0 0"/>
           <ProgressRing IsActive="{x:Bind CardCollectionsViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0"/>
         </StackPanel>
+        <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"/>
         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom">
           <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.MTGSearchViewModel.SearchCards.Count), Mode=OneWay}"/>
           <Run Text="{x:Bind sys:String.Format('{0} cards loaded', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>

@@ -40,7 +40,7 @@ namespace MTGApplication.Views.Pages.Tabs
       }
     }
 
-    public MTGSearchViewModel SearchViewModel = new(new ScryfallAPI());
+    public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> SearchViewModel = new(new ScryfallAPI());
     public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new SQLiteMTGDeckRepository(new ScryfallAPI(), new()));
 
     [ObservableProperty]

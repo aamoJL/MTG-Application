@@ -17,6 +17,23 @@ namespace MTGApplication.Models
     private string searchQuery = string.Empty;
 
     public ObservableCollection<MTGCard> Cards { get; set; } = new();
+
+    public bool AddToList(MTGCard card)
+    {
+      if(Cards.Contains(card)) return false;
+      Cards.Add(card);
+      return true;
+    }
+
+    public bool RemoveFromList(MTGCard card)
+    {
+      if(Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is MTGCard existingCard)
+      {
+        Cards.Remove(existingCard);
+        return true;
+      }
+      return false;
+    }
   }
 
   public class MTGCardCollectionListDTO

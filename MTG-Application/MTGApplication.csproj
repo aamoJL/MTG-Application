@@ -33,7 +33,6 @@
     <None Remove="Assets\ColorIcons\W.svg" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
-    <None Remove="Views\Controls\CardPrintDialog.xaml" />
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
@@ -71,8 +70,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230217.4" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230313.1" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -114,11 +113,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Styles\MTGPrintGridViewItemTemplate.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Controls\CardPrintDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

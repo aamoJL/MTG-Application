@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
+using MTGApplication.Models;
 using static MTGApplication.Views.Dialogs;
 
 namespace MTGApplicationTests.Services
@@ -143,6 +144,21 @@ namespace MTGApplicationTests.Services
         return new TestDialogWrapper(Result);
       }
       public override object? GetInputValue() => ReturnObject;
+    }
+
+    public class TestCollectionListContentDialog : MTGApplication.ViewModels.CardCollectionsViewModel.CardCollectionsDialogs.CollectionListContentDialog
+    {
+      public ContentDialogResult Result { get; set; } = ContentDialogResult.Primary;
+      public MTGCardCollectionList? ReturnsObject { get; set; }
+
+      public TestCollectionListContentDialog(string title = "") : base(title) { }
+
+      protected override IDialogWrapper CreateDialog(FrameworkElement root)
+      {
+        return new TestDialogWrapper(Result);
+      }
+
+      public override MTGCardCollectionList? GetInputValue() => ReturnsObject; 
     }
   }
 }

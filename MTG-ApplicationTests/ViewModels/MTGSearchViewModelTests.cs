@@ -12,7 +12,7 @@ namespace MTGApplicationTests.ViewModels
     [TestMethod]
     public async Task SearchSubmitCommandTest()
     {
-      MTGSearchViewModel vm = new(new TestCardAPI()
+      MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> vm = new(new TestCardAPI()
       {
         ExpectedCards = new MTGCard[]
         {
@@ -20,9 +20,11 @@ namespace MTGApplicationTests.ViewModels
           Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Seconds"),
           Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
         }
-      });
-
-      vm.SearchQuery = "NotEmpty";
+      })
+      {
+        SearchQuery = "NotEmpty"
+      };
+      
       await vm.SearchSubmit();
       Assert.IsTrue(vm.TotalCardCount > 0);
 
