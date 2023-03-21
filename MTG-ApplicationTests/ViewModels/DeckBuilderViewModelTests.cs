@@ -260,8 +260,17 @@ namespace MTGApplicationTests.ViewModels
     public async Task LoadDeckDialogCommandTest_IsSorted()
     {
       var deckName = "First";
+      var cards = new List<MTGCard>()
+      {
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", cmc: 3),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", cmc: 2),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", cmc: 1),
+      };
 
-      using TestInMemoryMTGDeckRepository repo = new();
+      using TestInMemoryMTGDeckRepository repo = new(new TestCardAPI()
+      {
+        ExpectedCards = cards.ToArray()
+      });
       DeckBuilderViewModel vm = new(null, repo, dialogs: new DeckBuilderViewDialogs() // Override dialogs
       {
         LoadDialog = new TestComboBoxDialog(ContentDialogResult.Primary, deckName), // Load deck
@@ -271,21 +280,17 @@ namespace MTGApplicationTests.ViewModels
       var dbDeck = new MTGCardDeck()
       {
         Name = deckName,
-        DeckCards = new()
-        {
-          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", cmc: 3),
-          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", cmc: 2),
-          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", cmc: 1),
-        }
+        DeckCards = new(cards),
       };
       await repo.Add(dbDeck);
 
       vm.SelectedSortDirection = SortDirection.Ascending;
       vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;
-      var sortedDbCards = dbDeck.DeckCards.OrderBy(x => x.Info.CMC);
+      vm.SelectedSecondarySortProperty = MTGSortProperty.Name;
+      var sortedDbCards = dbDeck.DeckCards.OrderBy(x => x.Info.CMC).ThenBy(x => x.Info.Name).ToList();
 
       await vm.LoadDeckDialog();
-      CollectionAssert.AreEqual(sortedDbCards.Select(x => x.Info.CMC).ToList(), vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model.Info.CMC).ToList());
+      CollectionAssert.AreEqual(sortedDbCards.Select(x => x.Info.CMC).ToArray(), vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model.Info.CMC).ToArray());
     }
     #endregion
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication;
 using MTGApplication.Database;
@@ -12,80 +11,26 @@ using MTGApplicationTests.Services;
 namespace MTGApplicationTests.Database
 {
   [TestClass]
-  public class SQLiteRepositoryTests
+  public partial class SQLiteMTGDeckRepositoryTests
   {
-    public class TestSQLiteRepository : SQLiteMTGDeckRepository
+    public class TestSQLiteMTGDeckRepository : SQLiteMTGDeckRepository
     {
-      public TestSQLiteRepository(ICardAPI<MTGCard> cardAPI, CardDbContextFactory cardDbContextFactory) : base(cardAPI, cardDbContextFactory)
+      public TestSQLiteMTGDeckRepository(ICardAPI<MTGCard> cardAPI, CardDbContextFactory cardDbContextFactory) : base(cardAPI, cardDbContextFactory)
       {
         AppConfig.Init();
       }
 
-      public override Task<bool> Add(MTGCardDeck deck)
-      {
-        return base.Add(deck);
-      }
-      public override Task<bool> AddOrUpdate(MTGCardDeck deck)
-      {
-        return base.AddOrUpdate(deck);
-      }
-      public override Task<bool> Exists(string name)
-      {
-        return base.Exists(name);
-      }
-      public override Task<IEnumerable<MTGCardDeck>> Get()
-      {
-        return base.Get();
-      }
-      public override Task<MTGCardDeck> Get(string name)
-      {
-        return base.Get(name);
-      }
-      public override Task<bool> Remove(MTGCardDeck deck)
-      {
-        return base.Remove(deck);
-      }
-      public override Task<bool> Update(MTGCardDeck deck)
-      {
-        return base.Update(deck);
-      }
-
-      public async Task<CardDTO[]> GetCards()
+      public async Task<MTGCardDTO[]> GetCards()
       {
         using var db = cardDbContextFactory.CreateDbContext();
         return await db.MTGCards.ToArrayAsync();
-      }
-    }
-    public class TestCardDbContextFactory : CardDbContextFactory, IDisposable
-    {
-      private const string inMemoryConnectionString = "Filename=:memory:";
-      private readonly SqliteConnection connection;
-
-      public TestCardDbContextFactory()
-      {
-        connection = new SqliteConnection(inMemoryConnectionString);
-        connection.Open();
-      }
-
-      public override CardDbContext CreateDbContext()
-      {
-        var options = new DbContextOptionsBuilder<CardDbContext>().UseSqlite(connection).Options;
-        var cardDbContext = new CardDbContext(options);
-        cardDbContext.Database.EnsureCreated();
-        return cardDbContext;
-      }
-
-      public void Dispose()
-      {
-        connection.Close();
-        GC.SuppressFinalize(this);
       }
     }
 
     [TestMethod]
     public async Task AddTest()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -116,7 +61,7 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task ExistsTest()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -148,7 +93,7 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task GetTest()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -179,7 +124,7 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task GetTest_Named()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -210,7 +155,7 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task RemoveTest()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -243,7 +188,7 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task UpdateTest()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -281,7 +226,7 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task AddAndUpdateTest()
     {
-      var repo = new TestSQLiteRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
       var deck1 = new MTGCardDeck()
       {
         Name = "First",

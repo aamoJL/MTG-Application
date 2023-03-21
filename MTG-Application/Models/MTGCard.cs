@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using MTGApplication.Interfaces;
 
 namespace MTGApplication.Models
 {
@@ -213,10 +214,10 @@ namespace MTGApplication.Models
     }
   }
 
-  public class CardDTO
+  public class MTGCardDTO
   {
-    private CardDTO() { }
-    public CardDTO(MTGCard card)
+    private MTGCardDTO() { }
+    public MTGCardDTO(MTGCard card)
     {
       Name = card.Info.Name;
       ScryfallId = card.Info.ScryfallId;
@@ -232,5 +233,6 @@ namespace MTGApplication.Models
     public MTGCardDeckDTO DeckCards { get; set; }
     public MTGCardDeckDTO DeckWishlist { get; set; }
     public MTGCardDeckDTO DeckMaybelist { get; set; }
+    public MTGCardCollectionListDTO CollectionList { get; set; }
   }
 }

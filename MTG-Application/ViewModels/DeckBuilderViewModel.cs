@@ -475,7 +475,7 @@ namespace MTGApplication.ViewModels
       }
     }
 
-    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IDeckRepository<MTGCardDeck> deckRepository, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
+    public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IO.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
     {
       DeckRepository = deckRepository;
       CardAPI = cardAPI;
@@ -526,7 +526,7 @@ namespace MTGApplication.ViewModels
 
     private MTGCardDeck cardDeck = new();
 
-    private IDeckRepository<MTGCardDeck> DeckRepository { get; }
+    private IRepository<MTGCardDeck> DeckRepository { get; }
     private DeckBuilderViewDialogs Dialogs { get; }
     private ICardAPI<MTGCard> CardAPI { get; }
     private MTGCardDeck CardDeck

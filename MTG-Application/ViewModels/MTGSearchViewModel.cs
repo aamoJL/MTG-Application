@@ -1,56 +1,39 @@
-﻿using CommunityToolkit.Common.Collections;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
-using System.Collections.Generic;
+using MTGApplication.Services;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MTGApplication.ViewModels
 {
-  public partial class MTGSearchViewModel : ObservableObject
+  public class MTGCardViewModelSource : MTGCardSource<MTGCardViewModel>
   {
-    public class MTGCardSource : IIncrementalSource<MTGCardViewModel>
-    {
-      private readonly List<MTGCard> cards = new();
-      private readonly ICardAPI<MTGCard> cardAPI;
-      private string nextPage;
+    public MTGCardViewModelSource() : base() { }
 
-      public MTGCardSource() { }
-      public MTGCardSource(MTGCard[] cardArray, string nextPage, ICardAPI<MTGCard> cardAPI)
-      {
-        cards.AddRange(cardArray);
-        this.nextPage = nextPage;
-        this.cardAPI = cardAPI;
-      }
+    protected override MTGCardViewModel GetCardViewModel(MTGCard card) => new(card);
+  }
 
-      public async Task<IEnumerable<MTGCardViewModel>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
-      {
-        if (!string.IsNullOrEmpty(nextPage))
-        {
-          // Load next page
-          (var newCards, nextPage, _) = await cardAPI.FetchCardsFromPage(nextPage);
-          foreach (var card in newCards)
-          {
-            cards.Add(card);
-          }
-        }
-        return await Task.Run(() => (from p in cards select p).Skip(pageIndex * pageSize).Take(pageSize).Select(x => new MTGCardViewModel(x))); ;
-      }
-    }
+  public class MTGCardCollectionCardViewModelSource : MTGCardSource<MTGCardCollectionCardViewModel>
+  {
+    public MTGCardCollectionCardViewModelSource() : base() { }
 
-    public MTGSearchViewModel(ICardAPI<MTGCard> cardAPI)
+    protected override MTGCardCollectionCardViewModel GetCardViewModel(MTGCard card) => new(card);
+  }
+
+  public partial class MTGAPISearch<TSource, IType> : ObservableObject where TSource : MTGCardSource<IType>, new() where IType : MTGCardViewModel
+  {
+    public MTGAPISearch(ICardAPI<MTGCard> cardAPI)
     {
       this.cardAPI = cardAPI;
     }
 
-    private readonly ICardAPI<MTGCard> cardAPI;
+    protected readonly ICardAPI<MTGCard> cardAPI;
 
     [ObservableProperty]
-    private IncrementalLoadingCollection<MTGCardSource, MTGCardViewModel> searchCards = new();
+    private IncrementalLoadingCollection<TSource, IType> searchCards = new();
     [ObservableProperty]
     private int totalCardCount;
     [ObservableProperty]
@@ -66,7 +49,13 @@ namespace MTGApplication.ViewModels
     {
       IsBusy = true;
       (var cards, var nextPage, TotalCardCount) = await cardAPI.FetchCardsFromPage(cardAPI.GetSearchUri(SearchQuery));
-      SearchCards = new(new MTGCardSource(cards, nextPage, cardAPI), cardAPI.PageSize);
+      var source = new TSource()
+      {
+        Cards = cards.ToList(),
+        CardAPI = cardAPI,
+        NextPage = nextPage,
+      };
+      SearchCards = new(source, cardAPI.PageSize);
       IsBusy = false;
     }
   }
