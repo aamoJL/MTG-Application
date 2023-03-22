@@ -11,6 +11,8 @@ namespace MTGApplication.Views
 {
   public static class Dialogs
   {
+    public static ContentDialog CurrentDialog { get; set; } = null;
+
     /// <summary>
     /// Basic class implementation of the <see cref="IDialogWrapper"/> interface
     /// </summary>
@@ -43,7 +45,12 @@ namespace MTGApplication.Views
 
       public async Task<ContentDialogResult> ShowAsync()
       {
-        return await Dialog.ShowAsync();
+        // Only one dialog can be open
+        await Task.Run(() => { while (CurrentDialog != null) { } });
+        CurrentDialog = Dialog;
+        var result = await Dialog.ShowAsync();
+        CurrentDialog = null;
+        return result;
       }
     }
 
