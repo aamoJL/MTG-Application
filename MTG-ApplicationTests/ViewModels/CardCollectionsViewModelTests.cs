@@ -27,6 +27,7 @@ namespace MTGApplicationTests.ViewModels
       await vm.NewCollectionListDialog();
       Assert.AreEqual(1, vm.Collection.CollectionLists.Count);
       Assert.AreEqual(list, vm.Collection.CollectionLists[0]);
+      Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -46,6 +47,7 @@ namespace MTGApplicationTests.ViewModels
 
       await vm.DeleteCollectionListDialog();
       Assert.AreEqual(0, vm.Collection.CollectionLists.Count);
+      Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -67,25 +69,22 @@ namespace MTGApplicationTests.ViewModels
       await vm.EditCollectionListDialog();
       Assert.AreEqual(1, vm.Collection.CollectionLists.Count);
       Assert.AreEqual(list.Name, editedList.Name);
+      Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
     public void AddToListTest()
     {
       var list = new MTGCardCollectionList() { Name = "First" };
-      var vm = new CardCollectionsViewModel(new TestCardAPI(), new TestInMemoryMTGCardCollectionRepository(new TestCardAPI()))
-      {
-        Dialogs = new()
-        {
-          DeleteListDialog = new TestConfirmationDialog(Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
-        }
-      };
+      var vm = new CardCollectionsViewModel(new TestCardAPI(), new TestInMemoryMTGCardCollectionRepository(new TestCardAPI()));
 
       vm.Collection.CollectionLists.Add(list);
+      vm.SelectedList = list;
 
       var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
       vm.Collection.CollectionLists[0].AddToList(card);
       Assert.AreEqual(1, vm.Collection.CollectionLists[0].Cards.Count);
+      Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -97,9 +96,11 @@ namespace MTGApplicationTests.ViewModels
       vm.Collection.CollectionLists.Add(list);
       var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
       vm.Collection.CollectionLists[0].Cards.Add(card);
+      vm.SelectedList = list;
 
       vm.Collection.CollectionLists[0].RemoveFromList(card);
       Assert.AreEqual(0, vm.Collection.CollectionLists[0].Cards.Count);
+      Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -133,6 +134,7 @@ namespace MTGApplicationTests.ViewModels
       await vm.NewCollectionDialog();
       Assert.AreEqual(string.Empty, vm.Collection.Name);
       Assert.AreEqual(0, vm.Collection.CollectionLists.Count);
+      Assert.IsFalse(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -152,6 +154,7 @@ namespace MTGApplicationTests.ViewModels
 
       await vm.LoadCollectionDialog();
       Assert.AreEqual(collection.Name, vm.Collection.Name);
+      Assert.IsFalse(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -173,6 +176,7 @@ namespace MTGApplicationTests.ViewModels
       await vm.SaveCollectionDialog();
       Assert.AreEqual(1, (await repo.Get()).ToList().Count);
       Assert.AreEqual(1, (await repo.Get(collectionName)).CollectionLists.Count);
+      Assert.IsFalse(vm.HasUnsavedChanges);
     }
 
     [TestMethod]
@@ -195,6 +199,7 @@ namespace MTGApplicationTests.ViewModels
 
       await vm.DeleteCollectionDialog();
       Assert.AreEqual(0, (await repo.Get()).ToList().Count);
+      Assert.IsFalse(vm.HasUnsavedChanges);
     }
     #endregion
   }

@@ -22,22 +22,12 @@ namespace MTGApplication.Views.Pages.Tabs
     public DeckBuilderTabView()
     {
       this.InitializeComponent();
-      App.MainWindow.Closed += MainWindow_Closed;
+      App.Closing += MainWindow_Closed;
     }
 
-    private async void MainWindow_Closed(object sender, WindowEventArgs args)
+    private void MainWindow_Closed(object sender, App.WindowClosingEventArgs args)
     {
-      if (DeckBuilderViewModel.HasUnsavedChanges)
-      {
-        args.Handled = true;
-        if (await DeckBuilderViewModel.ShowUnsavedDialogs())
-        {
-          // UnsavedChanges needs to be set to false, otherwise the window would not close
-          // until the used saves the deck.
-          DeckBuilderViewModel.HasUnsavedChanges = false;
-          App.MainWindow.Close();
-        }
-      }
+      args.ClosingTasks.Add(DeckBuilderViewModel);
     }
 
     public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> SearchViewModel = new(new ScryfallAPI());
@@ -60,7 +50,7 @@ namespace MTGApplication.Views.Pages.Tabs
     private void CardListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
       // Change card preview image to hovered item
-      if ((sender as FrameworkElement)?.DataContext is MTGCardViewModel cardVM)
+      if (sender is FrameworkElement { DataContext: MTGCardViewModel cardVM })
       {
         PreviewImage.Visibility = Visibility.Visible;
         PreviewImage.Source = new BitmapImage(new(cardVM.SelectedFaceUri));
@@ -114,7 +104,7 @@ namespace MTGApplication.Views.Pages.Tabs
         DragOperationDeferral def = e.GetDeferral();
         string data = await e.DataView.GetTextAsync();
 
-        if ((sender as FrameworkElement)?.DataContext is DeckBuilderViewModel.Cardlist cardlist)
+        if (sender is FrameworkElement { DataContext: DeckBuilderViewModel.Cardlist cardlist })
         {
           var card = new Func<MTGCard>(() =>
           {
@@ -159,7 +149,7 @@ namespace MTGApplication.Views.Pages.Tabs
       // Remove original item if the operation is 'Move'
       if ((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move
         && args.Items[0] is MTGCardViewModel cardVM
-        && (sender as FrameworkElement)?.DataContext is DeckBuilderViewModel.Cardlist cardlist)
+        && sender is FrameworkElement { DataContext: DeckBuilderViewModel.Cardlist cardlist })
       {
         if (cardlist.RemoveFromCardlistCommand.CanExecute(cardVM.Model))
         {

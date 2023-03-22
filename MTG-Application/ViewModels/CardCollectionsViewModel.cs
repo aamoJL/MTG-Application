@@ -13,7 +13,7 @@ using static MTGApplication.Views.Dialogs;
 
 namespace MTGApplication.ViewModels
 {
-  public partial class CardCollectionsViewModel : ViewModelBase
+  public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   {
     public class CardCollectionsDialogs
     {
@@ -176,7 +176,6 @@ namespace MTGApplication.ViewModels
           };
         }
       }
-
     }
 
     public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository)
@@ -216,6 +215,7 @@ namespace MTGApplication.ViewModels
     {
       if(e.PropertyName == nameof(SelectedList)) 
       {
+        if (SelectedList != null) { SelectedList.Cards.CollectionChanged += (s, e) => { HasUnsavedChanges = true; }; }
         MTGSearchViewModel.SearchQuery = SelectedList?.SearchQuery ?? string.Empty;
       }
     }
@@ -355,7 +355,7 @@ namespace MTGApplication.ViewModels
 
       await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(App.MainRoot);
     }
-    
+
     private void NewCollection()
     {
       Collection = new MTGCardCollection();
@@ -406,6 +406,7 @@ namespace MTGApplication.ViewModels
       {
         Collection.CollectionLists.Add(newList);
         ChangeSelectedCollectionList(newList);
+        HasUnsavedChanges = true;
         Notifications.RaiseNotification(Notifications.NotificationType.Success, "List added to the collection successfully.");
       }
       else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. List already exists in the collection."); }
@@ -416,12 +417,14 @@ namespace MTGApplication.ViewModels
       SelectedList.Name = updatedList.Name;
       SelectedList.SearchQuery = updatedList.SearchQuery;
       MTGSearchViewModel.SearchQuery = updatedList.SearchQuery;
+      HasUnsavedChanges = true;
     }
     private void DeleteSelectedCollectionList()
     {
       if (Collection.CollectionLists.Remove(SelectedList))
       {
         SelectedList = Collection.CollectionLists.Count > 0 ? Collection.CollectionLists[0] : null;
+        HasUnsavedChanges = true;
         Notifications.RaiseNotification(Notifications.NotificationType.Success, "The list was deleted successfully.");
       }
       else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not delete the list."); }
@@ -431,7 +434,7 @@ namespace MTGApplication.ViewModels
     /// Asks user if they want to save the collections's unsaved changes.
     /// </summary>
     /// <returns><see langword="true"/>, if user does not cancel any of the dialogs</returns>
-    private async Task<bool> ShowUnsavedDialogs()
+    public async Task<bool> ShowUnsavedDialogs()
     {
       if (HasUnsavedChanges)
       {
@@ -462,7 +465,10 @@ namespace MTGApplication.ViewModels
       }
       return true;
     }
-
+    public async Task<bool> SaveUnsavedChanges()
+    {
+      return await ShowUnsavedDialogs();
+    }
 
     private bool SaveCollectionDialogCommandCanExecute() => Collection.CollectionLists.Count > 0;
     private bool DeleteCollectionDialogCommandCanExecute() => !string.IsNullOrEmpty(Collection.Name);

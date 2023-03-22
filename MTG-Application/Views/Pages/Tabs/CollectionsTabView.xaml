@@ -8,7 +8,7 @@
   xmlns:viewmodels="using:MTGApplication.ViewModels" 
   xmlns:ui="using:CommunityToolkit.WinUI.UI" 
   xmlns:sys="using:System"
-  xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
+  xmlns:helpers="using:MTGApplication.Views.BindingHelpers" xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
   mc:Ignorable="d">
 
   <UserControl.Resources>
@@ -38,6 +38,29 @@
   </UserControl.Resources>
 
   <Grid>
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="CollectionNameTitleSaveStatus">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" To="{x:Bind sys:String.Empty}"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedCollectionNameTitle.Text" Value="Unsaved"/>
+            <Setter Target="SelectedCollectionNameTitle.FontStyle" Value="Italic"/>
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="LightGray"/>
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind CardCollectionsViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="Red"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    
     <controls:DockPanel LastChildFill="True" Margin="10 0 10 10">
       <Grid controls:DockPanel.Dock="Top">
         <StackPanel Orientation="Horizontal">
@@ -101,7 +124,7 @@
             </ComboBox.ItemTemplate>
           </ComboBox>
           <AppBarSeparator/>
-          <TextBlock Text="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" VerticalAlignment="Center" Margin="10 0 0 0"/>
+          <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" VerticalAlignment="Center" Margin="10 0 0 0" FontWeight="Bold" HorizontalAlignment="Right"/>
           <ProgressRing IsActive="{x:Bind CardCollectionsViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0"/>
         </StackPanel>
         <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"/>

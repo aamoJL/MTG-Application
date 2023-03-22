@@ -17,7 +17,7 @@ using static MTGApplication.Views.Dialogs;
 
 namespace MTGApplication.ViewModels
 {
-  public partial class DeckBuilderViewModel : ViewModelBase
+  public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   {
     public class DeckBuilderViewDialogs
     {
@@ -783,6 +783,10 @@ namespace MTGApplication.ViewModels
         }
       }
       return true;
+    }
+    public async Task<bool> SaveUnsavedChanges()
+    {
+      return await ShowUnsavedDialogs();
     }
   }
 }

@@ -11,9 +11,15 @@ namespace MTGApplication.Views.Pages.Tabs
     public CollectionsTabView()
     {
       this.InitializeComponent();
+      App.Closing += MainWindow_Closed;
     }
 
     public CardCollectionsViewModel CardCollectionsViewModel = new(new ScryfallAPI(), new SQLiteMTGCardCollectionRepository(new ScryfallAPI(), new()));
+    
+    private void MainWindow_Closed(object sender, App.WindowClosingEventArgs args)
+    {
+      args.ClosingTasks.Add(CardCollectionsViewModel);
+    }
 
     private void GridViewItemImage_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
     {

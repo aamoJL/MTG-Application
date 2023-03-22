@@ -6,6 +6,11 @@ using MTGApplication.Pages;
 using MTGApplication.Services;
 using MTGApplication.Database;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MTGApplication.Interfaces;
 
 namespace MTGApplication
 {
@@ -17,6 +22,19 @@ namespace MTGApplication
     public static Window MainWindow { get; private set; }
     // Used for Dialogs
     public static FrameworkElement MainRoot { get; private set; }
+
+    // Variable for window close event so the window will close when all tasks has been compleated
+    private bool close = false;
+
+    public class WindowClosingEventArgs : EventArgs
+    {
+      public List<ISavable> ClosingTasks { get; set; } = new();
+      //public bool? Canceled => Close.FirstOrDefault(x => x is false);
+
+      public WindowClosingEventArgs() { }
+    }
+
+    public static event EventHandler<WindowClosingEventArgs> Closing;
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -51,6 +69,7 @@ namespace MTGApplication
       rootFrame.Navigate(typeof(MainPage), args.Arguments);
 
       MainWindow.Activate();
+      MainWindow.Closed += MainWindow_Closed;
 
       MainRoot = MainWindow.Content as FrameworkElement;
 
@@ -58,6 +77,30 @@ namespace MTGApplication
       LiveCharts.Configure(config =>
         config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()
       );
+    }
+
+    private async void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+      if (close) { return; }
+
+      var closingArgs = new WindowClosingEventArgs();
+      Closing?.Invoke(this, closingArgs);
+
+      args.Handled = closingArgs.ClosingTasks.FirstOrDefault(x => x.HasUnsavedChanges is true) != null;
+      bool canceled = false; 
+
+      foreach (var task in closingArgs.ClosingTasks)
+      {
+        canceled = !await task.SaveUnsavedChanges();
+        if (canceled) { break; }
+      }
+      
+      if(!canceled)
+      {
+        close = true;
+        args.Handled = false;
+        MainWindow.Close();
+      }
     }
   }
 }

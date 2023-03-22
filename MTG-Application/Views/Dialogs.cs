@@ -11,7 +11,7 @@ namespace MTGApplication.Views
 {
   public static class Dialogs
   {
-    public static ContentDialog CurrentDialog { get; set; } = null;
+    public static ContentDialog CurrentDialogs { get; set; } = null;
 
     /// <summary>
     /// Basic class implementation of the <see cref="IDialogWrapper"/> interface
@@ -37,7 +37,7 @@ namespace MTGApplication.Views
           };
           smokeLayer.PointerReleased += (sender, e) =>
           {
-            if(pressed == true) { Dialog.Hide(); }
+            if (pressed == true) { Dialog.Hide(); }
             pressed = false;
           };
         };
@@ -46,10 +46,11 @@ namespace MTGApplication.Views
       public async Task<ContentDialogResult> ShowAsync()
       {
         // Only one dialog can be open
-        await Task.Run(() => { while (CurrentDialog != null) { } });
-        CurrentDialog = Dialog;
+        if(CurrentDialogs != null) { return ContentDialogResult.None; }
+        CurrentDialogs = Dialog;
+        if(CurrentDialogs != Dialog) { return ContentDialogResult.None; }
         var result = await Dialog.ShowAsync();
-        CurrentDialog = null;
+        CurrentDialogs = null;
         return result;
       }
     }
