@@ -211,12 +211,14 @@ namespace MTGApplication.ViewModels
         };
       }
     }
-    private void CardCollectionsViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private async void CardCollectionsViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       if(e.PropertyName == nameof(SelectedList)) 
       {
         if (SelectedList != null) { SelectedList.Cards.CollectionChanged += (s, e) => { HasUnsavedChanges = true; }; }
-        MTGSearchViewModel.SearchQuery = SelectedList?.SearchQuery ?? string.Empty;
+        // Search does not update itself if the query is same as previous query, so it has to be updated manually.
+        if(MTGSearchViewModel.SearchQuery == SelectedList?.SearchQuery) { await MTGSearchViewModel.SearchSubmit(); }
+        else { MTGSearchViewModel.SearchQuery = SelectedList?.SearchQuery ?? string.Empty; }
       }
     }
 
