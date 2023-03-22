@@ -46,13 +46,15 @@ namespace MTGApplication.Models
       public ColorTypes[] Colors { get; }
       public string Name { get; }
       public string ImageUri { get; }
+      public Guid? IllustrationId { get; }
 
       [JsonConstructor]
-      public CardFace(ColorTypes[] colors, string name, string imageUri)
+      public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId)
       {
         Colors = colors;
         Name = name;
         ImageUri = imageUri;
+        IllustrationId = illustrationId;
       }
     }
     [Serializable]
@@ -103,7 +105,7 @@ namespace MTGApplication.Models
         ProducedMana = producedMana;
         PrintSearchUri = printSearchUri;
       }
-      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri)
+      public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri)
       {
         ScryfallId = scryfallId;
         Name = name;
@@ -117,13 +119,13 @@ namespace MTGApplication.Models
         SetIconUri = setIconUri;
         RarityType = rarityType;
         PrintSearchUri = printSearchUri;
+        CardMarketUri = cardMarketUri;
 
         FrontFace = frontFace;
         BackFace = backFace;
 
         Colors = GetColors(FrontFace, BackFace);
         SpellTypes = GetSpellTypes(TypeLine);
-        CardMarketUri = $"https://www.cardmarket.com/en/Magic/Products/Search?searchString={Name.Replace(" // ", "-").Replace(' ', '-').Trim('\u0027')}"; // '\u0027' == '
         ProducedMana = producedMana;
       }
     }

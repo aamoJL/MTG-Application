@@ -26,7 +26,7 @@
                 <MenuFlyoutItem Command="{x:Bind SwitchOwnedCommand}" Icon="switch" Text="Switch owned"/>
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
+                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints"/>
                 <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
                 <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
               </MenuFlyout>

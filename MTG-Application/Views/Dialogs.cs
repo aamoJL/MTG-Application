@@ -358,8 +358,15 @@ namespace MTGApplication.Views
           // Add event to click the primary button when selected item has been double tapped.
           (dialog.Dialog.Content as GridView).DoubleTapped += (sender, e) =>
           {
-            var feap = FrameworkElementAutomationPeer.FromElement(primaryButton) as ButtonAutomationPeer;
-            feap.Invoke(); // Click the primary button
+            var PrimaryFeap = FrameworkElementAutomationPeer.FromElement(primaryButton) as ButtonAutomationPeer;
+            if (PrimaryFeap != null) { PrimaryFeap?.Invoke(); } // Click the primary button
+            else
+            {
+              // If primary button is not available, press close button
+              var closeButton = FindByName(root, "CloseButton") as Button;
+              var closeFeap = FrameworkElementAutomationPeer.FromElement(closeButton) as ButtonAutomationPeer;
+              closeFeap?.Invoke();
+            }
           };
         };
 

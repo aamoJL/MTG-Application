@@ -67,7 +67,7 @@
                 <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
                 <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
+                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
                 <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
                 <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
                 <MenuFlyoutSeparator />
@@ -96,7 +96,7 @@
             <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
             <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
+            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
             <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
             <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
             <MenuFlyoutSeparator />
@@ -124,7 +124,7 @@
             <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
             <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind ChangePrintDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
+            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
             <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
             <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
             <MenuFlyoutSeparator />

@@ -26,9 +26,9 @@ namespace MTGApplicationTests.Services
           int count = 1,
           string apiWebsiteUri = "https://scryfall.com/card/neo/4/befriending-the-moths-imperial-moth?utm_source=api",
           string printSearchUri = "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A2ee5f5ad-2f16-40d9-831a-2aefece31b36&unique=prints",
-          ColorTypes[]? producedMana = null)
+          ColorTypes[]? producedMana = null,
+          string cardMarketUri = "https://www.cardmarket.com/en/Magic/Products/Search?referrer=scryfall&searchString=Befriending+the+Moths&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall")
       {
-        
         producedMana ??= Array.Empty<ColorTypes>();
         scryfallId ??= Guid.NewGuid();
         frontFace ??= CreateCardFace();
@@ -48,8 +48,8 @@ namespace MTGApplicationTests.Services
           apiWebsiteUri: apiWebsiteUri,
           setIconUri: setIconUri,
           producedMana: producedMana,
-          printSearchUri: printSearchUri
-          ), count);
+          printSearchUri: printSearchUri,
+          cardMarketUri: cardMarketUri), count);
       }
 
       /// <summary>
@@ -58,14 +58,16 @@ namespace MTGApplicationTests.Services
       public static CardFace CreateCardFace(
         ColorTypes[]? colors = null,
         string name = "Befriending the Moths",
-        string imageUri = "https://cards.scryfall.io/normal/front/8/a/8ad44884-ae0d-40ae-87a9-bad043d4e9ad.jpg?1656453019")
+        string imageUri = "https://cards.scryfall.io/normal/front/8/a/8ad44884-ae0d-40ae-87a9-bad043d4e9ad.jpg?1656453019",
+        Guid? illustrationId = null)
       {
         colors ??= new ColorTypes[] { ColorTypes.W };
+        illustrationId ??= Guid.Parse("a35ceece-124c-41aa-b9f1-ef95f7d20228");
         return new CardFace(
             colors: colors,
             name: name,
-            imageUri: imageUri
-            ); ;
+            imageUri: imageUri,
+            illustrationId: illustrationId);
       }
 
       /// <summary>

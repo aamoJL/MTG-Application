@@ -10,7 +10,6 @@ using Microsoft.UI.Xaml.Controls;
 using static MTGApplication.ViewModels.DeckBuilderViewModel;
 using CommunityToolkit.WinUI.UI;
 using static MTGApplication.Models.MTGCard;
-using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
 
 namespace MTGApplicationTests.ViewModels
 {

@@ -23,6 +23,7 @@ namespace MTGApplication.ViewModels
       public ConfirmationDialog DeleteCollectionDialog { protected get; set; } = new ConfirmationDialog("Delete collection?");
       public ConfirmationDialog SaveUnsavedDialog { protected get; set; } = new ConfirmationDialog("Save unsaved changes?");
       public ConfirmationDialog DeleteListDialog { protected get; set; } = new ConfirmationDialog("Delete list?");
+      public GridViewDialog CardPrintDialog { protected get; set; } = new GridViewDialog("Illustration prints");
       public TextBoxDialog SaveDialog { protected get; set; } = new TextBoxDialog("Save your collection?");
       public ComboBoxDialog LoadDialog { protected get; set; } = new ComboBoxDialog("Open collection");
 
@@ -32,6 +33,16 @@ namespace MTGApplication.ViewModels
         EditCollectionListDialog.SearchQueryBoxDefaultText = query;
         EditCollectionListDialog.PrimaryButtonText = "Update";
         return EditCollectionListDialog;
+      }
+      public GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      {
+        CardPrintDialog.Items = printViewModels;
+        CardPrintDialog.SecondaryButtonText = string.Empty;
+        CardPrintDialog.GridViewStyleName = "MTGAdaptiveGridViewStyle";
+        CardPrintDialog.ItemTemplateName = "MTGPrintGridViewItemTemplate";
+        CardPrintDialog.PrimaryButtonText = string.Empty;
+        CardPrintDialog.CloseButtonText = "Close";
+        return CardPrintDialog;
       }
       public ConfirmationDialog GetDeleteCollectionDialog(string name)
       {
@@ -165,6 +176,7 @@ namespace MTGApplication.ViewModels
           };
         }
       }
+
     }
 
     public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository)
@@ -193,6 +205,7 @@ namespace MTGApplication.ViewModels
             case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
               var newCard = e.NewItems[0] as MTGCardCollectionCardViewModel;
               if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == newCard.Model.Info.ScryfallId) != null) { newCard.IsOwned = true; }
+              newCard.ShowPrintsDialogCommand = ShowCardIllustrationsCommand;
               break;
             default: break;
           }
@@ -328,6 +341,21 @@ namespace MTGApplication.ViewModels
       }
     }
 
+    /// <summary>
+    /// Shows the prints with the same illustrations than the given card's print's illustration
+    /// </summary>
+    [RelayCommand]
+    private async Task ShowCardIllustrations(MTGCard card)
+    {
+      // Get prints
+      IsBusy = true;
+      var prints = (await CardAPI.FetchCardsWithParameters($"!\"{card.Info.Name}\"+unique:prints+game:paper")).Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray();
+      var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
+      IsBusy = false;
+
+      await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(App.MainRoot);
+    }
+    
     private void NewCollection()
     {
       Collection = new MTGCardCollection();
@@ -434,6 +462,7 @@ namespace MTGApplication.ViewModels
       }
       return true;
     }
+
 
     private bool SaveCollectionDialogCommandCanExecute() => Collection.CollectionLists.Count > 0;
     private bool DeleteCollectionDialogCommandCanExecute() => !string.IsNullOrEmpty(Collection.Name);

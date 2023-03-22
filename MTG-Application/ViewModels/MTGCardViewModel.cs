@@ -21,7 +21,7 @@ namespace MTGApplication.ViewModels
 
     protected void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if (e.PropertyName == nameof(SelectedFace)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
+      if (e.PropertyName == nameof(SelectedFaceSide)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
     }
     protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -40,13 +40,13 @@ namespace MTGApplication.ViewModels
     public MTGCard Model { get; }
 
     [ObservableProperty]
-    protected CardSide selectedFace;
+    protected CardSide selectedFaceSide;
 
     public string SelectedFaceUri
     {
       get
       {
-        return SelectedFace == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
+        return SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
       }
     }
     public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
@@ -66,7 +66,7 @@ namespace MTGApplication.ViewModels
     #endregion
 
     public ICommand DeleteCardCommand { get; set; }
-    public ICommand ChangePrintDialogCommand { get; set; }
+    public ICommand ShowPrintsDialogCommand { get; set; }
 
     /// <summary>
     /// Changes selected face image if possible
@@ -74,7 +74,7 @@ namespace MTGApplication.ViewModels
     [RelayCommand(CanExecute = nameof(HasBackFace))]
     public void FlipCard()
     {
-      if (HasBackFace) SelectedFace = SelectedFace == CardSide.Front ? CardSide.Back : CardSide.Front;
+      if (HasBackFace) SelectedFaceSide = SelectedFaceSide == CardSide.Front ? CardSide.Back : CardSide.Front;
     }
 
     /// <summary>

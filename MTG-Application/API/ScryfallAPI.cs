@@ -102,8 +102,7 @@ namespace MTGApplication.API
     public async Task<MTGCard[]> FetchCardsWithParameters(string searchParams, int countLimit = 700)
     {
       if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
-      string searchUri = GetSearchUri(searchParams);
-      return await FetchCardsFromUri(searchUri, countLimit);
+      return await FetchCardsFromUri(GetSearchUri(searchParams), countLimit);
     }
     public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false)
     {
@@ -183,9 +182,9 @@ namespace MTGApplication.API
       JsonNode dataNode = jsonNode?["data"];
       if (dataNode != null)
       {
-        var infos = dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x, paperOnly)));
+        var infos = await Task.WhenAll(dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x, paperOnly))));
 
-        foreach (var itemInfo in await Task.WhenAll(infos))
+        foreach (var itemInfo in infos)
         {
           if (itemInfo != null)
           {
@@ -230,6 +229,7 @@ namespace MTGApplication.API
       var apiWebsiteUri = json["scryfall_uri"]?.GetValue<string>();
       var setIconUri = $"{SET_ICON_URL}/{setCode}.svg";
       var printSearchUri = json["prints_search_uri"]?.GetValue<string>();
+      var cardMarketUri = json["purchase_uris"]?["cardmarket"]?.GetValue<string>();
 
       // https://scryfall.com/docs/api/layouts
       var twoSideLayouts = new string[] { "transform", "modal_dfc", "double_faced_token", "art_series", "reversible_card" };
@@ -243,29 +243,34 @@ namespace MTGApplication.API
         frontFace = new CardFace(
             colors: GetColors(json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
             name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>(),
-            imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>());
+            imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>(),
+            illustrationId: json["card_faces"]?.AsArray()[0]["illustration_id"]?.GetValue<Guid?>());
         backFace = new CardFace(
             colors: GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()),
             name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>(),
-            imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>());
+            imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>(),
+            illustrationId: json["card_faces"]?.AsArray()[1]["illustration_id"]?.GetValue<Guid?>());
       }
       else if (twoPartLayouts.Contains(layout))
       {
         frontFace = new CardFace(
           colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
           name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>(),
-          imageUri: json["image_uris"]?["normal"]?.GetValue<string>());
+          imageUri: json["image_uris"]?["normal"]?.GetValue<string>(),
+          illustrationId: json["illustration_id"]?.GetValue<Guid?>());
         backFace = new CardFace(
           colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
           name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>(),
-          imageUri: null);
+          imageUri: null,
+          illustrationId: null);
       }
       else
       {
         frontFace = new CardFace(
             colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
             name: json["name"]?.GetValue<string>(),
-            imageUri: json["image_uris"]?["normal"]?.GetValue<string>());
+            imageUri: json["image_uris"]?["normal"]?.GetValue<string>(),
+            illustrationId: json["illustration_id"]?.GetValue<Guid?>());
         backFace = null;
       }
 
@@ -284,7 +289,7 @@ namespace MTGApplication.API
       }
 
       return new MTGCardInfo(
-        scryfallId: scryfallId,
+        scryfallId: scryfallId, 
         frontFace: frontFace,
         backFace: backFace,
         cmc: cmc,
@@ -298,8 +303,8 @@ namespace MTGApplication.API
         setIconUri: setIconUri,
         rarityType: rarityType,
         producedMana: producedManaList.ToArray(),
-        printSearchUri: printSearchUri
-        );
+        printSearchUri: printSearchUri,
+        cardMarketUri: cardMarketUri);
     }
 
     /// <summary>

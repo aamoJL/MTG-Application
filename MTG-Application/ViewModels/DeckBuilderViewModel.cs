@@ -404,7 +404,7 @@ namespace MTGApplication.ViewModels
       {
         foreach (var card in cards)
         {
-          var vm = new MTGCardViewModel(card) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand };
+          var vm = new MTGCardViewModel(card) { DeleteCardCommand = RemoveFromCardlistCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand };
           vm.PropertyChanged += CardViewModel_PropertyChanged;
           CardViewModels.Add(vm);
         }
@@ -414,7 +414,7 @@ namespace MTGApplication.ViewModels
       /// </summary>
       private void AddCardViewModels(MTGCard card)
       {
-        var vm = new MTGCardViewModel(card) { DeleteCardCommand = RemoveFromCardlistCommand, ChangePrintDialogCommand = ChangePrintDialogCommand };
+        var vm = new MTGCardViewModel(card) { DeleteCardCommand = RemoveFromCardlistCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand };
         vm.PropertyChanged += CardViewModel_PropertyChanged;
         CardViewModels.Add(vm);
       }

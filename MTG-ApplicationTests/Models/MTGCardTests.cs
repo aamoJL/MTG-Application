@@ -34,8 +34,8 @@ namespace MTGApplicationTests.Models
     [TestMethod]
     public void GetColorTypeTest()
     {
-      var frontFace = new CardFace(new[] { ColorTypes.W, ColorTypes.G }, "WhiteGreen", string.Empty);
-      var backFace = new CardFace(new[] { ColorTypes.R }, "Red", string.Empty);
+      var frontFace = Mocker.MTGCardModelMocker.CreateCardFace(colors: new[] { ColorTypes.W, ColorTypes.G }, name: "WhiteGreen");
+      var backFace = Mocker.MTGCardModelMocker.CreateCardFace(colors: new[] { ColorTypes.R }, name: "Red");
 
       CollectionAssert.AreEquivalent(new[] { ColorTypes.W, ColorTypes.G, ColorTypes.R }, GetColors(frontFace, backFace));
       CollectionAssert.AreEquivalent(new[] { ColorTypes.R }, GetColors(backFace, null));
