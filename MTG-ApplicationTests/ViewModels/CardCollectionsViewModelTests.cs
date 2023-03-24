@@ -3,6 +3,8 @@ using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
+using static MTGApplication.ViewModels.CardCollectionsViewModel;
+using static MTGApplication.Views.Dialogs;
 using static MTGApplicationTests.Database.InMemoryMTGCardCollectionRepositoryTests;
 using static MTGApplicationTests.Services.TestDialogService;
 
@@ -11,6 +13,78 @@ namespace MTGApplicationTests.ViewModels
   [TestClass]
   public class CardCollectionsViewModelTests
   {
+    public class TestCardCollectionsDialogs : CardCollectionsDialogs
+    {
+      public TestDialogResult<(string Name, string Query)> EditCollectionListDialog { protected get; set; } = new();
+      public TestDialogResult<(string Name, string Query)> NewCollectionListDialog { protected get; set; } = new();
+      public TestDialogResult<MTGCardViewModel> CardPrintDialog { protected get; set; } = new();
+      public TestDialogResult<string> LoadDialog { protected get; set; } = new();
+      public TestDialogResult<string> SaveDialog { protected get; set; } = new();
+      public TestDialogResult DeleteCollectionDialog { protected get; set; } = new();
+      public TestDialogResult SaveUnsavedDialog { protected get; set; } = new();
+      public TestDialogResult DeleteListDialog { protected get; set; } = new();
+      public TestDialogResult OverrideDialog { protected get; set; } = new();
+
+      public override CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
+      {
+        DialogWrapper = new TestDialogWrapper(EditCollectionListDialog.Result);
+        var dialog = base.GetEditCollectionListDialog(EditCollectionListDialog.Values.Name, EditCollectionListDialog.Values.Query);
+        return dialog;
+      }
+      public override CollectionListContentDialog GetNewCollectionListDialog()
+      {
+        DialogWrapper = new TestDialogWrapper(NewCollectionListDialog.Result);
+        var dialog = base.GetNewCollectionListDialog();
+        dialog.NameInputText = NewCollectionListDialog.Values.Name;
+        dialog.QueryInputText = NewCollectionListDialog.Values.Query;
+        return dialog;
+      }
+      public override ConfirmationDialog GetDeleteCollectionDialog(string name)
+      {
+        DialogWrapper = new TestDialogWrapper(DeleteCollectionDialog.Result);
+        var dialog = base.GetDeleteCollectionDialog(name);
+        return dialog;
+      }
+      public override ConfirmationDialog GetDeleteListDialog(string name)
+      {
+        DialogWrapper = new TestDialogWrapper(DeleteListDialog.Result);
+        var dialog = base.GetDeleteListDialog(name);
+        return dialog;
+      }
+      public override ConfirmationDialog GetOverrideDialog(string name)
+      {
+        DialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
+        var dialog = base.GetOverrideDialog(name);
+        return dialog;
+      }
+      public override ConfirmationDialog GetSaveUnsavedDialog()
+      {
+        DialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
+        var dialog = base.GetSaveUnsavedDialog();
+        return dialog;
+      }
+      public override GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      {
+        DialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
+        var dialog = base.GetCardPrintDialog(printViewModels);
+        dialog.Selection = CardPrintDialog.Values;
+        return dialog;
+      }
+      public override ComboBoxDialog GetLoadDialog(string[] names)
+      {
+        DialogWrapper = new TestDialogWrapper(LoadDialog.Result);
+        var dialog = base.GetLoadDialog(names);
+        dialog.Selection = LoadDialog.Values;
+        return dialog;
+      }
+      public override TextBoxDialog GetSaveDialog(string name)
+      {
+        DialogWrapper = new TestDialogWrapper(SaveDialog.Result);
+        var dialog = base.GetSaveDialog(SaveDialog.Values);
+        return dialog;
+      }
+    }
+
     #region List Tests
     [TestMethod]
     public async Task NewListTest()
@@ -18,15 +92,15 @@ namespace MTGApplicationTests.ViewModels
       var list = new MTGCardCollectionList() { Name = "First" };
       var vm = new CardCollectionsViewModel(new TestCardAPI(), new TestInMemoryMTGCardCollectionRepository(new TestCardAPI()))
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          NewCollectionListDialog = new TestCollectionListContentDialog() { ReturnsObject = list }
+          NewCollectionListDialog = new() { Values = (list.Name, list.SearchQuery)},
         }
       };
 
       await vm.NewCollectionListDialog();
       Assert.AreEqual(1, vm.Collection.CollectionLists.Count);
-      Assert.AreEqual(list, vm.Collection.CollectionLists[0]);
+      Assert.AreEqual(list.Name, vm.Collection.CollectionLists[0].Name);
       Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
@@ -36,10 +110,10 @@ namespace MTGApplicationTests.ViewModels
       var list = new MTGCardCollectionList() { Name = "First" };
       var vm = new CardCollectionsViewModel(new TestCardAPI(), new TestInMemoryMTGCardCollectionRepository(new TestCardAPI()))
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          NewCollectionListDialog = new TestCollectionListContentDialog() { ReturnsObject = list},
-          DeleteListDialog = new TestConfirmationDialog(Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+          NewCollectionListDialog = new() { Values = (list.Name, list.SearchQuery) },
+          DeleteListDialog = new()
         }
       };
 
@@ -57,10 +131,10 @@ namespace MTGApplicationTests.ViewModels
       var editedList = new MTGCardCollectionList() { Name = "Edited" };
       var vm = new CardCollectionsViewModel(new TestCardAPI(), new TestInMemoryMTGCardCollectionRepository(new TestCardAPI()))
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          NewCollectionListDialog = new TestCollectionListContentDialog() { ReturnsObject = list },
-          EditCollectionListDialog = new TestCollectionListContentDialog() { ReturnsObject = editedList }
+          NewCollectionListDialog = new() { Values = (list.Name, list.SearchQuery) },
+          EditCollectionListDialog = new() { Values = (editedList.Name, editedList.SearchQuery) },
         }
       };
 
@@ -68,7 +142,7 @@ namespace MTGApplicationTests.ViewModels
 
       await vm.EditCollectionListDialog();
       Assert.AreEqual(1, vm.Collection.CollectionLists.Count);
-      Assert.AreEqual(list.Name, editedList.Name);
+      Assert.AreEqual(editedList.Name, vm.Collection.CollectionLists[0].Name);
       Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
@@ -110,18 +184,18 @@ namespace MTGApplicationTests.ViewModels
       var secondlist = new MTGCardCollectionList() { Name = "Second" };
       var vm = new CardCollectionsViewModel(new TestCardAPI(), new TestInMemoryMTGCardCollectionRepository(new TestCardAPI()))
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          NewCollectionListDialog = new TestCollectionListContentDialog() { ReturnsObject = firstlist },
+          NewCollectionListDialog = new() { Values = (firstlist.Name, firstlist.SearchQuery) },
         }
       };
 
       await vm.NewCollectionListDialog();
       vm.Collection.CollectionLists.Add(secondlist);
-      Assert.AreEqual(firstlist, vm.SelectedList);
+      Assert.AreEqual(firstlist.Name, vm.SelectedList.Name);
       
       vm.ChangeSelectedCollectionList(secondlist);
-      Assert.AreEqual(secondlist, vm.SelectedList);
+      Assert.AreEqual(secondlist.Name, vm.SelectedList.Name);
     }
     #endregion
 
@@ -144,9 +218,9 @@ namespace MTGApplicationTests.ViewModels
       using var repo = new TestInMemoryMTGCardCollectionRepository(new TestCardAPI());
       var vm = new CardCollectionsViewModel(new TestCardAPI(), repo)
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          LoadDialog = new TestComboBoxDialog(Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary, collection.Name)
+          LoadDialog = new() { Values = collection.Name },
         }
       };
 
@@ -165,17 +239,18 @@ namespace MTGApplicationTests.ViewModels
       using var repo = new TestInMemoryMTGCardCollectionRepository(new TestCardAPI());
       var vm = new CardCollectionsViewModel(new TestCardAPI(), repo)
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          SaveDialog = new TestTextBoxDialog(Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary, collectionName)
+          NewCollectionListDialog = new() { Values = (list.Name, list.SearchQuery) },
+          SaveDialog = new() { Values = collectionName }
         }
       };
 
-      vm.Collection.CollectionLists.Add(list);
+      await vm.NewCollectionListDialog();
 
       await vm.SaveCollectionDialog();
       Assert.AreEqual(1, (await repo.Get()).ToList().Count);
-      Assert.AreEqual(1, (await repo.Get(collectionName)).CollectionLists.Count);
+      Assert.AreEqual(1, (await repo.Get(collectionName))?.CollectionLists.Count);
       Assert.IsFalse(vm.HasUnsavedChanges);
     }
 
@@ -187,10 +262,10 @@ namespace MTGApplicationTests.ViewModels
       using var repo = new TestInMemoryMTGCardCollectionRepository(new TestCardAPI());
       var vm = new CardCollectionsViewModel(new TestCardAPI(), repo)
       {
-        Dialogs = new()
+        Dialogs = new TestCardCollectionsDialogs()
         {
-          SaveDialog = new TestTextBoxDialog(Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary, collectionName),
-          DeleteCollectionDialog = new TestConfirmationDialog(Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+          SaveDialog = new() { Values = collectionName },
+          DeleteCollectionDialog = new(),
         }
       };
 

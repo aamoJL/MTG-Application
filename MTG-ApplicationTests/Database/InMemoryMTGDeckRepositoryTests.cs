@@ -39,7 +39,7 @@ namespace MTGApplicationTests.Database
         if (WillFail) { return new List<MTGCardDeck>(); }
         return await base.Get();
       }
-      public override async Task<MTGCardDeck> Get(string name)
+      public override async Task<MTGCardDeck?> Get(string name)
       {
         if (WillFail) { return null; }
         return await base.Get(name);
@@ -120,7 +120,7 @@ namespace MTGApplicationTests.Database
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
 
       var deck = await repo.Get(firstDeckName);
-      Assert.AreEqual(firstDeckName, deck.Name);
+      Assert.AreEqual(firstDeckName, deck?.Name);
     }
 
     [TestMethod]
@@ -135,7 +135,7 @@ namespace MTGApplicationTests.Database
       await repo.Add(new MTGCardDeck() { Name = secondDeckName });
       var firstDeck = await repo.Get(firstDeckName);
 
-      await repo.Remove(firstDeck);
+      if(firstDeck != null) await repo.Remove(firstDeck);
       Assert.AreEqual(1, repo.Get().Result.ToList().Count);
     }
 
@@ -153,12 +153,12 @@ namespace MTGApplicationTests.Database
       deck.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 5));
       deck.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1));
       await repo.Update(deck);
-      Assert.AreEqual(6, (await repo.Get(firstDeckName)).DeckCards.Sum(x => x.Count));
+      Assert.AreEqual(6, (await repo.Get(firstDeckName))?.DeckCards.Sum(x => x.Count));
 
       // Remove
       deck.DeckCards.RemoveAt(0);
       await repo.Update(deck);
-      Assert.AreEqual(1, (await repo.Get(firstDeckName)).DeckCards.Sum(x => x.Count));
+      Assert.AreEqual(1, (await repo.Get(firstDeckName))?.DeckCards.Sum(x => x.Count));
     }
 
     [TestMethod]
@@ -175,12 +175,12 @@ namespace MTGApplicationTests.Database
       deck.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 5));
       deck.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1));
       await repo.AddOrUpdate(deck);
-      Assert.AreEqual(6, (await repo.Get(firstDeckName)).DeckCards.Sum(x => x.Count));
+      Assert.AreEqual(6, (await repo.Get(firstDeckName))?.DeckCards.Sum(x => x.Count));
 
       // Remove
       deck.DeckCards.RemoveAt(0);
       await repo.AddOrUpdate(deck);
-      Assert.AreEqual(1, (await repo.Get(firstDeckName)).DeckCards.Sum(x => x.Count));
+      Assert.AreEqual(1, (await repo.Get(firstDeckName))?.DeckCards.Sum(x => x.Count));
     }
   }
 }

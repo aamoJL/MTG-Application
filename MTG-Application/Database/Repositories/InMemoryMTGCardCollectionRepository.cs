@@ -41,7 +41,7 @@ namespace MTGApplication.Database.Repositories
     }
     public virtual async Task<MTGCardCollection> Get(string name)
     {
-      return await Collections.FirstOrDefault(x => x.Name == name).AsMTGCardCollection(CardAPI);
+      return await Collections.FirstOrDefault(x => x.Name == name)?.AsMTGCardCollection(CardAPI);
     }
     public virtual async Task<bool> Remove(MTGCardCollection collection)
     {
