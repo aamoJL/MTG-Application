@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
 using CommunityToolkit.WinUI.UI.Controls;
-using MTGApplication.Interfaces;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Automation.Peers;
 
@@ -11,23 +10,61 @@ namespace MTGApplication.Views
 {
   public static class Dialogs
   {
-    public static ContentDialog CurrentDialogs { get; set; } = null;
+    public static ContentDialog CurrentDialog { get; set; } = null; // Dialog that is currently open
 
     /// <summary>
-    /// Basic class implementation of the <see cref="IDialogWrapper"/> interface
+    /// Class that can be used to call dialog's showAsync method.
+    /// <see cref="TestDialogWrapper"/> can be used to unit test dialogs without calling UI thread.
     /// </summary>
-    public class ContentDialogWrapper : IDialogWrapper
+    public class DialogWrapper
     {
-      public ContentDialog Dialog { get; set; }
-
-      public ContentDialogWrapper(ContentDialog dialog)
+      public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog)
       {
-        Dialog = dialog;
+        var contentDialog = dialog.GetDialog();
+
+        // Only one dialog can be open
+        if (CurrentDialog != null) { return ContentDialogResult.None; }
+        CurrentDialog = contentDialog;
+        // TODO: remove?
+        if (CurrentDialog != contentDialog) { return ContentDialogResult.None; }
+        var result = await contentDialog.ShowAsync();
+        CurrentDialog = null;
+        return result;
+      }
+    }
+
+    public abstract class Dialog
+    {
+      public DialogWrapper DialogWrapper { get; set; }
+
+      public string Title { get; init; }
+      public string PrimaryButtonText { get; init; } = "Yes";
+      public string SecondaryButtonText { get; init; } = "No";
+      public string CloseButtonText { get; init; } = "Cancel";
+
+      public Dialog(string title, DialogWrapper dialogWrapper)
+      {
+        Title = title;
+        DialogWrapper = dialogWrapper ?? new();
+      }
+
+      public virtual ContentDialog GetDialog()
+      {
+        var dialog = new ContentDialog()
+        {
+          Title = Title,
+          XamlRoot = App.MainRoot.XamlRoot,
+          RequestedTheme = App.MainRoot.ActualTheme,
+          DefaultButton = ContentDialogButton.Primary,
+          PrimaryButtonText = PrimaryButtonText,
+          SecondaryButtonText = SecondaryButtonText,
+          CloseButtonText = CloseButtonText,
+        };
 
         // Add event to close the dialog when user clicks outside of the dialog.
-        Dialog.Loaded += (sender, e) =>
+        dialog.Loaded += (sender, e) =>
         {
-          var root = VisualTreeHelper.GetParent(Dialog);
+          var root = VisualTreeHelper.GetParent(dialog);
           var smokeLayer = FindByName(root, "SmokeLayerBackground") as FrameworkElement;
           var pressed = false;
 
@@ -37,202 +74,221 @@ namespace MTGApplication.Views
           };
           smokeLayer.PointerReleased += (sender, e) =>
           {
-            if (pressed == true) { Dialog.Hide(); }
+            if (pressed == true) { dialog.Hide(); }
             pressed = false;
           };
         };
-      }
 
-      public async Task<ContentDialogResult> ShowAsync()
-      {
-        // Only one dialog can be open
-        if(CurrentDialogs != null) { return ContentDialogResult.None; }
-        CurrentDialogs = Dialog;
-        if(CurrentDialogs != Dialog) { return ContentDialogResult.None; }
-        var result = await Dialog.ShowAsync();
-        CurrentDialogs = null;
-        return result;
-      }
-    }
-
-    /// <summary>
-    /// Generic base class for dialogs
-    /// </summary>
-    public abstract class DialogBase<T>
-    {
-      protected string Title { get; }
-      public string PrimaryButtonText { get; set; } = "Yes";
-      public string SecondaryButtonText { get; set; } = "No";
-      public string CloseButtonText { get; set; } = "Cancel";
-
-      public DialogBase(string title)
-      {
-        Title = title;
-      }
-
-      /// <summary>
-      /// Shows dialog to the user and returns requested object
-      /// </summary>
-      public async Task<T> ShowAsync(FrameworkElement root)
-      {
-        var result = await CreateDialog(root).ShowAsync();
-        return ProcessResult(result);
-      }
-
-      /// <summary>
-      /// Creates the dialog that will be shown to the user
-      /// </summary>
-      protected virtual IDialogWrapper CreateDialog(FrameworkElement root)
-      {
-        return new ContentDialogWrapper(new ContentDialog()
-        {
-          Title = Title,
-          RequestedTheme = root.ActualTheme,
-          XamlRoot = root.XamlRoot,
-          DefaultButton = ContentDialogButton.Primary,
-          CloseButtonText = CloseButtonText,
-          PrimaryButtonText = PrimaryButtonText,
-          SecondaryButtonText = SecondaryButtonText,
-        });
-      }
-
-      /// <summary>
-      /// Returns object that matches the given result for the dialog
-      /// </summary>
-      protected abstract T ProcessResult(ContentDialogResult result);
-    }
-
-    /// <summary>
-    /// Dialog that can only be closed
-    /// </summary>
-    public class MessageDialog : DialogBase<bool?>
-    {
-      public string Message { get; set; } = string.Empty;
-
-      public MessageDialog(string title) : base(title) { }
-
-      protected override IDialogWrapper CreateDialog(FrameworkElement root)
-      {
-        var dialog = base.CreateDialog(root);
-        dialog.Dialog.Content = Message;
-        dialog.Dialog.PrimaryButtonText = string.Empty;
-        dialog.Dialog.SecondaryButtonText = string.Empty;
         return dialog;
       }
 
-      protected override bool? ProcessResult(ContentDialogResult result) => true;
+      public async Task<ContentDialogResult> ShowAsync() => await DialogWrapper.ShowAsync(this);
+    }
+
+    public abstract class Dialog<T> : Dialog
+    {
+      public Dialog(string title, DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
+
+      public abstract T ProcessResult(ContentDialogResult result);
+
+      public new async Task<T> ShowAsync()
+      {
+        return ProcessResult(await base.ShowAsync());
+      }
     }
 
     /// <summary>
-    /// Dialog without secondary inputs
+    /// Dialog that asks confirmation from the used.
     /// </summary>
-    public class ConfirmationDialog : DialogBase<bool?>
+    public class ConfirmationDialog : Dialog<bool?>
     {
-      public string Message = string.Empty;
+      public string Message { get; set; }
 
-      public ConfirmationDialog(string title) : base(title) { }
+      public ConfirmationDialog(string title = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
 
-      protected override IDialogWrapper CreateDialog(FrameworkElement root)
+      public override ContentDialog GetDialog()
       {
-        var dialog = base.CreateDialog(root);
-        dialog.Dialog.Content = Message;
+        var dialog = base.GetDialog();
+        dialog.Content = Message;
         return dialog;
       }
 
-      protected override bool? ProcessResult(ContentDialogResult result)
+      public override bool? ProcessResult(ContentDialogResult result)
       {
         return result switch
         {
           ContentDialogResult.Primary => true,
           ContentDialogResult.Secondary => false,
-          _ => null,
+          _ => null
         };
       }
     }
 
-    public class CheckBoxDialog : DialogBase<(bool? answer, bool? isChecked)>, IInputDialog<bool?>
+    /// <summary>
+    /// Dialog that shows a message to the used.
+    /// Dialog has only close button
+    /// </summary>
+    public class MessageDialog : Dialog<bool?>
+    {
+      public string Message { get; set; }
+
+      public MessageDialog(string title = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
+
+      public override ContentDialog GetDialog()
+      {
+        var dialog = base.GetDialog();
+        dialog.Content = Message;
+        dialog.CloseButtonText = "Close";
+        dialog.PrimaryButtonText = string.Empty;
+        dialog.SecondaryButtonText = string.Empty;
+        return dialog;
+      }
+
+      public override bool? ProcessResult(ContentDialogResult result) => true;
+    }
+
+    /// <summary>
+    /// Dialog with a checkbox
+    /// </summary>
+    public class CheckBoxDialog : Dialog<(bool? answer, bool? isChecked)>
     {
       protected CheckBox checkBox;
+      protected TextBlock textBlock;
 
-      public string Message = string.Empty;
-      public string InputText { get; set; } = string.Empty;
-      public bool InputDefaultValue { get; set; } = false;
+      public string Message { get; set; }
+      public string InputText { get; set; }
+      public bool? IsChecked { get; set; }
+      public bool InputDefaultValue { get; set; }
 
-      public CheckBoxDialog(string title) : base(title) { }
+      public CheckBoxDialog(string title = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
 
-      protected virtual CheckBox CreateCheckBox()
+      public override ContentDialog GetDialog()
       {
-        return new CheckBox
+        checkBox = new()
         {
           IsChecked = InputDefaultValue,
           Content = InputText,
         };
-      }
+        textBlock = new()
+        {
+          Text = Message
+        };
 
-      protected override IDialogWrapper CreateDialog(FrameworkElement root)
-      {
-        var dialog = base.CreateDialog(root);
-        checkBox = CreateCheckBox();
-        dialog.Dialog.Content = new StackPanel() 
-        { 
+        var dialog = base.GetDialog();
+        dialog.Content = new StackPanel()
+        {
           Orientation = Orientation.Vertical,
           Children =
           {
-            new TextBlock() { Text = Message },
+            textBlock,
             checkBox
           }
         };
+
+        checkBox.Checked += (s, e) => { IsChecked = checkBox.IsChecked; };
+        checkBox.Unchecked += (s, e) => { IsChecked = checkBox.IsChecked; };
         return dialog;
       }
 
-      protected override (bool? answer, bool? isChecked) ProcessResult(ContentDialogResult result)
+      public override (bool? answer, bool? isChecked) ProcessResult(ContentDialogResult result)
       {
         return result switch
         {
-          ContentDialogResult.Primary => (answer: true, isChecked: GetInputValue()),
-          _ => (answer: null, isChecked: GetInputValue()),
+          ContentDialogResult.Primary => (answer: true, isChecked: IsChecked),
+          _ => (answer: null, isChecked: IsChecked),
         };
       }
-
-      public virtual bool? GetInputValue() => checkBox.IsChecked;
     }
 
     /// <summary>
     /// Dialog with a textbox input
     /// </summary>
-    public class TextBoxDialog : DialogBase<string>, IInputDialog<string>
+    public class TextBoxDialog : Dialog<string>
     {
       protected TextBox textBox;
 
-      public string InputHeaderText { get; set; } = string.Empty;
-      public string InputDefaultText { get; set; } = string.Empty;
-      public string InputPlaceholderText { get; set; } = string.Empty;
-      public char[] InvalidInputCharacters { get; set; } = Array.Empty<char>();
-      public bool IsSpellCheckEnabled { get; set; } = false;
+      public string TextInputText { get; set; } = "";
+      public string InputHeaderText { get; set; } = "";
+      public string InputPlaceholderText { get; set; } = "";
+      public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
+      public bool IsSpellCheckEnabled { get; set; }
 
-      public TextBoxDialog(string title) : base(title)
-      {
-        PrimaryButtonText = "OK";
-      }
+      public TextBoxDialog(string title = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
 
-      protected virtual TextBox CreateTextBox(bool multiline = false)
+      public override ContentDialog GetDialog()
       {
-        return new TextBox()
+        textBox = new()
         {
           Header = InputHeaderText,
-          AcceptsReturn = multiline,
           IsSpellCheckEnabled = IsSpellCheckEnabled,
           PlaceholderText = InputPlaceholderText,
-          Text = InputDefaultText,
-          SelectionStart = InputDefaultText.Length,
+          Text = TextInputText,
+          SelectionStart = TextInputText.Length,
         };
+        var dialog = base.GetDialog();
+        dialog.Content = textBox;
+
+        if(InvalidInputCharacters.Length > 0)
+        {
+          textBox.TextChanging += (sender, args) =>
+          {
+            var text = sender.Text;
+            foreach (var c in System.IO.Path.GetInvalidFileNameChars())
+            {
+              text = text.Replace(c.ToString(), string.Empty);
+            }
+            var oldSelectionStart = sender.SelectionStart;
+            sender.Text = text;
+            sender.Select(oldSelectionStart, 0);
+          };
+        }
+
+        TextInputText = textBox.Text;
+        textBox.TextChanged += (s, e) => { TextInputText = textBox.Text; };
+        return dialog;
       }
 
-      protected override IDialogWrapper CreateDialog(FrameworkElement root)
+      public override string ProcessResult(ContentDialogResult result)
       {
-        var dialog = base.CreateDialog(root);
-        textBox = CreateTextBox();
-        dialog.Dialog.Content = textBox;
+        return result switch
+        {
+          ContentDialogResult.Primary => TextInputText,
+          ContentDialogResult.Secondary => string.Empty,
+          _ => null,
+        };
+      }
+    }
+
+    /// <summary>
+    /// Dialog with a text area input
+    /// </summary>
+    public class TextAreaDialog : Dialog<string>
+    {
+      protected TextBox textBox;
+
+      public string TextInputText { get; set; } = "";
+      public string InputHeaderText { get; set; } = "";
+      public string InputPlaceholderText { get; set; } = "";
+      public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
+      public bool IsSpellCheckEnabled { get; set; }
+
+      public TextAreaDialog(string title = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
+
+      public override ContentDialog GetDialog()
+      {
+        textBox = new()
+        {
+          Header = InputHeaderText,
+          AcceptsReturn = true,
+          IsSpellCheckEnabled = IsSpellCheckEnabled,
+          PlaceholderText = InputPlaceholderText,
+          Text = TextInputText,
+          SelectionStart = TextInputText.Length,
+          Height = 500,
+          Width = 800,
+        };
+        var dialog = base.GetDialog();
+        dialog.Content = textBox;
 
         if (InvalidInputCharacters.Length > 0)
         {
@@ -249,122 +305,103 @@ namespace MTGApplication.Views
           };
         }
 
+        TextInputText = textBox.Text;
+        textBox.TextChanged += (s, e) => { TextInputText = textBox.Text; };
         return dialog;
       }
 
-      protected override string ProcessResult(ContentDialogResult result)
+      public override string ProcessResult(ContentDialogResult result)
       {
         return result switch
         {
-          ContentDialogResult.Primary => GetInputValue(),
+          ContentDialogResult.Primary => TextInputText,
           ContentDialogResult.Secondary => string.Empty,
           _ => null,
         };
-      }
-
-      public virtual string GetInputValue() => textBox.Text;
-    }
-
-    /// <summary>
-    /// Dialog with a text area input
-    /// </summary>
-    public class TextAreaDialog : TextBoxDialog
-    {
-      public TextAreaDialog(string title) : base(title) { }
-
-      protected override TextBox CreateTextBox(bool multipline)
-      {
-        var textBox = base.CreateTextBox(true);
-        textBox.AcceptsReturn = true;
-        textBox.Height = 500;
-        textBox.Width = 800;
-        return textBox;
       }
     }
 
     /// <summary>
     /// Dialog with a combobox input
     /// </summary>
-    public class ComboBoxDialog : DialogBase<string>, IInputDialog<string>
+    public class ComboBoxDialog : Dialog<string>
     {
       protected ComboBox comboBox;
 
-      public string InputHeader { get; set; } = string.Empty;
-      public string[] Items { get; set; } = Array.Empty<string>();
+      public string Selection { get; set; }
+      public string InputHeader { get; set; }
+      public string[] Items { get; set; }
 
-      public ComboBoxDialog(string title) : base(title) { }
+      public ComboBoxDialog(string title = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper) { }
 
-      protected ComboBox CreateComboBox()
+      public override ContentDialog GetDialog()
       {
-        return new ComboBox()
+        comboBox = new ComboBox()
         {
           ItemsSource = Items,
           Header = InputHeader,
         };
-      }
-
-      protected override IDialogWrapper CreateDialog(FrameworkElement root)
-      {
-        var dialog = base.CreateDialog(root);
-        comboBox = CreateComboBox();
-        dialog.Dialog.Content = comboBox;
+        var dialog = base.GetDialog();
+        dialog.Content = comboBox;
+        
+        comboBox.SelectionChanged += (s, e) => { Selection = (string)comboBox.SelectedValue; };
         return dialog;
       }
 
-      protected override string ProcessResult(ContentDialogResult result)
+      public override string ProcessResult(ContentDialogResult result)
       {
         return result switch
         {
-          ContentDialogResult.Primary => GetInputValue(),
+          ContentDialogResult.Primary => Selection,
           ContentDialogResult.Secondary => string.Empty,
           _ => null,
         };
       }
-
-      public virtual string GetInputValue() => (string)comboBox.SelectedValue;
     }
 
     /// <summary>
     /// Dialog with a gridview input
     /// </summary>
-    public class GridViewDialog : DialogBase<object>, IInputDialog<object>
+    public class GridViewDialog : Dialog<object>
     {
       protected GridView gridView;
 
-      public string ItemTemplateName { get; set; } = string.Empty;
-      public string GridViewStyleName { get; set; } = string.Empty;
-      public object[] Items { get; set; } = Array.Empty<object>();
+      public object Selection { get; set; }
+      public object[] Items { get; set; }
+      public object GridStyle { get; }
+      public object GridItemTemplate { get; }
 
-      public GridViewDialog(string title) : base(title) { }
-
-      protected GridView CreateGridView()
+      public GridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "", DialogWrapper dialogWrapper = default) : base(title, dialogWrapper)
       {
-        Application.Current.Resources.TryGetValue(ItemTemplateName, out object template);
-        Application.Current.Resources.TryGetValue(GridViewStyleName, out object style);
-
-        return new AdaptiveGridView()
-        {
-          ItemsSource = Items,
-          DesiredWidth = 250,
-          Style = (Style)style,
-          ItemTemplate = (DataTemplate)template
-        };
+        GridStyle = gridStyle;
+        GridItemTemplate = itemTemplate;
       }
 
-      protected override IDialogWrapper CreateDialog(FrameworkElement root)
+      public override ContentDialog GetDialog()
       {
-        var dialog = base.CreateDialog(root);
-        gridView = CreateGridView();
+        Application.Current.Resources.TryGetValue(GridItemTemplate, out object template);
+        Application.Current.Resources.TryGetValue(GridStyle, out object style);
 
-        dialog.Dialog.Content = gridView;
-
-        dialog.Dialog.Loaded += (sender, e) =>
+        gridView = new AdaptiveGridView()
         {
-          var root = VisualTreeHelper.GetParent(dialog.Dialog);
+          DesiredWidth = 250,
+          Style = (Style)style,
+          ItemTemplate = (DataTemplate)template,
+          ItemsSource = Items,
+        };
+
+        var dialog = base.GetDialog();
+        dialog.Content = gridView;
+
+        gridView.SelectionChanged += (s, e) => { Selection = gridView.SelectedItem; };
+
+        dialog.Loaded += (sender, e) =>
+        {
+          var root = VisualTreeHelper.GetParent(dialog);
           var primaryButton = FindByName(root, "PrimaryButton") as Button;
 
           // Add event to click the primary button when selected item has been double tapped.
-          (dialog.Dialog.Content as GridView).DoubleTapped += (sender, e) =>
+          (dialog.Content as GridView).DoubleTapped += (sender, e) =>
           {
             var PrimaryFeap = FrameworkElementAutomationPeer.FromElement(primaryButton) as ButtonAutomationPeer;
             if (PrimaryFeap != null) { PrimaryFeap?.Invoke(); } // Click the primary button
@@ -377,20 +414,17 @@ namespace MTGApplication.Views
             }
           };
         };
-
         return dialog;
       }
 
-      protected override object ProcessResult(ContentDialogResult result)
+      public override object ProcessResult(ContentDialogResult result)
       {
         return result switch
         {
-          ContentDialogResult.Primary => GetInputValue(),
+          ContentDialogResult.Primary => Selection,
           _ => null
         };
       }
-
-      public virtual object GetInputValue() => gridView.SelectedValue;
     }
 
     /// <summary>

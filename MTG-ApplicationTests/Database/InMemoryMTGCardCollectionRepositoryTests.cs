@@ -39,7 +39,7 @@ namespace MTGApplicationTests.Database
         if (WillFail) { return new List<MTGCardCollection>(); }
         return await base.Get();
       }
-      public override async Task<MTGCardCollection> Get(string name)
+      public override async Task<MTGCardCollection?> Get(string name)
       {
         if (WillFail) { return null; }
         return await base.Get(name);
@@ -119,7 +119,7 @@ namespace MTGApplicationTests.Database
       await repo.Add(new() { Name = secondCollectionName });
 
       var deck = await repo.Get(firstCollectionName);
-      Assert.AreEqual(firstCollectionName, deck.Name);
+      Assert.AreEqual(firstCollectionName, deck?.Name);
     }
 
     [TestMethod]
@@ -134,7 +134,7 @@ namespace MTGApplicationTests.Database
       await repo.Add(new() { Name = secondCollectionName });
       var firstDeck = await repo.Get(firstCollectionName);
 
-      await repo.Remove(firstDeck);
+      if(firstDeck != null) await repo.Remove(firstDeck);
       Assert.AreEqual(1, repo.Get().Result.ToList().Count);
     }
 
@@ -168,14 +168,14 @@ namespace MTGApplicationTests.Database
       firstList.Cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", count: 1));
       collection.CollectionLists.Add(secondList);
       await repo.Update(collection);
-      Assert.AreEqual(6, (await repo.Get(firstCollectionName)).CollectionLists.First(x => x.Name == firstListName).Cards.Sum(x => x.Count));
-      Assert.AreEqual(2, (await repo.Get(firstCollectionName)).CollectionLists.Count);
+      Assert.AreEqual(6, (await repo.Get(firstCollectionName))?.CollectionLists.First(x => x.Name == firstListName).Cards.Sum(x => x.Count));
+      Assert.AreEqual(2, (await repo.Get(firstCollectionName))?.CollectionLists.Count);
 
       // Remove
       collection.CollectionLists.RemoveAt(0);
       await repo.Update(collection);
-      Assert.AreEqual(1, (await repo.Get(firstCollectionName)).CollectionLists.First(x => x.Name == secondListName).Cards.Sum(x => x.Count));
-      Assert.AreEqual(1, (await repo.Get(firstCollectionName)).CollectionLists.Count);
+      Assert.AreEqual(1, (await repo.Get(firstCollectionName))?.CollectionLists.First(x => x.Name == secondListName).Cards.Sum(x => x.Count));
+      Assert.AreEqual(1, (await repo.Get(firstCollectionName))?.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -208,14 +208,14 @@ namespace MTGApplicationTests.Database
       firstList.Cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", count: 1));
       collection.CollectionLists.Add(secondList);
       await repo.AddOrUpdate(collection);
-      Assert.AreEqual(6, (await repo.Get(firstCollectionName)).CollectionLists.First(x => x.Name == firstListName).Cards.Sum(x => x.Count));
-      Assert.AreEqual(2, (await repo.Get(firstCollectionName)).CollectionLists.Count);
+      Assert.AreEqual(6, (await repo.Get(firstCollectionName))?.CollectionLists.First(x => x.Name == firstListName).Cards.Sum(x => x.Count));
+      Assert.AreEqual(2, (await repo.Get(firstCollectionName))?.CollectionLists.Count);
 
       // Remove
       collection.CollectionLists.RemoveAt(0);
       await repo.AddOrUpdate(collection);
-      Assert.AreEqual(1, (await repo.Get(firstCollectionName)).CollectionLists.First(x => x.Name == secondListName).Cards.Sum(x => x.Count));
-      Assert.AreEqual(1, (await repo.Get(firstCollectionName)).CollectionLists.Count);
+      Assert.AreEqual(1, (await repo.Get(firstCollectionName))?.CollectionLists.First(x => x.Name == secondListName).Cards.Sum(x => x.Count));
+      Assert.AreEqual(1, (await repo.Get(firstCollectionName))?.CollectionLists.Count);
     }
   }
 }
