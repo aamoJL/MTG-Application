@@ -35,7 +35,7 @@ namespace MTGApplication.Views
 
     public abstract class Dialog
     {
-      public DialogWrapper DialogWrapper { get; set; }
+      protected DialogWrapper DialogWrapper { get; set; }
 
       public string Title { get; init; }
       public string PrimaryButtonText { get; init; } = "Yes";

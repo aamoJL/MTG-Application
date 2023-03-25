@@ -138,11 +138,5 @@ namespace MTGApplication.ViewModels
 
     [ObservableProperty]
     private bool isOwned;
-
-    [RelayCommand]
-    public void SwitchOwned()
-    {
-      IsOwned = !IsOwned;
-    }
   }
 }

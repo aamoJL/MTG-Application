@@ -23,7 +23,6 @@
                             Tapped="GridViewItemImage_Tapped">
             <controls:ImageEx.ContextFlyout>
               <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                <MenuFlyoutItem Command="{x:Bind SwitchOwnedCommand}" Icon="switch" Text="Switch owned"/>
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints"/>
@@ -86,7 +85,10 @@
                   </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Import List..." Command="{x:Bind CardCollectionsViewModel.ImportCollectionListDialogCommand}" />
+                <MenuFlyoutItem Text="Export List..." Command="{x:Bind CardCollectionsViewModel.ExportCollectionListDialogCommand}" />
                 <MenuFlyoutItem Text="Delete List..." Command="{x:Bind CardCollectionsViewModel.DeleteCollectionListDialogCommand}" Background="IndianRed"/>
+                <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Delete Collection..." Command="{x:Bind CardCollectionsViewModel.DeleteCollectionDialogCommand}" Background="IndianRed"/>
               </MenuFlyout>
             </AppBarButton.Flyout>
@@ -124,7 +126,13 @@
             </ComboBox.ItemTemplate>
           </ComboBox>
           <AppBarSeparator/>
-          <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" VerticalAlignment="Center" Margin="10 0 0 0" FontWeight="Bold" HorizontalAlignment="Right"/>
+          <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10 0 0 0">
+            <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" FontWeight="Bold"/>
+            <TextBlock>
+              <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.SelectedListCardCount), Mode=OneWay}"/>
+              <Run Text="{x:Bind sys:String.Format('{0} cards collected', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
+            </TextBlock>
+          </StackPanel>
           <ProgressRing IsActive="{x:Bind CardCollectionsViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0"/>
         </StackPanel>
         <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"/>

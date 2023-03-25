@@ -8,7 +8,9 @@ using MTGApplication.Services;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using static MTGApplication.Services.IO;
 using static MTGApplication.Views.Dialogs;
 
 namespace MTGApplication.ViewModels
@@ -25,7 +27,7 @@ namespace MTGApplication.ViewModels
           QueryInputText = queryInputText,
           PrimaryButtonText = "Update",
         };
-        
+
       }
       public virtual CollectionListContentDialog GetNewCollectionListDialog()
       {
@@ -93,12 +95,30 @@ namespace MTGApplication.ViewModels
           SecondaryButtonText = string.Empty,
         };
       }
+      public virtual TextAreaDialog GetExportDialog(string text)
+      {
+        return new TextAreaDialog("Export list", DialogWrapper)
+        {
+          TextInputText = text,
+          PrimaryButtonText = "Copy to Clipboard",
+          SecondaryButtonText = string.Empty,
+        };
+      }
+      public virtual TextAreaDialog GetImportDialog()
+      {
+        return new TextAreaDialog("Import list", DialogWrapper)
+        {
+          InputPlaceholderText = "Black lotus\nMox Ruby",
+          SecondaryButtonText = string.Empty,
+          PrimaryButtonText = "Add to Collection",
+        };
+      }
 
       public class CollectionListContentDialog : Dialog<MTGCardCollectionList>
       {
         protected TextBox nameBox;
         protected TextBox searchQueryBox;
-        
+
         public string NameInputText { get; set; }
         public string QueryInputText { get; set; }
 
@@ -177,11 +197,12 @@ namespace MTGApplication.ViewModels
       }
     }
 
-    public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository)
+    public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, ClipboardService clipboardService = default)
     {
       CardAPI = cardAPI;
       CollectionRepository = collectionRepository;
       MTGSearchViewModel = new(CardAPI);
+      ClipboardService = clipboardService ?? new();
 
       PropertyChanged += CardCollectionsViewModel_PropertyChanged;
       MTGSearchViewModel.PropertyChanged += MTGSearchViewModel_PropertyChanged;
@@ -189,12 +210,12 @@ namespace MTGApplication.ViewModels
 
     private async void MTGSearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(MTGSearchViewModel.IsBusy)) { IsBusy = MTGSearchViewModel.IsBusy; }
-      else if(e.PropertyName == nameof(MTGSearchViewModel.SearchQuery))
+      if (e.PropertyName == nameof(MTGSearchViewModel.IsBusy)) { IsBusy = MTGSearchViewModel.IsBusy; }
+      else if (e.PropertyName == nameof(MTGSearchViewModel.SearchQuery))
       {
         await MTGSearchViewModel.SearchSubmit();
       }
-      else if(e.PropertyName == nameof(MTGSearchViewModel.SearchCards))
+      else if (e.PropertyName == nameof(MTGSearchViewModel.SearchCards))
       {
         MTGSearchViewModel.SearchCards.CollectionChanged += (s, e) =>
         {
@@ -212,16 +233,44 @@ namespace MTGApplication.ViewModels
     }
     private async void CardCollectionsViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      if(e.PropertyName == nameof(SelectedList)) 
+      if (e.PropertyName == nameof(SelectedList))
       {
-        if (SelectedList != null) { SelectedList.Cards.CollectionChanged += (s, e) => { HasUnsavedChanges = true; }; }
+        OnPropertyChanged(nameof(SelectedListCardCount));
+        if (SelectedList != null)
+        {
+          SelectedList.Cards.CollectionChanged += SelectedListCards_CollectionChanged;
+        }
         // Search does not update itself if the query is same as previous query, so it has to be updated manually.
-        if(MTGSearchViewModel.SearchQuery == SelectedList?.SearchQuery) { await MTGSearchViewModel.SearchSubmit(); }
+        if (MTGSearchViewModel.SearchQuery == SelectedList?.SearchQuery) { await MTGSearchViewModel.SearchSubmit(); }
         else { MTGSearchViewModel.SearchQuery = SelectedList?.SearchQuery ?? string.Empty; }
       }
     }
+    private void SelectedListCards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+      if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+      {
+        if(MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
+        {
+          cardVM.IsOwned = true;
+        }
+      }
+      else if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+      {
+        if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
+        {
+          cardVM.IsOwned = false;
+        }
+      }
 
-    [ObservableProperty, NotifyCanExecuteChangedFor(nameof(EditCollectionListDialogCommand)), NotifyCanExecuteChangedFor(nameof(DeleteCollectionListDialogCommand))]
+      HasUnsavedChanges = true;
+      OnPropertyChanged(nameof(SelectedListCardCount));
+    }
+
+    [ObservableProperty, 
+      NotifyCanExecuteChangedFor(nameof(EditCollectionListDialogCommand)),
+      NotifyCanExecuteChangedFor(nameof(DeleteCollectionListDialogCommand)),
+      NotifyCanExecuteChangedFor(nameof(ImportCollectionListDialogCommand)),
+      NotifyCanExecuteChangedFor(nameof(ExportCollectionListDialogCommand))]
     private MTGCardCollectionList selectedList;
     [ObservableProperty]
     private MTGCardCollection collection = new();
@@ -232,9 +281,11 @@ namespace MTGApplication.ViewModels
 
     public MTGAPISearch<MTGCardCollectionCardViewModelSource, MTGCardCollectionCardViewModel> MTGSearchViewModel { get; }
     public CardCollectionsDialogs Dialogs { get; init; } = new();
+    public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
     
     private IRepository<MTGCardCollection> CollectionRepository { get; }
     private ICardAPI<MTGCard> CardAPI { get; }
+    private ClipboardService ClipboardService { get; set; }
 
     /// <summary>
     /// Asks if user wants to save unsaved changes and clears the <see cref="Collection"/>
@@ -265,7 +316,7 @@ namespace MTGApplication.ViewModels
     /// <summary>
     /// Saves the current <see cref="Collection"/> with the given name to the database
     /// </summary>
-    [RelayCommand(CanExecute = nameof(SaveCollectionDialogCommandCanExecute))]
+    [RelayCommand(CanExecute = nameof(SaveCollectionCommandCanExecute))]
     public async Task SaveCollectionDialog()
     {
       var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync();
@@ -285,7 +336,7 @@ namespace MTGApplication.ViewModels
     /// <summary>
     /// Deletes the current <see cref="Collection"/> from the database
     /// </summary>
-    [RelayCommand(CanExecute = nameof(DeleteCollectionDialogCommandCanExecute))]
+    [RelayCommand(CanExecute = nameof(DeleteCollectionCommandCanExecute))]
     public async Task DeleteCollectionDialog()
     {
       if (!await CollectionRepository.Exists(Collection.Name)) { return; }
@@ -310,7 +361,7 @@ namespace MTGApplication.ViewModels
     /// <summary>
     /// Changes the <see cref="SelectedList"/>'s information to the given information
     /// </summary>
-    [RelayCommand(CanExecute = nameof(EditCollectionListDialogCommandCanExecute))]
+    [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
     public async Task EditCollectionListDialog()
     {
       if(SelectedList != null && await Dialogs.GetEditCollectionListDialog(SelectedList.Name, SelectedList.SearchQuery).ShowAsync() is MTGCardCollectionList updatedList)
@@ -331,13 +382,38 @@ namespace MTGApplication.ViewModels
     /// <summary>
     /// Removes the <see cref="SelectedList"/> from the <see cref="Collection"/>
     /// </summary>
-    [RelayCommand(CanExecute = nameof(DeleteCollectionListDialogCommandCanExecute))]
+    [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
     public async Task DeleteCollectionListDialog()
     {
       if(SelectedList == null) { return; }
       else if (await Dialogs.GetDeleteListDialog(SelectedList.Name).ShowAsync() is true)
       {
         DeleteSelectedCollectionList();
+      }
+    }
+
+    /// <summary>
+    /// Shows dialog that can be used to import cards to the selected list
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
+    public async Task ImportCollectionListDialog()
+    {
+      if (await Dialogs.GetImportDialog().ShowAsync() is string importText)
+      {
+        await ImportCards(importText);
+      }
+    }
+
+    /// <summary>
+    /// Shows dialog with selected list's card IDs
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
+    public async Task ExportCollectionListDialog()
+    {
+      var response = await Dialogs.GetExportDialog(GetExportString()).ShowAsync();
+      if (!string.IsNullOrEmpty(response))
+      {
+        ClipboardService.Copy(response);
       }
     }
 
@@ -359,6 +435,7 @@ namespace MTGApplication.ViewModels
     private void NewCollection()
     {
       Collection = new MTGCardCollection();
+      hasUnsavedChanges = false;
     }
     private async Task SaveCollection(string name)
     {
@@ -430,6 +507,48 @@ namespace MTGApplication.ViewModels
       }
       else { Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Could not delete the list."); }
     }
+    private string GetExportString()
+    {
+      if(SelectedList == null) { return string.Empty; }
+      StringBuilder stringBuilder = new();
+      foreach (var item in SelectedList.Cards)
+      {
+        stringBuilder.AppendLine($"{item.Info.ScryfallId}");
+      }
+
+      return stringBuilder.ToString();
+    }
+    private async Task ImportCards(string importText)
+    {
+      var notFoundCount = 0;
+      var found = Array.Empty<MTGCard>();
+      var notImportedCount = 0;
+
+      if (!string.IsNullOrEmpty(importText) && SelectedList != null)
+      {
+        IsBusy = true;
+        (found, notFoundCount) = await CardAPI.FetchFromString(importText);
+        foreach (var card in found)
+        {
+          if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is null)
+          {
+            // Card is not in the list
+            SelectedList.AddToList(card);
+          }
+          else { notImportedCount++; }
+        }
+      }
+
+      if (notFoundCount == 0 && found.Length > 0)
+        Notifications.RaiseNotification(Notifications.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+      else if (found.Length > 0 && notFoundCount > 0)
+        Notifications.RaiseNotification(Notifications.NotificationType.Warning,
+          $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+      else if (found.Length == 0)
+        Notifications.RaiseNotification(Notifications.NotificationType.Error, $"Error. No cards were imported.");
+
+      IsBusy = false;
+    }
 
     /// <summary>
     /// Asks user if they want to save the collections's unsaved changes.
@@ -445,6 +564,12 @@ namespace MTGApplication.ViewModels
         else if (wantSaveConfirmed is true)
         {
           // User wants to save the unsaved changes
+          if(!SaveCollectionCommandCanExecute())
+          {
+            // Collection can't be saved if it has no lists.
+            Notifications.RaiseNotification(Notifications.NotificationType.Error, "Error. Collection can't be saved, because it has no lists.");
+            return false;
+          }
           var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync();
           if (string.IsNullOrEmpty(saveName)) { return false; }
           else
@@ -471,9 +596,8 @@ namespace MTGApplication.ViewModels
       return await ShowUnsavedDialogs();
     }
 
-    private bool SaveCollectionDialogCommandCanExecute() => Collection.CollectionLists.Count > 0;
-    private bool DeleteCollectionDialogCommandCanExecute() => !string.IsNullOrEmpty(Collection.Name);
-    private bool EditCollectionListDialogCommandCanExecute() => SelectedList != null;
-    private bool DeleteCollectionListDialogCommandCanExecute() => SelectedList != null;
+    private bool SaveCollectionCommandCanExecute() => Collection.CollectionLists.Count > 0;
+    private bool DeleteCollectionCommandCanExecute() => !string.IsNullOrEmpty(Collection.Name);
+    private bool SelectedListCommandCanExecute() => SelectedList != null;
   }
 }
