@@ -10,12 +10,12 @@ using static MTGApplicationTests.ViewModels.DeckBuilderViewModelTests;
 using static MTGApplicationTests.Services.TestDialogService;
 using static MTGApplication.ViewModels.DeckBuilderViewModel;
 using static MTGApplication.Models.MTGCard;
-using static MTGApplication.Views.Dialogs;
+using static MTGApplication.Services.DialogService;
 using static MTGApplication.Enums;
 
 namespace MTGApplicationTests.ViewModels
 {
-  [TestClass]
+    [TestClass]
   public class DeckBuilderViewModelTests
   {
     public class TestDeckBuilderViewDialogs : DeckBuilderViewDialogs
@@ -33,65 +33,65 @@ namespace MTGApplicationTests.ViewModels
 
       public override ConfirmationDialog GetCardAlreadyInDeckDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
         var dialog = base.GetCardAlreadyInDeckDialog(name);
         return dialog;
       }
       public override ConfirmationDialog GetOverrideDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
         var dialog = base.GetOverrideDialog(name);
         return dialog;
       }
       public override ConfirmationDialog GetDeleteDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(DeleteDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(DeleteDialog.Result);
         var dialog = base.GetDeleteDialog(name);
         return dialog;
       }
       public override ConfirmationDialog GetSaveUnsavedDialog()
       {
-        DialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
         var dialog = base.GetSaveUnsavedDialog();
         return dialog;
       }
       public override CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(MultipleCardsAlreadyInDeckDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(MultipleCardsAlreadyInDeckDialog.Result);
         var dialog = base.GetMultipleCardsAlreadyInDeckDialog(name);
         dialog.IsChecked = MultipleCardsAlreadyInDeckDialog.Values;
         return dialog;
       }
       public override GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       {
-        DialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
         var dialog = base.GetCardPrintDialog(printViewModels);
         dialog.Selection = CardPrintDialog.Values;
         return dialog;
       }
       public override ComboBoxDialog GetLoadDialog(string[] names)
       {
-        DialogWrapper = new TestDialogWrapper(LoadDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(LoadDialog.Result);
         var dialog = base.GetLoadDialog(names);
         dialog.Selection = LoadDialog.Values;
         return dialog;
       }
       public override TextAreaDialog GetExportDialog(string text)
       {
-        DialogWrapper = new TestDialogWrapper(ExportDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(ExportDialog.Result);
         var dialog = base.GetExportDialog(text);
         return dialog;
       }
       public override TextAreaDialog GetImportDialog()
       {
-        DialogWrapper = new TestDialogWrapper(ImportDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(ImportDialog.Result);
         var dialog = base.GetImportDialog();
         dialog.TextInputText = ImportDialog.Values;
         return dialog;
       }
       public override TextBoxDialog GetSaveDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(SaveDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(SaveDialog.Result);
         var dialog = base.GetSaveDialog(name);
         dialog.TextInputText = SaveDialog.Values;
         return dialog;

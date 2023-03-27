@@ -6,7 +6,7 @@ using MTGApplicationTests.Services;
 
 namespace MTGApplicationTests.ViewModels
 {
-  [TestClass]
+    [TestClass]
   public partial class MTGSearchViewModelTests
   {
     [TestMethod]

@@ -2,27 +2,29 @@
 using MTGApplication.Services;
 using System.IO;
 
-namespace MTGApplication.Database
+namespace MTGApplication.Database;
+
+/// <summary>
+/// Factory, that returns <see cref="CardDbContext"/>
+/// </summary>
+public class CardDbContextFactory
 {
-  public class CardDbContextFactory
+  protected string connectionString;
+  public readonly static string DbFileName = "database.db";
+
+  public CardDbContextFactory(string connectionString = "")
   {
-    protected string connectionString;
-    public readonly static string DbFileName = "database.db";
-
-    public CardDbContextFactory(string connectionString = "")
+    if (string.IsNullOrEmpty(connectionString))
     {
-      if (string.IsNullOrEmpty(connectionString))
-      {
-        var dbPath = Path.Join(IO.GetAppDataPath(), DbFileName);
-        connectionString = $"Data Source={dbPath}";
-      }
-      this.connectionString = connectionString;
+      var dbPath = Path.Join(IOService.GetAppDataPath(), DbFileName);
+      connectionString = $"Data Source={dbPath}";
     }
-
-    public virtual CardDbContext CreateDbContext()
-    {
-      DbContextOptions options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;
-      return new CardDbContext(options);
-    }
+    this.connectionString = connectionString;
   }
+
+  /// <summary>
+  /// Returns <see cref="CardDbContext"/> with the <see cref="connectionString"/> options
+  /// </summary>
+  public virtual CardDbContext CreateDbContext()
+    => new(new DbContextOptionsBuilder().UseSqlite(connectionString).Options);
 }

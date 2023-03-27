@@ -17,7 +17,7 @@ namespace MTGApplicationTests.Database
     {
       public TestSQLiteMTGDeckRepository(ICardAPI<MTGCard> cardAPI, CardDbContextFactory cardDbContextFactory) : base(cardAPI, cardDbContextFactory)
       {
-        AppConfig.Init();
+        AppConfig.Initialize();
       }
 
       public async Task<MTGCardDTO[]> GetCards()

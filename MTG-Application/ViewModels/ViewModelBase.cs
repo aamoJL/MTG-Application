@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MTGApplication.ViewModels
-{
-  public class ViewModelBase : ObservableObject { }
-}
+namespace MTGApplication.ViewModels;
+
+/// <summary>
+/// Base class for view models
+/// </summary>
+public class ViewModelBase : ObservableObject { }

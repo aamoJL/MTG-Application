@@ -40,7 +40,7 @@ namespace MTGApplicationTests.API
     {
       return await Task.Run(() => ExpectedCards != null ? new Result(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : Result.Empty());
     }
-    public async Task<Result> FetchFromPageUri(string pageUri, bool paperOnly = false)
+    public async Task<Result> FetchFromUri(string pageUri, bool paperOnly = false)
     {
       var cards = string.IsNullOrEmpty(pageUri) ? Array.Empty<MTGCard>() : ExpectedCards ?? Array.Empty<MTGCard>();
       return await Task.Run(() => new Result(cards, NotFoundCount, cards.Length));

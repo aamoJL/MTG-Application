@@ -3,16 +3,14 @@ using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
-using System;
-using System.Text;
 using static MTGApplication.ViewModels.CardCollectionsViewModel;
-using static MTGApplication.Views.Dialogs;
+using static MTGApplication.Services.DialogService;
 using static MTGApplicationTests.Database.InMemoryMTGCardCollectionRepositoryTests;
 using static MTGApplicationTests.Services.TestDialogService;
 
 namespace MTGApplicationTests.ViewModels
 {
-  [TestClass]
+    [TestClass]
   public class CardCollectionsViewModelTests
   {
     public class TestCardCollectionsDialogs : CardCollectionsDialogs
@@ -31,12 +29,12 @@ namespace MTGApplicationTests.ViewModels
 
       public override CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
       {
-        DialogWrapper = new TestDialogWrapper(EditCollectionListDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(EditCollectionListDialog.Result);
         return base.GetEditCollectionListDialog(EditCollectionListDialog.Values.Name, EditCollectionListDialog.Values.Query);
       }
       public override CollectionListContentDialog GetNewCollectionListDialog()
       {
-        DialogWrapper = new TestDialogWrapper(NewCollectionListDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(NewCollectionListDialog.Result);
         var dialog = base.GetNewCollectionListDialog();
         dialog.NameInputText = NewCollectionListDialog.Values.Name;
         dialog.QueryInputText = NewCollectionListDialog.Values.Query;
@@ -44,51 +42,51 @@ namespace MTGApplicationTests.ViewModels
       }
       public override ConfirmationDialog GetDeleteCollectionDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(DeleteCollectionDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(DeleteCollectionDialog.Result);
         return base.GetDeleteCollectionDialog(name);
       }
       public override ConfirmationDialog GetDeleteListDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(DeleteListDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(DeleteListDialog.Result);
         return base.GetDeleteListDialog(name);
       }
       public override ConfirmationDialog GetOverrideDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
         return base.GetOverrideDialog(name);
       }
       public override ConfirmationDialog GetSaveUnsavedDialog()
       {
-        DialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
         return base.GetSaveUnsavedDialog();
       }
       public override GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       {
-        DialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
         var dialog = base.GetCardPrintDialog(printViewModels);
         dialog.Selection = CardPrintDialog.Values;
         return dialog;
       }
       public override ComboBoxDialog GetLoadDialog(string[] names)
       {
-        DialogWrapper = new TestDialogWrapper(LoadDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(LoadDialog.Result);
         var dialog = base.GetLoadDialog(names);
         dialog.Selection = LoadDialog.Values;
         return dialog;
       }
       public override TextBoxDialog GetSaveDialog(string name)
       {
-        DialogWrapper = new TestDialogWrapper(SaveDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(SaveDialog.Result);
         return base.GetSaveDialog(SaveDialog.Values);
       }
       public override TextAreaDialog GetExportDialog(string text)
       {
-        DialogWrapper = new TestDialogWrapper(ExportDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(ExportDialog.Result);
         return base.GetExportDialog(text);
       }
       public override TextAreaDialog GetImportDialog()
       {
-        DialogWrapper = new TestDialogWrapper(ImportDialog.Result);
+        CurrentDialogWrapper = new TestDialogWrapper(ImportDialog.Result);
         var dialog = base.GetImportDialog();
         dialog.TextInputText = ImportDialog.Values;
         return dialog;

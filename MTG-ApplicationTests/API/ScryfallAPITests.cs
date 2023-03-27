@@ -55,15 +55,6 @@ namespace MTGApplicationTests.API
     }
 
     [TestMethod]
-    public void FetchScryfallJsonObjectTest()
-    {
-      var api = new ScryfallAPI();
-      string searchUri = api.GetSearchUri("asd");
-
-      Assert.IsNotNull(FetchScryfallJsonObject(searchUri));
-    }
-
-    [TestMethod]
     public async Task FetchFromDTOsTest()
     {
       var api = new ScryfallAPI();
@@ -86,7 +77,7 @@ namespace MTGApplicationTests.API
     {
       var api = new ScryfallAPI();
       string pageUri = "";
-      var result = await api.FetchFromPageUri(pageUri);
+      var result = await api.FetchFromUri(pageUri);
 
       Assert.AreEqual(0, result.TotalCount);
       Assert.AreEqual(0, result.Found.Length);
@@ -99,7 +90,7 @@ namespace MTGApplicationTests.API
       var api = new ScryfallAPI();
       string pageUri = 
         "https://api.scryfall.com/cards/search?dir=asc&format=json&include_extras=false&include_multilingual=false&include_variations=false&order=released&page=2&q=set%3Aneo+unique%3Acards+order%3Areleased+direction%3Aasc+format%3Aany+game%3Apaper&unique=cards";
-      var result = await api.FetchFromPageUri(pageUri);
+      var result = await api.FetchFromUri(pageUri);
 
       Assert.IsTrue(result.TotalCount > 0);
       Assert.IsTrue(result.Found.Length > 0);
@@ -120,7 +111,7 @@ namespace MTGApplicationTests.API
       var uri = 
         "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A48e603a2-b965-4fbc-ad57-4388bce5ac8b&unique=prints";
 
-      var result = await api.FetchFromPageUri(uri);
+      var result = await api.FetchFromUri(uri);
       Assert.IsTrue(result.Found.Length > 0);
     }
 
@@ -130,7 +121,7 @@ namespace MTGApplicationTests.API
       var api = new ScryfallAPI();
       var uri = string.Empty;
 
-      var result = await api.FetchFromPageUri(uri);
+      var result = await api.FetchFromUri(uri);
       Assert.AreEqual(0, result.Found.Length);
     }
 

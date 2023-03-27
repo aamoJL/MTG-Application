@@ -1,9 +1,9 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using static MTGApplication.Views.Dialogs;
+using static MTGApplication.Services.DialogService;
 
 namespace MTGApplicationTests.Services
 {
-  public static class TestDialogService
+    public static class TestDialogService
   {
     public class TestDialogResult
     {

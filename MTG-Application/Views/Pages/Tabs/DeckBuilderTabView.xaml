@@ -20,9 +20,8 @@
       <StackPanel 
         Orientation="Vertical">
         <Grid>
-          <controls:ImageEx 
-            Source="{x:Bind SelectedFaceUri, Mode=OneWay}"
-            Style="{StaticResource PlaceholderImageStyle}">
+          <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}"
+                            Style="{StaticResource PlaceholderImageStyle}">
             <controls:ImageEx.ContextFlyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -37,11 +36,10 @@
       </StackPanel>
     </DataTemplate>
     <DataTemplate x:Key="SearchListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel 
-        Style="{StaticResource MTGListViewItemStyle}"
-        PointerEntered="CardListViewItem_PointerEntered"
-        PointerExited="CardListViewItem_PointerExited"
-        PointerMoved="CardListViewItem_PointerMoved">
+      <StackPanel  Style="{StaticResource MTGListViewItemStyle}"
+                   PointerEntered="CardListViewItem_PointerEntered"
+                   PointerExited="CardListViewItem_PointerExited"
+                   PointerMoved="CardListViewItem_PointerMoved">
         <StackPanel.ContextFlyout>
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -85,11 +83,10 @@
       </StackPanel>
     </DataTemplate>
     <DataTemplate x:Key="DeckListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel 
-        Style="{StaticResource MTGListViewItemStyle}"
-        PointerEntered="CardListViewItem_PointerEntered"
-        PointerExited="CardListViewItem_PointerExited"
-        PointerMoved="CardListViewItem_PointerMoved">
+      <StackPanel Style="{StaticResource MTGListViewItemStyle}"
+                  PointerEntered="CardListViewItem_PointerEntered"
+                  PointerExited="CardListViewItem_PointerExited"
+                  PointerMoved="CardListViewItem_PointerMoved">
         <StackPanel.ContextFlyout>
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -112,12 +109,11 @@
     </DataTemplate>
     <!--Sidelists-->
     <DataTemplate x:Key="SideListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel
-        Background="Transparent"
-        Height="25"
-        PointerEntered="CardListViewItem_PointerEntered"
-        PointerExited="CardListViewItem_PointerExited"
-        PointerMoved="CardListViewItem_PointerMoved">
+      <StackPanel Background="Transparent"
+                  Height="25"
+                  PointerEntered="CardListViewItem_PointerEntered"
+                  PointerExited="CardListViewItem_PointerExited"
+                  PointerMoved="CardListViewItem_PointerMoved">
         <StackPanel.ContextFlyout>
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -215,15 +211,14 @@
         <controls:DockPanel LastChildFill="True">
           <!--Side Button-->
           <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical">
-            <AppBarButton 
-              Command="{x:Bind SwitchSearchPanelCommand}"
-              VerticalAlignment="Top"
-              Label="Search"
-              Width="50"
-              CornerRadius="0" 
-              Margin="0" 
-              Padding="0" 
-              BorderThickness="0">
+            <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}"
+                          VerticalAlignment="Top"
+                          Label="Search"
+                          Width="50"
+                          CornerRadius="0" 
+                          Margin="0" 
+                          Padding="0" 
+                          BorderThickness="0">
               <AppBarButton.Icon>
                 <FontIcon Glyph="&#xE721;"/>
               </AppBarButton.Icon>
@@ -231,7 +226,10 @@
           </StackPanel>
           <!--Search-->
           <controls:DockPanel controls:DockPanel.Dock="Left" Grid.Column="0" LastChildFill="True" Padding="10 0 10 10" Background="Transparent">
-            <customcontrols:ScryfallSearchBarControl controls:DockPanel.Dock="Top" Margin="0 10 0 0" SearchSubmitCommand="{x:Bind SearchViewModel.SearchSubmitCommand}" SearchQuery="{x:Bind SearchViewModel.SearchQuery, Mode=TwoWay}"/>
+            <customcontrols:ScryfallSearchBarControl controls:DockPanel.Dock="Top" 
+                                                     Margin="0 10 0 0" 
+                                                     SearchSubmitCommand="{x:Bind SearchViewModel.SearchSubmitCommand}" 
+                                                     SearchQuery="{x:Bind SearchViewModel.SearchQuery, Mode=TwoWay}"/>
             <!--Scryfall commands-->
             <Grid controls:DockPanel.Dock="Top">
               <StackPanel Orientation="Horizontal">
@@ -239,7 +237,15 @@
                   <AppBarButton Icon="ZoomIn" Label="Zoom">
                     <AppBarButton.Flyout>
                       <Flyout AreOpenCloseAnimationsEnabled="False">
-                        <Slider Header="Card size" Value="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside"/>
+                        <Slider Header="Card size" 
+                                Value="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}" 
+                                Width="200" 
+                                HorizontalAlignment="Left" 
+                                Maximum="350" 
+                                Minimum="140" 
+                                SnapsTo="Ticks" 
+                                TickFrequency="10" 
+                                TickPlacement="Outside"/>
                       </Flyout>
                     </AppBarButton.Flyout>
                   </AppBarButton>
@@ -261,27 +267,23 @@
             </Grid>
             <!--Scryfall Card view-->
             <Grid controls:DockPanel.Dock="Top">
-              <!--Grid view-->
-              <controls:AdaptiveGridView
-                x:Name="CardSearchImagesDisplay"
-                Style="{StaticResource MTGAdaptiveGridViewStyle}"
-                SelectionMode="None"
-                DesiredWidth="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}"
-                ItemsSource="{x:Bind SearchViewModel.SearchCards, Mode=OneWay}"
-                Visibility="Collapsed"
-                CanDragItems="True"
-                DragItemsStarting="CardView_DragItemsStarting"
-                ItemTemplate="{StaticResource SearchImageViewItemTemplate}"/>
-              <!--List view-->
-              <ListView
-                x:Name="CardSearchListDisplay"
-                Style="{StaticResource MTGListViewStyle}"
-                SelectionMode="Single"
-                ItemsSource="{x:Bind SearchViewModel.SearchCards, Mode=OneWay}"
-                Visibility="Collapsed"
-                CanDragItems="True"
-                DragItemsStarting="CardView_DragItemsStarting"
-                ItemTemplate="{StaticResource SearchListViewItemTemplate}"/>
+              <controls:AdaptiveGridView x:Name="CardSearchImagesDisplay"
+                                         Style="{StaticResource MTGAdaptiveGridViewStyle}"
+                                         SelectionMode="None"
+                                         DesiredWidth="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}"
+                                         ItemsSource="{x:Bind SearchViewModel.SearchCards, Mode=OneWay}"
+                                         Visibility="Collapsed"
+                                         CanDragItems="True"
+                                         DragItemsStarting="CardView_DragItemsStarting"
+                                         ItemTemplate="{StaticResource SearchImageViewItemTemplate}"/>
+              <ListView x:Name="CardSearchListDisplay"
+                        Style="{StaticResource MTGListViewStyle}"
+                        SelectionMode="Single"
+                        ItemsSource="{x:Bind SearchViewModel.SearchCards, Mode=OneWay}"
+                        Visibility="Collapsed"
+                        CanDragItems="True"
+                        DragItemsStarting="CardView_DragItemsStarting"
+                        ItemTemplate="{StaticResource SearchListViewItemTemplate}"/>
             </Grid>
           </controls:DockPanel>
         </controls:DockPanel>
@@ -312,22 +314,21 @@
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
-                  <ListView
-                    Grid.Row="1"
-                    x:Name="DeckMaybeDisplay"
-                    DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
-                    ItemsSource="{Binding FilteredAndSortedCardViewModels}"
-                    Style="{StaticResource MTGListViewStyle}"
-                    SelectionMode="Single"
-                    CanDragItems="True"
-                    AllowDrop="True"
-                    DragOver="CardView_DragOver"
-                    Drop="CardView_Drop"
-                    DragItemsStarting="CardView_DragItemsStarting"
-                    DragItemsCompleted="CardView_DragItemsCompleted" 
-                    ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                    KeyDown="CardView_KeyDown"
-                    LosingFocus="CardView_LosingFocus"/>
+                  <ListView Grid.Row="1"
+                            x:Name="DeckMaybeDisplay"
+                            DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
+                            ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                            Style="{StaticResource MTGListViewStyle}"
+                            SelectionMode="Single"
+                            CanDragItems="True"
+                            AllowDrop="True"
+                            DragOver="CardView_DragOver"
+                            Drop="CardView_Drop"
+                            DragItemsStarting="CardView_DragItemsStarting"
+                            DragItemsCompleted="CardView_DragItemsCompleted" 
+                            ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                            KeyDown="CardView_KeyDown"
+                            LosingFocus="CardView_LosingFocus"/>
                   <TextBlock Grid.Row="2" Text="Wishlist">
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False">
@@ -339,22 +340,21 @@
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
-                  <ListView
-                    Grid.Row="3"
-                    x:Name="DeckWishlistDisplay"
-                    DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
-                    ItemsSource="{Binding FilteredAndSortedCardViewModels}"
-                    Style="{StaticResource MTGListViewStyle}"
-                    SelectionMode="Single"
-                    CanDragItems="True"
-                    AllowDrop="True"
-                    DragOver="CardView_DragOver"
-                    Drop="CardView_Drop"
-                    DragItemsStarting="CardView_DragItemsStarting"
-                    DragItemsCompleted="CardView_DragItemsCompleted"
-                    ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                    KeyDown="CardView_KeyDown"
-                    LosingFocus="CardView_LosingFocus"/>
+                  <ListView Grid.Row="3"
+                            x:Name="DeckWishlistDisplay"
+                            DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
+                            ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                            Style="{StaticResource MTGListViewStyle}"
+                            SelectionMode="Single"
+                            CanDragItems="True"
+                            AllowDrop="True"
+                            DragOver="CardView_DragOver"
+                            Drop="CardView_Drop"
+                            DragItemsStarting="CardView_DragItemsStarting"
+                            DragItemsCompleted="CardView_DragItemsCompleted"
+                            ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                            KeyDown="CardView_KeyDown"
+                            LosingFocus="CardView_LosingFocus"/>
                 </Grid>
               </TabViewItem>
               <TabViewItem Header="Info" IsClosable="False">
@@ -434,7 +434,15 @@
                 <AppBarButton Icon="ZoomIn" Label="Zoom">
                   <AppBarButton.Flyout>
                     <Flyout AreOpenCloseAnimationsEnabled="False">
-                      <Slider Header="Card size" Value="{x:Bind DeckDesiredItemWidth, Mode=TwoWay}" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside"/>
+                      <Slider Header="Card size" 
+                              Value="{x:Bind DeckDesiredItemWidth, Mode=TwoWay}" 
+                              Width="200" 
+                              HorizontalAlignment="Left" 
+                              Maximum="350" 
+                              Minimum="140" 
+                              SnapsTo="Ticks" 
+                              TickFrequency="10" 
+                              TickPlacement="Outside"/>
                     </Flyout>
                   </AppBarButton.Flyout>
                 </AppBarButton>
@@ -512,46 +520,52 @@
           </Grid>
           <!--Deck View-->
           <Grid controls:DockPanel.Dock="Top">
-            <controls:AdaptiveGridView
-              x:Name="DeckImagesDisplay"
-              Style="{StaticResource MTGAdaptiveGridViewStyle}"
-              DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
-              ItemsSource="{Binding FilteredAndSortedCardViewModels}"
-              DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
-              SelectionMode="Single"
-              Visibility="Collapsed"
-              CanDragItems="True"
-              AllowDrop="True"
-              DragOver="CardView_DragOver"
-              Drop="CardView_Drop"
-              DragItemsStarting="CardView_DragItemsStarting"
-              DragItemsCompleted="CardView_DragItemsCompleted" 
-              ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
-              KeyDown="CardView_KeyDown"
-              LosingFocus="CardView_LosingFocus"/>
-            <ListView
-              x:Name="DeckListDisplay"
-              Style="{StaticResource MTGListViewStyle}"
-              DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
-              ItemsSource="{Binding FilteredAndSortedCardViewModels}"
-              SelectionMode="Single"
-              Visibility="Collapsed"
-              CanDragItems="True"
-              AllowDrop="True"
-              DragOver="CardView_DragOver"
-              Drop="CardView_Drop"
-              DragItemsStarting="CardView_DragItemsStarting"
-              DragItemsCompleted="CardView_DragItemsCompleted" 
-              ItemTemplate="{StaticResource DeckListViewItemTemplate}"
-              KeyDown="CardView_KeyDown"
-              LosingFocus="CardView_LosingFocus"/>
+            <controls:AdaptiveGridView x:Name="DeckImagesDisplay"
+                                       Style="{StaticResource MTGAdaptiveGridViewStyle}"
+                                       DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
+                                       ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                                       DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
+                                       SelectionMode="Single"
+                                       Visibility="Collapsed"
+                                       CanDragItems="True"
+                                       AllowDrop="True"
+                                       DragOver="CardView_DragOver"
+                                       Drop="CardView_Drop"
+                                       DragItemsStarting="CardView_DragItemsStarting"
+                                       DragItemsCompleted="CardView_DragItemsCompleted" 
+                                       ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
+                                       KeyDown="CardView_KeyDown"
+                                       LosingFocus="CardView_LosingFocus"/>
+            <ListView x:Name="DeckListDisplay"
+                      Style="{StaticResource MTGListViewStyle}"
+                      DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
+                      ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                      SelectionMode="Single"
+                      Visibility="Collapsed"
+                      CanDragItems="True"
+                      AllowDrop="True"
+                      DragOver="CardView_DragOver"
+                      Drop="CardView_Drop"
+                      DragItemsStarting="CardView_DragItemsStarting"
+                      DragItemsCompleted="CardView_DragItemsCompleted" 
+                      ItemTemplate="{StaticResource DeckListViewItemTemplate}"
+                      KeyDown="CardView_KeyDown"
+                      LosingFocus="CardView_LosingFocus"/>
           </Grid>
         </controls:DockPanel>
       </Grid>
     </SplitView>
     <!--Preview image-->
     <Canvas>
-      <controls:ImageEx x:Name="PreviewImage" Height="350" IsHitTestVisible="False" CornerRadius="10" Visibility="Collapsed" PlaceholderStretch="Fill" CacheMode="BitmapCache" IsCacheEnabled="True" Style="{StaticResource PreviewImagePlaceholderStyle}"/>
+      <controls:ImageEx x:Name="PreviewImage" 
+                        Height="350" 
+                        IsHitTestVisible="False" 
+                        CornerRadius="10" 
+                        Visibility="Collapsed" 
+                        PlaceholderStretch="Fill" 
+                        CacheMode="BitmapCache" 
+                        IsCacheEnabled="True" 
+                        Style="{StaticResource PreviewImagePlaceholderStyle}"/>
     </Canvas>
   </Grid>
 </UserControl>

@@ -14,7 +14,7 @@
       <ColumnDefinition Width="auto"/>
       <ColumnDefinition Width="auto"/>
     </Grid.ColumnDefinitions>
-    <TextBox x:Name="ScryfallSearchBox" Grid.Column="0" PlaceholderText="Search..."  IsSpellCheckEnabled="False" CornerRadius="4 0 0 4" Text="{x:Bind SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+    <TextBox x:Name="ScryfallSearchBox" Grid.Column="0" PlaceholderText="Search..." IsSpellCheckEnabled="False" CornerRadius="4 0 0 4" Text="{x:Bind SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
       <TextBox.HeaderTemplate>
         <DataTemplate>
           <StackPanel Orientation="Horizontal">
@@ -25,45 +25,40 @@
       </TextBox.HeaderTemplate>
     </TextBox>
     <StackPanel Grid.Column="1" Orientation="Horizontal">
-      <ComboBox
-              Header="Format"
-              VerticalAlignment="Bottom" 
-              HorizontalAlignment="Stretch"
-              CornerRadius="0" 
-              BorderThickness="0 1 1 1" 
-              Width="85"
-              ItemsSource="{ui:EnumValues Type=controls:MTGSearchFormatTypes}"
-              SelectedItem="{x:Bind SearchFormat, Mode=TwoWay}"/>
-      <ComboBox
-              Header="Unique"
-              VerticalAlignment="Bottom" 
-              HorizontalAlignment="Stretch"
-              CornerRadius="0" 
-              BorderThickness="0 1 1 1" 
-              Width="85"
-              ItemsSource="{ui:EnumValues Type=controls:MTGSearchUniqueTypes}"
-              SelectedItem="{x:Bind SearchUnique, Mode=TwoWay}"/>
-      <ComboBox
-              Header="Order" 
-              VerticalAlignment="Bottom" 
-              HorizontalAlignment="Stretch"
-              CornerRadius="0" 
-              BorderThickness="0 1 1 1" 
-              Width="105"
-              ItemsSource="{ui:EnumValues Type=controls:MTGSearchOrderTypes}"
-              SelectedItem="{x:Bind SearchOrder, Mode=TwoWay}" />
-      <ComboBox
-              Header="Direction" 
-              VerticalAlignment="Bottom" 
-              HorizontalAlignment="Stretch"
-              CornerRadius="0" 
-              BorderThickness="0 1 1 1" 
-              Width="80"
-              ItemsSource="{ui:EnumValues Type=controls:MTGSearchDirectionTypes}"
-              SelectedItem="{x:Bind SearchDirection, Mode=TwoWay}" />
+      <ComboBox Header="Format"
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Stretch"
+                CornerRadius="0" 
+                BorderThickness="0 1 1 1" 
+                Width="85"
+                ItemsSource="{ui:EnumValues Type=controls:MTGSearchFormatTypes}"
+                SelectedItem="{x:Bind SearchFormat, Mode=TwoWay}"/>
+      <ComboBox Header="Unique"
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Stretch"
+                CornerRadius="0" 
+                BorderThickness="0 1 1 1" 
+                Width="85"
+                ItemsSource="{ui:EnumValues Type=controls:MTGSearchUniqueTypes}"
+                SelectedItem="{x:Bind SearchUnique, Mode=TwoWay}"/>
+      <ComboBox Header="Order" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Stretch"
+                CornerRadius="0" 
+                BorderThickness="0 1 1 1" 
+                Width="105"
+                ItemsSource="{ui:EnumValues Type=controls:MTGSearchOrderTypes}"
+                SelectedItem="{x:Bind SearchOrder, Mode=TwoWay}" />
+      <ComboBox Header="Direction" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Stretch"
+                CornerRadius="0" 
+                BorderThickness="0 1 1 1" 
+                Width="80"
+                ItemsSource="{ui:EnumValues Type=controls:MTGSearchDirectionTypes}"
+                SelectedItem="{x:Bind SearchDirection, Mode=TwoWay}" />
     </StackPanel>
-    <Button
-            Grid.Column="2" 
+    <Button Grid.Column="2" 
             VerticalAlignment="Bottom"
             HorizontalAlignment="Stretch"
             CornerRadius="0 4 4 0" 

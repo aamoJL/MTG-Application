@@ -1,106 +1,99 @@
-﻿using Microsoft.UI.Xaml;
-using LiveChartsCore;
+﻿using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Database;
+using MTGApplication.Interfaces;
 using MTGApplication.Pages;
 using MTGApplication.Services;
-using MTGApplication.Database;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using MTGApplication.Interfaces;
 
-namespace MTGApplication
+namespace MTGApplication;
+
+/// <summary>
+/// Provides application-specific behavior to supplement the default Application class.
+/// </summary>
+public partial class App : Application
 {
-  /// <summary>
-  /// Provides application-specific behavior to supplement the default Application class.
-  /// </summary>
-  public partial class App : Application
+  public class WindowClosingEventArgs : EventArgs
   {
-    public static Window MainWindow { get; private set; }
-    // Used for Dialogs
-    public static FrameworkElement MainRoot { get; private set; }
+    public List<ISavable> ClosingTasks { get; set; } = new();
 
-    // Variable for window close event so the window will close when all tasks has been compleated
-    private bool close = false;
+    public WindowClosingEventArgs() { }
+  }
 
-    public class WindowClosingEventArgs : EventArgs
+  public static Window MainWindow { get; private set; }
+  public static event EventHandler<WindowClosingEventArgs> Closing;
+
+  private bool close = false; // Variable for window close event so the window will close when all tasks has been completed
+
+  /// <summary>
+  /// Initializes the singleton application object.  This is the first line of authored code
+  /// executed, and as such is the logical equivalent of main() or WinMain().
+  /// </summary>
+  public App() => InitializeComponent();
+
+  /// <summary>
+  /// Invoked when the application is launched normally by the end user.  Other entry points
+  /// will be used such as when the application is launched to open a specific file.
+  /// </summary>
+  /// <param name="args">Details about the launch request and process.</param>
+  protected override void OnLaunched(LaunchActivatedEventArgs args)
+  {
+    AppConfig.Initialize();
+
+    using (var db = new CardDbContextFactory().CreateDbContext())
     {
-      public List<ISavable> ClosingTasks { get; set; } = new();
-      //public bool? Canceled => Close.FirstOrDefault(x => x is false);
-
-      public WindowClosingEventArgs() { }
+      db.Database.Migrate();
     }
 
-    public static event EventHandler<WindowClosingEventArgs> Closing;
-
-    /// <summary>
-    /// Initializes the singleton application object.  This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
-    public App()
+    MainWindow = new MainWindow
     {
-      this.InitializeComponent();
+      Title = "MTG Application",
+    };
+
+    Frame rootFrame = new();
+    MainWindow.Content = rootFrame;
+    rootFrame.Navigate(typeof(MainPage), args.Arguments);
+
+    MainWindow.Activate();
+    MainWindow.Closed += MainWindow_Closed;
+
+    DialogService.DialogRoot = MainWindow.Content as FrameworkElement;
+
+    IOService.InitDirectories();
+
+    LiveCharts.Configure(config =>
+      config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()
+    );
+  }
+
+  private async void MainWindow_Closed(object sender, WindowEventArgs args)
+  {
+    if (close)
+    { return; }
+
+    var closingArgs = new WindowClosingEventArgs();
+    Closing?.Invoke(this, closingArgs);
+
+    args.Handled = closingArgs.ClosingTasks.FirstOrDefault(x => x.HasUnsavedChanges is true) != null;
+    var canceled = false;
+
+    foreach (var task in closingArgs.ClosingTasks)
+    {
+      canceled = !await task.SaveUnsavedChanges();
+      if (canceled)
+      { break; }
     }
 
-    /// <summary>
-    /// Invoked when the application is launched normally by the end user.  Other entry points
-    /// will be used such as when the application is launched to open a specific file.
-    /// </summary>
-    /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    if (!canceled)
     {
-      AppConfig.Init();
-
-      using (var db = new CardDbContextFactory().CreateDbContext())
-      {
-        db.Database.Migrate();
-      }
-
-      MainWindow = new MainWindow
-      {
-        Title = "MTG Application",
-      };
-
-      Frame rootFrame = new();
-      MainWindow.Content = rootFrame;
-      rootFrame.Navigate(typeof(MainPage), args.Arguments);
-
-      MainWindow.Activate();
-      MainWindow.Closed += MainWindow_Closed;
-
-      MainRoot = MainWindow.Content as FrameworkElement;
-
-      IO.InitDirectories();
-      LiveCharts.Configure(config =>
-        config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()
-      );
-    }
-
-    private async void MainWindow_Closed(object sender, WindowEventArgs args)
-    {
-      if (close) { return; }
-
-      var closingArgs = new WindowClosingEventArgs();
-      Closing?.Invoke(this, closingArgs);
-
-      args.Handled = closingArgs.ClosingTasks.FirstOrDefault(x => x.HasUnsavedChanges is true) != null;
-      bool canceled = false; 
-
-      foreach (var task in closingArgs.ClosingTasks)
-      {
-        canceled = !await task.SaveUnsavedChanges();
-        if (canceled) { break; }
-      }
-      
-      if(!canceled)
-      {
-        close = true;
-        args.Handled = false;
-        MainWindow.Close();
-      }
+      close = true;
+      args.Handled = false;
+      MainWindow.Close();
     }
   }
 }

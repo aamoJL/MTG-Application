@@ -8,7 +8,8 @@
   xmlns:viewmodels="using:MTGApplication.ViewModels" 
   xmlns:ui="using:CommunityToolkit.WinUI.UI" 
   xmlns:sys="using:System"
-  xmlns:helpers="using:MTGApplication.Views.BindingHelpers" xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+  xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
   mc:Ignorable="d">
 
   <UserControl.Resources>
@@ -94,31 +95,28 @@
             </AppBarButton.Flyout>
           </AppBarButton>
           <AppBarSeparator/>
-          <AppBarButton
-            Command="{x:Bind CardCollectionsViewModel.NewCollectionListDialogCommand}"
-            VerticalAlignment="Top"
-            Label="Add"
-            Width="50">
+          <AppBarButton Command="{x:Bind CardCollectionsViewModel.NewCollectionListDialogCommand}"
+                        VerticalAlignment="Top"
+                        Label="Add"
+                        Width="50">
             <AppBarButton.Icon>
               <FontIcon Glyph="&#xE710;"/>
             </AppBarButton.Icon>
           </AppBarButton>
-          <AppBarButton
-            Command="{x:Bind CardCollectionsViewModel.EditCollectionListDialogCommand}"
-            VerticalAlignment="Top"
-            Label="Edit"
-            Width="50">
+          <AppBarButton Command="{x:Bind CardCollectionsViewModel.EditCollectionListDialogCommand}"
+                        VerticalAlignment="Top"
+                        Label="Edit"
+                        Width="50">
             <AppBarButton.Icon>
               <FontIcon Glyph="&#xE70F;"/>
             </AppBarButton.Icon>
           </AppBarButton>
-          <ComboBox 
-            ItemsSource="{x:Bind CardCollectionsViewModel.Collection.CollectionLists, Mode=OneWay}"
-            SelectedItem="{x:Bind CardCollectionsViewModel.SelectedList, Mode=TwoWay}"
-            VerticalAlignment="Center" 
-            Width="200"
-            Margin="0 0 5 0"
-            IsEnabled="{x:Bind helpers:Comparison.MoreThan(CardCollectionsViewModel.Collection.CollectionLists.Count, 0), Mode=OneWay}">
+          <ComboBox  ItemsSource="{x:Bind CardCollectionsViewModel.Collection.CollectionLists, Mode=OneWay}" 
+                     SelectedItem="{x:Bind CardCollectionsViewModel.SelectedList, Mode=TwoWay}"
+                     VerticalAlignment="Center" 
+                     Width="200"
+                     Margin="0 0 5 0"
+                     IsEnabled="{x:Bind helpers:Comparison.MoreThan(CardCollectionsViewModel.Collection.CollectionLists.Count, 0), Mode=OneWay}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
                 <TextBlock Text="{Binding Name}"/>
@@ -141,13 +139,12 @@
           <Run Text="{x:Bind sys:String.Format('{0} cards loaded', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
         </TextBlock>
       </Grid>
-      <controls:AdaptiveGridView
-        controls:DockPanel.Dock="Top"
-        Style="{StaticResource MTGAdaptiveGridViewStyle}"
-        ItemTemplate="{StaticResource CardViewModelItemTemplate}"
-        ItemsSource="{x:Bind CardCollectionsViewModel.MTGSearchViewModel.SearchCards, Mode=OneWay}"
-        SelectionMode="None"
-        DesiredWidth="250"/>
+      <controls:AdaptiveGridView controls:DockPanel.Dock="Top" 
+                                 Style="{StaticResource MTGAdaptiveGridViewStyle}"
+                                 ItemTemplate="{StaticResource CardViewModelItemTemplate}"
+                                 ItemsSource="{x:Bind CardCollectionsViewModel.MTGSearchViewModel.SearchCards, Mode=OneWay}"
+                                 SelectionMode="None"
+                                 DesiredWidth="250"/>
     </controls:DockPanel>
   </Grid>
 </UserControl>

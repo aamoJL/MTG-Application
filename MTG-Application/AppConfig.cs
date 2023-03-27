@@ -9,7 +9,10 @@ namespace MTGApplication
 
     public static string CompanyName { get; set; }
 
-    public static void Init()
+    /// <summary>
+    /// Initializes the App configurations using appsettings.json
+    /// </summary>
+    public static void Initialize()
     {
       var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false);
       configurationRoot = builder.Build();
@@ -17,6 +20,9 @@ namespace MTGApplication
       CompanyName = GetCompanyName();
     }
 
+    /// <summary>
+    /// Returns company's name from the appsettings.json
+    /// </summary>
     private static string GetCompanyName()
     {
       var config = configurationRoot.GetSection("AppInformation").GetChildren();

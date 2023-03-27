@@ -5,7 +5,7 @@ namespace MTGApplicationTests.Services
 {
   public class TestIO
   {
-    public class TestClipboard : IO.ClipboardService, IDisposable
+    public class TestClipboard : IOService.ClipboardService, IDisposable
     {
       public object? Content { get; set; }
 

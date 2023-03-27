@@ -3,8 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
-using static MTGApplication.Services.Notifications;
-using static MTGApplication.Views.Dialogs;
+using static MTGApplication.Services.NotificationService;
 using static MTGApplicationTests.Database.InMemoryMTGDeckRepositoryTests;
 using static MTGApplicationTests.ViewModels.DeckBuilderViewModelTests;
 
