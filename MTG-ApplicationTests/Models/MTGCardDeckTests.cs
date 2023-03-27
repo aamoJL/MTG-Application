@@ -53,7 +53,7 @@ namespace MTGApplicationTests.Models
 
       var dtoToDeck = await dto.AsMTGCardDeck(new TestCardAPI(deckCards.ToArray()));
       Assert.AreEqual(name, dtoToDeck.Name);
-      CollectionAssert.AreEquivalent(deckCards, dtoToDeck.DeckCards);
+      CollectionAssert.AreEquivalent(deckCards.Select(x => x.Info.ScryfallId).ToArray(), dtoToDeck.DeckCards.Select(x => x.Info.ScryfallId).ToArray());
     }
   }
 }

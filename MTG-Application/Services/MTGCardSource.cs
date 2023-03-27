@@ -20,8 +20,9 @@ namespace MTGApplication.Services
       if (!string.IsNullOrEmpty(NextPage))
       {
         // Load next page
-        (var newCards, NextPage, _) = await CardAPI.FetchCardsFromPage(NextPage);
-        foreach (var card in newCards)
+        var result = await CardAPI.FetchFromPageUri(NextPage);
+        NextPage = result.NextPageUri;
+        foreach (var card in result.Found)
         {
           Cards.Add(card);
         }

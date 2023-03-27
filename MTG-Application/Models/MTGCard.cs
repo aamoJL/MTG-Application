@@ -3,9 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using MTGApplication.Interfaces;
+using MTGApplication.API;
 
 namespace MTGApplication.Models
 {
@@ -214,23 +213,28 @@ namespace MTGApplication.Models
 
       return colors.ToArray();
     }
+
+    /// <summary>
+    /// Returns the API's name that was used to fetch the given card
+    /// </summary>
+    public string GetAPIName()
+    {
+      if (Info.ScryfallId != Guid.Empty) { return ScryfallAPI.APIName; }
+      else { return string.Empty; }
+    }
   }
 
-  public class MTGCardDTO
+  public class MTGCardDTO : CardDTO
   {
-    private MTGCardDTO() { }
-    public MTGCardDTO(MTGCard card)
+    private MTGCardDTO() : base() { }
+    public MTGCardDTO(MTGCard card) : base()
     {
       Name = card.Info.Name;
       ScryfallId = card.Info.ScryfallId;
       Count = card.Count;
     }
 
-    [Key]
-    public int Id { get; init; }
-    public string Name { get; init; }
     public Guid ScryfallId { get; init; }
-    public int Count { get; set; }
 
     public MTGCardDeckDTO DeckCards { get; set; }
     public MTGCardDeckDTO DeckWishlist { get; set; }

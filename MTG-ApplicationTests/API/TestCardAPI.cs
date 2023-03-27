@@ -2,6 +2,7 @@
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplicationTests.Services;
+using static MTGApplication.Interfaces.ICardAPI<MTGApplication.Models.MTGCard>;
 
 namespace MTGApplicationTests.API
 {
@@ -18,35 +19,31 @@ namespace MTGApplicationTests.API
 
     public int PageSize => 40;
 
-    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false)
+    public async Task<Result> FetchCardsWithParameters(string searchParams)
     {
-      return await FetchCardsWithParameters(uri, countLimit);
+      if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
+      return await Task.Run(() => ExpectedCards != null ? new Result(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : Result.Empty());
     }
-    public async Task<MTGCard[]> FetchCardsWithParameters(string searchParams, int countLimit = 700)
+    public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)
     {
-      if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
-      return await Task.Run(() => ExpectedCards ?? Array.Empty<MTGCard>());
-    }
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(MTGCardDTO[] dtoArray)
-    {
-      var cards = dtoArray.Select(x => Mocker.MTGCardModelMocker.FromDTO(x)).ToArray();
+      var cards = dtoArray.Select(x => Mocker.MTGCardModelMocker.FromDTO((MTGCardDTO)x)).ToArray();
 
-      if(ExpectedCards == null) { return await Task.Run(() => (cards, 0)); }
+      if(ExpectedCards == null) { return await Task.Run(() => new Result(cards, 0, cards.Length)); }
       else
       {
-        var found = cards.Select(dtoCard => ExpectedCards.FirstOrDefault(ex => ex.Info.ScryfallId == dtoCard.Info.ScryfallId))?.ToList() ?? new List<MTGCard?>();
+        var found = ExpectedCards.Where(ex => cards.FirstOrDefault(x => x.Info.ScryfallId == ex.Info.ScryfallId) != null).ToList() ?? new List<MTGCard>();
         var notFoundCount = ExpectedCards.Length - found.Count;
-        return await Task.Run(() => (found.ToArray(), notFoundCount));
+        return await Task.Run(() => new Result(found.ToArray(), notFoundCount, found.Count));
       }
     }
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromString(string importText)
+    public async Task<Result> FetchFromString(string importText)
     {
-      return await Task.Run(() => (ExpectedCards ?? Array.Empty<MTGCard>(), NotFoundCount));
+      return await Task.Run(() => ExpectedCards != null ? new Result(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : Result.Empty());
     }
-    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri, bool paperOnly = false)
+    public async Task<Result> FetchFromPageUri(string pageUri, bool paperOnly = false)
     {
       var cards = string.IsNullOrEmpty(pageUri) ? Array.Empty<MTGCard>() : ExpectedCards ?? Array.Empty<MTGCard>();
-      return await Task.Run(() => (cards,  string.Empty, cards.Length));
+      return await Task.Run(() => new Result(cards, NotFoundCount, cards.Length));
     }
     public string GetSearchUri(string searchParams) => searchParams;
   }
@@ -58,19 +55,15 @@ namespace MTGApplicationTests.API
     public async Task FetchCardsTest()
     {
       var api = new TestCardAPI();
-      Assert.AreEqual(0, (await api.FetchCardsWithParameters(string.Empty)).Length);
-      Assert.AreEqual(0, (await api.FetchCardsWithParameters("params")).Length);
-      Assert.AreEqual(0, (await api.FetchCardsFromUri(string.Empty)).Length);
-      Assert.AreEqual(0, (await api.FetchCardsFromUri("params")).Length);
+      Assert.AreEqual(0, (await api.FetchCardsWithParameters(string.Empty)).Found.Length);
+      Assert.AreEqual(0, (await api.FetchCardsWithParameters("params")).Found.Length);
 
       api.ExpectedCards = new MTGCard[]
       {
         Mocker.MTGCardModelMocker.CreateMTGCardModel(),
       };
-      Assert.AreEqual(0, (await api.FetchCardsWithParameters(string.Empty)).Length);
-      Assert.AreEqual(1, (await api.FetchCardsWithParameters("params")).Length);
-      Assert.AreEqual(0, (await api.FetchCardsFromUri(string.Empty)).Length);
-      Assert.AreEqual(1, (await api.FetchCardsFromUri("params")).Length);
+      Assert.AreEqual(0, (await api.FetchCardsWithParameters(string.Empty)).Found.Length);
+      Assert.AreEqual(1, (await api.FetchCardsWithParameters("params")).Found.Length);
     }
 
     [TestMethod]

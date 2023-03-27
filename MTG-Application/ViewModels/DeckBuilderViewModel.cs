@@ -6,6 +6,7 @@ using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
@@ -340,7 +341,16 @@ namespace MTGApplication.ViewModels
       {
         // Get prints
         IsBusy = true;
-        var prints = await CardAPI.FetchCardsFromUri(card.Info.PrintSearchUri, paperOnly: true);
+        
+        var pageUri = card.Info.PrintSearchUri;
+        var prints = new List<MTGCard>();
+        while (pageUri != string.Empty)
+        {
+          var result = await CardAPI.FetchFromPageUri(pageUri, paperOnly: true);
+          prints.AddRange(result.Found);
+          pageUri = result.NextPageUri;
+        }
+
         var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
         IsBusy = false;
 
@@ -371,7 +381,9 @@ namespace MTGApplication.ViewModels
           IsBusy = true;
           bool? import = true;
           bool? skipDialog = false;
-          (found, notFoundCount) = await CardAPI.FetchFromString(importText);
+          var result = await CardAPI.FetchFromString(importText);
+          found = result.Found;
+          notFoundCount = result.NotFoundCount;
           foreach (var card in found)
           {
             if (CardDeck.GetCardlist(ListType).FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)

@@ -3,13 +3,13 @@ using MTGApplication.Models;
 using MTGApplication.Services;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static MTGApplication.Interfaces.ICardAPI<MTGApplication.Models.MTGCard>;
 using static MTGApplication.Models.MTGCard;
 
 namespace MTGApplication.API
@@ -94,30 +94,34 @@ namespace MTGApplication.API
     private static string COLLECTION_URL => $"{CARDS_URL}/collection";
     private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
 
+    /// <summary>
+    /// How many cards can be fetched in one query using identifiers
+    /// </summary>
     private static int MaxFetchIdentifierCount => 75;
 
     public int PageSize => 175;
 
+    #region ICardAPI interface
     public string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";
-    public async Task<MTGCard[]> FetchCardsWithParameters(string searchParams, int countLimit = 700)
+    public async Task<Result> FetchCardsWithParameters(string searchParams)
     {
-      if (string.IsNullOrEmpty(searchParams)) { return Array.Empty<MTGCard>(); }
-      return await FetchCardsFromUri(GetSearchUri(searchParams), countLimit);
+      if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
+      return await FetchFromPageUri(GetSearchUri(searchParams));
     }
-    public async Task<MTGCard[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false)
+    public async Task<Result> FetchFromPageUri(string pageUri, bool paperOnly = false)
     {
-      List<MTGCard> cards = new();
+      JsonNode rootNode = await FetchScryfallJsonObject(pageUri);
+      if (rootNode == null) { return Result.Empty(); }
 
-      // Loop through API pages
-      while (uri != "" && cards.Count < countLimit)
-      {
-        (var fetchedCards, uri, _) = await FetchCardsFromPage(uri, paperOnly);
-        cards.AddRange(fetchedCards);
-      }
+      List<MTGCard> found = new();
 
-      return cards.GetRange(0, Math.Min(countLimit, cards.Count)).ToArray();
+      found.AddRange(await GetCardsFromJsonObject(rootNode, paperOnly));
+      var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
+      var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
+
+      return new Result(found.ToArray(), 0, totalCount, nextPage);
     }
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromString(string importText)
+    public async Task<Result> FetchFromString(string importText)
     {
       var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -152,25 +156,13 @@ namespace MTGApplication.API
 
       return await FetchWithIdentifiers(identifiers);
     }
-    public async Task<(MTGCard[] Found, int NotFoundCount)> FetchFromDTOs(MTGCardDTO[] dtoArray)
+    public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)
     {
-      var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x));
+      var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x as MTGCardDTO));
       return await FetchWithIdentifiers(identifiers.ToArray());
     }
-    public async Task<(MTGCard[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri, bool paperOnly = false)
-    {
-      List<MTGCard> cards = new();
+    #endregion
 
-      JsonNode rootNode = await FetchScryfallJsonObject(pageUri);
-      if (rootNode == null) { return (cards.ToArray(), string.Empty, 0); }
-
-      cards.AddRange(await GetCardsFromJsonObject(rootNode, paperOnly));
-      var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
-      var totalCount = rootNode["total_cards"]?.GetValue<int>();
-
-      return (cards.ToArray(), nextPage, totalCount ?? 0);
-    }
-    
     /// <summary>
     /// Returns <see cref="MTGCard"/> array from the given <paramref name="jsonNode"/>
     /// </summary>
@@ -214,6 +206,24 @@ namespace MTGApplication.API
     /// </summary>
     private static MTGCardInfo? GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
     {
+      /// <summary>
+      /// Converts the <paramref name="colorArray"/> to <see cref="ColorTypes"/> array
+      /// </summary>
+      static ColorTypes[] GetColors(string[] colorArray)
+      {
+        var colors = new List<ColorTypes>();
+
+        foreach (var color in colorArray)
+        {
+          if (Enum.TryParse(color, true, out ColorTypes colorType))
+          {
+            colors.Add(colorType);
+          }
+        }
+
+        return colors.ToArray();
+      }
+
       // TODO: add tokens if available
       if (json == null || json["object"]?.GetValue<string>() != "card") { return null; }
       if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null) { return null; }
@@ -310,7 +320,7 @@ namespace MTGApplication.API
     /// <summary>
     /// Fetches MTGCards from the API using the given identifier objects
     /// </summary>
-    private static async Task<(MTGCard[] Found, int NotFoundCount)> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
+    private static async Task<Result> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
     {
       var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
       {
@@ -343,28 +353,14 @@ namespace MTGApplication.API
         }
         catch (Exception) { throw; }
 
-        return (Found: fetchedCards.ToArray(), NotFoundCount: notFoundCount);
+        return (Found: fetchedCards, NotFoundCount: notFoundCount);
       })));
 
-      return (fetchResults.SelectMany(x => x.Found).ToArray(), fetchResults.Sum(x => x.NotFoundCount));
-    }
+      var found = fetchResults.SelectMany(x => x.Found).ToArray();
+      var notFoundCount = fetchResults.Sum(x => x.NotFoundCount);
+      var totalCount = found.Length;
 
-    /// <summary>
-    /// Converts the <paramref name="colorArray"/> to <see cref="ColorTypes"/> array
-    /// </summary>
-    private static ColorTypes[] GetColors(string[] colorArray)
-    {
-      var colors = new List<ColorTypes>();
-
-      foreach (var color in colorArray)
-      {
-        if(Enum.TryParse(color, true, out ColorTypes colorType))
-        {
-          colors.Add(colorType);
-        }
-      }
-
-      return colors.ToArray();
+      return new(found, notFoundCount, totalCount);
     }
   }
 }

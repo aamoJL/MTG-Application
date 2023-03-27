@@ -425,7 +425,7 @@ namespace MTGApplication.ViewModels
     {
       // Get prints
       IsBusy = true;
-      var prints = (await CardAPI.FetchCardsWithParameters($"!\"{card.Info.Name}\"+unique:prints+game:paper")).Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray();
+      var prints = (await CardAPI.FetchCardsWithParameters($"!\"{card.Info.Name}\"+unique:prints+game:paper")).Found.Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray();
       var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
       IsBusy = false;
 
@@ -527,7 +527,9 @@ namespace MTGApplication.ViewModels
       if (!string.IsNullOrEmpty(importText) && SelectedList != null)
       {
         IsBusy = true;
-        (found, notFoundCount) = await CardAPI.FetchFromString(importText);
+        var result = await CardAPI.FetchFromString(importText);
+        found = result.Found;
+        notFoundCount = result.NotFoundCount;
         foreach (var card in found)
         {
           if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is null)

@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.API;
-using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplicationTests.Services;
 using System.Text.Json;
@@ -17,10 +16,10 @@ namespace MTGApplicationTests.API
       var api = new ScryfallAPI();
       string searchQuery = "asd";
 
-      var fetchedCards = await api.FetchCardsWithParameters(searchQuery, 2);
+      var result = await api.FetchCardsWithParameters(searchQuery);
 
-      Assert.AreEqual(2, fetchedCards.Length);
-      Assert.AreEqual(APIName, ICardAPI<MTGCard>.GetAPIName(fetchedCards[0]));
+      Assert.IsTrue(result.Found.Length > 0);
+      Assert.AreEqual(APIName, result.Found[0].GetAPIName());
     }
 
     [TestMethod]
@@ -29,9 +28,9 @@ namespace MTGApplicationTests.API
       var api = new ScryfallAPI();
       string searchQuery = "";
 
-      var fetchedCards = await api.FetchCardsWithParameters(searchQuery);
+      var result = await api.FetchCardsWithParameters(searchQuery);
 
-      Assert.AreEqual(0, fetchedCards.Length);
+      Assert.AreEqual(0, result.Found.Length);
     }
 
     [TestMethod]
@@ -49,10 +48,10 @@ namespace MTGApplicationTests.API
         2 57e547cd-eba4-4a75-9c4e-8eeb6e00ddc4
         ";
 
-      var (Found, NotFoundCount) = await api.FetchFromString(importString);
-      Assert.IsNotNull(Found);
-      Assert.AreEqual(7, Found.Length);
-      Assert.AreEqual(11, Found.Sum(x => x.Count));
+      var result = await api.FetchFromString(importString);
+      Assert.IsNotNull(result.Found);
+      Assert.AreEqual(7, result.Found.Length);
+      Assert.AreEqual(11, result.Found.Sum(x => x.Count));
     }
 
     [TestMethod]
@@ -75,11 +74,11 @@ namespace MTGApplicationTests.API
         Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Apostle of Invasion", scryfallId: Guid.Parse("8a973487-5def-4771-bb77-5748cbd2f469")),
       };
 
-      var (Found, NotFoundCount) = await api.FetchFromDTOs(cards.Select(x => new MTGCardDTO(x)).ToArray());
+      var result = await api.FetchFromDTOs(cards.Select(x => new MTGCardDTO(x)).ToArray());
 
-      Assert.AreEqual(cards[0].Info.Name, Found[0].Info.Name);
-      Assert.AreEqual(cards[1].Info.Name, Found[1].Info.Name);
-      Assert.AreEqual(cards[2].Info.Name, Found[2].Info.Name);
+      Assert.AreEqual(cards[0].Info.Name, result.Found[0].Info.Name);
+      Assert.AreEqual(cards[1].Info.Name, result.Found[1].Info.Name);
+      Assert.AreEqual(cards[2].Info.Name, result.Found[2].Info.Name);
     }
 
     [TestMethod]
@@ -87,11 +86,11 @@ namespace MTGApplicationTests.API
     {
       var api = new ScryfallAPI();
       string pageUri = "";
-      var (cards, nextPageUri, totalCount) = await api.FetchCardsFromPage(pageUri);
+      var result = await api.FetchFromPageUri(pageUri);
 
-      Assert.AreEqual(0, totalCount);
-      Assert.AreEqual(0, cards.Length);
-      Assert.AreEqual(string.Empty, nextPageUri);
+      Assert.AreEqual(0, result.TotalCount);
+      Assert.AreEqual(0, result.Found.Length);
+      Assert.AreEqual(string.Empty, result.NextPageUri);
     }
 
     [TestMethod]
@@ -100,11 +99,11 @@ namespace MTGApplicationTests.API
       var api = new ScryfallAPI();
       string pageUri = 
         "https://api.scryfall.com/cards/search?dir=asc&format=json&include_extras=false&include_multilingual=false&include_variations=false&order=released&page=2&q=set%3Aneo+unique%3Acards+order%3Areleased+direction%3Aasc+format%3Aany+game%3Apaper&unique=cards";
-      var (cards, nextPageUri, totalCount) = await api.FetchCardsFromPage(pageUri);
+      var result = await api.FetchFromPageUri(pageUri);
 
-      Assert.IsTrue(totalCount > 0);
-      Assert.IsTrue(cards.Length > 0);
-      Assert.AreEqual(string.Empty, nextPageUri);
+      Assert.IsTrue(result.TotalCount > 0);
+      Assert.IsTrue(result.Found.Length > 0);
+      Assert.AreEqual(string.Empty, result.NextPageUri);
     }
 
     [TestMethod]
@@ -121,8 +120,8 @@ namespace MTGApplicationTests.API
       var uri = 
         "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A48e603a2-b965-4fbc-ad57-4388bce5ac8b&unique=prints";
 
-      var cards = await api.FetchCardsFromUri(uri);
-      Assert.IsTrue(cards.Length > 0);
+      var result = await api.FetchFromPageUri(uri);
+      Assert.IsTrue(result.Found.Length > 0);
     }
 
     [TestMethod]
@@ -131,8 +130,8 @@ namespace MTGApplicationTests.API
       var api = new ScryfallAPI();
       var uri = string.Empty;
 
-      var cards = await api.FetchCardsFromUri(uri);
-      Assert.AreEqual(0, cards.Length);
+      var result = await api.FetchFromPageUri(uri);
+      Assert.AreEqual(0, result.Found.Length);
     }
 
     #region Identifier

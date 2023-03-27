@@ -340,12 +340,16 @@ namespace MTGApplicationTests.ViewModels
     [TestMethod]
     public async Task LoadDeckDialogCommandTest_IsSorted()
     {
-      var deckName = "First";
       var cards = new List<MTGCard>()
       {
         Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", cmc: 3),
         Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", cmc: 2),
         Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", cmc: 1),
+      };
+      var dbDeck = new MTGCardDeck()
+      {
+        Name = "First",
+        DeckCards = new(cards),
       };
 
       using TestInMemoryMTGDeckRepository repo = new(new TestCardAPI()
@@ -354,16 +358,10 @@ namespace MTGApplicationTests.ViewModels
       });
       DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
       {
-        LoadDialog = new() { Values = deckName }, // Load deck
+        LoadDialog = new() { Values = dbDeck.Name }, // Load deck
       });
 
-      // Add deck to the database
-      var dbDeck = new MTGCardDeck()
-      {
-        Name = deckName,
-        DeckCards = new(cards),
-      };
-      await repo.Add(dbDeck);
+      await repo.Add(dbDeck);      
 
       vm.SelectedSortDirection = SortDirection.Ascending;
       vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;

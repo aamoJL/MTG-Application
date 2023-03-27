@@ -1,5 +1,4 @@
-﻿using MTGApplication.API;
-using MTGApplication.Models;
+﻿using MTGApplication.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -11,9 +10,32 @@ namespace MTGApplication.Interfaces
   /// <typeparam name="T">Card type</typeparam>
   public interface ICardAPI<T>
   {
+    /// <summary>
+    /// API fetch result
+    /// </summary>
+    public class Result
+    {
+      public Result(T[] found, int notFoundCount, int totalCount, string nextPageUri = "")
+      {
+        Found = found;
+        NotFoundCount = notFoundCount;
+        TotalCount = totalCount;
+        NextPageUri = nextPageUri;
+      }
+
+      public T[] Found { get; set; }
+      public int NotFoundCount { get; set; }
+      public string NextPageUri { get; set; }
+      public int TotalCount { get; set; }
+
+      public static Result Empty() => new(Array.Empty<T>(), 0, 0);
+    }
+
+    /// <summary>
+    /// How many cards the API returns in one query
+    /// </summary>
     public int PageSize { get; }
 
-    // TODO: Result class that contains found cards, next page, not found cards etc.
     /// <summary>
     /// Returns API search URI with the <paramref name="searchParams"/>
     /// </summary>
@@ -22,35 +44,22 @@ namespace MTGApplication.Interfaces
     /// <summary>
     /// Fetch cards from the API using API search parameters
     /// </summary>
-    public Task<T[]> FetchCardsWithParameters(string searchParams, int countLimit = int.MaxValue);
+    public Task<Result> FetchCardsWithParameters(string searchParams);
 
     /// <summary>
     /// Fetches cards from the given <paramref name="pageUri"/>
     /// </summary>
-    public Task<(T[] cards, string nextPageUri, int totalCount)> FetchCardsFromPage(string pageUri, bool paperOnly = false);
-
-    /// <summary>
-    /// Fetch cards from the API using API search uri
-    /// </summary>
-    public Task<T[]> FetchCardsFromUri(string uri, int countLimit = int.MaxValue, bool paperOnly = false);
+    /// <param name="paperOnly">Fetches only cards that are printed on paper</param>
+    public Task<Result> FetchFromPageUri(string pageUri, bool paperOnly = false);
 
     /// <summary>
     /// Fetch cards from the API using formatted text
     /// </summary>
-    public Task<(T[] Found, int NotFoundCount)> FetchFromString(string importText);
+    public Task<Result> FetchFromString(string importText);
     
     /// <summary>
-    /// Fetch cards from the API using <see cref="MTGCardDTO"/> array
+    /// Fetch cards from the API using <see cref="CardDTO"/> array
     /// </summary>
-    public Task<(T[] Found, int NotFoundCount)> FetchFromDTOs(MTGCardDTO[] dtoArray);
-
-    /// <summary>
-    /// Returns the API's name that was used to fetch the given card
-    /// </summary>
-    public static string GetAPIName(MTGCard card)
-    {
-      if (card.Info.ScryfallId != Guid.Empty) { return ScryfallAPI.APIName; }
-      else { return string.Empty; }
-    }
+    public Task<Result> FetchFromDTOs(CardDTO[] dtoArray);
   }
 }

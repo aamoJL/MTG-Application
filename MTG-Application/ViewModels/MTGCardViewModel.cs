@@ -50,7 +50,7 @@ namespace MTGApplication.ViewModels
       }
     }
     public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
-    public string ModelAPIName => ICardAPI<MTGCard>.GetAPIName(Model);
+    public string ModelAPIName => Model.GetAPIName();
 
     #region Model Properties
     public ColorTypes ColorType => Model.Info.Colors.Length > 1 ? ColorTypes.M : Model.Info.Colors[0];

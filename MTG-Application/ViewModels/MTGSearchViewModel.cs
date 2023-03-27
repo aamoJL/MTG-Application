@@ -48,12 +48,13 @@ namespace MTGApplication.ViewModels
     public async Task SearchSubmit()
     {
       IsBusy = true;
-      (var cards, var nextPage, TotalCardCount) = await cardAPI.FetchCardsFromPage(cardAPI.GetSearchUri(SearchQuery));
+      var result = await cardAPI.FetchFromPageUri(cardAPI.GetSearchUri(SearchQuery));
+      TotalCardCount = result.TotalCount;
       var source = new TSource()
       {
-        Cards = cards.ToList(),
+        Cards = result.Found.ToList(),
         CardAPI = cardAPI,
-        NextPage = nextPage,
+        NextPage = result.NextPageUri,
       };
       SearchCards = new(source, cardAPI.PageSize);
       IsBusy = false;
