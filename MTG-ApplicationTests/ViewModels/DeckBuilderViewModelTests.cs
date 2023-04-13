@@ -488,19 +488,6 @@ public class DeckBuilderViewModelTests
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
     Assert.AreEqual(string.Empty, vm.CardDeckName);
   }
-
-  [TestMethod]
-  public async Task SaveDeckDialogCommandTest_CanExecute()
-  {
-    using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo);
-
-    // Empty deck should not be able to save using the command
-    Assert.IsFalse(vm.SaveDeckDialogCommand.CanExecute(null));
-
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    Assert.IsTrue(vm.SaveDeckDialogCommand.CanExecute(null));
-  }
   #endregion
 
   #region DeleteDeckDialogCommand

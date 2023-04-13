@@ -202,7 +202,18 @@
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
-      
+
+      <VisualStateGroup x:Name="DeckSaveButtonState">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.DeckCards.CardlistSize, Mode=OneWay}" To="0"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SaveButton.IsEnabled" Value="False"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+
     </VisualStateManager.VisualStateGroups>
 
     <SplitView PaneBackground="Transparent" IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" OpenPaneLength="780" CompactPaneLength="48" DisplayMode="CompactInline">
@@ -400,9 +411,9 @@
                           <KeyboardAccelerator Key="O" Modifiers="Control"/>
                         </MenuFlyoutItem.KeyboardAccelerators>
                       </MenuFlyoutItem>
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SaveDeckDialogCommand}" Icon="Save" Text="Save...">
+                      <MenuFlyoutItem x:Name="SaveButton" Command="{x:Bind DeckBuilderViewModel.SaveDeckDialogCommand}" Icon="Save" Text="Save...">
                         <MenuFlyoutItem.KeyboardAccelerators>
-                          <KeyboardAccelerator Key="S" Modifiers="Control" IsEnabled="True"/>
+                          <KeyboardAccelerator Key="S" Modifiers="Control"/>
                         </MenuFlyoutItem.KeyboardAccelerators>
                       </MenuFlyoutItem>
                       <MenuFlyoutSeparator/>
@@ -427,6 +438,22 @@
                       </MenuFlyoutSubItem>
                       <MenuFlyoutSeparator/>
                       <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeleteDeckDialogCommand}" Background="IndianRed" Icon="Delete" Text="Delete"/>
+                    </MenuFlyout>
+                  </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton Icon="Edit" Label="Edit">
+                  <AppBarButton.Flyout>
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.UndoCommand}" Icon="Undo" Text="Undo">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                          <KeyboardAccelerator Key="Z" Modifiers="Control"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
+                      </MenuFlyoutItem>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.RedoCommand}" Icon="Redo" Text="Redo">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                          <KeyboardAccelerator Key="Y" Modifiers="Control"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
+                      </MenuFlyoutItem>
                     </MenuFlyout>
                   </AppBarButton.Flyout>
                 </AppBarButton>

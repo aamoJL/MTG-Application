@@ -144,7 +144,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
     }
 
-    public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default)
+    public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default, CommandService commandService = default)
     {
       CardViewModels = new();
       FilteredAndSortedCardViewModels = new(CardViewModels, true);
@@ -162,6 +162,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       PropertyChanged += Cardlist_PropertyChanged;
       CardViewModels.CollectionChanged += CardViewModels_CollectionChanged;
       OnPropertyChanged(nameof(CardDeck));
+      CommandService = commandService ?? new();
     }
 
     private void CardViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnPropertyChanged(nameof(CardlistSize));
@@ -248,6 +249,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     private ICardAPI<MTGCard> CardAPI { get; }
     private CardFilters Filters { get; set; }
     private CardlistType ListType { get; }
+    private CommandService CommandService { get; }
 
     public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
     /// <summary>
@@ -303,12 +305,12 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       else
       { CardDeck.AddToCardlist(ListType, card); }
     }
-    
+
     /// <summary>
     /// Removes given card from the deck cardlist
     /// </summary>
     [RelayCommand]
-    public void RemoveFromCardlist(MTGCard card) => CardDeck.RemoveFromCardlist(ListType, card);
+    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new CommandService.RemoveCardFromCardlistCommand(CardDeck, ListType, card));
     
     /// <summary>
     /// Shows a dialog with cards prints and changes the cards print to the selected print
@@ -480,10 +482,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
 
     clipboardService ??= new();
-    CardFilters = new();
-    DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters);
-    WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters);
-    MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters);
+    DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
+    WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
+    MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
 
     DeckCards.PropertyChanged += Cardlist_PropertyChanged;
     WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
@@ -549,11 +550,12 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private MTGColorPieChart colorChart;
   [ObservableProperty]
   private bool isBusy;
-
+  
   public Cardlist DeckCards { get; }
   public Cardlist WishlistCards { get; }
   public Cardlist MaybelistCards { get; }
-  public Cardlist.CardFilters CardFilters { get; }
+  public Cardlist.CardFilters CardFilters { get; } = new();
+  public CommandService CommandService { get; } = new();
   public MTGSortProperty SelectedPrimarySortProperty
   {
     set
@@ -628,7 +630,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Shows dialog that asks name for the deck and saves current deck to the database with the given name
   /// </summary>
-  [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckDialogCommand))]
+  [RelayCommand]
   public async Task SaveDeckDialog()
   {
     var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync();
@@ -816,9 +818,5 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
   }
 
-  #region CanExecute Command Methods
-  private bool CanExecuteSaveDeckDialogCommand() => DeckCards.CardlistSize > 0;
-  
   private bool CanExecuteDeleteDeckDialogCommand() => !string.IsNullOrEmpty(CardDeck.Name);
-  #endregion
 }
