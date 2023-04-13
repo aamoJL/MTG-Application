@@ -63,6 +63,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   {
     public partial class CardFilters : ObservableObject
     {
+      public enum ColorGroups { All, Mono, Multi }
+
       [ObservableProperty]
       private string nameText = string.Empty;
       [ObservableProperty]
@@ -80,13 +82,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       [ObservableProperty]
       private bool colorless = true;
       [ObservableProperty]
-      private string colorGroup = "All"; // All, Mono, Multi
+      private ColorGroups colorGroup = ColorGroups.All; // All, Mono, Multi
+      [ObservableProperty]
+      private double cmc = double.NaN;
 
       /// <summary>
       /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
       /// </summary>
-      public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != "All";
-
+      public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(cmc);
+      
       /// <summary>
       /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
       /// </summary>
@@ -100,9 +104,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
           && (Red || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.R))
           && (Green || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.G))
           && (Colorless || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.C))
-          && (ColorGroup == "All"
-            || ColorGroup == "Mono" && cardViewModel.Colors.Length == 1
-            || (ColorGroup == "Multi" && cardViewModel.Colors.Length > 1)))
+          && (ColorGroup == ColorGroups.All
+            || ColorGroup == ColorGroups.Mono && cardViewModel.Colors.Length == 1
+            || (ColorGroup == ColorGroups.Multi && cardViewModel.Colors.Length > 1))
+          && (double.IsNaN(Cmc) || cardViewModel.CMC == Cmc))
         { return true; }
         else
         { return false; };
@@ -122,7 +127,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         Red = true;
         Green = true;
         Colorless = true;
-        ColorGroup = "All";
+        ColorGroup = ColorGroups.All;
+        Cmc = double.NaN;
       }
 
       /// <summary>
@@ -131,19 +137,20 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       [RelayCommand]
       public void ChangeColorGroup(string group)
       {
-        if (!new string[] { "All", "Mono", "Multi" }.Contains(group))
-        { throw new NotImplementedException(); }
-        ColorGroup = group;
+        if(Enum.TryParse(group, out ColorGroups colorGroup))
+        {
+          ColorGroup = colorGroup;
+        }
       }
     }
 
-    public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default)
+    public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default)
     {
       CardViewModels = new();
       FilteredAndSortedCardViewModels = new(CardViewModels, true);
       FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(primarySortProperty), sortDirection));
       FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(secondarySortProperty), sortDirection));
-      Filters = new();
+      Filters = filters ?? new();
 
       CardDeck = deck;
       ListType = listType;
@@ -239,10 +246,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     private IOService.ClipboardService ClipboardService { get; }
     private DeckBuilderViewDialogs Dialogs { get; }
     private ICardAPI<MTGCard> CardAPI { get; }
+    private CardFilters Filters { get; set; }
     private CardlistType ListType { get; }
 
     public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
-    public CardFilters Filters { get; }
     /// <summary>
     /// Returns total card count of the cardlist cards
     /// </summary>
@@ -473,9 +480,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
 
     clipboardService ??= new();
-    DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService: clipboardService);
-    WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService: clipboardService);
-    MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService);
+    CardFilters = new();
+    DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters);
+    WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters);
+    MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters);
 
     DeckCards.PropertyChanged += Cardlist_PropertyChanged;
     WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
@@ -542,9 +550,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   [ObservableProperty]
   private bool isBusy;
 
-  public Cardlist DeckCards { get; set; }
-  public Cardlist WishlistCards { get; set; }
-  public Cardlist MaybelistCards { get; set; }
+  public Cardlist DeckCards { get; }
+  public Cardlist WishlistCards { get; }
+  public Cardlist MaybelistCards { get; }
+  public Cardlist.CardFilters CardFilters { get; }
   public MTGSortProperty SelectedPrimarySortProperty
   {
     set

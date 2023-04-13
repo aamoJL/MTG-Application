@@ -478,21 +478,22 @@
                   <AppBarButton.Flyout>
                     <Flyout AreOpenCloseAnimationsEnabled="False">
                       <StackPanel Orientation="Vertical" Spacing="10">
-                        <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ResetCommand}"/>
-                        <TextBox Text="{x:Bind DeckBuilderViewModel.DeckCards.Filters.NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter name..."/>
-                        <TextBox Text="{x:Bind DeckBuilderViewModel.DeckCards.Filters.TypeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter type..."/>
+                        <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.CardFilters.ResetCommand}"/>
+                        <TextBox Text="{x:Bind DeckBuilderViewModel.CardFilters.NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter name..."/>
+                        <TextBox Text="{x:Bind DeckBuilderViewModel.CardFilters.TypeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter type..."/>
+                        <NumberBox PlaceholderText="Filter CMC..." SpinButtonPlacementMode="Hidden" Value="{x:Bind DeckBuilderViewModel.CardFilters.Cmc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <StackPanel Orientation="Horizontal" Spacing="5">
-                          <ToggleButton Content="W" ToolTipService.ToolTip="White" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.White, Mode=TwoWay}"/>
-                          <ToggleButton Content="U" ToolTipService.ToolTip="Blue" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Blue, Mode=TwoWay}"/>
-                          <ToggleButton Content="B" ToolTipService.ToolTip="Black" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Black, Mode=TwoWay}"/>
-                          <ToggleButton Content="R" ToolTipService.ToolTip="Red" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Red, Mode=TwoWay}"/>
-                          <ToggleButton Content="G" ToolTipService.ToolTip="Green" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Green, Mode=TwoWay}"/>
-                          <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind DeckBuilderViewModel.DeckCards.Filters.Colorless, Mode=TwoWay}"/>
+                          <ToggleButton Content="W" ToolTipService.ToolTip="White" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.White, Mode=TwoWay}"/>
+                          <ToggleButton Content="U" ToolTipService.ToolTip="Blue" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.Blue, Mode=TwoWay}"/>
+                          <ToggleButton Content="B" ToolTipService.ToolTip="Black" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.Black, Mode=TwoWay}"/>
+                          <ToggleButton Content="R" ToolTipService.ToolTip="Red" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.Red, Mode=TwoWay}"/>
+                          <ToggleButton Content="G" ToolTipService.ToolTip="Green" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.Green, Mode=TwoWay}"/>
+                          <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.Colorless, Mode=TwoWay}"/>
                         </StackPanel>
                         <RadioButtons Header="Color group" MaxColumns="3" SelectedIndex="0">
-                          <RadioButton Content="All" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ChangeColorGroupCommand}" CommandParameter="All"/>
-                          <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ChangeColorGroupCommand}" CommandParameter="Mono"/>
-                          <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.DeckCards.Filters.ChangeColorGroupCommand}" CommandParameter="Multi"/>
+                          <RadioButton Content="All" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="All"/>
+                          <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="Mono"/>
+                          <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="Multi"/>
                         </RadioButtons>
                       </StackPanel>
                     </Flyout>
