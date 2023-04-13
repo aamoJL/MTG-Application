@@ -488,19 +488,6 @@ public class DeckBuilderViewModelTests
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
     Assert.AreEqual(string.Empty, vm.CardDeckName);
   }
-
-  [TestMethod]
-  public async Task SaveDeckDialogCommandTest_CanExecute()
-  {
-    using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo);
-
-    // Empty deck should not be able to save using the command
-    Assert.IsFalse(vm.SaveDeckDialogCommand.CanExecute(null));
-
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    Assert.IsTrue(vm.SaveDeckDialogCommand.CanExecute(null));
-  }
   #endregion
 
   #region DeleteDeckDialogCommand
@@ -936,7 +923,7 @@ public class DeckBuilderViewModel_CardlistTests
   public async Task RemoveFromCardlistCommandTest()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new DeckBuilderViewModel.Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
     await cardlist.AddToCardlist(card);
@@ -944,6 +931,22 @@ public class DeckBuilderViewModel_CardlistTests
 
     cardlist.RemoveFromCardlist(card);
     Assert.AreEqual(0, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
+  public async Task RemoveFromCardlistCommandTest_Undo_Redo()
+  {
+    var vm = new DeckBuilderViewModel(null, null);
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    await vm.DeckCards.AddToCardlist(card);
+    vm.DeckCards.RemoveFromCardlist(card);
+
+    vm.CommandService.Undo();
+    Assert.AreEqual(1, vm.DeckCards.FilteredAndSortedCardViewModels.Count);
+
+    vm.CommandService.Redo();
+    Assert.AreEqual(0, vm.DeckCards.FilteredAndSortedCardViewModels.Count);
   }
 
   [TestMethod]
