@@ -245,7 +245,6 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       return colors.ToArray();
     }
 
-    // TODO: add tokens if available
     if (json == null || json["object"]?.GetValue<string>() != "card")
     { return null; }
     if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null)
@@ -323,6 +322,8 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       }
     }
 
+    var tokens = json["all_parts"]?.AsArray().Where(x => x["component"]?.GetValue<string>() == "token").Select(x => new CardToken(x["id"]!.GetValue<Guid>())).ToArray();
+
     return new MTGCardInfo(
       scryfallId: scryfallId,
       frontFace: frontFace,
@@ -339,7 +340,8 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       rarityType: rarityType,
       producedMana: producedManaList.ToArray(),
       printSearchUri: printSearchUri,
-      cardMarketUri: cardMarketUri);
+      cardMarketUri: cardMarketUri,
+      tokens: tokens ?? Array.Empty<CardToken>());
   }
 
   /// <summary>

@@ -46,6 +46,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     public virtual GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
 
+    public virtual GridViewDialog GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
+
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
       => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
@@ -698,6 +701,23 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     {
       SelectedSecondarySortProperty = sortProperty;
     }
+  }
+
+  [RelayCommand]
+  public async void TokensDialog()
+  {
+    var stringBuilder = new StringBuilder();
+    
+    foreach (var card in CardDeck.DeckCards)
+    {
+      foreach (var token in card.Info.Tokens)
+      {
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
+      }
+    }
+
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToArray();
+    await Dialogs.GetTokenPrintDialog(tokens).ShowAsync();
   }
   #endregion
 
