@@ -55,9 +55,7 @@ public partial class App : Application
       Title = "MTG Application",
     };
 
-    Frame rootFrame = new();
-    MainWindow.Content = rootFrame;
-    rootFrame.Navigate(typeof(MainPage), args.Arguments);
+    (MainWindow.Content as FrameworkElement).RequestedTheme = ElementTheme.Dark;
 
     MainWindow.Activate();
     MainWindow.Closed += MainWindow_Closed;

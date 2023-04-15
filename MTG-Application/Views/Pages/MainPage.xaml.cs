@@ -28,6 +28,7 @@ public sealed partial class MainPage : Page
       NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
       _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
     };
+    PopupAppNotification.RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Light;
     PopupAppNotification.Show(e.Text, notificationDuration);
   }
 }

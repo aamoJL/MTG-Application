@@ -37,7 +37,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <Grid>
+  <Grid BorderBrush="{ThemeResource SystemAccentColorDark1}" BorderThickness="0 2 0 0">
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="CollectionNameTitleSaveStatus">
         <VisualState>
@@ -55,14 +55,14 @@
             <triggers:IsEqualStateTrigger Value="{x:Bind CardCollectionsViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
-            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="Red"/>
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="{ThemeResource SystemAccentColorDark3}"/>
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
     
-    <controls:DockPanel LastChildFill="True" Margin="10 0 10 10">
-      <Grid controls:DockPanel.Dock="Top">
+    <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
+      <Grid controls:DockPanel.Dock="Top" BorderThickness="0 0 0 1" BorderBrush="{ThemeResource RegionColor}">
         <StackPanel Orientation="Horizontal">
           <AppBarButton Label="File">
             <AppBarButton.Icon>
@@ -133,11 +133,13 @@
           </StackPanel>
           <ProgressRing IsActive="{x:Bind CardCollectionsViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0"/>
         </StackPanel>
-        <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"/>
-        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom">
-          <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.MTGSearchViewModel.SearchCards.Count), Mode=OneWay}"/>
-          <Run Text="{x:Bind sys:String.Format('{0} cards loaded', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
-        </TextBlock>
+        <Grid HorizontalAlignment="Right" Padding="0 0 10 0">
+          <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 5 0 0"/>
+          <TextBlock VerticalAlignment="Bottom">
+            <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.MTGSearchViewModel.SearchCards.Count), Mode=OneWay}"/>
+            <Run Text="{x:Bind sys:String.Format('{0} cards loaded', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
+          </TextBlock>
+        </Grid>
       </Grid>
       <controls:AdaptiveGridView controls:DockPanel.Dock="Top" 
                                  Style="{StaticResource MTGAdaptiveGridViewStyle}"

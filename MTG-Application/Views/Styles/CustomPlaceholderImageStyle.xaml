@@ -8,67 +8,59 @@
       <Setter.Value>
         <ControlTemplate TargetType="controls:ImageEx">
           <Grid Background="{TemplateBinding Background}"
-                          CornerRadius="{TemplateBinding CornerRadius}"
-                          BorderBrush="{TemplateBinding BorderBrush}"
-                          BorderThickness="{TemplateBinding BorderThickness}">
+                CornerRadius="{TemplateBinding CornerRadius}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
             <Image Name="PlaceholderImage"
-                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                               VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                               Opacity="1.0"
-                               Source="{TemplateBinding PlaceholderSource}"
-                               Stretch="{TemplateBinding PlaceholderStretch}" />
+                   HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                   VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                   Opacity="1.0"
+                   Source="{TemplateBinding PlaceholderSource}"
+                   Stretch="{TemplateBinding PlaceholderStretch}" />
             <Image Name="Image"
-                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                               VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                               NineGrid="{TemplateBinding NineGrid}"
-                               Opacity="0.0"
-                               Stretch="{TemplateBinding Stretch}" />
+                   HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                   VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                   NineGrid="{TemplateBinding NineGrid}"
+                   Opacity="0.0"
+                   Stretch="{TemplateBinding Stretch}" />
             <VisualStateManager.VisualStateGroups>
               <VisualStateGroup x:Name="CommonStates">
                 <VisualState x:Name="Failed">
                   <Storyboard>
-                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Image"
-                                                                       Storyboard.TargetProperty="Opacity">
-                      <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Image" Storyboard.TargetProperty="Opacity">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                     </ObjectAnimationUsingKeyFrames>
-                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PlaceholderImage"
-                                                                       Storyboard.TargetProperty="Opacity">
-                      <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PlaceholderImage" Storyboard.TargetProperty="Opacity">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
                     </ObjectAnimationUsingKeyFrames>
                   </Storyboard>
                 </VisualState>
                 <VisualState x:Name="Loading">
                   <Storyboard>
-                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Image"
-                                                                       Storyboard.TargetProperty="Opacity">
-                      <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Image" Storyboard.TargetProperty="Opacity">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                     </ObjectAnimationUsingKeyFrames>
-                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PlaceholderImage"
-                                                                       Storyboard.TargetProperty="Opacity">
-                      <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
+                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PlaceholderImage" Storyboard.TargetProperty="Opacity">
+                      <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
                     </ObjectAnimationUsingKeyFrames>
                   </Storyboard>
                 </VisualState>
                 <VisualState x:Name="Loaded">
                   <Storyboard>
                     <DoubleAnimation AutoReverse="False"
-                        BeginTime="0"
-                                       Duration="00:00:00.2"
-                        Storyboard.TargetName="Image"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1" />
+                                     BeginTime="0" 
+                                     Duration="00:00:00.2" 
+                                     Storyboard.TargetName="Image" 
+                                     Storyboard.TargetProperty="Opacity" 
+                                     From="0" 
+                                     To="1" />
                     <DoubleAnimation AutoReverse="False"
-                                       Duration="00:00:00.2"
-                        BeginTime="0"
-                        Storyboard.TargetName="PlaceholderImage"
-                        Storyboard.TargetProperty="Opacity"
-                        From="1"
-                        To="0" />
+                                     Duration="00:00:00.2"
+                                     BeginTime="0"
+                                     Storyboard.TargetName="PlaceholderImage"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="1"
+                                     To="0" />
                   </Storyboard>
                 </VisualState>
                 <VisualState x:Name="Unloaded" />
@@ -78,7 +70,7 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
-    <Setter Property="CornerRadius" Value="10"/>
+    <Setter Property="CornerRadius" Value="12"/>
     <Setter Property="IsCacheEnabled" Value="True"/>
     <Setter Property="PlaceholderSource" Value="/Assets/back.jpg"/>
     <Setter Property="PlaceholderStretch" Value="Fill"/>

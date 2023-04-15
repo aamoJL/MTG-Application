@@ -9,8 +9,7 @@
     <Setter Property="Padding" Value="10 10 5 10" />
     <Setter Property="StretchContentForSingleRow" Value="False" />
     <Setter Property="ItemContainerTransitions" Value="{x:Null}" />
-    <Setter Property="Background" Value="White" />
-    <Setter Property="BorderBrush" Value="LightGray" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
+    <Setter Property="BorderThickness" Value="1 1 0 0" />
   </Style>
 </ResourceDictionary>

@@ -6,9 +6,9 @@
   <x:Double x:Key="ListViewItemMinHeight">25</x:Double>
   <Style x:Key="MTGListViewStyle" TargetType="ListView">
     <Setter Property="ItemContainerTransitions" Value="{x:Null}"/>
-    <Setter Property="Background" Value="White" />
-    <Setter Property="BorderBrush" Value="LightGray" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
+    <Setter Property="BorderThickness" Value="1 1 0 0" />
+    <Setter Property="BorderBrush" Value="{ThemeResource RegionColor}" />
   </Style>
   <Style x:Key="MTGListViewItemStyle" TargetType="StackPanel">
     <Setter Property="Height" Value="25" />

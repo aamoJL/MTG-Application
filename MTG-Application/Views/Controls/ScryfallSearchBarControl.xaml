@@ -19,7 +19,11 @@
         <DataTemplate>
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Scryfall search" VerticalAlignment="Center" />
-            <HyperlinkButton Content="syntax?" NavigateUri="https://scryfall.com/docs/syntax" Padding="5 0 5 0" Margin="5 0 5 0"/>
+            <HyperlinkButton Content="syntax?" 
+                             NavigateUri="https://scryfall.com/docs/syntax" 
+                             Padding="5 0 5 0" 
+                             Margin="5 0 5 0"
+                             Foreground="{ThemeResource SystemAccentColorDark2}"/>
           </StackPanel>
         </DataTemplate>
       </TextBox.HeaderTemplate>

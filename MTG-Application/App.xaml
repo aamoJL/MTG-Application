@@ -7,10 +7,14 @@
       <ResourceDictionary.MergedDictionaries>
         <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
         <!-- Other merged dictionaries here -->
+        <!--Theme-->
+        <ResourceDictionary Source="/Views/Styles/Themes/VioletTheme.xaml"/>
+        <!--Styles-->
         <ResourceDictionary Source="/Views/Styles/CustomPlaceholderImageStyle.xaml"/>
         <ResourceDictionary Source="/Views/Styles/PreviewImagePlaceholderImageStyle.xaml"/>
         <ResourceDictionary Source="/Views/Styles/CustomListViewStyle.xaml"/>
         <ResourceDictionary Source="/Views/Styles/CustomAdaptiveGridViewStyle.xaml"/>
+        <!--Templates-->
         <ResourceDictionary Source="/Views/Styles/Templates/MTGPrintGridViewItemTemplate.xaml"/>
       </ResourceDictionary.MergedDictionaries>
       <!-- Other app resources here -->

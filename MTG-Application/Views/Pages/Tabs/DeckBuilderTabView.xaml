@@ -141,7 +141,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <Grid>
+  <Grid BorderBrush="{ThemeResource SystemAccentColorDark1}" BorderThickness="0 2 0 0">
     <VisualStateManager.VisualStateGroups>
       
       <VisualStateGroup x:Name="CardSearchDisplayStates">
@@ -198,7 +198,7 @@
             <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
-            <Setter Target="SelectedDeckNameTitle.Foreground" Value="Red"/>
+            <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorDark3}"/>
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
@@ -216,7 +216,11 @@
 
     </VisualStateManager.VisualStateGroups>
 
-    <SplitView PaneBackground="Transparent" IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" OpenPaneLength="780" CompactPaneLength="48" DisplayMode="CompactInline">
+    <SplitView PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" 
+               IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" 
+               OpenPaneLength="780" 
+               CompactPaneLength="49"
+               DisplayMode="CompactInline" BorderThickness="0">
       <!--Search Panel-->
       <SplitView.Pane>
         <controls:DockPanel LastChildFill="True">
@@ -236,7 +240,11 @@
             </AppBarButton>
           </StackPanel>
           <!--Search-->
-          <controls:DockPanel controls:DockPanel.Dock="Left" Grid.Column="0" LastChildFill="True" Padding="10 0 10 10" Background="Transparent">
+          <controls:DockPanel controls:DockPanel.Dock="Left" 
+                              Grid.Column="0" 
+                              LastChildFill="True" 
+                              Padding="10 0 10 10"
+                              Background="Transparent">
             <customcontrols:ScryfallSearchBarControl controls:DockPanel.Dock="Top" 
                                                      Margin="0 10 0 0" 
                                                      SearchSubmitCommand="{x:Bind SearchViewModel.SearchSubmitCommand}" 
@@ -286,7 +294,8 @@
                                          Visibility="Collapsed"
                                          CanDragItems="True"
                                          DragItemsStarting="CardView_DragItemsStarting"
-                                         ItemTemplate="{StaticResource SearchImageViewItemTemplate}"/>
+                                         ItemTemplate="{StaticResource SearchImageViewItemTemplate}"
+                                         BorderBrush="{ThemeResource RegionColor}"/>
               <ListView x:Name="CardSearchListDisplay"
                         Style="{StaticResource MTGListViewStyle}"
                         SelectionMode="Single"
@@ -300,10 +309,19 @@
         </controls:DockPanel>
       </SplitView.Pane>
       <!--Deck-->
-      <Grid BorderThickness="16 0 0 0" BorderBrush="{ThemeResource ApplicationPageBackgroundThemeBrush}" Padding="10 0 0 0">
-        <controls:DockPanel LastChildFill="True" Padding="0 0 10 10">
+      <Grid>
+        <controls:DockPanel LastChildFill="True" 
+                            Padding="0 0 10 10" 
+                            Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
           <!--Sidebar-->
-          <TabView controls:DockPanel.Dock="Right" IsAddTabButtonVisible="False" Width="250" Margin="10 10 0 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+          <TabView controls:DockPanel.Dock="Right" 
+                   IsAddTabButtonVisible="False" 
+                   Width="250" 
+                   Margin="10 7 0 0" 
+                   HorizontalAlignment="Stretch" 
+                   VerticalAlignment="Stretch"
+                   BorderThickness="0 2 0 0"
+                   BorderBrush="{ThemeResource RegionColor}">
             <TabView.TabItems>
               <TabViewItem Header="Side lists" IsClosable="False">
                 <!--Side lists-->
@@ -314,17 +332,26 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
-                  <TextBlock Grid.Row="0" Text="Maybe">
-                    <TextBlock.ContextFlyout>
-                      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
-                        <MenuFlyoutSubItem Text="Export...">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
-                        </MenuFlyoutSubItem>
-                      </MenuFlyout>
-                    </TextBlock.ContextFlyout>
-                  </TextBlock>
+                  <Grid Grid.Row="0" Margin="20 0 20 0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="Maybe" Margin="10 0 10 0">
+                      <TextBlock.ContextFlyout>
+                        <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                          <MenuFlyoutSubItem Text="Export...">
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                          </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                      </TextBlock.ContextFlyout>
+                    </TextBlock>
+                    <Border Grid.Column="2" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
+                  </Grid>
                   <ListView Grid.Row="1"
                             x:Name="DeckMaybeDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
@@ -340,17 +367,26 @@
                             ItemTemplate="{StaticResource SideListViewItemTemplate}"
                             KeyDown="CardView_KeyDown"
                             LosingFocus="CardView_LosingFocus"/>
-                  <TextBlock Grid.Row="2" Text="Wishlist">
-                    <TextBlock.ContextFlyout>
-                      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
-                        <MenuFlyoutSubItem Text="Export...">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
-                        </MenuFlyoutSubItem>
-                      </MenuFlyout>
-                    </TextBlock.ContextFlyout>
-                  </TextBlock>
+                  <Grid Grid.Row="2" Margin="20 0 20 0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="Wishlist" HorizontalAlignment="Center" Margin="10 0 10 0">
+                      <TextBlock.ContextFlyout>
+                        <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                          <MenuFlyoutSubItem Text="Export...">
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                          </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                      </TextBlock.ContextFlyout>
+                    </TextBlock>
+                    <Border Grid.Column="2" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
+                  </Grid>
                   <ListView Grid.Row="3"
                             x:Name="DeckWishlistDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
@@ -396,7 +432,10 @@
             </TabView.TabItems>
           </TabView>
           <!--Commands-->
-          <Grid controls:DockPanel.Dock="Top">
+          <Grid controls:DockPanel.Dock="Top" 
+                Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="0 0 0 1"
+                BorderBrush="{ThemeResource RegionColor}">
             <StackPanel Orientation="Horizontal">
               <CommandBar x:Name="DeckCommandBar" IsOpen="False" DefaultLabelPosition="Right">
                 <AppBarButton Icon="OpenFile" Label="File">
@@ -554,6 +593,7 @@
                                        DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
                                        ItemsSource="{Binding FilteredAndSortedCardViewModels}"
                                        DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
+                                       BorderBrush="{ThemeResource RegionColor}"
                                        SelectionMode="Single"
                                        Visibility="Collapsed"
                                        CanDragItems="True"
@@ -564,7 +604,8 @@
                                        DragItemsCompleted="CardView_DragItemsCompleted" 
                                        ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
                                        KeyDown="CardView_KeyDown"
-                                       LosingFocus="CardView_LosingFocus"/>
+                                       LosingFocus="CardView_LosingFocus"
+                                       BorderThickness="0"/>
             <ListView x:Name="DeckListDisplay"
                       Style="{StaticResource MTGListViewStyle}"
                       DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
@@ -589,7 +630,7 @@
       <controls:ImageEx x:Name="PreviewImage" 
                         Height="350" 
                         IsHitTestVisible="False" 
-                        CornerRadius="10" 
+                        CornerRadius="12"
                         Visibility="Collapsed" 
                         PlaceholderStretch="Fill" 
                         CacheMode="BitmapCache" 
