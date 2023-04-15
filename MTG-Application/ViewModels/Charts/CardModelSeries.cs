@@ -22,6 +22,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
   {
     get
     {
+      if(App.MainWindow == null) { return new(255, 255, 255); } // For testing
       return (App.MainWindow.Content as FrameworkElement).RequestedTheme == ElementTheme.Light 
         ? new(45, 45, 45)
         : new(255, 255, 255);
