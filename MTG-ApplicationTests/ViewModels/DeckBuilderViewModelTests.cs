@@ -443,7 +443,6 @@ public class DeckBuilderViewModelTests
       LoadDialog = new() { Values = loadName }
     });
 
-    // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
     {
       Name = loadName,
@@ -461,10 +460,10 @@ public class DeckBuilderViewModelTests
 
     await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"));
 
-    await vm.SaveDeckDialog();
+    await vm.SaveDeckDialog(); // Rename with the saveName name
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(3, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(2, (await repo.Get()).ToList().Count);
+    Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(3, (await repo.Get(saveName))?.DeckCards.Count);
     Assert.AreEqual(saveName, vm.CardDeckName);
   }

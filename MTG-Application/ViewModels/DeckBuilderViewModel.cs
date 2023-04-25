@@ -622,7 +622,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   {
     if (await ShowUnsavedDialogs())
     {
-      var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).ToArray()).ShowAsync();
+      var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray()).ShowAsync();
       if (loadName != null)
       {
         await LoadDeck(loadName);
@@ -643,7 +643,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     {
       if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
       {
-        // Deck exists already
+        // Deck with the given name exists already
         if (await Dialogs.GetOverrideDialog(saveName).ShowAsync() == null)
         { return; }
       }
@@ -703,6 +703,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     }
   }
 
+  /// <summary>
+  /// Shows deck cards' tokens in a dialog
+  /// </summary>
   [RelayCommand]
   public async void TokensDialog()
   {
@@ -777,15 +780,19 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private async Task SaveDeck(string name)
   {
     IsBusy = true;
-    var saveDeck = new MTGCardDeck()
+    var tempDeck = new MTGCardDeck() // Temp deck that is copy of the current deck
     {
       Name = name,
       DeckCards = CardDeck.DeckCards,
       Maybelist = CardDeck.Maybelist,
       Wishlist = CardDeck.Wishlist,
     };
-    if (await Task.Run(() => DeckRepository.AddOrUpdate(saveDeck)))
+    if (await Task.Run(() => DeckRepository.AddOrUpdate(tempDeck)))
     {
+      if(!string.IsNullOrEmpty(CardDeckName) && name != CardDeckName)
+      {
+        await DeckRepository.Remove(CardDeck); // Delete old deck if the name was changed
+      }
       CardDeck.Name = name;
       HasUnsavedChanges = false;
       NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was saved successfully.");

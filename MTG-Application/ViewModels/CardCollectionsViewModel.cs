@@ -264,7 +264,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   {
     if (await ShowUnsavedDialogs())
     {
-      var loadName = await Dialogs.GetLoadDialog((await CollectionRepository.Get()).Select(x => x.Name).ToArray()).ShowAsync();
+      var loadName = await Dialogs.GetLoadDialog((await CollectionRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray()).ShowAsync();
       if (loadName != null)
       {
         await LoadCollection(loadName);
@@ -408,13 +408,17 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   private async Task SaveCollection(string name)
   {
     IsBusy = true;
-    var saveCollection = new MTGCardCollection()
+    var tempCollection = new MTGCardCollection() // Copy of the current collection
     {
       Name = name,
       CollectionLists = Collection.CollectionLists,
     };
-    if (await Task.Run(() => CollectionRepository.AddOrUpdate(saveCollection)))
+    if (await Task.Run(() => CollectionRepository.AddOrUpdate(tempCollection)))
     {
+      if(!string.IsNullOrEmpty(Collection.Name) && Collection.Name != name)
+      {
+        await CollectionRepository.Remove(Collection); // Delete old collection if the name was changed
+      }
       Collection.Name = name;
       HasUnsavedChanges = false;
       NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was saved successfully.");
