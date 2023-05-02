@@ -13,7 +13,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinRT;
 using static MTGApplication.Enums;
+using static MTGApplication.Services.CommandService;
 using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels;
@@ -147,6 +149,88 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
     }
 
+    public static class CardlistCommands
+    {
+      public class AddCardsToCardlistCommand : ICommand
+      {
+        private MTGCardDeck CardDeck { get; }
+        private CardlistType ListType { get; }
+        private MTGCard[] Cards { get; }
+
+        public AddCardsToCardlistCommand(MTGCardDeck cardDeck, CardlistType listType, MTGCard[] cards)
+        {
+          CardDeck = cardDeck;
+          ListType = listType;
+          Cards = cards;
+        }
+
+        public void Execute()
+        {
+          if (CardDeck == null)
+            return;
+          foreach (var item in Cards)
+          {
+            CardDeck.AddToCardlist(ListType, item);
+          }
+        }
+
+        public void Undo()
+        {
+          if (CardDeck == null)
+            return;
+          var cardlist = CardDeck.GetCardlist(ListType);
+          foreach (var item in Cards)
+          {
+            if (cardlist.FirstOrDefault(x => x.Info.Name == item.Info.Name) is MTGCard existingCard)
+            {
+              if(existingCard.Count <= item.Count)
+              {
+                CardDeck.RemoveFromCardlist(ListType, existingCard);
+              }
+              else
+              {
+                existingCard.Count -= item.Count;
+              }
+            }
+          }
+        }
+      }
+
+      public class RemoveCardsFromCardlistCommand : ICommand
+      {
+        MTGCardDeck CardDeck { get; }
+        public CardlistType ListType { get; }
+        public MTGCard[] Cards { get; }
+
+        public RemoveCardsFromCardlistCommand(MTGCardDeck deck, CardlistType listType, MTGCard[] cards)
+        {
+          CardDeck = deck;
+          ListType = listType;
+          Cards = cards;
+        }
+
+        public void Execute()
+        {
+          if (CardDeck == null)
+            return;
+          foreach (var item in Cards)
+          {
+            CardDeck.RemoveFromCardlist(ListType, item);
+          }
+        }
+
+        public void Undo()
+        {
+          if (CardDeck == null)
+            return;
+          foreach (var item in Cards)
+          {
+            CardDeck.AddToCardlist(ListType, item);
+          }
+        }
+      }
+    }
+
     public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default, CommandService commandService = default)
     {
       CardViewModels = new();
@@ -252,8 +336,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     private ICardAPI<MTGCard> CardAPI { get; }
     private CardFilters Filters { get; set; }
     private CardlistType ListType { get; }
-    private CommandService CommandService { get; }
 
+    public CommandService CommandService { get; }
     public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
     /// <summary>
     /// Returns total card count of the cardlist cards
@@ -302,18 +386,18 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       {
         if ((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync()) is true)
         {
-          CardDeck.AddToCardlist(ListType, card);
+          CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card }));
         }
       }
       else
-      { CardDeck.AddToCardlist(ListType, card); }
+      { CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card })); }
     }
 
     /// <summary>
     /// Removes given card from the deck cardlist
     /// </summary>
     [RelayCommand]
-    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new CommandService.RemoveCardFromCardlistCommand(CardDeck, ListType, card));
+    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new CardlistCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, new[] {card}));
     
     /// <summary>
     /// Shows a dialog with cards prints and changes the cards print to the selected print
@@ -357,7 +441,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     {
       var notFoundCount = 0;
       var found = Array.Empty<MTGCard>();
-      var notImportedCount = 0;
+      var importCards = new List<MTGCard>();
 
       if (!string.IsNullOrEmpty(importText))
       {
@@ -378,25 +462,34 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
             }
 
             if (import is true)
-            { CardDeck.AddToCardlist(ListType, card); }
-            else
-            { notImportedCount++; }
+            { importCards.Add(card); }
           }
           else
-          { CardDeck.AddToCardlist(ListType, card); }
+          { importCards.Add(card); }
         }
       }
 
+      if(importCards.Count != 0)
+      {
+        CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, importCards.ToArray()));
+      }
+
       if (notFoundCount == 0 && found.Length > 0)
-        NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+        NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"{importCards.Count} cards imported successfully." + ((found.Length - importCards.Count) > 0 ? $" ({(found.Length - importCards.Count)} cards skipped) " : ""));
       else if (found.Length > 0 && notFoundCount > 0)
         NotificationService.RaiseNotification(NotificationService.NotificationType.Warning,
-          $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+          $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + ((found.Length - importCards.Count) > 0 ? $" ({(found.Length - importCards.Count)} cards skipped) " : ""));
       else if (found.Length == 0)
         NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
 
       IsBusy = false;
     }
+
+    /// <summary>
+    /// Removes all items in the card list
+    /// </summary>
+    [RelayCommand]
+    public void Clear() => CommandService.Execute(new CardlistCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, CardDeck.GetCardlist(ListType).ToArray()));
     #endregion
 
     /// <summary>
@@ -523,6 +616,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       DeckCards.CardDeck = CardDeck;
       WishlistCards.CardDeck = CardDeck;
       MaybelistCards.CardDeck = CardDeck;
+      CommandService.Clear();
       UpdateCharts();
       OnPropertyChanged(nameof(CardDeckName));
     }

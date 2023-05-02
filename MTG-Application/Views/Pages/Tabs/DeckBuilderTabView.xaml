@@ -347,6 +347,7 @@
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
                           </MenuFlyoutSubItem>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
                         </MenuFlyout>
                       </TextBlock.ContextFlyout>
                     </TextBlock>
@@ -382,6 +383,7 @@
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
                           </MenuFlyoutSubItem>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
                         </MenuFlyout>
                       </TextBlock.ContextFlyout>
                     </TextBlock>

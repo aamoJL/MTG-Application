@@ -617,6 +617,30 @@ public class DeckBuilderViewModel_CardlistTests
   }
 
   [TestMethod]
+  public async Task ImportToDeckCardsDialogTest_Undo()
+  {
+    var importedCards = new MTGCard[]
+    {
+      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First"),
+      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second"),
+      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
+    };
+
+    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null, dialogs: new TestDeckBuilderViewDialogs()
+    {
+      ImportDialog = new() { Values = nameof(importedCards) },
+    });
+
+    await vm.DeckCards.ImportToCardlistDialog();
+
+    vm.CommandService.Undo();
+    Assert.AreEqual(0, vm.DeckCards.CardlistSize);
+
+    vm.CommandService.Redo();
+    Assert.AreEqual(3, vm.DeckCards.CardlistSize);
+  }
+
+  [TestMethod]
   public async Task ImportToDeckCardsDialogTest_AlreadyExists_Add()
   {
     var importedCards = new MTGCard[]
@@ -919,6 +943,21 @@ public class DeckBuilderViewModel_CardlistTests
   }
 
   [TestMethod]
+  public async Task AddToCardlistCommandTest_Undo()
+  {
+    var deck = new MTGCardDeck();
+    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+
+    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    
+    cardlist.CommandService.Undo();
+    Assert.AreEqual(0, deck.DeckCards.Count);
+
+    cardlist.CommandService.Redo();
+    Assert.AreEqual(1, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
   public async Task RemoveFromCardlistCommandTest()
   {
     var deck = new MTGCardDeck();
@@ -926,7 +965,6 @@ public class DeckBuilderViewModel_CardlistTests
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
     await cardlist.AddToCardlist(card);
-    Assert.AreEqual(1, deck.DeckCards.Count);
 
     cardlist.RemoveFromCardlist(card);
     Assert.AreEqual(0, deck.DeckCards.Count);
@@ -960,6 +998,44 @@ public class DeckBuilderViewModel_CardlistTests
 
     ((MTGCardViewModel)cardlist.FilteredAndSortedCardViewModels[0]).DeleteCardCommand.Execute(card);
     Assert.AreEqual(0, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
+  public async Task RemoveFromCardlistCommandTest_Undo()
+  {
+    var deck = new MTGCardDeck();
+    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    await cardlist.AddToCardlist(card);
+    cardlist.RemoveFromCardlist(card);
+    
+    cardlist.CommandService.Undo();
+    Assert.AreEqual(1, deck.DeckCards.Count);
+
+    cardlist.CommandService.Redo();
+    Assert.AreEqual(0, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
+  public async Task ClearCardlistCommandTest()
+  {
+    var deck = new MTGCardDeck();
+    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+
+    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "1"));
+    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "2"));
+    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "3"));
+    Assert.AreEqual(3, cardlist.CardlistSize);
+
+    cardlist.Clear();
+    Assert.AreEqual(0, cardlist.CardlistSize);
+
+    cardlist.CommandService.Undo();
+    Assert.AreEqual(3, cardlist.CardlistSize);
+
+    cardlist.CommandService.Redo();
+    Assert.AreEqual(0, cardlist.CardlistSize);
   }
   #endregion
 

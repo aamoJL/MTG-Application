@@ -1,11 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Models;
 using System.Collections.Generic;
 
 namespace MTGApplication.Services;
 
 /// <summary>
-/// Service that handles command Undo and Redo
+/// Service that handles commands that supports undo and redo
 /// </summary>
 public partial class CommandService
 {
@@ -15,35 +14,13 @@ public partial class CommandService
     public void Undo();
   }
 
-  public class RemoveCardFromCardlistCommand : ICommand
-  {
-    MTGCardDeck CardDeck { get; }
-    public Enums.CardlistType ListType { get; }
-    public MTGCard Card { get; }
-
-    public RemoveCardFromCardlistCommand(MTGCardDeck deck, Enums.CardlistType listType, MTGCard card)
-    {
-      CardDeck = deck;
-      ListType = listType;
-      Card = card;
-    }
-
-    public void Execute()
-    {
-      if(CardDeck == null) return;
-      CardDeck.RemoveFromCardlist(ListType, Card);
-    }
-
-    public void Undo()
-    {
-      if (CardDeck == null) return;
-      CardDeck.AddToCardlist(ListType, Card);
-    }
-  }
-
+  // TODO: Limit undo stack?
   public Stack<ICommand> UndoCommandStack { get; } = new();
   public Stack<ICommand> RedoCommandStack { get; } = new();
 
+  /// <summary>
+  /// Undoes the last executed command.
+  /// </summary>
   [RelayCommand]
   public void Undo()
   {
@@ -55,6 +32,9 @@ public partial class CommandService
     }
   }
 
+  /// <summary>
+  /// Redoes the last undoed command
+  /// </summary>
   [RelayCommand]
   public void Redo()
   {
@@ -66,10 +46,22 @@ public partial class CommandService
     }
   }
 
+  /// <summary>
+  /// Adds the command to the undo stack, clears redo stack and executes the command.
+  /// </summary>
   public void Execute(ICommand command)
   {
     UndoCommandStack.Push(command);
     RedoCommandStack.Clear();
     command.Execute();
+  }
+
+  /// <summary>
+  /// Clears Undo and Redo stacks
+  /// </summary>
+  public void Clear()
+  {
+    UndoCommandStack.Clear();
+    RedoCommandStack.Clear();
   }
 }
