@@ -2,10 +2,8 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Database;
 using MTGApplication.Interfaces;
-using MTGApplication.Pages;
 using MTGApplication.Services;
 using System;
 using System.Collections.Generic;
@@ -71,6 +69,9 @@ public partial class App : Application
 
   private async void MainWindow_Closed(object sender, WindowEventArgs args)
   {
+    // The Window will close if the close variable has been set to true.
+    // Otherwise the user will be asked to save unsaved changes.
+    // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
     if (close)
     { return; }
 

@@ -7,6 +7,7 @@ using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -383,9 +384,17 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   [RelayCommand]
   private async Task ShowCardIllustrations(MTGCard card)
   {
-    // Get prints
+    var prints = new List<MTGCard>();
+
     IsBusy = true;
-    var prints = (await CardAPI.FetchCardsWithParameters($"!\"{card.Info.Name}\"+unique:prints+game:paper")).Found.Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray();
+    // Get prints
+    var fetchResult = await CardAPI.FetchCardsWithParameters($"{card.Info.Name}+unique:prints+game:paper");
+    prints.AddRange(fetchResult.Found.Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray());
+    while (!string.IsNullOrEmpty(fetchResult.NextPageUri))
+    {
+      fetchResult = await CardAPI.FetchFromUri(fetchResult.NextPageUri);
+      prints.AddRange(fetchResult.Found.Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray());
+    }
     var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
     IsBusy = false;
 
@@ -570,7 +579,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     if (HasUnsavedChanges)
     {
       // Collection has unsaved changes
-      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync();
+      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
       if (wantSaveConfirmed == null)
       { return false; }
       else if (wantSaveConfirmed is true)

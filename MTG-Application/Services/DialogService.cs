@@ -16,13 +16,13 @@ public static class DialogService
   /// </summary>
   public class DialogWrapper
   {
-    public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog)
+    public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog, bool force = false)
     {
       var contentDialog = dialog.GetDialog();
 
       // Only one dialog can be open
-      if (CurrentDialog != null)
-      { return ContentDialogResult.None; }
+      if (force && CurrentDialog != null) { CurrentDialog.Hide(); CurrentDialog = null; }
+      if (CurrentDialog != null) { return ContentDialogResult.None; }
       CurrentDialog = contentDialog;
       var result = await contentDialog.ShowAsync();
       CurrentDialog = null;
@@ -72,8 +72,7 @@ public static class DialogService
         };
         smokeLayer.PointerReleased += (sender, e) =>
         {
-          if (pressed == true)
-          { dialog.Hide(); }
+          if (pressed == true) { dialog.Hide(); }
           pressed = false;
         };
       };
@@ -84,7 +83,7 @@ public static class DialogService
     /// <summary>
     /// Shows the dialog to the user using <see cref="CurrentDialogWrapper"/>
     /// </summary>
-    public async Task<ContentDialogResult> ShowAsync() => await CurrentDialogWrapper.ShowAsync(this);
+    public async Task<ContentDialogResult> ShowAsync(bool force = false) => await CurrentDialogWrapper.ShowAsync(this, force);
   }
 
   /// <summary>
@@ -104,7 +103,7 @@ public static class DialogService
     /// Shows the dialog to the user and returns <typeparamref name="T"/>.
     /// The returned value depends on the user's answer.
     /// </summary>
-    public new async Task<T> ShowAsync() => ProcessResult(await base.ShowAsync());
+    public new async Task<T> ShowAsync(bool force = false) => ProcessResult(await base.ShowAsync(force));
   }
 
   public static FrameworkElement DialogRoot { get; set; } // MainWindow's root that will be used to show the dialogs

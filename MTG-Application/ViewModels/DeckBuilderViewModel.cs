@@ -13,7 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WinRT;
 using static MTGApplication.Enums;
 using static MTGApplication.Services.CommandService;
 using static MTGApplication.Services.DialogService;
@@ -95,7 +94,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
       /// </summary>
       public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(cmc);
-      
+
       /// <summary>
       /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
       /// </summary>
@@ -142,7 +141,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       [RelayCommand]
       public void ChangeColorGroup(string group)
       {
-        if(Enum.TryParse(group, out ColorGroups colorGroup))
+        if (Enum.TryParse(group, out ColorGroups colorGroup))
         {
           ColorGroup = colorGroup;
         }
@@ -183,7 +182,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
           {
             if (cardlist.FirstOrDefault(x => x.Info.Name == item.Info.Name) is MTGCard existingCard)
             {
-              if(existingCard.Count <= item.Count)
+              if (existingCard.Count <= item.Count)
               {
                 CardDeck.RemoveFromCardlist(ListType, existingCard);
               }
@@ -253,9 +252,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     }
 
     private void CardViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnPropertyChanged(nameof(CardlistSize));
-    
+
     private void Filters_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => FilterViewModels();
-    
+
     private void CardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       switch (e.PropertyName)
@@ -272,7 +271,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
           break;
       }
     }
-    
+
     private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
       switch (e.PropertyName)
@@ -296,7 +295,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
           break;
       }
     }
-    
+
     private void CardModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       // Sync models and viewmodels
@@ -397,8 +396,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     /// Removes given card from the deck cardlist
     /// </summary>
     [RelayCommand]
-    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new CardlistCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, new[] {card}));
-    
+    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new CardlistCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, new[] { card }));
+
     /// <summary>
     /// Shows a dialog with cards prints and changes the cards print to the selected print
     /// </summary>
@@ -431,7 +430,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         }
       }
     }
-    
+
     /// <summary>
     /// Imports cards from the card API using the <paramref name="importText"/>
     /// Shows a dialog that asks the user if they want to skip already existing cards.
@@ -469,7 +468,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         }
       }
 
-      if(importCards.Count != 0)
+      if (importCards.Count != 0)
       {
         CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, importCards.ToArray()));
       }
@@ -504,7 +503,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         CardViewModels.Add(vm);
       }
     }
-    
+
     /// <summary>
     /// Adds given <paramref name="card"/> to <see cref="CardViewModels"/> list as a <see cref="MTGCardViewModel"/>
     /// </summary>
@@ -514,7 +513,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       vm.PropertyChanged += CardViewModel_PropertyChanged;
       CardViewModels.Add(vm);
     }
-    
+
     /// <summary>
     /// Removes given <paramref name="card"/> from the <see cref="CardViewModels"/> list
     /// </summary>
@@ -527,7 +526,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         CardViewModels.Remove(vm);
       }
     }
-    
+
     /// <summary>
     /// Filters <see cref="FilteredAndSortedCardViewModels"/> list with the given <paramref name="filterText"/>
     /// </summary>
@@ -600,13 +599,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     else if (e.PropertyName == nameof(HasUnsavedChanges))
     { OnPropertyChanged(nameof(HasUnsavedChanges)); }
   }
-  
+
   private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(CardDeck.Name))
     { OnPropertyChanged(nameof(CardDeckName)); }
   }
-  
+
   private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(CardDeck))
@@ -647,7 +646,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private MTGColorPieChart colorChart;
   [ObservableProperty]
   private bool isBusy;
-  
+
   public Cardlist DeckCards { get; }
   public Cardlist WishlistCards { get; }
   public Cardlist MaybelistCards { get; }
@@ -693,7 +692,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       MaybelistCards.HasUnsavedChanges = value;
     }
   }
-  
+
   public async Task<bool> SaveUnsavedChanges() => await ShowUnsavedDialogs();
   #endregion
 
@@ -804,7 +803,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   public async void TokensDialog()
   {
     var stringBuilder = new StringBuilder();
-    
+
     foreach (var card in CardDeck.DeckCards)
     {
       foreach (var token in card.Info.Tokens)
@@ -827,23 +826,20 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (HasUnsavedChanges)
     {
       // Deck has unsaved changes
-      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync();
-      if (wantSaveConfirmed == null)
-      { return false; }
+      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
+      if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
         // User wants to save the unsaved changes
         var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync();
-        if (string.IsNullOrEmpty(saveName))
-        { return false; }
+        if (string.IsNullOrEmpty(saveName)) { return false; }
         else
         {
           if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
           {
             // Deck exists already
             var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync();
-            if (overrideConfirmed == null)
-            { return false; }
+            if (overrideConfirmed == null) { return false; }
             else if (overrideConfirmed is true)
             {
               // User wants to override the deck
@@ -867,7 +863,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     CardDeck = await Task.Run(() => new MTGCardDeck());
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Saves current deck with the given <paramref name="name"/>
   /// </summary>
@@ -883,7 +879,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     };
     if (await Task.Run(() => DeckRepository.AddOrUpdate(tempDeck)))
     {
-      if(!string.IsNullOrEmpty(CardDeckName) && name != CardDeckName)
+      if (!string.IsNullOrEmpty(CardDeckName) && name != CardDeckName)
       {
         await DeckRepository.Remove(CardDeck); // Delete old deck if the name was changed
       }
@@ -895,7 +891,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not save the deck."); }
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Loads a deck with the given <paramref name="name"/> and changes current deck to the loaded deck
   /// </summary>
@@ -911,7 +907,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck."); }
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Deletes the current deck
   /// </summary>
@@ -927,7 +923,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the deck."); }
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Updates card charts
   /// </summary>

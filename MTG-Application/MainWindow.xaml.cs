@@ -1,24 +1,22 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using System;
 
-namespace MTGApplication
+namespace MTGApplication;
+
+/// <summary>
+/// Main Window
+/// </summary>
+public sealed partial class MainWindow : Window
 {
-  /// <summary>
-  /// Main Window
-  /// </summary>
-  public sealed partial class MainWindow : Window
+  public MainWindow()
   {
-    public MainWindow()
-    {
-      this.InitializeComponent();
+    this.InitializeComponent();
 
-      // Change window icon
-      IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-      WindowId windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
-      var appWindow = AppWindow.GetFromWindowId(windowId);
-      appWindow.SetIcon("Assets/Icon.ico");
-    }
+    // Change window icon
+    var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+    var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
+    var appWindow = AppWindow.GetFromWindowId(windowId);
+    appWindow.SetIcon("Assets/Icon.ico");
   }
 }
