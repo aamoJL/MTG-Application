@@ -62,6 +62,7 @@ public partial class App : Application
 
     IOService.InitDirectories();
 
+    // TODO: LightCharts Themes
     LiveCharts.Configure(config =>
       config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()
     );
@@ -95,4 +96,6 @@ public partial class App : Application
       MainWindow.Close();
     }
   }
+
+  public static void ChangeTheme(ElementTheme theme) => (MainWindow.Content as FrameworkElement).RequestedTheme = theme;
 }

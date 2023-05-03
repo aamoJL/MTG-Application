@@ -1,6 +1,9 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.Services;
+using System.Windows.Input;
 using Windows.UI;
 
 namespace MTGApplication.Pages;
@@ -12,9 +15,17 @@ public sealed partial class MainPage : Page
 {
   private readonly int notificationDuration = 5000;
 
+  public ICommand ChangeTheme { get; }
+
   public MainPage()
   {
     this.InitializeComponent();
+
+    ChangeTheme = new RelayCommand(() =>
+    {
+      var currentTheme = (App.MainWindow.Content as FrameworkElement).RequestedTheme;
+      App.ChangeTheme(currentTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark);
+    });
 
     NotificationService.OnNotification += Notifications_OnNotification;
   }

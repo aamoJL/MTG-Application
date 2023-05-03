@@ -20,6 +20,11 @@
         </TabViewItem>
       </TabView.TabItems>
     </TabView>
+    <AppBarButton Width="50" IsCompact="True" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Bind ChangeTheme}">
+      <AppBarButton.Icon>
+        <FontIcon Glyph="&#xE793;"/>
+      </AppBarButton.Icon>
+    </AppBarButton>
 
     <controls:InAppNotification
       x:Name="PopupAppNotification"

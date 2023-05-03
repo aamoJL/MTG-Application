@@ -226,14 +226,7 @@
         <controls:DockPanel LastChildFill="True">
           <!--Side Button-->
           <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical">
-            <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}"
-                          VerticalAlignment="Top"
-                          Label="Search"
-                          Width="50"
-                          CornerRadius="0" 
-                          Margin="0" 
-                          Padding="0" 
-                          BorderThickness="0">
+            <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}" Label="Search" Width="50">
               <AppBarButton.Icon>
                 <FontIcon Glyph="&#xE721;"/>
               </AppBarButton.Icon>
@@ -332,27 +325,22 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
-                  <Grid Grid.Row="0" Margin="20 0 20 0">
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="*" />
-                      <ColumnDefinition Width="auto" />
-                      <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="1" Text="Maybe" Margin="10 0 10 0">
-                      <TextBlock.ContextFlyout>
-                        <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
-                          <MenuFlyoutSubItem Text="Export...">
-                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
-                          </MenuFlyoutSubItem>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
-                        </MenuFlyout>
-                      </TextBlock.ContextFlyout>
-                    </TextBlock>
-                    <Border Grid.Column="2" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
-                  </Grid>
+                  <customcontrols:LinedHeader Grid.Row="0">
+                    <customcontrols:LinedHeader.Header>
+                      <TextBlock Text="Maybe">
+                        <TextBlock.ContextFlyout>
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                            <MenuFlyoutSubItem Text="Export...">
+                              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
+                          </MenuFlyout>
+                        </TextBlock.ContextFlyout>
+                      </TextBlock>
+                    </customcontrols:LinedHeader.Header>
+                  </customcontrols:LinedHeader>
                   <ListView Grid.Row="1"
                             x:Name="DeckMaybeDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
@@ -368,27 +356,22 @@
                             ItemTemplate="{StaticResource SideListViewItemTemplate}"
                             KeyDown="CardView_KeyDown"
                             LosingFocus="CardView_LosingFocus"/>
-                  <Grid Grid.Row="2" Margin="20 0 20 0">
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="*" />
-                      <ColumnDefinition Width="auto" />
-                      <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="1" Text="Wishlist" HorizontalAlignment="Center" Margin="10 0 10 0">
-                      <TextBlock.ContextFlyout>
-                        <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
-                          <MenuFlyoutSubItem Text="Export...">
-                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
-                          </MenuFlyoutSubItem>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
-                        </MenuFlyout>
-                      </TextBlock.ContextFlyout>
-                    </TextBlock>
-                    <Border Grid.Column="2" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center" />
-                  </Grid>
+                  <customcontrols:LinedHeader Grid.Row="2">
+                    <customcontrols:LinedHeader.Header>
+                      <TextBlock Text="Wishlist">
+                        <TextBlock.ContextFlyout>
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                            <MenuFlyoutSubItem Text="Export...">
+                              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
+                          </MenuFlyout>
+                        </TextBlock.ContextFlyout>
+                      </TextBlock>
+                    </customcontrols:LinedHeader.Header>
+                  </customcontrols:LinedHeader>
                   <ListView Grid.Row="3"
                             x:Name="DeckWishlistDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
@@ -414,20 +397,28 @@
                         <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckCards.EuroPrice), Mode=OneWay}" />
                     </TextBlock>
                     <Button Content="Show tokens" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
-                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
                     <!--Charts-->
-                    <TextBlock Text="Mana Curve" TextAlignment="Center"/>
+                    <customcontrols:LinedHeader>
+                      <customcontrols:LinedHeader.Header>
+                        <TextBlock Text="Mana Curve"/>
+                      </customcontrols:LinedHeader.Header>
+                    </customcontrols:LinedHeader>
                     <lvc:CartesianChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" Series="{Binding Series}"/>
-                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-                    <TextBlock Text="Type Chart" TextAlignment="Center"/>
+                    <customcontrols:LinedHeader>
+                      <customcontrols:LinedHeader.Header>
+                        <TextBlock Text="Type Chart"/>
+                      </customcontrols:LinedHeader.Header>
+                    </customcontrols:LinedHeader>
                     <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series}"/>
-                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
-                    <TextBlock Text="Color &amp; Mana Chart" TextAlignment="Center"/>
+                    <customcontrols:LinedHeader>
+                      <customcontrols:LinedHeader.Header>
+                        <TextBlock Text="Color &amp; Mana Chart"/>
+                      </customcontrols:LinedHeader.Header>
+                    </customcontrols:LinedHeader>
                     <Grid Height="170" Width="170" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 10">
                       <lvc:PieChart DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series}"/>
                       <lvc:PieChart Height="110" Width="110" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series}"/>
                     </Grid>
-                    <Border BorderThickness="0,1,0,0" BorderBrush="LightGray" Margin="10"/>
                   </StackPanel>
                 </ScrollViewer>
               </TabViewItem>

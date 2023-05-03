@@ -34,6 +34,7 @@
     <None Remove="Assets\ColorIcons\W.svg" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
+    <None Remove="Views\Controls\LinedHeader.xaml" />
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
@@ -175,6 +176,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="Views\Styles\Template\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\LinedHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\Tabs\CollectionsTabView.xaml">
