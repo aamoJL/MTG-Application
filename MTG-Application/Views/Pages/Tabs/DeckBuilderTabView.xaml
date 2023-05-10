@@ -403,7 +403,11 @@
                         <TextBlock Text="Mana Curve"/>
                       </customcontrols:LinedHeader.Header>
                     </customcontrols:LinedHeader>
-                    <lvc:CartesianChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" Series="{Binding Series}"/>
+                    <lvc:CartesianChart Height="250" 
+                                        DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" 
+                                        Series="{Binding Series}"
+                                        XAxes="{Binding XAxes}"
+                                        YAxes="{Binding YAxes}"/>
                     <customcontrols:LinedHeader>
                       <customcontrols:LinedHeader.Header>
                         <TextBlock Text="Type Chart"/>

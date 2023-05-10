@@ -24,7 +24,7 @@ public sealed partial class MainPage : Page
     ChangeTheme = new RelayCommand(() =>
     {
       var currentTheme = (App.MainWindow.Content as FrameworkElement).RequestedTheme;
-      App.ChangeTheme(currentTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark);
+      AppConfig.LocalSettings.AppTheme = currentTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;
     });
 
     NotificationService.OnNotification += Notifications_OnNotification;

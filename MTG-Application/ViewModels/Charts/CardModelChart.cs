@@ -7,7 +7,7 @@ using System.Linq;
 namespace MTGApplication.ViewModels.Charts;
 
 /// <summary>
-/// Base class for MTG card charts
+/// Base class for card charts
 /// </summary>
 public abstract class CardModelChart<TPrimaryType, TModel> where TModel : ObservableObject
 {

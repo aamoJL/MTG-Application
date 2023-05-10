@@ -42,6 +42,7 @@ public partial class App : Application
   protected override void OnLaunched(LaunchActivatedEventArgs args)
   {
     AppConfig.Initialize();
+    AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
     using (var db = new CardDbContextFactory().CreateDbContext())
     {
@@ -53,19 +54,22 @@ public partial class App : Application
       Title = "MTG Application",
     };
 
-    (MainWindow.Content as FrameworkElement).RequestedTheme = ElementTheme.Dark;
+    (MainWindow.Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
 
-    MainWindow.Activate();
     MainWindow.Closed += MainWindow_Closed;
+    MainWindow.Activate();
 
     DialogService.DialogRoot = MainWindow.Content as FrameworkElement;
 
-    IOService.InitDirectories();
+    LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
+  }
 
-    // TODO: LightCharts Themes
-    LiveCharts.Configure(config =>
-      config.AddSkiaSharp().AddDefaultMappers().AddLightTheme()
-    );
+  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if(e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
+    {
+      (MainWindow.Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
+    }
   }
 
   private async void MainWindow_Closed(object sender, WindowEventArgs args)
@@ -73,8 +77,7 @@ public partial class App : Application
     // The Window will close if the close variable has been set to true.
     // Otherwise the user will be asked to save unsaved changes.
     // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
-    if (close)
-    { return; }
+    if (close) { return; }
 
     var closingArgs = new WindowClosingEventArgs();
     Closing?.Invoke(this, closingArgs);
@@ -96,6 +99,4 @@ public partial class App : Application
       MainWindow.Close();
     }
   }
-
-  public static void ChangeTheme(ElementTheme theme) => (MainWindow.Content as FrameworkElement).RequestedTheme = theme;
 }

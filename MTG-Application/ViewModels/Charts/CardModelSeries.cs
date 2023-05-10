@@ -2,7 +2,6 @@
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using Microsoft.UI.Xaml;
 using MTGApplication.Models;
 using SkiaSharp;
 using System.Collections.ObjectModel;
@@ -18,17 +17,6 @@ namespace MTGApplication.ViewModels.Charts;
 /// </summary>
 public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : ObservableObject
 {
-  protected static SKColor LabelColor
-  {
-    get
-    {
-      if(App.MainWindow == null) { return new(255, 255, 255); } // For testing
-      return (App.MainWindow.Content as FrameworkElement).RequestedTheme == ElementTheme.Light 
-        ? new(45, 45, 45)
-        : new(255, 255, 255);
-    }
-  }
-
   protected ObservableCollection<TModel> Models { get; }
   protected double primaryValue;
 
@@ -102,7 +90,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       },
       Padding = 0,
       MaxBarWidth = double.MaxValue,
-      DataLabelsPaint = new SolidColorPaint(LabelColor),
+      DataLabelsPaint = new SolidColorPaint(ChartColorPalette.LightThemeText),
       DataLabelsSize = 10,
       DataLabelsPosition = DataLabelsPosition.Middle,
       Mapping = (value, point) =>
@@ -134,7 +122,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
         ColorTypes.M => new SolidColorPaint(ChartColorPalette.Multicolor),
         _ => new SolidColorPaint(SKColors.Pink),
       },
-      DataLabelsPaint = new SolidColorPaint(LabelColor),
+      DataLabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       DataLabelsSize = 10,
       DataLabelsPosition = PolarLabelsPosition.Outer,
       DataLabelsFormatter = p => p.Context.Series.Name,
@@ -167,7 +155,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
         SpellType.Planeswalker => new SolidColorPaint(ChartColorPalette.Black),
         _ => new SolidColorPaint(SKColors.Pink),
       },
-      DataLabelsPaint = new SolidColorPaint(LabelColor),
+      DataLabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       DataLabelsSize = 10,
       DataLabelsPosition = PolarLabelsPosition.Outer,
       DataLabelsFormatter = p => p.Context.Series.Name,

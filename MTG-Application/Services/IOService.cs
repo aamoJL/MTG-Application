@@ -40,18 +40,13 @@ public static class IOService
 
   #region//-----------------File-------------------//
   /// <summary>
-  /// Create directories if they do not exist
-  /// </summary>
-  public static void InitDirectories() { }
-
-  /// <summary>
   /// Returns the application's AppData folder path. The path will be to the company's folder inside the AppData folder.
   /// If the debugger is attached, the path will be /Debug folder inside the company folder instead.
   /// </summary>
   public static string GetAppDataPath()
   {
-    var path = System.Diagnostics.Debugger.IsAttached ? Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.CompanyName,
-        Assembly.GetCallingAssembly().GetName().Name, "Debug") : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.CompanyName,
+    var path = System.Diagnostics.Debugger.IsAttached ? Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.GlobalSettings.CompanyName,
+        Assembly.GetCallingAssembly().GetName().Name, "Debug") : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.GlobalSettings.CompanyName,
         Assembly.GetCallingAssembly().GetName().Name);
 
     Directory.CreateDirectory(path);

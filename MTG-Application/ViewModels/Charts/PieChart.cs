@@ -40,8 +40,7 @@ public class MTGSpellTypePieChart : MTGPieChart<SpellType>
     {
       return series;
     }
-    else
-    { return null; }
+    else { return null; }
   }
 
   protected override SpellType[] GetPrimaryItems(MTGCard model) => model.Info.SpellTypes;
@@ -66,22 +65,16 @@ public class MTGManaProductionPieChart : MTGPieChart<ColorTypes>
 
   protected override ISeries FindPrimarySeries(MTGCard model, ColorTypes item)
   {
-    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is PieSeries<CardModelSeries<MTGCard>> series)
-    {
-      return series;
-    }
-    else
-    { return null; }
+    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is PieSeries<CardModelSeries<MTGCard>> series) { return series; }
+    else { return null; }
   }
 
   protected override ColorTypes[] GetPrimaryItems(MTGCard model)
   {
     // Combine together mana producers that can produce all colors
     var producedMana = model.Info.ProducedMana;
-    if (producedMana.Length == 6 || (producedMana.Length == 5 && !producedMana.Contains(ColorTypes.C)))
-    { return new ColorTypes[] { ColorTypes.M }; }
-    else
-    { return producedMana; }
+    if (producedMana.Length == 6 || (producedMana.Length == 5 && !producedMana.Contains(ColorTypes.C))) { return new ColorTypes[] { ColorTypes.M }; }
+    else { return producedMana; }
   }
 }
 
@@ -100,12 +93,8 @@ public class MTGColorPieChart : MTGPieChart<ColorTypes>
 
   protected override ISeries FindPrimarySeries(MTGCard model, ColorTypes item)
   {
-    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is PieSeries<CardModelSeries<MTGCard>> series)
-    {
-      return series;
-    }
-    else
-    { return null; }
+    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is PieSeries<CardModelSeries<MTGCard>> series) { return series; }
+    else { return null; }
   }
 
   protected override ColorTypes[] GetPrimaryItems(MTGCard model) => model.Info.Colors;
