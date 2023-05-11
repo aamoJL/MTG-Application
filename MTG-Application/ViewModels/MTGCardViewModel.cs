@@ -43,7 +43,7 @@ public partial class MTGCardViewModel : ViewModelBase
   protected CardSide selectedFaceSide;
 
   public string SelectedFaceUri => SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
-  public bool HasBackFace => Model.Info.BackFace?.ImageUri != null;
+  public bool HasBackFaceImage => Model.Info.BackFace?.ImageUri != null;
   public string ModelAPIName => Model.GetAPIName();
 
   #region Model Properties
@@ -65,10 +65,10 @@ public partial class MTGCardViewModel : ViewModelBase
   /// <summary>
   /// Changes selected face image if possible
   /// </summary>
-  [RelayCommand(CanExecute = nameof(HasBackFace))]
+  [RelayCommand(CanExecute = nameof(HasBackFaceImage))]
   public void FlipCard()
   {
-    if (HasBackFace)
+    if (HasBackFaceImage)
       SelectedFaceSide = SelectedFaceSide == CardSide.Front ? CardSide.Back : CardSide.Front;
   }
 

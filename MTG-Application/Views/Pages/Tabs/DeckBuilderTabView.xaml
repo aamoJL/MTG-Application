@@ -142,7 +142,10 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <Grid BorderBrush="{ThemeResource SystemAccentColorDark1}" BorderThickness="0 2 0 0">
+  <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
+    <Grid.KeyboardAccelerators>
+      <KeyboardAccelerator Key="Escape" Invoked="Root_KeyboardAccelerator_Invoked"/>
+    </Grid.KeyboardAccelerators>
     <VisualStateManager.VisualStateGroups>
       
       <VisualStateGroup x:Name="CardSearchDisplayStates">
@@ -199,7 +202,7 @@
             <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
-            <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorDark3}"/>
+            <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}"/>
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
@@ -211,6 +214,17 @@
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SaveButton.IsEnabled" Value="False"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+
+      <VisualStateGroup x:Name="DeckFilterAppBarButtonState">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.CardFilters.FiltersApplied, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="DeckFilterAppBarButton.Background" Value="{ThemeResource SystemAccentColorLight1}"/>
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
@@ -539,13 +553,16 @@
                     </MenuFlyout>
                   </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarButton Icon="Filter" Label="Filter" AllowFocusOnInteraction="True">
+                <AppBarButton x:Name="DeckFilterAppBarButton" Icon="Filter" Label="Filter" AllowFocusOnInteraction="True">
+                  <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F" Modifiers="Control"/>
+                  </AppBarButton.KeyboardAccelerators>
                   <AppBarButton.Flyout>
                     <Flyout AreOpenCloseAnimationsEnabled="False">
                       <StackPanel Orientation="Vertical" Spacing="10">
-                        <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.CardFilters.ResetCommand}"/>
                         <TextBox Text="{x:Bind DeckBuilderViewModel.CardFilters.NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter name..."/>
                         <TextBox Text="{x:Bind DeckBuilderViewModel.CardFilters.TypeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter type..."/>
+                        <TextBox Text="{x:Bind DeckBuilderViewModel.CardFilters.OracleText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter oracle text..."/>
                         <NumberBox PlaceholderText="Filter CMC..." SpinButtonPlacementMode="Hidden" Value="{x:Bind DeckBuilderViewModel.CardFilters.Cmc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <StackPanel Orientation="Horizontal" Spacing="5">
                           <ToggleButton Content="W" ToolTipService.ToolTip="White" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.White, Mode=TwoWay}"/>
@@ -560,6 +577,7 @@
                           <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="Mono"/>
                           <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="Multi"/>
                         </RadioButtons>
+                        <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.CardFilters.ResetCommand}"/>
                       </StackPanel>
                     </Flyout>
                   </AppBarButton.Flyout>

@@ -37,7 +37,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <Grid BorderBrush="{ThemeResource SystemAccentColorDark1}" BorderThickness="0 2 0 0">
+  <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="CollectionNameTitleSaveStatus">
         <VisualState>

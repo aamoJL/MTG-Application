@@ -15,13 +15,13 @@ public sealed partial class MainPage : Page
 {
   private readonly int notificationDuration = 5000;
 
-  public ICommand ChangeTheme { get; }
+  public ICommand ChangeThemeCommand { get; }
 
   public MainPage()
   {
     this.InitializeComponent();
 
-    ChangeTheme = new RelayCommand(() =>
+    ChangeThemeCommand = new RelayCommand(() =>
     {
       var currentTheme = (App.MainWindow.Content as FrameworkElement).RequestedTheme;
       AppConfig.LocalSettings.AppTheme = currentTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;

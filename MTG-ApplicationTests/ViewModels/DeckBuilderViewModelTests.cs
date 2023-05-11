@@ -775,10 +775,34 @@ public class DeckBuilderViewModel_CardlistTests
   {
     DeckBuilderViewModel vm = new(null, null);
 
-    var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2, typeLine: "Artifact", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.R }));
-    var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1, typeLine: "Creature", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.W }));
-    var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, typeLine: "Land", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.C }));
-    var fourthCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "D", cmc: 4, typeLine: "Enchantment", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.W, ColorTypes.B }));
+    var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel( 
+      name: "A", 
+      cmc: 2, 
+      typeLine: "Artifact", 
+      frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
+        new ColorTypes[] { ColorTypes.R },
+        oracleText: "Exile taget creature"));
+    var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+      name: "B", 
+      cmc: 1, 
+      typeLine: "Creature", 
+      frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
+        new ColorTypes[] { ColorTypes.W },
+        oracleText: "Destroy taget creature"));
+    var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+      name: "C", 
+      cmc: 3, 
+      typeLine: "Land", 
+      frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
+        new ColorTypes[] { ColorTypes.C }, 
+        oracleText: "You gain 5 life"));
+    var fourthCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+      name: "D", 
+      cmc: 4, 
+      typeLine: "Enchantment",
+      frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
+        new ColorTypes[] { ColorTypes.W, ColorTypes.B }, 
+        oracleText: "Draw a card"));
 
     await vm.DeckCards.AddToCardlist(secondCard);
     await vm.DeckCards.AddToCardlist(thirdCard);
@@ -811,6 +835,11 @@ public class DeckBuilderViewModel_CardlistTests
     vm.CardFilters.Reset();
     vm.CardFilters.Cmc = 3; // Multicolored
     CollectionAssert.AreEquivalent(new[] { thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+
+    // Oracle filter
+    vm.CardFilters.Reset();
+    vm.CardFilters.OracleText = "destroy"; // Oracle says 'destroy'
+    CollectionAssert.AreEquivalent(new[] { secondCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
   }
 
   [TestMethod]

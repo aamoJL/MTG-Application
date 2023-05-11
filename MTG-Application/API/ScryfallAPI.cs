@@ -250,6 +250,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
     if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null)
     { return null; }
 
+    // https://scryfall.com/docs/api/cards
     var scryfallId = json["id"].GetValue<Guid>();
     var cmc = (int)json["cmc"].GetValue<float>();
     var name = json["name"].GetValue<string>();
@@ -263,48 +264,30 @@ public class ScryfallAPI : ICardAPI<MTGCard>
     var printSearchUri = json["prints_search_uri"]?.GetValue<string>();
     var cardMarketUri = json["purchase_uris"]?["cardmarket"]?.GetValue<string>();
 
-    // https://scryfall.com/docs/api/layouts
-    var twoSideLayouts = new string[] { "transform", "modal_dfc", "double_faced_token", "art_series", "reversible_card" };
-    var twoPartLayouts = new string[] { "split", "adventure", "flip" };
-    var layout = json["layout"]?.GetValue<string>();
     CardFace frontFace;
     CardFace? backFace;
 
-    if (twoSideLayouts.Contains(layout))
+    frontFace = new CardFace(
+      colors: json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()) 
+        : GetColors(json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
+      name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>() ?? json["name"]?.GetValue<string>(),
+      imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>() ?? json["image_uris"]?["normal"]?.GetValue<string>(),
+      illustrationId: json["card_faces"]?.AsArray()[0]["illustration_id"]?.GetValue<Guid?>() ?? json["illustration_id"]?.GetValue<Guid?>(),
+      oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? json["oracle_text"]?.GetValue<string>() ?? string.Empty
+      );
+
+    if(json["card_faces"] != null)
     {
-      frontFace = new CardFace(
-          colors: GetColors(json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
-          name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>(),
-          imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>(),
-          illustrationId: json["card_faces"]?.AsArray()[0]["illustration_id"]?.GetValue<Guid?>());
       backFace = new CardFace(
-          colors: GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()),
-          name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>(),
-          imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>(),
-          illustrationId: json["card_faces"]?.AsArray()[1]["illustration_id"]?.GetValue<Guid?>());
+        colors: json["card_faces"]!.AsArray()[1]["colors"] != null ? GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray())
+          : Array.Empty<ColorTypes>(),
+        name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>() ?? string.Empty,
+        imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>() ?? null,
+        illustrationId: json["card_faces"]?.AsArray()[1]["illustration_id"]?.GetValue<Guid?>() ?? null,
+        oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? string.Empty
+        );
     }
-    else if (twoPartLayouts.Contains(layout))
-    {
-      frontFace = new CardFace(
-        colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
-        name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>(),
-        imageUri: json["image_uris"]?["normal"]?.GetValue<string>(),
-        illustrationId: json["illustration_id"]?.GetValue<Guid?>());
-      backFace = new CardFace(
-        colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
-        name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>(),
-        imageUri: null,
-        illustrationId: null);
-    }
-    else
-    {
-      frontFace = new CardFace(
-          colors: GetColors(json["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
-          name: json["name"]?.GetValue<string>(),
-          imageUri: json["image_uris"]?["normal"]?.GetValue<string>(),
-          illustrationId: json["illustration_id"]?.GetValue<Guid?>());
-      backFace = null;
-    }
+    else { backFace = null; }
 
     var rarityString = json["rarity"].GetValue<string>();
     var rarityType = RarityTypes.Common;

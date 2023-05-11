@@ -19,7 +19,7 @@ namespace MTGApplicationTests.ViewModels
           frontFace: Mocker.MTGCardModelMocker.CreateCardFace(imageUri: frontUri),
           backFace: Mocker.MTGCardModelMocker.CreateCardFace(imageUri: backUri)));
 
-      Assert.IsTrue(vm.HasBackFace);
+      Assert.IsTrue(vm.HasBackFaceImage);
       Assert.IsTrue(vm.SelectedFaceSide == MTGCard.CardSide.Front);
       Assert.AreEqual(frontUri, vm.SelectedFaceUri);
 
@@ -37,7 +37,7 @@ namespace MTGApplicationTests.ViewModels
         Mocker.MTGCardModelMocker.CreateMTGCardModel(
           frontFace: Mocker.MTGCardModelMocker.CreateCardFace(imageUri: frontUri)));
 
-      Assert.IsFalse(vm.HasBackFace);
+      Assert.IsFalse(vm.HasBackFaceImage);
       Assert.IsTrue(vm.SelectedFaceSide == MTGCard.CardSide.Front);
       Assert.AreEqual(frontUri, vm.SelectedFaceUri);
 

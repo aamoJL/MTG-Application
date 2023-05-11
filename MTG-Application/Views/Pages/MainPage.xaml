@@ -20,7 +20,7 @@
         </TabViewItem>
       </TabView.TabItems>
     </TabView>
-    <AppBarButton Width="50" IsCompact="True" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Bind ChangeTheme}">
+    <AppBarButton Width="50" IsCompact="True" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Bind ChangeThemeCommand}">
       <AppBarButton.Icon>
         <FontIcon Glyph="&#xE793;"/>
       </AppBarButton.Icon>

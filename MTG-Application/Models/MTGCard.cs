@@ -54,14 +54,16 @@ public partial class MTGCard : ObservableObject
     public string Name { get; }
     public string ImageUri { get; }
     public Guid? IllustrationId { get; }
+    public string OracleText { get; }
 
     [JsonConstructor]
-    public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId)
+    public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId, string oracleText)
     {
       Colors = colors;
       Name = name;
       ImageUri = imageUri;
       IllustrationId = illustrationId;
+      OracleText = oracleText;
     }
   }
   [Serializable]

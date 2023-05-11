@@ -69,31 +69,34 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     {
       public enum ColorGroups { All, Mono, Multi }
 
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private string nameText = string.Empty;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private string typeText = string.Empty;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+      private string oracleText = string.Empty;
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private bool white = true;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private bool blue = true;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private bool black = true;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private bool red = true;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private bool green = true;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private bool colorless = true;
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private ColorGroups colorGroup = ColorGroups.All; // All, Mono, Multi
-      [ObservableProperty]
+      [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
       private double cmc = double.NaN;
 
       /// <summary>
       /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
       /// </summary>
-      public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(cmc);
+      public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !string.IsNullOrEmpty(OracleText)
+        || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(cmc);
 
       /// <summary>
       /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
@@ -102,6 +105,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       {
         if (cardViewModel.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
           && cardViewModel.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)
+          && (cardViewModel.Model.Info.FrontFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)
+          || (cardViewModel.Model.Info.BackFace != null && cardViewModel.Model.Info.BackFace.Value.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)))
           && (White || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.W))
           && (Blue || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.U))
           && (Black || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.B))
@@ -125,6 +130,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       {
         NameText = string.Empty;
         TypeText = string.Empty;
+        OracleText = string.Empty;
         White = true;
         Blue = true;
         Black = true;

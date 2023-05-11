@@ -62,7 +62,8 @@ public static class Mocker
       ColorTypes[]? colors = null,
       string name = "Befriending the Moths",
       string imageUri = "https://cards.scryfall.io/normal/front/8/a/8ad44884-ae0d-40ae-87a9-bad043d4e9ad.jpg?1656453019",
-      Guid? illustrationId = null)
+      Guid? illustrationId = null,
+      string oracleText = "")
     {
       colors ??= new ColorTypes[] { ColorTypes.W };
       illustrationId ??= Guid.Parse("a35ceece-124c-41aa-b9f1-ef95f7d20228");
@@ -70,7 +71,8 @@ public static class Mocker
           colors: colors,
           name: name,
           imageUri: imageUri,
-          illustrationId: illustrationId);
+          illustrationId: illustrationId,
+          oracleText: oracleText);
     }
 
     /// <summary>

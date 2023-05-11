@@ -178,8 +178,7 @@ public sealed partial class DeckBuilderTabView : UserControl
   {
     if (e.Key == Windows.System.VirtualKey.Delete && sender is ListViewBase element && element.SelectedItem is MTGCardViewModel cardVM)
     {
-      if (cardVM.DeleteCardCommand.CanExecute(null))
-      { cardVM.DeleteCardCommand.Execute(cardVM.Model); }
+      if (cardVM.DeleteCardCommand.CanExecute(null)) { cardVM.DeleteCardCommand.Execute(cardVM.Model); }
     }
   }
 
@@ -188,4 +187,6 @@ public sealed partial class DeckBuilderTabView : UserControl
     if (sender is ListViewBase element)
     { element.DeselectAll(); }
   }
+
+  private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args) => DeckBuilderViewModel.CardFilters.Reset();
 }
