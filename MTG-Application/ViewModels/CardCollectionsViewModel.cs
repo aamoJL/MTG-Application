@@ -156,12 +156,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
 
   private async void MTGSearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(MTGSearchViewModel.IsBusy))
-    { IsBusy = MTGSearchViewModel.IsBusy; }
-    else if (e.PropertyName == nameof(MTGSearchViewModel.SearchQuery))
-    {
-      await MTGSearchViewModel.SearchSubmit();
-    }
+    if (e.PropertyName == nameof(MTGSearchViewModel.IsBusy)) { IsBusy = MTGSearchViewModel.IsBusy; }
+    else if (e.PropertyName == nameof(MTGSearchViewModel.SearchQuery)) { await MTGSearchViewModel.SearchSubmit(); }
     else if (e.PropertyName == nameof(MTGSearchViewModel.SearchCards))
     {
       MTGSearchViewModel.SearchCards.CollectionChanged += (s, e) =>

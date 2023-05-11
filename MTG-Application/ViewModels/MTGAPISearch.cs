@@ -13,9 +13,9 @@ namespace MTGApplication.ViewModels;
 /// </summary>
 public partial class MTGAPISearch<TSource, IType> : ObservableObject where TSource : MTGCardSource<IType>, new() where IType : MTGCardViewModel
 {
-  public MTGAPISearch(ICardAPI<MTGCard> cardAPI) => this.cardAPI = cardAPI;
+  public MTGAPISearch(ICardAPI<MTGCard> cardAPI) => this.CardAPI = cardAPI;
 
-  protected readonly ICardAPI<MTGCard> cardAPI;
+  public ICardAPI<MTGCard> CardAPI { get; }
 
   [ObservableProperty]
   private IncrementalLoadingCollection<TSource, IType> searchCards = new();
@@ -33,15 +33,16 @@ public partial class MTGAPISearch<TSource, IType> : ObservableObject where TSour
   public async Task SearchSubmit()
   {
     IsBusy = true;
-    var result = await cardAPI.FetchFromUri(cardAPI.GetSearchUri(SearchQuery));
+    var result = await CardAPI.FetchFromUri(CardAPI.GetSearchUri(SearchQuery));
     TotalCardCount = result.TotalCount;
+
     var source = new TSource()
     {
       Cards = result.Found.ToList(),
-      CardAPI = cardAPI,
+      CardAPI = CardAPI,
       NextPage = result.NextPageUri,
     };
-    SearchCards = new(source, cardAPI.PageSize);
+    SearchCards = new(source, CardAPI.PageSize);
     IsBusy = false;
   }
 }

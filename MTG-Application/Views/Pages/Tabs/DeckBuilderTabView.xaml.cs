@@ -26,12 +26,16 @@ public sealed partial class DeckBuilderTabView : UserControl
   {
     this.InitializeComponent();
     App.Closing += MainWindow_Closed;
+
+    var cardAPI = new ScryfallAPI();
+    DeckBuilderViewModel = new(cardAPI, new SQLiteMTGDeckRepository(cardAPI, cardDbContextFactory: new()));
+    SearchViewModel = new(cardAPI);
   }
 
   private void MainWindow_Closed(object sender, App.WindowClosingEventArgs args) => args.ClosingTasks.Add(DeckBuilderViewModel);
 
-  public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> SearchViewModel = new(new ScryfallAPI());
-  public DeckBuilderViewModel DeckBuilderViewModel = new(new ScryfallAPI(), new SQLiteMTGDeckRepository(new ScryfallAPI(), new()));
+  public DeckBuilderAPISearchViewModel SearchViewModel { get; }
+  public DeckBuilderViewModel DeckBuilderViewModel { get; }
 
   [ObservableProperty]
   private double searchDesiredItemWidth = 250;
