@@ -5,6 +5,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.Services;
 
@@ -375,12 +377,12 @@ public static class DialogService
   /// <summary>
   /// Dialog with a gridview input
   /// </summary>
-  public class GridViewDialog : Dialog<object>
+  public class GridViewDialog<T> : Dialog<object>
   {
     protected GridView gridView;
 
-    public object Selection { get; set; }
-    public object[] Items { get; set; }
+    public T Selection { get; set; }
+    public T[] Items { get; set; }
     public object GridStyle { get; }
     public object GridItemTemplate { get; }
 
@@ -406,7 +408,7 @@ public static class DialogService
       var dialog = base.GetDialog();
       dialog.Content = gridView;
 
-      gridView.SelectionChanged += (s, e) => { Selection = gridView.SelectedItem; };
+      gridView.SelectionChanged += (s, e) => { Selection = (T)gridView.SelectedItem; };
 
       dialog.Loaded += (sender, e) =>
       {
@@ -421,10 +423,8 @@ public static class DialogService
           { PrimaryFeap?.Invoke(); } // Click the primary button
           else
           {
-            // If primary button is not available, press close button
-            var closeButton = FindByName(root, "CloseButton") as Button;
-            var closeFeap = FrameworkElementAutomationPeer.FromElement(closeButton) as ButtonAutomationPeer;
-            closeFeap?.Invoke();
+            // If primary button is not available, close the dialog
+            CurrentDialog.Hide();
           }
         };
       };
@@ -439,6 +439,32 @@ public static class DialogService
         _ => null
       };
     }
+  }
+
+  /// <summary>
+  /// GridViewDialog that has draggable items.
+  /// Dragging will close the dialog automaticly.
+  /// </summary>
+  /// <typeparam name="T">Items type</typeparam>
+  public class DraggableGridViewDialog<T> : GridViewDialog<T>
+  {
+    public DraggableGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle)
+    {
+    }
+
+    public override ContentDialog GetDialog()
+    {
+      var dialog = base.GetDialog();
+
+      var gridview = (dialog.Content as GridView);
+      gridview.CanDragItems = true;
+
+      (dialog.Content as GridView).DragItemsStarting += DraggableGridViewDialog_DragItemsStarting;
+
+      return dialog;
+    }
+
+    protected virtual void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e) => CurrentDialog.Hide();
   }
 
   /// <summary>

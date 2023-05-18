@@ -44,7 +44,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     public virtual ConfirmationDialog GetSaveUnsavedDialog()
       => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
     
-    public virtual GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
     
     public virtual ComboBoxDialog GetLoadDialog(string[] names)

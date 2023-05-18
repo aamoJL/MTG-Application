@@ -62,7 +62,7 @@ public class DeckBuilderViewModelTests
       dialog.IsChecked = MultipleCardsAlreadyInDeckDialog.Values;
       return dialog;
     }
-    public override GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+    public override GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
     {
       CurrentDialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
       var dialog = base.GetCardPrintDialog(printViewModels);

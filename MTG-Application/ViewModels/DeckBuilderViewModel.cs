@@ -44,10 +44,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
       => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
-    public virtual GridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
 
-    public virtual GridViewDialog GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
+    public virtual GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
 
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
