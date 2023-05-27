@@ -73,17 +73,18 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
   [RelayCommand]
   public async Task ShowPrintsDialog(MTGCard card)
   {
-    var prints = new List<MTGCard>();
-
     IsBusy = true;
-    // Get prints
-    var fetchResult = await APISearch.CardAPI.FetchCardsWithParameters($"{card.Info.Name}+unique:prints+game:paper");
-    prints.AddRange(fetchResult.Found);
-    while (!string.IsNullOrEmpty(fetchResult.NextPageUri))
+
+    var pageUri = card.Info.PrintSearchUri;
+    var prints = new List<MTGCard>();
+   
+    while (pageUri != string.Empty)
     {
-      fetchResult = await APISearch.CardAPI.FetchFromUri(fetchResult.NextPageUri);
-      prints.AddRange(fetchResult.Found);
+      var result = await APISearch.CardAPI.FetchFromUri(pageUri, paperOnly: true);
+      prints.AddRange(result.Found);
+      pageUri = result.NextPageUri;
     }
+
     var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
     IsBusy = false;
 
