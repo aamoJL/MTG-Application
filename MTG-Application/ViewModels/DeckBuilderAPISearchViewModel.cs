@@ -52,6 +52,7 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
     if (e.PropertyName == nameof(APISearch.IsBusy)) { IsBusy = APISearch.IsBusy; }
     if (e.PropertyName == nameof(APISearch.SearchCards))
     {
+      // Add print dialog command to the card viewmodel
       APISearch.SearchCards.CollectionChanged += (s, e) =>
       {
         switch (e.Action)

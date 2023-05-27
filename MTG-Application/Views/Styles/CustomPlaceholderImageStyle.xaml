@@ -74,5 +74,7 @@
     <Setter Property="IsCacheEnabled" Value="True"/>
     <Setter Property="PlaceholderSource" Value="/Assets/back.jpg"/>
     <Setter Property="PlaceholderStretch" Value="Fill"/>
+    <Setter Property="EnableLazyLoading" Value="True"/>
+    <Setter Property="LazyLoadingThreshold" Value="600"/>
   </Style>
 </ResourceDictionary>
