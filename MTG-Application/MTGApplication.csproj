@@ -38,6 +38,7 @@
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
+    <None Remove="Views\Pages\DeckTestingPage.xaml" />
     <None Remove="Views\Pages\MainPage.xaml" />
     <None Remove="README.md" />
     <None Remove="Views\Pages\Tabs\CollectionsTabView.xaml" />
@@ -46,6 +47,7 @@
     <None Remove="Views\Styles\MTGPrintGridViewItemTemplate.xaml" />
     <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
     <None Remove="Views\Styles\Themes\VioletTheme.xaml" />
+    <None Remove="Views\Windows\DeckTestingWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -178,6 +180,11 @@
     <PRIResource Remove="Views\Styles\Template\**" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\Pages\DeckTestingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\Controls\LinedHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -189,6 +196,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Styles\Themes\VioletTheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Windows\DeckTestingWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -18,9 +18,9 @@ public partial class App : Application
 {
   public class WindowClosingEventArgs : EventArgs
   {
-    public List<ISavable> ClosingTasks { get; set; } = new();
-
     public WindowClosingEventArgs() { }
+    
+    public List<ISavable> ClosingTasks { get; set; } = new();
   }
 
   public static Window MainWindow { get; private set; }
@@ -42,34 +42,19 @@ public partial class App : Application
   protected override void OnLaunched(LaunchActivatedEventArgs args)
   {
     AppConfig.Initialize();
-    AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
     using (var db = new CardDbContextFactory().CreateDbContext())
     {
       db.Database.Migrate();
     }
 
-    MainWindow = new MainWindow
-    {
-      Title = "MTG Application",
-    };
-
-    (MainWindow.Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
-
+    MainWindow = new MainWindow();
     MainWindow.Closed += MainWindow_Closed;
     MainWindow.Activate();
 
     DialogService.DialogRoot = MainWindow.Content as FrameworkElement;
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
-  }
-
-  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if(e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
-    {
-      (MainWindow.Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
-    }
   }
 
   private async void MainWindow_Closed(object sender, WindowEventArgs args)

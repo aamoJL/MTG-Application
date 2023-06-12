@@ -104,7 +104,7 @@ public sealed partial class DeckBuilderTabView : UserControl
     {
       // Change operation to 'Move' if the shift key is down
       e.AcceptedOperation =
-        (e.Modifiers & Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) == Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
+        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
         ? DataPackageOperation.Move : DataPackageOperation.Copy;
     }
   }
@@ -176,7 +176,7 @@ public sealed partial class DeckBuilderTabView : UserControl
 
   private void CardView_KeyDown(object sender, KeyRoutedEventArgs e)
   {
-    if (e.Key == Windows.System.VirtualKey.Delete && sender is ListViewBase element && element.SelectedItem is MTGCardViewModel cardVM)
+    if (e.Key == global::Windows.System.VirtualKey.Delete && sender is ListViewBase element && element.SelectedItem is MTGCardViewModel cardVM)
     {
       if (cardVM.DeleteCardCommand.CanExecute(null)) { cardVM.DeleteCardCommand.Execute(cardVM.Model); }
     }

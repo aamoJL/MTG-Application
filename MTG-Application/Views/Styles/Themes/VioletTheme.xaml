@@ -42,9 +42,8 @@
           <Color x:Key="SystemAccentColorLight2">#FF6543A9</Color>
           <Color x:Key="SystemAccentColorLight3">#FF543397</Color>
           <Color x:Key="RegionColor">#FF393B54</Color>
-          
+
           <SolidColorBrush x:Key="RegionBrush" Color="{StaticResource RegionColor}" />
-          <StaticResource x:Key="TabViewItemHeaderBackgroundSelected" ResourceKey="AcrylicBackgroundFillColorDefaultBrush"/>
         </ResourceDictionary>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
@@ -73,7 +72,7 @@
           <Thickness x:Key="RepeatButtonBorderThemeThickness">0,0,0,0</Thickness>
           <Thickness x:Key="SearchBoxBorderThemeThickness">0,0,0,0</Thickness>
           <Thickness x:Key="ToggleButtonBorderThemeThickness">0,0,0,0</Thickness>
-          <!--<Thickness x:Key="TextControlBorderThemeThickness">0,0,0,0</Thickness>-->
+          <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,0</Thickness>
           <Thickness x:Key="ButtonRevealBorderThemeThickness">0,0,0,0</Thickness>
           <Thickness x:Key="RepeatButtonRevealBorderThemeThickness">0,0,0,0</Thickness>
           <Thickness x:Key="ToggleButtonRevealBorderThemeThickness">0,0,0,0</Thickness>
@@ -92,6 +91,7 @@
           <Color x:Key="SystemAccentColorDark2">#FF6543A9</Color>
           <Color x:Key="SystemAccentColorDark3">#FF543397</Color>
           <Color x:Key="RegionColor">#ededed</Color>
+          
           <SolidColorBrush x:Key="RegionBrush" Color="LightGray" />
         </ResourceDictionary>
       </ResourceDictionary.MergedDictionaries>

@@ -1,0 +1,61 @@
+<Page
+  x:Class="MTGApplication.Views.Pages.DeckTestingPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:controls1="using:MTGApplication.Views.Controls"
+  mc:Ignorable="d"
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+  <Grid>
+    <controls:DockPanel LastChildFill="True">
+      <MenuBar controls:DockPanel.Dock="Top">
+        <MenuBarItem Title="File">
+          <MenuFlyoutItem Text="New Game"/>
+        </MenuBarItem>
+      </MenuBar>
+      <Grid controls:DockPanel.Dock="Bottom" Height="200">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="200"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" BorderThickness="0 1 1 0" BorderBrush="DarkGray" Margin="10">
+          <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+            <Button HorizontalAlignment="Center">Draw</Button>
+          </StackPanel>
+        </Grid>
+        <ListView Grid.Column="1" Height="200" Header="Hand">
+          <ListView.HeaderTemplate>
+            <DataTemplate>
+              <controls1:LinedHeader Margin="10 0 10 0">
+                <controls1:LinedHeader.Header>
+                  <TextBlock Text="{Binding}"/>
+                </controls1:LinedHeader.Header>
+              </controls1:LinedHeader>
+            </DataTemplate>
+          </ListView.HeaderTemplate>
+        </ListView>
+      </Grid>
+      <ListView controls:DockPanel.Dock="Left" Width="200" Header="Library">
+        <ListView.HeaderTemplate>
+          <DataTemplate>
+            <controls1:LinedHeader Margin="10 0 10 0">
+              <controls1:LinedHeader.Header>
+                <TextBlock Text="{Binding}"/>
+              </controls1:LinedHeader.Header>
+            </controls1:LinedHeader>
+          </DataTemplate>
+        </ListView.HeaderTemplate>
+      </ListView>
+      <Grid controls:DockPanel.Dock="Top">
+        <Canvas Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+          <NumberBox Value="40" AcceptsExpression="True" SpinButtonPlacementMode="Compact"/>
+          <NumberBox Value="40" AcceptsExpression="True" SpinButtonPlacementMode="Compact"/>
+        </StackPanel>
+      </Grid>
+    </controls:DockPanel>
+  </Grid>
+</Page>

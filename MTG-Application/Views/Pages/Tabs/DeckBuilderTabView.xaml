@@ -140,6 +140,10 @@
         </Grid>
       </StackPanel>
     </DataTemplate>
+
+    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
+    </Style>
   </UserControl.Resources>
 
   <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
@@ -411,7 +415,13 @@
                         <Run Text="Price:" />
                         <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckCards.EuroPrice), Mode=OneWay}" />
                     </TextBlock>
-                    <Button Content="Show tokens" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <Button Content="Show tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                      <Button Content="Playtest" 
+                              Style="{StaticResource PrimaryButtonStyle}" 
+                              Command="{x:Bind DeckBuilderViewModel.OpenPlaytestWindowCommand}" 
+                              CommandParameter="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}"/>
+                    </StackPanel>
                     <!--Charts-->
                     <customcontrols:LinedHeader>
                       <customcontrols:LinedHeader.Header>

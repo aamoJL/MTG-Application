@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
+using Microsoft.UI.Xaml;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
+using MTGApplication.Views.Pages;
+using MTGApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -627,20 +630,12 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     }
   }
 
+  [ObservableProperty, NotifyCanExecuteChangedForAttribute(nameof(OpenPlaytestWindowCommand))]
   private MTGCardDeck cardDeck = new();
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
   private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
-  private MTGCardDeck CardDeck
-  {
-    get => cardDeck;
-    set
-    {
-      cardDeck = value;
-      OnPropertyChanged(nameof(CardDeck));
-    }
-  }
 
   [ObservableProperty]
   private MTGManaProductionPieChart manaProductionChart;
@@ -754,7 +749,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Deletes current deck from the database
   /// </summary>
-  [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckDialogCommand))]
+  [RelayCommand(CanExecute = nameof(DeckLoaded))]
   public async Task DeleteDeckDialog()
   {
     if (!await DeckRepository.Exists(CardDeck.Name))
@@ -820,6 +815,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
     var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToArray();
     await Dialogs.GetTokenPrintDialog(tokens).ShowAsync();
+  }
+
+  [RelayCommand(CanExecute = nameof(DeckLoaded))]
+  public void OpenPlaytestWindow(MTGCardDeck deck)
+  {
+    if (string.IsNullOrEmpty(deck.Name)) { return; }
+
+    var testingWindow = new DeckTestingWindow(deck.DeckCards.ToArray());
+    testingWindow.Activate();
   }
   #endregion
 
@@ -941,5 +945,5 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
   }
 
-  private bool CanExecuteDeleteDeckDialogCommand() => !string.IsNullOrEmpty(CardDeck.Name);
+  private bool DeckLoaded() => !string.IsNullOrEmpty(CardDeck.Name);
 }

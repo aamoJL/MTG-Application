@@ -16,6 +16,7 @@ public sealed partial class MainPage : Page
   private readonly int notificationDuration = 5000;
 
   public ICommand ChangeThemeCommand { get; }
+  public ICommand OpenWindowCommand { get; }
 
   public MainPage()
   {
