@@ -6,7 +6,7 @@ using MTGApplication.Services;
 using System.Windows.Input;
 using Windows.UI;
 
-namespace MTGApplication.Pages;
+namespace MTGApplication.Views.Pages;
 
 /// <summary>
 /// Code behind for MainPage

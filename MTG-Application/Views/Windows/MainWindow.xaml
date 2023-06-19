@@ -5,7 +5,7 @@
   xmlns:local="using:MTGApplication"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:pages="using:MTGApplication.Pages"
+  xmlns:pages="using:MTGApplication.Views.Pages"
   mc:Ignorable="d">
 
   <pages:MainPage/>

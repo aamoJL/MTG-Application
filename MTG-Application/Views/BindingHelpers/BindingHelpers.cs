@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Microsoft.UI.Xaml;
+using System.Globalization;
 
 namespace MTGApplication.Views.BindingHelpers;
 
@@ -38,6 +39,14 @@ public static class Format
   /// Converts <paramref name="text"/> to uppercase
   /// </summary>
   public static string ToUpper(string text) => text.ToUpper();
+}
+
+public static class BooleanInversion
+{
+  /// <summary>
+  /// Returns the inverted visibility value of the given visibility
+  /// </summary>
+  public static Visibility VisibilityInversion(Visibility visibility) => visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 }
 
 /// <summary>

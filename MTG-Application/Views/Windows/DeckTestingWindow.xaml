@@ -7,5 +7,5 @@
   xmlns:pages="using:MTGApplication.Views.Pages"
   mc:Ignorable="d">
 
-  <pages:DeckTestingPage DeckCards="{x:Bind DeckCards}"/>
+  <pages:DeckTestingPage DeckCards="{x:Bind DeckCards, Mode=OneTime}"/>
 </Window>
