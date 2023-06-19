@@ -43,7 +43,7 @@ public sealed partial class DeckTestingPage : Page
       MTGDeckTestingViewModel.DeckCards = value;
     }
   }
-  public Vector2 BattlefieldCardDimensions { get; } = new(179, 250);
+  public Vector2 BattlefieldCardDimensions { get; } = new(179 * 1.2f, 250 * 1.2f);
   [ObservableProperty]
   public Visibility libraryVisibility = Visibility.Collapsed;
 
@@ -144,6 +144,37 @@ public sealed partial class DeckTestingPage : Page
     PreviewImage.PlaceholderSource = PreviewImage.Source as ImageSource;
   }
 
+  private void HandCard_PointerMoved(object sender, PointerRoutedEventArgs e)
+  {
+    var pointerPoint = e.GetCurrentPoint(null);
+    if (!pointerPoint.Properties.IsLeftButtonPressed)
+    {
+      PreviewImage.Visibility = Visibility.Visible;
+      // Move card preview image to mouse position when hovering over on hand card.
+      // The position is clamped to element size
+      var element = (sender as FrameworkElement);
+      var elementPosition = element.TransformToVisual(null).TransformPoint(new());
+
+      var xOffsetFromPointer = -(PreviewImage.ActualWidth / 2) + (element.ActualWidth / 2);
+      var yOffsetFromPointer = 0;
+
+      PreviewImage.SetValue(Canvas.LeftProperty, Math.Max(Math.Clamp(elementPosition.X + xOffsetFromPointer, 0, Math.Max(ActualSize.X - PreviewImage.ActualWidth, 0)), 0));
+      PreviewImage.SetValue(Canvas.TopProperty, Math.Max(Math.Clamp(elementPosition.Y + yOffsetFromPointer, 0, Math.Max(ActualSize.Y - PreviewImage.ActualHeight, 0)), 0));
+    }
+    else
+    {
+      // Dont show preview image if the user is dragging a card
+      PreviewImage.Visibility = Visibility.Collapsed;
+    }
+  }
+
+  private void HandCard_PointerExited(object sender, PointerRoutedEventArgs e)
+  {
+    PreviewImage.Visibility = Visibility.Collapsed;
+    // Change placeholder image to the old hovered card's image so the placeholder won't flicker
+    PreviewImage.PlaceholderSource = null;
+  }
+
   // ------------------ Item Drag & Drop ----------------------
 
   private void Root_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -157,8 +188,8 @@ public sealed partial class DeckTestingPage : Page
       else
       {
         var pointerPosition = e.GetCurrentPoint(null).Position;
-        DragPreviewImage.SetValue(Canvas.LeftProperty, pointerPosition.X - CardDrag.DragOffset.X);
-        DragPreviewImage.SetValue(Canvas.TopProperty, pointerPosition.Y - CardDrag.DragOffset.Y);
+        DragPreviewImage.SetValue(Canvas.LeftProperty, pointerPosition.X + CardDrag.DragOffset.X);
+        DragPreviewImage.SetValue(Canvas.TopProperty, pointerPosition.Y + CardDrag.DragOffset.Y);
       }
     }
   }
@@ -176,7 +207,7 @@ public sealed partial class DeckTestingPage : Page
   {
     if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
-      SetCardDragArgs((sender as FrameworkElement).DataContext as MTGCardViewModel, new(BattlefieldCardDimensions.X / 2, BattlefieldCardDimensions.Y / 2));
+      SetCardDragArgs((sender as FrameworkElement).DataContext as MTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
 
       CardDrag.Completed += (item) =>
       {
@@ -185,8 +216,10 @@ public sealed partial class DeckTestingPage : Page
 
       var pointerPosition = e.GetCurrentPoint(null).Position;
       DragPreviewImage.Source = CardDrag?.Item.SelectedFaceUri;
-      DragPreviewImage.SetValue(Canvas.LeftProperty, pointerPosition.X - CardDrag.DragOffset.X);
-      DragPreviewImage.SetValue(Canvas.TopProperty, pointerPosition.Y - CardDrag.DragOffset.Y);
+      DragPreviewImage.SetValue(Canvas.LeftProperty, pointerPosition.X + CardDrag.DragOffset.X);
+      DragPreviewImage.SetValue(Canvas.TopProperty, pointerPosition.Y + CardDrag.DragOffset.Y);
+
+      (DragPreviewImage.RenderTransform as RotateTransform).Angle = 0;
     }
   }
 
@@ -268,7 +301,7 @@ public sealed partial class DeckTestingPage : Page
         var targetSource = target.ItemsSource as ObservableCollection<MTGCardViewModel>;
         var oldIndex = targetSource.IndexOf(item);
 
-        if (oldIndex != insertIndex && oldIndex + 1 != insertIndex)
+        if (oldIndex == -1 || (oldIndex != insertIndex && oldIndex + 1 != insertIndex))
         {
           if (oldIndex != -1 && oldIndex < insertIndex)
           {
@@ -301,8 +334,8 @@ public sealed partial class DeckTestingPage : Page
         {
           // Card is already on the canvas, so move it the dragged position
           // TODO: z-index (check if card are under the pointer)
-          Canvas.SetLeft(existingElement, pos.X - CardDrag.DragOffset.X);
-          Canvas.SetTop(existingElement, pos.Y - CardDrag.DragOffset.Y);
+          Canvas.SetLeft(existingElement, pos.X + CardDrag.DragOffset.X);
+          Canvas.SetTop(existingElement, pos.Y + CardDrag.DragOffset.Y);
           CardDrag?.Cancel();
         }
         else
@@ -317,14 +350,16 @@ public sealed partial class DeckTestingPage : Page
             Source = card.SelectedFaceUri,
             Height = BattlefieldCardDimensions.Y,
             Width = BattlefieldCardDimensions.X,
-            CornerRadius = new(10),
+            CornerRadius = new(12),
             Style = (Style)style,
+            RenderTransformOrigin = new Point(0.5, 0.5),
+            RenderTransform = new RotateTransform(),
           };
 
           SetBattlefieldImage_PointerEvents(canvasImg, canvas);
 
-          Canvas.SetLeft(canvasImg, pos.X - CardDrag.DragOffset.X);
-          Canvas.SetTop(canvasImg, pos.Y - CardDrag.DragOffset.Y);
+          Canvas.SetLeft(canvasImg, pos.X + CardDrag.DragOffset.X);
+          Canvas.SetTop(canvasImg, pos.Y + CardDrag.DragOffset.Y);
 
           canvas.Children.Add(canvasImg);
 
@@ -338,13 +373,30 @@ public sealed partial class DeckTestingPage : Page
 
   private void SetBattlefieldImage_PointerEvents(FrameworkElement img, Canvas canvas)
   {
+    img.PointerEntered += (sender, e) =>
+    {
+      if (CardDrag == null)
+      {
+        // Settings the preview image's source before dragging reduces flickering when staring the drag
+        DragPreviewImage.Source = (img.DataContext as MTGCardViewModel).SelectedFaceUri;
+      }
+    };
+
     img.PointerPressed += (sender, e) =>
     {
       var pointerPoint = e.GetCurrentPoint(sender as FrameworkElement);
 
       if (pointerPoint.Properties.IsLeftButtonPressed)
       {
-        SetCardDragArgs((sender as FrameworkElement).DataContext as MTGCardViewModel, new(pointerPoint.Position.X, pointerPoint.Position.Y));
+        var imgPos = new Point(Canvas.GetLeft(img), Canvas.GetTop(img));
+        var pointetPos = e.GetCurrentPoint(canvas).Position;
+        var offset = new Point()
+        {
+          X = imgPos.X - pointetPos.X,
+          Y = imgPos.Y - pointetPos.Y,
+        };
+
+        SetCardDragArgs((sender as FrameworkElement).DataContext as MTGCardViewModel, offset);
 
         CardDrag.Completed += (item) =>
         {
@@ -358,11 +410,24 @@ public sealed partial class DeckTestingPage : Page
 
         var pointerWindowPosition = e.GetCurrentPoint(null).Position;
         DragPreviewImage.Source = CardDrag.Item.SelectedFaceUri;
-        DragPreviewImage.SetValue(Canvas.LeftProperty, pointerWindowPosition.X - CardDrag.DragOffset.X);
-        DragPreviewImage.SetValue(Canvas.TopProperty, pointerWindowPosition.Y - CardDrag.DragOffset.Y);
+
+        DragPreviewImage.SetValue(Canvas.LeftProperty, pointerWindowPosition.X + CardDrag.DragOffset.X);
+        DragPreviewImage.SetValue(Canvas.TopProperty, pointerWindowPosition.Y + CardDrag.DragOffset.Y);
+
+        var previewRenderTransform = (DragPreviewImage.RenderTransform as RotateTransform);
+        previewRenderTransform.Angle = (img.RenderTransform as RotateTransform).Angle;
 
         img.Opacity = 0;
       }
+    };
+
+    img.DoubleTapped += (sender, e) =>
+    {
+      var oldTransform = img.RenderTransform as RotateTransform;
+      (img.RenderTransform as RotateTransform).Angle = oldTransform.Angle == 90 ? 0 : 90;
+
+      var previewRenderTransform = (DragPreviewImage.RenderTransform as RotateTransform);
+      previewRenderTransform.Angle = (img.RenderTransform as RotateTransform).Angle;
     };
   }
 

@@ -14,7 +14,7 @@
 
   <Grid Background="Transparent">
     <VisualStateManager.VisualStateGroups>
-      
+
       <VisualStateGroup x:Name="LibraryVisibilityState">
         <VisualState>
           <VisualState.StateTriggers>
@@ -25,9 +25,9 @@
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
-      
+
     </VisualStateManager.VisualStateGroups>
-    
+
     <controls:DockPanel LastChildFill="True">
       <MenuBar controls:DockPanel.Dock="Top">
         <MenuBarItem Title="File">
@@ -72,7 +72,7 @@
                     PointerExited="Droppable_PointerExited">
             <ListView.ItemsPanel>
               <ItemsPanelTemplate>
-                <ItemsStackPanel Orientation="Horizontal"/>
+                <ItemsStackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
               </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.ItemContainerStyle>
@@ -86,7 +86,10 @@
                 <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
                                   Style="{StaticResource PlaceholderImageStyle}"
                                   CornerRadius="7"
-                                  PointerPressed="DraggableListItem_PointerPressed">
+                                  PointerPressed="DraggableListItem_PointerPressed"
+                                  PointerEntered="CardListViewItem_PointerEntered"
+                                  PointerMoved="HandCard_PointerMoved"
+                                  PointerExited="HandCard_PointerExited">
                   <controls:ImageEx.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                       <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -282,16 +285,21 @@
     </Canvas>
     <Canvas>
       <controls:ImageEx x:Name="DragPreviewImage" 
-                        MaxWidth="{x:Bind CardDimensions.X}"
-                        MaxHeight="{x:Bind CardDimensions.Y}"
+                        MaxWidth="{x:Bind BattlefieldCardDimensions.X}"
+                        MaxHeight="{x:Bind BattlefieldCardDimensions.Y}"
                         IsHitTestVisible="False" 
-                        CornerRadius="10"
+                        CornerRadius="12"
                         Visibility="Collapsed" 
                         PlaceholderStretch="Fill" 
                         CacheMode="BitmapCache" 
                         IsCacheEnabled="True"
                         Opacity=".5"
-                        Style="{StaticResource PreviewImagePlaceholderStyle}"/>
+                        Style="{StaticResource PreviewImagePlaceholderStyle}"
+                        RenderTransformOrigin="0.5,0.5">
+        <controls:ImageEx.RenderTransform>
+          <RotateTransform Angle="0"/>
+        </controls:ImageEx.RenderTransform>
+      </controls:ImageEx>
     </Canvas>
   </Grid>
 </Page>
