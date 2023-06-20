@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -343,19 +344,36 @@ public sealed partial class DeckTestingPage : Page
           // Add card to the canvas
           Application.Current.Resources.TryGetValue("PreviewImagePlaceholderStyle", out var style);
 
-          // TODO: source binding to datacontext, flyouts (propably build image from template)
+          // TODO: flyouts
           var canvasImg = new ImageEx()
           {
             DataContext = card,
-            Source = card.SelectedFaceUri,
             Height = BattlefieldCardDimensions.Y,
             Width = BattlefieldCardDimensions.X,
             CornerRadius = new(12),
             Style = (Style)style,
             RenderTransformOrigin = new Point(0.5, 0.5),
             RenderTransform = new RotateTransform(),
+            Source = card.SelectedFaceUri,
           };
 
+          //// Settings the binding to the canvasImg did not update the image, why?
+          //canvasImg.SetBinding(ImageEx.SourceProperty, new Binding()
+          //{
+          //  Mode = BindingMode.OneWay,
+          //  Source = card.SelectedFaceUri,
+          //});
+
+          // Instead using property change event to change the image
+          card.PropertyChanged += (s,e) =>
+          {
+            if(e.PropertyName == nameof(MTGCardViewModel.SelectedFaceUri))
+            {
+              canvasImg.Source = card.SelectedFaceUri;
+            }
+          };
+
+          SetBattlefieldImage_Flyouts(canvasImg);
           SetBattlefieldImage_PointerEvents(canvasImg, canvas);
 
           Canvas.SetLeft(canvasImg, pos.X + CardDrag.DragOffset.X);
@@ -369,6 +387,28 @@ public sealed partial class DeckTestingPage : Page
     }
 
     CardDrag?.Cancel();
+  }
+
+  private void SetBattlefieldImage_Flyouts(FrameworkElement img)
+  {
+    var card = img.DataContext as MTGCardViewModel;
+    var flyout = new MenuFlyout
+    {
+      AreOpenCloseAnimationsEnabled = false
+    };
+
+    flyout.Items.Add(new MenuFlyoutItem()
+    {
+      Command = card.FlipCardCommand,
+      Icon = new FontIcon()
+      {
+        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+        Glyph = "\xE117"
+      },
+      Text = "Flip"
+    });
+
+    img.ContextFlyout = flyout;
   }
 
   private void SetBattlefieldImage_PointerEvents(FrameworkElement img, Canvas canvas)
