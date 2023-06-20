@@ -3,10 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using MTGApplication.API;
 using MTGApplication.Extensions;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
@@ -28,9 +28,9 @@ public sealed partial class DeckTestingPage : Page
     PointerMoved += Root_PointerMoved;
     PointerReleased += Root_PointerReleased;
 
-    MTGDeckTestingViewModel.NewGameStarted += MTGDeckTestingViewModel_NewGameStarted;
-
     LibraryVisibilitySwitchCommand = new RelayCommand(SwitchLibraryVisibility);
+
+    MTGDeckTestingViewModel.NewGameStarted += MTGDeckTestingViewModel_NewGameStarted;
   }
 
   private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
@@ -42,18 +42,20 @@ public sealed partial class DeckTestingPage : Page
     {
       SetValue(DeckCardsProperty, value);
       MTGDeckTestingViewModel.DeckCards = value;
+      MTGDeckTestingViewModel.NewGame();
     }
   }
   public Vector2 BattlefieldCardDimensions { get; } = new(179 * 1.2f, 250 * 1.2f);
+  
   [ObservableProperty]
-  public Visibility libraryVisibility = Visibility.Collapsed;
+  private Visibility libraryVisibility = Visibility.Collapsed;
 
   public ICommand LibraryVisibilitySwitchCommand;
 
   public static readonly DependencyProperty DeckCardsProperty =
       DependencyProperty.Register(nameof(DeckCards), typeof(MTGCard[]), typeof(DeckTestingPage), new PropertyMetadata(Array.Empty<MTGCard>()));
 
-  public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; } = new();
+  public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; } = new(new ScryfallAPI());
 
   public void SwitchLibraryVisibility() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 
@@ -214,6 +216,21 @@ public sealed partial class DeckTestingPage : Page
       {
         ((sender as FrameworkElement).FindParentByType<ListViewBase>().ItemsSource as ObservableCollection<MTGCardViewModel>).Remove(item);
       };
+
+      var pointerPosition = e.GetCurrentPoint(null).Position;
+      DragPreviewImage.Source = CardDrag?.Item.SelectedFaceUri;
+      DragPreviewImage.SetValue(Canvas.LeftProperty, pointerPosition.X + CardDrag.DragOffset.X);
+      DragPreviewImage.SetValue(Canvas.TopProperty, pointerPosition.Y + CardDrag.DragOffset.Y);
+
+      (DragPreviewImage.RenderTransform as RotateTransform).Angle = 0;
+    }
+  }
+
+  private void TokenListView_PointerPressed(object sender, PointerRoutedEventArgs e)
+  {
+    if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
+    {
+      SetCardDragArgs((sender as FrameworkElement).DataContext as MTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
 
       var pointerPosition = e.GetCurrentPoint(null).Position;
       DragPreviewImage.Source = CardDrag?.Item.SelectedFaceUri;

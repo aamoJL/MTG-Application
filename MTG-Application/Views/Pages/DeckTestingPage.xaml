@@ -38,6 +38,7 @@
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="200"/>
           <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0" BorderThickness="0 1 1 0" BorderBrush="{ThemeResource RegionBrush}" Margin="10">
           <Button Command="{x:Bind MTGDeckTestingViewModel.DrawCommand}" 
@@ -96,6 +97,40 @@
                     </MenuFlyout>
                   </controls:ImageEx.ContextFlyout>
                 </controls:ImageEx>
+              </DataTemplate>
+            </ListView.ItemTemplate>
+          </ListView>
+        </Grid>
+        <Grid Grid.Column="2">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
+            <controls1:LinedHeader.Header>
+              <TextBlock Text="Tokens"/>
+            </controls1:LinedHeader.Header>
+          </controls1:LinedHeader>
+          <ListView Grid.Row="1"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Tokens, Mode=OneWay}"
+                    SelectionMode="None"
+                    BorderBrush="{ThemeResource RegionBrush}"
+                    BorderThickness="1 0 0 0"
+                    Margin="0 0 0 10">
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                <StackPanel Style="{StaticResource MTGListViewItemStyle}"
+                            PointerEntered="CardListViewItem_PointerEntered"
+                            PointerExited="CardListViewItem_PointerExited"
+                            PointerMoved="CardListViewItem_PointerMoved"
+                            PointerPressed="TokenListView_PointerPressed">
+                  <StackPanel.ContextFlyout>
+                    <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                    </MenuFlyout>
+                  </StackPanel.ContextFlyout>
+                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+                </StackPanel>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>

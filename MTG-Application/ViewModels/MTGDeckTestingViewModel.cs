@@ -1,8 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MTGApplication.ViewModels;
 
@@ -10,14 +15,25 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
 {
   // TODO: commander out of the library
 
-  public MTGDeckTestingViewModel() { }
-  public MTGDeckTestingViewModel(MTGCard[] deckCards) => DeckCards = deckCards;
+  public MTGDeckTestingViewModel(ICardAPI<MTGCard> cardAPI)
+  {
+    CardAPI = cardAPI;
+    PropertyChanged += MTGDeckTestingViewModel_PropertyChanged;
+  }
 
-  private MTGCard[] deckCards;
+  private async void MTGDeckTestingViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if(e.PropertyName == nameof(DeckCards))
+    {
+      await FetchTokens();
+    }
+  }
+
   public ObservableCollection<MTGCardViewModel> Library { get; set; } = new();
   public ObservableCollection<MTGCardViewModel> Graveyard { get; set; } = new();
   public ObservableCollection<MTGCardViewModel> Exile { get; set; } = new();
   public ObservableCollection<MTGCardViewModel> Hand { get; set; } = new();
+  public ObservableCollection<MTGCardViewModel> Tokens { get; set; } = new();
 
   public event Action NewGameStarted;
 
@@ -25,15 +41,25 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   private int playerHP = 40;
   [ObservableProperty]
   private int enemyHP = 40;
+  [ObservableProperty]
+  private MTGCard[] deckCards;
+  
+  private ICardAPI<MTGCard> CardAPI { get; }
 
-  public MTGCard[] DeckCards
+  private async Task FetchTokens()
   {
-    get => deckCards;
-    set
+    var stringBuilder = new StringBuilder();
+
+    foreach (var card in DeckCards)
     {
-      deckCards = value;
-      NewGame();
+      foreach (var token in card.Info.Tokens)
+      {
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
+      }
     }
+
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToList();
+    tokens.ForEach(x => Tokens.Add(x));
   }
 
   [RelayCommand]

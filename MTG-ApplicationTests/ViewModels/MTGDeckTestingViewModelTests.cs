@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
+using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 
 namespace MTGApplicationTests.ViewModels;
@@ -8,13 +9,24 @@ namespace MTGApplicationTests.ViewModels;
 [TestClass]
 public class MTGDeckTestingViewModelTests
 {
+  public static MTGDeckTestingViewModel Init(int cardCount = 100)
+  {
+    var vm = new MTGDeckTestingViewModel(new TestCardAPI())
+    {
+      DeckCards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: cardCount) },
+    };
+    vm.NewGame();
+
+    return vm;
+  }
+
   [TestMethod]
   public void NewGameTest_Init()
   {
-    var cards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 20) };
-    var vm = new MTGDeckTestingViewModel(cards);
+    var count = 100;
+    var vm = Init(count);
 
-    Assert.AreEqual(cards.Sum(x => x.Count) - 7, vm.Library.Count);
+    Assert.AreEqual(count - 7, vm.Library.Count);
     Assert.AreEqual(7, vm.Hand.Count);
     Assert.AreEqual(0, vm.Exile.Count);
     Assert.AreEqual(0, vm.Graveyard.Count);
@@ -24,8 +36,7 @@ public class MTGDeckTestingViewModelTests
   [TestMethod]
   public void DrawTest()
   {
-    var cards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 20) };
-    var vm = new MTGDeckTestingViewModel(cards);
+    var vm = Init();
 
     var oldLibraryCount = vm.Library.Count;
     var oldHandCount = vm.Hand.Count;
@@ -38,8 +49,7 @@ public class MTGDeckTestingViewModelTests
   [TestMethod]
   public void DrawTest_EmptyLibrary()
   {
-    var cards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1) };
-    var vm = new MTGDeckTestingViewModel(cards);
+    var vm = Init(1);
 
     vm.Draw();
     vm.Draw();
@@ -50,8 +60,7 @@ public class MTGDeckTestingViewModelTests
   [TestMethod]
   public void ShuffleTest()
   {
-    var cards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 20) };
-    var vm = new MTGDeckTestingViewModel(cards);
+    var vm = Init(10);
 
     var oldLibrary = vm.Library.ToArray();
 
@@ -63,8 +72,7 @@ public class MTGDeckTestingViewModelTests
   [TestMethod]
   public void LibraryAddTopTest()
   {
-    var cards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 5) };
-    var vm = new MTGDeckTestingViewModel(cards);
+    var vm = Init(5);
     var newCard = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     vm.LibraryAddBottom(newCard);
@@ -74,8 +82,7 @@ public class MTGDeckTestingViewModelTests
   [TestMethod]
   public void LibraryAddBottomTest()
   {
-    var cards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 5) };
-    var vm = new MTGDeckTestingViewModel(cards);
+    var vm = Init(5);
     var newCard = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     vm.LibraryAddBottom(newCard);
