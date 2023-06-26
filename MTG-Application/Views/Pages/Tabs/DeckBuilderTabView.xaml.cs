@@ -104,7 +104,8 @@ public sealed partial class DeckBuilderTabView : UserControl
     {
       // Change operation to 'Move' if the shift key is down
       e.AcceptedOperation =
-        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
+        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) 
+        == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
         ? DataPackageOperation.Move : DataPackageOperation.Copy;
     }
   }
@@ -172,6 +173,93 @@ public sealed partial class DeckBuilderTabView : UserControl
     }
     draggedElement = null;
   }
+  
+  private void CommanderView_DragOver(object sender, DragEventArgs e)
+  {
+    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
+    {
+      // Change operation to 'Move' if the shift key is down
+      e.AcceptedOperation =
+        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift)
+        == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
+        ? DataPackageOperation.Move : DataPackageOperation.Copy;
+
+      e.DragUIOverride.Caption = "Set as Commander";
+      e.DragUIOverride.IsContentVisible = false;
+    }
+  }
+  
+  private async void CommanderView_Drop(object sender, DragEventArgs e)
+  {
+    if (e.DataView.Contains(StandardDataFormats.Text))
+    {
+      var def = e.GetDeferral();
+      var data = await e.DataView.GetTextAsync();
+
+      var card = new Func<MTGCard>(() =>
+      {
+        // Try to import from JSON
+        try
+        {
+          var card = JsonSerializer.Deserialize<MTGCard>(data);
+          if (string.IsNullOrEmpty(card?.Info.Name))
+          { throw new Exception("Card does not have name"); }
+          return card;
+        }
+        catch { return null; }
+      })();
+
+      if (card != null && DeckBuilderViewModel.CardDeck != null)
+      {
+        DeckBuilderViewModel.SetCommander(card);
+      }
+      def.Complete();
+    }
+  }
+
+  private void CommanderPartnerView_DragOver(object sender, DragEventArgs e)
+  {
+    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
+    {
+      // Change operation to 'Move' if the shift key is down
+      e.AcceptedOperation =
+        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift)
+        == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
+        ? DataPackageOperation.Move : DataPackageOperation.Copy;
+
+      e.DragUIOverride.Caption = "Set as Partner";
+      e.DragUIOverride.IsContentVisible = false;
+    }
+  }
+
+  private async void CommanderPartnerView_Drop(object sender, DragEventArgs e)
+  {
+    if (e.DataView.Contains(StandardDataFormats.Text))
+    {
+      var def = e.GetDeferral();
+      var data = await e.DataView.GetTextAsync();
+
+      var card = new Func<MTGCard>(() =>
+      {
+        // Try to import from JSON
+        try
+        {
+          var card = JsonSerializer.Deserialize<MTGCard>(data);
+          if (string.IsNullOrEmpty(card?.Info.Name))
+          { throw new Exception("Card does not have name"); }
+          return card;
+        }
+        catch { return null; }
+      })();
+
+      if (card != null && DeckBuilderViewModel.CardDeck != null)
+      {
+        DeckBuilderViewModel.SetCommanderPartner(card);
+      }
+      def.Complete();
+    }
+  }
+
   #endregion
 
   private void CardView_KeyDown(object sender, KeyRoutedEventArgs e)

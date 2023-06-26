@@ -59,6 +59,30 @@ namespace MTGApplicationTests.Database
     }
 
     [TestMethod]
+    public async Task AddTest_Commanders()
+    {
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Commander");
+      var partner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner");
+      var deck = new MTGCardDeck()
+      {
+        Name = "Firts",
+        DeckCards = new System.Collections.ObjectModel.ObservableCollection<MTGCard>
+        {
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third"),
+        },
+        Commander = commander,
+        CommanderPartner = partner,
+      };
+
+      await repo.Add(deck);
+      Assert.AreEqual(commander.Info.Name, repo.Get(deck.Name).Result.Commander?.Info.Name);
+      Assert.AreEqual(partner.Info.Name, repo.Get(deck.Name).Result.CommanderPartner?.Info.Name);
+    }
+
+    [TestMethod]
     public async Task ExistsTest()
     {
       var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
@@ -155,7 +179,8 @@ namespace MTGApplicationTests.Database
     [TestMethod]
     public async Task RemoveTest()
     {
-      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
+      var contextFactory = new TestCardDbContextFactory();
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), contextFactory);
       var deck1 = new MTGCardDeck()
       {
         Name = "Firts",
@@ -164,7 +189,9 @@ namespace MTGApplicationTests.Database
           Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
           Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
           Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third"),
-        }
+        },
+        Commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Commander"),
+        CommanderPartner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner")
       };
       var deck2 = new MTGCardDeck()
       {
@@ -179,10 +206,13 @@ namespace MTGApplicationTests.Database
 
       await repo.Add(deck1);
       await repo.Add(deck2);
-      await repo.Remove(deck1);
 
+      await repo.Remove(deck1);
       Assert.AreEqual(1, (await repo.Get()).ToList().Count);
       Assert.IsFalse(await repo.Exists(deck1.Name));
+
+      var dBcontext = contextFactory.CreateDbContext();
+      Assert.AreEqual(deck2.DeckCards.Count, dBcontext.MTGCards.Count());
     }
 
     [TestMethod]
@@ -221,6 +251,44 @@ namespace MTGApplicationTests.Database
       Assert.AreEqual(1, (await repo.Get(deck1.Name)).Wishlist.Count);
       Assert.AreEqual(2, (await repo.Get(deck1.Name)).DeckCards.Count);
       Assert.AreEqual(4, (await repo.Get(deck1.Name)).DeckCards.Sum(x => x.Count));
+    }
+
+    [TestMethod]
+    public async Task UpdateTest_Commanders()
+    {
+      var contextFactory = new TestCardDbContextFactory();
+      var repo = new TestSQLiteMTGDeckRepository(new TestCardAPI(), contextFactory);
+      var deck = new MTGCardDeck()
+      {
+        Name = "Firts",
+        DeckCards = new System.Collections.ObjectModel.ObservableCollection<MTGCard>
+        {
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
+          Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third"),
+        }
+      };
+
+      await repo.Add(deck);
+      
+      var commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Commander");
+      var partner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner");
+      deck.Commander = commander;
+      deck.CommanderPartner = partner;
+
+      await repo.Update(deck);
+      Assert.AreEqual(commander.Info.Name, (await repo.Get(deck.Name)).Commander?.Info.Name);
+      Assert.AreEqual(partner.Info.Name, (await repo.Get(deck.Name)).CommanderPartner?.Info.Name);
+
+      var dBcontext = contextFactory.CreateDbContext();
+      Assert.AreEqual(deck.DeckCards.Count + 2, dBcontext.MTGCards.Count());
+
+      deck.CommanderPartner = null!;
+      
+      await repo.Update(deck);
+      Assert.AreEqual(commander.Info.Name, (await repo.Get(deck.Name)).Commander?.Info.Name);
+      Assert.AreEqual(null, (await repo.Get(deck.Name)).CommanderPartner?.Info.Name);
+      Assert.AreEqual(deck.DeckCards.Count + 1, dBcontext.MTGCards.Count());
     }
 
     [TestMethod]

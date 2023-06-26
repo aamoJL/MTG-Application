@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -46,6 +45,9 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   
   private ICardAPI<MTGCard> CardAPI { get; }
 
+  /// <summary>
+  /// Fetches and adds tokens from the deck to the token collection
+  /// </summary>
   private async Task FetchTokens()
   {
     var stringBuilder = new StringBuilder();

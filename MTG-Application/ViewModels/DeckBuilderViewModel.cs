@@ -591,6 +591,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
 
     DeckCards.PropertyChanged += Cardlist_PropertyChanged;
+    DeckCards.PropertyChanged += DeckCards_PropertyChanged;
     WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
     MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
 
@@ -599,20 +600,35 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     UpdateCharts();
   }
 
-  private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckCards_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(Cardlist.IsBusy))
+    if(e.PropertyName == nameof(Cardlist.CardlistSize))
     {
-      IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
+      OnPropertyChanged(nameof(DeckSize));
     }
-    else if (e.PropertyName == nameof(HasUnsavedChanges))
-    { OnPropertyChanged(nameof(HasUnsavedChanges)); }
   }
 
   private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(CardDeck.Name))
-    { OnPropertyChanged(nameof(CardDeckName)); }
+    switch (e.PropertyName)
+    {
+      case nameof(CardDeck.Commander):
+      case nameof(CardDeck.CommanderPartner):
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckSize));
+        break;
+    }
+  }
+
+  private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(Cardlist.IsBusy):
+        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
+        break;
+      case nameof(HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
+    }
   }
 
   private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -620,17 +636,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (e.PropertyName == nameof(CardDeck))
     {
       CardDeck.PropertyChanged += CardDeck_PropertyChanged;
-
       DeckCards.CardDeck = CardDeck;
       WishlistCards.CardDeck = CardDeck;
       MaybelistCards.CardDeck = CardDeck;
       CommandService.Clear();
       UpdateCharts();
-      OnPropertyChanged(nameof(CardDeckName));
     }
   }
 
-  [ObservableProperty, NotifyCanExecuteChangedForAttribute(nameof(OpenPlaytestWindowCommand))]
+  [ObservableProperty, NotifyCanExecuteChangedFor(nameof(OpenPlaytestWindowCommand))]
   private MTGCardDeck cardDeck = new();
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
@@ -680,7 +694,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       MaybelistCards.SortDirection = value;
     }
   }
-  public string CardDeckName => CardDeck.Name;
+  public int DeckSize => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
 
   #region ISavable implementation
   public bool HasUnsavedChanges
@@ -817,6 +831,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     await Dialogs.GetTokenPrintDialog(tokens).ShowAsync();
   }
 
+  /// <summary>
+  /// Opens Deck testing page on a new window for the given deck
+  /// </summary>
   [RelayCommand(CanExecute = nameof(DeckLoaded))]
   public void OpenPlaytestWindow(MTGCardDeck deck)
   {
@@ -825,6 +842,12 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     var testingWindow = new DeckTestingWindow(deck.DeckCards.ToArray());
     testingWindow.Activate();
   }
+
+  [RelayCommand]
+  public void SetCommander(MTGCard card) => CardDeck.Commander = card;
+
+  [RelayCommand]
+  public void SetCommanderPartner(MTGCard card) => CardDeck.CommanderPartner = card;
   #endregion
 
   /// <summary>
@@ -880,16 +903,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private async Task SaveDeck(string name)
   {
     IsBusy = true;
-    var tempDeck = new MTGCardDeck() // Temp deck that is copy of the current deck
-    {
-      Name = name,
-      DeckCards = CardDeck.DeckCards,
-      Maybelist = CardDeck.Maybelist,
-      Wishlist = CardDeck.Wishlist,
-    };
+    var tempDeck = CardDeck.GetCopy();
+    tempDeck.Name = name;
     if (await Task.Run(() => DeckRepository.AddOrUpdate(tempDeck)))
     {
-      if (!string.IsNullOrEmpty(CardDeckName) && name != CardDeckName)
+      // TODO: can the temp deck be moved to the AddOrUpdate method?
+      // Maybe add Remove(string name) method?
+      if (!string.IsNullOrEmpty(CardDeck?.Name) && name != CardDeck.Name)
       {
         await DeckRepository.Remove(CardDeck); // Delete old deck if the name was changed
       }

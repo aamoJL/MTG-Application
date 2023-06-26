@@ -1,17 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplicationTests.Services;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
-using MTGApplication.Models;
-using CommunityToolkit.WinUI.UI;
-using static MTGApplicationTests.Database.InMemoryMTGDeckRepositoryTests;
-using static MTGApplicationTests.ViewModels.DeckBuilderViewModelTests;
-using static MTGApplicationTests.Services.TestDialogService;
-using static MTGApplication.ViewModels.DeckBuilderViewModel;
+using MTGApplicationTests.Services;
+using static MTGApplication.Enums;
 using static MTGApplication.Models.MTGCard;
 using static MTGApplication.Services.DialogService;
-using static MTGApplication.Enums;
+using static MTGApplication.ViewModels.DeckBuilderViewModel;
+using static MTGApplicationTests.Database.InMemoryMTGDeckRepositoryTests;
+using static MTGApplicationTests.Services.TestDialogService;
+using static MTGApplicationTests.ViewModels.DeckBuilderViewModelTests;
 
 namespace MTGApplicationTests.ViewModels;
 
@@ -129,7 +129,7 @@ public class DeckBuilderViewModelTests
     await vm.NewDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(0, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(2, (await repo.Get(deckName))?.DeckCards.Count);
   }
@@ -153,7 +153,7 @@ public class DeckBuilderViewModelTests
     await vm.NewDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(0, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(1, (await repo.Get(deckName))?.DeckCards.Count);
   }
@@ -167,8 +167,8 @@ public class DeckBuilderViewModelTests
     DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
     {
       SaveUnsavedDialog = new(), // Save
-      SaveDialog = new() { Values = deckName}, // Give deck name
-      OverrideDialog = new() { Result = ContentDialogResult.Secondary}, // Don't override
+      SaveDialog = new() { Values = deckName }, // Give deck name
+      OverrideDialog = new() { Result = ContentDialogResult.Secondary }, // Don't override
     });
 
     // Add deck with the same name to the database
@@ -190,7 +190,7 @@ public class DeckBuilderViewModelTests
     await vm.NewDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(0, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(2, (await repo.Get(deckName))?.DeckCards.Count);
   }
@@ -227,7 +227,7 @@ public class DeckBuilderViewModelTests
     await vm.NewDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(0, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(1, (await repo.Get(deckName))?.DeckCards.Count);
   }
@@ -263,7 +263,7 @@ public class DeckBuilderViewModelTests
     await vm.NewDeckDialog();
     Assert.IsTrue(vm.HasUnsavedChanges);
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(2, (await repo.Get(deckName))?.DeckCards.Count);
   }
@@ -301,7 +301,40 @@ public class DeckBuilderViewModelTests
     await vm.LoadDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(2, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
+  }
+
+  [TestMethod]
+  public async Task LoadDeckDialogCommandTest_Commanders()
+  {
+    var deckName = "First";
+    var commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Commander");
+    var partner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner");
+
+    using TestInMemoryMTGDeckRepository repo = new();
+    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    {
+      LoadDialog = new() { Values = deckName }, // Load deck
+    });
+
+    // Add deck with the same name to the database
+    var dbDeck = new MTGCardDeck()
+    {
+      Name = deckName,
+      DeckCards = new()
+      {
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First"),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second")
+      },
+      Commander = commander,
+      CommanderPartner = partner,
+    };
+    await repo.Add(dbDeck);
+
+    await vm.LoadDeckDialog();
+    Assert.IsFalse(vm.HasUnsavedChanges);
+    Assert.AreEqual(commander.Info.Name, vm.CardDeck.Commander?.Info.Name);
+    Assert.AreEqual(partner.Info.Name, vm.CardDeck.CommanderPartner?.Info.Name);
   }
 
   [TestMethod]
@@ -334,7 +367,7 @@ public class DeckBuilderViewModelTests
     await vm.LoadDeckDialog();
     Assert.IsTrue(vm.HasUnsavedChanges);
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
   }
 
   [TestMethod]
@@ -361,7 +394,7 @@ public class DeckBuilderViewModelTests
       LoadDialog = new() { Values = dbDeck.Name }, // Load deck
     });
 
-    await repo.Add(dbDeck);      
+    await repo.Add(dbDeck);
 
     vm.SelectedSortDirection = SortDirection.Ascending;
     vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;
@@ -392,7 +425,47 @@ public class DeckBuilderViewModelTests
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
+  }
+
+  [TestMethod]
+  public async Task SaveDeckDialogCommandTest_Commanders()
+  {
+    var deckName = "First";
+    var commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Commander");
+    var partner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner");
+
+    using TestInMemoryMTGDeckRepository repo = new();
+    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    {
+      SaveDialog = new() { Values = deckName }, // Save deck
+      OverrideDialog = new() { Result = ContentDialogResult.Primary },
+    });
+
+    vm.SetCommander(commander);
+    Assert.IsTrue(vm.HasUnsavedChanges);
+
+    await vm.SaveDeckDialog();
+    Assert.IsFalse(vm.HasUnsavedChanges);
+    Assert.AreEqual(commander.Info.Name, (await repo.Get(deckName))?.Commander?.Info.Name);
+    Assert.AreEqual(null, (await repo.Get(deckName))?.CommanderPartner?.Info.Name);
+
+    vm.SetCommanderPartner(partner);
+    Assert.IsTrue(vm.HasUnsavedChanges);
+
+    await vm.SaveDeckDialog();
+    Assert.IsFalse(vm.HasUnsavedChanges);
+    Assert.AreEqual(commander.Info.Name, (await repo.Get(deckName))?.Commander?.Info.Name);
+    Assert.AreEqual(partner.Info.Name, (await repo.Get(deckName))?.CommanderPartner?.Info.Name);
+
+    vm.SetCommander(null);
+    vm.SetCommanderPartner(null);
+    Assert.IsTrue(vm.HasUnsavedChanges);
+
+    await vm.SaveDeckDialog();
+    Assert.IsFalse(vm.HasUnsavedChanges);
+    Assert.AreEqual(null, (await repo.Get(deckName))?.Commander?.Info.Name);
+    Assert.AreEqual(null, (await repo.Get(deckName))?.CommanderPartner?.Info.Name);
   }
 
   [TestMethod]
@@ -426,7 +499,7 @@ public class DeckBuilderViewModelTests
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(1, (await repo.Get(deckName))?.DeckCards.Count);
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
   }
 
   [TestMethod]
@@ -456,7 +529,7 @@ public class DeckBuilderViewModelTests
 
     // Load the added deck
     await vm.LoadDeckDialog();
-    Assert.AreEqual(loadName, vm.CardDeckName);
+    Assert.AreEqual(loadName, vm.CardDeck.Name);
 
     await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"));
 
@@ -465,7 +538,7 @@ public class DeckBuilderViewModelTests
     Assert.AreEqual(3, vm.DeckCards.CardlistSize);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(3, (await repo.Get(saveName))?.DeckCards.Count);
-    Assert.AreEqual(saveName, vm.CardDeckName);
+    Assert.AreEqual(saveName, vm.CardDeck.Name);
   }
 
   [TestMethod]
@@ -474,8 +547,8 @@ public class DeckBuilderViewModelTests
     using TestInMemoryMTGDeckRepository repo = new();
     DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
     {
-      OverrideDialog = new() { Result = ContentDialogResult.None},
-      SaveDialog = new() { Result = ContentDialogResult.None, Values = "Name"},
+      OverrideDialog = new() { Result = ContentDialogResult.None },
+      SaveDialog = new() { Result = ContentDialogResult.None, Values = "Name" },
     });
 
     // Add card so the deck has unsaved changes
@@ -485,7 +558,7 @@ public class DeckBuilderViewModelTests
 
     Assert.IsTrue(vm.HasUnsavedChanges);
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
   }
   #endregion
 
@@ -519,11 +592,11 @@ public class DeckBuilderViewModelTests
     });
 
     await vm.SaveDeckDialog();
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
 
     await vm.DeleteDeckDialog();
     Assert.AreEqual(0, (await repo.Get()).ToList().Count);
-    Assert.AreEqual(string.Empty, vm.CardDeckName);
+    Assert.AreEqual(string.Empty, vm.CardDeck.Name);
   }
 
   [TestMethod]
@@ -539,11 +612,11 @@ public class DeckBuilderViewModelTests
     });
 
     await vm.SaveDeckDialog();
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
 
     await vm.DeleteDeckDialog();
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
   }
 
   [TestMethod]
@@ -559,43 +632,65 @@ public class DeckBuilderViewModelTests
     });
 
     await vm.SaveDeckDialog();
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
 
     await vm.DeleteDeckDialog();
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
-    Assert.AreEqual(deckName, vm.CardDeckName);
+    Assert.AreEqual(deckName, vm.CardDeck.Name);
   }
   #endregion
+
+  [TestMethod]
+  public void SetCommanderCommandTest()
+  {
+    var vm = new DeckBuilderViewModel(null, null, null);
+    var commanderCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    vm.SetCommander(commanderCard);
+    Assert.AreEqual(commanderCard, vm.CardDeck.Commander);
+  }
+
+  [TestMethod]
+  public void SetCommanderPartnerCommandTest()
+  {
+    var vm = new DeckBuilderViewModel(null, null, null);
+    var PartnerCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    vm.SetCommanderPartner(PartnerCard);
+    Assert.AreEqual(PartnerCard, vm.CardDeck.CommanderPartner);
+  }
+
+  [TestMethod]
+  public async Task DeckSizeTest()
+  {
+    var vm = new DeckBuilderViewModel(null, null, null);
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1);
+
+    using var propAsserter = new PropertyChangedAssert(vm, nameof(vm.DeckSize));
+    await vm.DeckCards.AddToCardlist(card);
+    Assert.AreEqual(card.Count, vm.DeckSize);
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    card.Count += 1;
+    Assert.AreEqual(card.Count, vm.DeckSize);
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    vm.SetCommander(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1));
+    Assert.AreEqual(card.Count + 1, vm.DeckSize);
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    vm.SetCommanderPartner(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1));
+    Assert.AreEqual(card.Count + 2, vm.DeckSize);
+    Assert.IsTrue(propAsserter.PropertyChanged);
+  }
 }
 
 [TestClass]
-public class DeckBuilderViewModel_CardlistTests
+public partial class DeckBuilderViewModel_CardlistTests
 {
-  public class CardlistPropertyAsserter : IDisposable
-  {
-    public Cardlist Cardlist { get; }
-    public string ExpectedPropertyChanged { get; }
-    public bool PropertyChanged { get; private set; } = false;
-
-    public CardlistPropertyAsserter(Cardlist cardlist, string expectedPropertyChanged)
-    {
-      Cardlist = cardlist;
-      ExpectedPropertyChanged = expectedPropertyChanged;
-      Cardlist.PropertyChanged += Cardlist_PropertyChanged;
-    }
-
-    private void Cardlist_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      if (e.PropertyName == ExpectedPropertyChanged) { PropertyChanged = true; }
-    }
-
-    public void Dispose()
-    {
-      Cardlist.PropertyChanged -= Cardlist_PropertyChanged;
-      GC.SuppressFinalize(this);
-    }
-  }
-
   #region Import & Export
   [TestMethod]
   public async Task ImportToDeckCardsDialogTest()
@@ -775,33 +870,33 @@ public class DeckBuilderViewModel_CardlistTests
   {
     DeckBuilderViewModel vm = new(null, null);
 
-    var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel( 
-      name: "A", 
-      cmc: 2, 
-      typeLine: "Artifact", 
+    var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+      name: "A",
+      cmc: 2,
+      typeLine: "Artifact",
       frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
         new ColorTypes[] { ColorTypes.R },
         oracleText: "Exile taget creature"));
     var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
-      name: "B", 
-      cmc: 1, 
-      typeLine: "Creature", 
+      name: "B",
+      cmc: 1,
+      typeLine: "Creature",
       frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
         new ColorTypes[] { ColorTypes.W },
         oracleText: "Destroy taget creature"));
     var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
-      name: "C", 
-      cmc: 3, 
-      typeLine: "Land", 
+      name: "C",
+      cmc: 3,
+      typeLine: "Land",
       frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
-        new ColorTypes[] { ColorTypes.C }, 
+        new ColorTypes[] { ColorTypes.C },
         oracleText: "You gain 5 life"));
     var fourthCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
-      name: "D", 
-      cmc: 4, 
+      name: "D",
+      cmc: 4,
       typeLine: "Enchantment",
       frontFace: Mocker.MTGCardModelMocker.CreateCardFace(
-        new ColorTypes[] { ColorTypes.W, ColorTypes.B }, 
+        new ColorTypes[] { ColorTypes.W, ColorTypes.B },
         oracleText: "Draw a card"));
 
     await vm.DeckCards.AddToCardlist(secondCard);
@@ -830,7 +925,7 @@ public class DeckBuilderViewModel_CardlistTests
     vm.CardFilters.Reset();
     vm.CardFilters.ColorGroup = Cardlist.CardFilters.ColorGroups.Multi; // Multicolored
     CollectionAssert.AreEquivalent(new[] { fourthCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
-    
+
     // CMC filter
     vm.CardFilters.Reset();
     vm.CardFilters.Cmc = 3; // Multicolored
@@ -920,7 +1015,7 @@ public class DeckBuilderViewModel_CardlistTests
     var newPrint = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()));
     DeckBuilderViewModel vm = new(new TestCardAPI(), null, dialogs: new TestDeckBuilderViewDialogs()
     {
-      CardPrintDialog = new() { Values = newPrint},
+      CardPrintDialog = new() { Values = newPrint },
     });
 
     await vm.DeckCards.AddToCardlist(card);
@@ -978,7 +1073,7 @@ public class DeckBuilderViewModel_CardlistTests
     var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
 
     await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    
+
     cardlist.CommandService.Undo();
     Assert.AreEqual(0, deck.DeckCards.Count);
 
@@ -1038,7 +1133,7 @@ public class DeckBuilderViewModel_CardlistTests
 
     await cardlist.AddToCardlist(card);
     cardlist.RemoveFromCardlist(card);
-    
+
     cardlist.CommandService.Undo();
     Assert.AreEqual(1, deck.DeckCards.Count);
 
@@ -1090,7 +1185,7 @@ public class DeckBuilderViewModel_CardlistTests
   public async Task DeckPriceChangesTest_CardlistChanges()
   {
     var cardlist = new Cardlist(new(), CardlistType.Deck, null, null);
-    using var asserter = new CardlistPropertyAsserter(cardlist, nameof(cardlist.EuroPrice));
+    using var asserter = new PropertyChangedAssert(cardlist, nameof(cardlist.EuroPrice));
 
     await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(price: 500));
     Assert.IsTrue(asserter.PropertyChanged);
@@ -1105,7 +1200,7 @@ public class DeckBuilderViewModel_CardlistTests
 
     await vm.DeckCards.AddToCardlist(card);
 
-    using var asserter = new CardlistPropertyAsserter(cardlist, nameof(cardlist.EuroPrice));
+    using var asserter = new PropertyChangedAssert(cardlist, nameof(cardlist.EuroPrice));
     card.Count++;
     Assert.IsTrue(asserter.PropertyChanged);
   }
@@ -1123,7 +1218,7 @@ public class DeckBuilderViewModel_CardlistTests
 
     await vm.DeckCards.AddToCardlist(card);
 
-    using var asserter = new CardlistPropertyAsserter(cardlist, nameof(cardlist.EuroPrice));
+    using var asserter = new PropertyChangedAssert(cardlist, nameof(cardlist.EuroPrice));
     await vm.DeckCards.ChangePrintDialog(card);
     Assert.IsTrue(asserter.PropertyChanged);
   }

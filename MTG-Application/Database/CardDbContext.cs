@@ -39,6 +39,18 @@ public class CardDbContext : DbContext
       .WithMany(e => e.Cards)
       .OnDelete(DeleteBehavior.Cascade);
 
+    modelBuilder.Entity<MTGCardDeckDTO>()
+      .HasOne(e => e.Commander)
+      .WithOne()
+      .HasForeignKey<MTGCardDTO>(e => e.DeckCommanderId)
+      .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<MTGCardDeckDTO>()
+      .HasOne(e => e.CommanderPartner)
+      .WithOne()
+      .HasForeignKey<MTGCardDTO>(e => e.DeckCommanderPartnerId)
+      .OnDelete(DeleteBehavior.Cascade);
+
     modelBuilder.Entity<MTGCardCollectionListDTO>()
       .HasOne(e => e.Collection)
       .WithMany(e => e.CollectionLists)

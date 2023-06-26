@@ -270,6 +270,9 @@ public class MTGCardDTO : CardDTO
 
   public Guid ScryfallId { get; init; }
 
+  public int? DeckCommanderId { get; private set; }
+  public int? DeckCommanderPartnerId { get; private set; }
+  
   public MTGCardDeckDTO DeckCards { get; set; }
   public MTGCardDeckDTO DeckWishlist { get; set; }
   public MTGCardDeckDTO DeckMaybelist { get; set; }
