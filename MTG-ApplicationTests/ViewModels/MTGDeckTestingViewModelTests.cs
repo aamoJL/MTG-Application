@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyModel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
@@ -14,7 +13,12 @@ public class MTGDeckTestingViewModelTests
   {
     var vm = new MTGDeckTestingViewModel(new TestCardAPI())
     {
-      DeckCards = new MTGCard[] { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: cardCount) },
+      CardDeck = new MTGCardDeck() 
+      { 
+        DeckCards = new() { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: cardCount) },
+        Commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1, name: "Commander"),
+        CommanderPartner = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1, name: "Partner"),
+      },
     };
     vm.NewGame();
 
@@ -29,7 +33,7 @@ public class MTGDeckTestingViewModelTests
 
     var unsortedLibrary = new List<MTGCardViewModel>();
 
-    foreach (var item in vm.DeckCards)
+    foreach (var item in vm.CardDeck.DeckCards)
     {
       for (var i = 0; i < item.Count; i++)
       {
@@ -41,6 +45,7 @@ public class MTGDeckTestingViewModelTests
     Assert.AreEqual(7, vm.Hand.Count);
     Assert.AreEqual(0, vm.Exile.Count);
     Assert.AreEqual(0, vm.Graveyard.Count);
+    Assert.AreEqual(2, vm.CommandZone.Count);
     CollectionAssert.AreNotEqual(unsortedLibrary.ToArray(), vm.Library.ToArray());
   }
 

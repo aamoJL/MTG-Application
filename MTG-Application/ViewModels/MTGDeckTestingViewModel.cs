@@ -12,8 +12,6 @@ namespace MTGApplication.ViewModels;
 
 public partial class MTGDeckTestingViewModel : ViewModelBase
 {
-  // TODO: commander out of the library
-
   public MTGDeckTestingViewModel(ICardAPI<MTGCard> cardAPI)
   {
     CardAPI = cardAPI;
@@ -22,7 +20,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
 
   private async void MTGDeckTestingViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if(e.PropertyName == nameof(DeckCards))
+    if(e.PropertyName == nameof(CardDeck))
     {
       await FetchTokens();
     }
@@ -33,6 +31,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   public ObservableCollection<MTGCardViewModel> Exile { get; set; } = new();
   public ObservableCollection<MTGCardViewModel> Hand { get; set; } = new();
   public ObservableCollection<MTGCardViewModel> Tokens { get; set; } = new();
+  public ObservableCollection<MTGCardViewModel> CommandZone { get; set; } = new();
 
   public event Action NewGameStarted;
 
@@ -41,7 +40,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   [ObservableProperty]
   private int enemyHP = 40;
   [ObservableProperty]
-  private MTGCard[] deckCards;
+  private MTGCardDeck cardDeck;
   
   private ICardAPI<MTGCard> CardAPI { get; }
 
@@ -52,7 +51,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   {
     var stringBuilder = new StringBuilder();
 
-    foreach (var card in DeckCards)
+    foreach (var card in CardDeck.DeckCards)
     {
       foreach (var token in card.Info.Tokens)
       {
@@ -71,20 +70,25 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     Graveyard.Clear();
     Exile.Clear();
     Hand.Clear();
+    CommandZone.Clear();
     
     PlayerHP = 40;
     EnemyHP = 40;
 
     // Reset library
-    foreach (var item in DeckCards)
+    foreach (var item in CardDeck.DeckCards)
     {
       for (var i = 0; i < item.Count; i++)
       {
-        Library.Add(new(item)); // Add as many of the same card as the cards Count property
+        Library.Add(new(item)); // Add as many of the same cards as the card's Count property
       }
     }
 
     Shuffle();
+
+    // Add commanders to the command zone
+    if (CardDeck.Commander != null) { CommandZone.Add(new(CardDeck.Commander)); }
+    if (CardDeck.CommanderPartner != null) { CommandZone.Add(new(CardDeck.CommanderPartner)); }
 
     for (var i = 0; i < 7; i++)
     {

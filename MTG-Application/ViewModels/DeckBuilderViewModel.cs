@@ -839,7 +839,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   {
     if (string.IsNullOrEmpty(deck.Name)) { return; }
 
-    var testingWindow = new DeckTestingWindow(deck.DeckCards.ToArray());
+    var testingWindow = new DeckTestingWindow(deck);
     testingWindow.Activate();
   }
 

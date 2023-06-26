@@ -38,6 +38,7 @@
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="200"/>
           <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="auto"/>
           <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0" BorderThickness="0 1 1 0" BorderBrush="{ThemeResource RegionBrush}" Margin="10">
@@ -61,7 +62,6 @@
           </controls1:LinedHeader>
           <ListView Grid.Row="1"
                     ItemsSource="{x:Bind MTGDeckTestingViewModel.Hand}"
-                    SelectionMode="Single"
                     ScrollViewer.HorizontalScrollMode="Enabled"
                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                     ScrollViewer.IsHorizontalRailEnabled="True"
@@ -102,6 +102,60 @@
           </ListView>
         </Grid>
         <Grid Grid.Column="2">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
+            <controls1:LinedHeader.Header>
+              <TextBlock Text="Command Zone"/>
+            </controls1:LinedHeader.Header>
+          </controls1:LinedHeader>
+          <ListView Grid.Row="1"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.CommandZone}"
+                    MaxWidth="300"
+                    ScrollViewer.HorizontalScrollMode="Enabled"
+                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                    ScrollViewer.IsHorizontalRailEnabled="True"
+                    ScrollViewer.VerticalScrollMode="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    BorderBrush="{ThemeResource RegionBrush}"
+                    BorderThickness="1 0 0 0"
+                    Padding="0 0 0 10"
+                    PointerReleased="DroppableList_PointerReleased"
+                    PointerEntered="Droppable_PointerEntered"
+                    PointerExited="Droppable_PointerExited">
+            <ListView.ItemsPanel>
+              <ItemsPanelTemplate>
+                <ItemsStackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+              </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemContainerStyle>
+              <Style TargetType="ListViewItem">
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="5 0 5 0"/>
+              </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="viewmodels:MTGCardViewModel">
+                <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
+                                  Style="{StaticResource PlaceholderImageStyle}"
+                                  CornerRadius="7"
+                                  PointerPressed="DraggableListItem_PointerPressed"
+                                  PointerEntered="CardListViewItem_PointerEntered"
+                                  PointerMoved="HandCard_PointerMoved"
+                                  PointerExited="HandCard_PointerExited">
+                  <controls:ImageEx.ContextFlyout>
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                    </MenuFlyout>
+                  </controls:ImageEx.ContextFlyout>
+                </controls:ImageEx>
+              </DataTemplate>
+            </ListView.ItemTemplate>
+          </ListView>
+        </Grid>
+        <Grid Grid.Column="3">
           <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>

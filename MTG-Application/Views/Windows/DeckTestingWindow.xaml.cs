@@ -7,7 +7,7 @@ namespace MTGApplication.Views.Windows;
 
 public sealed partial class DeckTestingWindow : Window
 {
-  public DeckTestingWindow(MTGCard[] deckCards)
+  public DeckTestingWindow(MTGCardDeck cardDeck)
   {
     this.InitializeComponent();
 
@@ -18,7 +18,7 @@ public sealed partial class DeckTestingWindow : Window
     appWindow.SetIcon("Assets/Icon.ico");
     
     Title = "Deck Testing";
-    DeckCards = deckCards;
+    CardDeck = cardDeck;
 
     (Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
     AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
@@ -26,7 +26,7 @@ public sealed partial class DeckTestingWindow : Window
     Closed += DeckTestingWindow_Closed;
   }
 
-  public MTGCard[] DeckCards { get; }
+  public MTGCardDeck CardDeck { get; }
 
   private void DeckTestingWindow_Closed(object sender, WindowEventArgs args) => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
 

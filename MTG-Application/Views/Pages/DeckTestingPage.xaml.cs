@@ -35,25 +35,25 @@ public sealed partial class DeckTestingPage : Page
 
   private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
 
-  public MTGCard[] DeckCards
+  public MTGCardDeck CardDeck
   {
-    get => (MTGCard[])GetValue(DeckCardsProperty);
+    get => (MTGCardDeck)GetValue(CardDeckProperty);
     set
     {
-      SetValue(DeckCardsProperty, value);
-      MTGDeckTestingViewModel.DeckCards = value;
+      SetValue(CardDeckProperty, value);
+      MTGDeckTestingViewModel.CardDeck = value;
       MTGDeckTestingViewModel.NewGame();
     }
   }
-  public Vector2 BattlefieldCardDimensions { get; } = new(179 * 1.2f, 250 * 1.2f);
+  public Vector2 BattlefieldCardDimensions { get; } = new(215, 300);
   
   [ObservableProperty]
   private Visibility libraryVisibility = Visibility.Collapsed;
 
   public ICommand LibraryVisibilitySwitchCommand;
 
-  public static readonly DependencyProperty DeckCardsProperty =
-      DependencyProperty.Register(nameof(DeckCards), typeof(MTGCard[]), typeof(DeckTestingPage), new PropertyMetadata(Array.Empty<MTGCard>()));
+  public static readonly DependencyProperty CardDeckProperty =
+      DependencyProperty.Register(nameof(CardDeck), typeof(MTGCardDeck), typeof(DeckTestingPage), new PropertyMetadata(null));
 
   public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; } = new(new ScryfallAPI());
 
