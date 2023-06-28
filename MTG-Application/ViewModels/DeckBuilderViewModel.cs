@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
+using Microsoft.UI.Xaml;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
+using MTGApplication.Views.Pages;
+using MTGApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -96,7 +99,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
       /// </summary>
       public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !string.IsNullOrEmpty(OracleText)
-        || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(cmc);
+        || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(Cmc);
 
       /// <summary>
       /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
@@ -588,6 +591,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
 
     DeckCards.PropertyChanged += Cardlist_PropertyChanged;
+    DeckCards.PropertyChanged += DeckCards_PropertyChanged;
     WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
     MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
 
@@ -596,20 +600,35 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     UpdateCharts();
   }
 
-  private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckCards_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(Cardlist.IsBusy))
+    if(e.PropertyName == nameof(Cardlist.CardlistSize))
     {
-      IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
+      OnPropertyChanged(nameof(DeckSize));
     }
-    else if (e.PropertyName == nameof(HasUnsavedChanges))
-    { OnPropertyChanged(nameof(HasUnsavedChanges)); }
   }
 
   private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(CardDeck.Name))
-    { OnPropertyChanged(nameof(CardDeckName)); }
+    switch (e.PropertyName)
+    {
+      case nameof(CardDeck.Commander):
+      case nameof(CardDeck.CommanderPartner):
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckSize));
+        break;
+    }
+  }
+
+  private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(Cardlist.IsBusy):
+        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
+        break;
+      case nameof(HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
+    }
   }
 
   private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -617,30 +636,20 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (e.PropertyName == nameof(CardDeck))
     {
       CardDeck.PropertyChanged += CardDeck_PropertyChanged;
-
       DeckCards.CardDeck = CardDeck;
       WishlistCards.CardDeck = CardDeck;
       MaybelistCards.CardDeck = CardDeck;
       CommandService.Clear();
       UpdateCharts();
-      OnPropertyChanged(nameof(CardDeckName));
     }
   }
 
+  [ObservableProperty, NotifyCanExecuteChangedFor(nameof(OpenPlaytestWindowCommand))]
   private MTGCardDeck cardDeck = new();
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
   private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
-  private MTGCardDeck CardDeck
-  {
-    get => cardDeck;
-    set
-    {
-      cardDeck = value;
-      OnPropertyChanged(nameof(CardDeck));
-    }
-  }
 
   [ObservableProperty]
   private MTGManaProductionPieChart manaProductionChart;
@@ -685,7 +694,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       MaybelistCards.SortDirection = value;
     }
   }
-  public string CardDeckName => CardDeck.Name;
+  public int DeckSize => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
 
   #region ISavable implementation
   public bool HasUnsavedChanges
@@ -754,7 +763,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Deletes current deck from the database
   /// </summary>
-  [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckDialogCommand))]
+  [RelayCommand(CanExecute = nameof(DeckLoaded))]
   public async Task DeleteDeckDialog()
   {
     if (!await DeckRepository.Exists(CardDeck.Name))
@@ -821,6 +830,24 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToArray();
     await Dialogs.GetTokenPrintDialog(tokens).ShowAsync();
   }
+
+  /// <summary>
+  /// Opens Deck testing page on a new window for the given deck
+  /// </summary>
+  [RelayCommand(CanExecute = nameof(DeckLoaded))]
+  public void OpenPlaytestWindow(MTGCardDeck deck)
+  {
+    if (string.IsNullOrEmpty(deck.Name)) { return; }
+
+    var testingWindow = new DeckTestingWindow(deck);
+    testingWindow.Activate();
+  }
+
+  [RelayCommand]
+  public void SetCommander(MTGCard card) => CardDeck.Commander = card;
+
+  [RelayCommand]
+  public void SetCommanderPartner(MTGCard card) => CardDeck.CommanderPartner = card;
   #endregion
 
   /// <summary>
@@ -876,16 +903,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private async Task SaveDeck(string name)
   {
     IsBusy = true;
-    var tempDeck = new MTGCardDeck() // Temp deck that is copy of the current deck
-    {
-      Name = name,
-      DeckCards = CardDeck.DeckCards,
-      Maybelist = CardDeck.Maybelist,
-      Wishlist = CardDeck.Wishlist,
-    };
+    var tempDeck = CardDeck.GetCopy();
+    tempDeck.Name = name;
     if (await Task.Run(() => DeckRepository.AddOrUpdate(tempDeck)))
     {
-      if (!string.IsNullOrEmpty(CardDeckName) && name != CardDeckName)
+      // TODO: can the temp deck be moved to the AddOrUpdate method?
+      // Maybe add Remove(string name) method?
+      if (!string.IsNullOrEmpty(CardDeck?.Name) && name != CardDeck.Name)
       {
         await DeckRepository.Remove(CardDeck); // Delete old deck if the name was changed
       }
@@ -941,5 +965,5 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
   }
 
-  private bool CanExecuteDeleteDeckDialogCommand() => !string.IsNullOrEmpty(CardDeck.Name);
+  private bool DeckLoaded() => !string.IsNullOrEmpty(CardDeck.Name);
 }

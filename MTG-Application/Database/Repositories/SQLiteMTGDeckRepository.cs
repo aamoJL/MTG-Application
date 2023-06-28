@@ -58,7 +58,13 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
   public virtual async Task<MTGCardDeck> Get(string name)
   {
     using var db = cardDbContextFactory.CreateDbContext();
-    var deck = db.MTGDecks.Where(x => x.Name == name).Include(x => x.DeckCards).Include(x => x.WishlistCards).Include(x => x.MaybelistCards).FirstOrDefault();
+    var deck = db.MTGDecks.Where(x => x.Name == name)
+      .Include(x => x.DeckCards)
+      .Include(x => x.WishlistCards)
+      .Include(x => x.MaybelistCards)
+      .Include(x => x.Commander)
+      .Include(x => x.CommanderPartner)
+      .FirstOrDefault();
     return await deck.AsMTGCardDeck(CardAPI);
   }
 
@@ -75,7 +81,13 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
   public virtual async Task<bool> Update(MTGCardDeck item)
   {
     using var db = cardDbContextFactory.CreateDbContext();
-    if (await db.MTGDecks.Where(x => x.Name == item.Name).Include(x => x.DeckCards).Include(x => x.WishlistCards).Include(x => x.MaybelistCards).FirstOrDefaultAsync() is MTGCardDeckDTO deckDTO)
+    if (db.MTGDecks.Where(x => x.Name == item.Name)
+      .Include(x => x.DeckCards)
+      .Include(x => x.WishlistCards)
+      .Include(x => x.MaybelistCards)
+      .Include(x => x.Commander)
+      .Include(x => x.CommanderPartner)
+      .FirstOrDefault() is MTGCardDeckDTO deckDTO)
     {
       // Remove unused cards from the database
       List<Guid> deckCardIds = new(item.DeckCards.Select(x => x.Info.ScryfallId).ToList());
@@ -110,6 +122,24 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
         { cdto.Count = card.Count; }
         else
         { deckDTO.MaybelistCards.Add(new MTGCardDTO(card)); }
+      }
+
+      // Remove old commander and add new one if the commander changed
+      if(deckDTO.Commander?.Name != item.Commander?.Info.Name)
+      {
+        if(deckDTO.Commander != null)
+        {
+          _ = db.Remove(deckDTO.Commander);
+        }
+        deckDTO.Commander = item.Commander != null ? new(item.Commander) : null;
+      }
+      if (deckDTO.CommanderPartner?.Name != item.CommanderPartner?.Info.Name)
+      {
+        if(deckDTO.CommanderPartner != null)
+        {
+          _ = db.Remove(deckDTO.CommanderPartner);
+        }
+        deckDTO.CommanderPartner = item.CommanderPartner != null ? new(item.CommanderPartner) : null;
       }
 
       var updatedDTO = db.Update(deckDTO);

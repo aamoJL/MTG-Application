@@ -11,7 +11,8 @@
   xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
   xmlns:customcontrols="using:MTGApplication.Views.Controls"
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-  xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
+  xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI" 
+  xmlns:converters="using:MTGApplication.Views.BindingHelpers.Converters"
   mc:Ignorable="d">
 
   <UserControl.Resources>
@@ -140,12 +141,19 @@
         </Grid>
       </StackPanel>
     </DataTemplate>
+
+    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
+    </Style>
+
+    <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter"/>
   </UserControl.Resources>
 
   <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
     <Grid.KeyboardAccelerators>
       <KeyboardAccelerator Key="Escape" Invoked="Root_KeyboardAccelerator_Invoked"/>
     </Grid.KeyboardAccelerators>
+    
     <VisualStateManager.VisualStateGroups>
       
       <VisualStateGroup x:Name="CardSearchDisplayStates">
@@ -189,7 +197,7 @@
       <VisualStateGroup x:Name="DeckNameTitleSaveStatus">
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.CardDeckName, Mode=OneWay}" To="{x:Bind sys:String.Empty}"/>
+            <triggers:IsEqualStateTrigger Value="{x:Bind DeckBuilderViewModel.CardDeck.Name, Mode=OneWay}" To="{x:Bind sys:String.Empty}"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SelectedDeckNameTitle.Text" Value="Unsaved"/>
@@ -322,7 +330,7 @@
                             Padding="0 0 10 10" 
                             Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
           <!--Sidebar-->
-          <TabView controls:DockPanel.Dock="Right" 
+          <TabView controls:DockPanel.Dock="Right"
                    IsAddTabButtonVisible="False" 
                    Width="250" 
                    Margin="10 7 0 0" 
@@ -336,11 +344,38 @@
                 <Grid RowSpacing="5" Margin="0 5 0 0">
                   <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
-                  <customcontrols:LinedHeader Grid.Row="0">
+                  <StackPanel Grid.Row="0" Orientation="Vertical" DataContext="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}">
+                    <TextBlock Text="Commander: " 
+                               TextTrimming="CharacterEllipsis"
+                               AllowDrop="True"
+                               DragOver="CommanderView_DragOver"
+                               Drop="CommanderView_Drop">
+                      <Run Text="{Binding Commander.Info.Name}"/>
+                      <TextBlock.ContextFlyout>
+                        <MenuFlyout>
+                          <MenuFlyoutItem IsEnabled="{Binding Commander, FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderCommand}" CommandParameter="{x:Null}"/>
+                        </MenuFlyout>
+                      </TextBlock.ContextFlyout>
+                    </TextBlock>
+                    <TextBlock Text="Partner: " 
+                               TextTrimming="CharacterEllipsis"
+                               AllowDrop="True"
+                               DragOver="CommanderPartnerView_DragOver"
+                               Drop="CommanderPartnerView_Drop">
+                      <Run Text="{Binding CommanderPartner.Info.Name}"/>
+                      <TextBlock.ContextFlyout>
+                        <MenuFlyout>
+                          <MenuFlyoutItem IsEnabled="{Binding CommanderPartner, FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderPartnerCommand}" CommandParameter="{x:Null}"/>
+                        </MenuFlyout>
+                      </TextBlock.ContextFlyout>
+                    </TextBlock>
+                  </StackPanel>
+                  <customcontrols:LinedHeader Grid.Row="1">
                     <customcontrols:LinedHeader.Header>
                       <TextBlock Text="Maybe">
                         <TextBlock.ContextFlyout>
@@ -356,7 +391,7 @@
                       </TextBlock>
                     </customcontrols:LinedHeader.Header>
                   </customcontrols:LinedHeader>
-                  <ListView Grid.Row="1"
+                  <ListView Grid.Row="2"
                             x:Name="DeckMaybeDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
                             ItemsSource="{Binding FilteredAndSortedCardViewModels}"
@@ -371,7 +406,7 @@
                             ItemTemplate="{StaticResource SideListViewItemTemplate}"
                             KeyDown="CardView_KeyDown"
                             LosingFocus="CardView_LosingFocus"/>
-                  <customcontrols:LinedHeader Grid.Row="2">
+                  <customcontrols:LinedHeader Grid.Row="3">
                     <customcontrols:LinedHeader.Header>
                       <TextBlock Text="Wishlist">
                         <TextBlock.ContextFlyout>
@@ -387,7 +422,7 @@
                       </TextBlock>
                     </customcontrols:LinedHeader.Header>
                   </customcontrols:LinedHeader>
-                  <ListView Grid.Row="3"
+                  <ListView Grid.Row="4"
                             x:Name="DeckWishlistDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
                             ItemsSource="{Binding FilteredAndSortedCardViewModels}"
@@ -411,7 +446,13 @@
                         <Run Text="Price:" />
                         <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckCards.EuroPrice), Mode=OneWay}" />
                     </TextBlock>
-                    <Button Content="Show tokens" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <Button Content="Show tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                      <Button Content="Playtest" 
+                              Style="{StaticResource PrimaryButtonStyle}" 
+                              Command="{x:Bind DeckBuilderViewModel.OpenPlaytestWindowCommand}" 
+                              CommandParameter="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}"/>
+                    </StackPanel>
                     <!--Charts-->
                     <customcontrols:LinedHeader>
                       <customcontrols:LinedHeader.Header>
@@ -589,8 +630,8 @@
             </StackPanel>
             <!--Info-->
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-              <TextBlock x:Name="SelectedDeckNameTitle" Text="{x:Bind DeckBuilderViewModel.CardDeckName, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
-              <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckCards.CardlistSize), Mode=OneWay}" HorizontalAlignment="Right"/>
+              <TextBlock x:Name="SelectedDeckNameTitle" Text="{x:Bind DeckBuilderViewModel.CardDeck.Name, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
+              <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckSize), Mode=OneWay}" HorizontalAlignment="Right"/>
               <StackPanel.ContextFlyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False">
                   <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" Text="Import..."/>

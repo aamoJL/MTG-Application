@@ -5,8 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
-using static MTGApplication.Services.DialogService;
+using MTGApplication.Extensions;
 
 namespace MTGApplication.Services;
 
@@ -65,7 +64,7 @@ public static class DialogService
       dialog.Loaded += (sender, e) =>
       {
         var root = VisualTreeHelper.GetParent(dialog);
-        var smokeLayer = FindByName(root, "SmokeLayerBackground") as FrameworkElement;
+        var smokeLayer = root.FindChildByName("SmokeLayerBackground") as FrameworkElement;
         var pressed = false;
 
         smokeLayer.PointerPressed += (sender, e) =>
@@ -413,7 +412,7 @@ public static class DialogService
       dialog.Loaded += (sender, e) =>
       {
         var root = VisualTreeHelper.GetParent(dialog);
-        var primaryButton = FindByName(root, "PrimaryButton") as Button;
+        var primaryButton = root.FindChildByName("PrimaryButton") as Button;
 
         // Add event to click the primary button when selected item has been double tapped.
         (dialog.Content as GridView).DoubleTapped += (sender, e) =>
@@ -465,34 +464,5 @@ public static class DialogService
     }
 
     protected virtual void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e) => CurrentDialog.Hide();
-  }
-
-  /// <summary>
-  /// Returns <see cref="DependencyObject"/> from the <paramref name="root"/> that has the given <paramref name="name"/>
-  /// Searches every child element and child of the children elements
-  /// </summary>
-  private static DependencyObject FindByName(DependencyObject root, string name)
-  {
-    var childCount = VisualTreeHelper.GetChildrenCount(root);
-    for (var i = 0; i < childCount; i++)
-    {
-      var child = VisualTreeHelper.GetChild(root, i);
-      if (child is not null)
-      {
-        if (child.GetValue(FrameworkElement.NameProperty) is string value && value == name)
-        {
-          return child;
-        }
-        else
-        {
-          var recursiveResult = FindByName(child, name);
-          if (recursiveResult is not null && recursiveResult.GetValue(FrameworkElement.NameProperty) is string recValue && recValue == name)
-          {
-            return recursiveResult;
-          }
-        }
-      }
-    }
-    return null;
   }
 }

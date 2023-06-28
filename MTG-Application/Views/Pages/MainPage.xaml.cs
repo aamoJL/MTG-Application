@@ -6,7 +6,7 @@ using MTGApplication.Services;
 using System.Windows.Input;
 using Windows.UI;
 
-namespace MTGApplication.Pages;
+namespace MTGApplication.Views.Pages;
 
 /// <summary>
 /// Code behind for MainPage
@@ -16,6 +16,7 @@ public sealed partial class MainPage : Page
   private readonly int notificationDuration = 5000;
 
   public ICommand ChangeThemeCommand { get; }
+  public ICommand OpenWindowCommand { get; }
 
   public MainPage()
   {

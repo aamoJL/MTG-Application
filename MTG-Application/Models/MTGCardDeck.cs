@@ -22,6 +22,10 @@ public partial class MTGCardDeck : ObservableObject
 
   [ObservableProperty]
   private string name = "";
+  [ObservableProperty]
+  private MTGCard commander;
+  [ObservableProperty]
+  private MTGCard commanderPartner;
 
   public ObservableCollection<MTGCard> DeckCards { get; set; } = new();
   public ObservableCollection<MTGCard> Wishlist { get; set; } = new();
@@ -76,6 +80,23 @@ public partial class MTGCardDeck : ObservableObject
     { return; }
     collection.Remove(card);
   }
+
+  /// <summary>
+  /// Returns copy of the card deck.
+  /// Used for saving the deck to a database
+  /// </summary>
+  public MTGCardDeck GetCopy()
+  {
+    return new()
+    {
+      Name = Name,
+      Commander = Commander,
+      CommanderPartner = CommanderPartner,
+      DeckCards = DeckCards,
+      Maybelist = Maybelist,
+      Wishlist = Wishlist,
+    };
+  }
 }
 
 /// <summary>
@@ -87,6 +108,8 @@ public class MTGCardDeckDTO
   public MTGCardDeckDTO(MTGCardDeck deck)
   {
     Name = deck.Name;
+    Commander = deck.Commander != null ? new(deck.Commander) : null;
+    CommanderPartner = deck.CommanderPartner != null ? new(deck.CommanderPartner) : null;
     DeckCards = deck.DeckCards.Select(x => new MTGCardDTO(x)).ToList();
     WishlistCards = deck.Wishlist.Select(x => new MTGCardDTO(x)).ToList();
     MaybelistCards = deck.Maybelist.Select(x => new MTGCardDTO(x)).ToList();
@@ -95,6 +118,9 @@ public class MTGCardDeckDTO
   [Key]
   public int Id { get; init; }
   public string Name { get; init; }
+
+  public MTGCardDTO Commander { get; set; }
+  public MTGCardDTO CommanderPartner { get; set; }
 
   [InverseProperty(nameof(MTGCardDTO.DeckCards))]
   public List<MTGCardDTO> DeckCards { get; init; } = new();
@@ -111,6 +137,8 @@ public class MTGCardDeckDTO
     return new MTGCardDeck()
     {
       Name = Name,
+      Commander = Commander != null ? (await api.FetchFromDTOs(new CardDTO[] { Commander })).Found.FirstOrDefault() : null,
+      CommanderPartner = CommanderPartner != null ? (await api.FetchFromDTOs(new CardDTO[] { CommanderPartner })).Found.FirstOrDefault() : null,
       DeckCards = new((await api.FetchFromDTOs(DeckCards.ToArray())).Found),
       Wishlist = new((await api.FetchFromDTOs(WishlistCards.ToArray())).Found),
       Maybelist = new((await api.FetchFromDTOs(MaybelistCards.ToArray())).Found),
