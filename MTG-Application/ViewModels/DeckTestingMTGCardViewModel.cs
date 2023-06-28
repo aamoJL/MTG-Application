@@ -12,6 +12,7 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
   public DeckTestingMTGCardViewModel(MTGCard model) : base(model) { }
 
   private int plusCounters = 0;
+  private int countCounters = 1;
 
   [ObservableProperty]
   private bool isTapped = false;
@@ -21,9 +22,20 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
     get => plusCounters;
     set
     {
-      value = value < 0 ? 0 : value;
+      value = value < 0 ? 0 : value; // Value can't be under 0
       plusCounters = value;
       OnPropertyChanged(nameof(PlusCounters));
+    }
+  }
+
+  public int CountCounters
+  {
+    get => countCounters;
+    set
+    {
+      value = value < 1 ? 1 : value; // Value must ne over 0
+      countCounters = value;
+      OnPropertyChanged(nameof(CountCounters));
     }
   }
 
@@ -32,4 +44,10 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
 
   [RelayCommand]
   public void DecreasePlusCounters() => PlusCounters--;
+
+  [RelayCommand]
+  public void IncreaseCountCounters() => CountCounters++;
+
+  [RelayCommand]
+  public void DecreaseCountCounters() => CountCounters--;
 }

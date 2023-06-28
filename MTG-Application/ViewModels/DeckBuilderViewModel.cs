@@ -99,7 +99,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
       /// </summary>
       public bool FiltersApplied => !string.IsNullOrEmpty(NameText) || !string.IsNullOrEmpty(TypeText) || !string.IsNullOrEmpty(OracleText)
-        || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(cmc);
+        || !White || !Blue || !Black || !Red || !Green || !Colorless || ColorGroup != ColorGroups.All || !double.IsNaN(Cmc);
 
       /// <summary>
       /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters

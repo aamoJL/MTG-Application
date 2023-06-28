@@ -404,7 +404,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   private void NewCollection()
   {
     Collection = new MTGCardCollection();
-    hasUnsavedChanges = false;
+    HasUnsavedChanges = false;
   }
   
   /// <summary>

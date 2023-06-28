@@ -89,7 +89,7 @@ public partial class MTGCardDeck : ObservableObject
   {
     return new()
     {
-      Name = name,
+      Name = Name,
       Commander = Commander,
       CommanderPartner = CommanderPartner,
       DeckCards = DeckCards,

@@ -40,4 +40,39 @@ public class DeckTestingMTGCardViewModelTests
     vm.DecreasePlusCounters();
     Assert.AreEqual(vm.PlusCounters, counters);
   }
+
+  [TestMethod]
+  public void IncreaseCountCountersTest()
+  {
+    var vm = new DeckTestingMTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+
+    Assert.AreEqual(vm.CountCounters, 1);
+
+    vm.IncreaseCountCounters();
+    Assert.AreEqual(vm.CountCounters, 2);
+  }
+
+  [TestMethod]
+  public void DecreaseCountCountersTest()
+  {
+    var counters = 2;
+    var vm = new DeckTestingMTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel()) { CountCounters = counters };
+
+    Assert.AreEqual(vm.CountCounters, counters);
+
+    vm.DecreaseCountCounters();
+    Assert.AreEqual(vm.CountCounters, counters - 1);
+  }
+
+  [TestMethod]
+  public void DecreaseCountCountersTest_One()
+  {
+    var counters = 1;
+    var vm = new DeckTestingMTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel()) { CountCounters = counters };
+
+    Assert.AreEqual(vm.CountCounters, counters);
+
+    vm.DecreaseCountCounters();
+    Assert.AreEqual(vm.CountCounters, counters);
+  }
 }

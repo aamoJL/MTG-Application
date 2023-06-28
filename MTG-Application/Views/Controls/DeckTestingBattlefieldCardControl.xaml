@@ -12,7 +12,7 @@
 
   <UserControl.Resources>
     <local:PlusCounterConverter x:Key="PlusCounterConverter"/>
-    <local:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
+    <local:IntMoreThanToVisibilityConverter x:Key="IntMoreThanToVisibilityConverter"/>
     <local:BoolToIntConverter x:Key="BoolToIntConverter"/>
   </UserControl.Resources>
 
@@ -23,8 +23,12 @@
     <Grid.ContextFlyout>
       <MenuFlyout AreOpenCloseAnimationsEnabled="False">
         <MenuFlyoutItem Icon="sync" Text="Flip" Command="{Binding FlipCardCommand}"/>
+        <MenuFlyoutSeparator/>
         <MenuFlyoutItem Icon="add" Text="Add +1/+1 Counter" Command="{Binding IncreasePlusCountersCommand}"/>
         <MenuFlyoutItem Icon="remove" Text="Remove +1/+1 Counter" Command="{Binding DecreasePlusCountersCommand}"/>
+        <MenuFlyoutSeparator/>
+        <MenuFlyoutItem Icon="add" Text="Add Count Counter" Command="{Binding IncreaseCountCountersCommand}"/>
+        <MenuFlyoutItem Icon="remove" Text="Remove Count Counter" Command="{Binding DecreaseCountCountersCommand}"/>
       </MenuFlyout>
     </Grid.ContextFlyout>
     <controls:ImageEx MaxWidth="{x:Bind CardWidth}"
@@ -34,13 +38,14 @@
                       IsCacheEnabled="True"
                       Source="{Binding SelectedFaceUri}"
                       Style="{StaticResource PreviewImagePlaceholderStyle}"/>
+    <!--Plus Counters-->
     <Grid Margin="25 40" 
           Width="50"
           Height="50"
           HorizontalAlignment="Left" 
           VerticalAlignment="Top"
           RenderTransformOrigin="0.5,0.5"
-          Visibility="{Binding PlusCounters, Converter={StaticResource IntToVisibilityConverter}}">
+          Visibility="{Binding PlusCounters, Converter={StaticResource IntMoreThanToVisibilityConverter}, ConverterParameter='0'}">
       <Grid.RenderTransform>
         <RotateTransform Angle="{Binding IsTapped, Converter={StaticResource BoolToIntConverter}, ConverterParameter='-90'}"/>
       </Grid.RenderTransform>
@@ -65,6 +70,43 @@
                  VerticalAlignment="Center" 
                  HorizontalAlignment="Center"
                  Margin="0 0 5 5"
+                 Foreground="White"
+                 FontSize="24"
+                 FontWeight="Bold">
+      </TextBlock>
+    </Grid>
+    <!--Count Counters-->
+    <Grid Margin="25 40" 
+          Width="50"
+          Height="50"
+          HorizontalAlignment="Right" 
+          VerticalAlignment="Top"
+          RenderTransformOrigin="0.5,0.5"
+          Visibility="{Binding CountCounters, Converter={StaticResource IntMoreThanToVisibilityConverter}, ConverterParameter='1'}">
+      <Grid.RenderTransform>
+        <RotateTransform Angle="{Binding IsTapped, Converter={StaticResource BoolToIntConverter}, ConverterParameter='-90'}"/>
+      </Grid.RenderTransform>
+      <Ellipse>
+        <Ellipse.Fill>
+          <RadialGradientBrush
+                Center="0.5,0.5"
+                InterpolationSpace="RgbLinear"
+                GradientOrigin="0.35,0.35"
+                Opacity=".7"
+                RadiusX="0.5"
+                RadiusY="0.5"
+                SpreadMethod="Pad">
+            <GradientStop Color="White" Offset="0" />
+            <GradientStop Color="Blue" Offset="0.1" />
+            <GradientStop Color="#0000B0" Offset="0.8" />
+            <GradientStop Color="#000050" Offset="1" />
+          </RadialGradientBrush>
+        </Ellipse.Fill>
+      </Ellipse>
+      <TextBlock Text="{Binding CountCounters}" 
+                 VerticalAlignment="Center" 
+                 HorizontalAlignment="Center"
+                 Margin="0 0 0 5"
                  Foreground="White"
                  FontSize="24"
                  FontWeight="Bold">
