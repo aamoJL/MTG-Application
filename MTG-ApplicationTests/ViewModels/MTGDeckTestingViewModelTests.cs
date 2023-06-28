@@ -65,12 +65,12 @@ public class MTGDeckTestingViewModelTests
   [TestMethod]
   public void DrawTest_EmptyLibrary()
   {
-    var vm = Init(1);
+    var vm = Init(8);
 
     vm.Draw();
     vm.Draw();
     Assert.AreEqual(0, vm.Library.Count);
-    Assert.AreEqual(1, vm.Hand.Count);
+    Assert.AreEqual(8, vm.Hand.Count);
   }
 
   [TestMethod]
@@ -89,7 +89,7 @@ public class MTGDeckTestingViewModelTests
   public void LibraryAddTopTest()
   {
     var vm = Init(5);
-    var newCard = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    var newCard = new DeckTestingMTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     vm.LibraryAddBottom(newCard);
     Assert.AreEqual(newCard, vm.Library.First());
@@ -99,7 +99,7 @@ public class MTGDeckTestingViewModelTests
   public void LibraryAddBottomTest()
   {
     var vm = Init(5);
-    var newCard = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    var newCard = new DeckTestingMTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     vm.LibraryAddBottom(newCard);
     Assert.AreEqual(newCard, vm.Library.Last());

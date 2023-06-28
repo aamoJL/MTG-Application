@@ -26,12 +26,12 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     }
   }
 
-  public ObservableCollection<MTGCardViewModel> Library { get; set; } = new();
-  public ObservableCollection<MTGCardViewModel> Graveyard { get; set; } = new();
-  public ObservableCollection<MTGCardViewModel> Exile { get; set; } = new();
-  public ObservableCollection<MTGCardViewModel> Hand { get; set; } = new();
-  public ObservableCollection<MTGCardViewModel> Tokens { get; set; } = new();
-  public ObservableCollection<MTGCardViewModel> CommandZone { get; set; } = new();
+  public ObservableCollection<DeckTestingMTGCardViewModel> Library { get; set; } = new();
+  public ObservableCollection<DeckTestingMTGCardViewModel> Graveyard { get; set; } = new();
+  public ObservableCollection<DeckTestingMTGCardViewModel> Exile { get; set; } = new();
+  public ObservableCollection<DeckTestingMTGCardViewModel> Hand { get; set; } = new();
+  public ObservableCollection<DeckTestingMTGCardViewModel> Tokens { get; set; } = new();
+  public ObservableCollection<DeckTestingMTGCardViewModel> CommandZone { get; set; } = new();
 
   public event Action NewGameStarted;
 
@@ -59,7 +59,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
       }
     }
 
-    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToList();
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new DeckTestingMTGCardViewModel(x)).ToList();
     tokens.ForEach(x => Tokens.Add(x));
   }
 
@@ -122,7 +122,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     }
   }
 
-  public void LibraryAddBottom(MTGCardViewModel card) => Library.Add(card);
+  public void LibraryAddBottom(DeckTestingMTGCardViewModel card) => Library.Add(card);
 
-  public void LibraryAddTop(MTGCardViewModel card) => Library.Insert(0, card);
+  public void LibraryAddTop(DeckTestingMTGCardViewModel card) => Library.Insert(0, card);
 }
