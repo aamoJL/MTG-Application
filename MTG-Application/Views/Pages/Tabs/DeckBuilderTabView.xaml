@@ -18,13 +18,11 @@
   <UserControl.Resources>
     <!--Search-->
     <DataTemplate x:Key="SearchImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
-      <StackPanel 
-        Orientation="Vertical">
+      <StackPanel Orientation="Vertical">
         <Grid>
-          <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}"
-                            Style="{StaticResource PlaceholderImageStyle}">
+          <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}">
             <controls:ImageEx.ContextFlyout>
-              <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+              <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints..."/>
@@ -46,6 +44,7 @@
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
             <MenuFlyoutSeparator />
+            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints..."/>
             <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
             <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
           </MenuFlyout>
@@ -62,17 +61,26 @@
         <Grid>
           <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
             <controls:ImageEx.ContextFlyout>
-              <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
-                <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
-                <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Change print..."/>
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
-                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Text="Delete"/>
-              </MenuFlyout>
+              <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+                <CommandBarFlyout.PrimaryCommands>
+                  <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" />
+                  <AppBarSeparator />
+                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}"/>
+                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+                  <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+                </CommandBarFlyout.PrimaryCommands>
+                <CommandBarFlyout.SecondaryCommands>
+                  <AppBarButton Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+                  <!-- Count controls -->
+                  <AppBarSeparator/>
+                  <AppBarElementContainer AllowFocusOnInteraction="True">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+                      <NumberBox Grid.Column="1" Value="{x:Bind Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
+                    </StackPanel>
+                  </AppBarElementContainer>
+                </CommandBarFlyout.SecondaryCommands>
+              </CommandBarFlyout>
             </controls:ImageEx.ContextFlyout>
           </controls:ImageEx>
         </Grid>
@@ -90,17 +98,26 @@
                   PointerExited="CardListViewItem_PointerExited"
                   PointerMoved="CardListViewItem_PointerMoved">
         <StackPanel.ContextFlyout>
-          <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-            <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
-            <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
-            <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
-            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
-            <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
-          </MenuFlyout>
+          <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+            <CommandBarFlyout.PrimaryCommands>
+              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" />
+              <AppBarSeparator />
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+              <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+            </CommandBarFlyout.PrimaryCommands>
+            <CommandBarFlyout.SecondaryCommands>
+              <AppBarButton Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+              <!-- Count controls -->
+              <AppBarSeparator/>
+              <AppBarElementContainer AllowFocusOnInteraction="True">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+                  <NumberBox Grid.Column="1" Value="{x:Bind Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
+                </StackPanel>
+              </AppBarElementContainer>
+            </CommandBarFlyout.SecondaryCommands>
+          </CommandBarFlyout>
         </StackPanel.ContextFlyout>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}" Width="30"/>
         <Image Width="20" Source="{x:Bind Model.Info.SetIconUri}"/>
@@ -117,17 +134,26 @@
                   PointerExited="CardListViewItem_PointerExited"
                   PointerMoved="CardListViewItem_PointerMoved">
         <StackPanel.ContextFlyout>
-          <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-            <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
-            <MenuFlyoutItem Command="{x:Bind IncreaseCountCommand}" Icon="Add" Text="Add"/>
-            <MenuFlyoutItem Command="{x:Bind DecreaseCountCommand}" Icon="Remove" Text="Remove"/>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{Binding Model}" Icon="BrowsePhotos" Text="Change print..."/>
-            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
-            <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind DeleteCardCommand}" CommandParameter="{Binding Model}" Background="IndianRed" Icon="delete" Text="Delete"/>
-          </MenuFlyout>
+          <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+            <CommandBarFlyout.PrimaryCommands>
+              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" />
+              <AppBarSeparator />
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+              <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+            </CommandBarFlyout.PrimaryCommands>
+            <CommandBarFlyout.SecondaryCommands>
+              <AppBarButton Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+              <!-- Count controls -->
+              <AppBarSeparator/>
+              <AppBarElementContainer AllowFocusOnInteraction="True">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+                  <NumberBox Grid.Column="1" Value="{x:Bind Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
+                </StackPanel>
+              </AppBarElementContainer>
+            </CommandBarFlyout.SecondaryCommands>
+          </CommandBarFlyout>
         </StackPanel.ContextFlyout>
         <Grid HorizontalAlignment="Stretch" ColumnSpacing="10">
           <Grid.ColumnDefinitions>

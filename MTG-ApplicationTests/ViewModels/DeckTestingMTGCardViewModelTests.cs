@@ -13,7 +13,7 @@ public class DeckTestingMTGCardViewModelTests
 
     Assert.AreEqual(vm.PlusCounters, 0);
 
-    vm.IncreasePlusCounters();
+    vm.PlusCounters++;
     Assert.AreEqual(vm.PlusCounters, 1);
   }
 
@@ -25,7 +25,7 @@ public class DeckTestingMTGCardViewModelTests
 
     Assert.AreEqual(vm.PlusCounters, counters);
 
-    vm.DecreasePlusCounters();
+    vm.PlusCounters--;
     Assert.AreEqual(vm.PlusCounters, counters - 1);
   }
 
@@ -37,7 +37,7 @@ public class DeckTestingMTGCardViewModelTests
 
     Assert.AreEqual(vm.PlusCounters, counters);
 
-    vm.DecreasePlusCounters();
+    vm.PlusCounters--;
     Assert.AreEqual(vm.PlusCounters, counters);
   }
 
@@ -48,7 +48,7 @@ public class DeckTestingMTGCardViewModelTests
 
     Assert.AreEqual(vm.CountCounters, 1);
 
-    vm.IncreaseCountCounters();
+    vm.CountCounters++;
     Assert.AreEqual(vm.CountCounters, 2);
   }
 
@@ -60,7 +60,7 @@ public class DeckTestingMTGCardViewModelTests
 
     Assert.AreEqual(vm.CountCounters, counters);
 
-    vm.DecreaseCountCounters();
+    vm.CountCounters--;
     Assert.AreEqual(vm.CountCounters, counters - 1);
   }
 
@@ -72,7 +72,7 @@ public class DeckTestingMTGCardViewModelTests
 
     Assert.AreEqual(vm.CountCounters, counters);
 
-    vm.DecreaseCountCounters();
+    vm.CountCounters--;
     Assert.AreEqual(vm.CountCounters, counters);
   }
 }

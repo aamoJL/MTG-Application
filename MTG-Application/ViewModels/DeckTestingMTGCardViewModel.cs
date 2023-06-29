@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Models;
 
 namespace MTGApplication.ViewModels;
@@ -27,7 +26,6 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
       OnPropertyChanged(nameof(PlusCounters));
     }
   }
-
   public int CountCounters
   {
     get => countCounters;
@@ -38,16 +36,4 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
       OnPropertyChanged(nameof(CountCounters));
     }
   }
-
-  [RelayCommand]
-  public void IncreasePlusCounters() => PlusCounters++;
-
-  [RelayCommand]
-  public void DecreasePlusCounters() => PlusCounters--;
-
-  [RelayCommand]
-  public void IncreaseCountCounters() => CountCounters++;
-
-  [RelayCommand]
-  public void DecreaseCountCounters() => CountCounters--;
 }

@@ -160,8 +160,12 @@ public partial class MTGCard : ObservableObject
     get => count;
     set
     {
-      count = Math.Max(1, value);
-      OnPropertyChanged(nameof(Count));
+      value = Math.Max(1, value);
+      if(count != value)
+      {
+        count = value;
+        OnPropertyChanged(nameof(Count));
+      }
     }
   }
 

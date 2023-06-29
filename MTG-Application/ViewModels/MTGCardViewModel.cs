@@ -25,15 +25,14 @@ public partial class MTGCardViewModel : ViewModelBase
   }
   protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(Model.Count))
+    switch (e.PropertyName)
     {
-      DecreaseCountCommand.NotifyCanExecuteChanged();
-      OnPropertyChanged(nameof(Count));
-    }
-    else if (e.PropertyName == nameof(Model.Info))
-    {
-      OnPropertyChanged(nameof(SelectedFaceUri));
-      OnPropertyChanged(nameof(Price));
+      case nameof(Model.Count):
+        OnPropertyChanged(nameof(Count)); break;
+      case nameof(Model.Info):
+        OnPropertyChanged(nameof(SelectedFaceUri));
+        OnPropertyChanged(nameof(Price));
+        break;
     }
   }
 
@@ -56,7 +55,7 @@ public partial class MTGCardViewModel : ViewModelBase
   public float Price => Model.Info.Price;
   public string Name => Model.Info.Name;
   public int CMC => Model.Info.CMC;
-  public int Count => Model.Count;
+  public int Count { get => Model.Count; set => Model.Count = value; }
   #endregion
 
   public ICommand DeleteCardCommand { get; set; }
@@ -85,23 +84,8 @@ public partial class MTGCardViewModel : ViewModelBase
   public async Task OpenCardmarketWebsite() => await IOService.OpenUri(Model.Info.CardMarketUri);
 
   /// <summary>
-  /// Increases count by one
+  /// Returns name of the property that the given sort property uses
   /// </summary>
-  [RelayCommand]
-  public void IncreaseCount() => Model.Count++;
-
-  /// <summary>
-  /// Decreases count by one if possible
-  /// </summary>
-  [RelayCommand(CanExecute = nameof(CanExecuteDecreaseCountCommand))]
-  public void DecreaseCount()
-  {
-    if (Model.Count > 0)
-    { Model.Count--; }
-  }
-
-  protected bool CanExecuteDecreaseCountCommand() => Model.Count > 1;
-
   public static string GetPropertyName(MTGSortProperty prop)
   {
     return prop switch

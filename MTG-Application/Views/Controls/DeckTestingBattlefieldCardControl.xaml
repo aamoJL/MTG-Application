@@ -6,7 +6,8 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-  xmlns:viewmodels="using:MTGApplication.ViewModels"
+  xmlns:viewmodels="using:MTGApplication.ViewModels" 
+  xmlns:ui="using:CommunityToolkit.WinUI.UI"
   d:DataContext="{d:DesignInstance Type=viewmodels:DeckTestingMTGCardViewModel}"
   mc:Ignorable="d">
 
@@ -21,15 +22,18 @@
       <RotateTransform Angle="{Binding IsTapped, Converter={StaticResource BoolToIntConverter}, ConverterParameter='90'}"/>
     </Grid.RenderTransform>
     <Grid.ContextFlyout>
-      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-        <MenuFlyoutItem Icon="sync" Text="Flip" Command="{Binding FlipCardCommand}"/>
-        <MenuFlyoutSeparator/>
-        <MenuFlyoutItem Icon="add" Text="Add +1/+1 Counter" Command="{Binding IncreasePlusCountersCommand}"/>
-        <MenuFlyoutItem Icon="remove" Text="Remove +1/+1 Counter" Command="{Binding DecreasePlusCountersCommand}"/>
-        <MenuFlyoutSeparator/>
-        <MenuFlyoutItem Icon="add" Text="Add Count Counter" Command="{Binding IncreaseCountCountersCommand}"/>
-        <MenuFlyoutItem Icon="remove" Text="Remove Count Counter" Command="{Binding DecreaseCountCountersCommand}"/>
-      </MenuFlyout>
+      <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+        <CommandBarFlyout.PrimaryCommands>
+          <AppBarButton Command="{Binding FlipCardCommand}" Icon="sync" Label="Flip" />
+          <AppBarSeparator />
+          <AppBarButton Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Label="{Binding ModelAPIName}"/>
+          <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+        </CommandBarFlyout.PrimaryCommands>
+        <CommandBarFlyout.SecondaryCommands>
+          <AppBarButton Label="Toggle +1/+1 counters" Click="PlusCounterFlyoutButton_Click"/>
+          <AppBarButton Label="Toggle count counters" Click="CountCounterFlyoutButton_Click"/>
+        </CommandBarFlyout.SecondaryCommands>
+      </CommandBarFlyout>
     </Grid.ContextFlyout>
     <controls:ImageEx MaxWidth="{x:Bind CardWidth}"
                       MaxHeight="{x:Bind CardHeight}"
@@ -39,13 +43,15 @@
                       Source="{Binding SelectedFaceUri}"
                       Style="{StaticResource PreviewImagePlaceholderStyle}"/>
     <!--Plus Counters-->
-    <Grid Margin="25 40" 
+    <Grid x:Name="PlusCounter" 
+          Margin="25 40" 
           Width="50"
           Height="50"
           HorizontalAlignment="Left" 
           VerticalAlignment="Top"
           RenderTransformOrigin="0.5,0.5"
-          Visibility="{Binding PlusCounters, Converter={StaticResource IntMoreThanToVisibilityConverter}, ConverterParameter='0'}">
+          Visibility="Collapsed"
+          PointerWheelChanged="PlusCounter_PointerWheelChanged">
       <Grid.RenderTransform>
         <RotateTransform Angle="{Binding IsTapped, Converter={StaticResource BoolToIntConverter}, ConverterParameter='-90'}"/>
       </Grid.RenderTransform>
@@ -76,13 +82,15 @@
       </TextBlock>
     </Grid>
     <!--Count Counters-->
-    <Grid Margin="25 40" 
+    <Grid x:Name="CountCounter"
+          Margin="25 40" 
           Width="50"
           Height="50"
           HorizontalAlignment="Right" 
           VerticalAlignment="Top"
           RenderTransformOrigin="0.5,0.5"
-          Visibility="{Binding CountCounters, Converter={StaticResource IntMoreThanToVisibilityConverter}, ConverterParameter='1'}">
+          Visibility="Collapsed"
+          PointerWheelChanged="CountCounter_PointerWheelChanged">
       <Grid.RenderTransform>
         <RotateTransform Angle="{Binding IsTapped, Converter={StaticResource BoolToIntConverter}, ConverterParameter='-90'}"/>
       </Grid.RenderTransform>

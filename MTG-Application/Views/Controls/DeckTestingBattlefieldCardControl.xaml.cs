@@ -34,6 +34,36 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
       card.IsTapped = !card.IsTapped;
     }
   }
+
+  private void PlusCounterFlyoutButton_Click(object sender, RoutedEventArgs e) 
+    => PlusCounter.Visibility = PlusCounter.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+
+  private void CountCounterFlyoutButton_Click(object sender, RoutedEventArgs e) 
+    => CountCounter.Visibility = CountCounter.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+
+  private void PlusCounter_PointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if(e.GetCurrentPoint(null).Properties.MouseWheelDelta > 0)
+    {
+      (DataContext as DeckTestingMTGCardViewModel).PlusCounters++;
+    }
+    else
+    {
+      (DataContext as DeckTestingMTGCardViewModel).PlusCounters--;
+    }
+  }
+
+  private void CountCounter_PointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if (e.GetCurrentPoint(null).Properties.MouseWheelDelta > 0)
+    {
+      (DataContext as DeckTestingMTGCardViewModel).CountCounters++;
+    }
+    else
+    {
+      (DataContext as DeckTestingMTGCardViewModel).CountCounters--;
+    }
+  }
 }
 
 #region Value Converters

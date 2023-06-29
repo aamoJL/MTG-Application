@@ -157,6 +157,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
     }
 
+    /// <summary>
+    /// Commands that can be undone and redone
+    /// </summary>
     public static class CardlistCommands
     {
       public class AddCardsToCardlistCommand : ICommand
@@ -625,8 +628,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     switch (e.PropertyName)
     {
       case nameof(Cardlist.IsBusy):
-        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy;
-        break;
+        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy; break;
       case nameof(HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
     }
   }
@@ -763,7 +765,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Deletes current deck from the database
   /// </summary>
-  [RelayCommand(CanExecute = nameof(DeckLoaded))]
+  [RelayCommand(CanExecute = nameof(DeckIsLoaded))]
   public async Task DeleteDeckDialog()
   {
     if (!await DeckRepository.Exists(CardDeck.Name))
@@ -834,7 +836,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Opens Deck testing page on a new window for the given deck
   /// </summary>
-  [RelayCommand(CanExecute = nameof(DeckLoaded))]
+  [RelayCommand(CanExecute = nameof(DeckIsLoaded))]
   public void OpenPlaytestWindow(MTGCardDeck deck)
   {
     if (string.IsNullOrEmpty(deck.Name)) { return; }
@@ -965,5 +967,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
   }
 
-  private bool DeckLoaded() => !string.IsNullOrEmpty(CardDeck.Name);
+  /// <summary>
+  /// Returns true if deck has been loaded from a database
+  /// </summary>
+  private bool DeckIsLoaded() => !string.IsNullOrEmpty(CardDeck.Name);
 }
