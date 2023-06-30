@@ -13,6 +13,7 @@ using MTGApplication.ViewModels;
 using System;
 using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
+using static MTGApplication.ViewModels.DeckBuilderViewModel;
 
 namespace MTGApplication.Views.Pages.Tabs;
 
@@ -51,10 +52,28 @@ public sealed partial class DeckBuilderTabView : UserControl
   public void SwitchSearchPanel() => SearchPanelOpen = !SearchPanelOpen;
 
   #region Pointer Events
-  // Prevents dropping to the same element as the element that started the dragging
-  private object draggedElement;
 
-  private void CardListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
+  /// <summary>
+  /// Custom drag and drop args.
+  /// This class is used for card drag and drop actions because the default drag and drop system did not work well with async methods.
+  /// </summary>
+  private class DragArgs
+  {
+    public DragArgs(object dragStartElement, Cardlist dragOrigin, MTGCard dragItem)
+    {
+      DragStartElement = dragStartElement;
+      DragOriginList = dragOrigin;
+      DragItem = dragItem;
+    }
+
+    public object DragStartElement { get; set; }
+    public Cardlist DragOriginList { get; set; }
+    public MTGCard DragItem { get; set; }
+  }
+
+  private DragArgs dragArgs;
+
+  private void PreviewableCard_PointerEntered(object sender, PointerRoutedEventArgs e)
   {
     // Change card preview image to hovered item
     if (sender is FrameworkElement { DataContext: MTGCardViewModel cardVM })
@@ -64,7 +83,7 @@ public sealed partial class DeckBuilderTabView : UserControl
     }
   }
 
-  private void CardListViewItem_PointerMoved(object sender, PointerRoutedEventArgs e)
+  private void PreviewableCard_PointerMoved(object sender, PointerRoutedEventArgs e)
   {
     // Move card preview image to mouse position when hovering over on list view item.
     // The position is clamped to element size
@@ -81,7 +100,7 @@ public sealed partial class DeckBuilderTabView : UserControl
     PreviewImage.SetValue(Canvas.TopProperty, Math.Max(Math.Clamp(pointerPosition.Y + yOffsetFromPointer, 0, Math.Max(ActualSize.Y - PreviewImage.ActualHeight, 0)), 0));
   }
 
-  private void CardListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
+  private void PreviewableCard_PointerExited(object sender, PointerRoutedEventArgs e)
   {
     PreviewImage.Visibility = Visibility.Collapsed;
     // Change placeholder image to the old hovered card's image so the placeholder won't flicker
@@ -94,17 +113,18 @@ public sealed partial class DeckBuilderTabView : UserControl
     {
       e.Data.SetText(vm.Model.ToJSON());
       e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-      draggedElement = sender;
+      var originList = (sender as FrameworkElement).DataContext as Cardlist;
+      dragArgs = new(sender, originList, vm.Model);
     }
   }
 
   private void CardView_DragOver(object sender, DragEventArgs e)
   {
-    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
+    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(dragArgs?.DragStartElement))
     {
       // Change operation to 'Move' if the shift key is down
       e.AcceptedOperation =
-        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift) 
+        (e.Modifiers & global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift)
         == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
         ? DataPackageOperation.Move : DataPackageOperation.Copy;
     }
@@ -112,12 +132,28 @@ public sealed partial class DeckBuilderTabView : UserControl
 
   private async void CardView_Drop(object sender, DragEventArgs e)
   {
-    if (e.DataView.Contains(StandardDataFormats.Text))
-    {
-      var def = e.GetDeferral();
-      var data = await e.DataView.GetTextAsync();
+    var def = e.GetDeferral();
+    var data = await e.DataView.GetTextAsync();
+    var operation = e.AcceptedOperation;
+    var targetList = (sender as FrameworkElement).DataContext as Cardlist;
 
-      if (sender is FrameworkElement { DataContext: DeckBuilderViewModel.Cardlist cardlist })
+    if (!string.IsNullOrEmpty(data))
+    {
+      if (dragArgs?.DragOriginList != null && dragArgs?.DragItem != null)
+      {
+        // Dragged from cardlist
+        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+        {
+          await targetList?.AddToCardlist(dragArgs.DragItem);
+        }
+        else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
+        {
+          await targetList?.MoveToCardlist(dragArgs.DragItem, dragArgs.DragOriginList);
+        }
+      }
+      else if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
+        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
+        && !string.IsNullOrEmpty(data))
       {
         var card = new Func<MTGCard>(() =>
         {
@@ -134,49 +170,32 @@ public sealed partial class DeckBuilderTabView : UserControl
 
         if (card != null)
         {
-          // Card was dragged from MTGApplication
-          if (cardlist.AddToCardlistCommand.CanExecute(card))
-          {
-            cardlist.AddToCardlistCommand.Execute(card);
-          }
+          await targetList?.AddToCardlist(card);
         }
         else
         {
-          // Try to import from EDHREC URL
           if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == "edhrec.com")
           {
+            // Try to import from EDHREC URL
             var cardName = uri.Segments[^1];
-            await cardlist.ImportCards(cardName);
+            await targetList?.ImportCards(cardName);
           }
           else
           {
             // Try to import from string
-            await cardlist.ImportCards(data);
+            await targetList?.ImportCards(data);
           }
         }
       }
-      def.Complete();
     }
+
+    dragArgs = null;
+    def.Complete();
   }
 
-  private void CardView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-  {
-    // Remove original item if the operation is 'Move'
-    if ((args.DropResult & DataPackageOperation.Move) == DataPackageOperation.Move
-      && args.Items[0] is MTGCardViewModel cardVM
-      && sender is FrameworkElement { DataContext: DeckBuilderViewModel.Cardlist cardlist })
-    {
-      if (cardlist.RemoveFromCardlistCommand.CanExecute(cardVM.Model))
-      {
-        cardlist.RemoveFromCardlistCommand.Execute(cardVM.Model);
-      }
-    }
-    draggedElement = null;
-  }
-  
   private void CommanderView_DragOver(object sender, DragEventArgs e)
   {
-    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
+    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(dragArgs?.DragStartElement))
     {
       // Change operation to 'Move' if the shift key is down
       e.AcceptedOperation =
@@ -184,42 +203,62 @@ public sealed partial class DeckBuilderTabView : UserControl
         == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
         ? DataPackageOperation.Move : DataPackageOperation.Copy;
 
-      e.DragUIOverride.Caption = "Set as Commander";
+      if (e.AcceptedOperation == DataPackageOperation.Move) { e.DragUIOverride.Caption = "Move to Commander"; }
+      else if (e.AcceptedOperation == DataPackageOperation.Copy) { e.DragUIOverride.Caption = "Copy to Commander"; }
+
       e.DragUIOverride.IsContentVisible = false;
     }
   }
-  
+
   private async void CommanderView_Drop(object sender, DragEventArgs e)
   {
-    if (e.DataView.Contains(StandardDataFormats.Text))
+    var def = e.GetDeferral();
+    var data = await e.DataView.GetTextAsync();
+    var operation = e.AcceptedOperation;
+
+    if (!string.IsNullOrEmpty(data))
     {
-      var def = e.GetDeferral();
-      var data = await e.DataView.GetTextAsync();
-
-      var card = new Func<MTGCard>(() =>
+      if (dragArgs?.DragOriginList != null && dragArgs?.DragItem != null)
       {
-        // Try to import from JSON
-        try
+        // Dragged from cardlist
+        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
         {
-          var card = JsonSerializer.Deserialize<MTGCard>(data);
-          if (string.IsNullOrEmpty(card?.Info.Name))
-          { throw new Exception("Card does not have name"); }
-          return card;
+          DeckBuilderViewModel.SetCommander(dragArgs.DragItem);
         }
-        catch { return null; }
-      })();
-
-      if (card != null && DeckBuilderViewModel.CardDeck != null)
-      {
-        DeckBuilderViewModel.SetCommander(card);
+        else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
+        {
+          DeckBuilderViewModel.MoveToCommander(dragArgs.DragItem, dragArgs.DragOriginList);
+        }
       }
-      def.Complete();
+      else if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
+        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
+        && !string.IsNullOrEmpty(data))
+      {
+        var card = new Func<MTGCard>(() =>
+        {
+          // Try to import from JSON
+          try
+          {
+            var card = JsonSerializer.Deserialize<MTGCard>(data);
+            if (string.IsNullOrEmpty(card?.Info.Name))
+            { throw new Exception("Card does not have name"); }
+            return card;
+          }
+          catch { return null; }
+        })();
+
+        if (card != null)
+        {
+          DeckBuilderViewModel.SetCommander(card);
+        }
+      }
     }
+    def.Complete();
   }
 
   private void CommanderPartnerView_DragOver(object sender, DragEventArgs e)
   {
-    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(draggedElement))
+    if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(dragArgs?.DragStartElement))
     {
       // Change operation to 'Move' if the shift key is down
       e.AcceptedOperation =
@@ -227,37 +266,57 @@ public sealed partial class DeckBuilderTabView : UserControl
         == global::Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
         ? DataPackageOperation.Move : DataPackageOperation.Copy;
 
-      e.DragUIOverride.Caption = "Set as Partner";
+      if (e.AcceptedOperation == DataPackageOperation.Move) { e.DragUIOverride.Caption = "Move to Partner"; }
+      else if (e.AcceptedOperation == DataPackageOperation.Copy) { e.DragUIOverride.Caption = "Copy to Partner"; }
+
       e.DragUIOverride.IsContentVisible = false;
     }
   }
 
   private async void CommanderPartnerView_Drop(object sender, DragEventArgs e)
   {
-    if (e.DataView.Contains(StandardDataFormats.Text))
+    var def = e.GetDeferral();
+    var data = await e.DataView.GetTextAsync();
+    var operation = e.AcceptedOperation;
+
+    if (!string.IsNullOrEmpty(data))
     {
-      var def = e.GetDeferral();
-      var data = await e.DataView.GetTextAsync();
-
-      var card = new Func<MTGCard>(() =>
+      if (dragArgs?.DragOriginList != null && dragArgs?.DragItem != null)
       {
-        // Try to import from JSON
-        try
+        // Dragged from cardlist
+        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
         {
-          var card = JsonSerializer.Deserialize<MTGCard>(data);
-          if (string.IsNullOrEmpty(card?.Info.Name))
-          { throw new Exception("Card does not have name"); }
-          return card;
+          DeckBuilderViewModel.SetCommanderPartner(dragArgs.DragItem);
         }
-        catch { return null; }
-      })();
-
-      if (card != null && DeckBuilderViewModel.CardDeck != null)
-      {
-        DeckBuilderViewModel.SetCommanderPartner(card);
+        else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
+        {
+          DeckBuilderViewModel.MoveToCommanderPartner(dragArgs.DragItem, dragArgs.DragOriginList);
+        }
       }
-      def.Complete();
+      else if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
+        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
+        && !string.IsNullOrEmpty(data))
+      {
+        var card = new Func<MTGCard>(() =>
+        {
+          // Try to import from JSON
+          try
+          {
+            var card = JsonSerializer.Deserialize<MTGCard>(data);
+            if (string.IsNullOrEmpty(card?.Info.Name))
+            { throw new Exception("Card does not have name"); }
+            return card;
+          }
+          catch { return null; }
+        })();
+
+        if (card != null)
+        {
+          DeckBuilderViewModel.SetCommanderPartner(card);
+        }
+      }
     }
+    def.Complete();
   }
 
   #endregion
@@ -277,4 +336,15 @@ public sealed partial class DeckBuilderTabView : UserControl
   }
 
   private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args) => DeckBuilderViewModel.CardFilters.Reset();
+
+  private void CommanderView_DragStarting(UIElement sender, DragStartingEventArgs args)
+  {
+    if ((sender as FrameworkElement).DataContext is MTGCardViewModel vm && vm != null)
+    {
+      args.Data.SetText(vm.Model.ToJSON());
+      args.Data.RequestedOperation = DataPackageOperation.Copy;
+      dragArgs = new(sender, null, vm.Model);
+    }
+    else { args.Cancel = true; }
+  }
 }

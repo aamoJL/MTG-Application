@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Enums;
+using static MTGApplication.Services.CommandService;
 
 namespace MTGApplication.Models;
 
@@ -15,6 +16,148 @@ namespace MTGApplication.Models;
 /// </summary>
 public partial class MTGCardDeck : ObservableObject
 {
+  public class MTGCardDeckCommands
+  {
+    public class AddCardsToCardlistCommand : ICommand
+    {
+      private MTGCardDeck CardDeck { get; }
+      private CardlistType ListType { get; }
+      private MTGCard[] Cards { get; }
+
+      public AddCardsToCardlistCommand(MTGCardDeck cardDeck, CardlistType listType, MTGCard[] cards)
+      {
+        CardDeck = cardDeck;
+        ListType = listType;
+        Cards = cards;
+      }
+
+      public void Execute()
+      {
+        if (CardDeck == null)
+          return;
+        foreach (var item in Cards)
+        {
+          CardDeck.AddToCardlist(ListType, item);
+        }
+      }
+
+      public void Undo()
+      {
+        if (CardDeck == null)
+          return;
+        var cardlist = CardDeck.GetCardlist(ListType);
+        foreach (var item in Cards)
+        {
+          if (cardlist.FirstOrDefault(x => x.Info.Name == item.Info.Name) is MTGCard existingCard)
+          {
+            if (existingCard.Count <= item.Count)
+            {
+              CardDeck.RemoveFromCardlist(ListType, existingCard);
+            }
+            else
+            {
+              existingCard.Count -= item.Count;
+            }
+          }
+        }
+      }
+    }
+
+    public class RemoveCardsFromCardlistCommand : ICommand
+    {
+      private MTGCardDeck CardDeck { get; }
+      private CardlistType ListType { get; }
+      private MTGCard[] Cards { get; }
+
+      public RemoveCardsFromCardlistCommand(MTGCardDeck deck, CardlistType listType, MTGCard[] cards)
+      {
+        CardDeck = deck;
+        ListType = listType;
+        Cards = cards;
+      }
+
+      public void Execute()
+      {
+        if (CardDeck == null)
+          return;
+        foreach (var item in Cards)
+        {
+          CardDeck.RemoveFromCardlist(ListType, item);
+        }
+      }
+
+      public void Undo()
+      {
+        if (CardDeck == null)
+          return;
+        foreach (var item in Cards)
+        {
+          CardDeck.AddToCardlist(ListType, item);
+        }
+      }
+    }
+
+    public class SetCommanderCommand : ICommand
+    {
+      private MTGCardDeck CardDeck { get; }
+      private MTGCard NewCommander { get; set; }
+      private MTGCard OriginalCommander { get; set; }
+
+      public SetCommanderCommand(MTGCardDeck cardDeck, MTGCard commander)
+      {
+        CardDeck = cardDeck;
+        NewCommander = commander;
+        OriginalCommander = CardDeck?.Commander;
+      }
+
+      public void Execute()
+      {
+        if(CardDeck != null)
+        {
+          CardDeck.Commander = NewCommander;
+        }
+      }
+
+      public void Undo()
+      {
+        if (CardDeck != null)
+        {
+          CardDeck.Commander = OriginalCommander;
+        }
+      }
+    }
+
+    public class SetCommanderPartnerCommand : ICommand
+    {
+      private MTGCardDeck CardDeck { get; }
+      private MTGCard NewPartner { get; set; }
+      private MTGCard OriginalPartner { get; set; }
+
+      public SetCommanderPartnerCommand(MTGCardDeck cardDeck, MTGCard partner)
+      {
+        CardDeck = cardDeck;
+        NewPartner = partner;
+        OriginalPartner = CardDeck?.CommanderPartner;
+      }
+
+      public void Execute()
+      {
+        if (CardDeck != null)
+        {
+          CardDeck.CommanderPartner = NewPartner;
+        }
+      }
+
+      public void Undo()
+      {
+        if (CardDeck != null)
+        {
+          CardDeck.CommanderPartner = OriginalPartner;
+        }
+      }
+    }
+  }
+
   public enum CombineProperty
   {
     Name, Id

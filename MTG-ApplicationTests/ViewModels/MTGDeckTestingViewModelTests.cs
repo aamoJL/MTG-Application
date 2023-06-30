@@ -46,6 +46,7 @@ public class MTGDeckTestingViewModelTests
     Assert.AreEqual(0, vm.Exile.Count);
     Assert.AreEqual(0, vm.Graveyard.Count);
     Assert.AreEqual(2, vm.CommandZone.Count);
+    Assert.AreEqual(0, vm.TurnCount);
     CollectionAssert.AreNotEqual(unsortedLibrary.ToArray(), vm.Library.ToArray());
   }
 
@@ -71,6 +72,16 @@ public class MTGDeckTestingViewModelTests
     vm.Draw();
     Assert.AreEqual(0, vm.Library.Count);
     Assert.AreEqual(8, vm.Hand.Count);
+  }
+
+  [TestMethod]
+  public void NewTurnTest()
+  {
+    var vm = Init(20);
+
+    vm.NewTurn();
+    Assert.AreEqual(8, vm.Hand.Count);
+    Assert.AreEqual(1, vm.TurnCount);
   }
 
   [TestMethod]

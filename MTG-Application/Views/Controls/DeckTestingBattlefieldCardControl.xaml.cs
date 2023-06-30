@@ -27,9 +27,9 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
   public static readonly DependencyProperty CardHeightProperty =
       DependencyProperty.Register(nameof(CardHeight), typeof(float), typeof(DeckTestingBattlefieldCardControl), new PropertyMetadata(0));
 
-  private void Root_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+  private void Root_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
   {
-    if(DataContext is DeckTestingMTGCardViewModel card and not null)
+    if (DataContext is DeckTestingMTGCardViewModel card and not null)
     {
       card.IsTapped = !card.IsTapped;
     }

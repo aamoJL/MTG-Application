@@ -14,6 +14,32 @@ public partial class CommandService
     public void Undo();
   }
 
+  /// <summary>
+  /// Command that executes multiple commands at once
+  /// </summary>
+  public class CombinedCommand : ICommand
+  {
+    private ICommand[] Commands { get; }
+
+    public CombinedCommand(ICommand[] commands) => Commands = commands;
+
+    public void Execute()
+    {
+      foreach (var command in Commands)
+      {
+        command.Execute();
+      }
+    }
+
+    public void Undo()
+    {
+      foreach (var command in Commands)
+      {
+        command.Undo();
+      }
+    }
+  }
+
   // TODO: Limit undo stack?
   public Stack<ICommand> UndoCommandStack { get; } = new();
   public Stack<ICommand> RedoCommandStack { get; } = new();

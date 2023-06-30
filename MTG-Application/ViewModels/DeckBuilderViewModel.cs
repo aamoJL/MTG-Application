@@ -1,12 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
-using Microsoft.UI.Xaml;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
-using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -157,91 +155,6 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
     }
 
-    /// <summary>
-    /// Commands that can be undone and redone
-    /// </summary>
-    public static class CardlistCommands
-    {
-      public class AddCardsToCardlistCommand : ICommand
-      {
-        private MTGCardDeck CardDeck { get; }
-        private CardlistType ListType { get; }
-        private MTGCard[] Cards { get; }
-
-        public AddCardsToCardlistCommand(MTGCardDeck cardDeck, CardlistType listType, MTGCard[] cards)
-        {
-          CardDeck = cardDeck;
-          ListType = listType;
-          Cards = cards;
-        }
-
-        public void Execute()
-        {
-          if (CardDeck == null)
-            return;
-          foreach (var item in Cards)
-          {
-            CardDeck.AddToCardlist(ListType, item);
-          }
-        }
-
-        public void Undo()
-        {
-          if (CardDeck == null)
-            return;
-          var cardlist = CardDeck.GetCardlist(ListType);
-          foreach (var item in Cards)
-          {
-            if (cardlist.FirstOrDefault(x => x.Info.Name == item.Info.Name) is MTGCard existingCard)
-            {
-              if (existingCard.Count <= item.Count)
-              {
-                CardDeck.RemoveFromCardlist(ListType, existingCard);
-              }
-              else
-              {
-                existingCard.Count -= item.Count;
-              }
-            }
-          }
-        }
-      }
-
-      public class RemoveCardsFromCardlistCommand : ICommand
-      {
-        MTGCardDeck CardDeck { get; }
-        public CardlistType ListType { get; }
-        public MTGCard[] Cards { get; }
-
-        public RemoveCardsFromCardlistCommand(MTGCardDeck deck, CardlistType listType, MTGCard[] cards)
-        {
-          CardDeck = deck;
-          ListType = listType;
-          Cards = cards;
-        }
-
-        public void Execute()
-        {
-          if (CardDeck == null)
-            return;
-          foreach (var item in Cards)
-          {
-            CardDeck.RemoveFromCardlist(ListType, item);
-          }
-        }
-
-        public void Undo()
-        {
-          if (CardDeck == null)
-            return;
-          foreach (var item in Cards)
-          {
-            CardDeck.AddToCardlist(ListType, item);
-          }
-        }
-      }
-    }
-
     public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default, CommandService commandService = default)
     {
       CardViewModels = new();
@@ -346,8 +259,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     private DeckBuilderViewDialogs Dialogs { get; }
     private ICardAPI<MTGCard> CardAPI { get; }
     private CardFilters Filters { get; set; }
-    private CardlistType ListType { get; }
 
+    public CardlistType ListType { get; }
     public CommandService CommandService { get; }
     public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
     /// <summary>
@@ -358,6 +271,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     /// Returns total euro price of the cardlist cards
     /// </summary>
     public float EuroPrice => (float)Math.Round(CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count), 0);
+    /// <summary>
+    /// Returns the deck's <see cref="MTGCard"/> collection that this cardlist represents
+    /// </summary>
+    public ObservableCollection<MTGCard> CardCollection => CardDeck.GetCardlist(ListType);
 
     #region Relay Commands
     /// <summary>
@@ -388,27 +305,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     }
 
     /// <summary>
-    /// Adds given card to the deck cardlist
-    /// </summary>
-    [RelayCommand]
-    public async Task AddToCardlist(MTGCard card)
-    {
-      if (CardDeck.GetCardlist(ListType).FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
-      {
-        if ((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync()) is true)
-        {
-          CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card }));
-        }
-      }
-      else
-      { CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card })); }
-    }
-
-    /// <summary>
     /// Removes given card from the deck cardlist
     /// </summary>
     [RelayCommand]
-    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new CardlistCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, new[] { card }));
+    public void RemoveFromCardlist(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, new[] { card }));
 
     /// <summary>
     /// Shows a dialog with cards prints and changes the cards print to the selected print
@@ -482,7 +382,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
       if (importCards.Count != 0)
       {
-        CommandService.Execute(new CardlistCommands.AddCardsToCardlistCommand(CardDeck, ListType, importCards.ToArray()));
+        CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, importCards.ToArray()));
       }
 
       if (notFoundCount == 0 && found.Length > 0)
@@ -500,8 +400,49 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     /// Removes all items in the card list
     /// </summary>
     [RelayCommand]
-    public void Clear() => CommandService.Execute(new CardlistCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, CardDeck.GetCardlist(ListType).ToArray()));
+    public void Clear() => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, ListType, CardDeck.GetCardlist(ListType).ToArray()));
     #endregion
+
+    /// <summary>
+    /// Adds given card to the deck cardlist
+    /// </summary>
+    public async Task AddToCardlist(MTGCard card)
+    {
+      if (CardCollection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
+      {
+        if ((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync()) is true)
+        {
+          CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card }));
+        }
+      }
+      else { CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card })); }
+    }
+
+    /// <summary>
+    /// Moves the given card from the origin list to this list
+    /// </summary>
+    public async Task MoveToCardlist(MTGCard card, Cardlist origin)
+    {
+      if (CardCollection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
+      {
+        if ((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync()) is true)
+        {
+          CommandService.Execute(new CombinedCommand(new ICommand[]
+          {
+            new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[]{card}),
+            new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(origin.CardDeck, origin.ListType, new[]{card})
+          }));
+        }
+      }
+      else
+      {
+        CommandService.Execute(new CombinedCommand(new ICommand[]
+          {
+            new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[]{card}),
+            new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(origin.CardDeck, origin.ListType, new[]{card})
+          }));
+      }
+    }
 
     /// <summary>
     /// Adds given <paramref name="cards"/> to <see cref="CardViewModels"/> list as a <see cref="MTGCardViewModel"/>
@@ -605,7 +546,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
   private void DeckCards_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if(e.PropertyName == nameof(Cardlist.CardlistSize))
+    if (e.PropertyName == nameof(Cardlist.CardlistSize))
     {
       OnPropertyChanged(nameof(DeckSize));
     }
@@ -616,7 +557,12 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     switch (e.PropertyName)
     {
       case nameof(CardDeck.Commander):
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckSize));
+        break;
       case nameof(CardDeck.CommanderPartner):
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
@@ -641,18 +587,19 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       DeckCards.CardDeck = CardDeck;
       WishlistCards.CardDeck = CardDeck;
       MaybelistCards.CardDeck = CardDeck;
+      Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
+      CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
       CommandService.Clear();
       UpdateCharts();
     }
   }
 
-  [ObservableProperty, NotifyCanExecuteChangedFor(nameof(OpenPlaytestWindowCommand))]
-  private MTGCardDeck cardDeck = new();
-
   private IRepository<MTGCardDeck> DeckRepository { get; }
   private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
 
+  [ObservableProperty, NotifyCanExecuteChangedFor(nameof(OpenPlaytestWindowCommand))]
+  private MTGCardDeck cardDeck = new();
   [ObservableProperty]
   private MTGManaProductionPieChart manaProductionChart;
   [ObservableProperty]
@@ -663,6 +610,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private MTGColorPieChart colorChart;
   [ObservableProperty]
   private bool isBusy;
+  [ObservableProperty]
+  private MTGCardViewModel commander;
+  [ObservableProperty]
+  private MTGCardViewModel commanderPartner;
 
   public Cardlist DeckCards { get; }
   public Cardlist WishlistCards { get; }
@@ -779,7 +730,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Sorts selected card deck by selected property using given direction
   /// </summary>
-  /// <param name="dir">Sorting direction, NOT case-sensitive</param>
+  /// <param name="dir">"Ascending" or "Descending"</param>
   [RelayCommand]
   public void SortByDirection(string dir)
   {
@@ -846,17 +797,48 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   }
 
   [RelayCommand]
-  public void SetCommander(MTGCard card) => CardDeck.Commander = card;
+  /// <summary>
+  /// Sets deck's commander to the given card
+  /// </summary>
+  public void SetCommander(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderCommand(CardDeck, card));
 
   [RelayCommand]
-  public void SetCommanderPartner(MTGCard card) => CardDeck.CommanderPartner = card;
+  /// <summary>
+  /// Sets deck's commander partner to the given card
+  /// </summary>
+  /// <param name="card"></param>
+  public void SetCommanderPartner(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card));
   #endregion
+  
+  /// <summary>
+  /// Sets deck's commander to the given card and removes the card from the origin
+  /// </summary>
+  public void MoveToCommander(MTGCard card, Cardlist origin)
+  {
+    CommandService.Execute(new CombinedCommand(new ICommand[]
+    {
+      new MTGCardDeck.MTGCardDeckCommands.SetCommanderCommand(CardDeck, card),
+      new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, origin.ListType, new[] { card }),
+    }));
+  }
+
+  /// <summary>
+  /// Sets deck's commander partner to the given card and removes the card from the origin
+  /// </summary>
+  public void MoveToCommanderPartner(MTGCard card, Cardlist origin)
+  {
+    CommandService.Execute(new CombinedCommand(new ICommand[]
+    {
+      new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card),
+      new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, origin.ListType, new[] { card }),
+    }));
+  }
 
   /// <summary>
   /// Asks user if they want to save the deck's unsaved changes.
   /// </summary>
   /// <returns><see langword="true"/>, if user does not cancel any of the dialogs</returns>
-  public async Task<bool> ShowUnsavedDialogs()
+  private async Task<bool> ShowUnsavedDialogs()
   {
     if (HasUnsavedChanges)
     {

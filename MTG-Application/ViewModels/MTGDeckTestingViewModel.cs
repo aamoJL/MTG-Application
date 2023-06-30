@@ -20,7 +20,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
 
   private async void MTGDeckTestingViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if(e.PropertyName == nameof(CardDeck))
+    if (e.PropertyName == nameof(CardDeck))
     {
       await FetchTokens();
     }
@@ -34,6 +34,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   public ObservableCollection<DeckTestingMTGCardViewModel> CommandZone { get; set; } = new();
 
   public event Action NewGameStarted;
+  public event Action NewTurnStarted;
 
   [ObservableProperty]
   private int playerHP = 40;
@@ -41,7 +42,9 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
   private int enemyHP = 40;
   [ObservableProperty]
   private MTGCardDeck cardDeck;
-  
+  [ObservableProperty]
+  private int turnCount;
+
   private ICardAPI<MTGCard> CardAPI { get; }
 
   /// <summary>
@@ -59,10 +62,13 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
       }
     }
 
-    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new DeckTestingMTGCardViewModel(x)).ToList();
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new DeckTestingMTGCardViewModel(x) { IsToken = true }).ToList();
     tokens.ForEach(x => Tokens.Add(x));
   }
 
+  /// <summary>
+  /// Resets game state
+  /// </summary>
   [RelayCommand]
   public void NewGame()
   {
@@ -71,7 +77,8 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     Exile.Clear();
     Hand.Clear();
     CommandZone.Clear();
-    
+
+    TurnCount = 0;
     PlayerHP = 40;
     EnemyHP = 40;
 
@@ -98,6 +105,9 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     NewGameStarted?.Invoke(); // Clear battlefield
   }
 
+  /// <summary>
+  /// Draws a card from the library to the hand
+  /// </summary>
   [RelayCommand]
   public void Draw()
   {
@@ -108,6 +118,20 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     Hand.Add(card);
   }
 
+  /// <summary>
+  /// Untaps all battlefield cards and draws a card from the library to the hand
+  /// </summary>
+  [RelayCommand]
+  public void NewTurn()
+  {
+    TurnCount++;
+    NewTurnStarted?.Invoke();
+    Draw();
+  }
+
+  /// <summary>
+  /// Shuffles the library
+  /// </summary>
   [RelayCommand]
   public void Shuffle()
   {
@@ -122,7 +146,13 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     }
   }
 
+  /// <summary>
+  /// Adds given card to the bottom of the library
+  /// </summary>
   public void LibraryAddBottom(DeckTestingMTGCardViewModel card) => Library.Add(card);
 
+  /// <summary>
+  /// Adds given card to the top of the library
+  /// </summary>
   public void LibraryAddTop(DeckTestingMTGCardViewModel card) => Library.Insert(0, card);
 }

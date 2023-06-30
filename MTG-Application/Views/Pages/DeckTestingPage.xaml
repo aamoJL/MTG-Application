@@ -8,7 +8,7 @@
   xmlns:controls1="using:MTGApplication.Views.Controls" 
   xmlns:viewmodels="using:MTGApplication.ViewModels"
   xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:sys="using:System"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -41,14 +41,38 @@
           <ColumnDefinition Width="auto"/>
           <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" BorderThickness="0 1 1 0" BorderBrush="{ThemeResource RegionBrush}" Margin="10">
-          <Button Command="{x:Bind MTGDeckTestingViewModel.DrawCommand}" 
-                  Content="Draw"
-                  FontSize="24"
-                  FontWeight="Bold"
-                  HorizontalAlignment="Stretch" 
-                  VerticalAlignment="Stretch"
-                  Margin="0 10 10 0"/>
+        <Grid Grid.Column="0" Padding="10 0 0 10">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <controls1:LinedHeader Grid.Row="0" Margin="0 0 10 0">
+            <controls1:LinedHeader.Header>
+              <TextBlock Text="{x:Bind sys:String.Format('Turn {0}', MTGDeckTestingViewModel.TurnCount), Mode=OneWay}"/>
+            </controls1:LinedHeader.Header>
+          </controls1:LinedHeader>
+          <Grid Grid.Row="1" BorderThickness="0 0 1 0" BorderBrush="{ThemeResource RegionBrush}" Padding="0 0 10 0 ">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" 
+                    Command="{x:Bind MTGDeckTestingViewModel.NewTurnCommand}" 
+                    Content="New Turn"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch"
+                    Margin="0 5"/>
+            <Button Grid.Row="1" 
+                    Command="{x:Bind MTGDeckTestingViewModel.DrawCommand}" 
+                    Content="Draw a Card"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch"
+                    Margin="0 5 0 0"/>
+          </Grid>
         </Grid>
         <Grid Grid.Column="1">
           <Grid.RowDefinitions>
@@ -57,7 +81,7 @@
           </Grid.RowDefinitions>
           <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
             <controls1:LinedHeader.Header>
-              <TextBlock Text="Hand"/>
+              <TextBlock Text="{x:Bind sys:String.Format('Hand ({0})', MTGDeckTestingViewModel.Hand.Count), Mode=OneWay}"/>
             </controls1:LinedHeader.Header>
           </controls1:LinedHeader>
           <ListView Grid.Row="1"
@@ -121,7 +145,7 @@
                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
                     BorderBrush="{ThemeResource RegionBrush}"
                     BorderThickness="1 0 0 0"
-                    Padding="0 0 0 10"
+                    Margin="0 0 0 10"
                     PointerReleased="DroppableList_PointerReleased"
                     PointerEntered="Droppable_PointerEntered"
                     PointerExited="Droppable_PointerExited">
@@ -203,7 +227,7 @@
           </Grid.RowDefinitions>
           <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
             <controls1:LinedHeader.Header>
-              <TextBlock Text="Library"/>
+              <TextBlock Text="{x:Bind sys:String.Format('Library ({0})', MTGDeckTestingViewModel.Library.Count), Mode=OneWay}"/>
             </controls1:LinedHeader.Header>
           </controls1:LinedHeader>
           <Grid Grid.Row="1" RowSpacing="10">
@@ -283,7 +307,7 @@
           </Grid.RowDefinitions>
           <controls1:LinedHeader Grid.Row="0" Margin="10 5 10 0">
             <controls1:LinedHeader.Header>
-              <TextBlock Text="Graveyard"/>
+              <TextBlock Text="{x:Bind sys:String.Format('Graveyard ({0})', MTGDeckTestingViewModel.Graveyard.Count), Mode=OneWay}"/>
             </controls1:LinedHeader.Header>
           </controls1:LinedHeader>
           <ListView Grid.Row="1"
@@ -317,7 +341,7 @@
           </Grid.RowDefinitions>
           <controls1:LinedHeader Grid.Row="0" Margin="10 5 10 0">
             <controls1:LinedHeader.Header>
-              <TextBlock Text="Exile"/>
+              <TextBlock Text="{x:Bind sys:String.Format('Exile ({0})', MTGDeckTestingViewModel.Exile.Count), Mode=OneWay}"/>
             </controls1:LinedHeader.Header>
           </controls1:LinedHeader>
           <ListView Grid.Row="1"
@@ -355,8 +379,8 @@
                 PointerExited="Droppable_PointerExited">
         </Canvas>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" Background="{ThemeResource AppBarBackgroundThemeBrush}">
-          <NumberBox Value="{x:Bind MTGDeckTestingViewModel.PlayerHP, Mode=TwoWay}" AcceptsExpression="True" SpinButtonPlacementMode="Compact"/>
-          <NumberBox Value="{x:Bind MTGDeckTestingViewModel.EnemyHP, Mode=TwoWay}" AcceptsExpression="True" SpinButtonPlacementMode="Compact"/>
+          <NumberBox Value="{x:Bind MTGDeckTestingViewModel.PlayerHP, Mode=TwoWay}" AcceptsExpression="True" SpinButtonPlacementMode="Hidden"/>
+          <NumberBox Value="{x:Bind MTGDeckTestingViewModel.EnemyHP, Mode=TwoWay}" AcceptsExpression="True" SpinButtonPlacementMode="Hidden"/>
         </StackPanel>
       </Grid>
     </controls:DockPanel>

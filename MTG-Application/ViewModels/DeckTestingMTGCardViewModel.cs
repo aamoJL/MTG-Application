@@ -36,4 +36,5 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
       OnPropertyChanged(nameof(CountCounters));
     }
   }
+  public bool IsToken { get; init; }
 }

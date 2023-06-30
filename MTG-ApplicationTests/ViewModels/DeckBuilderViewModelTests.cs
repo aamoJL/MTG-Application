@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
+using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
@@ -651,12 +652,44 @@ public class DeckBuilderViewModelTests
   }
 
   [TestMethod]
+  public void SetCommanderCommandTest_UndoRedo()
+  {
+    var vm = new DeckBuilderViewModel(null, null, null);
+    var commanderCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    vm.SetCommander(commanderCard);
+    Assert.AreEqual(commanderCard, vm.CardDeck.Commander);
+
+    vm.CommandService.Undo();
+    Assert.AreEqual(null, vm.CardDeck.Commander);
+
+    vm.CommandService.Redo();
+    Assert.AreEqual(commanderCard, vm.CardDeck.Commander);
+  }
+
+  [TestMethod]
   public void SetCommanderPartnerCommandTest()
   {
     var vm = new DeckBuilderViewModel(null, null, null);
     var PartnerCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
     vm.SetCommanderPartner(PartnerCard);
+    Assert.AreEqual(PartnerCard, vm.CardDeck.CommanderPartner);
+  }
+
+  [TestMethod]
+  public void SetCommanderPartnerCommandTest_UndoRedo()
+  {
+    var vm = new DeckBuilderViewModel(null, null, null);
+    var PartnerCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    vm.SetCommanderPartner(PartnerCard);
+    Assert.AreEqual(PartnerCard, vm.CardDeck.CommanderPartner);
+
+    vm.CommandService.Undo();
+    Assert.AreEqual(null, vm.CardDeck.CommanderPartner);
+
+    vm.CommandService.Redo();
     Assert.AreEqual(PartnerCard, vm.CardDeck.CommanderPartner);
   }
 
@@ -1079,6 +1112,30 @@ public partial class DeckBuilderViewModel_CardlistTests
 
     cardlist.CommandService.Redo();
     Assert.AreEqual(1, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
+  public async Task AddToCardlistCommandTest_Move_UndoRedo()
+  {
+    var commandService = new CommandService();
+    var deck = new MTGCardDeck();
+    var deckCards = new Cardlist(deck, CardlistType.Deck, null, null, commandService: commandService);
+    var wishlist = new Cardlist(deck, CardlistType.Wishlist, null, null, commandService: commandService);
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+
+    await deckCards.AddToCardlist(card);
+
+    await wishlist.MoveToCardlist(card, deckCards);
+    Assert.AreEqual(0, deck.DeckCards.Count);
+    Assert.AreEqual(1, deck.Wishlist.Count);
+
+    commandService.Undo();
+    Assert.AreEqual(1, deck.DeckCards.Count);
+    Assert.AreEqual(0, deck.Wishlist.Count);
+
+    commandService.Redo();
+    Assert.AreEqual(0, deck.DeckCards.Count);
+    Assert.AreEqual(1, deck.Wishlist.Count);
   }
 
   [TestMethod]

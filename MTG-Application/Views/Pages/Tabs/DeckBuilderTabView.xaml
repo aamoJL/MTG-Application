@@ -37,9 +37,9 @@
     </DataTemplate>
     <DataTemplate x:Key="SearchListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel  Style="{StaticResource MTGListViewItemStyle}"
-                   PointerEntered="CardListViewItem_PointerEntered"
-                   PointerExited="CardListViewItem_PointerExited"
-                   PointerMoved="CardListViewItem_PointerMoved">
+                   PointerEntered="PreviewableCard_PointerEntered"
+                   PointerExited="PreviewableCard_PointerExited"
+                   PointerMoved="PreviewableCard_PointerMoved">
         <StackPanel.ContextFlyout>
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -94,9 +94,9 @@
     </DataTemplate>
     <DataTemplate x:Key="DeckListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel Style="{StaticResource MTGListViewItemStyle}"
-                  PointerEntered="CardListViewItem_PointerEntered"
-                  PointerExited="CardListViewItem_PointerExited"
-                  PointerMoved="CardListViewItem_PointerMoved">
+                  PointerEntered="PreviewableCard_PointerEntered"
+                  PointerExited="PreviewableCard_PointerExited"
+                  PointerMoved="PreviewableCard_PointerMoved">
         <StackPanel.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
@@ -130,9 +130,9 @@
     <DataTemplate x:Key="SideListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel Background="Transparent"
                   Height="25"
-                  PointerEntered="CardListViewItem_PointerEntered"
-                  PointerExited="CardListViewItem_PointerExited"
-                  PointerMoved="CardListViewItem_PointerMoved">
+                  PointerEntered="PreviewableCard_PointerEntered"
+                  PointerExited="PreviewableCard_PointerExited"
+                  PointerMoved="PreviewableCard_PointerMoved">
         <StackPanel.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
@@ -375,28 +375,40 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
-                  <StackPanel Grid.Row="0" Orientation="Vertical" DataContext="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}">
-                    <TextBlock Text="Commander: " 
+                  <StackPanel Grid.Row="0" Orientation="Vertical">
+                    <TextBlock DataContext="{x:Bind DeckBuilderViewModel.Commander, Mode=OneWay}"
+                               Text="Commander: " 
                                TextTrimming="CharacterEllipsis"
                                AllowDrop="True"
                                DragOver="CommanderView_DragOver"
-                               Drop="CommanderView_Drop">
-                      <Run Text="{Binding Commander.Info.Name}"/>
+                               Drop="CommanderView_Drop"
+                               CanDrag="True"
+                               PointerEntered="PreviewableCard_PointerEntered"
+                               PointerExited="PreviewableCard_PointerExited"
+                               PointerMoved="PreviewableCard_PointerMoved"
+                               DragStarting="CommanderView_DragStarting">
+                      <Run Text="{Binding Name}"/>
                       <TextBlock.ContextFlyout>
                         <MenuFlyout>
-                          <MenuFlyoutItem IsEnabled="{Binding Commander, FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderCommand}" CommandParameter="{x:Null}"/>
+                          <MenuFlyoutItem IsEnabled="{Binding FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderCommand}" CommandParameter="{x:Null}"/>
                         </MenuFlyout>
                       </TextBlock.ContextFlyout>
                     </TextBlock>
-                    <TextBlock Text="Partner: " 
+                    <TextBlock DataContext="{x:Bind DeckBuilderViewModel.CommanderPartner, Mode=OneWay}"
+                               Text="Partner: " 
                                TextTrimming="CharacterEllipsis"
                                AllowDrop="True"
                                DragOver="CommanderPartnerView_DragOver"
-                               Drop="CommanderPartnerView_Drop">
-                      <Run Text="{Binding CommanderPartner.Info.Name}"/>
+                               Drop="CommanderPartnerView_Drop"
+                               CanDrag="True"
+                               PointerEntered="PreviewableCard_PointerEntered"
+                               PointerExited="PreviewableCard_PointerExited"
+                               PointerMoved="PreviewableCard_PointerMoved"
+                               DragStarting="CommanderView_DragStarting">
+                      <Run Text="{Binding Name}"/>
                       <TextBlock.ContextFlyout>
                         <MenuFlyout>
-                          <MenuFlyoutItem IsEnabled="{Binding CommanderPartner, FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderPartnerCommand}" CommandParameter="{x:Null}"/>
+                          <MenuFlyoutItem IsEnabled="{Binding FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderPartnerCommand}" CommandParameter="{x:Null}"/>
                         </MenuFlyout>
                       </TextBlock.ContextFlyout>
                     </TextBlock>
@@ -428,7 +440,6 @@
                             DragOver="CardView_DragOver"
                             Drop="CardView_Drop"
                             DragItemsStarting="CardView_DragItemsStarting"
-                            DragItemsCompleted="CardView_DragItemsCompleted" 
                             ItemTemplate="{StaticResource SideListViewItemTemplate}"
                             KeyDown="CardView_KeyDown"
                             LosingFocus="CardView_LosingFocus"/>
@@ -459,7 +470,6 @@
                             DragOver="CardView_DragOver"
                             Drop="CardView_Drop"
                             DragItemsStarting="CardView_DragItemsStarting"
-                            DragItemsCompleted="CardView_DragItemsCompleted"
                             ItemTemplate="{StaticResource SideListViewItemTemplate}"
                             KeyDown="CardView_KeyDown"
                             LosingFocus="CardView_LosingFocus"/>
@@ -684,7 +694,6 @@
                                        DragOver="CardView_DragOver"
                                        Drop="CardView_Drop"
                                        DragItemsStarting="CardView_DragItemsStarting"
-                                       DragItemsCompleted="CardView_DragItemsCompleted" 
                                        ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
                                        KeyDown="CardView_KeyDown"
                                        LosingFocus="CardView_LosingFocus"
@@ -700,7 +709,6 @@
                       DragOver="CardView_DragOver"
                       Drop="CardView_Drop"
                       DragItemsStarting="CardView_DragItemsStarting"
-                      DragItemsCompleted="CardView_DragItemsCompleted" 
                       ItemTemplate="{StaticResource DeckListViewItemTemplate}"
                       KeyDown="CardView_KeyDown"
                       LosingFocus="CardView_LosingFocus"/>

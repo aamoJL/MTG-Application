@@ -17,7 +17,7 @@
     <local:BoolToIntConverter x:Key="BoolToIntConverter"/>
   </UserControl.Resources>
 
-  <Grid RenderTransformOrigin="0.5,0.5" DoubleTapped="Root_DoubleTapped">
+  <Grid RenderTransformOrigin="0.5,0.5" Tapped="Root_Tapped">
     <Grid.RenderTransform>
       <RotateTransform Angle="{Binding IsTapped, Converter={StaticResource BoolToIntConverter}, ConverterParameter='90'}"/>
     </Grid.RenderTransform>
