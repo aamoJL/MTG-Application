@@ -280,5 +280,6 @@ public class MTGCardDTO : CardDTO
   public MTGCardDeckDTO DeckCards { get; set; }
   public MTGCardDeckDTO DeckWishlist { get; set; }
   public MTGCardDeckDTO DeckMaybelist { get; set; }
+  public MTGCardDeckDTO DeckRemovelist { get; set; }
   public MTGCardCollectionListDTO CollectionList { get; set; }
 }

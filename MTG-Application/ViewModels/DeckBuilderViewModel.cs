@@ -30,8 +30,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// </summary>
   public class DeckBuilderViewDialogs
   {
-    public virtual ConfirmationDialog GetCardAlreadyInDeckDialog(string name)
-      => new("Card already in the deck") { Message = $"Card '{name}' is already in the deck. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+    public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
+      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual ConfirmationDialog GetOverrideDialog(string name)
       => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
@@ -155,8 +155,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
     }
 
-    public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default, CommandService commandService = default)
+    public Cardlist(MTGCardDeck deck, CardlistType listType, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, IOService.ClipboardService clipboardService = default, CardFilters filters = default, CommandService commandService = default, string name = "")
     {
+      Name = name;
       CardViewModels = new();
       FilteredAndSortedCardViewModels = new(CardViewModels, true);
       FilteredAndSortedCardViewModels.SortDescriptions.Add(new SortDescription(MTGCardViewModel.GetPropertyName(primarySortProperty), sortDirection));
@@ -260,6 +261,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     private ICardAPI<MTGCard> CardAPI { get; }
     private CardFilters Filters { get; set; }
 
+    public string Name { get; }
     public CardlistType ListType { get; }
     public CommandService CommandService { get; }
     public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
@@ -410,7 +412,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     {
       if (CardCollection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
       {
-        if ((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync()) is true)
+        if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync()) is true)
         {
           CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[] { card }));
         }
@@ -425,7 +427,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     {
       if (CardCollection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
       {
-        if ((await Dialogs.GetCardAlreadyInDeckDialog(card.Info.Name).ShowAsync()) is true)
+        if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync()) is true)
         {
           CommandService.Execute(new CombinedCommand(new ICommand[]
           {
@@ -530,14 +532,16 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
 
     clipboardService ??= new();
-    DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
-    WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
-    MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService: clipboardService, CardFilters, CommandService);
+    DeckCards = new Cardlist(CardDeck, CardlistType.Deck, Dialogs, CardAPI, clipboardService, CardFilters, CommandService, "Deck");
+    WishlistCards = new Cardlist(CardDeck, CardlistType.Wishlist, Dialogs, CardAPI, clipboardService, CardFilters, CommandService, "Wishlist");
+    MaybelistCards = new Cardlist(CardDeck, CardlistType.Maybelist, Dialogs, CardAPI, clipboardService, CardFilters, CommandService, "Maybelist");
+    RemovelistCards = new Cardlist(CardDeck, CardlistType.Removelist, Dialogs, CardAPI, clipboardService, CardFilters, CommandService, "Removelist");
 
     DeckCards.PropertyChanged += Cardlist_PropertyChanged;
     DeckCards.PropertyChanged += DeckCards_PropertyChanged;
     WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
     MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
+    RemovelistCards.PropertyChanged += Cardlist_PropertyChanged;
 
     SelectedSortDirection = SortDirection.Ascending;
     SelectedPrimarySortProperty = MTGSortProperty.CMC;
@@ -574,7 +578,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     switch (e.PropertyName)
     {
       case nameof(Cardlist.IsBusy):
-        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy; break;
+        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy || RemovelistCards.IsBusy; break;
       case nameof(HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
     }
   }
@@ -587,6 +591,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       DeckCards.CardDeck = CardDeck;
       WishlistCards.CardDeck = CardDeck;
       MaybelistCards.CardDeck = CardDeck;
+      RemovelistCards.CardDeck = CardDeck;
       Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
       CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
       CommandService.Clear();
@@ -618,6 +623,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   public Cardlist DeckCards { get; }
   public Cardlist WishlistCards { get; }
   public Cardlist MaybelistCards { get; }
+  public Cardlist RemovelistCards { get; }
   public Cardlist.CardFilters CardFilters { get; } = new();
   public CommandService CommandService { get; } = new();
   public MTGSortProperty SelectedPrimarySortProperty
@@ -627,6 +633,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       DeckCards.PrimarySortProperty = value;
       WishlistCards.PrimarySortProperty = value;
       MaybelistCards.PrimarySortProperty = value;
+      RemovelistCards.PrimarySortProperty = value;
     }
   }
   public MTGSortProperty SelectedSecondarySortProperty
@@ -636,6 +643,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       DeckCards.SecondarySortProperty = value;
       WishlistCards.SecondarySortProperty = value;
       MaybelistCards.SecondarySortProperty = value;
+      RemovelistCards.SecondarySortProperty = value;
     }
   }
   public SortDirection SelectedSortDirection
@@ -645,6 +653,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       DeckCards.SortDirection = value;
       WishlistCards.SortDirection = value;
       MaybelistCards.SortDirection = value;
+      RemovelistCards.SortDirection = value;
     }
   }
   public int DeckSize => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
@@ -652,12 +661,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   #region ISavable implementation
   public bool HasUnsavedChanges
   {
-    get => DeckCards.HasUnsavedChanges || WishlistCards.HasUnsavedChanges || MaybelistCards.HasUnsavedChanges;
+    get => DeckCards.HasUnsavedChanges || WishlistCards.HasUnsavedChanges || MaybelistCards.HasUnsavedChanges || RemovelistCards.HasUnsavedChanges;
     set
     {
       DeckCards.HasUnsavedChanges = value;
       WishlistCards.HasUnsavedChanges = value;
       MaybelistCards.HasUnsavedChanges = value;
+      RemovelistCards.HasUnsavedChanges = value;
     }
   }
 
@@ -809,7 +819,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <param name="card"></param>
   public void SetCommanderPartner(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card));
   #endregion
-  
+
   /// <summary>
   /// Sets deck's commander to the given card and removes the card from the origin
   /// </summary>

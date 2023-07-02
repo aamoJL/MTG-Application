@@ -374,6 +374,8 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
                   </Grid.RowDefinitions>
                   <StackPanel Grid.Row="0" Orientation="Vertical">
                     <TextBlock DataContext="{x:Bind DeckBuilderViewModel.Commander, Mode=OneWay}"
@@ -462,6 +464,36 @@
                   <ListView Grid.Row="4"
                             x:Name="DeckWishlistDisplay"
                             DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
+                            ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                            Style="{StaticResource MTGListViewStyle}"
+                            SelectionMode="Single"
+                            CanDragItems="True"
+                            AllowDrop="True"
+                            DragOver="CardView_DragOver"
+                            Drop="CardView_Drop"
+                            DragItemsStarting="CardView_DragItemsStarting"
+                            ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                            KeyDown="CardView_KeyDown"
+                            LosingFocus="CardView_LosingFocus"/>
+                  <customcontrols:LinedHeader Grid.Row="5">
+                    <customcontrols:LinedHeader.Header>
+                      <TextBlock Text="Remove">
+                        <TextBlock.ContextFlyout>
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                            <MenuFlyoutSubItem Text="Export...">
+                              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
+                              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
+                          </MenuFlyout>
+                        </TextBlock.ContextFlyout>
+                      </TextBlock>
+                    </customcontrols:LinedHeader.Header>
+                  </customcontrols:LinedHeader>
+                  <ListView Grid.Row="6"
+                            x:Name="DeckRemovelistDisplay"
+                            DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards}"
                             ItemsSource="{Binding FilteredAndSortedCardViewModels}"
                             Style="{StaticResource MTGListViewStyle}"
                             SelectionMode="Single"
