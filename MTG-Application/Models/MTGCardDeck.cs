@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MTGApplication.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
@@ -173,6 +174,7 @@ public partial class MTGCardDeck : ObservableObject
   public ObservableCollection<MTGCard> DeckCards { get; set; } = new();
   public ObservableCollection<MTGCard> Wishlist { get; set; } = new();
   public ObservableCollection<MTGCard> Maybelist { get; set; } = new();
+  public ObservableCollection<MTGCard> Removelist { get; set; } = new();
 
   /// <summary>
   /// Returns the cardlist that is associated with the given <paramref name="listType"/>
@@ -184,7 +186,8 @@ public partial class MTGCardDeck : ObservableObject
       CardlistType.Deck => DeckCards,
       CardlistType.Wishlist => Wishlist,
       CardlistType.Maybelist => Maybelist,
-      _ => null,
+      CardlistType.Removelist => Removelist,
+      _ => throw new NotImplementedException(),
     };
   }
 
@@ -238,6 +241,7 @@ public partial class MTGCardDeck : ObservableObject
       DeckCards = DeckCards,
       Maybelist = Maybelist,
       Wishlist = Wishlist,
+      Removelist = Removelist,
     };
   }
 }
@@ -256,6 +260,7 @@ public class MTGCardDeckDTO
     DeckCards = deck.DeckCards.Select(x => new MTGCardDTO(x)).ToList();
     WishlistCards = deck.Wishlist.Select(x => new MTGCardDTO(x)).ToList();
     MaybelistCards = deck.Maybelist.Select(x => new MTGCardDTO(x)).ToList();
+    RemovelistCards = deck.Removelist.Select(x => new MTGCardDTO(x)).ToList();
   }
 
   [Key]
@@ -271,6 +276,8 @@ public class MTGCardDeckDTO
   public List<MTGCardDTO> WishlistCards { get; init; } = new();
   [InverseProperty(nameof(MTGCardDTO.DeckMaybelist))]
   public List<MTGCardDTO> MaybelistCards { get; init; } = new();
+  [InverseProperty(nameof(MTGCardDTO.DeckRemovelist))]
+  public List<MTGCardDTO> RemovelistCards { get; init; } = new();
 
   /// <summary>
   /// Converts the DTO to a <see cref="MTGCardDeck"/> object using the <paramref name="api"/>
@@ -285,6 +292,7 @@ public class MTGCardDeckDTO
       DeckCards = new((await api.FetchFromDTOs(DeckCards.ToArray())).Found),
       Wishlist = new((await api.FetchFromDTOs(WishlistCards.ToArray())).Found),
       Maybelist = new((await api.FetchFromDTOs(MaybelistCards.ToArray())).Found),
+      Removelist = new((await api.FetchFromDTOs(RemovelistCards.ToArray())).Found),
     };
   }
 }

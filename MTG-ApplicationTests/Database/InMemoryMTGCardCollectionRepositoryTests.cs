@@ -21,27 +21,33 @@ public class InMemoryMTGCardCollectionRepositoryTests
       if (WillFail) { return false; }
       return await base.Add(item);
     }
+
     public override async Task<bool> AddOrUpdate(MTGCardCollection item)
     {
       if (WillFail) { return false; }
       return await base.AddOrUpdate(item);
     }
+    
     public override async Task<bool> Exists(string name)
     {
       if (WillFail) { return false; }
       return await base.Exists(name);
     }
+    
     public override async Task<IEnumerable<MTGCardCollection>> Get()
     {
       if (WillFail) { return new List<MTGCardCollection>(); }
       return await base.Get();
     }
+    
     public override async Task<MTGCardCollection?> Get(string name)
     {
       if (WillFail) { return null; }
       return await base.Get(name);
     }
+    
     public override async Task<bool> Remove(MTGCardCollection item) => await base.Remove(item);
+    
     public override async Task<bool> Update(MTGCardCollection item)
     {
       if (WillFail) { return false; }

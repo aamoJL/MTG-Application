@@ -35,6 +35,11 @@ public class CardDbContext : DbContext
       .OnDelete(DeleteBehavior.Cascade);
 
     modelBuilder.Entity<MTGCardDTO>()
+      .HasOne(e => e.DeckRemovelist)
+      .WithMany(e => e.RemovelistCards)
+      .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<MTGCardDTO>()
       .HasOne(e => e.CollectionList)
       .WithMany(e => e.Cards)
       .OnDelete(DeleteBehavior.Cascade);

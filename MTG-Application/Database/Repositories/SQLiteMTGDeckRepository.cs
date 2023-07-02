@@ -64,6 +64,7 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
       .Include(x => x.MaybelistCards)
       .Include(x => x.Commander)
       .Include(x => x.CommanderPartner)
+      .Include(x => x.RemovelistCards)
       .FirstOrDefault();
     return await deck.AsMTGCardDeck(CardAPI);
   }
@@ -87,17 +88,20 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
       .Include(x => x.MaybelistCards)
       .Include(x => x.Commander)
       .Include(x => x.CommanderPartner)
+      .Include(x => x.RemovelistCards)
       .FirstOrDefault() is MTGCardDeckDTO deckDTO)
     {
       // Remove unused cards from the database
       List<Guid> deckCardIds = new(item.DeckCards.Select(x => x.Info.ScryfallId).ToList());
       List<Guid> wishlistCardIds = new(item.Wishlist.Select(x => x.Info.ScryfallId).ToList());
       List<Guid> maybelistCardIds = new(item.Maybelist.Select(x => x.Info.ScryfallId).ToList());
+      List<Guid> removelistCardIds = new(item.Removelist.Select(x => x.Info.ScryfallId).ToList());
 
       List<MTGCardDTO> missingCards = new();
       missingCards.AddRange(db.MTGCards.Where(cardDTO => cardDTO.DeckCards.Id == deckDTO.Id && !deckCardIds.Contains(cardDTO.ScryfallId)).ToList());
       missingCards.AddRange(db.MTGCards.Where(cardDTO => cardDTO.DeckWishlist.Id == deckDTO.Id && !wishlistCardIds.Contains(cardDTO.ScryfallId)).ToList());
       missingCards.AddRange(db.MTGCards.Where(cardDTO => cardDTO.DeckMaybelist.Id == deckDTO.Id && !maybelistCardIds.Contains(cardDTO.ScryfallId)).ToList());
+      missingCards.AddRange(db.MTGCards.Where(cardDTO => cardDTO.DeckRemovelist.Id == deckDTO.Id && !removelistCardIds.Contains(cardDTO.ScryfallId)).ToList());
 
       db.RemoveRange(missingCards);
 
@@ -123,9 +127,16 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
         else
         { deckDTO.MaybelistCards.Add(new MTGCardDTO(card)); }
       }
+      foreach (var card in item.Removelist)
+      {
+        if (deckDTO.RemovelistCards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto)
+        { cdto.Count = card.Count; }
+        else
+        { deckDTO.RemovelistCards.Add(new MTGCardDTO(card)); }
+      }
 
       // Remove old commander and add new one if the commander changed
-      if(deckDTO.Commander?.Name != item.Commander?.Info.Name)
+      if (deckDTO.Commander?.Name != item.Commander?.Info.Name)
       {
         if(deckDTO.Commander != null)
         {

@@ -32,10 +32,10 @@ public class DeckBuilderViewModelTests
     public TestDialogResult OverrideDialog { get; set; } = new();
     public TestDialogResult DeleteDialog { get; set; } = new();
 
-    public override ConfirmationDialog GetCardAlreadyInDeckDialog(string name)
+    public override ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName = "")
     {
       CurrentDialogWrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
-      var dialog = base.GetCardAlreadyInDeckDialog(name);
+      var dialog = base.GetCardAlreadyInCardlistDialog(cardName, listName);
       return dialog;
     }
     public override ConfirmationDialog GetOverrideDialog(string name)
@@ -289,9 +289,30 @@ public class DeckBuilderViewModelTests
       Name = deckName,
       DeckCards = new()
       {
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First"),
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second")
-      }
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      },
+      Maybelist = new()
+      {
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      },
+      Wishlist = new()
+      {
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      },
+      Removelist = new()
+      {
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      },
     };
     await repo.Add(dbDeck);
 
@@ -303,6 +324,10 @@ public class DeckBuilderViewModelTests
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(2, vm.DeckCards.CardlistSize);
     Assert.AreEqual(deckName, vm.CardDeck.Name);
+    Assert.AreEqual(2, vm.DeckCards.CardCollection.Count);
+    Assert.AreEqual(3, vm.MaybelistCards.CardCollection.Count);
+    Assert.AreEqual(4, vm.WishlistCards.CardCollection.Count);
+    Assert.AreEqual(5, vm.RemovelistCards.CardCollection.Count);
   }
 
   [TestMethod]
@@ -420,6 +445,9 @@ public class DeckBuilderViewModelTests
     });
 
     await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.MaybelistCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.WishlistCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.RemovelistCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.SaveDeckDialog();
@@ -427,6 +455,12 @@ public class DeckBuilderViewModelTests
     Assert.AreEqual(1, vm.DeckCards.CardlistSize);
     Assert.AreEqual(1, (await repo.Get()).ToList().Count);
     Assert.AreEqual(deckName, vm.CardDeck.Name);
+
+    var dbDeck = await repo.Get(deckName);
+    Assert.AreEqual(vm.DeckCards.CardCollection.Count, dbDeck?.DeckCards.Count);
+    Assert.AreEqual(vm.MaybelistCards.CardCollection.Count, dbDeck?.Maybelist.Count);
+    Assert.AreEqual(vm.WishlistCards.CardCollection.Count, dbDeck?.Wishlist.Count);
+    Assert.AreEqual(vm.RemovelistCards.CardCollection.Count, dbDeck?.Removelist.Count);
   }
 
   [TestMethod]
