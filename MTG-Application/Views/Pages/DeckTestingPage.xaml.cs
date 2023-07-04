@@ -31,11 +31,35 @@ public sealed partial class DeckTestingPage : Page
     PointerMoved += Root_PointerMoved;
     PointerReleased += Root_PointerReleased;
 
-    LibraryVisibilitySwitchCommand = new RelayCommand(SwitchLibraryVisibility);
+    LibraryVisibilitySwitchCommand = new RelayCommand(() =>
+    {
+      LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+    });
 
     MTGDeckTestingViewModel.NewGameStarted += MTGDeckTestingViewModel_NewGameStarted;
     MTGDeckTestingViewModel.NewTurnStarted += MTGDeckTestingViewModel_NewTurnStarted;
   }
+
+  [ObservableProperty]
+  private Visibility libraryVisibility = Visibility.Collapsed;
+
+  public ICommand LibraryVisibilitySwitchCommand;
+
+  public static readonly DependencyProperty CardDeckProperty =
+      DependencyProperty.Register(nameof(CardDeck), typeof(MTGCardDeck), typeof(DeckTestingPage), new PropertyMetadata(null));
+
+  public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; } = new(new ScryfallAPI());
+  public MTGCardDeck CardDeck
+  {
+    get => (MTGCardDeck)GetValue(CardDeckProperty);
+    set
+    {
+      SetValue(CardDeckProperty, value);
+      MTGDeckTestingViewModel.CardDeck = value;
+      MTGDeckTestingViewModel.NewGame();
+    }
+  }
+  public Vector2 BattlefieldCardDimensions { get; } = new(215, 300);
 
   private void MTGDeckTestingViewModel_NewTurnStarted()
   {
@@ -50,30 +74,6 @@ public sealed partial class DeckTestingPage : Page
 
   private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
 
-  public MTGCardDeck CardDeck
-  {
-    get => (MTGCardDeck)GetValue(CardDeckProperty);
-    set
-    {
-      SetValue(CardDeckProperty, value);
-      MTGDeckTestingViewModel.CardDeck = value;
-      MTGDeckTestingViewModel.NewGame();
-    }
-  }
-  public Vector2 BattlefieldCardDimensions { get; } = new(215, 300);
-
-  [ObservableProperty]
-  private Visibility libraryVisibility = Visibility.Collapsed;
-
-  public ICommand LibraryVisibilitySwitchCommand;
-
-  public static readonly DependencyProperty CardDeckProperty =
-      DependencyProperty.Register(nameof(CardDeck), typeof(MTGCardDeck), typeof(DeckTestingPage), new PropertyMetadata(null));
-
-  public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; } = new(new ScryfallAPI());
-
-  public void SwitchLibraryVisibility() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-
   #region Pointer Events
 
   public class CustomDragArgs<T>
@@ -86,44 +86,57 @@ public sealed partial class DeckTestingPage : Page
 
     public T Item { get; }
     public Point DragOffset { get; }
+    public event Action<T> Started;
     public event Action<T> Completed;
     public event Action<T> Canceled;
+    public bool IsDragging { get; private set; } = false;
     public bool IsCompleted { get; private set; } = false;
 
     public static float UndroppableOpacity { get; } = .3f;
     public static float DroppableOpacity { get; } = .8f;
 
+    public void Start()
+    {
+      IsDragging = true;
+      Started?.Invoke(Item);
+    }
+
     public void Complete()
     {
       IsCompleted = true;
+      IsDragging = false;
       Completed?.Invoke(Item);
     }
 
     public void Cancel()
     {
-      if (!IsCompleted) Canceled?.Invoke(Item);
+      if (!IsCompleted || IsDragging) Canceled?.Invoke(Item);
+      IsDragging = false;
     }
   }
 
-  private CustomDragArgs<DeckTestingMTGCardViewModel> cardDrag;
-  private CustomDragArgs<DeckTestingMTGCardViewModel> DragArgs => cardDrag;
-
-  private void SetCardDragArgs(DeckTestingMTGCardViewModel item, Point? offset)
+  private CustomDragArgs<DeckTestingMTGCardViewModel> dragArgs;
+  private CustomDragArgs<DeckTestingMTGCardViewModel> DragArgs
   {
-    offset ??= new(BattlefieldCardDimensions.X / 2, BattlefieldCardDimensions.Y / 2);
-    cardDrag = new(item, (Point)offset);
-    DragPreviewImage.Visibility = Visibility.Visible;
+    get => dragArgs;
+    set
+    {
+      dragArgs = value;
 
-    DragArgs.Completed += (item) =>
-    {
-      DragPreviewImage.Visibility = Visibility.Collapsed;
-      cardDrag = null;
-    };
-    DragArgs.Canceled += (item) =>
-    {
-      DragPreviewImage.Visibility = Visibility.Collapsed;
-      cardDrag = null;
-    };
+      if (dragArgs != null)
+      {
+        DragArgs.Completed += (item) =>
+        {
+          DragPreviewImage.Visibility = Visibility.Collapsed;
+          dragArgs = null;
+        };
+        DragArgs.Canceled += (item) =>
+        {
+          DragPreviewImage.Visibility = Visibility.Collapsed;
+          dragArgs = null;
+        };
+      }
+    }
   }
 
   // ---------------- Item Pointer Movement -------------------
@@ -208,6 +221,8 @@ public sealed partial class DeckTestingPage : Page
         var pointerPosition = e.GetCurrentPoint(null).Position;
         DragPreviewImage.SetValue(Canvas.LeftProperty, pointerPosition.X + DragArgs.DragOffset.X);
         DragPreviewImage.SetValue(Canvas.TopProperty, pointerPosition.Y + DragArgs.DragOffset.Y);
+        DragPreviewImage.Visibility = Visibility.Visible;
+        DragArgs.Start();
       }
     }
   }
@@ -225,7 +240,7 @@ public sealed partial class DeckTestingPage : Page
   {
     if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
-      SetCardDragArgs((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
+      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
 
       DragArgs.Completed += (item) =>
       {
@@ -245,7 +260,7 @@ public sealed partial class DeckTestingPage : Page
   {
     if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
-      SetCardDragArgs((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
+      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
 
       var pointerPosition = e.GetCurrentPoint(null).Position;
       DragPreviewImage.Source = DragArgs?.Item.SelectedFaceUri;
@@ -388,7 +403,8 @@ public sealed partial class DeckTestingPage : Page
             CardWidth = BattlefieldCardDimensions.X,
           };
 
-          SetBattlefieldImage_PointerEvents(cardImg, canvas);
+          cardImg.PointerEntered += BattlefieldCard_PointerEntered;
+          cardImg.PointerPressed += BattlefieldCard_PointerPressed;
 
           Canvas.SetLeft(cardImg, pos.X + DragArgs.DragOffset.X);
           Canvas.SetTop(cardImg, pos.Y + DragArgs.DragOffset.Y);
@@ -403,57 +419,58 @@ public sealed partial class DeckTestingPage : Page
     DragArgs?.Cancel();
   }
 
-  private void SetBattlefieldImage_PointerEvents(FrameworkElement img, Canvas canvas)
+  private void BattlefieldCard_PointerEntered(object sender, PointerRoutedEventArgs e)
   {
-    img.PointerEntered += (sender, e) =>
+    if (DragArgs == null)
     {
-      if (DragArgs == null)
-      {
-        // Settings the preview image's source before dragging reduces flickering when staring the drag
-        DragPreviewImage.Source = (img.DataContext as DeckTestingMTGCardViewModel).SelectedFaceUri;
-      }
-    };
+      // Settings the preview image's source before dragging reduces flickering when staring the drag
+      DragPreviewImage.Source = ((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel).SelectedFaceUri;
+    }
+  }
 
+  private void BattlefieldCard_PointerPressed(object sender, PointerRoutedEventArgs e)
+  {
     // Drag and drop
-    img.PointerPressed += (sender, e) =>
+    var img = sender as FrameworkElement;
+    var canvas = BattlefieldCanvas;
+    var pointerPoint = e.GetCurrentPoint(img);
+
+    if (pointerPoint.Properties.IsLeftButtonPressed)
     {
-      var pointerPoint = e.GetCurrentPoint(sender as FrameworkElement);
-
-      if (pointerPoint.Properties.IsLeftButtonPressed)
+      var imgPos = new Point(Canvas.GetLeft(img), Canvas.GetTop(img));
+      var pointetPos = e.GetCurrentPoint(canvas).Position;
+      var offset = new Point()
       {
-        var imgPos = new Point(Canvas.GetLeft(img), Canvas.GetTop(img));
-        var pointetPos = e.GetCurrentPoint(canvas).Position;
-        var offset = new Point()
-        {
-          X = imgPos.X - pointetPos.X,
-          Y = imgPos.Y - pointetPos.Y,
-        };
+        X = imgPos.X - pointetPos.X,
+        Y = imgPos.Y - pointetPos.Y,
+      };
 
-        SetCardDragArgs((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, offset);
+      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, offset);
 
-        DragArgs.Completed += (item) =>
-        {
-          canvas.Children.Remove(canvas.Children.FirstOrDefault(x => ((FrameworkElement)x).DataContext as DeckTestingMTGCardViewModel == item));
-        };
-
-        DragArgs.Canceled += (item) =>
-        {
-          img.Opacity = 1;
-        };
-
-        var pointerWindowPosition = e.GetCurrentPoint(null).Position;
-        DragPreviewImage.Source = DragArgs.Item.SelectedFaceUri;
-
-        DragPreviewImage.SetValue(Canvas.LeftProperty, pointerWindowPosition.X + DragArgs.DragOffset.X);
-        DragPreviewImage.SetValue(Canvas.TopProperty, pointerWindowPosition.Y + DragArgs.DragOffset.Y);
-
-        // Preview card rotation
-        (DragPreviewImage.RenderTransform as RotateTransform).Angle = (img.DataContext as DeckTestingMTGCardViewModel).IsTapped ? 90 : 0;
-
-        // TODO: move to CardDrag.Started and show the preview image only when the drag starts so it does not hide +1/+1 counters
+      DragArgs.Started += (item) =>
+      {
         img.Opacity = 0;
-      }
-    };
+      };
+
+      DragArgs.Completed += (item) =>
+      {
+        canvas.Children.Remove(canvas.Children.FirstOrDefault(x => ((FrameworkElement)x).DataContext as DeckTestingMTGCardViewModel == item));
+      };
+
+      DragArgs.Canceled += (item) =>
+      {
+        img.Opacity = 1;
+      };
+
+      var pointerWindowPosition = e.GetCurrentPoint(null).Position;
+      DragPreviewImage.Source = DragArgs.Item.SelectedFaceUri;
+
+      DragPreviewImage.SetValue(Canvas.LeftProperty, pointerWindowPosition.X + DragArgs.DragOffset.X);
+      DragPreviewImage.SetValue(Canvas.TopProperty, pointerWindowPosition.Y + DragArgs.DragOffset.Y);
+
+      // Preview card rotation
+      (DragPreviewImage.RenderTransform as RotateTransform).Angle = (img.DataContext as DeckTestingMTGCardViewModel).IsTapped ? 90 : 0;
+    }
   }
 
   private void LibraryTop_PointerReleased(object sender, PointerRoutedEventArgs e)

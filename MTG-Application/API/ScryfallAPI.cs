@@ -142,38 +142,64 @@ public class ScryfallAPI : ICardAPI<MTGCard>
 
   public async Task<Result> FetchFromString(string importText)
   {
-    var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-    // Convert each line to scryfall identifier objects
-    var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>
+    var card = new Func<MTGCard>(() =>
     {
-      // Format: {Count (optional)} {Name} OR {Count (optional)} {Scryfall Id}
-      // Stops at '/' so only the first name will be used for multiface cards
-      var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
-      var match = regexGroups.Match(line);
-
-      var countMatch = match.Groups["Count"]?.Value;
-      var nameMatch = match.Groups["Name"]?.Value;
-
-      if (Guid.TryParse(nameMatch, out var id))
+      // Try to import from JSON
+      try
       {
-        return new ScryfallIdentifier()
-        {
-          ScryfallId = id,
-          CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
-        };
+        var card = JsonSerializer.Deserialize<MTGCard>(importText);
+        if (string.IsNullOrEmpty(card?.Info.Name))
+        { throw new Exception("Card does not have name"); }
+        return card;
       }
-      else
-      {
-        return new ScryfallIdentifier()
-        {
-          Name = nameMatch.Trim(),
-          CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
-        };
-      }
-    })));
+      catch { return null; }
+    })();
 
-    return await FetchWithIdentifiers(identifiers);
+    if(card != null)
+    {
+      return new Result(new[] {card}, 0, 1);
+    }
+    else
+    {
+      if (Uri.TryCreate(importText, UriKind.Absolute, out var uri) && uri.Host == "edhrec.com")
+      {
+        // Imported from EDHREC.com
+        importText = uri.Segments[^1]; // Get the last part of the url, which should be the card's name
+      }
+
+      var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+      // Convert each line to scryfall identifier objects
+      var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>
+      {
+        // Format: {Count (optional)} {Name} OR {Count (optional)} {Scryfall Id}
+        // Multiface cards will be formatted as {front} // {back}, so the name search will stop at '/' so only the first name will be used.
+        var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
+        var match = regexGroups.Match(line);
+
+        var countMatch = match.Groups["Count"]?.Value;
+        var nameMatch = match.Groups["Name"]?.Value;
+
+        if (Guid.TryParse(nameMatch, out var id))
+        {
+          return new ScryfallIdentifier()
+          {
+            ScryfallId = id,
+            CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+          };
+        }
+        else
+        {
+          return new ScryfallIdentifier()
+          {
+            Name = nameMatch.Trim(),
+            CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+          };
+        }
+      })));
+
+      return await FetchWithIdentifiers(identifiers);
+    }
   }
 
   public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)

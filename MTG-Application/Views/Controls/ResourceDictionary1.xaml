@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI">
+  
+  <MenuFlyout x:Key="MTGSearchViewItemFlyout">
+    <MenuFlyoutItem Command="{Binding FlipCardCommand}" Icon="sync" Text="Flip"/>
+    <MenuFlyoutSeparator />
+    <MenuFlyoutItem Command="{Binding ShowPrintsDialogCommand}" CommandParameter="{Binding Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints..."/>
+    <MenuFlyoutItem Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Text="{Binding ModelAPIName}"/>
+    <MenuFlyoutItem Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+  </MenuFlyout>
+</ResourceDictionary>

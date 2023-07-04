@@ -36,6 +36,7 @@
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
     <None Remove="Views\Controls\LinedHeader.xaml" />
+    <None Remove="Views\Controls\ResourceDictionary1.xaml" />
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
@@ -179,6 +180,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="Views\Styles\Template\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\ResourceDictionary1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Controls\DeckTestingBattlefieldCardControl.xaml">

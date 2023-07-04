@@ -425,13 +425,17 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     /// </summary>
     public async Task MoveToCardlist(MTGCard card, Cardlist origin)
     {
-      if (CardCollection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
+      if (origin == null)
+      {
+        await AddToCardlist(card); return;
+      }
+      else if (CardCollection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
       {
         if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync()) is true)
         {
           CommandService.Execute(new CombinedCommand(new ICommand[]
           {
-            new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[]{card}),
+            new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[]{ new MTGCard(card.Info, card.Count) }),
             new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(origin.CardDeck, origin.ListType, new[]{card})
           }));
         }
@@ -440,7 +444,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       {
         CommandService.Execute(new CombinedCommand(new ICommand[]
           {
-            new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[]{card}),
+            new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(CardDeck, ListType, new[]{new MTGCard(card.Info, card.Count) }),
             new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(origin.CardDeck, origin.ListType, new[]{card})
           }));
       }
@@ -825,11 +829,18 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// </summary>
   public void MoveToCommander(MTGCard card, Cardlist origin)
   {
-    CommandService.Execute(new CombinedCommand(new ICommand[]
+    if (origin == null)
     {
-      new MTGCardDeck.MTGCardDeckCommands.SetCommanderCommand(CardDeck, card),
-      new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, origin.ListType, new[] { card }),
-    }));
+      SetCommander(card);
+    }
+    else
+    {
+      CommandService.Execute(new CombinedCommand(new ICommand[]
+      {
+        new MTGCardDeck.MTGCardDeckCommands.SetCommanderCommand(CardDeck, new(card.Info)),
+        new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, origin.ListType, new[] { card }),
+      }));
+    }
   }
 
   /// <summary>
@@ -837,11 +848,46 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// </summary>
   public void MoveToCommanderPartner(MTGCard card, Cardlist origin)
   {
-    CommandService.Execute(new CombinedCommand(new ICommand[]
+    if (origin == null)
     {
-      new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card),
-      new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, origin.ListType, new[] { card }),
-    }));
+      SetCommanderPartner(card);
+    }
+    else
+    {
+      CommandService.Execute(new CombinedCommand(new ICommand[]
+      {
+        new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, new(card.Info)),
+        new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(CardDeck, origin.ListType, new[] { card }),
+      }));
+    }
+  }
+
+  public async Task ImportCommander(string importText)
+  {
+    var result = await CardAPI.FetchFromString(importText);
+    if (result.Found.Length > 0)
+    {
+      SetCommander(result.Found[0]);
+      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"Commander was imported successfully.");
+    }
+    else
+    {
+      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Could not import the commander.");
+    }
+  }
+
+  public async Task ImportCommanderPartner(string importText)
+  {
+    var result = await CardAPI.FetchFromString(importText);
+    if (result.Found.Length > 0)
+    {
+      SetCommanderPartner(result.Found[0]);
+      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"Partner was imported successfully.");
+    }
+    else
+    {
+      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Could not import the partner.");
+    }
   }
 
   /// <summary>

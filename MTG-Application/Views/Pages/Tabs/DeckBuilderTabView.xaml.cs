@@ -8,10 +8,10 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.API;
 using MTGApplication.Database.Repositories;
+using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
-using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.ViewModels.DeckBuilderViewModel;
 
@@ -25,18 +25,18 @@ public sealed partial class DeckBuilderTabView : UserControl
 {
   public DeckBuilderTabView()
   {
-    this.InitializeComponent();
+    InitializeComponent();
     App.Closing += MainWindow_Closed;
 
-    var cardAPI = new ScryfallAPI();
-    DeckBuilderViewModel = new(cardAPI, new SQLiteMTGDeckRepository(cardAPI, cardDbContextFactory: new()));
-    SearchViewModel = new(cardAPI);
+    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()));
+    SearchViewModel = new(CardAPI);
   }
 
   private void MainWindow_Closed(object sender, App.WindowClosingEventArgs args) => args.ClosingTasks.Add(DeckBuilderViewModel);
 
   public DeckBuilderAPISearchViewModel SearchViewModel { get; }
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
+  public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
 
   [ObservableProperty]
   private double searchDesiredItemWidth = 250;
@@ -139,12 +139,12 @@ public sealed partial class DeckBuilderTabView : UserControl
 
     if (!string.IsNullOrEmpty(data))
     {
-      if (dragArgs?.DragOriginList != null && dragArgs?.DragItem != null)
+      if (dragArgs?.DragStartElement != null && dragArgs?.DragItem != null)
       {
-        // Dragged from cardlist
+        // Dragged from this application
         if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
         {
-          await targetList?.AddToCardlist(dragArgs.DragItem);
+          await targetList?.AddToCardlist(new(dragArgs.DragItem.Info, dragArgs.DragItem.Count));
         }
         else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         {
@@ -155,37 +155,7 @@ public sealed partial class DeckBuilderTabView : UserControl
         || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
         && !string.IsNullOrEmpty(data))
       {
-        var card = new Func<MTGCard>(() =>
-        {
-          // Try to import from JSON
-          try
-          {
-            var card = JsonSerializer.Deserialize<MTGCard>(data);
-            if (string.IsNullOrEmpty(card?.Info.Name))
-            { throw new Exception("Card does not have name"); }
-            return card;
-          }
-          catch { return null; }
-        })();
-
-        if (card != null)
-        {
-          await targetList?.AddToCardlist(card);
-        }
-        else
-        {
-          if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == "edhrec.com")
-          {
-            // Try to import from EDHREC URL
-            var cardName = uri.Segments[^1];
-            await targetList?.ImportCards(cardName);
-          }
-          else
-          {
-            // Try to import from string
-            await targetList?.ImportCards(data);
-          }
-        }
+        await targetList?.ImportCards(data);
       }
     }
 
@@ -218,12 +188,12 @@ public sealed partial class DeckBuilderTabView : UserControl
 
     if (!string.IsNullOrEmpty(data))
     {
-      if (dragArgs?.DragOriginList != null && dragArgs?.DragItem != null)
+      if (dragArgs?.DragStartElement != null && dragArgs?.DragItem != null)
       {
         // Dragged from cardlist
         if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
         {
-          DeckBuilderViewModel.SetCommander(dragArgs.DragItem);
+          DeckBuilderViewModel.SetCommander(new(dragArgs.DragItem.Info));
         }
         else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         {
@@ -234,23 +204,7 @@ public sealed partial class DeckBuilderTabView : UserControl
         || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
         && !string.IsNullOrEmpty(data))
       {
-        var card = new Func<MTGCard>(() =>
-        {
-          // Try to import from JSON
-          try
-          {
-            var card = JsonSerializer.Deserialize<MTGCard>(data);
-            if (string.IsNullOrEmpty(card?.Info.Name))
-            { throw new Exception("Card does not have name"); }
-            return card;
-          }
-          catch { return null; }
-        })();
-
-        if (card != null)
-        {
-          DeckBuilderViewModel.SetCommander(card);
-        }
+        await DeckBuilderViewModel.ImportCommander(data);
       }
     }
     def.Complete();
@@ -281,12 +235,12 @@ public sealed partial class DeckBuilderTabView : UserControl
 
     if (!string.IsNullOrEmpty(data))
     {
-      if (dragArgs?.DragOriginList != null && dragArgs?.DragItem != null)
+      if (dragArgs?.DragStartElement != null && dragArgs?.DragItem != null)
       {
         // Dragged from cardlist
         if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
         {
-          DeckBuilderViewModel.SetCommanderPartner(dragArgs.DragItem);
+          DeckBuilderViewModel.SetCommanderPartner(new(dragArgs.DragItem.Info));
         }
         else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         {
@@ -297,23 +251,7 @@ public sealed partial class DeckBuilderTabView : UserControl
         || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
         && !string.IsNullOrEmpty(data))
       {
-        var card = new Func<MTGCard>(() =>
-        {
-          // Try to import from JSON
-          try
-          {
-            var card = JsonSerializer.Deserialize<MTGCard>(data);
-            if (string.IsNullOrEmpty(card?.Info.Name))
-            { throw new Exception("Card does not have name"); }
-            return card;
-          }
-          catch { return null; }
-        })();
-
-        if (card != null)
-        {
-          DeckBuilderViewModel.SetCommanderPartner(card);
-        }
+        await DeckBuilderViewModel.ImportCommanderPartner(data);
       }
     }
     def.Complete();

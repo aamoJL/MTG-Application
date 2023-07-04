@@ -63,10 +63,10 @@
             <controls:ImageEx.ContextFlyout>
               <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
                 <CommandBarFlyout.PrimaryCommands>
-                  <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" />
+                  <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                   <AppBarSeparator />
-                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}"/>
-                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}" ToolTipService.ToolTip="API Website"/>
+                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
                   <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                 </CommandBarFlyout.PrimaryCommands>
                 <CommandBarFlyout.SecondaryCommands>
@@ -100,10 +100,10 @@
         <StackPanel.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
-              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" />
+              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}" ToolTipService.ToolTip="API Website"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
               <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
@@ -136,10 +136,10 @@
         <StackPanel.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
-              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" />
+              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}" ToolTipService.ToolTip="API Website"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
               <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
