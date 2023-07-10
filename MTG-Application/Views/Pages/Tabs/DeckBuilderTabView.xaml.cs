@@ -59,7 +59,7 @@ public sealed partial class DeckBuilderTabView : UserControl
   /// </summary>
   private class DragArgs
   {
-    public DragArgs(object dragStartElement, Cardlist dragOrigin, MTGCard dragItem)
+    public DragArgs(object dragStartElement, DeckCardlistViewModel dragOrigin, MTGCard dragItem)
     {
       DragStartElement = dragStartElement;
       DragOriginList = dragOrigin;
@@ -67,7 +67,7 @@ public sealed partial class DeckBuilderTabView : UserControl
     }
 
     public object DragStartElement { get; set; }
-    public Cardlist DragOriginList { get; set; }
+    public DeckCardlistViewModel DragOriginList { get; set; }
     public MTGCard DragItem { get; set; }
   }
 
@@ -113,7 +113,7 @@ public sealed partial class DeckBuilderTabView : UserControl
     {
       e.Data.SetText(vm.Model.ToJSON());
       e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-      var originList = (sender as FrameworkElement).DataContext as Cardlist;
+      var originList = (sender as FrameworkElement).DataContext as DeckCardlistViewModel;
       dragArgs = new(sender, originList, vm.Model);
     }
   }
@@ -135,7 +135,7 @@ public sealed partial class DeckBuilderTabView : UserControl
     var def = e.GetDeferral();
     var data = await e.DataView.GetTextAsync();
     var operation = e.AcceptedOperation;
-    var targetList = (sender as FrameworkElement).DataContext as Cardlist;
+    var targetList = (sender as FrameworkElement).DataContext as DeckCardlistViewModel;
 
     if (!string.IsNullOrEmpty(data))
     {
@@ -144,18 +144,18 @@ public sealed partial class DeckBuilderTabView : UserControl
         // Dragged from this application
         if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
         {
-          await targetList?.AddToCardlist(new(dragArgs.DragItem.Info, dragArgs.DragItem.Count));
+          await targetList?.Add(new(dragArgs.DragItem.Info, dragArgs.DragItem.Count));
         }
         else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         {
-          await targetList?.MoveToCardlist(dragArgs.DragItem, dragArgs.DragOriginList);
+          await targetList?.Move(dragArgs.DragItem, dragArgs.DragOriginList);
         }
       }
       else if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
         || (operation & DataPackageOperation.Move) == DataPackageOperation.Move
         && !string.IsNullOrEmpty(data))
       {
-        await targetList?.ImportCards(data);
+        await targetList?.Import(data);
       }
     }
 
