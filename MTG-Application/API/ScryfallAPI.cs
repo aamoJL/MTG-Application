@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static MTGApplication.Interfaces.ICardAPI<MTGApplication.Models.MTGCard>;
 using static MTGApplication.Models.MTGCard;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.API;
 
@@ -57,48 +58,33 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       switch (PreferedSchema)
       {
         case IdentifierSchema.ID:
-          if (ScryfallId != Guid.Empty)
-          { return new { id = ScryfallId }; }
+          if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
           break;
         case IdentifierSchema.ILLUSTRATION_ID:
-          if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty)
-          { return new { illustration_id = IllustrationId }; }
+          if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
           break;
         case IdentifierSchema.NAME:
-          if (Name != string.Empty)
-          { return new { name = Name }; }
+          if (Name != string.Empty) { return new { name = Name }; }
           break;
         case IdentifierSchema.NAME_SET:
-          if (Name != string.Empty && SetCode != string.Empty)
-          { return new { name = Name, set = SetCode }; }
-          break;
-        default:
+          if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
           break;
       }
 
       // If prefered schema does not work, select secondary if possible
-      if (ScryfallId != Guid.Empty)
-      { return new { id = ScryfallId }; }
-      else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty)
-      { return new { illustration_id = IllustrationId }; }
-      else if (Name != string.Empty && SetCode != string.Empty)
-      { return new { name = Name, set = SetCode }; }
-      else if (Name != string.Empty)
-      { return new { name = Name }; }
-      else
-      { return string.Empty; }
+      if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
+      else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
+      else if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
+      else if (Name != string.Empty) { return new { name = Name }; }
+      else { return string.Empty; }
     }
 
     public bool Compare(MTGCardInfo? info)
     {
-      if (ScryfallId != Guid.Empty)
-      { return info?.ScryfallId == ScryfallId; }
-      else if (Name != string.Empty && SetCode != string.Empty)
-      { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }
-      else if (Name != string.Empty)
-      { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase); }
-      else
-      { return false; }
+      if (ScryfallId != Guid.Empty) { return info?.ScryfallId == ScryfallId; }
+      else if (Name != string.Empty && SetCode != string.Empty) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }
+      else if (Name != string.Empty) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase); }
+      else { return false; }
     }
   }
 
@@ -114,7 +100,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
   /// </summary>
   private static int MaxFetchIdentifierCount => 75;
 
-  #region ICardAPI interface
+  #region ICardAPI interface implementation
   public int PageSize => 175;
 
   public string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";

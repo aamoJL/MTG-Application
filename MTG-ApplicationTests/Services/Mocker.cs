@@ -1,5 +1,7 @@
 ﻿using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using static MTGApplication.Models.MTGCard;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplicationTests.Services;
 

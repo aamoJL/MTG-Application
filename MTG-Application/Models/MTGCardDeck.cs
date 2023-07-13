@@ -121,12 +121,9 @@ public partial class MTGCardDeck : ObservableObject
     }
   }
 
-  [ObservableProperty]
-  private string name = "";
-  [ObservableProperty]
-  private MTGCard commander;
-  [ObservableProperty]
-  private MTGCard commanderPartner;
+  [ObservableProperty] private string name = "";
+  [ObservableProperty] private MTGCard commander;
+  [ObservableProperty] private MTGCard commanderPartner;
 
   public ObservableCollection<MTGCard> DeckCards { get; set; } = new();
   public ObservableCollection<MTGCard> Wishlist { get; set; } = new();

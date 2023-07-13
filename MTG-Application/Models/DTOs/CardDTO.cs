@@ -8,6 +8,11 @@ namespace MTGApplication.Models.DTOs;
 public abstract class CardDTO
 {
   public CardDTO() { }
+  public CardDTO(string name, int count)
+  {
+    Name = name;
+    Count = count;
+  }
 
   [Key] public int Id { get; init; }
   public string Name { get; init; }

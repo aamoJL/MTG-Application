@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.API;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using MTGApplicationTests.Services;
 using System.Text.Json;
 using static MTGApplication.API.ScryfallAPI;

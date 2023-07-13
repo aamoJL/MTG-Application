@@ -3,9 +3,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using MTGApplication.Extensions;
 using System;
 using System.Threading.Tasks;
-using MTGApplication.Extensions;
 
 namespace MTGApplication.Services;
 

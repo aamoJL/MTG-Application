@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.ViewModels;
-using MTGApplication.Models;
 using MTGApplicationTests.Services;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplicationTests.ViewModels;
 
@@ -20,11 +20,11 @@ public class MTGCardViewModelTests
         backFace: Mocker.MTGCardModelMocker.CreateCardFace(imageUri: backUri)));
 
     Assert.IsTrue(vm.HasBackFaceImage);
-    Assert.IsTrue(vm.SelectedFaceSide == MTGCard.CardSide.Front);
+    Assert.IsTrue(vm.SelectedFaceSide == CardSide.Front);
     Assert.AreEqual(frontUri, vm.SelectedFaceUri);
 
     vm.FlipCard();
-    Assert.IsTrue(vm.SelectedFaceSide == MTGCard.CardSide.Back);
+    Assert.IsTrue(vm.SelectedFaceSide == CardSide.Back);
     Assert.AreEqual(backUri, vm.SelectedFaceUri);
   }
 
@@ -38,11 +38,11 @@ public class MTGCardViewModelTests
         frontFace: Mocker.MTGCardModelMocker.CreateCardFace(imageUri: frontUri)));
 
     Assert.IsFalse(vm.HasBackFaceImage);
-    Assert.IsTrue(vm.SelectedFaceSide == MTGCard.CardSide.Front);
+    Assert.IsTrue(vm.SelectedFaceSide == CardSide.Front);
     Assert.AreEqual(frontUri, vm.SelectedFaceUri);
 
     vm.FlipCard();
-    Assert.IsTrue(vm.SelectedFaceSide == MTGCard.CardSide.Front);
+    Assert.IsTrue(vm.SelectedFaceSide == CardSide.Front);
     Assert.AreEqual(frontUri, vm.SelectedFaceUri);
   }
 

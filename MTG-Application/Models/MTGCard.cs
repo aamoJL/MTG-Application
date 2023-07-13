@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.Models.DTOs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.Models;
 
@@ -13,31 +11,6 @@ namespace MTGApplication.Models;
 /// </summary>
 public partial class MTGCard : ObservableObject
 {
-  #region Enums
-  public enum RarityTypes
-  {
-    Common = 0,
-    Uncommon = 1,
-    Rare = 2,
-    Mythic = 3,
-    Special = 4,
-    Bonus = 5,
-  }
-  public enum ColorTypes { W, U, B, R, G, M, C }
-  public enum SpellType
-  {
-    Land,
-    Creature,
-    Artifact,
-    Enchantment,
-    Planeswalker,
-    Instant,
-    Sorcery,
-    Other
-  }
-  public enum CardSide { Front, Back }
-  #endregion
-
   #region Structs
   [Serializable]
   public readonly struct CardToken
@@ -130,16 +103,15 @@ public partial class MTGCard : ObservableObject
       CollectorNumber = collectorNumber;
       APIWebsiteUri = apiWebsiteUri;
       SetIconUri = setIconUri;
-      RarityType = rarityType;
-      PrintSearchUri = printSearchUri;
-      CardMarketUri = cardMarketUri;
-      Tokens = tokens;
-
       FrontFace = frontFace;
       BackFace = backFace;
+      PrintSearchUri = printSearchUri;
+      Tokens = tokens;
 
+      RarityType = rarityType;
       Colors = GetColors(FrontFace, BackFace);
       SpellTypes = GetSpellTypes(TypeLine);
+      CardMarketUri = cardMarketUri;
       ProducedMana = producedMana;
       APIName = apiName;
     }
@@ -158,6 +130,9 @@ public partial class MTGCard : ObservableObject
   [ObservableProperty] private MTGCardInfo info;
 
   public string APIName => Info.APIName;
+  /// <summary>
+  /// Card count. Minimum is 1
+  /// </summary>
   public int Count
   {
     get => count;
@@ -183,82 +158,4 @@ public partial class MTGCard : ObservableObject
       Count
     });
   }
-
-  /// <summary>
-  /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
-  /// </summary>
-  public static SpellType[] GetSpellTypes(string typeLine)
-  {
-    List<SpellType> types = new();
-    var typeStrings = typeLine.Split('\u0020'); // 'Space'
-
-    foreach (var typeString in typeStrings)
-    {
-      if (Enum.TryParse(typeString, true, out SpellType spellType))
-      {
-        types.Add(spellType);
-      }
-    }
-
-    if (types.Count == 0) { types.Add(SpellType.Other); }
-    return types.OrderBy(x => x).ToArray();
-  }
-
-  /// <summary>
-  /// Returns given <paramref name="color"/> character's full name
-  /// </summary>
-  public static string GetColorTypeName(ColorTypes color)
-  {
-    return color switch
-    {
-      ColorTypes.W => "White",
-      ColorTypes.U => "Blue",
-      ColorTypes.B => "Black",
-      ColorTypes.R => "Red",
-      ColorTypes.G => "Green",
-      ColorTypes.M => "Multicolor",
-      _ => "Colorless",
-    };
-  }
-
-  /// <summary>
-  /// Returns all the <see cref="ColorTypes"/> that the given faces have
-  /// </summary>
-  public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
-  {
-    var colors = new List<ColorTypes>();
-
-    foreach (var color in frontFace.Colors)
-    {
-      if (!colors.Contains(color)) { colors.Add(color); }
-    }
-
-    if (backFace != null)
-    {
-      foreach (var color in backFace?.Colors)
-      {
-        if (!colors.Contains(color)) { colors.Add(color); }
-      }
-    }
-
-    // Card is colorless if it has no other colors
-    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
-    return colors.ToArray();
-  }
-}
-
-/// <summary>
-/// Data transfer object for <see cref="MTGCard"/> class
-/// </summary>
-public class MTGCardDTO : CardDTO
-{
-  private MTGCardDTO() : base() { }
-  public MTGCardDTO(MTGCard card) : base()
-  {
-    Name = card.Info.Name;
-    ScryfallId = card.Info.ScryfallId;
-    Count = card.Count;
-  }
-
-  public Guid ScryfallId { get; init; }
 }

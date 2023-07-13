@@ -50,7 +50,7 @@ public partial class CommandService
   [RelayCommand]
   public void Undo()
   {
-    if(UndoCommandStack.Count > 0)
+    if (UndoCommandStack.Count > 0)
     {
       var command = UndoCommandStack.Pop();
       command.Undo();

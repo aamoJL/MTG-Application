@@ -4,9 +4,11 @@ using CommunityToolkit.WinUI.UI;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static MTGApplication.Enums;
+using static MTGApplication.Models.MTGCard;
 
 namespace MTGApplication.Services;
 
@@ -15,6 +17,57 @@ namespace MTGApplication.Services;
 /// </summary>
 public static partial class MTGService
 {
+  #region Enums
+  public enum RarityTypes
+  {
+    Common = 0,
+    Uncommon = 1,
+    Rare = 2,
+    Mythic = 3,
+    Special = 4,
+    Bonus = 5,
+  }
+  public enum ColorTypes
+  {
+    W, U, B, R, G, M, C
+  }
+  public enum SpellType
+  {
+    Land,
+    Creature,
+    Artifact,
+    Enchantment,
+    Planeswalker,
+    Instant,
+    Sorcery,
+    Other
+  }
+  public enum CardSide
+  {
+    Front, Back
+  }
+
+  /// <summary>
+  /// Returns given <paramref name="color"/> character's full name
+  /// </summary>
+  public static string GetFullName(this ColorTypes color)
+  {
+    return color switch
+    {
+      ColorTypes.W => "White",
+      ColorTypes.U => "Blue",
+      ColorTypes.B => "Black",
+      ColorTypes.R => "Red",
+      ColorTypes.G => "Green",
+      ColorTypes.M => "Multicolor",
+      _ => "Colorless",
+    };
+  }
+  #endregion
+
+  /// <summary>
+  /// Class that has properties to filter MTG card lists
+  /// </summary>
   public partial class MTGCardFilters : ObservableObject
   {
     public enum ColorGroups { All, Mono, Multi }
@@ -57,19 +110,20 @@ public static partial class MTGService
         && cardViewModel.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)
         && (cardViewModel.Model.Info.FrontFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)
         || (cardViewModel.Model.Info.BackFace != null && cardViewModel.Model.Info.BackFace.Value.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)))
-        && (White || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.W))
-        && (Blue || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.U))
-        && (Black || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.B))
-        && (Red || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.R))
-        && (Green || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.G))
-        && (Colorless || !cardViewModel.Colors.Contains(MTGCard.ColorTypes.C))
+        && (White || !cardViewModel.Colors.Contains(ColorTypes.W))
+        && (Blue || !cardViewModel.Colors.Contains(ColorTypes.U))
+        && (Black || !cardViewModel.Colors.Contains(ColorTypes.B))
+        && (Red || !cardViewModel.Colors.Contains(ColorTypes.R))
+        && (Green || !cardViewModel.Colors.Contains(ColorTypes.G))
+        && (Colorless || !cardViewModel.Colors.Contains(ColorTypes.C))
         && (ColorGroup == ColorGroups.All
           || ColorGroup == ColorGroups.Mono && cardViewModel.Colors.Length == 1
           || (ColorGroup == ColorGroups.Multi && cardViewModel.Colors.Length > 1))
-        && (double.IsNaN(Cmc) || cardViewModel.CMC == Cmc))
-      { return true; }
-      else
-      { return false; };
+        && (double.IsNaN(Cmc) || cardViewModel.CMC == Cmc)) 
+      { 
+        return true; 
+      }
+      else { return false; };
     }
 
     /// <summary>
@@ -104,6 +158,9 @@ public static partial class MTGService
     }
   }
 
+  /// <summary>
+  /// Class that has properties to sort MTG card lists
+  /// </summary>
   public partial class MTGCardSortProperties : ObservableObject
   {
     [ObservableProperty] public MTGSortProperty primarySortProperty;
@@ -130,5 +187,50 @@ public static partial class MTGService
     }
 
     return stringBuilder.ToString();
+  }
+
+  /// <summary>
+  /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
+  /// </summary>
+  public static SpellType[] GetSpellTypes(string typeLine)
+  {
+    List<SpellType> types = new();
+    var typeStrings = typeLine.Split('\u0020'); // 'Space'
+
+    foreach (var typeString in typeStrings)
+    {
+      if (Enum.TryParse(typeString, true, out SpellType spellType))
+      {
+        types.Add(spellType);
+      }
+    }
+
+    if (types.Count == 0) { types.Add(SpellType.Other); }
+    return types.OrderBy(x => x).ToArray();
+  }
+
+  /// <summary>
+  /// Returns all the <see cref="ColorTypes"/> that the given faces have
+  /// </summary>
+  public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
+  {
+    var colors = new List<ColorTypes>();
+
+    foreach (var color in frontFace.Colors)
+    {
+      if (!colors.Contains(color)) { colors.Add(color); }
+    }
+
+    if (backFace != null)
+    {
+      foreach (var color in backFace?.Colors)
+      {
+        if (!colors.Contains(color)) { colors.Add(color); }
+      }
+    }
+
+    // Card is colorless if it has no other colors
+    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
+    return colors.ToArray();
   }
 }
