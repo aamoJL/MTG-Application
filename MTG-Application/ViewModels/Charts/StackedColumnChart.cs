@@ -5,7 +5,7 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MTGApplication.Models;
 using System.Linq;
-using static MTGApplication.Models.MTGCard;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels.Charts;
 
@@ -18,7 +18,7 @@ public abstract class StackedColumnChart<TPrimaryType, TModel> : CardModelChart<
 
   private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if(e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
+    if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
     {
       (XAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
       (YAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
@@ -56,7 +56,7 @@ public class MTGCMCStackedColumnChart : StackedColumnChart<ColorTypes, MTGCard>
 
   protected override StackedColumnSeries<CardModelSeries<MTGCard>> FindPrimarySeries(MTGCard model, ColorTypes item)
   {
-    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is StackedColumnSeries<CardModelSeries<MTGCard>> series)
+    if (Series.FirstOrDefault(x => x.Name == item.GetFullName()) is StackedColumnSeries<CardModelSeries<MTGCard>> series)
     {
       return series;
     }

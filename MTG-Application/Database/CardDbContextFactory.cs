@@ -25,6 +25,5 @@ public class CardDbContextFactory
   /// <summary>
   /// Returns <see cref="CardDbContext"/> with the <see cref="connectionString"/> options
   /// </summary>
-  public virtual CardDbContext CreateDbContext()
-    => new(new DbContextOptionsBuilder().UseSqlite(connectionString).Options);
+  public virtual CardDbContext CreateDbContext() => new(new DbContextOptionsBuilder().UseSqlite(connectionString).Options);
 }

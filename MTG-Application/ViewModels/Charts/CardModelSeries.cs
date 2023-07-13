@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using static MTGApplication.Models.MTGCard;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels.Charts;
 
@@ -48,8 +48,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
   /// </summary>
   public virtual void AddItem(TModel item)
   {
-    if (Models.Contains(item))
-    { return; }
+    if (Models.Contains(item)) { return; }
     Models.Add(item);
 
     item.PropertyChanged += Model_PropertyChanged;
@@ -60,8 +59,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
   /// </summary>
   public virtual void RemoveItem(TModel item)
   {
-    if (!Models.Contains(item))
-    { return; }
+    if (!Models.Contains(item)) { return; }
     Models.Remove(item);
 
     item.PropertyChanged -= Model_PropertyChanged;
@@ -74,7 +72,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
   {
     return new StackedColumnSeries<CardModelSeries<TModel>>
     {
-      Name = GetColorTypeName(color),
+      Name = color.GetFullName(),
       Values = new ObservableCollection<CardModelSeries<TModel>>(),
       Stroke = new SolidColorPaint(SKColors.Gray) { StrokeThickness = 1 },
       Fill = color switch
@@ -108,7 +106,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
   {
     return new PieSeries<CardModelSeries<TModel>>
     {
-      Name = GetColorTypeName(color),
+      Name = color.GetFullName(),
       Values = new ObservableCollection<CardModelSeries<TModel>>(),
       Stroke = new SolidColorPaint(SKColors.Gray) { StrokeThickness = 1 },
       Fill = color switch

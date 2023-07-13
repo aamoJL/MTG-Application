@@ -7,8 +7,8 @@ using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 using static MTGApplication.Enums;
-using static MTGApplication.Models.MTGCard;
 using static MTGApplication.Services.DialogService;
+using static MTGApplication.Services.MTGService;
 using static MTGApplication.ViewModels.DeckBuilderViewModel;
 using static MTGApplicationTests.Database.InMemoryMTGDeckRepositoryTests;
 using static MTGApplicationTests.Services.TestDialogService;
@@ -124,7 +124,7 @@ public class DeckBuilderViewModelTests
     await repo.Add(dbDeck);
 
     // Add card to the deck so the unsaved dialog appears
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.NewDeckDialog();
@@ -148,7 +148,7 @@ public class DeckBuilderViewModelTests
     });
 
     // Add a card to the deck so the unsaved dialog appears
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.NewDeckDialog();
@@ -185,7 +185,7 @@ public class DeckBuilderViewModelTests
     await repo.Add(dbDeck);
 
     // Add a card to the deck so the unsaved dialog appears.
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.NewDeckDialog();
@@ -222,7 +222,7 @@ public class DeckBuilderViewModelTests
     await repo.Add(dbDeck);
 
     // Add a card to the deck so the unsaved dialog appears
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.NewDeckDialog();
@@ -258,7 +258,7 @@ public class DeckBuilderViewModelTests
     await repo.Add(dbDeck);
 
     // Add a card to the deck so the unsaved dialog appears.
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.NewDeckDialog();
@@ -317,17 +317,17 @@ public class DeckBuilderViewModelTests
     await repo.Add(dbDeck);
 
     // Add a card to the deck so the unsaved dialog appears.
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.LoadDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
     Assert.AreEqual(2, vm.DeckCards.CardlistSize);
     Assert.AreEqual(deckName, vm.CardDeck.Name);
-    Assert.AreEqual(2, vm.DeckCards.CardCollection.Count);
-    Assert.AreEqual(3, vm.MaybelistCards.CardCollection.Count);
-    Assert.AreEqual(4, vm.WishlistCards.CardCollection.Count);
-    Assert.AreEqual(5, vm.RemovelistCards.CardCollection.Count);
+    Assert.AreEqual(2, vm.DeckCards.Cardlist.Count);
+    Assert.AreEqual(3, vm.MaybelistCards.Cardlist.Count);
+    Assert.AreEqual(4, vm.WishlistCards.Cardlist.Count);
+    Assert.AreEqual(5, vm.RemovelistCards.Cardlist.Count);
   }
 
   [TestMethod]
@@ -387,7 +387,7 @@ public class DeckBuilderViewModelTests
     await repo.Add(dbDeck);
 
     // Add a card to the deck so the unsaved dialog appears.
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.LoadDeckDialog();
@@ -422,9 +422,9 @@ public class DeckBuilderViewModelTests
 
     await repo.Add(dbDeck);
 
-    vm.SelectedSortDirection = SortDirection.Ascending;
-    vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;
-    vm.SelectedSecondarySortProperty = MTGSortProperty.Name;
+    vm.SortProperties.SortDirection = SortDirection.Ascending;
+    vm.SortProperties.PrimarySortProperty = MTGSortProperty.CMC;
+    vm.SortProperties.SecondarySortProperty = MTGSortProperty.Name;
     var sortedDbCards = dbDeck.DeckCards.OrderBy(x => x.Info.CMC).ThenBy(x => x.Info.Name).ToList();
 
     await vm.LoadDeckDialog();
@@ -444,10 +444,10 @@ public class DeckBuilderViewModelTests
       SaveDialog = new() { Values = deckName }, // Save deck
     });
 
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    await vm.MaybelistCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    await vm.WishlistCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    await vm.RemovelistCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.MaybelistCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.WishlistCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.RemovelistCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
 
     await vm.SaveDeckDialog();
@@ -457,10 +457,10 @@ public class DeckBuilderViewModelTests
     Assert.AreEqual(deckName, vm.CardDeck.Name);
 
     var dbDeck = await repo.Get(deckName);
-    Assert.AreEqual(vm.DeckCards.CardCollection.Count, dbDeck?.DeckCards.Count);
-    Assert.AreEqual(vm.MaybelistCards.CardCollection.Count, dbDeck?.Maybelist.Count);
-    Assert.AreEqual(vm.WishlistCards.CardCollection.Count, dbDeck?.Wishlist.Count);
-    Assert.AreEqual(vm.RemovelistCards.CardCollection.Count, dbDeck?.Removelist.Count);
+    Assert.AreEqual(vm.DeckCards.Cardlist.Count, dbDeck?.DeckCards.Count);
+    Assert.AreEqual(vm.MaybelistCards.Cardlist.Count, dbDeck?.Maybelist.Count);
+    Assert.AreEqual(vm.WishlistCards.Cardlist.Count, dbDeck?.Wishlist.Count);
+    Assert.AreEqual(vm.RemovelistCards.Cardlist.Count, dbDeck?.Removelist.Count);
   }
 
   [TestMethod]
@@ -527,7 +527,7 @@ public class DeckBuilderViewModelTests
     };
     await repo.Add(dbDeck);
 
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     await vm.SaveDeckDialog();
     Assert.IsFalse(vm.HasUnsavedChanges);
@@ -566,7 +566,7 @@ public class DeckBuilderViewModelTests
     await vm.LoadDeckDialog();
     Assert.AreEqual(loadName, vm.CardDeck.Name);
 
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"));
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"));
 
     await vm.SaveDeckDialog(); // Rename with the saveName name
     Assert.IsFalse(vm.HasUnsavedChanges);
@@ -587,7 +587,7 @@ public class DeckBuilderViewModelTests
     });
 
     // Add card so the deck has unsaved changes
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     await vm.SaveDeckDialog();
 
@@ -734,7 +734,7 @@ public class DeckBuilderViewModelTests
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1);
 
     using var propAsserter = new PropertyChangedAssert(vm, nameof(vm.DeckSize));
-    await vm.DeckCards.AddToCardlist(card);
+    await vm.DeckCards.Add(card);
     Assert.AreEqual(card.Count, vm.DeckSize);
     Assert.IsTrue(propAsserter.PropertyChanged);
 
@@ -866,8 +866,8 @@ public partial class DeckBuilderViewModel_CardlistTests
     {
       DeckCards = cards,
     };
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
-    var expectedText = cardlist.GetExportString();
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
+    var expectedText = MTGService.GetExportString(cardlist.Cardlist.ToArray(), "Name");
 
     using TestIO.TestClipboard clipboard = new();
     DeckBuilderViewModel vm = new(cardAPI: null, deckRepository: null, dialogs: new TestDeckBuilderViewDialogs()
@@ -877,7 +877,7 @@ public partial class DeckBuilderViewModel_CardlistTests
 
     foreach (var item in cards)
     {
-      await vm.DeckCards.AddToCardlist(item);
+      await vm.DeckCards.Add(item);
     }
 
     await vm.DeckCards.ExportDeckCardsDialog();
@@ -895,11 +895,11 @@ public partial class DeckBuilderViewModel_CardlistTests
     var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1);
     var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3);
 
-    vm.SelectedPrimarySortProperty = MTGSortProperty.CMC;
-    vm.SelectedSortDirection = SortDirection.Ascending;
-    await vm.DeckCards.AddToCardlist(secondCard);
-    await vm.DeckCards.AddToCardlist(thirdCard);
-    await vm.DeckCards.AddToCardlist(firstCard);
+    vm.SortProperties.PrimarySortProperty = MTGSortProperty.CMC;
+    vm.SortProperties.SortDirection = SortDirection.Ascending;
+    await vm.DeckCards.Add(secondCard);
+    await vm.DeckCards.Add(thirdCard);
+    await vm.DeckCards.Add(firstCard);
     // The viewmodels should be sorted when cards are added to the deck
     CollectionAssert.AreEqual(new[] { secondCard, firstCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
@@ -919,12 +919,12 @@ public partial class DeckBuilderViewModel_CardlistTests
     var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
     var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
 
-    vm.SelectedPrimarySortProperty = MTGSortProperty.Color;
-    vm.SelectedSecondarySortProperty = MTGSortProperty.Name;
-    vm.SelectedSortDirection = SortDirection.Ascending;
-    await vm.DeckCards.AddToCardlist(secondCard);
-    await vm.DeckCards.AddToCardlist(thirdCard);
-    await vm.DeckCards.AddToCardlist(firstCard);
+    vm.SortProperties.PrimarySortProperty = MTGSortProperty.Color;
+    vm.SortProperties.SecondarySortProperty = MTGSortProperty.Name;
+    vm.SortProperties.SortDirection = SortDirection.Ascending;
+    await vm.DeckCards.Add(secondCard);
+    await vm.DeckCards.Add(thirdCard);
+    await vm.DeckCards.Add(firstCard);
     // The viewmodels should be sorted by name when added, because they are the same color
     CollectionAssert.AreEqual(new[] { firstCard, secondCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
@@ -966,10 +966,10 @@ public partial class DeckBuilderViewModel_CardlistTests
         new ColorTypes[] { ColorTypes.W, ColorTypes.B },
         oracleText: "Draw a card"));
 
-    await vm.DeckCards.AddToCardlist(secondCard);
-    await vm.DeckCards.AddToCardlist(thirdCard);
-    await vm.DeckCards.AddToCardlist(firstCard);
-    await vm.DeckCards.AddToCardlist(fourthCard);
+    await vm.DeckCards.Add(secondCard);
+    await vm.DeckCards.Add(thirdCard);
+    await vm.DeckCards.Add(firstCard);
+    await vm.DeckCards.Add(fourthCard);
 
     // Name filter
     vm.CardFilters.NameText = "a";
@@ -990,7 +990,7 @@ public partial class DeckBuilderViewModel_CardlistTests
 
     // Color group filter
     vm.CardFilters.Reset();
-    vm.CardFilters.ColorGroup = Cardlist.CardFilters.ColorGroups.Multi; // Multicolored
+    vm.CardFilters.ColorGroup = MTGService.MTGCardFilters.ColorGroups.Multi; // Multicolored
     CollectionAssert.AreEquivalent(new[] { fourthCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
     // CMC filter
@@ -1014,10 +1014,10 @@ public partial class DeckBuilderViewModel_CardlistTests
     var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, typeLine: "Land", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.C }));
     var fourthCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "D", cmc: 4, typeLine: "Enchantment", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.W, ColorTypes.B }));
 
-    await vm.MaybelistCards.AddToCardlist(secondCard);
-    await vm.MaybelistCards.AddToCardlist(thirdCard);
-    await vm.MaybelistCards.AddToCardlist(firstCard);
-    await vm.MaybelistCards.AddToCardlist(fourthCard);
+    await vm.MaybelistCards.Add(secondCard);
+    await vm.MaybelistCards.Add(thirdCard);
+    await vm.MaybelistCards.Add(firstCard);
+    await vm.MaybelistCards.Add(fourthCard);
 
     // Name filter
     vm.CardFilters.NameText = "a";
@@ -1038,7 +1038,7 @@ public partial class DeckBuilderViewModel_CardlistTests
 
     // Color group filter
     vm.CardFilters.Reset();
-    vm.CardFilters.ColorGroup = Cardlist.CardFilters.ColorGroups.Multi; // Multicolored
+    vm.CardFilters.ColorGroup = MTGService.MTGCardFilters.ColorGroups.Multi; // Multicolored
     CollectionAssert.AreEquivalent(new[] { fourthCard }, vm.MaybelistCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
     // CMC filter
@@ -1057,7 +1057,7 @@ public partial class DeckBuilderViewModel_CardlistTests
   {
     DeckBuilderViewModel vm = new(null, null);
 
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
   }
 
@@ -1067,7 +1067,7 @@ public partial class DeckBuilderViewModel_CardlistTests
     DeckBuilderViewModel vm = new(null, null);
 
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
-    await vm.DeckCards.AddToCardlist(card);
+    await vm.DeckCards.Add(card);
     vm.HasUnsavedChanges = false;
     Assert.IsFalse(vm.HasUnsavedChanges);
 
@@ -1085,7 +1085,7 @@ public partial class DeckBuilderViewModel_CardlistTests
       CardPrintDialog = new() { Values = newPrint },
     });
 
-    await vm.DeckCards.AddToCardlist(card);
+    await vm.DeckCards.Add(card);
     vm.HasUnsavedChanges = false; // Change unsaved state to false without saving
     Assert.IsFalse(vm.HasUnsavedChanges);
 
@@ -1099,9 +1099,9 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task AddToCardlistCommandTest()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
 
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.AreEqual(1, deck.DeckCards.Count);
   }
 
@@ -1109,13 +1109,13 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task AddToCardlistCommandTest_AlreadyExists_Add()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, new TestDeckBuilderViewDialogs()
     {
       CardAlreadyInDeckDialog = new(),
     }, null);
 
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 1));
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 2));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 1));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 2));
     Assert.AreEqual(3, deck.DeckCards.Sum(x => x.Count));
   }
 
@@ -1123,13 +1123,13 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task AddToCardlistCommandTest_AlreadyExists_Skip()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, new TestDeckBuilderViewDialogs()
     {
       CardAlreadyInDeckDialog = new() { Result = ContentDialogResult.None }
     }, null);
 
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 1));
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 2));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 1));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 2));
     Assert.AreEqual(1, deck.DeckCards.Sum(x => x.Count));
   }
 
@@ -1137,9 +1137,9 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task AddToCardlistCommandTest_Undo()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
 
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     cardlist.CommandService.Undo();
     Assert.AreEqual(0, deck.DeckCards.Count);
@@ -1153,13 +1153,13 @@ public partial class DeckBuilderViewModel_CardlistTests
   {
     var commandService = new CommandService();
     var deck = new MTGCardDeck();
-    var deckCards = new Cardlist(deck, CardlistType.Deck, null, null, commandService: commandService);
-    var wishlist = new Cardlist(deck, CardlistType.Wishlist, null, null, commandService: commandService);
+    var deckCards = new DeckCardlistViewModel(deck.DeckCards, null, null) { CommandService = commandService };
+    var wishlist = new DeckCardlistViewModel(deck.Wishlist, null, null) { CommandService = commandService };
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
-    await deckCards.AddToCardlist(card);
+    await deckCards.Add(card);
 
-    await wishlist.MoveToCardlist(card, deckCards);
+    await wishlist.Move(card, deckCards);
     Assert.AreEqual(0, deck.DeckCards.Count);
     Assert.AreEqual(1, deck.Wishlist.Count);
 
@@ -1176,12 +1176,12 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task RemoveFromCardlistCommandTest()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
-    await cardlist.AddToCardlist(card);
+    await cardlist.Add(card);
 
-    cardlist.RemoveFromCardlist(card);
+    cardlist.Remove(card);
     Assert.AreEqual(0, deck.DeckCards.Count);
   }
 
@@ -1191,8 +1191,8 @@ public partial class DeckBuilderViewModel_CardlistTests
     var vm = new DeckBuilderViewModel(null, null);
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
-    await vm.DeckCards.AddToCardlist(card);
-    vm.DeckCards.RemoveFromCardlist(card);
+    await vm.DeckCards.Add(card);
+    vm.DeckCards.Remove(card);
 
     vm.CommandService.Undo();
     Assert.AreEqual(1, vm.DeckCards.FilteredAndSortedCardViewModels.Count);
@@ -1205,10 +1205,10 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task RemoveFromCardlistCommandTest_CardViewModelCommand()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
-    await cardlist.AddToCardlist(card);
+    await cardlist.Add(card);
     Assert.AreEqual(1, deck.DeckCards.Count);
 
     ((MTGCardViewModel)cardlist.FilteredAndSortedCardViewModels[0]).DeleteCardCommand.Execute(card);
@@ -1219,11 +1219,11 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task RemoveFromCardlistCommandTest_Undo()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
-    await cardlist.AddToCardlist(card);
-    cardlist.RemoveFromCardlist(card);
+    await cardlist.Add(card);
+    cardlist.Remove(card);
 
     cardlist.CommandService.Undo();
     Assert.AreEqual(1, deck.DeckCards.Count);
@@ -1236,11 +1236,11 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task ClearCardlistCommandTest()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new Cardlist(deck, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
 
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "1"));
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "2"));
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "3"));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "1"));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "2"));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "3"));
     Assert.AreEqual(3, cardlist.CardlistSize);
 
     cardlist.Clear();
@@ -1265,7 +1265,7 @@ public partial class DeckBuilderViewModel_CardlistTests
       CardPrintDialog = new() { Values = newPrint }
     });
 
-    await vm.DeckCards.AddToCardlist(card);
+    await vm.DeckCards.Add(card);
 
     await vm.DeckCards.ChangePrintDialog(card);
     Assert.AreEqual(card.Info.ScryfallId, newPrint.Model.Info.ScryfallId);
@@ -1275,10 +1275,10 @@ public partial class DeckBuilderViewModel_CardlistTests
   [TestMethod]
   public async Task DeckPriceChangesTest_CardlistChanges()
   {
-    var cardlist = new Cardlist(new(), CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(new MTGCardDeck().DeckCards, null, null);
     using var asserter = new PropertyChangedAssert(cardlist, nameof(cardlist.EuroPrice));
 
-    await cardlist.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel(price: 500));
+    await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(price: 500));
     Assert.IsTrue(asserter.PropertyChanged);
   }
 
@@ -1286,10 +1286,10 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task DeckPriceChangesTest_CardCountChanges()
   {
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid());
-    var cardlist = new Cardlist(new() { DeckCards = new() { card } }, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(new MTGCardDeck() { DeckCards = new() { card } }.DeckCards, null, null);
     DeckBuilderViewModel vm = new(new TestCardAPI(), null, null);
 
-    await vm.DeckCards.AddToCardlist(card);
+    await vm.DeckCards.Add(card);
 
     using var asserter = new PropertyChangedAssert(cardlist, nameof(cardlist.EuroPrice));
     card.Count++;
@@ -1300,14 +1300,14 @@ public partial class DeckBuilderViewModel_CardlistTests
   public async Task DeckPriceChangesTest_CardPrintChanges()
   {
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid());
-    var cardlist = new Cardlist(new() { DeckCards = new() { card } }, CardlistType.Deck, null, null);
+    var cardlist = new DeckCardlistViewModel(new MTGCardDeck { DeckCards = new() { card } }.DeckCards, null, null);
     var newPrint = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()));
     DeckBuilderViewModel vm = new(new TestCardAPI(), null, dialogs: new TestDeckBuilderViewDialogs()
     {
       CardPrintDialog = new() { Values = newPrint }
     });
 
-    await vm.DeckCards.AddToCardlist(card);
+    await vm.DeckCards.Add(card);
 
     using var asserter = new PropertyChangedAssert(cardlist, nameof(cardlist.EuroPrice));
     await vm.DeckCards.ChangePrintDialog(card);

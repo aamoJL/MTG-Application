@@ -35,9 +35,11 @@ public class InMemoryMTGDeckRepositoryTests : MTGDeckRepositoryTestsBase
       if (WillFail) { return new List<MTGCardDeck>(); }
       return await base.Get();
     }
-    public override async Task<MTGCardDeck?> Get(string name)
+    public override async Task<MTGCardDeck> Get(string name)
     {
+#pragma warning disable CS8603 // Possible null reference return.
       if (WillFail) { return null; }
+#pragma warning restore CS8603 // Possible null reference return.
       return await base.Get(name);
     }
     public override async Task<bool> Remove(MTGCardDeck item)

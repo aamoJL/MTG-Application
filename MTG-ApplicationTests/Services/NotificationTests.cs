@@ -62,11 +62,10 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success);
 
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ImportDialog = new() { Values = nameof(expectedCards) },
-      }, new TestCardAPI(expectedCards, 0));
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ImportDialog = new() { Values = nameof(expectedCards) },
+    }, new TestCardAPI(expectedCards, 0));
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -83,11 +82,10 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Warning);
 
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ImportDialog = new() { Values = nameof(expectedCards) },
-      }, new TestCardAPI(expectedCards, 3));
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ImportDialog = new() { Values = nameof(expectedCards) },
+    }, new TestCardAPI(expectedCards, 3));
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -97,11 +95,10 @@ public class NotificationTests
   {
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ImportDialog = new() { Values = "notFound" },
-      }, new TestCardAPI(null, 3));
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ImportDialog = new() { Values = "notFound" },
+    }, new TestCardAPI(null, 3));
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -111,11 +108,10 @@ public class NotificationTests
   {
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ImportDialog = new() { Values = string.Empty },
-      }, new TestCardAPI(null, 0));
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ImportDialog = new() { Values = string.Empty },
+    }, new TestCardAPI(null, 0));
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -132,11 +128,10 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success) { WillFail = true };
 
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ImportDialog = new() { Result = ContentDialogResult.None, Values = "NotFound"}, // Cancel dialog
-      }, new TestCardAPI(expectedCards, 3));
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ImportDialog = new() { Result = ContentDialogResult.None, Values = "NotFound" }, // Cancel dialog
+    }, new TestCardAPI(expectedCards, 3));
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -144,11 +139,11 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Copy()
   {
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ExportDialog = new() { Values = "Text"},
-      }, new TestCardAPI(), clipboardService: new TestIO.TestClipboard());
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ExportDialog = new() { Values = "Text" },
+    }, new TestCardAPI())
+    { ClipboardService = new TestIO.TestClipboard() };
 
     using var asserter = new NotificationAsserter(NotificationType.Info);
 
@@ -158,11 +153,11 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Empty()
   {
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ExportDialog = new() { Values = string.Empty },
-      }, new TestCardAPI(), clipboardService: new TestIO.TestClipboard());
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ExportDialog = new() { Values = string.Empty },
+    }, new TestCardAPI())
+    { ClipboardService = new TestIO.TestClipboard() };
 
     using var asserter = new NotificationAsserter(NotificationType.Info);
 
@@ -172,11 +167,11 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Canceled()
   {
-    var cardlist = new DeckBuilderViewModel.Cardlist(new(),
-      MTGApplication.Enums.CardlistType.Deck, new TestDeckBuilderViewDialogs()
-      {
-        ExportDialog = new() { Result = ContentDialogResult.None, Values = null }, // Cancel dialog
-      }, new TestCardAPI(), clipboardService: new TestIO.TestClipboard());
+    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    {
+      ExportDialog = new() { Result = ContentDialogResult.None, Values = null }, // Cancel dialog
+    }, new TestCardAPI())
+    { ClipboardService = new TestIO.TestClipboard() };
 
     using var asserter = new NotificationAsserter(NotificationType.Error) { WillFail = true };
 
@@ -198,7 +193,7 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success);
 
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     await vm.SaveDeckDialog();
   }
 
@@ -215,7 +210,7 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    await vm.DeckCards.AddToCardlist(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     await vm.SaveDeckDialog();
   }
 

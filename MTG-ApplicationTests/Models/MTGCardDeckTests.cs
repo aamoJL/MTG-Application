@@ -1,59 +1,49 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 using System.Collections.ObjectModel;
-using static MTGApplication.Enums;
 
-namespace MTGApplicationTests.Models
+namespace MTGApplicationTests.Models;
+
+[TestClass]
+public class MTGCardDeckTests
 {
-  [TestClass]
-  public class MTGCardDeckTests
+  [TestMethod]
+  public void AddToCardlistTest()
   {
-    [TestMethod]
-    public void GetCardlistTest()
+    var deck = new MTGCardDeck();
+
+    MTGCardDeck.AddOrCombineToCardlist(new[] { Mocker.MTGCardModelMocker.CreateMTGCardModel() }, deck.DeckCards);
+    Assert.AreEqual(1, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
+  public void RemoveFromCardlistTest()
+  {
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var deck = new MTGCardDeck() { DeckCards = new() { card } };
+
+    MTGCardDeck.RemoveOrReduceFromCardlist(new[] { card }, deck.DeckCards);
+    Assert.AreEqual(0, deck.DeckCards.Count);
+  }
+
+  [TestMethod]
+  public async Task MTGCardDeckDTO_AsMTGCardDeckTest()
+  {
+    var name = "First";
+    ObservableCollection<MTGCard> deckCards = new()
     {
-      var deck = new MTGCardDeck();
+      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
+      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
+      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third"),
+    };
+    var deck = new MTGCardDeck() { Name = name, DeckCards = deckCards };
+    var dto = new MTGCardDeckDTO(deck);
 
-      deck.AddToCardlist(CardlistType.Deck, Mocker.MTGCardModelMocker.CreateMTGCardModel());
-      Assert.AreEqual(1, deck.GetCardlist(CardlistType.Deck).Count);
-    }
-
-    [TestMethod]
-    public void AddToCardlistTest()
-    {
-      var deck = new MTGCardDeck();
-      
-      deck.AddToCardlist(CardlistType.Deck, Mocker.MTGCardModelMocker.CreateMTGCardModel());
-      Assert.AreEqual(1, deck.DeckCards.Count);
-    }
-
-    [TestMethod]
-    public void RemoveFromCardlistTest()
-    {
-      var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
-      var deck = new MTGCardDeck() { DeckCards = new() { card } };
-
-      deck.RemoveFromCardlist(CardlistType.Deck, card);
-      Assert.AreEqual(0, deck.DeckCards.Count);
-    }
-
-    [TestMethod]
-    public async Task MTGCardDeckDTO_AsMTGCardDeckTest()
-    {
-      string name = "First";
-      ObservableCollection<MTGCard> deckCards = new()
-      {
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third"),
-      };
-      var deck = new MTGCardDeck() { Name = name, DeckCards = deckCards };
-      var dto = new MTGCardDeckDTO(deck);
-
-      var dtoToDeck = await dto.AsMTGCardDeck(new TestCardAPI(deckCards.ToArray()));
-      Assert.AreEqual(name, dtoToDeck.Name);
-      CollectionAssert.AreEquivalent(deckCards.Select(x => x.Info.ScryfallId).ToArray(), dtoToDeck.DeckCards.Select(x => x.Info.ScryfallId).ToArray());
-    }
+    var dtoToDeck = await dto.AsMTGCardDeck(new TestCardAPI(deckCards.ToArray()));
+    Assert.AreEqual(name, dtoToDeck.Name);
+    CollectionAssert.AreEquivalent(deckCards.Select(x => x.Info.ScryfallId).ToArray(), dtoToDeck.DeckCards.Select(x => x.Info.ScryfallId).ToArray());
   }
 }

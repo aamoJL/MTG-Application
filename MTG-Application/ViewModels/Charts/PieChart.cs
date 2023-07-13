@@ -3,7 +3,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using MTGApplication.Models;
 using System.Linq;
-using static MTGApplication.Models.MTGCard;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels.Charts;
 
@@ -65,7 +65,7 @@ public class MTGManaProductionPieChart : MTGPieChart<ColorTypes>
 
   protected override ISeries FindPrimarySeries(MTGCard model, ColorTypes item)
   {
-    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is PieSeries<CardModelSeries<MTGCard>> series) { return series; }
+    if (Series.FirstOrDefault(x => x.Name == item.GetFullName()) is PieSeries<CardModelSeries<MTGCard>> series) { return series; }
     else { return null; }
   }
 
@@ -93,7 +93,7 @@ public class MTGColorPieChart : MTGPieChart<ColorTypes>
 
   protected override ISeries FindPrimarySeries(MTGCard model, ColorTypes item)
   {
-    if (Series.FirstOrDefault(x => x.Name == GetColorTypeName(item)) is PieSeries<CardModelSeries<MTGCard>> series) { return series; }
+    if (Series.FirstOrDefault(x => x.Name == item.GetFullName()) is PieSeries<CardModelSeries<MTGCard>> series) { return series; }
     else { return null; }
   }
 

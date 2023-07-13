@@ -5,7 +5,7 @@ using MTGApplication.Services;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using static MTGApplication.Enums;
-using static MTGApplication.Models.MTGCard;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels;
 
@@ -20,9 +20,9 @@ public partial class MTGCardViewModel : ViewModelBase
 
   protected void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(SelectedFaceSide))
-    { OnPropertyChanged(nameof(SelectedFaceUri)); }
+    if (e.PropertyName == nameof(SelectedFaceSide)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
   }
+
   protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
@@ -43,9 +43,8 @@ public partial class MTGCardViewModel : ViewModelBase
 
   public string SelectedFaceUri => SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
   public bool HasBackFaceImage => Model.Info.BackFace?.ImageUri != null;
-  public string ModelAPIName => Model.GetAPIName();
+  public string ModelAPIName => Model.APIName;
 
-  #region Model Properties
   public ColorTypes ColorType => Model.Info.Colors.Length > 1 ? ColorTypes.M : Model.Info.Colors[0];
   public SpellType PrimaryType => Model.Info.SpellTypes[0];
   public RarityTypes Rarity => Model.Info.RarityType;
@@ -56,7 +55,6 @@ public partial class MTGCardViewModel : ViewModelBase
   public string Name => Model.Info.Name;
   public int CMC => Model.Info.CMC;
   public int Count { get => Model.Count; set => Model.Count = value; }
-  #endregion
 
   public ICommand DeleteCardCommand { get; set; }
   public ICommand ShowPrintsDialogCommand { get; set; }
@@ -84,7 +82,7 @@ public partial class MTGCardViewModel : ViewModelBase
   public async Task OpenCardmarketWebsite() => await IOService.OpenUri(Model.Info.CardMarketUri);
 
   /// <summary>
-  /// Returns name of the property that the given sort property uses
+  /// Returns the name of the viewmodel property that the given sort property uses to sort viewmodels
   /// </summary>
   public static string GetPropertyName(MTGSortProperty prop)
   {
@@ -101,12 +99,4 @@ public partial class MTGCardViewModel : ViewModelBase
       _ => string.Empty,
     };
   }
-}
-
-public partial class MTGCardCollectionCardViewModel : MTGCardViewModel
-{
-  public MTGCardCollectionCardViewModel(MTGCard model) : base(model) { }
-
-  [ObservableProperty]
-  private bool isOwned;
 }

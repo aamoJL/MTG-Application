@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,10 +37,8 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
 
   public async Task<bool> AddOrUpdate(MTGCardCollection item)
   {
-    if (await Exists(item.Name))
-    { return await Update(item); }
-    else
-    { return await Add(item); }
+    if (await Exists(item.Name)) { return await Update(item); }
+    else { return await Add(item); }
   }
 
   public async Task<bool> Exists(string name)
@@ -65,8 +64,7 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
   {
     using var db = cardDbContextFactory.CreateDbContext();
     var dbItem = await db.MTGCardCollections.FirstOrDefaultAsync(x => x.Name == item.Name);
-    if (dbItem == null)
-    { return false; }
+    if (dbItem == null) { return false; }
     db.Remove(dbItem);
     return await db.SaveChangesAsync() > 0;
   }
@@ -74,10 +72,10 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
   public async Task<bool> Update(MTGCardCollection item)
   {
     using var db = cardDbContextFactory.CreateDbContext();
-    if (await db.MTGCardCollections.Where(x => x.Name == item.Name).Include(x => x.CollectionLists).ThenInclude(x => x.Cards).FirstOrDefaultAsync() is MTGCardCollectionDTO collectionDTO)
+    if (await db.MTGCardCollections.Where(x => x.Name == item.Name).Include(x => x.CollectionLists).ThenInclude(x => x.Cards).FirstOrDefaultAsync() is MTGCardCollectionDTO dbCollectionDTO)
     {
       // Remove unused card lists from the database
-      foreach (var listDTO in collectionDTO.CollectionLists)
+      foreach (var listDTO in dbCollectionDTO.CollectionLists)
       {
         if (item.CollectionLists.FirstOrDefault(x => x.Name == listDTO.Name) is null)
         {
@@ -88,36 +86,34 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
       foreach (var itemList in item.CollectionLists)
       {
         // Find item list from the database, add if it does not exist
-        var listDTO = collectionDTO.CollectionLists.FirstOrDefault(x => x.Name == itemList.Name);
-        if (listDTO == null)
+        var dbListDTO = dbCollectionDTO.CollectionLists.FirstOrDefault(x => x.Name == itemList.Name);
+        if (dbListDTO == null)
         {
-          collectionDTO.CollectionLists.Add(new(itemList));
+          dbCollectionDTO.CollectionLists.Add(new(itemList));
           continue;
         }
         else
         {
           // Update list's search query
-          listDTO.SearchQuery = itemList.SearchQuery;
+          dbListDTO.SearchQuery = itemList.SearchQuery;
 
           // Remove unused cards from the database
-          List<Guid> itemListCards = new(itemList.Cards.Select(x => x.Info.ScryfallId).ToList());
-
           List<MTGCardDTO> missingCards = new();
-          missingCards.AddRange(db.MTGCards.Where(cardDTO => cardDTO.CollectionList.Id == listDTO.Id && !itemListCards.Contains(cardDTO.ScryfallId)).ToList());
+          missingCards.AddRange(dbListDTO.Cards.Where(cardDTO => !itemList.Cards.Select(x => x.Info.ScryfallId).ToList().Contains(cardDTO.ScryfallId)).ToList());
           db.RemoveRange(missingCards);
 
           // Add new cards to the deckDTO
           foreach (var card in itemList.Cards)
           {
-            if (listDTO.Cards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto)
+            if (dbListDTO.Cards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto)
             { cdto.Count = card.Count; }
             else
-            { listDTO.Cards.Add(new(card)); }
+            { dbListDTO.Cards.Add(new(card)); }
           }
         }
       }
 
-      db.Update(collectionDTO);
+      db.Update(dbCollectionDTO);
     }
 
     return await db.SaveChangesAsync() > 0;
