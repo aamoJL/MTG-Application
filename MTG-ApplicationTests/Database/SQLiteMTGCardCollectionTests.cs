@@ -7,6 +7,7 @@ using MTGApplication;
 using Microsoft.EntityFrameworkCore;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.API;
+using MTGApplication.Models.DTOs;
 
 namespace MTGApplicationTests.Database
 {

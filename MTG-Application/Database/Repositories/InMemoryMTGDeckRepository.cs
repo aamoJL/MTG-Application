@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,16 +25,13 @@ public class InMemoryMTGDeckRepository : IRepository<MTGCardDeck>
       Decks.Add(new MTGCardDeckDTO(item));
       return true;
     }
-    else
-    { return false; }
+    else { return false; }
   }
 
   public virtual async Task<bool> AddOrUpdate(MTGCardDeck item)
   {
-    if (await Exists(item.Name))
-    { return await Update(item); }
-    else
-    { return await Add(item); }
+    if (await Exists(item.Name)) { return await Update(item); }
+    else { return await Add(item); }
   }
 
   public virtual async Task<bool> Exists(string name) => await Task.Run(() => Decks.FirstOrDefault(x => x.Name == name) != null);
@@ -47,10 +45,8 @@ public class InMemoryMTGDeckRepository : IRepository<MTGCardDeck>
   public virtual async Task<bool> Update(MTGCardDeck item)
   {
     var index = await Task.Run(() => Decks.FindIndex(x => x.Name == item.Name));
-    if (index >= 0)
-    { Decks[index] = new MTGCardDeckDTO(item); return true; }
-    else
-    { return false; }
+    if (index >= 0) { Decks[index] = new MTGCardDeckDTO(item); return true; }
+    else { return false; }
   }
   #endregion
 }

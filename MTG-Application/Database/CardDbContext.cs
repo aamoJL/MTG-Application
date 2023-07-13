@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 
 // Add-migration 001 -OutputDir "Database/Migrations"
 
@@ -19,46 +20,58 @@ public class CardDbContext : DbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
-    modelBuilder.Entity<MTGCardDTO>()
-      .HasOne(e => e.DeckCards)
-      .WithMany(e => e.DeckCards)
-      .OnDelete(DeleteBehavior.Cascade);
-
-    modelBuilder.Entity<MTGCardDTO>()
-      .HasOne(e => e.DeckMaybelist)
-      .WithMany(e => e.MaybelistCards)
-      .OnDelete(DeleteBehavior.Cascade);
-
-    modelBuilder.Entity<MTGCardDTO>()
-      .HasOne(e => e.DeckWishlist)
-      .WithMany(e => e.WishlistCards)
-      .OnDelete(DeleteBehavior.Cascade);
-
-    modelBuilder.Entity<MTGCardDTO>()
-      .HasOne(e => e.DeckRemovelist)
-      .WithMany(e => e.RemovelistCards)
-      .OnDelete(DeleteBehavior.Cascade);
-
-    modelBuilder.Entity<MTGCardDTO>()
-      .HasOne(e => e.CollectionList)
-      .WithMany(e => e.Cards)
+    #region MTGCardDeckDTO
+    modelBuilder.Entity<MTGCardDeckDTO>()
+      .HasMany(c => c.DeckCards)
+      .WithOne()
+      .HasForeignKey("DeckCardsId")
       .OnDelete(DeleteBehavior.Cascade);
 
     modelBuilder.Entity<MTGCardDeckDTO>()
-      .HasOne(e => e.Commander)
+      .HasMany(c => c.MaybelistCards)
       .WithOne()
-      .HasForeignKey<MTGCardDTO>(e => e.DeckCommanderId)
+      .HasForeignKey("DeckMaybelistId")
       .OnDelete(DeleteBehavior.Cascade);
 
     modelBuilder.Entity<MTGCardDeckDTO>()
-      .HasOne(e => e.CommanderPartner)
+      .HasMany(c => c.WishlistCards)
       .WithOne()
-      .HasForeignKey<MTGCardDTO>(e => e.DeckCommanderPartnerId)
+      .HasForeignKey("DeckWishlistId")
       .OnDelete(DeleteBehavior.Cascade);
 
+    modelBuilder.Entity<MTGCardDeckDTO>()
+      .HasMany(c => c.RemovelistCards)
+      .WithOne()
+      .HasForeignKey("DeckRemovelistId")
+      .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<MTGCardDeckDTO>()
+      .HasOne(c => c.Commander)
+      .WithOne()
+      .HasForeignKey<MTGCardDTO>("DeckCommanderId")
+      .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<MTGCardDeckDTO>()
+      .HasOne(c => c.CommanderPartner)
+      .WithOne()
+      .HasForeignKey<MTGCardDTO>("DeckCommanderPartnerId")
+      .OnDelete(DeleteBehavior.Cascade);
+    #endregion
+
+    #region MTGCardCollectionDTO
+    modelBuilder.Entity<MTGCardCollectionDTO>()
+      .HasMany(c => c.CollectionLists)
+      .WithOne()
+      .HasForeignKey("CollectionId")
+      .OnDelete(DeleteBehavior.Cascade);
+    #endregion
+
+    #region MTGCardCollectionListDTO
     modelBuilder.Entity<MTGCardCollectionListDTO>()
-      .HasOne(e => e.Collection)
-      .WithMany(e => e.CollectionLists)
+      .HasMany(c => c.Cards)
+      .WithOne()
+      .HasForeignKey("CollectionListId")
       .OnDelete(DeleteBehavior.Cascade);
+    #endregion
   }
 }

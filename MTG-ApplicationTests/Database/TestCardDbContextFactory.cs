@@ -2,32 +2,31 @@
 using Microsoft.EntityFrameworkCore;
 using MTGApplication.Database;
 
-namespace MTGApplicationTests.Database
+namespace MTGApplicationTests.Database;
+
+public class TestCardDbContextFactory : CardDbContextFactory, IDisposable
 {
-  public class TestCardDbContextFactory : CardDbContextFactory, IDisposable
+  private const string inMemoryConnectionString = "Filename=:memory:";
+  private readonly SqliteConnection connection;
+
+  public TestCardDbContextFactory()
   {
-    private const string inMemoryConnectionString = "Filename=:memory:";
-    private readonly SqliteConnection connection;
+    connection = new SqliteConnection(inMemoryConnectionString);
+    connection.Open();
+  }
 
-    public TestCardDbContextFactory()
-    {
-      connection = new SqliteConnection(inMemoryConnectionString);
-      connection.Open();
-    }
+  public override CardDbContext CreateDbContext()
+  {
+    var options = new DbContextOptionsBuilder<CardDbContext>().UseSqlite(connection).Options;
+    var cardDbContext = new CardDbContext(options);
+    cardDbContext.Database.EnsureCreated();
+    return cardDbContext;
+  }
 
-    public override CardDbContext CreateDbContext()
-    {
-      var options = new DbContextOptionsBuilder<CardDbContext>().UseSqlite(connection).Options;
-      var cardDbContext = new CardDbContext(options);
-      cardDbContext.Database.EnsureCreated();
-      return cardDbContext;
-    }
-
-    public void Dispose()
-    {
-      connection.Close();
-      GC.SuppressFinalize(this);
-    }
+  public void Dispose()
+  {
+    connection.Close();
+    GC.SuppressFinalize(this);
   }
 }
 

@@ -43,7 +43,7 @@ public partial class MTGCardViewModel : ViewModelBase
 
   public string SelectedFaceUri => SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
   public bool HasBackFaceImage => Model.Info.BackFace?.ImageUri != null;
-  public string ModelAPIName => Model.GetAPIName();
+  public string ModelAPIName => Model.APIName;
 
   #region Model Properties
   public ColorTypes ColorType => Model.Info.Colors.Length > 1 ? ColorTypes.M : Model.Info.Colors[0];

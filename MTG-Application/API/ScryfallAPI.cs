@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using MTGApplication.Services;
 using System;
 using System.Collections.Generic;
@@ -115,21 +116,19 @@ public class ScryfallAPI : ICardAPI<MTGCard>
 
   #region ICardAPI interface
   public int PageSize => 175;
-  
+
   public string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";
 
   public async Task<Result> FetchCardsWithParameters(string searchParams)
   {
-    if (string.IsNullOrEmpty(searchParams))
-    { return Result.Empty(); }
+    if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
     return await FetchFromUri(GetSearchUri(searchParams));
   }
 
   public async Task<Result> FetchFromUri(string pageUri, bool paperOnly = false)
   {
     var rootNode = await FetchScryfallJsonObject(pageUri);
-    if (rootNode == null)
-    { return Result.Empty(); }
+    if (rootNode == null) { return Result.Empty(); }
 
     List<MTGCard> found = new();
 
@@ -155,9 +154,9 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       catch { return null; }
     })();
 
-    if(card != null)
+    if (card != null)
     {
-      return new Result(new[] {card}, 0, 1);
+      return new Result(new[] { card }, 0, 1);
     }
     else
     {
@@ -215,8 +214,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
   private static async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
     var cards = new List<MTGCard>();
-    if (jsonNode == null)
-    { return cards.ToArray(); }
+    if (jsonNode == null) { return cards.ToArray(); }
 
     var dataNode = jsonNode?["data"];
     if (dataNode != null)
@@ -271,10 +269,8 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       return colors.ToArray();
     }
 
-    if (json == null || json["object"]?.GetValue<string>() != "card")
-    { return null; }
-    if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null)
-    { return null; }
+    if (json == null || json["object"]?.GetValue<string>() != "card") { return null; }
+    if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null) { return null; }
 
     // https://scryfall.com/docs/api/cards
     var scryfallId = json["id"].GetValue<Guid>();
@@ -294,7 +290,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
     CardFace? backFace;
 
     frontFace = new CardFace(
-      colors: json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()) 
+      colors: json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray())
         : GetColors(json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
       name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>() ?? json["name"]?.GetValue<string>(),
       imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>() ?? json["image_uris"]?["normal"]?.GetValue<string>(),
@@ -302,7 +298,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? json["oracle_text"]?.GetValue<string>() ?? string.Empty
       );
 
-    if(json["card_faces"] != null)
+    if (json["card_faces"] != null)
     {
       backFace = new CardFace(
         colors: json["card_faces"]!.AsArray()[1]["colors"] != null ? GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray())
@@ -317,8 +313,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
 
     var rarityString = json["rarity"].GetValue<string>();
     var rarityType = RarityTypes.Common;
-    if (Enum.TryParse(rarityString, true, out RarityTypes type))
-    { rarityType = type; }
+    if (Enum.TryParse(rarityString, true, out RarityTypes type)) { rarityType = type; }
 
     var producedManaStringArray = json["produced_mana"]?.AsArray().Select(x => x.GetValue<string>()).ToArray();
     var producedManaList = new List<ColorTypes>();
@@ -350,7 +345,8 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       producedMana: producedManaList.ToArray(),
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
-      tokens: tokens ?? Array.Empty<CardToken>());
+      tokens: tokens ?? Array.Empty<CardToken>(),
+      apiName: APIName);
   }
 
   /// <summary>

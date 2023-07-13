@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 using System.Collections.ObjectModel;

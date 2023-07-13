@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
 using MTGApplicationTests.Services;
 using static MTGApplication.Interfaces.ICardAPI<MTGApplication.Models.MTGCard>;
 

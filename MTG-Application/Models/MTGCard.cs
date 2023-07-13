@@ -1,12 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.API;
-using MTGApplication.Interfaces;
+using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace MTGApplication.Models;
 
@@ -91,12 +89,13 @@ public partial class MTGCard : ObservableObject
     public SpellType[] SpellTypes { get; }
     public string CardMarketUri { get; }
     public ColorTypes[] ProducedMana { get; }
+    public string APIName { get; }
 
     /// <summary>
     /// Constructor for JSON deserialization
     /// </summary>
     [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-    public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens)
+    public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string apiName)
     {
       ScryfallId = scryfallId;
       Name = name;
@@ -117,8 +116,9 @@ public partial class MTGCard : ObservableObject
       ProducedMana = producedMana;
       PrintSearchUri = printSearchUri;
       Tokens = tokens;
+      APIName = apiName;
     }
-    public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens)
+    public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, string apiName = "")
     {
       ScryfallId = scryfallId;
       Name = name;
@@ -141,6 +141,7 @@ public partial class MTGCard : ObservableObject
       Colors = GetColors(FrontFace, BackFace);
       SpellTypes = GetSpellTypes(TypeLine);
       ProducedMana = producedMana;
+      APIName = apiName;
     }
   }
   #endregion
@@ -154,16 +155,16 @@ public partial class MTGCard : ObservableObject
 
   protected int count = 1;
 
-  [ObservableProperty]
-  private MTGCardInfo info;
+  [ObservableProperty] private MTGCardInfo info;
 
+  public string APIName => Info.APIName;
   public int Count
   {
     get => count;
     set
     {
       value = Math.Max(1, value);
-      if(count != value)
+      if (count != value)
       {
         count = value;
         OnPropertyChanged(nameof(Count));
@@ -184,17 +185,6 @@ public partial class MTGCard : ObservableObject
   }
 
   /// <summary>
-  /// Returns the API's name that was used to fetch the given card
-  /// </summary>
-  public string GetAPIName()
-  {
-    if (Info.ScryfallId != Guid.Empty)
-    { return ScryfallAPI.APIName; }
-    else
-    { return string.Empty; }
-  }
-
-  /// <summary>
   /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
   /// </summary>
   public static SpellType[] GetSpellTypes(string typeLine)
@@ -210,8 +200,7 @@ public partial class MTGCard : ObservableObject
       }
     }
 
-    if (types.Count == 0)
-    { types.Add(SpellType.Other); }
+    if (types.Count == 0) { types.Add(SpellType.Other); }
     return types.OrderBy(x => x).ToArray();
   }
 
@@ -241,22 +230,19 @@ public partial class MTGCard : ObservableObject
 
     foreach (var color in frontFace.Colors)
     {
-      if (!colors.Contains(color))
-      { colors.Add(color); }
+      if (!colors.Contains(color)) { colors.Add(color); }
     }
 
     if (backFace != null)
     {
       foreach (var color in backFace?.Colors)
       {
-        if (!colors.Contains(color))
-        { colors.Add(color); }
+        if (!colors.Contains(color)) { colors.Add(color); }
       }
     }
 
     // Card is colorless if it has no other colors
-    if (colors.Count == 0)
-    { colors.Add(ColorTypes.C); }
+    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
     return colors.ToArray();
   }
 }
@@ -275,13 +261,4 @@ public class MTGCardDTO : CardDTO
   }
 
   public Guid ScryfallId { get; init; }
-
-  public int? DeckCommanderId { get; private set; }
-  public int? DeckCommanderPartnerId { get; private set; }
-  
-  public MTGCardDeckDTO DeckCards { get; set; }
-  public MTGCardDeckDTO DeckWishlist { get; set; }
-  public MTGCardDeckDTO DeckMaybelist { get; set; }
-  public MTGCardDeckDTO DeckRemovelist { get; set; }
-  public MTGCardCollectionListDTO CollectionList { get; set; }
 }

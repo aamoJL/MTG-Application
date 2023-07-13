@@ -21,13 +21,13 @@ public partial class SQLiteMTGDeckRepositoryTests : MTGDeckRepositoryTestsBase
 
   protected override ITestRepository<MTGCardDeck> GetRepository() => new TestSQLiteMTGDeckRepository(new TestCardAPI(), new TestCardDbContextFactory());
 
-  [TestMethod] public override Task AddTest() => base.AddTest();
-  [TestMethod] public override Task AddTest_Commanders() => base.AddTest_Commanders();
-  [TestMethod] public override Task ExistsTest() => base.ExistsTest();
-  [TestMethod] public override Task GetTest() => base.GetTest();
-  [TestMethod] public override Task GetTest_Named() => base.GetTest_Named();
-  [TestMethod] public override Task RemoveTest() => base.RemoveTest();
-  [TestMethod] public override Task UpdateTest() => base.UpdateTest();
-  [TestMethod] public override Task UpdateTest_Commanders() => base.UpdateTest_Commanders();
-  [TestMethod] public override Task AddAndUpdateTest() => base.AddAndUpdateTest();
+  [TestMethod] public override async Task AddTest() => await base.AddTest();
+  [TestMethod] public override async Task AddTest_Commanders() => await base.AddTest_Commanders();
+  [TestMethod] public override async Task ExistsTest() => await base.ExistsTest();
+  [TestMethod] public override async Task GetTest() => await base.GetTest();
+  [TestMethod] public override async Task GetTest_Named() => await base.GetTest_Named();
+  [TestMethod] public override async Task RemoveTest() => await base.RemoveTest();
+  [TestMethod] public override async Task UpdateTest() => await base.UpdateTest();
+  [TestMethod] public override async Task UpdateTest_Commanders() => await base.UpdateTest_Commanders();
+  [TestMethod] public override async Task AddAndUpdateTest() => await base.AddAndUpdateTest();
 }
