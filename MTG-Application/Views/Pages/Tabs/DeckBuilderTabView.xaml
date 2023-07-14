@@ -389,12 +389,21 @@
                                PointerExited="PreviewableCard_PointerExited"
                                PointerMoved="PreviewableCard_PointerMoved"
                                DragStarting="CommanderView_DragStarting">
-                      <Run Text="{Binding Name}"/>
-                      <TextBlock.ContextFlyout>
-                        <MenuFlyout>
-                          <MenuFlyoutItem IsEnabled="{Binding FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderCommand}" CommandParameter="{x:Null}"/>
-                        </MenuFlyout>
+                      <TextBlock.ContextFlyout >
+                        <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+                          <CommandBarFlyout.PrimaryCommands>
+                            <AppBarButton Command="{Binding FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+                            <AppBarSeparator />
+                            <AppBarButton Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Label="{Binding ModelAPIName}" ToolTipService.ToolTip="API Website"/>
+                            <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                            <AppBarButton Command="{Binding DeleteCardCommand}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+                          </CommandBarFlyout.PrimaryCommands>
+                          <CommandBarFlyout.SecondaryCommands>
+                            <AppBarButton Command="{Binding ShowPrintsDialogCommand}" CommandParameter="{Binding Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+                          </CommandBarFlyout.SecondaryCommands>
+                        </CommandBarFlyout>
                       </TextBlock.ContextFlyout>
+                      <Run Text="{Binding Name}"/>
                     </TextBlock>
                     <TextBlock DataContext="{x:Bind DeckBuilderViewModel.CommanderPartner, Mode=OneWay}"
                                Text="Partner: " 
@@ -407,12 +416,21 @@
                                PointerExited="PreviewableCard_PointerExited"
                                PointerMoved="PreviewableCard_PointerMoved"
                                DragStarting="CommanderView_DragStarting">
-                      <Run Text="{Binding Name}"/>
                       <TextBlock.ContextFlyout>
-                        <MenuFlyout>
-                          <MenuFlyoutItem IsEnabled="{Binding FallbackValue=false, Converter={StaticResource NotNullToBooleanConverter}}" Text="Remove" Background="IndianRed" Command="{x:Bind DeckBuilderViewModel.SetCommanderPartnerCommand}" CommandParameter="{x:Null}"/>
-                        </MenuFlyout>
+                        <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+                          <CommandBarFlyout.PrimaryCommands>
+                            <AppBarButton Command="{Binding FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+                            <AppBarSeparator />
+                            <AppBarButton Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Label="{Binding ModelAPIName}" ToolTipService.ToolTip="API Website"/>
+                            <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                            <AppBarButton Command="{Binding DeleteCardCommand}" CommandParameter="{Binding Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+                          </CommandBarFlyout.PrimaryCommands>
+                          <CommandBarFlyout.SecondaryCommands>
+                            <AppBarButton Command="{Binding ShowPrintsDialogCommand}" CommandParameter="{Binding Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+                          </CommandBarFlyout.SecondaryCommands>
+                        </CommandBarFlyout>
                       </TextBlock.ContextFlyout>
+                      <Run Text="{Binding Name}"/>
                     </TextBlock>
                   </StackPanel>
                   <customcontrols:LinedHeader Grid.Row="1">

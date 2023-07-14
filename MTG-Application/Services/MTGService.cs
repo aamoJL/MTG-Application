@@ -119,9 +119,9 @@ public static partial class MTGService
         && (ColorGroup == ColorGroups.All
           || ColorGroup == ColorGroups.Mono && cardViewModel.Colors.Length == 1
           || (ColorGroup == ColorGroups.Multi && cardViewModel.Colors.Length > 1))
-        && (double.IsNaN(Cmc) || cardViewModel.CMC == Cmc)) 
-      { 
-        return true; 
+        && (double.IsNaN(Cmc) || cardViewModel.CMC == Cmc))
+      {
+        return true;
       }
       else { return false; };
     }

@@ -229,29 +229,24 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     /// </summary>
     public async Task ChangePrintDialog(MTGCard card)
     {
+      if (card == null) { return; }
+
       // Get prints
       IsBusy = true;
-
+      var printVMs = new List<MTGCardViewModel>();
       var pageUri = card.Info.PrintSearchUri;
-      var prints = new List<MTGCard>();
-      while (pageUri != string.Empty)
+      while (!string.IsNullOrEmpty(pageUri))
       {
         var result = await CardAPI.FetchFromUri(pageUri, paperOnly: true);
-        prints.AddRange(result.Found);
+        printVMs.AddRange(result.Found.Select(x => new MTGCardViewModel(x)));
         pageUri = result.NextPageUri;
       }
-
-      var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
       IsBusy = false;
 
-      if (await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync() is MTGCardViewModel newPrint)
+      if (await Dialogs.GetCardPrintDialog(printVMs.ToArray()).ShowAsync() is MTGCardViewModel newPrint)
       {
         // Replace card
-        var index = Cardlist.IndexOf(card);
-        if (index > -1)
-        {
-          Cardlist[index].Info = newPrint.Model.Info;
-        }
+        card.Info = newPrint.Model.Info;
       }
     }
 
@@ -398,10 +393,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     PropertyChanged += DeckBuilderViewModel_PropertyChanged;
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
     DeckCards.PropertyChanged += DeckCards_PropertyChanged;
-    DeckCards.PropertyChanged += Cardlist_PropertyChanged;
-    WishlistCards.PropertyChanged += Cardlist_PropertyChanged;
-    MaybelistCards.PropertyChanged += Cardlist_PropertyChanged;
-    RemovelistCards.PropertyChanged += Cardlist_PropertyChanged;
+    DeckCards.PropertyChanged += DeckCardlistViewModel_PropertyChanged;
+    WishlistCards.PropertyChanged += DeckCardlistViewModel_PropertyChanged;
+    MaybelistCards.PropertyChanged += DeckCardlistViewModel_PropertyChanged;
+    RemovelistCards.PropertyChanged += DeckCardlistViewModel_PropertyChanged;
 
     UpdateCharts();
   }
@@ -419,19 +414,19 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     switch (e.PropertyName)
     {
       case nameof(CardDeck.Commander):
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand} : null;
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
       case nameof(CardDeck.CommanderPartner):
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
     }
   }
 
-  private void Cardlist_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckCardlistViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
     {
@@ -442,18 +437,22 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
   private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(CardDeck))
+    switch (e.PropertyName)
     {
-      CardDeck.PropertyChanged += CardDeck_PropertyChanged;
-      DeckCards.Cardlist = CardDeck.DeckCards;
-      WishlistCards.Cardlist = CardDeck.Wishlist;
-      MaybelistCards.Cardlist = CardDeck.Maybelist;
-      RemovelistCards.Cardlist = CardDeck.Removelist;
-      Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
-      CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
-      CommandService.Clear();
-      UpdateCharts();
-      HasUnsavedChanges = false;
+      case nameof(CardDeck):
+        CardDeck.PropertyChanged += CardDeck_PropertyChanged;
+        DeckCards.Cardlist = CardDeck.DeckCards;
+        WishlistCards.Cardlist = CardDeck.Wishlist;
+        MaybelistCards.Cardlist = CardDeck.Maybelist;
+        RemovelistCards.Cardlist = CardDeck.Removelist;
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
+        CommandService.Clear();
+        UpdateCharts();
+        HasUnsavedChanges = false;
+        break;
+      case nameof(DeckSize):
+        OpenPlaytestWindowCommand.NotifyCanExecuteChanged(); break;
     }
   }
 
@@ -461,7 +460,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
 
-  [ObservableProperty, NotifyCanExecuteChangedFor(nameof(OpenPlaytestWindowCommand))] private MTGCardDeck cardDeck = new();
+  [ObservableProperty] private MTGCardDeck cardDeck = new();
   [ObservableProperty] private MTGManaProductionPieChart manaProductionChart;
   [ObservableProperty] private MTGSpellTypePieChart spellTypeChart;
   [ObservableProperty] private MTGCMCStackedColumnChart cMCChart;
@@ -657,11 +656,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Opens Deck testing page on a new window for the given deck
   /// </summary>
-  [RelayCommand(CanExecute = nameof(DeckIsLoaded))]
+  [RelayCommand(CanExecute = nameof(DeckHasCards))]
   public void OpenPlaytestWindow(MTGCardDeck deck)
   {
-    if (string.IsNullOrEmpty(deck.Name)) { return; }
-
     var testingWindow = new DeckTestingWindow(deck);
     testingWindow.Activate();
   }
@@ -678,6 +675,33 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// </summary>
   /// <param name="card"></param>
   public void SetCommanderPartner(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card));
+
+  /// <summary>
+  /// Shows a dialog with cards prints and changes the cards print to the selected print
+  /// </summary>
+  [RelayCommand]
+  public async Task ChangePrintDialog(MTGCard card)
+  {
+    if (card == null) { return; }
+
+    // Get prints
+    IsBusy = true;
+    var printVMs = new List<MTGCardViewModel>();
+    var pageUri = card.Info.PrintSearchUri;
+    while (!string.IsNullOrEmpty(pageUri))
+    {
+      var result = await CardAPI.FetchFromUri(pageUri, paperOnly: true);
+      printVMs.AddRange(result.Found.Select(x => new MTGCardViewModel(x)));
+      pageUri = result.NextPageUri;
+    }
+    IsBusy = false;
+
+    if (await Dialogs.GetCardPrintDialog(printVMs.ToArray()).ShowAsync() is MTGCardViewModel newPrint)
+    {
+      // Replace card
+      card.Info = newPrint.Model.Info;
+    }
+  }
   #endregion
 
   /// <summary>
@@ -786,8 +810,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
   }
 
+  #region RelayCommand CanExecute Methods
   /// <summary>
   /// Returns true if deck has been loaded from a database
   /// </summary>
   private bool DeckIsLoaded() => !string.IsNullOrEmpty(CardDeck.Name);
+
+  /// <summary>
+  /// Returns true if the deck has cards in it
+  /// </summary>
+  private bool DeckHasCards() => DeckCards.CardlistSize > 0;
+  #endregion
 }
