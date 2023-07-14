@@ -419,7 +419,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         OnPropertyChanged(nameof(DeckSize));
         break;
       case nameof(CardDeck.CommanderPartner):
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
