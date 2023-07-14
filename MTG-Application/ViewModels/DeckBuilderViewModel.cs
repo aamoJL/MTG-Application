@@ -637,7 +637,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// Shows deck cards' tokens in a dialog
   /// </summary>
   [RelayCommand]
-  public async void TokensDialog()
+  public async Task TokensDialog()
   {
     var stringBuilder = new StringBuilder();
 

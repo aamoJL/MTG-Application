@@ -32,7 +32,7 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
     get => (float)GetValue(CardHeightProperty);
     set => SetValue(CardHeightProperty, value);
   }
-  
+
   private ClickArgs? RootClickArgs { get; set; }
 
   public static readonly DependencyProperty CardWidthProperty =
@@ -82,7 +82,7 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
   {
     var properties = e.GetCurrentPoint(null).Properties;
 
-    if(properties.IsLeftButtonPressed)
+    if (properties.IsLeftButtonPressed)
     {
       RootClickArgs = new() { LeftMouse = true };
     }
@@ -94,7 +94,7 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
 
   private void Root_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
-    if(RootClickArgs != null)
+    if (RootClickArgs != null)
     {
       if (RootClickArgs.Value.LeftMouse)
       {
@@ -111,7 +111,7 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
     }
   }
 
-  private void Root_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) => RootClickArgs = null;
+  private void Root_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) => RootClickArgs = null;
 }
 
 #region Value Converters

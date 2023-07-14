@@ -13,8 +13,7 @@ public partial class DeckTestingMTGCardViewModel : MTGCardViewModel
   private int plusCounters = 0;
   private int countCounters = 1;
 
-  [ObservableProperty]
-  private bool isTapped = false;
+  [ObservableProperty] private bool isTapped = false;
 
   public int PlusCounters
   {
