@@ -414,7 +414,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     switch (e.PropertyName)
     {
       case nameof(CardDeck.Commander):
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand} : null;
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
@@ -479,7 +479,12 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   public int DeckSize => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
 
   #region ISavable implementation
-  public bool HasUnsavedChanges { get; set; }
+  private bool hasUnsavedChanges = false;
+  public bool HasUnsavedChanges
+  {
+    get => hasUnsavedChanges;
+    set => SetProperty(ref hasUnsavedChanges, value);
+  }
 
   /// <summary>
   /// Shows dialog that asks the user if they want to save unsaved changes
