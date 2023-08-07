@@ -475,7 +475,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   public DeckCardlistViewModel RemovelistCards { get; }
   public MTGCardFilters CardFilters { get; } = new();
   public CommandService CommandService { get; } = new();
-  public MTGCardSortProperties SortProperties { get; } = new() { SortDirection = SortDirection.Ascending, PrimarySortProperty = MTGSortProperty.CMC };
+  public MTGCardSortProperties SortProperties { get; } = new() { SortDirection = SortDirection.Ascending, PrimarySortProperty = MTGSortProperty.CMC, SecondarySortProperty = MTGSortProperty.Name };
   public int DeckSize => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
 
   #region ISavable implementation

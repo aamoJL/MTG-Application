@@ -916,20 +916,22 @@ public partial class DeckBuilderViewModel_CardlistTests
     DeckBuilderViewModel vm = new(null, null);
 
     var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
-    var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
-    var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
+    var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "BA", cmc: 1, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
+    var thirdCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "BB", cmc: 1, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
+    var fourthCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "C", cmc: 3, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
 
     vm.SortProperties.PrimarySortProperty = MTGSortProperty.Color;
     vm.SortProperties.SecondarySortProperty = MTGSortProperty.Name;
     vm.SortProperties.SortDirection = SortDirection.Ascending;
-    await vm.DeckCards.Add(secondCard);
     await vm.DeckCards.Add(thirdCard);
+    await vm.DeckCards.Add(secondCard);
     await vm.DeckCards.Add(firstCard);
+    await vm.DeckCards.Add(fourthCard);
     // The viewmodels should be sorted by name when added, because they are the same color
-    CollectionAssert.AreEqual(new[] { firstCard, secondCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+    CollectionAssert.AreEqual(new[] { firstCard, secondCard, thirdCard, fourthCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
 
     vm.SetSecondarySortProperty(MTGSortProperty.CMC.ToString());
-    CollectionAssert.AreEqual(new[] { secondCard, firstCard, thirdCard }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model).ToArray());
+    CollectionAssert.AreEqual(new[] { secondCard.Info.CMC, thirdCard.Info.CMC, firstCard.Info.CMC, fourthCard.Info.CMC }, vm.DeckCards.FilteredAndSortedCardViewModels.Select(x => ((MTGCardViewModel)x).Model.Info.CMC).ToArray());
   }
 
   [TestMethod]
