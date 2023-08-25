@@ -63,8 +63,8 @@ public partial class MTGCardDeck : ObservableObject
     public class SetCommanderCommand : ICommand
     {
       private MTGCardDeck CardDeck { get; }
-      private MTGCard NewCommander { get; set; }
-      private MTGCard OriginalCommander { get; set; }
+      private MTGCard NewCommander { get; }
+      private MTGCard OriginalCommander { get; }
 
       public SetCommanderCommand(MTGCardDeck cardDeck, MTGCard commander)
       {
@@ -93,8 +93,8 @@ public partial class MTGCardDeck : ObservableObject
     public class SetCommanderPartnerCommand : ICommand
     {
       private MTGCardDeck CardDeck { get; }
-      private MTGCard NewPartner { get; set; }
-      private MTGCard OriginalPartner { get; set; }
+      private MTGCard NewPartner { get; }
+      private MTGCard OriginalPartner { get; }
 
       public SetCommanderPartnerCommand(MTGCardDeck cardDeck, MTGCard partner)
       {

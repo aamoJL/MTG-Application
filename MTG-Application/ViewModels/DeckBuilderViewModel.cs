@@ -155,8 +155,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         WishlistCards.Cardlist = CardDeck.Wishlist;
         MaybelistCards.Cardlist = CardDeck.Maybelist;
         RemovelistCards.Cardlist = CardDeck.Removelist;
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) : null;
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) : null;
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
         CommandService.Clear();
         UpdateCharts();
         HasUnsavedChanges = false;
