@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using System;
 using System.Globalization;
 
 namespace MTGApplication.Views.BindingHelpers;
@@ -34,6 +35,12 @@ public static class Format
   /// The string format will be "0,00 €"
   /// </summary>
   public static string EuroToString(float value) => value.ToString("c2", new CultureInfo("fi-FI"));
+
+  /// <summary>
+  /// Returns the <paramref name="value"/> as a euro currency formatted <see cref="string"/>.
+  /// The string format will be "0,00 €"
+  /// </summary>
+  public static string EuroToString(float value, int digits) => ((float)Math.Round(value, digits)).ToString("c2", new CultureInfo("fi-FI"));
 
   /// <summary>
   /// Converts <paramref name="text"/> to uppercase

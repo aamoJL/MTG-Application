@@ -530,7 +530,7 @@
                   <StackPanel Margin="0 5 0 0" Orientation="Vertical" Spacing="5">
                     <TextBlock>
                         <Run Text="Price:" />
-                        <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckCards.EuroPrice), Mode=OneWay}" />
+                        <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckPrice, 0), Mode=OneWay}" />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" Spacing="10">
                       <Button Content="Show tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>

@@ -675,6 +675,7 @@ public class DeckBuilderViewModelTests
   }
   #endregion
 
+  #region Commander
   [TestMethod]
   public void SetCommanderCommandTest()
   {
@@ -726,6 +727,7 @@ public class DeckBuilderViewModelTests
     vm.CommandService.Redo();
     Assert.AreEqual(PartnerCard, vm.CardDeck.CommanderPartner);
   }
+  #endregion
 
   [TestMethod]
   public async Task DeckSizeTest()
@@ -750,7 +752,44 @@ public class DeckBuilderViewModelTests
 
     propAsserter.Reset();
     vm.SetCommanderPartner(Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1));
-    Assert.AreEqual(card.Count + 2, vm.DeckSize);
+    Assert.AreEqual(card.Count + 1 + 1, vm.DeckSize);
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    vm.SetCommander(null);
+    Assert.AreEqual(card.Count + 1, vm.DeckSize);
+    Assert.IsTrue(propAsserter.PropertyChanged);
+  }
+
+  [TestMethod]
+  public async Task DeckPriceTest()
+  {
+    var vm = new DeckBuilderViewModel(null, null, null);
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(price: 1.5f);
+
+    using var propAsserter = new PropertyChangedAssert(vm, nameof(vm.DeckPrice));
+    await vm.DeckCards.Add(card);
+    Assert.AreEqual(card.Info.Price, vm.DeckPrice); // 1.5€
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    card.Count += 1;
+    Assert.AreEqual(card.Info.Price * 2, vm.DeckPrice); // 3€
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    vm.SetCommander(Mocker.MTGCardModelMocker.CreateMTGCardModel(price: 1));
+    Assert.AreEqual(card.Info.Price * 2 + 1, vm.DeckPrice); // 4€
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    vm.SetCommanderPartner(Mocker.MTGCardModelMocker.CreateMTGCardModel(price: 3));
+    Assert.AreEqual(card.Info.Price * 2 + 1 + 3, vm.DeckPrice); // 7€
+    Assert.IsTrue(propAsserter.PropertyChanged);
+
+    propAsserter.Reset();
+    vm.SetCommander(null);
+    Assert.AreEqual(card.Info.Price * 2 + 3, vm.DeckPrice); // 6€
     Assert.IsTrue(propAsserter.PropertyChanged);
   }
 }

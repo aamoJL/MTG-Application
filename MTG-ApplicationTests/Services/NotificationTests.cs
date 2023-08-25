@@ -62,7 +62,7 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success);
 
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ImportDialog = new() { Values = nameof(expectedCards) },
     }, new TestCardAPI(expectedCards, 0));
@@ -82,7 +82,7 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Warning);
 
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ImportDialog = new() { Values = nameof(expectedCards) },
     }, new TestCardAPI(expectedCards, 3));
@@ -95,7 +95,7 @@ public class NotificationTests
   {
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ImportDialog = new() { Values = "notFound" },
     }, new TestCardAPI(null, 3));
@@ -108,7 +108,7 @@ public class NotificationTests
   {
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ImportDialog = new() { Values = string.Empty },
     }, new TestCardAPI(null, 0));
@@ -128,7 +128,7 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success) { WillFail = true };
 
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ImportDialog = new() { Result = ContentDialogResult.None, Values = "NotFound" }, // Cancel dialog
     }, new TestCardAPI(expectedCards, 3));
@@ -139,7 +139,7 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Copy()
   {
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ExportDialog = new() { Values = "Text" },
     }, new TestCardAPI())
@@ -153,7 +153,7 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Empty()
   {
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ExportDialog = new() { Values = string.Empty },
     }, new TestCardAPI())
@@ -167,7 +167,7 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Canceled()
   {
-    var cardlist = new DeckBuilderViewModel.DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
     {
       ExportDialog = new() { Result = ContentDialogResult.None, Values = null }, // Cancel dialog
     }, new TestCardAPI())
