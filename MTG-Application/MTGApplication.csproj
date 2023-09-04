@@ -36,11 +36,11 @@
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
     <None Remove="Views\Controls\LinedHeader.xaml" />
-    <None Remove="Views\Controls\ResourceDictionary1.xaml" />
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
     <None Remove="Views\Pages\DeckTestingPage.xaml" />
+    <None Remove="Views\Pages\EDHRECSearchPage.xaml" />
     <None Remove="Views\Pages\MainPage.xaml" />
     <None Remove="README.md" />
     <None Remove="Views\Pages\Tabs\CollectionsTabView.xaml" />
@@ -50,6 +50,7 @@
     <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
     <None Remove="Views\Styles\Themes\VioletTheme.xaml" />
     <None Remove="Views\Windows\DeckTestingWindow.xaml" />
+    <None Remove="Views\Windows\EDHRECSearchWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -182,7 +183,12 @@
     <PRIResource Remove="Views\Styles\Template\**" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\ResourceDictionary1.xaml">
+    <Page Update="Views\Pages\EDHRECSearchPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Windows\EDHRECSearchWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

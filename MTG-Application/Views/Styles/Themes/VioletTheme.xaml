@@ -44,6 +44,10 @@
           <Color x:Key="RegionColor">#FF393B54</Color>
 
           <SolidColorBrush x:Key="RegionBrush" Color="{StaticResource RegionColor}" />
+          
+          <!--Workaround for broken flyout background colors-->
+          <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="AcrylicBackgroundFillColorDefaultBrush" />
+          <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="AcrylicBackgroundFillColorDefaultBrush" />
         </ResourceDictionary>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
@@ -93,6 +97,10 @@
           <Color x:Key="RegionColor">#ededed</Color>
           
           <SolidColorBrush x:Key="RegionBrush" Color="LightGray" />
+          
+          <!--Workaround for broken flyout background colors-->
+          <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="ApplicationPageBackgroundThemeBrush" />
+          <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="ApplicationPageBackgroundThemeBrush" />
         </ResourceDictionary>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>

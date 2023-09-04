@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
+using MTGApplication.API;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
@@ -121,6 +122,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
   private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
+    /// NOTE: Remember to set changes also on the <see cref="DeckBuilderViewModel_PropertyChanged"/>
     switch (e.PropertyName)
     {
       case nameof(CardDeck.Commander):
@@ -163,13 +165,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         break;
       case nameof(DeckSize):
         OnPropertyChanged(nameof(DeckPrice));
-        OpenPlaytestWindowCommand.NotifyCanExecuteChanged(); break;
+        OpenPlaytestWindowCommand.NotifyCanExecuteChanged();
+        break;
     }
   }
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
   private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
+  private IMTGCommanderAPI CommanderAPI { get; } = new EDHRECCommanderAPI();
 
   [ObservableProperty] private MTGCardDeck cardDeck = new();
   [ObservableProperty] private MTGManaProductionPieChart manaProductionChart;
@@ -265,12 +269,19 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       if (loadName != null)
       {
         IsBusy = true;
-        if (await Task.Run(() => DeckRepository.Get(loadName)) is MTGCardDeck loadedDeck)
+        try
         {
-          CardDeck = loadedDeck;
-          NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
+          if (await Task.Run(() => DeckRepository.Get(loadName)) is MTGCardDeck loadedDeck)
+          {
+            CardDeck = loadedDeck;
+            NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
+          }
+          else { throw new Exception(); }
         }
-        else { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck."); }
+        catch (Exception)
+        {
+          NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
+        }
         IsBusy = false;
       }
     }
@@ -299,7 +310,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Deletes current deck from the database
   /// </summary>
-  [RelayCommand(CanExecute = nameof(DeckIsLoaded))]
+  [RelayCommand(CanExecute = nameof(DeckHasName))]
   public async Task DeleteDeckDialog()
   {
     if (!await DeckRepository.Exists(CardDeck.Name)) { return; }
@@ -381,6 +392,18 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   {
     var testingWindow = new DeckTestingWindow(deck);
     testingWindow.Activate();
+  }
+
+  /// <summary>
+  /// Opens EDHREC card search page on a new window for the given deck
+  /// </summary>
+  [RelayCommand(CanExecute = nameof(DeckHasCommanders))]
+  public async Task OpenEDHRECWindow(MTGCardDeck deck)
+  {
+    new EDHRECSearchWindow(
+      await CommanderAPI.GetThemes(new Models.Structs.Commanders(
+        deck.Commander?.Info.Name ?? string.Empty, deck.CommanderPartner?.Info.Name ?? string.Empty)))
+      .Activate();
   }
 
   [RelayCommand]
@@ -532,13 +555,18 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
   #region RelayCommand CanExecute Methods
   /// <summary>
-  /// Returns true if deck has been loaded from a database
+  /// Returns true if deck has a name
   /// </summary>
-  private bool DeckIsLoaded() => !string.IsNullOrEmpty(CardDeck.Name);
+  public bool DeckHasName() => !string.IsNullOrEmpty(CardDeck.Name);
 
   /// <summary>
   /// Returns true if the deck has cards in it
   /// </summary>
-  private bool DeckHasCards() => DeckCards.CardlistSize > 0;
+  public bool DeckHasCards() => DeckCards.CardlistSize > 0;
+
+  /// <summary>
+  /// Returns true if the deck has commanders in it
+  /// </summary>
+  public bool DeckHasCommanders() => Commander != null || CommanderPartner != null;
   #endregion
 }

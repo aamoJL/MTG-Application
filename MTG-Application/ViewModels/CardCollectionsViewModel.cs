@@ -31,31 +31,31 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       => new("Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
 
     public virtual CollectionListContentDialog GetNewCollectionListDialog() => new("Add new list");
-    
+
     public virtual ConfirmationDialog GetDeleteCollectionDialog(string name)
       => new("Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
-    
+
     public virtual ConfirmationDialog GetDeleteListDialog(string name)
       => new("Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
-    
+
     public virtual ConfirmationDialog GetOverrideDialog(string name)
       => new("Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
-    
+
     public virtual ConfirmationDialog GetSaveUnsavedDialog()
       => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
-    
+
     public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
-    
+
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
       => new("Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
-    
+
     public virtual TextBoxDialog GetSaveDialog(string name)
       => new("Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
-    
+
     public virtual TextAreaDialog GetExportDialog(string text)
       => new("Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
-    
+
     public virtual TextAreaDialog GetImportDialog()
       => new("Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
 
@@ -156,27 +156,33 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
 
   private async void MTGSearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(MTGSearchViewModel.IsBusy)) { IsBusy = MTGSearchViewModel.IsBusy; }
-    else if (e.PropertyName == nameof(MTGSearchViewModel.SearchQuery)) { await MTGSearchViewModel.SearchSubmit(); }
-    else if (e.PropertyName == nameof(MTGSearchViewModel.SearchCards))
+    switch (e.PropertyName)
     {
-      MTGSearchViewModel.SearchCards.CollectionChanged += (s, e) =>
-      {
-        switch (e.Action)
+      case nameof(MTGSearchViewModel.IsBusy):
+        IsBusy = MTGSearchViewModel.IsBusy; break;
+      case nameof(MTGSearchViewModel.SearchQuery):
+        await MTGSearchViewModel.SearchWithQuery(); break;
+      case nameof(MTGSearchViewModel.SearchCards):
         {
-          case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-            var newCard = e.NewItems[0] as MTGCardCollectionCardViewModel;
-            if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == newCard.Model.Info.ScryfallId) != null)
-            { newCard.IsOwned = true; }
-            newCard.ShowPrintsDialogCommand = ShowCardIllustrationsCommand;
-            break;
-          default:
-            break;
+          MTGSearchViewModel.SearchCards.CollectionChanged += (s, e) =>
+          {
+            switch (e.Action)
+            {
+              case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                var newCard = e.NewItems[0] as MTGCardCollectionCardViewModel;
+                if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == newCard.Model.Info.ScryfallId) != null)
+                { newCard.IsOwned = true; }
+                newCard.ShowPrintsDialogCommand = ShowCardIllustrationsCommand;
+                break;
+              default:
+                break;
+            }
+          };
+          break;
         }
-      };
     }
   }
-  
+
   private async void CardCollectionsViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(SelectedList))
@@ -188,27 +194,32 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       }
       // Search does not update itself if the query is same as previous query, so it has to be updated manually.
       if (MTGSearchViewModel.SearchQuery == SelectedList?.SearchQuery)
-      { await MTGSearchViewModel.SearchSubmit(); }
+      { await MTGSearchViewModel.SearchWithQuery(); }
       else
       { MTGSearchViewModel.SearchQuery = SelectedList?.SearchQuery ?? string.Empty; }
     }
   }
-  
+
   private void SelectedListCards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
-    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+    switch (e.Action)
     {
-      if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
-      {
-        cardVM.IsOwned = true;
-      }
-    }
-    else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-    {
-      if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
-      {
-        cardVM.IsOwned = false;
-      }
+      case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+        {
+          if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
+          {
+            cardVM.IsOwned = true;
+          }
+          break;
+        }
+      case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+        {
+          if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
+          {
+            cardVM.IsOwned = false;
+          }
+          break;
+        }
     }
 
     HasUnsavedChanges = true;
@@ -248,7 +259,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   [RelayCommand]
   public async Task NewCollectionDialog()
   {
-    if (await ShowUnsavedDialogs()) 
+    if (await ShowUnsavedDialogs())
       NewCollection();
   }
 
@@ -384,7 +395,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
 
     IsBusy = true;
     // Get prints
-    var fetchResult = await CardAPI.FetchCardsWithParameters($"{card.Info.Name}+unique:prints+game:paper");
+    var fetchResult = await CardAPI.FetchCardsWithSearchQuery($"{card.Info.Name}+unique:prints+game:paper");
     prints.AddRange(fetchResult.Found.Where(x => x.Info.FrontFace.IllustrationId == card.Info.FrontFace.IllustrationId).ToArray());
     while (!string.IsNullOrEmpty(fetchResult.NextPageUri))
     {
@@ -406,7 +417,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     Collection = new MTGCardCollection();
     HasUnsavedChanges = false;
   }
-  
+
   /// <summary>
   /// Saves current collection with the given <paramref name="name"/>
   /// </summary>
@@ -420,7 +431,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     };
     if (await Task.Run(() => CollectionRepository.AddOrUpdate(tempCollection)))
     {
-      if(!string.IsNullOrEmpty(Collection.Name) && Collection.Name != name)
+      if (!string.IsNullOrEmpty(Collection.Name) && Collection.Name != name)
       {
         await CollectionRepository.Remove(Collection); // Delete old collection if the name was changed
       }
@@ -432,7 +443,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not save the collection."); }
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Loads collection with the given <paramref name="name"/> and sets the current collection to the loaded collection
   /// </summary>
@@ -450,7 +461,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the collection."); }
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Deletes current collection
   /// </summary>
@@ -467,7 +478,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the collection."); }
     IsBusy = false;
   }
-  
+
   /// <summary>
   /// Adds the given <paramref name="list"/> to the current collection
   /// </summary>
@@ -483,7 +494,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     else
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection."); }
   }
-  
+
   /// <summary>
   /// Updates the <see cref="SelectedList"/> to be <paramref name="list"/>
   /// </summary>
@@ -496,7 +507,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     MTGSearchViewModel.SearchQuery = list.SearchQuery;
     HasUnsavedChanges = true;
   }
-  
+
   /// <summary>
   /// Deletes <see cref="SelectedList"/> from the current collection
   /// </summary>
@@ -511,7 +522,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     else
     { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the list."); }
   }
-  
+
   /// <summary>
   /// Returns exportable string of the <see cref="SelectedList"/>'s cards
   /// </summary>
@@ -527,7 +538,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
 
     return stringBuilder.ToString();
   }
-  
+
   /// <summary>
   /// Imports cards from the <paramref name="importText"/> to the <see cref="SelectedList"/>
   /// </summary>
@@ -614,9 +625,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
 
   #region CanExecute command methods
   private bool SaveCollectionCommandCanExecute() => Collection.CollectionLists.Count > 0;
-  
+
   private bool DeleteCollectionCommandCanExecute() => !string.IsNullOrEmpty(Collection.Name);
-  
+
   private bool SelectedListCommandCanExecute() => SelectedList != null;
   #endregion
 }

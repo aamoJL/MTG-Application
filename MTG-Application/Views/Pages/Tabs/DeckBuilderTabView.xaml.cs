@@ -13,7 +13,6 @@ using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
 using Windows.ApplicationModel.DataTransfer;
-using static MTGApplication.ViewModels.DeckBuilderViewModel;
 
 namespace MTGApplication.Views.Pages.Tabs;
 
@@ -38,12 +37,9 @@ public sealed partial class DeckBuilderTabView : UserControl
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
   public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
 
-  [ObservableProperty]
-  private double searchDesiredItemWidth = 250;
-  [ObservableProperty]
-  private bool searchPanelOpen = false;
-  [ObservableProperty]
-  private double deckDesiredItemWidth = 250;
+  [ObservableProperty] private double searchDesiredItemWidth = 250;
+  [ObservableProperty] private bool searchPanelOpen = false;
+  [ObservableProperty] private double deckDesiredItemWidth = 250;
 
   /// <summary>
   /// Opens and closes search panel
@@ -57,7 +53,7 @@ public sealed partial class DeckBuilderTabView : UserControl
   /// Custom drag and drop args.
   /// This class is used for card drag and drop actions because the default drag and drop system did not work well with async methods.
   /// </summary>
-  private class DragArgs
+  public class DragArgs
   {
     public DragArgs(object dragStartElement, DeckCardlistViewModel dragOrigin, MTGCard dragItem)
     {

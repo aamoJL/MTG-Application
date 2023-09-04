@@ -17,10 +17,10 @@ public class ScryfallAPITests
     var api = new ScryfallAPI();
     var searchQuery = "asd";
 
-    var result = await api.FetchCardsWithParameters(searchQuery);
+    var result = await api.FetchCardsWithSearchQuery(searchQuery);
 
     Assert.IsTrue(result.Found.Length > 0);
-    Assert.AreEqual(APIName, result.Found[0].APIName);
+    Assert.AreEqual(api.Name, result.Found[0].APIName);
   }
 
   [TestMethod]
@@ -29,7 +29,7 @@ public class ScryfallAPITests
     var api = new ScryfallAPI();
     var searchQuery = "";
 
-    var result = await api.FetchCardsWithParameters(searchQuery);
+    var result = await api.FetchCardsWithSearchQuery(searchQuery);
 
     Assert.AreEqual(0, result.Found.Length);
   }

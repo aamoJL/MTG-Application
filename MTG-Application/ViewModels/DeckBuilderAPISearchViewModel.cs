@@ -10,12 +10,13 @@ using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels;
+
 public partial class DeckBuilderAPISearchViewModel : ViewModelBase
 {
   public class DeckBuilderAPISearchViewModelDialogs
   {
     public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-        => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
     {
@@ -40,30 +41,33 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
     APISearch = new(cardAPI);
     APISearch.PropertyChanged += SearchViewModel_PropertyChanged;
   }
-  
-  [ObservableProperty]
-  private bool isBusy;
+
+  [ObservableProperty] private bool isBusy;
 
   public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> APISearch { get; }
   public DeckBuilderAPISearchViewModelDialogs Dialogs { get; init; } = new();
 
   private void SearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(APISearch.IsBusy)) { IsBusy = APISearch.IsBusy; }
-    if (e.PropertyName == nameof(APISearch.SearchCards))
+    switch (e.PropertyName)
     {
-      // Add print dialog command to the card viewmodel
-      APISearch.SearchCards.CollectionChanged += (s, e) =>
-      {
-        switch (e.Action)
+      case nameof(APISearch.IsBusy): IsBusy = APISearch.IsBusy; break;
+      case nameof(APISearch.SearchCards):
         {
-          case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-            var newCard = e.NewItems[0] as MTGCardViewModel;
-            newCard.ShowPrintsDialogCommand = ShowPrintsDialogCommand;
-            break;
-          default: break;
+          // Add print dialog command to the card viewmodel
+          APISearch.SearchCards.CollectionChanged += (s, e) =>
+          {
+            switch (e.Action)
+            {
+              case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                var newCard = e.NewItems[0] as MTGCardViewModel;
+                newCard.ShowPrintsDialogCommand = ShowPrintsDialogCommand;
+                break;
+              default: break;
+            }
+          };
+          break;
         }
-      };
     }
   }
 
@@ -77,7 +81,7 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
 
     var pageUri = card.Info.PrintSearchUri;
     var prints = new List<MTGCard>();
-   
+
     while (pageUri != string.Empty)
     {
       var result = await APISearch.CardAPI.FetchFromUri(pageUri, paperOnly: true);

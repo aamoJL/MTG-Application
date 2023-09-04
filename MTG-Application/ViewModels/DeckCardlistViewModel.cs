@@ -262,10 +262,10 @@ public partial class DeckCardlistViewModel : ObservableObject
     {
       if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync()) is true)
       {
-        CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(cardlist, new[] { card }));
+        CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(Cardlist, new[] { card }));
       }
     }
-    else { CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(cardlist, new[] { card })); }
+    else { CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(Cardlist, new[] { card })); }
   }
 
   /// <summary>

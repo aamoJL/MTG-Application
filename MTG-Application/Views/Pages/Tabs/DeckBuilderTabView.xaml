@@ -265,31 +265,30 @@
 
     </VisualStateManager.VisualStateGroups>
 
+    <controls:DockPanel LastChildFill="True">
+      <!--Side Button-->
+      <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+        <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}" Label="Search" Width="50">
+          <AppBarButton.Icon>
+            <FontIcon Glyph="&#xE721;"/>
+          </AppBarButton.Icon>
+        </AppBarButton>
+      </StackPanel>
     <SplitView PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" 
                IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" 
                OpenPaneLength="780" 
-               CompactPaneLength="49"
+               CompactPaneLength="0"
                DisplayMode="CompactInline" BorderThickness="0">
       <!--Search Panel-->
-      <SplitView.Pane>
-        <controls:DockPanel LastChildFill="True">
-          <!--Side Button-->
-          <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical">
-            <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}" Label="Search" Width="50">
-              <AppBarButton.Icon>
-                <FontIcon Glyph="&#xE721;"/>
-              </AppBarButton.Icon>
-            </AppBarButton>
-          </StackPanel>
+        <SplitView.Pane>
           <!--Search-->
-          <controls:DockPanel controls:DockPanel.Dock="Left" 
-                              Grid.Column="0" 
+          <controls:DockPanel Grid.Column="0" 
                               LastChildFill="True" 
                               Padding="10 0 10 10"
                               Background="Transparent">
             <customcontrols:ScryfallSearchBarControl controls:DockPanel.Dock="Top" 
                                                      Margin="0 10 0 0" 
-                                                     SearchSubmitCommand="{x:Bind SearchViewModel.APISearch.SearchSubmitCommand}" 
+                                                     SearchSubmitCommand="{x:Bind SearchViewModel.APISearch.SearchWithQueryCommand}"
                                                      SearchQuery="{x:Bind SearchViewModel.APISearch.SearchQuery, Mode=TwoWay}"/>
             <!--Scryfall commands-->
             <Grid controls:DockPanel.Dock="Top">
@@ -297,7 +296,7 @@
                 <CommandBar IsOpen="False" DefaultLabelPosition="Right" HorizontalAlignment="Left">
                   <AppBarButton Icon="ZoomIn" Label="Zoom">
                     <AppBarButton.Flyout>
-                      <Flyout AreOpenCloseAnimationsEnabled="False">
+                      <Flyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                         <Slider Header="Card size" 
                                 Value="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}" 
                                 Width="200" 
@@ -312,7 +311,7 @@
                   </AppBarButton>
                   <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
                     <AppBarButton.Flyout>
-                      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                      <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                         <RadioMenuFlyoutItem x:Name="CardSearchImagesCheck" Text="Images" GroupName="CardSearchDisplayCheck" IsChecked="True" Icon="{ui:SymbolIcon Symbol=Pictures}" />
                         <RadioMenuFlyoutItem x:Name="CardSearchListCheck" Text="List" GroupName="CardSearchDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                       </MenuFlyout>
@@ -348,8 +347,7 @@
                         ItemTemplate="{StaticResource SearchListViewItemTemplate}"/>
             </Grid>
           </controls:DockPanel>
-        </controls:DockPanel>
-      </SplitView.Pane>
+        </SplitView.Pane>
       <!--Deck-->
       <Grid>
         <controls:DockPanel LastChildFill="True" 
@@ -437,7 +435,7 @@
                     <customcontrols:LinedHeader.Header>
                       <TextBlock Text="Maybe">
                         <TextBlock.ContextFlyout>
-                          <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
                             <MenuFlyoutSubItem Text="Export...">
                               <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
@@ -467,7 +465,7 @@
                     <customcontrols:LinedHeader.Header>
                       <TextBlock Text="Wishlist">
                         <TextBlock.ContextFlyout>
-                          <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
                             <MenuFlyoutSubItem Text="Export...">
                               <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
@@ -497,7 +495,7 @@
                     <customcontrols:LinedHeader.Header>
                       <TextBlock Text="Remove">
                         <TextBlock.ContextFlyout>
-                          <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                             <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
                             <MenuFlyoutSubItem Text="Export...">
                               <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
@@ -533,7 +531,11 @@
                         <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckPrice, 0), Mode=OneWay}" />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                      <Button Content="Show tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                      <Button Content="Tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                      <Button Content="EDHREC"
+                              Style="{StaticResource PrimaryButtonStyle}"
+                              Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWindowCommand}"
+                              CommandParameter="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}"/>
                       <Button Content="Playtest" 
                               Style="{StaticResource PrimaryButtonStyle}" 
                               Command="{x:Bind DeckBuilderViewModel.OpenPlaytestWindowCommand}" 
@@ -579,7 +581,7 @@
               <CommandBar x:Name="DeckCommandBar" IsOpen="False" DefaultLabelPosition="Right">
                 <AppBarButton Icon="OpenFile" Label="File">
                   <AppBarButton.Flyout>
-                    <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.NewDeckDialogCommand}" Icon="NewFolder" Text="New">
                         <MenuFlyoutItem.KeyboardAccelerators>
                           <KeyboardAccelerator Key="N" Modifiers="Control"/>
@@ -622,7 +624,7 @@
                 </AppBarButton>
                 <AppBarButton Icon="Edit" Label="Edit">
                   <AppBarButton.Flyout>
-                    <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.UndoCommand}" Icon="Undo" Text="Undo">
                         <MenuFlyoutItem.KeyboardAccelerators>
                           <KeyboardAccelerator Key="Z" Modifiers="Control"/>
@@ -654,7 +656,7 @@
                 </AppBarButton>
                 <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
                   <AppBarButton.Flyout>
-                    <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <RadioMenuFlyoutItem x:Name="DeckImagesCheck" Text="Images" GroupName="DeckDisplayCheck" IsChecked="True" Icon="{ui:SymbolIcon Symbol=Pictures}" />
                       <RadioMenuFlyoutItem x:Name="DeckListCheck" Text="List" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                     </MenuFlyout>
@@ -662,7 +664,7 @@
                 </AppBarButton>
                 <AppBarButton Icon="Sort" Label="Sort" AutomationProperties.Name="Order">
                   <AppBarButton.Flyout>
-                    <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
                       <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
                       <MenuFlyoutSeparator/>
@@ -719,7 +721,7 @@
               <TextBlock x:Name="SelectedDeckNameTitle" Text="{x:Bind DeckBuilderViewModel.CardDeck.Name, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
               <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckSize), Mode=OneWay}" HorizontalAlignment="Right"/>
               <StackPanel.ContextFlyout>
-                <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                   <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" Text="Import..."/>
                   <MenuFlyoutSubItem Text="Export...">
                     <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
@@ -766,6 +768,7 @@
         </controls:DockPanel>
       </Grid>
     </SplitView>
+    </controls:DockPanel>
     <!--Preview image-->
     <Canvas>
       <controls:ImageEx x:Name="PreviewImage" 

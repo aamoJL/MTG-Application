@@ -19,7 +19,7 @@
           <controls:ImageEx x:Name="GridViewItemImage" 
                             Style="{StaticResource PlaceholderImageStyle}" 
                             Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-                            Opacity="{x:Bind helpers:MTGCardViewModel.OwnedToOpacity(IsOwned), Mode=OneWay}" 
+                            Opacity="{x:Bind helpers:MTGCardViewModelHelpers.OwnedToOpacity(IsOwned), Mode=OneWay}" 
                             DoubleTapped="GridViewItemImage_DoubleTapped" 
                             Tapped="GridViewItemImage_Tapped">
             <controls:ImageEx.ContextFlyout>
@@ -69,7 +69,7 @@
               <FontIcon Glyph="&#xE8E5;"/>
             </AppBarButton.Icon>
             <AppBarButton.Flyout>
-              <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+              <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                 <MenuFlyoutItem Text="New..." Command="{x:Bind CardCollectionsViewModel.NewCollectionDialogCommand}">
                   <MenuFlyoutItem.KeyboardAccelerators>
                     <KeyboardAccelerator Key="N" Modifiers="Control"/>
