@@ -14,7 +14,13 @@
       <ColumnDefinition Width="auto"/>
       <ColumnDefinition Width="auto"/>
     </Grid.ColumnDefinitions>
-    <TextBox x:Name="ScryfallSearchBox" Grid.Column="0" PlaceholderText="Search..." IsSpellCheckEnabled="False" CornerRadius="4 0 0 4" Text="{x:Bind SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+    <TextBox x:Name="ScryfallSearchBox" 
+             Grid.Column="0" 
+             PlaceholderText="Search..." 
+             IsSpellCheckEnabled="False" 
+             CornerRadius="4 0 0 4"
+             BorderThickness="1"
+             Text="{x:Bind SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
       <TextBox.HeaderTemplate>
         <DataTemplate>
           <StackPanel Orientation="Horizontal">

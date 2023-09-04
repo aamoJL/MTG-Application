@@ -40,8 +40,7 @@ public sealed partial class DeckTestingPage : Page
     MTGDeckTestingViewModel.NewTurnStarted += MTGDeckTestingViewModel_NewTurnStarted;
   }
 
-  [ObservableProperty]
-  private Visibility libraryVisibility = Visibility.Collapsed;
+  [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
 
   public ICommand LibraryVisibilitySwitchCommand;
 

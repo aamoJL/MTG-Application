@@ -38,7 +38,7 @@ public static partial class AppConfig
   {
     private static IConfigurationRoot configurationRoot;
     private static readonly string fileName = "appsettings.json";
-    
+
     public string CompanyName { get; set; }
 
     /// <summary>
@@ -59,8 +59,8 @@ public static partial class AppConfig
   /// </summary>
   public partial class LocalAppSettings : ObservableObject
   {
-    [ObservableProperty]
-    private ElementTheme appTheme = ElementTheme.Default;
+    [ObservableProperty] private ElementTheme appTheme = ElementTheme.Default;
+
     private readonly static string fileName = "settings.json";
     private readonly static string filePath = Path.Join(IOService.GetAppDataPath(), fileName);
 
@@ -96,7 +96,7 @@ public static partial class AppConfig
           _ => ElementTheme.Default,
         };
       }
-      catch(Exception e) { Debug.WriteLine(e.Message); }
+      catch (Exception e) { Debug.WriteLine(e.Message); }
     }
   }
 }

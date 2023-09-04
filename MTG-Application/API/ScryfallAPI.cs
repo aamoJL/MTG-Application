@@ -88,8 +88,6 @@ public class ScryfallAPI : ICardAPI<MTGCard>
     }
   }
 
-  public readonly static string APIName = "Scryfall";
-
   private readonly static string API_URL = "https://api.scryfall.com";
   private static string CARDS_URL => $"{API_URL}/cards";
   private static string COLLECTION_URL => $"{CARDS_URL}/collection";
@@ -101,11 +99,12 @@ public class ScryfallAPI : ICardAPI<MTGCard>
   private static int MaxFetchIdentifierCount => 75;
 
   #region ICardAPI interface implementation
+  public string Name => "Scryfall";
   public int PageSize => 175;
 
   public string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";
 
-  public async Task<Result> FetchCardsWithParameters(string searchParams)
+  public async Task<Result> FetchCardsWithSearchQuery(string searchParams)
   {
     if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
     return await FetchFromUri(GetSearchUri(searchParams));
@@ -197,7 +196,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
   /// <summary>
   /// Returns <see cref="MTGCard"/> array from the given <paramref name="jsonNode"/>
   /// </summary>
-  private static async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
+  private async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
     var cards = new List<MTGCard>();
     if (jsonNode == null) { return cards.ToArray(); }
@@ -235,7 +234,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
   /// <summary>
   /// Converts Scryfall API Json object to <see cref="MTGCardInfo"/> object
   /// </summary>
-  private static MTGCardInfo? GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
+  private MTGCardInfo? GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
   {
     /// <summary>
     /// Converts the <paramref name="colorArray"/> to <see cref="ColorTypes"/> array
@@ -332,13 +331,13 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
       tokens: tokens ?? Array.Empty<CardToken>(),
-      apiName: APIName);
+      apiName: Name);
   }
 
   /// <summary>
   /// Fetches MTGCards from the API using the given identifier objects
   /// </summary>
-  private static async Task<Result> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
+  private async Task<Result> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
     {

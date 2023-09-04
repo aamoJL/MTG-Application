@@ -259,7 +259,7 @@
                 </DataTemplate>
               </ListView.ItemTemplate>
             </ListView>
-            <Grid Grid.Row="0" Visibility="{x:Bind helpers:BooleanInversion.VisibilityInversion(LibraryVisibility), Mode=OneWay}">
+            <Grid Grid.Row="0" Visibility="{x:Bind helpers:VisibilityHelpers.VisibilityInversion(LibraryVisibility), Mode=OneWay}">
               <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>

@@ -35,6 +35,11 @@ public interface ICardAPI<T>
   }
 
   /// <summary>
+  /// Name of the API
+  /// </summary>
+  public string Name { get; }
+
+  /// <summary>
   /// How many cards the API returns in one query
   /// </summary>
   public int PageSize { get; }
@@ -45,9 +50,9 @@ public interface ICardAPI<T>
   public string GetSearchUri(string searchParams);
 
   /// <summary>
-  /// Fetch cards from the API using API search parameters
+  /// Fetch cards from the API using API search query
   /// </summary>
-  public Task<Result> FetchCardsWithParameters(string searchParams);
+  public Task<Result> FetchCardsWithSearchQuery(string searchParams);
 
   /// <summary>
   /// Fetches cards from the given <paramref name="pageUri"/>
