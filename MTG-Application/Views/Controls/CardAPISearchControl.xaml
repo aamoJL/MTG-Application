@@ -79,7 +79,7 @@
       </VisualStateGroup>
     
     </VisualStateManager.VisualStateGroups>
-    
+
     <controls:DockPanel Grid.Column="0" 
                     LastChildFill="True" 
                     Padding="10 0 10 10"
@@ -146,16 +146,5 @@
                   ItemTemplate="{StaticResource SearchListViewItemTemplate}"/>
       </Grid>
     </controls:DockPanel>
-    <Canvas>
-      <controls:ImageEx x:Name="PreviewImage" 
-                    Height="350" 
-                    IsHitTestVisible="False" 
-                    CornerRadius="12"
-                    Visibility="Collapsed" 
-                    PlaceholderStretch="Fill" 
-                    CacheMode="BitmapCache" 
-                    IsCacheEnabled="True" 
-                    Style="{StaticResource PreviewImagePlaceholderStyle}"/>
-    </Canvas>
   </Grid>
 </UserControl>

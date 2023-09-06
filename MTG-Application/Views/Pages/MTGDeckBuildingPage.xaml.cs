@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
 namespace MTGApplication.Views.Pages;
 
@@ -44,6 +45,8 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   [ObservableProperty] private bool searchPanelOpen = false;
   [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
 
+  public CardPreviewProperties CardPreviewProperties { get; } = new();
+
   /// <summary>
   /// Opens and closes search panel
   /// </summary>
@@ -75,7 +78,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
 
   private void TabView_AddTabButtonClick(TabView tabView, object args)
   {
-    var newItem = new DeckBuilderTabView();
+    var newItem = new DeckBuilderTabView(CardPreviewProperties);
     TabViews.Add(newItem);
     tabView.SelectedItem = newItem;
   }
@@ -90,7 +93,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
     }
   }
 
-  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView()); // Add default tab
+  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView(CardPreviewProperties)); // Add default tab
 
   private void TabView_TabItemsChanged(TabView tabView, IVectorChangedEventArgs args)
   {

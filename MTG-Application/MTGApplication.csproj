@@ -37,6 +37,7 @@
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
     <None Remove="Views\Controls\LinedHeader.xaml" />
+    <None Remove="Views\Controls\MTGCardPreviewControl.xaml" />
     <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="Views\DeckBuilderView.xaml" />
@@ -45,7 +46,6 @@
     <None Remove="README.md" />
     <None Remove="Views\Pages\MTGCardCollectionPage.xaml" />
     <None Remove="Views\Pages\MTGDeckBuildingPage.xaml" />
-    <None Remove="Views\Pages\Tabs\CollectionsTabView.xaml" />
     <None Remove="Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
     <None Remove="Views\Styles\CustomListViewStyle.xaml" />
     <None Remove="Views\Styles\MTGPrintGridViewItemTemplate.xaml" />
@@ -181,6 +181,11 @@
     <PRIResource Remove="Views\Styles\Template\**" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\Controls\MTGCardPreviewControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\Pages\MTGDeckBuildingPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -222,11 +227,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Controls\LinedHeader.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Pages\Tabs\CollectionsTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -208,8 +208,8 @@
     </VisualStateManager.VisualStateGroups>
 
     <controls:DockPanel LastChildFill="True" 
-                          Padding="0 0 10 10" 
-                          Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                        Padding="0 0 10 10" 
+                        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
       <!--Sidebar-->
       <TabView controls:DockPanel.Dock="Right"
                IsAddTabButtonVisible="False" 
@@ -308,19 +308,19 @@
                 </customcontrols:LinedHeader.Header>
               </customcontrols:LinedHeader>
               <ListView Grid.Row="2"
-                          x:Name="DeckMaybeDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels}"
-                          Style="{StaticResource MTGListViewStyle}"
-                          SelectionMode="Single"
-                          CanDragItems="True"
-                          AllowDrop="True"
-                          DragOver="CardView_DragOver"
-                          Drop="CardView_Drop"
-                          DragItemsStarting="CardView_DragItemsStarting"
-                          ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                          KeyDown="CardView_KeyDown"
-                          LosingFocus="CardView_LosingFocus"/>
+                        x:Name="DeckMaybeDisplay"
+                        DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
+                        ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                        Style="{StaticResource MTGListViewStyle}"
+                        SelectionMode="Single"
+                        CanDragItems="True"
+                        AllowDrop="True"
+                        DragOver="CardView_DragOver"
+                        Drop="CardView_Drop"
+                        DragItemsStarting="CardView_DragItemsStarting"
+                        ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                        KeyDown="CardView_KeyDown"
+                        LosingFocus="CardView_LosingFocus"/>
               <customcontrols:LinedHeader Grid.Row="3">
                 <customcontrols:LinedHeader.Header>
                   <TextBlock Text="Wishlist">
@@ -626,17 +626,5 @@
                   LosingFocus="CardView_LosingFocus"/>
       </Grid>
     </controls:DockPanel>
-    <!--Preview image-->
-    <Canvas>
-      <controls:ImageEx x:Name="PreviewImage" 
-                        Height="350" 
-                        IsHitTestVisible="False" 
-                        CornerRadius="12"
-                        Visibility="Collapsed" 
-                        PlaceholderStretch="Fill" 
-                        CacheMode="BitmapCache" 
-                        IsCacheEnabled="True" 
-                        Style="{StaticResource PreviewImagePlaceholderStyle}"/>
-    </Canvas>
   </Grid>
 </UserControl>

@@ -17,7 +17,7 @@
     <controls:DockPanel LastChildFill="True">
       <!--Side Button-->
       <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
-        <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}" Label="Search" Width="50">
+        <AppBarButton Command="{x:Bind SwitchSearchPanelCommand, Mode=OneTime}" Label="Search" Width="50">
           <AppBarButton.Icon>
             <FontIcon Glyph="&#xE721;"/>
           </AppBarButton.Icon>
@@ -26,36 +26,36 @@
 
       <!--Search Panel-->
       <SplitView PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" 
-               IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" 
-               OpenPaneLength="780" 
-               CompactPaneLength="0"
-               DisplayMode="CompactInline" BorderThickness="0">
+                 IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" 
+                 OpenPaneLength="780" 
+                 CompactPaneLength="0"
+                 DisplayMode="CompactInline" BorderThickness="0">
         <SplitView.Pane>
-          <customcontrols:CardAPISearchControl />
+          <customcontrols:CardAPISearchControl CardPreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
         </SplitView.Pane>
         <Grid>
           <TabView IsAddTabButtonVisible="True" 
-                 VerticalAlignment="Stretch"
-                 HorizontalAlignment="Stretch" 
-                 CloseButtonOverlayMode="OnPointerOver"
-                 AddTabButtonClick="TabView_AddTabButtonClick"
-                 TabCloseRequested="TabView_TabCloseRequested"
-                 Loaded="TabView_Loaded"
-                 CanReorderTabs="False"
-                 TabItemsChanged="TabView_TabItemsChanged"
-                 TabItemsSource="{x:Bind TabViews, Mode=OneWay}">
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch" 
+                   CloseButtonOverlayMode="OnPointerOver"
+                   AddTabButtonClick="TabView_AddTabButtonClick"
+                   TabCloseRequested="TabView_TabCloseRequested"
+                   Loaded="TabView_Loaded"
+                   CanReorderTabs="False"
+                   TabItemsChanged="TabView_TabItemsChanged"
+                   TabItemsSource="{x:Bind TabViews, Mode=OneTime}">
             <!--NOTE: Tab item reordering crashes the app-->
             <TabView.TabItemTemplate>
               <DataTemplate x:DataType="tabs:DeckBuilderTabView">
-                <TabViewItem Header="{x:Bind DeckBuilderViewModel, Mode=OneWay}" IsClosable="{x:Bind IsClosable, Mode=OneWay}">
+                <TabViewItem Header="{x:Bind DeckBuilderViewModel, Mode=OneTime}" IsClosable="{x:Bind IsClosable, Mode=OneWay}">
                   <TabViewItem.HeaderTemplate>
                     <DataTemplate x:DataType="viewmodels:DeckBuilderViewModel">
                       <StackPanel Orientation="Horizontal" Spacing="5">
                         <Ellipse Fill="{ThemeResource SystemAccentColorLight1}" 
-                               Height="10" 
-                               Width="10" 
-                               StrokeThickness="0"
-                               Visibility="{x:Bind helpers:VisibilityHelpers.BooleanToVisibility(HasUnsavedChanges), Mode=OneWay}"/>
+                                 Height="10" 
+                                 Width="10" 
+                                 StrokeThickness="0"
+                                 Visibility="{x:Bind helpers:VisibilityHelpers.BooleanToVisibility(HasUnsavedChanges), Mode=OneWay}"/>
                         <TextBlock Text="{x:Bind helpers:Format.StringWithDefault(DeckName, 'New Deck'), Mode=OneWay}"/>
                       </StackPanel>
                     </DataTemplate>
@@ -67,8 +67,8 @@
           </TabView>
           <!--Top-right corner buttons-->
           <StackPanel Height="40" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Margin="0 0 5 0">
-            <Button MinWidth="40" Height="30" Content="Collections" Command="{x:Bind OpenCollectionsWindowCommand}"/>
-            <Button MinWidth="40" Height="30" Command="{x:Bind ChangeThemeCommand}">
+            <Button MinWidth="40" Height="30" Content="Collections" Command="{x:Bind OpenCollectionsWindowCommand, Mode=OneTime}"/>
+            <Button MinWidth="40" Height="30" Command="{x:Bind ChangeThemeCommand, Mode=OneTime}">
               <FontIcon Glyph="&#xE793;"/>
             </Button>
           </StackPanel>
@@ -76,11 +76,12 @@
       </SplitView>
     </controls:DockPanel>
 
-    <controls:InAppNotification
-    x:Name="PopupAppNotification"
-    ShowDismissButton="True"
-    VerticalOffset="100"
-    HorizontalOffset="0"
-    StackMode="Replace"/>
+    <customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
+    
+    <controls:InAppNotification x:Name="PopupAppNotification"
+                                ShowDismissButton="True"
+                                VerticalOffset="100"
+                                HorizontalOffset="0"
+                                StackMode="Replace"/>
   </Grid>
 </Page>

@@ -3,8 +3,6 @@ using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.API;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
@@ -13,6 +11,7 @@ using MTGApplication.ViewModels;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
 namespace MTGApplication.Views.Pages.Tabs;
 
@@ -22,9 +21,10 @@ namespace MTGApplication.Views.Pages.Tabs;
 [ObservableObject]
 public sealed partial class DeckBuilderTabView : UserControl, ISavable
 {
-  public DeckBuilderTabView()
+  public DeckBuilderTabView(CardPreviewProperties previewProperties)
   {
     InitializeComponent();
+    CardPreviewProperties = previewProperties;
 
     DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()));
   }
@@ -32,6 +32,7 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
   public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
   public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
+  public CardPreviewProperties CardPreviewProperties { get; }
 
   [ObservableProperty] private double deckDesiredItemWidth = 250;
   [ObservableProperty] private bool isClosable = true;
@@ -60,39 +61,20 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
 
   private DragArgs dragArgs;
 
+  // Change card preview image to hovered item
   private void PreviewableCard_PointerEntered(object sender, PointerRoutedEventArgs e)
-  {
-    // Change card preview image to hovered item
-    if (sender is FrameworkElement { DataContext: MTGCardViewModel cardVM })
-    {
-      PreviewImage.Visibility = Visibility.Visible;
-      PreviewImage.Source = new BitmapImage(new(cardVM.SelectedFaceUri));
-    }
-  }
+    => CardPreviewProperties.CardViewModel = (sender as FrameworkElement)?.DataContext as MTGCardViewModel;
 
   private void PreviewableCard_PointerMoved(object sender, PointerRoutedEventArgs e)
   {
     // Move card preview image to mouse position when hovering over on list view item.
     // The position is clamped to element size
-    var windowBounds = ActualSize;
-    var pointerPosition = e.GetCurrentPoint(null).Position;
-
-    pointerPosition.X -= ActualOffset.X; // Apply element offset
-    pointerPosition.Y -= ActualOffset.Y;
-
-    var xOffsetFromPointer = (windowBounds.X - pointerPosition.X) > PreviewImage.ActualWidth ? 50 : -50 - PreviewImage.ActualWidth;
-    var yOffsetFromPointer = -100;
-
-    PreviewImage.SetValue(Canvas.LeftProperty, Math.Max(Math.Clamp(pointerPosition.X + xOffsetFromPointer, 0, Math.Max(ActualSize.X - PreviewImage.ActualWidth, 0)), 0));
-    PreviewImage.SetValue(Canvas.TopProperty, Math.Max(Math.Clamp(pointerPosition.Y + yOffsetFromPointer, 0, Math.Max(ActualSize.Y - PreviewImage.ActualHeight, 0)), 0));
+    var point = e.GetCurrentPoint(null).Position;
+    CardPreviewProperties.Coordinates = new((float)point.X, (float)point.Y);
   }
 
   private void PreviewableCard_PointerExited(object sender, PointerRoutedEventArgs e)
-  {
-    PreviewImage.Visibility = Visibility.Collapsed;
-    // Change placeholder image to the old hovered card's image so the placeholder won't flicker
-    PreviewImage.PlaceholderSource = PreviewImage.Source as ImageSource;
-  }
+    => CardPreviewProperties.CardViewModel = null;
 
   private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
   {
