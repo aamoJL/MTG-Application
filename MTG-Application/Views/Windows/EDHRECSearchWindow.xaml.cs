@@ -22,18 +22,18 @@ public sealed partial class EDHRECSearchWindow : Window
 
     appWindow.Resize(new(550, appWindow.Size.Height));
 
-    Title = "Deck Testing";
+    Title = "EDHREC Search";
     CommanderThemes = themes;
 
     (Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
     AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
-    Closed += DeckTestingWindow_Closed;
+    Closed += EDHRECSearchWindow_Closed;
   }
 
   public CommanderTheme[] CommanderThemes { get; }
 
-  private void DeckTestingWindow_Closed(object sender, WindowEventArgs args) => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
+  private void EDHRECSearchWindow_Closed(object sender, WindowEventArgs args) => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
 
   private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {

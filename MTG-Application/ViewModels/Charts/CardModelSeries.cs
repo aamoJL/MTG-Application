@@ -93,8 +93,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       DataLabelsPosition = DataLabelsPosition.Middle,
       Mapping = (value, point) =>
       {
-        point.PrimaryValue = value.PrimaryValue;
-        point.SecondaryValue = value.SecondaryValue;
+        point.Coordinate = new(value.SecondaryValue, value.PrimaryValue);
       }
     };
   }
@@ -126,8 +125,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       DataLabelsFormatter = p => p.Context.Series.Name,
       Mapping = (value, point) =>
       {
-        point.PrimaryValue = value.PrimaryValue;
-        point.SecondaryValue = value.SecondaryValue;
+        point.Coordinate = new(value.SecondaryValue, value.PrimaryValue);
       },
     };
   }
@@ -159,8 +157,7 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       DataLabelsFormatter = p => p.Context.Series.Name,
       Mapping = (value, point) =>
       {
-        point.PrimaryValue = value.PrimaryValue;
-        point.SecondaryValue = value.SecondaryValue;
+        point.Coordinate = new(value.SecondaryValue, value.PrimaryValue);
       }
     };
   }

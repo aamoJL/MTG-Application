@@ -86,7 +86,7 @@ public partial class DeckCardlistViewModel : ObservableObject
         OnPropertyChanged(nameof(EuroPrice));
         break;
       case nameof(EuroPrice):
-        SavableChangesOccured?.Invoke();
+        SavableChangesOccurred?.Invoke();
         break;
     }
   }
@@ -115,7 +115,7 @@ public partial class DeckCardlistViewModel : ObservableObject
         CardViewModels.Clear();
         break;
     }
-    SavableChangesOccured?.Invoke();
+    SavableChangesOccurred?.Invoke();
   }
 
   private ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
@@ -130,7 +130,7 @@ public partial class DeckCardlistViewModel : ObservableObject
   public MTGCardSortProperties SortProperties { get; }
   public CommandService CommandService { get; init; } = new();
   public MTGCardFilters CardFilters { get; }
-  public Action SavableChangesOccured { get; set; }
+  public Action SavableChangesOccurred { get; set; }
   public string Name { get; init; }
 
   /// <summary>

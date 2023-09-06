@@ -39,8 +39,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     public virtual ConfirmationDialog GetDeleteDialog(string name)
       => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
 
-    public virtual ConfirmationDialog GetSaveUnsavedDialog()
-      => new("Save unsaved changes?") { Message = "Deck has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
+    public virtual ConfirmationDialog GetSaveUnsavedDialog(string name = "")
+      => new("Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
 
     public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
       => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
@@ -96,10 +96,10 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       Name = "Removelist",
     };
 
-    DeckCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
-    WishlistCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
-    MaybelistCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
-    RemovelistCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
+    DeckCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+    WishlistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+    MaybelistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+    RemovelistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
 
     PropertyChanged += DeckBuilderViewModel_PropertyChanged;
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
@@ -135,6 +135,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
+      case nameof(CardDeck.Name):
+        OnPropertyChanged(nameof(DeckName));
+        break;
     }
   }
 
@@ -162,6 +165,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         CommandService.Clear();
         UpdateCharts();
         HasUnsavedChanges = false;
+        OnPropertyChanged(nameof(DeckName));
         break;
       case nameof(DeckSize):
         OnPropertyChanged(nameof(DeckPrice));
@@ -192,6 +196,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   public CommandService CommandService { get; } = new();
   public MTGCardSortProperties SortProperties { get; }
     = new() { SortDirection = SortDirection.Ascending, PrimarySortProperty = MTGSortProperty.CMC, SecondarySortProperty = MTGSortProperty.Name };
+  public string DeckName => CardDeck.Name;
   public int DeckSize
     => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
   public float DeckPrice
@@ -208,12 +213,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Shows dialog that asks the user if they want to save unsaved changes
   /// </summary>
+  /// <returns>True, if the user does not cancel the operation</returns>
   public async Task<bool> SaveUnsavedChanges()
   {
     if (HasUnsavedChanges)
     {
       // Deck has unsaved changes
-      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
+      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog(CardDeck.Name).ShowAsync(force: true);
       if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
@@ -233,8 +239,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
               await SaveDeck(saveName);
             }
           }
-          else
-          { await SaveDeck(saveName); }
+          else { await SaveDeck(saveName); }
         }
       }
     }

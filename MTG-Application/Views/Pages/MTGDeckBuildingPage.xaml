@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MTGApplication.Views.Pages.MTGDeckBuildingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:customcontrols="using:MTGApplication.Views.Controls" 
+    xmlns:viewmodels="using:MTGApplication.ViewModels" 
+    xmlns:tabs="using:MTGApplication.Views.Pages.Tabs" 
+    xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+  <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <controls:DockPanel LastChildFill="True">
+      <!--Side Button-->
+      <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+        <AppBarButton Command="{x:Bind SwitchSearchPanelCommand}" Label="Search" Width="50">
+          <AppBarButton.Icon>
+            <FontIcon Glyph="&#xE721;"/>
+          </AppBarButton.Icon>
+        </AppBarButton>
+      </StackPanel>
+
+      <!--Search Panel-->
+      <SplitView PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" 
+               IsPaneOpen="{x:Bind SearchPanelOpen,Mode=OneWay}" 
+               OpenPaneLength="780" 
+               CompactPaneLength="0"
+               DisplayMode="CompactInline" BorderThickness="0">
+        <SplitView.Pane>
+          <customcontrols:CardAPISearchControl />
+        </SplitView.Pane>
+        <Grid>
+          <TabView IsAddTabButtonVisible="True" 
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch" 
+                 CloseButtonOverlayMode="OnPointerOver"
+                 AddTabButtonClick="TabView_AddTabButtonClick"
+                 TabCloseRequested="TabView_TabCloseRequested"
+                 Loaded="TabView_Loaded"
+                 CanReorderTabs="False"
+                 TabItemsChanged="TabView_TabItemsChanged"
+                 TabItemsSource="{x:Bind TabViews, Mode=OneWay}">
+            <!--NOTE: Tab item reordering crashes the app-->
+            <TabView.TabItemTemplate>
+              <DataTemplate x:DataType="tabs:DeckBuilderTabView">
+                <TabViewItem Header="{x:Bind DeckBuilderViewModel, Mode=OneWay}" IsClosable="{x:Bind IsClosable, Mode=OneWay}">
+                  <TabViewItem.HeaderTemplate>
+                    <DataTemplate x:DataType="viewmodels:DeckBuilderViewModel">
+                      <StackPanel Orientation="Horizontal" Spacing="5">
+                        <Ellipse Fill="{ThemeResource SystemAccentColorLight1}" 
+                               Height="10" 
+                               Width="10" 
+                               StrokeThickness="0"
+                               Visibility="{x:Bind helpers:VisibilityHelpers.BooleanToVisibility(HasUnsavedChanges), Mode=OneWay}"/>
+                        <TextBlock Text="{x:Bind helpers:Format.StringWithDefault(DeckName, 'New Deck'), Mode=OneWay}"/>
+                      </StackPanel>
+                    </DataTemplate>
+                  </TabViewItem.HeaderTemplate>
+                  <ContentPresenter Content="{Binding}"/>
+                </TabViewItem>
+              </DataTemplate>
+            </TabView.TabItemTemplate>
+          </TabView>
+          <!--Top-right corner buttons-->
+          <StackPanel Height="40" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Margin="0 0 5 0">
+            <Button MinWidth="40" Height="30" Content="Collections" Command="{x:Bind OpenCollectionsWindowCommand}"/>
+            <Button MinWidth="40" Height="30" Command="{x:Bind ChangeThemeCommand}">
+              <FontIcon Glyph="&#xE793;"/>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </SplitView>
+    </controls:DockPanel>
+
+    <controls:InAppNotification
+    x:Name="PopupAppNotification"
+    ShowDismissButton="True"
+    VerticalOffset="100"
+    HorizontalOffset="0"
+    StackMode="Replace"/>
+  </Grid>
+</Page>

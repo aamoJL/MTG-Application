@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,6 +11,7 @@ using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Views.Pages.Tabs;
@@ -20,32 +20,23 @@ namespace MTGApplication.Views.Pages.Tabs;
 /// Code behind for DeckBuilder Tab
 /// </summary>
 [ObservableObject]
-public sealed partial class DeckBuilderTabView : UserControl
+public sealed partial class DeckBuilderTabView : UserControl, ISavable
 {
   public DeckBuilderTabView()
   {
     InitializeComponent();
-    App.Closing += MainWindow_Closed;
 
     DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()));
-    SearchViewModel = new(CardAPI);
   }
 
-  private void MainWindow_Closed(object sender, App.WindowClosingEventArgs args) => args.ClosingTasks.Add(DeckBuilderViewModel);
-
-  public DeckBuilderAPISearchViewModel SearchViewModel { get; }
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
   public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
+  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
 
-  [ObservableProperty] private double searchDesiredItemWidth = 250;
-  [ObservableProperty] private bool searchPanelOpen = false;
   [ObservableProperty] private double deckDesiredItemWidth = 250;
+  [ObservableProperty] private bool isClosable = true;
 
-  /// <summary>
-  /// Opens and closes search panel
-  /// </summary>
-  [RelayCommand]
-  public void SwitchSearchPanel() => SearchPanelOpen = !SearchPanelOpen;
+  public async Task<bool> TabCloseRequested() => !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
 
   #region Pointer Events
 
@@ -265,11 +256,11 @@ public sealed partial class DeckBuilderTabView : UserControl
 
   private void CardView_LosingFocus(object sender, RoutedEventArgs e)
   {
-    if (sender is ListViewBase element)
-    { element.DeselectAll(); }
+    if (sender is ListViewBase element) { element.DeselectAll(); }
   }
 
-  private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args) => DeckBuilderViewModel.CardFilters.Reset();
+  private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    => DeckBuilderViewModel.CardFilters.Reset();
 
   private void CommanderView_DragStarting(UIElement sender, DragStartingEventArgs args)
   {
@@ -281,4 +272,6 @@ public sealed partial class DeckBuilderTabView : UserControl
     }
     else { args.Cancel = true; }
   }
+
+  public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
 }

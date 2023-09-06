@@ -21,6 +21,11 @@ public static class NotificationService
     }
   }
 
+  /// <summary>
+  /// Notification duration in milliseconds
+  /// </summary>
+  public static int NotificationDuration => 5000;
+
   public static event EventHandler<NotificationEventArgs> OnNotification;
 
   /// <summary>

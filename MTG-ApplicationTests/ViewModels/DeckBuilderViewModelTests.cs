@@ -47,7 +47,7 @@ public class DeckBuilderViewModelTests
       var dialog = base.GetDeleteDialog(name);
       return dialog;
     }
-    public override ConfirmationDialog GetSaveUnsavedDialog()
+    public override ConfirmationDialog GetSaveUnsavedDialog(string name = "")
     {
       CurrentDialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
       var dialog = base.GetSaveUnsavedDialog();

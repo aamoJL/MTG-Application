@@ -3,11 +3,9 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using MTGApplication.Database;
-using MTGApplication.Interfaces;
 using MTGApplication.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using MTGApplication.Views.Pages;
+using MTGApplication.Views.Windows;
 
 namespace MTGApplication;
 
@@ -16,17 +14,7 @@ namespace MTGApplication;
 /// </summary>
 public partial class App : Application
 {
-  public class WindowClosingEventArgs : EventArgs
-  {
-    public WindowClosingEventArgs() { }
-    
-    public List<ISavable> ClosingTasks { get; set; } = new();
-  }
-
-  public static Window MainWindow { get; private set; }
-  public static event EventHandler<WindowClosingEventArgs> Closing;
-
-  private bool close = false; // Variable for window close event so the window will close when all tasks has been completed
+  public static Window DeckBuilderWindow { get; private set; }
 
   /// <summary>
   /// Initializes the singleton application object.  This is the first line of authored code
@@ -48,40 +36,15 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    MainWindow = new MainWindow();
-    MainWindow.Closed += MainWindow_Closed;
-    MainWindow.Activate();
+    DeckBuilderWindow = new ThemedWindow()
+    {
+      Content = new MTGDeckBuildingPage(),
+      Title = "Deck Builder",
+    };
+    DeckBuilderWindow.Activate();
 
-    DialogService.DialogRoot = MainWindow.Content as FrameworkElement;
+    DialogService.DialogRoot = DeckBuilderWindow.Content as FrameworkElement;
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
-  }
-
-  private async void MainWindow_Closed(object sender, WindowEventArgs args)
-  {
-    // The Window will close if the close variable has been set to true.
-    // Otherwise the user will be asked to save unsaved changes.
-    // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
-    if (close) { return; }
-
-    var closingArgs = new WindowClosingEventArgs();
-    Closing?.Invoke(this, closingArgs);
-
-    args.Handled = closingArgs.ClosingTasks.FirstOrDefault(x => x.HasUnsavedChanges is true) != null;
-    var canceled = false;
-
-    foreach (var task in closingArgs.ClosingTasks)
-    {
-      canceled = !await task.SaveUnsavedChanges();
-      if (canceled)
-      { break; }
-    }
-
-    if (!canceled)
-    {
-      close = true;
-      args.Handled = false;
-      MainWindow.Close();
-    }
   }
 }
