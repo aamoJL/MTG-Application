@@ -229,11 +229,9 @@ public partial class DeckCardlistViewModel : ObservableObject
             (import, skipDialog) = await Dialogs.GetMultipleCardsAlreadyInDeckDialog(card.Info.Name).ShowAsync();
           }
 
-          if (import is true)
-          { importCards.Add(card); }
+          if (import is true) { importCards.Add(card); }
         }
-        else
-        { importCards.Add(card); }
+        else { importCards.Add(card); }
       }
     }
 

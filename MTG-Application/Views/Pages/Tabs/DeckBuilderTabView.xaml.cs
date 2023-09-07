@@ -9,6 +9,7 @@ using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
@@ -61,8 +62,9 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
 
   private DragArgs dragArgs;
 
-  // Change card preview image to hovered item
+  #region Card Preview
   private void PreviewableCard_PointerEntered(object sender, PointerRoutedEventArgs e)
+    // Change card preview image to hovered item
     => CardPreviewProperties.CardViewModel = (sender as FrameworkElement)?.DataContext as MTGCardViewModel;
 
   private void PreviewableCard_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -75,6 +77,7 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
 
   private void PreviewableCard_PointerExited(object sender, PointerRoutedEventArgs e)
     => CardPreviewProperties.CardViewModel = null;
+  #endregion
 
   private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
   {
@@ -106,18 +109,31 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
     var operation = e.AcceptedOperation;
     var targetList = (sender as FrameworkElement).DataContext as DeckCardlistViewModel;
 
+    var card = dragArgs?.DragItem ?? new Func<MTGCard>(() =>
+    {
+      // Try to import from JSON
+      try
+      {
+        var card = JsonSerializer.Deserialize<MTGCard>(data);
+        if (string.IsNullOrEmpty(card?.Info.Name))
+        { throw new Exception("Card does not have name"); }
+        return card;
+      }
+      catch { return null; }
+    })();
+
     if (!string.IsNullOrEmpty(data))
     {
-      if (dragArgs?.DragStartElement != null && dragArgs?.DragItem != null)
+      if (card != null)
       {
         // Dragged from this application
-        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy || dragArgs?.DragStartElement == null)
         {
-          await targetList?.Add(new(dragArgs.DragItem.Info, dragArgs.DragItem.Count));
+          await targetList?.Add(new(card.Info, card.Count));
         }
         else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         {
-          await targetList?.Move(dragArgs.DragItem, dragArgs.DragOriginList);
+          await targetList?.Move(card, dragArgs.DragOriginList);
         }
       }
       else if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
