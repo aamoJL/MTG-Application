@@ -146,7 +146,7 @@ public partial class DeckCardlistViewModelTests
   [TestMethod]
   public async Task SortDeckCommandTest()
   {
-    DeckBuilderViewModel vm = new(null, null);
+    DeckBuilderViewModel vm = new(null, null, null);
 
     var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2);
     var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1);
@@ -170,7 +170,7 @@ public partial class DeckCardlistViewModelTests
   [TestMethod]
   public async Task SortDeckCommandTest_SecondaryProperty()
   {
-    DeckBuilderViewModel vm = new(null, null);
+    DeckBuilderViewModel vm = new(null, null, null);
 
     var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
     var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "BA", cmc: 1, frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: new ColorTypes[] { ColorTypes.W }));
@@ -194,7 +194,7 @@ public partial class DeckCardlistViewModelTests
   [TestMethod]
   public async Task DeckFilterTest()
   {
-    DeckBuilderViewModel vm = new(null, null);
+    DeckBuilderViewModel vm = new(null, null, null);
 
     var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(
       name: "A",
@@ -266,7 +266,7 @@ public partial class DeckCardlistViewModelTests
   [TestMethod]
   public async Task DeckFilterTest_Maybelist()
   {
-    DeckBuilderViewModel vm = new(null, null);
+    DeckBuilderViewModel vm = new(null, null, null);
 
     var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "A", cmc: 2, typeLine: "Artifact", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.R }));
     var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "B", cmc: 1, typeLine: "Creature", frontFace: Mocker.MTGCardModelMocker.CreateCardFace(new ColorTypes[] { ColorTypes.W }));
@@ -309,12 +309,12 @@ public partial class DeckCardlistViewModelTests
 
   #region HasUnsavedChanges
   [TestMethod]
-  public void HasUnsavedChangesTest_Init() => Assert.IsFalse(new DeckBuilderViewModel(null, null).HasUnsavedChanges);
+  public void HasUnsavedChangesTest_Init() => Assert.IsFalse(new DeckBuilderViewModel(null, null, null).HasUnsavedChanges);
 
   [TestMethod]
   public async Task HasUnsavedChangesTest_AddCard()
   {
-    DeckBuilderViewModel vm = new(null, null);
+    DeckBuilderViewModel vm = new(null, null, null);
 
     await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.HasUnsavedChanges);
@@ -323,7 +323,7 @@ public partial class DeckCardlistViewModelTests
   [TestMethod]
   public async Task HasUnsavedChangesTest_IncreaseCount()
   {
-    DeckBuilderViewModel vm = new(null, null);
+    DeckBuilderViewModel vm = new(null, null, null);
 
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
     await vm.DeckCards.Add(card);
@@ -447,7 +447,7 @@ public partial class DeckCardlistViewModelTests
   [TestMethod]
   public async Task RemoveFromCardlistCommandTest_Undo_Redo()
   {
-    var vm = new DeckBuilderViewModel(null, null);
+    var vm = new DeckBuilderViewModel(null, null, null);
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
 
     await vm.DeckCards.Add(card);

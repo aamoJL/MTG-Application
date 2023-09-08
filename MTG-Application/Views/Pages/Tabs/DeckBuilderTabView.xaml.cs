@@ -7,6 +7,7 @@ using MTGApplication.API;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using System;
 using System.Text.Json;
@@ -22,17 +23,16 @@ namespace MTGApplication.Views.Pages.Tabs;
 [ObservableObject]
 public sealed partial class DeckBuilderTabView : UserControl, ISavable
 {
-  public DeckBuilderTabView(CardPreviewProperties previewProperties)
+  public DeckBuilderTabView(CardPreviewProperties previewProperties, DialogService dialogService)
   {
     InitializeComponent();
     CardPreviewProperties = previewProperties;
 
-    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()));
+    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new(dialogService));
   }
 
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
   public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
-  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
   public CardPreviewProperties CardPreviewProperties { get; }
 
   [ObservableProperty] private double deckDesiredItemWidth = 250;
@@ -271,5 +271,9 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
     else { args.Cancel = true; }
   }
 
+  #region ISavable Implementation
+  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
+  
   public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
+  #endregion
 }

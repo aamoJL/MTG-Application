@@ -9,7 +9,12 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Services;
 
-public static class DialogService
+/// <summary>
+/// Service to show dialogs on windows.
+/// One window should have only one Dialog Service
+/// Dialog service shows dialogs on the window it was initialized
+/// </summary>
+public class DialogService
 {
   /// <summary>
   /// Class that can be used to call dialog's showAsync method.
@@ -17,11 +22,13 @@ public static class DialogService
   /// </summary>
   public class DialogWrapper
   {
+    public ContentDialog CurrentDialog { get; private set; }
+
     public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog, bool force = false)
     {
       var contentDialog = dialog.GetDialog();
 
-      // Only one dialog can be open
+      // Only one dialog can be open at once on the window
       if (force && CurrentDialog != null) { CurrentDialog.Hide(); CurrentDialog = null; }
       if (CurrentDialog != null) { return ContentDialogResult.None; }
       CurrentDialog = contentDialog;
@@ -40,8 +47,13 @@ public static class DialogService
     public string PrimaryButtonText { get; init; } = "Yes";
     public string SecondaryButtonText { get; init; } = "No";
     public string CloseButtonText { get; init; } = "Cancel";
+    public DialogService DialogService { get; init; }
 
-    public Dialog(string title) => Title = title;
+    public Dialog(DialogService service, string title)
+    {
+      DialogService = service;
+      Title = title;
+    }
 
     /// <summary>
     /// Creates the <see cref="ContentDialog"/>
@@ -52,8 +64,8 @@ public static class DialogService
       var dialog = new ContentDialog()
       {
         Title = Title,
-        XamlRoot = DialogRoot.XamlRoot,
-        RequestedTheme = DialogRoot.ActualTheme,
+        XamlRoot = DialogService.XamlRoot,
+        RequestedTheme = AppConfig.LocalSettings.AppTheme,
         DefaultButton = ContentDialogButton.Primary,
         PrimaryButtonText = PrimaryButtonText,
         SecondaryButtonText = SecondaryButtonText,
@@ -82,9 +94,9 @@ public static class DialogService
     }
 
     /// <summary>
-    /// Shows the dialog to the user using <see cref="CurrentDialogWrapper"/>
+    /// Shows the dialog to the user using <see cref="Wrapper"/>
     /// </summary>
-    public async Task<ContentDialogResult> ShowAsync(bool force = false) => await CurrentDialogWrapper.ShowAsync(this, force);
+    public async Task<ContentDialogResult> ShowAsync(bool force = false) => await DialogService.Wrapper.ShowAsync(this, force);
   }
 
   /// <summary>
@@ -93,7 +105,7 @@ public static class DialogService
   /// </summary>
   public abstract class Dialog<T> : Dialog
   {
-    public Dialog(string title) : base(title) { }
+    public Dialog(DialogService service, string title) : base(service, title) { }
 
     /// <summary>
     /// Returns a value depending on the <paramref name="result"/>
@@ -107,9 +119,10 @@ public static class DialogService
     public new async Task<T> ShowAsync(bool force = false) => ProcessResult(await base.ShowAsync(force));
   }
 
-  public static FrameworkElement DialogRoot { get; set; } // MainWindow's root that will be used to show the dialogs
-  public static ContentDialog CurrentDialog { get; set; } = null; // Dialog that is currently open
-  public static DialogWrapper CurrentDialogWrapper { get; set; } = new(); // Wrapper that will be used to show the dialogs
+  public XamlRoot XamlRoot { get; set; } // Root that will be used to show the dialogs
+  public DialogWrapper Wrapper { get; set; } = new(); // Wrapper that will be used to show the dialogs
+
+  #region Dialog Types
 
   /// <summary>
   /// Dialog that asks confirmation from the used.
@@ -118,7 +131,7 @@ public static class DialogService
   {
     public string Message { get; set; }
 
-    public ConfirmationDialog(string title = "") : base(title) { }
+    public ConfirmationDialog(DialogService service, string title = "") : base(service, title) { }
 
     public override ContentDialog GetDialog()
     {
@@ -146,7 +159,7 @@ public static class DialogService
   {
     public string Message { get; set; }
 
-    public MessageDialog(string title = "") : base(title) { }
+    public MessageDialog(DialogService service, string title = "") : base(service, title) { }
 
     public override ContentDialog GetDialog()
     {
@@ -174,7 +187,7 @@ public static class DialogService
     public bool? IsChecked { get; set; }
     public bool InputDefaultValue { get; set; }
 
-    public CheckBoxDialog(string title = "") : base(title) { }
+    public CheckBoxDialog(DialogService service, string title = "") : base(service, title) { }
 
     public override ContentDialog GetDialog()
     {
@@ -227,7 +240,7 @@ public static class DialogService
     public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
     public bool IsSpellCheckEnabled { get; set; }
 
-    public TextBoxDialog(string title = "") : base(title) { }
+    public TextBoxDialog(DialogService service, string title = "") : base(service, title) { }
 
     public override ContentDialog GetDialog()
     {
@@ -286,7 +299,7 @@ public static class DialogService
     public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
     public bool IsSpellCheckEnabled { get; set; }
 
-    public TextAreaDialog(string title = "") : base(title) { }
+    public TextAreaDialog(DialogService service, string title = "") : base(service, title) { }
 
     public override ContentDialog GetDialog()
     {
@@ -346,7 +359,7 @@ public static class DialogService
     public string InputHeader { get; set; }
     public string[] Items { get; set; }
 
-    public ComboBoxDialog(string title = "") : base(title) { }
+    public ComboBoxDialog(DialogService service, string title = "") : base(service, title) { }
 
     public override ContentDialog GetDialog()
     {
@@ -385,7 +398,7 @@ public static class DialogService
     public object GridStyle { get; }
     public object GridItemTemplate { get; }
 
-    public GridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title)
+    public GridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title)
     {
       GridStyle = gridStyle;
       GridItemTemplate = itemTemplate;
@@ -423,7 +436,7 @@ public static class DialogService
           else
           {
             // If primary button is not available, close the dialog
-            CurrentDialog.Hide();
+            DialogService.Wrapper.CurrentDialog.Hide();
           }
         };
       };
@@ -447,7 +460,7 @@ public static class DialogService
   /// <typeparam name="T">Items type</typeparam>
   public class DraggableGridViewDialog<T> : GridViewDialog<T>
   {
-    public DraggableGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle)
+    public DraggableGridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title, itemTemplate, gridStyle)
     {
     }
 
@@ -463,6 +476,8 @@ public static class DialogService
       return dialog;
     }
 
-    protected virtual void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e) => CurrentDialog.Hide();
+    protected virtual void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e) => DialogService.Wrapper.CurrentDialog.Hide();
   }
+
+  #endregion
 }

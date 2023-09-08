@@ -3,8 +3,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API;
 using MTGApplication.Models.Structs;
+using MTGApplication.Services;
 using MTGApplication.ViewModels;
-using System;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Views.Pages;
@@ -15,21 +15,20 @@ namespace MTGApplication.Views.Pages;
 [ObservableObject]
 public sealed partial class EDHRECSearchPage : Page
 {
-  public EDHRECSearchPage() => InitializeComponent();
-
-  public static readonly DependencyProperty CommanderThemesProperty =
-      DependencyProperty.Register(nameof(CommanderThemes), typeof(CommanderTheme[]), typeof(EDHRECCommanderAPI), new PropertyMetadata(Array.Empty<CommanderTheme>()));
-
-  public EDHRECSearchViewModel SearchViewModel { get; } = new(new EDHRECCommanderAPI(), new ScryfallAPI());
-  public CommanderTheme[] CommanderThemes
+  public EDHRECSearchPage(CommanderTheme[] themes, FrameworkElement dialogRoot = null)
   {
-    get => (CommanderTheme[])GetValue(CommanderThemesProperty);
-    set
-    {
-      SetValue(CommanderThemesProperty, value);
-      SearchViewModel.CommanderThemes = value;
-    }
+    InitializeComponent();
+    var dialogService = new DialogService();
+    SearchViewModel = new(new EDHRECCommanderAPI(), new ScryfallAPI(), dialogService) { CommanderThemes = themes };
+
+    // Set dialog root
+    if (dialogRoot != null)
+      dialogRoot.Loaded += (s, e) => { dialogService.XamlRoot = dialogRoot.XamlRoot; };
+    else
+      Loaded += (s, e) => { dialogService.XamlRoot = XamlRoot; };
   }
+
+  public EDHRECSearchViewModel SearchViewModel { get; }
 
   [ObservableProperty] private double searchDesiredItemWidth = 250;
 

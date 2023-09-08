@@ -18,6 +18,8 @@ public class DeckBuilderViewModelTests
 {
   public class TestDeckBuilderViewDialogs : DeckBuilderViewDialogs
   {
+    public TestDeckBuilderViewDialogs() : base(service: new()) { }
+
     public TestDialogResult<MTGCardViewModel> CardPrintDialog { get; set; } = new();
     public TestDialogResult<bool?> MultipleCardsAlreadyInDeckDialog { get; set; } = new();
     public TestDialogResult<string> LoadDialog { get; set; } = new();
@@ -31,65 +33,65 @@ public class DeckBuilderViewModelTests
 
     public override ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName = "")
     {
-      CurrentDialogWrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
       var dialog = base.GetCardAlreadyInCardlistDialog(cardName, listName);
       return dialog;
     }
     public override ConfirmationDialog GetOverrideDialog(string name)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(OverrideDialog.Result);
       var dialog = base.GetOverrideDialog(name);
       return dialog;
     }
     public override ConfirmationDialog GetDeleteDialog(string name)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(DeleteDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(DeleteDialog.Result);
       var dialog = base.GetDeleteDialog(name);
       return dialog;
     }
     public override ConfirmationDialog GetSaveUnsavedDialog(string name = "")
     {
-      CurrentDialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
       var dialog = base.GetSaveUnsavedDialog();
       return dialog;
     }
     public override CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(MultipleCardsAlreadyInDeckDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(MultipleCardsAlreadyInDeckDialog.Result);
       var dialog = base.GetMultipleCardsAlreadyInDeckDialog(name);
       dialog.IsChecked = MultipleCardsAlreadyInDeckDialog.Values;
       return dialog;
     }
     public override GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(CardPrintDialog.Result);
       var dialog = base.GetCardPrintDialog(printViewModels);
       dialog.Selection = CardPrintDialog.Values;
       return dialog;
     }
     public override ComboBoxDialog GetLoadDialog(string[] names)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(LoadDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(LoadDialog.Result);
       var dialog = base.GetLoadDialog(names);
       dialog.Selection = LoadDialog.Values;
       return dialog;
     }
     public override TextAreaDialog GetExportDialog(string text)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(ExportDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(ExportDialog.Result);
       var dialog = base.GetExportDialog(text);
       return dialog;
     }
     public override TextAreaDialog GetImportDialog()
     {
-      CurrentDialogWrapper = new TestDialogWrapper(ImportDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(ImportDialog.Result);
       var dialog = base.GetImportDialog();
       dialog.TextInputText = ImportDialog.Values;
       return dialog;
     }
     public override TextBoxDialog GetSaveDialog(string name)
     {
-      CurrentDialogWrapper = new TestDialogWrapper(SaveDialog.Result);
+      Service.Wrapper = new TestDialogWrapper(SaveDialog.Result);
       var dialog = base.GetSaveDialog(name);
       dialog.TextInputText = SaveDialog.Values;
       return dialog;

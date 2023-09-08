@@ -22,12 +22,23 @@ namespace MTGApplication.Views.Pages;
 [ObservableObject]
 public sealed partial class MTGDeckBuildingPage : Page, ISavable
 {
-  public MTGDeckBuildingPage()
+  public MTGDeckBuildingPage(FrameworkElement dialogRoot = null)
   {
     InitializeComponent();
+    DialogService = new();
+
+    Loaded += MTGDeckBuildingPage_Loaded;
 
     NotificationService.OnNotification += Notifications_OnNotification;
+    
+    // Set dialog root
+    if(dialogRoot != null)
+      dialogRoot.Loaded += (s, e) => { DialogService.XamlRoot = dialogRoot.XamlRoot; };
+    else
+      Loaded += (s, e) => { DialogService.XamlRoot = XamlRoot; };
   }
+
+  private void MTGDeckBuildingPage_Loaded(object sender, RoutedEventArgs e) => DialogService.XamlRoot = XamlRoot;
 
   private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
   {
@@ -46,6 +57,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
 
   public CardPreviewProperties CardPreviewProperties { get; } = new();
+  public DialogService DialogService { get; }
 
   /// <summary>
   /// Opens and closes search panel
@@ -78,7 +90,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
 
   private void TabView_AddTabButtonClick(TabView tabView, object args)
   {
-    var newItem = new DeckBuilderTabView(CardPreviewProperties);
+    var newItem = new DeckBuilderTabView(CardPreviewProperties, DialogService);
     TabViews.Add(newItem);
     tabView.SelectedItem = newItem;
   }
@@ -93,7 +105,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
     }
   }
 
-  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView(CardPreviewProperties)); // Add default tab
+  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView(CardPreviewProperties, DialogService)); // Add default tab
 
   private void TabView_TabItemsChanged(TabView tabView, IVectorChangedEventArgs args)
   {

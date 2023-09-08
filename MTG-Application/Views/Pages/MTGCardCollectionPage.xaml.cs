@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
+using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using System.Threading.Tasks;
 
@@ -13,13 +14,20 @@ namespace MTGApplication.Views.Pages;
 /// </summary>
 public sealed partial class MTGCardCollectionPage : Page, ISavable
 {
-  public MTGCardCollectionPage()
+  public MTGCardCollectionPage(FrameworkElement dialogRoot = null)
   {
     InitializeComponent();
+    var dialogService = new DialogService();
+    CardCollectionsViewModel = new(new ScryfallAPI(), new SQLiteMTGCardCollectionRepository(new ScryfallAPI(), new()), new(dialogService));
+
+    // Set dialog root
+    if (dialogRoot != null)
+      dialogRoot.Loaded += (s, e) => { dialogService.XamlRoot = dialogRoot.XamlRoot; };
+    else
+      Loaded += (s, e) => { dialogService.XamlRoot = XamlRoot; };
   }
-  
-  public CardCollectionsViewModel CardCollectionsViewModel = 
-    new(new ScryfallAPI(), new SQLiteMTGCardCollectionRepository(new ScryfallAPI(), new()));
+
+  public CardCollectionsViewModel CardCollectionsViewModel { get; }
 
   private void GridViewItemImage_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
   {

@@ -6,6 +6,7 @@ using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
+using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -30,45 +31,49 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// </summary>
   public class DeckBuilderViewDialogs
   {
+    public DeckBuilderViewDialogs(DialogService service) => Service = service;
+
+    protected DialogService Service { get; }
+
     public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
-      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+      => new(Service, "Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
+      => new(Service, "Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetDeleteDialog(string name)
-      => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
+      => new(Service, "Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetSaveUnsavedDialog(string name = "")
-      => new("Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
+      => new(Service, "Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
 
     public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
-      => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+      => new(Service, "Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
+      => new(Service, "Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
 
     public virtual GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
+      => new(Service, "Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
 
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+      => new(Service, "Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetExportDialog(string text)
-      => new("Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+      => new(Service, "Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetImportDialog()
-      => new("Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+      => new(Service, "Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
 
     public virtual TextBoxDialog GetSaveDialog(string name)
-      => new("Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+      => new(Service, "Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
   }
 
-  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
+  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, DeckBuilderViewDialogs dialogs, IOService.ClipboardService clipboardService = null)
   {
     DeckRepository = deckRepository;
     CardAPI = cardAPI;
-    Dialogs = dialogs ?? new();
+    Dialogs = dialogs;
     clipboardService ??= new();
 
     DeckCards = new DeckCardlistViewModel(CardDeck.DeckCards, Dialogs, CardAPI, CardFilters, SortProperties)
@@ -405,10 +410,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   [RelayCommand(CanExecute = nameof(DeckHasCommanders))]
   public async Task OpenEDHRECWindow(MTGCardDeck deck)
   {
-    new EDHRECSearchWindow(
-      await CommanderAPI.GetThemes(new Models.Structs.Commanders(
-        deck.Commander?.Info.Name ?? string.Empty, deck.CommanderPartner?.Info.Name ?? string.Empty)))
-      .Activate();
+    var themes = await CommanderAPI.GetThemes(new Models.Structs.Commanders(
+        deck.Commander?.Info.Name ?? string.Empty, deck.CommanderPartner?.Info.Name ?? string.Empty));
+
+    new ThemedWindow()
+    {
+      Title = "EDHREC Search",
+      Content = new EDHRECSearchPage(themes),
+    }
+    .Activate();
   }
 
   [RelayCommand]

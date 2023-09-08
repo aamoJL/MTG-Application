@@ -52,7 +52,6 @@
     <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
     <None Remove="Views\Styles\Themes\VioletTheme.xaml" />
     <None Remove="Views\Windows\DeckTestingWindow.xaml" />
-    <None Remove="Views\Windows\EDHRECSearchWindow.xaml" />
     <None Remove="Views\Windows\ThemedWindow.xaml" />
   </ItemGroup>
 
@@ -207,11 +206,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\EDHRECSearchPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Windows\EDHRECSearchWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

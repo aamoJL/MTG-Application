@@ -3,7 +3,6 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using MTGApplication.Database;
-using MTGApplication.Services;
 using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 
@@ -36,14 +35,11 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    DeckBuilderWindow = new ThemedWindow()
+    new ThemedWindow
     {
-      Content = new MTGDeckBuildingPage(),
       Title = "Deck Builder",
-    };
-    DeckBuilderWindow.Activate();
-
-    DialogService.DialogRoot = DeckBuilderWindow.Content as FrameworkElement;
+      Content = new MTGDeckBuildingPage(),
+    }.Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
   }

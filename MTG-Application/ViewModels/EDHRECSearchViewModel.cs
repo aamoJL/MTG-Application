@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Models.Structs;
+using MTGApplication.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,15 +17,17 @@ public partial class EDHRECSearchViewModel : ObservableObject
 {
   public class EDHRECSearchViewModelDialogs
   {
+    public EDHRECSearchViewModelDialogs(DialogService service) => Service = service;
+
+    private DialogService Service { get; }
+
     public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+        => new(Service, "Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
         { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
     {
-      public DraggableMTGCardViewModelGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle)
-      {
-      }
+      public DraggableMTGCardViewModelGridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title, itemTemplate, gridStyle) { }
 
       protected override void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
       {
@@ -38,8 +41,9 @@ public partial class EDHRECSearchViewModel : ObservableObject
     }
   }
 
-  public EDHRECSearchViewModel(IMTGCommanderAPI commanderAPI, ICardAPI<MTGCard> cardAPI)
+  public EDHRECSearchViewModel(IMTGCommanderAPI commanderAPI, ICardAPI<MTGCard> cardAPI, DialogService dialogService)
   {
+    Dialogs = new(dialogService);
     CommanderAPI = commanderAPI;
     APISearch = new(cardAPI);
 
@@ -79,7 +83,7 @@ public partial class EDHRECSearchViewModel : ObservableObject
   }
 
   public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> APISearch { get; }
-  public EDHRECSearchViewModelDialogs Dialogs { get; init; } = new();
+  public EDHRECSearchViewModelDialogs Dialogs { get; }
 
   private IMTGCommanderAPI CommanderAPI { get; }
 

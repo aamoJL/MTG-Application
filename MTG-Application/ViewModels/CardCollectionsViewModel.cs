@@ -27,37 +27,41 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   /// </summary>
   public class CardCollectionsDialogs
   {
-    public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
-      => new("Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
+    public CardCollectionsDialogs(DialogService service) => Service = service;
 
-    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new("Add new list");
+    protected DialogService Service { get; }
+
+    public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
+      => new(Service, "Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
+
+    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new(Service, "Add new list");
 
     public virtual ConfirmationDialog GetDeleteCollectionDialog(string name)
-      => new("Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
+      => new(Service, "Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetDeleteListDialog(string name)
-      => new("Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
+      => new(Service, "Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new("Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
+      => new(Service, "Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetSaveUnsavedDialog()
-      => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
+      => new(Service, "Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
 
     public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+      => new(Service, "Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new("Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+      => new(Service, "Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
     public virtual TextBoxDialog GetSaveDialog(string name)
-      => new("Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+      => new(Service, "Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetExportDialog(string text)
-      => new("Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+      => new(Service, "Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetImportDialog()
-      => new("Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+      => new(Service, "Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
 
     public class CollectionListContentDialog : Dialog<MTGCardCollectionList>
     {
@@ -67,7 +71,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       public string NameInputText { get; set; }
       public string QueryInputText { get; set; }
 
-      public CollectionListContentDialog(string title = "") : base(title) { }
+      public CollectionListContentDialog(DialogService service, string title = "") : base(service, title) { }
 
       public override ContentDialog GetDialog()
       {
@@ -143,12 +147,13 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     }
   }
 
-  public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, ClipboardService clipboardService = default)
+  public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, CardCollectionsDialogs dialogs, ClipboardService clipboardService = default)
   {
     CardAPI = cardAPI;
     CollectionRepository = collectionRepository;
     MTGSearchViewModel = new(CardAPI);
     ClipboardService = clipboardService ?? new();
+    Dialogs = dialogs;
 
     PropertyChanged += CardCollectionsViewModel_PropertyChanged;
     MTGSearchViewModel.PropertyChanged += MTGSearchViewModel_PropertyChanged;
@@ -238,7 +243,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   private bool isBusy = false;
 
   public MTGAPISearch<MTGCardCollectionCardViewModelSource, MTGCardCollectionCardViewModel> MTGSearchViewModel { get; }
-  public CardCollectionsDialogs Dialogs { get; init; } = new();
+  public CardCollectionsDialogs Dialogs { get; }
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
 
   private IRepository<MTGCardCollection> CollectionRepository { get; }
