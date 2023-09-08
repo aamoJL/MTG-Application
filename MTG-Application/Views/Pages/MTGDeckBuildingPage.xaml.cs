@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -42,15 +43,18 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
 
   private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
   {
-    PopupAppNotification.Background = e.Type switch
+    if ((XamlRoot)sender == this.XamlRoot)
     {
-      NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
-      NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
-      NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
-      _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
-    };
-    PopupAppNotification.RequestedTheme = ElementTheme.Light;
-    PopupAppNotification.Show(e.Text, NotificationService.NotificationDuration);
+      InAppNotification.Background = e.Type switch
+      {
+        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+        _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
+      };
+      InAppNotification.RequestedTheme = ElementTheme.Light;
+      InAppNotification.Show(e.Text, NotificationService.NotificationDuration);
+    }
   }
 
   [ObservableProperty] private bool searchPanelOpen = false;

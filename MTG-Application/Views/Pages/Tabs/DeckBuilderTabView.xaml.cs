@@ -29,6 +29,7 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
     CardPreviewProperties = previewProperties;
 
     DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new(dialogService));
+    DeckBuilderViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
   }
 
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
@@ -273,7 +274,7 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
 
   #region ISavable Implementation
   public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
-  
+
   public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
   #endregion
 }

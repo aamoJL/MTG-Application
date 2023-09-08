@@ -149,5 +149,11 @@
                              SelectionMode="None"
                              DesiredWidth="250"/>
     </controls:DockPanel>
+    
+    <controls:InAppNotification x:Name="InAppNotification"
+                            ShowDismissButton="True"
+                            VerticalOffset="100"
+                            HorizontalOffset="0"
+                            StackMode="Replace"/>
   </Grid>
 </Page>

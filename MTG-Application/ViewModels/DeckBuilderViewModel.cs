@@ -24,7 +24,7 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Deck Builder tab view model
 /// </summary>
-public partial class DeckBuilderViewModel : ViewModelBase, ISavable
+public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier
 {
   /// <summary>
   /// Deck Builder tab dialogs
@@ -105,6 +105,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     WishlistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
     MaybelistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
     RemovelistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+
+    DeckCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+    WishlistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+    MaybelistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+    RemovelistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
 
     PropertyChanged += DeckBuilderViewModel_PropertyChanged;
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
@@ -209,6 +214,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
   #region ISavable implementation
   private bool hasUnsavedChanges = false;
+
   public bool HasUnsavedChanges
   {
     get => hasUnsavedChanges;
@@ -252,6 +258,14 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   }
   #endregion
 
+  #region IINAppNotifier implementation
+
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+
+  #endregion
+
   #region Relay Commands
   /// <summary>
   /// Shows UnsavedChanges dialog and clear current card deck
@@ -284,13 +298,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
           if (await Task.Run(() => DeckRepository.Get(loadName)) is MTGCardDeck loadedDeck)
           {
             CardDeck = loadedDeck;
-            NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
+            RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
           }
           else { throw new Exception(); }
         }
         catch (Exception)
         {
-          NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
+          RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
         }
         IsBusy = false;
       }
@@ -330,9 +344,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       if (await Task.Run(() => DeckRepository.Remove(CardDeck)))
       {
         CardDeck = new();
-        NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was deleted successfully.");
+        RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was deleted successfully.");
       }
-      else { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the deck."); }
+      else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not delete the deck."); }
       IsBusy = false;
     }
   }
@@ -508,11 +522,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (await CardAPI.FetchFromString(importText) is var result && result.Found.Length > 0)
     {
       SetCommander(result.Found[0]);
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"Commander was imported successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"Commander was imported successfully.");
     }
     else
     {
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Could not import the commander.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Could not import the commander.");
     }
   }
 
@@ -524,11 +538,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (await CardAPI.FetchFromString(importText) is var result && result.Found.Length > 0)
     {
       SetCommanderPartner(result.Found[0]);
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"Partner was imported successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"Partner was imported successfully.");
     }
     else
     {
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Could not import the partner.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Could not import the partner.");
     }
   }
 
@@ -550,10 +564,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
       CardDeck.Name = name;
       HasUnsavedChanges = false;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was saved successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was saved successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not save the deck."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not save the deck."); }
     IsBusy = false;
   }
 

@@ -16,7 +16,7 @@ using static MTGApplication.ViewModels.DeckBuilderViewModel;
 
 namespace MTGApplication.ViewModels;
 
-public partial class DeckCardlistViewModel : ObservableObject
+public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
 {
   public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGCardSortProperties sortProperties = null)
   {
@@ -142,6 +142,14 @@ public partial class DeckCardlistViewModel : ObservableObject
   /// </summary>
   public float EuroPrice => CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count);
 
+  #region IInAppNotifier implementation
+  
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+
+  #endregion
+
   #region Relay Commands
   /// <summary>
   /// Asks cards to import and imports them to the deck
@@ -165,6 +173,7 @@ public partial class DeckCardlistViewModel : ObservableObject
     if (await Dialogs.GetExportDialog(MTGService.GetExportString(Cardlist.ToArray(), exportProperty)).ShowAsync() is var response && !string.IsNullOrEmpty(response))
     {
       ClipboardService.Copy(response);
+      RaiseInAppNotification(NotificationService.NotificationType.Info, "Copied to clipboard.");
     }
   }
 
@@ -241,12 +250,12 @@ public partial class DeckCardlistViewModel : ObservableObject
     }
 
     if (notFoundCount == 0 && found.Length > 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"{importCards.Count} cards imported successfully." + ((found.Length - importCards.Count) > 0 ? $" ({(found.Length - importCards.Count)} cards skipped) " : ""));
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"{importCards.Count} cards imported successfully." + ((found.Length - importCards.Count) > 0 ? $" ({(found.Length - importCards.Count)} cards skipped) " : ""));
     else if (found.Length > 0 && notFoundCount > 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Warning,
+      RaiseInAppNotification(NotificationService.NotificationType.Warning,
         $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + ((found.Length - importCards.Count) > 0 ? $" ({(found.Length - importCards.Count)} cards skipped) " : ""));
     else if (found.Length == 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
 
     IsBusy = false;
   }

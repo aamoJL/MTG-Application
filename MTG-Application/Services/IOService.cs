@@ -26,8 +26,6 @@ public static class IOService
       DataPackage dataPackage = new();
       dataPackage.SetText(text);
       SetClipboardContent(dataPackage);
-
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Info, "Copied to clipboard.");
     }
 
     /// <summary>

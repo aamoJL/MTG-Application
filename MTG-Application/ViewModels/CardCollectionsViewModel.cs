@@ -20,7 +20,7 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Card Collections Tab view model
 /// </summary>
-public partial class CardCollectionsViewModel : ViewModelBase, ISavable
+public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppNotifier
 {
   /// <summary>
   /// Card Collections tab dialogs
@@ -257,6 +257,14 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   public async Task<bool> SaveUnsavedChanges() => await ShowUnsavedDialogs();
   #endregion
 
+  #region IINAppNotifier implementation
+
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+
+  #endregion
+
   #region Relay Commands
   /// <summary>
   /// Asks if user wants to save unsaved changes and clears the <see cref="Collection"/>
@@ -387,6 +395,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     if (!string.IsNullOrEmpty(response))
     {
       ClipboardService.Copy(response);
+      RaiseInAppNotification(NotificationService.NotificationType.Info, "Copied to clipboard.");
     }
   }
 
@@ -442,10 +451,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       }
       Collection.Name = name;
       HasUnsavedChanges = false;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was saved successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was saved successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not save the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not save the collection."); }
     IsBusy = false;
   }
 
@@ -459,11 +467,12 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       Collection = loadedCollection;
       if (Collection.CollectionLists.Count > 0)
-      { ChangeSelectedCollectionList(Collection.CollectionLists[0]); }
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was loaded successfully.");
+      {
+        ChangeSelectedCollectionList(Collection.CollectionLists[0]);
+      }
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was loaded successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the collection."); }
     IsBusy = false;
   }
 
@@ -477,10 +486,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       Collection = new();
       HasUnsavedChanges = false;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was deleted successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was deleted successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not delete the collection."); }
     IsBusy = false;
   }
 
@@ -494,10 +502,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       Collection.CollectionLists.Add(list);
       ChangeSelectedCollectionList(list);
       HasUnsavedChanges = true;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "List added to the collection successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "List added to the collection successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection."); }
   }
 
   /// <summary>
@@ -522,10 +529,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       SelectedList = Collection.CollectionLists.Count > 0 ? Collection.CollectionLists[0] : null;
       HasUnsavedChanges = true;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The list was deleted successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The list was deleted successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the list."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not delete the list."); }
   }
 
   /// <summary>
@@ -572,12 +578,12 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     }
 
     if (notFoundCount == 0 && found.Length > 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
     else if (found.Length > 0 && notFoundCount > 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Warning,
+      RaiseInAppNotification(NotificationService.NotificationType.Warning,
         $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
     else if (found.Length == 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
 
     IsBusy = false;
   }
@@ -592,36 +598,32 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       // Collection has unsaved changes
       var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
-      if (wantSaveConfirmed == null)
-      { return false; }
+      if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
         // User wants to save the unsaved changes
         if (!SaveCollectionCommandCanExecute())
         {
           // Collection can't be saved if it has no lists.
-          NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Collection can't be saved, because it has no lists.");
+          RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Collection can't be saved, because it has no lists.");
           return false;
         }
         var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync();
-        if (string.IsNullOrEmpty(saveName))
-        { return false; }
+        if (string.IsNullOrEmpty(saveName)) { return false; }
         else
         {
           if (saveName != Collection.Name && await CollectionRepository.Exists(saveName))
           {
             // Collection exists already
             var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync();
-            if (overrideConfirmed == null)
-            { return false; }
+            if (overrideConfirmed == null) { return false; }
             else if (overrideConfirmed is true)
             {
               // User wants to override the colleciton
               await SaveCollection(saveName);
             }
           }
-          else
-          { await SaveCollection(saveName); }
+          else { await SaveCollection(saveName); }
         }
       }
     }

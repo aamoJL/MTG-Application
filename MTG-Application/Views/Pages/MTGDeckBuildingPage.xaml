@@ -78,7 +78,7 @@
 
     <customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
     
-    <controls:InAppNotification x:Name="PopupAppNotification"
+    <controls:InAppNotification x:Name="InAppNotification"
                                 ShowDismissButton="True"
                                 VerticalOffset="100"
                                 HorizontalOffset="0"
