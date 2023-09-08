@@ -31,9 +31,9 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
     Loaded += MTGDeckBuildingPage_Loaded;
 
     NotificationService.OnNotification += Notifications_OnNotification;
-    
+
     // Set dialog root
-    if(dialogRoot != null)
+    if (dialogRoot != null)
       dialogRoot.Loaded += (s, e) => { DialogService.XamlRoot = dialogRoot.XamlRoot; };
     else
       Loaded += (s, e) => { DialogService.XamlRoot = XamlRoot; };
@@ -75,7 +75,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   [RelayCommand]
   public void ChangeTheme()
   {
-    AppConfig.LocalSettings.AppTheme = (App.DeckBuilderWindow.Content as FrameworkElement).RequestedTheme == ElementTheme.Dark
+    AppConfig.LocalSettings.AppTheme = AppConfig.LocalSettings.AppTheme == ElementTheme.Dark
       ? ElementTheme.Light : ElementTheme.Dark;
   }
 
