@@ -434,8 +434,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     {
       Title = "EDHREC Search",
       Content = new EDHRECSearchPage(themes),
-    }
-    .Activate();
+      Width = 550
+    }.Activate();
   }
 
   [RelayCommand]

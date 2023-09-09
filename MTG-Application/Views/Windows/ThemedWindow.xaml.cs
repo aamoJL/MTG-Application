@@ -1,4 +1,3 @@
-using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using MTGApplication.Interfaces;
@@ -10,15 +9,10 @@ namespace MTGApplication.Views.Windows;
 /// </summary>
 public sealed partial class ThemedWindow : Window
 {
-  public ThemedWindow(string iconUri = "Assets/Icon.ico"): base()
+  public ThemedWindow(string iconUri = "Assets/Icon.ico") : base()
   {
     InitializeComponent();
-
-    // Change window icon
-    var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-    var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
-    var appWindow = AppWindow.GetFromWindowId(windowId);
-    appWindow.SetIcon(iconUri);
+    AppWindow.SetIcon(iconUri);
 
     Closed += ThemedWindow_Closed;
   }
@@ -33,12 +27,30 @@ public sealed partial class ThemedWindow : Window
     {
       base.Content = value;
       // Set theme
-      if(value != null)
+      if (value != null)
       {
         (value as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
         AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
       }
     }
+  }
+
+  /// <summary>
+  /// Window's width
+  /// </summary>
+  public int Width
+  {
+    get => AppWindow.Size.Width;
+    set => AppWindow.Resize(new(value, Height));
+  }
+
+  /// <summary>
+  /// Window's height
+  /// </summary>
+  public int Height
+  {
+    get => AppWindow.Size.Height;
+    set => AppWindow.Resize(new(Width, value));
   }
 
   private bool close = false; // Temp variable for window closing
