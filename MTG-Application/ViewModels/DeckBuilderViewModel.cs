@@ -414,8 +414,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   [RelayCommand(CanExecute = nameof(DeckHasCards))]
   public void OpenPlaytestWindow(MTGCardDeck deck)
   {
-    var testingWindow = new DeckTestingWindow(deck);
-    testingWindow.Activate();
+    new ThemedWindow()
+    {
+      Title = "MTG Deck Testing",
+      Content = new DeckTestingPage(deck),
+    }.Activate();
   }
 
   /// <summary>
