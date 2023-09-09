@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using System;
 
 namespace MTGApplication.Services;
 
@@ -21,10 +22,15 @@ public static class NotificationService
     }
   }
 
+  /// <summary>
+  /// Notification duration in milliseconds
+  /// </summary>
+  public static int NotificationDuration => 5000;
+
   public static event EventHandler<NotificationEventArgs> OnNotification;
 
   /// <summary>
   /// Sends notification
   /// </summary>
-  public static void RaiseNotification(NotificationType type, string text) => OnNotification?.Invoke(null, new NotificationEventArgs(type, text));
+  public static void RaiseNotification(XamlRoot root, NotificationEventArgs args) => OnNotification?.Invoke(root, args);
 }

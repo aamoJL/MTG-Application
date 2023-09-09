@@ -20,44 +20,48 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Card Collections Tab view model
 /// </summary>
-public partial class CardCollectionsViewModel : ViewModelBase, ISavable
+public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppNotifier
 {
   /// <summary>
   /// Card Collections tab dialogs
   /// </summary>
   public class CardCollectionsDialogs
   {
-    public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
-      => new("Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
+    public CardCollectionsDialogs(DialogService service) => Service = service;
 
-    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new("Add new list");
+    protected DialogService Service { get; }
+
+    public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
+      => new(Service, "Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
+
+    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new(Service, "Add new list");
 
     public virtual ConfirmationDialog GetDeleteCollectionDialog(string name)
-      => new("Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
+      => new(Service, "Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetDeleteListDialog(string name)
-      => new("Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
+      => new(Service, "Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new("Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
+      => new(Service, "Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetSaveUnsavedDialog()
-      => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
+      => new(Service, "Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
 
     public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+      => new(Service, "Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new("Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+      => new(Service, "Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
     public virtual TextBoxDialog GetSaveDialog(string name)
-      => new("Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+      => new(Service, "Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetExportDialog(string text)
-      => new("Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+      => new(Service, "Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetImportDialog()
-      => new("Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+      => new(Service, "Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
 
     public class CollectionListContentDialog : Dialog<MTGCardCollectionList>
     {
@@ -67,7 +71,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       public string NameInputText { get; set; }
       public string QueryInputText { get; set; }
 
-      public CollectionListContentDialog(string title = "") : base(title) { }
+      public CollectionListContentDialog(DialogService service, string title = "") : base(service, title) { }
 
       public override ContentDialog GetDialog()
       {
@@ -143,12 +147,13 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     }
   }
 
-  public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, ClipboardService clipboardService = default)
+  public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, CardCollectionsDialogs dialogs, ClipboardService clipboardService = default)
   {
     CardAPI = cardAPI;
     CollectionRepository = collectionRepository;
     MTGSearchViewModel = new(CardAPI);
     ClipboardService = clipboardService ?? new();
+    Dialogs = dialogs;
 
     PropertyChanged += CardCollectionsViewModel_PropertyChanged;
     MTGSearchViewModel.PropertyChanged += MTGSearchViewModel_PropertyChanged;
@@ -238,7 +243,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   private bool isBusy = false;
 
   public MTGAPISearch<MTGCardCollectionCardViewModelSource, MTGCardCollectionCardViewModel> MTGSearchViewModel { get; }
-  public CardCollectionsDialogs Dialogs { get; init; } = new();
+  public CardCollectionsDialogs Dialogs { get; }
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
 
   private IRepository<MTGCardCollection> CollectionRepository { get; }
@@ -250,6 +255,14 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
   private bool hasUnsavedChanges = false;
 
   public async Task<bool> SaveUnsavedChanges() => await ShowUnsavedDialogs();
+  #endregion
+
+  #region IINAppNotifier implementation
+
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+
   #endregion
 
   #region Relay Commands
@@ -382,6 +395,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     if (!string.IsNullOrEmpty(response))
     {
       ClipboardService.Copy(response);
+      RaiseInAppNotification(NotificationService.NotificationType.Info, "Copied to clipboard.");
     }
   }
 
@@ -437,10 +451,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       }
       Collection.Name = name;
       HasUnsavedChanges = false;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was saved successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was saved successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not save the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not save the collection."); }
     IsBusy = false;
   }
 
@@ -454,11 +467,12 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       Collection = loadedCollection;
       if (Collection.CollectionLists.Count > 0)
-      { ChangeSelectedCollectionList(Collection.CollectionLists[0]); }
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was loaded successfully.");
+      {
+        ChangeSelectedCollectionList(Collection.CollectionLists[0]);
+      }
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was loaded successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the collection."); }
     IsBusy = false;
   }
 
@@ -472,10 +486,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       Collection = new();
       HasUnsavedChanges = false;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The collection was deleted successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was deleted successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not delete the collection."); }
     IsBusy = false;
   }
 
@@ -489,10 +502,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
       Collection.CollectionLists.Add(list);
       ChangeSelectedCollectionList(list);
       HasUnsavedChanges = true;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "List added to the collection successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "List added to the collection successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection."); }
   }
 
   /// <summary>
@@ -517,10 +529,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       SelectedList = Collection.CollectionLists.Count > 0 ? Collection.CollectionLists[0] : null;
       HasUnsavedChanges = true;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The list was deleted successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The list was deleted successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the list."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not delete the list."); }
   }
 
   /// <summary>
@@ -567,12 +578,12 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     }
 
     if (notFoundCount == 0 && found.Length > 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"{found.Length - notImportedCount} cards imported successfully." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
     else if (found.Length > 0 && notFoundCount > 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Warning,
+      RaiseInAppNotification(NotificationService.NotificationType.Warning,
         $"{found.Length} / {notFoundCount + found.Length} cards imported successfully.{Environment.NewLine}{notFoundCount} cards were not found." + (notImportedCount > 0 ? $" ({notImportedCount} cards skipped) " : ""));
     else if (found.Length == 0)
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Error. No cards were imported.");
 
     IsBusy = false;
   }
@@ -587,36 +598,32 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable
     {
       // Collection has unsaved changes
       var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
-      if (wantSaveConfirmed == null)
-      { return false; }
+      if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
         // User wants to save the unsaved changes
         if (!SaveCollectionCommandCanExecute())
         {
           // Collection can't be saved if it has no lists.
-          NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Collection can't be saved, because it has no lists.");
+          RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Collection can't be saved, because it has no lists.");
           return false;
         }
         var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync();
-        if (string.IsNullOrEmpty(saveName))
-        { return false; }
+        if (string.IsNullOrEmpty(saveName)) { return false; }
         else
         {
           if (saveName != Collection.Name && await CollectionRepository.Exists(saveName))
           {
             // Collection exists already
             var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync();
-            if (overrideConfirmed == null)
-            { return false; }
+            if (overrideConfirmed == null) { return false; }
             else if (overrideConfirmed is true)
             {
               // User wants to override the colleciton
               await SaveCollection(saveName);
             }
           }
-          else
-          { await SaveCollection(saveName); }
+          else { await SaveCollection(saveName); }
         }
       }
     }

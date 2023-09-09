@@ -25,9 +25,10 @@ namespace MTGApplication.Views.Pages;
 [ObservableObject]
 public sealed partial class DeckTestingPage : Page
 {
-  public DeckTestingPage()
+  public DeckTestingPage(MTGCardDeck cardDeck)
   {
     InitializeComponent();
+    CardDeck = cardDeck;
     PointerMoved += Root_PointerMoved;
     PointerReleased += Root_PointerReleased;
 

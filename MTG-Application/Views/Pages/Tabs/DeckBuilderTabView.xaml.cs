@@ -1,18 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.API;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using System;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
 namespace MTGApplication.Views.Pages.Tabs;
 
@@ -20,32 +21,25 @@ namespace MTGApplication.Views.Pages.Tabs;
 /// Code behind for DeckBuilder Tab
 /// </summary>
 [ObservableObject]
-public sealed partial class DeckBuilderTabView : UserControl
+public sealed partial class DeckBuilderTabView : UserControl, ISavable
 {
-  public DeckBuilderTabView()
+  public DeckBuilderTabView(CardPreviewProperties previewProperties, DialogService dialogService)
   {
     InitializeComponent();
-    App.Closing += MainWindow_Closed;
+    CardPreviewProperties = previewProperties;
 
-    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()));
-    SearchViewModel = new(CardAPI);
+    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new(dialogService));
+    DeckBuilderViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
   }
 
-  private void MainWindow_Closed(object sender, App.WindowClosingEventArgs args) => args.ClosingTasks.Add(DeckBuilderViewModel);
-
-  public DeckBuilderAPISearchViewModel SearchViewModel { get; }
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
   public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
+  public CardPreviewProperties CardPreviewProperties { get; }
 
-  [ObservableProperty] private double searchDesiredItemWidth = 250;
-  [ObservableProperty] private bool searchPanelOpen = false;
   [ObservableProperty] private double deckDesiredItemWidth = 250;
+  [ObservableProperty] private bool isClosable = true;
 
-  /// <summary>
-  /// Opens and closes search panel
-  /// </summary>
-  [RelayCommand]
-  public void SwitchSearchPanel() => SearchPanelOpen = !SearchPanelOpen;
+  public async Task<bool> TabCloseRequested() => !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
 
   #region Pointer Events
 
@@ -69,39 +63,22 @@ public sealed partial class DeckBuilderTabView : UserControl
 
   private DragArgs dragArgs;
 
+  #region Card Preview
   private void PreviewableCard_PointerEntered(object sender, PointerRoutedEventArgs e)
-  {
     // Change card preview image to hovered item
-    if (sender is FrameworkElement { DataContext: MTGCardViewModel cardVM })
-    {
-      PreviewImage.Visibility = Visibility.Visible;
-      PreviewImage.Source = new BitmapImage(new(cardVM.SelectedFaceUri));
-    }
-  }
+    => CardPreviewProperties.CardViewModel = (sender as FrameworkElement)?.DataContext as MTGCardViewModel;
 
   private void PreviewableCard_PointerMoved(object sender, PointerRoutedEventArgs e)
   {
     // Move card preview image to mouse position when hovering over on list view item.
     // The position is clamped to element size
-    var windowBounds = ActualSize;
-    var pointerPosition = e.GetCurrentPoint(null).Position;
-
-    pointerPosition.X -= ActualOffset.X; // Apply element offset
-    pointerPosition.Y -= ActualOffset.Y;
-
-    var xOffsetFromPointer = (windowBounds.X - pointerPosition.X) > PreviewImage.ActualWidth ? 50 : -50 - PreviewImage.ActualWidth;
-    var yOffsetFromPointer = -100;
-
-    PreviewImage.SetValue(Canvas.LeftProperty, Math.Max(Math.Clamp(pointerPosition.X + xOffsetFromPointer, 0, Math.Max(ActualSize.X - PreviewImage.ActualWidth, 0)), 0));
-    PreviewImage.SetValue(Canvas.TopProperty, Math.Max(Math.Clamp(pointerPosition.Y + yOffsetFromPointer, 0, Math.Max(ActualSize.Y - PreviewImage.ActualHeight, 0)), 0));
+    var point = e.GetCurrentPoint(null).Position;
+    CardPreviewProperties.Coordinates = new((float)point.X, (float)point.Y);
   }
 
   private void PreviewableCard_PointerExited(object sender, PointerRoutedEventArgs e)
-  {
-    PreviewImage.Visibility = Visibility.Collapsed;
-    // Change placeholder image to the old hovered card's image so the placeholder won't flicker
-    PreviewImage.PlaceholderSource = PreviewImage.Source as ImageSource;
-  }
+    => CardPreviewProperties.CardViewModel = null;
+  #endregion
 
   private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
   {
@@ -133,18 +110,31 @@ public sealed partial class DeckBuilderTabView : UserControl
     var operation = e.AcceptedOperation;
     var targetList = (sender as FrameworkElement).DataContext as DeckCardlistViewModel;
 
+    var card = dragArgs?.DragItem ?? new Func<MTGCard>(() =>
+    {
+      // Try to import from JSON
+      try
+      {
+        var card = JsonSerializer.Deserialize<MTGCard>(data);
+        if (string.IsNullOrEmpty(card?.Info.Name))
+        { throw new Exception("Card does not have name"); }
+        return card;
+      }
+      catch { return null; }
+    })();
+
     if (!string.IsNullOrEmpty(data))
     {
-      if (dragArgs?.DragStartElement != null && dragArgs?.DragItem != null)
+      if (card != null)
       {
         // Dragged from this application
-        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+        if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy || dragArgs?.DragStartElement == null)
         {
-          await targetList?.Add(new(dragArgs.DragItem.Info, dragArgs.DragItem.Count));
+          await targetList?.Add(new(card.Info, card.Count));
         }
         else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         {
-          await targetList?.Move(dragArgs.DragItem, dragArgs.DragOriginList);
+          await targetList?.Move(card, dragArgs.DragOriginList);
         }
       }
       else if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
@@ -265,11 +255,11 @@ public sealed partial class DeckBuilderTabView : UserControl
 
   private void CardView_LosingFocus(object sender, RoutedEventArgs e)
   {
-    if (sender is ListViewBase element)
-    { element.DeselectAll(); }
+    if (sender is ListViewBase element) { element.DeselectAll(); }
   }
 
-  private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args) => DeckBuilderViewModel.CardFilters.Reset();
+  private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    => DeckBuilderViewModel.CardFilters.Reset();
 
   private void CommanderView_DragStarting(UIElement sender, DragStartingEventArgs args)
   {
@@ -281,4 +271,10 @@ public sealed partial class DeckBuilderTabView : UserControl
     }
     else { args.Cancel = true; }
   }
+
+  #region ISavable Implementation
+  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
+
+  public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
+  #endregion
 }

@@ -33,6 +33,12 @@ public class BindingHelpersTests
 
     [TestMethod]
     public void ToUpperTest() => Assert.AreEqual("ASD", Format.ToUpper("Asd"));
+
+    [TestMethod]
+    public void StringWithDefaultTest_Text() => Assert.AreEqual("asd", Format.StringWithDefault("asd", "default"));
+
+    [TestMethod]
+    public void StringWithDefaultTest_Default() => Assert.AreEqual("default", Format.StringWithDefault(string.Empty, "default"));
   }
 
   [TestClass]

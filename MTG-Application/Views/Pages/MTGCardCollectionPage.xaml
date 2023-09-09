@@ -1,27 +1,28 @@
-<UserControl
-  x:Class="MTGApplication.Views.Pages.Tabs.CollectionsTabView"
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+  x:Class="MTGApplication.Views.Pages.MTGCardCollectionPage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
   xmlns:viewmodels="using:MTGApplication.ViewModels" 
+  xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
   xmlns:ui="using:CommunityToolkit.WinUI.UI" 
-  xmlns:sys="using:System"
-  xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
-  mc:Ignorable="d">
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:sys="using:System"
+  mc:Ignorable="d"
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-  <UserControl.Resources>
+  <Page.Resources>
     <DataTemplate x:Key="CardViewModelItemTemplate" x:DataType="viewmodels:MTGCardCollectionCardViewModel">
       <StackPanel x:Name="GridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
         <Grid>
           <controls:ImageEx x:Name="GridViewItemImage" 
-                            Style="{StaticResource PlaceholderImageStyle}" 
-                            Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-                            Opacity="{x:Bind helpers:MTGCardViewModelHelpers.OwnedToOpacity(IsOwned), Mode=OneWay}" 
-                            DoubleTapped="GridViewItemImage_DoubleTapped" 
-                            Tapped="GridViewItemImage_Tapped">
+                          Style="{StaticResource PlaceholderImageStyle}" 
+                          Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
+                          Opacity="{x:Bind helpers:MTGCardViewModelHelpers.OwnedToOpacity(IsOwned), Mode=OneWay}" 
+                          DoubleTapped="GridViewItemImage_DoubleTapped" 
+                          Tapped="GridViewItemImage_Tapped">
             <controls:ImageEx.ContextFlyout>
               <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
                 <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
@@ -35,9 +36,9 @@
         </Grid>
       </StackPanel>
     </DataTemplate>
-  </UserControl.Resources>
+  </Page.Resources>
 
-  <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
+  <Grid>
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="CollectionNameTitleSaveStatus">
         <VisualState>
@@ -60,7 +61,7 @@
         </VisualState>
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
-    
+
     <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
       <Grid controls:DockPanel.Dock="Top" BorderThickness="0 0 0 1" BorderBrush="{ThemeResource RegionColor}">
         <StackPanel Orientation="Horizontal">
@@ -96,27 +97,27 @@
           </AppBarButton>
           <AppBarSeparator/>
           <AppBarButton Command="{x:Bind CardCollectionsViewModel.NewCollectionListDialogCommand}"
-                        VerticalAlignment="Top"
-                        Label="Add"
-                        Width="50">
+                    VerticalAlignment="Top"
+                    Label="Add"
+                    Width="50">
             <AppBarButton.Icon>
               <FontIcon Glyph="&#xE710;"/>
             </AppBarButton.Icon>
           </AppBarButton>
           <AppBarButton Command="{x:Bind CardCollectionsViewModel.EditCollectionListDialogCommand}"
-                        VerticalAlignment="Top"
-                        Label="Edit"
-                        Width="50">
+                    VerticalAlignment="Top"
+                    Label="Edit"
+                    Width="50">
             <AppBarButton.Icon>
               <FontIcon Glyph="&#xE70F;"/>
             </AppBarButton.Icon>
           </AppBarButton>
           <ComboBox  ItemsSource="{x:Bind CardCollectionsViewModel.Collection.CollectionLists, Mode=OneWay}" 
-                     SelectedItem="{x:Bind CardCollectionsViewModel.SelectedList, Mode=TwoWay}"
-                     VerticalAlignment="Center" 
-                     Width="200"
-                     Margin="0 0 5 0"
-                     IsEnabled="{x:Bind helpers:Comparison.MoreThan(CardCollectionsViewModel.Collection.CollectionLists.Count, 0), Mode=OneWay}">
+                 SelectedItem="{x:Bind CardCollectionsViewModel.SelectedList, Mode=TwoWay}"
+                 VerticalAlignment="Center" 
+                 Width="200"
+                 Margin="0 0 5 0"
+                 IsEnabled="{x:Bind helpers:Comparison.MoreThan(CardCollectionsViewModel.Collection.CollectionLists.Count, 0), Mode=OneWay}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
                 <TextBlock Text="{Binding Name}"/>
@@ -127,8 +128,8 @@
           <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10 0 0 0">
             <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind CardCollectionsViewModel.Collection.Name, Mode=OneWay}" FontWeight="Bold"/>
             <TextBlock>
-              <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.SelectedListCardCount), Mode=OneWay}"/>
-              <Run Text="{x:Bind sys:String.Format('{0} cards collected', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
+          <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.SelectedListCardCount), Mode=OneWay}"/>
+          <Run Text="{x:Bind sys:String.Format('{0} cards collected', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
             </TextBlock>
           </StackPanel>
           <ProgressRing IsActive="{x:Bind CardCollectionsViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0"/>
@@ -136,17 +137,23 @@
         <Grid HorizontalAlignment="Right" Padding="0 0 10 0">
           <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 5 0 0"/>
           <TextBlock VerticalAlignment="Bottom">
-            <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.MTGSearchViewModel.SearchCards.Count), Mode=OneWay}"/>
-            <Run Text="{x:Bind sys:String.Format('{0} cards loaded', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
+        <Run Text="{x:Bind sys:String.Format('{0} /', CardCollectionsViewModel.MTGSearchViewModel.SearchCards.Count), Mode=OneWay}"/>
+        <Run Text="{x:Bind sys:String.Format('{0} cards loaded', CardCollectionsViewModel.MTGSearchViewModel.TotalCardCount), Mode=OneWay}"/>
           </TextBlock>
         </Grid>
       </Grid>
       <controls:AdaptiveGridView controls:DockPanel.Dock="Top" 
-                                 Style="{StaticResource MTGAdaptiveGridViewStyle}"
-                                 ItemTemplate="{StaticResource CardViewModelItemTemplate}"
-                                 ItemsSource="{x:Bind CardCollectionsViewModel.MTGSearchViewModel.SearchCards, Mode=OneWay}"
-                                 SelectionMode="None"
-                                 DesiredWidth="250"/>
+                             Style="{StaticResource MTGAdaptiveGridViewStyle}"
+                             ItemTemplate="{StaticResource CardViewModelItemTemplate}"
+                             ItemsSource="{x:Bind CardCollectionsViewModel.MTGSearchViewModel.SearchCards, Mode=OneWay}"
+                             SelectionMode="None"
+                             DesiredWidth="250"/>
     </controls:DockPanel>
+    
+    <controls:InAppNotification x:Name="InAppNotification"
+                            ShowDismissButton="True"
+                            VerticalOffset="100"
+                            HorizontalOffset="0"
+                            StackMode="Replace"/>
   </Grid>
-</UserControl>
+</Page>

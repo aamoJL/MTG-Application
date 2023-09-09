@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
+using MTGApplication.ViewModels;
 using System;
 using System.Globalization;
-using MTGApplication.ViewModels;
 
 namespace MTGApplication.Views.BindingHelpers;
 
@@ -52,6 +52,12 @@ public static class Format
   /// Converts <paramref name="text"/> to uppercase
   /// </summary>
   public static string ToUpper(string text) => text.ToUpper();
+
+  /// <summary>
+  /// Retruns given default text, if the value is empty or null
+  /// </summary>
+  public static string StringWithDefault(string value, string defaultText)
+    => string.IsNullOrEmpty(value) ? defaultText : value;
 }
 
 /// <summary>
@@ -72,7 +78,7 @@ public static class VisibilityHelpers
   /// <summary>
   /// Returns <see cref="Visibility.Visible"/>, if the <paramref name="value"/> equals <paramref name="comparison"/>
   /// </summary>
-  public static Visibility IntToVisibility(int value, int comparison) => value == comparison ? Visibility.Visible : Visibility.Collapsed; 
+  public static Visibility IntToVisibility(int value, int comparison) => value == comparison ? Visibility.Visible : Visibility.Collapsed;
 }
 
 /// <summary>

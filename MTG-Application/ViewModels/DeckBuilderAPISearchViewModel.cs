@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +16,16 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
 {
   public class DeckBuilderAPISearchViewModelDialogs
   {
+    public DeckBuilderAPISearchViewModelDialogs(DialogService service) => Service = service;
+
+    private DialogService Service { get; }
+
     public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+        => new(Service, "Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
     {
-      public DraggableMTGCardViewModelGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle)
+      public DraggableMTGCardViewModelGridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title, itemTemplate, gridStyle)
       {
       }
 
@@ -36,8 +41,9 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
     }
   }
 
-  public DeckBuilderAPISearchViewModel(ICardAPI<MTGCard> cardAPI)
+  public DeckBuilderAPISearchViewModel(ICardAPI<MTGCard> cardAPI, DialogService dialogService)
   {
+    Dialogs = new(dialogService);
     APISearch = new(cardAPI);
     APISearch.PropertyChanged += SearchViewModel_PropertyChanged;
   }
@@ -45,7 +51,7 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
   [ObservableProperty] private bool isBusy;
 
   public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> APISearch { get; }
-  public DeckBuilderAPISearchViewModelDialogs Dialogs { get; init; } = new();
+  public DeckBuilderAPISearchViewModelDialogs Dialogs { get; }
 
   private void SearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {

@@ -26,11 +26,15 @@ public interface ICardAPI<T>
     public T[] Found { get; set; }
     public int NotFoundCount { get; set; }
     public string NextPageUri { get; set; }
+    
     /// <summary>
     /// Total item count across all pages
     /// </summary>
     public int TotalCount { get; set; }
 
+    /// <summary>
+    /// Returns empty result object
+    /// </summary>
     public static Result Empty() => new(Array.Empty<T>(), 0, 0);
   }
 

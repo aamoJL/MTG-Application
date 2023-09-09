@@ -6,6 +6,7 @@ using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using MTGApplication.ViewModels.Charts;
+using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -23,52 +24,56 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Deck Builder tab view model
 /// </summary>
-public partial class DeckBuilderViewModel : ViewModelBase, ISavable
+public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier
 {
   /// <summary>
   /// Deck Builder tab dialogs
   /// </summary>
   public class DeckBuilderViewDialogs
   {
+    public DeckBuilderViewDialogs(DialogService service) => Service = service;
+
+    protected DialogService Service { get; }
+
     public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
-      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+      => new(Service, "Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
+      => new(Service, "Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetDeleteDialog(string name)
-      => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
+      => new(Service, "Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
 
-    public virtual ConfirmationDialog GetSaveUnsavedDialog()
-      => new("Save unsaved changes?") { Message = "Deck has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
+    public virtual ConfirmationDialog GetSaveUnsavedDialog(string name = "")
+      => new(Service, "Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
 
     public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
-      => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+      => new(Service, "Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
+      => new(Service, "Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
 
     public virtual GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
+      => new(Service, "Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
 
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+      => new(Service, "Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetExportDialog(string text)
-      => new("Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+      => new(Service, "Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetImportDialog()
-      => new("Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+      => new(Service, "Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
 
     public virtual TextBoxDialog GetSaveDialog(string name)
-      => new("Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+      => new(Service, "Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
   }
 
-  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = null, DeckBuilderViewDialogs dialogs = null)
+  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, DeckBuilderViewDialogs dialogs, IOService.ClipboardService clipboardService = null)
   {
     DeckRepository = deckRepository;
     CardAPI = cardAPI;
-    Dialogs = dialogs ?? new();
+    Dialogs = dialogs;
     clipboardService ??= new();
 
     DeckCards = new DeckCardlistViewModel(CardDeck.DeckCards, Dialogs, CardAPI, CardFilters, SortProperties)
@@ -96,10 +101,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       Name = "Removelist",
     };
 
-    DeckCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
-    WishlistCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
-    MaybelistCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
-    RemovelistCards.SavableChangesOccured += () => { HasUnsavedChanges = true; };
+    DeckCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+    WishlistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+    MaybelistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+    RemovelistCards.SavableChangesOccurred += () => { HasUnsavedChanges = true; };
+
+    DeckCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+    WishlistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+    MaybelistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+    RemovelistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
 
     PropertyChanged += DeckBuilderViewModel_PropertyChanged;
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
@@ -135,6 +145,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckSize));
         break;
+      case nameof(CardDeck.Name):
+        OnPropertyChanged(nameof(DeckName));
+        break;
     }
   }
 
@@ -162,6 +175,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
         CommandService.Clear();
         UpdateCharts();
         HasUnsavedChanges = false;
+        OnPropertyChanged(nameof(DeckName));
         break;
       case nameof(DeckSize):
         OnPropertyChanged(nameof(DeckPrice));
@@ -192,6 +206,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   public CommandService CommandService { get; } = new();
   public MTGCardSortProperties SortProperties { get; }
     = new() { SortDirection = SortDirection.Ascending, PrimarySortProperty = MTGSortProperty.CMC, SecondarySortProperty = MTGSortProperty.Name };
+  public string DeckName => CardDeck.Name;
   public int DeckSize
     => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
   public float DeckPrice
@@ -199,6 +214,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
 
   #region ISavable implementation
   private bool hasUnsavedChanges = false;
+
   public bool HasUnsavedChanges
   {
     get => hasUnsavedChanges;
@@ -208,12 +224,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   /// <summary>
   /// Shows dialog that asks the user if they want to save unsaved changes
   /// </summary>
+  /// <returns>True, if the user does not cancel the operation</returns>
   public async Task<bool> SaveUnsavedChanges()
   {
     if (HasUnsavedChanges)
     {
       // Deck has unsaved changes
-      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
+      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog(CardDeck.Name).ShowAsync(force: true);
       if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
@@ -233,13 +250,20 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
               await SaveDeck(saveName);
             }
           }
-          else
-          { await SaveDeck(saveName); }
+          else { await SaveDeck(saveName); }
         }
       }
     }
     return true;
   }
+  #endregion
+
+  #region IINAppNotifier implementation
+
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+
   #endregion
 
   #region Relay Commands
@@ -274,13 +298,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
           if (await Task.Run(() => DeckRepository.Get(loadName)) is MTGCardDeck loadedDeck)
           {
             CardDeck = loadedDeck;
-            NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
+            RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
           }
           else { throw new Exception(); }
         }
         catch (Exception)
         {
-          NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
+          RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
         }
         IsBusy = false;
       }
@@ -320,9 +344,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       if (await Task.Run(() => DeckRepository.Remove(CardDeck)))
       {
         CardDeck = new();
-        NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was deleted successfully.");
+        RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was deleted successfully.");
       }
-      else { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not delete the deck."); }
+      else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not delete the deck."); }
       IsBusy = false;
     }
   }
@@ -390,8 +414,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   [RelayCommand(CanExecute = nameof(DeckHasCards))]
   public void OpenPlaytestWindow(MTGCardDeck deck)
   {
-    var testingWindow = new DeckTestingWindow(deck);
-    testingWindow.Activate();
+    new ThemedWindow()
+    {
+      Title = "MTG Deck Testing",
+      Content = new DeckTestingPage(deck),
+    }.Activate();
   }
 
   /// <summary>
@@ -400,10 +427,15 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
   [RelayCommand(CanExecute = nameof(DeckHasCommanders))]
   public async Task OpenEDHRECWindow(MTGCardDeck deck)
   {
-    new EDHRECSearchWindow(
-      await CommanderAPI.GetThemes(new Models.Structs.Commanders(
-        deck.Commander?.Info.Name ?? string.Empty, deck.CommanderPartner?.Info.Name ?? string.Empty)))
-      .Activate();
+    var themes = await CommanderAPI.GetThemes(new Models.Structs.Commanders(
+        deck.Commander?.Info.Name ?? string.Empty, deck.CommanderPartner?.Info.Name ?? string.Empty));
+
+    new ThemedWindow()
+    {
+      Title = "EDHREC Search",
+      Content = new EDHRECSearchPage(themes),
+      Width = 550
+    }.Activate();
   }
 
   [RelayCommand]
@@ -493,11 +525,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (await CardAPI.FetchFromString(importText) is var result && result.Found.Length > 0)
     {
       SetCommander(result.Found[0]);
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"Commander was imported successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"Commander was imported successfully.");
     }
     else
     {
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Could not import the commander.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Could not import the commander.");
     }
   }
 
@@ -509,11 +541,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
     if (await CardAPI.FetchFromString(importText) is var result && result.Found.Length > 0)
     {
       SetCommanderPartner(result.Found[0]);
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, $"Partner was imported successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, $"Partner was imported successfully.");
     }
     else
     {
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Error, $"Could not import the partner.");
+      RaiseInAppNotification(NotificationService.NotificationType.Error, $"Could not import the partner.");
     }
   }
 
@@ -535,10 +567,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable
       }
       CardDeck.Name = name;
       HasUnsavedChanges = false;
-      NotificationService.RaiseNotification(NotificationService.NotificationType.Success, "The deck was saved successfully.");
+      RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was saved successfully.");
     }
-    else
-    { NotificationService.RaiseNotification(NotificationService.NotificationType.Error, "Error. Could not save the deck."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not save the deck."); }
     IsBusy = false;
   }
 
