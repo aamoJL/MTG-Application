@@ -259,9 +259,9 @@ public class ScryfallAPI : ICardAPI<MTGCard>
 
     // https://scryfall.com/docs/api/cards
     var scryfallId = json["id"].GetValue<Guid>();
-    var cmc = (int)json["cmc"].GetValue<float>();
+    var cmc = (int)(json["cmc"]?.GetValue<float>() ?? json["card_faces"].AsArray()[0]["cmc"].GetValue<float>());
     var name = json["name"].GetValue<string>();
-    var typeLine = json["type_line"].GetValue<string>();
+    var typeLine = json["type_line"]?.GetValue<string>() ?? json["card_faces"].AsArray()[0]["type_line"].GetValue<string>();
     var setCode = json["set"].GetValue<string>();
     var setName = json["set_name"].GetValue<string>();
     var collectorNumber = json["collector_number"].GetValue<string>();
@@ -312,6 +312,7 @@ public class ScryfallAPI : ICardAPI<MTGCard>
     }
 
     var tokens = json["all_parts"]?.AsArray().Where(x => x["component"]?.GetValue<string>() == "token").Select(x => new CardToken(x["id"]!.GetValue<Guid>())).ToArray();
+    var oracle = json["oracle_id"]?.GetValue<Guid>() ?? json["card_faces"]?.AsArray()[0]["oracle_id"]?.GetValue<Guid>() ?? Guid.Empty;
 
     return new MTGCardInfo(
       scryfallId: scryfallId,
@@ -331,7 +332,8 @@ public class ScryfallAPI : ICardAPI<MTGCard>
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
       tokens: tokens ?? Array.Empty<CardToken>(),
-      apiName: Name);
+      apiName: Name,
+      oracleId: oracle);
   }
 
   /// <summary>

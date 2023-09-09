@@ -35,6 +35,16 @@ public class ScryfallAPITests
   }
 
   [TestMethod]
+  public async Task FetchCardsTest_ReversibleCards()
+  {
+    var api = new ScryfallAPI();
+    var searchQuery = @"is:reversible";
+
+    var result = await api.FetchCardsWithSearchQuery(searchQuery);
+    Assert.IsTrue(result.Found.Length > 0);
+  }
+
+  [TestMethod]
   public async Task FetchFromStringTest()
   {
     var api = new ScryfallAPI();

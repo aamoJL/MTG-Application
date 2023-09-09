@@ -8,7 +8,12 @@ namespace MTGApplication.Models.DTOs;
 public class MTGCardDTO : CardDTO
 {
   private MTGCardDTO() : base() { }
-  public MTGCardDTO(MTGCard card) : base(card.Info.Name, card.Count) => ScryfallId = card.Info.ScryfallId;
+  public MTGCardDTO(MTGCard card) : base(card.Info.Name, card.Count)
+  {
+    ScryfallId = card.Info.ScryfallId;
+    OracleId = card.Info.OracleId;
+  }
 
   public Guid ScryfallId { get; init; }
+  public Guid OracleId { get; init; }
 }

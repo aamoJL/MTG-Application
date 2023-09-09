@@ -412,12 +412,25 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   /// Opens Deck testing page on a new window for the given deck
   /// </summary>
   [RelayCommand(CanExecute = nameof(DeckHasCards))]
-  public void OpenPlaytestWindow(MTGCardDeck deck)
+  public async Task OpenPlaytestWindow(MTGCardDeck deck)
   {
+    var stringBuilder = new StringBuilder();
+
+    foreach (var card in CardDeck.DeckCards)
+    {
+      foreach (var token in card.Info.Tokens)
+      {
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
+      }
+    }
+
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new DeckTestingMTGCardViewModel(x) { IsToken = true })
+      .DistinctBy(x => x.Model.Info.OracleId).ToArray(); // Filter duplicates out using oracleId
+
     new ThemedWindow()
     {
       Title = "MTG Deck Testing",
-      Content = new DeckTestingPage(deck),
+      Content = new DeckTestingPage(deck, tokens),
     }.Activate();
   }
 

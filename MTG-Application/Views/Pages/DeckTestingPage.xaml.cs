@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using MTGApplication.API;
 using MTGApplication.Extensions;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
@@ -14,7 +13,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
-using System.Windows.Input;
 using Windows.Foundation;
 
 namespace MTGApplication.Views.Pages;
@@ -25,40 +23,22 @@ namespace MTGApplication.Views.Pages;
 [ObservableObject]
 public sealed partial class DeckTestingPage : Page
 {
-  public DeckTestingPage(MTGCardDeck cardDeck)
+  public DeckTestingPage(MTGCardDeck cardDeck, DeckTestingMTGCardViewModel[] tokens = null)
   {
     InitializeComponent();
-    CardDeck = cardDeck;
     PointerMoved += Root_PointerMoved;
     PointerReleased += Root_PointerReleased;
 
-    LibraryVisibilitySwitchCommand = new RelayCommand(() =>
-    {
-      LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-    });
-
+    MTGDeckTestingViewModel = new MTGDeckTestingViewModel(cardDeck, tokens);
     MTGDeckTestingViewModel.NewGameStarted += MTGDeckTestingViewModel_NewGameStarted;
     MTGDeckTestingViewModel.NewTurnStarted += MTGDeckTestingViewModel_NewTurnStarted;
+
+    Loaded += (s, e) => MTGDeckTestingViewModel.NewGame(); // Start new game when page loads
   }
 
   [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
 
-  public ICommand LibraryVisibilitySwitchCommand;
-
-  public static readonly DependencyProperty CardDeckProperty =
-      DependencyProperty.Register(nameof(CardDeck), typeof(MTGCardDeck), typeof(DeckTestingPage), new PropertyMetadata(null));
-
-  public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; } = new(new ScryfallAPI());
-  public MTGCardDeck CardDeck
-  {
-    get => (MTGCardDeck)GetValue(CardDeckProperty);
-    set
-    {
-      SetValue(CardDeckProperty, value);
-      MTGDeckTestingViewModel.CardDeck = value;
-      MTGDeckTestingViewModel.NewGame();
-    }
-  }
+  public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; }
   public Vector2 BattlefieldCardDimensions { get; } = new(215, 300);
 
   private void MTGDeckTestingViewModel_NewTurnStarted()
@@ -73,6 +53,9 @@ public sealed partial class DeckTestingPage : Page
   }
 
   private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
+
+  [RelayCommand]
+  public void LibraryVisibilitySwitch() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 
   #region Pointer Events
 

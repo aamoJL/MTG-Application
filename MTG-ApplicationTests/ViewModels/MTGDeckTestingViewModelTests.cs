@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
-using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 
 namespace MTGApplicationTests.ViewModels;
@@ -11,15 +10,12 @@ public class MTGDeckTestingViewModelTests
 {
   public static MTGDeckTestingViewModel Init(int cardCount = 100)
   {
-    var vm = new MTGDeckTestingViewModel(new TestCardAPI())
+    var vm = new MTGDeckTestingViewModel(deck: new MTGCardDeck()
     {
-      CardDeck = new MTGCardDeck() 
-      { 
-        DeckCards = new() { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: cardCount) },
-        Commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1, name: "Commander"),
-        CommanderPartner = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1, name: "Partner"),
-      },
-    };
+      DeckCards = new() { Mocker.MTGCardModelMocker.CreateMTGCardModel(count: cardCount) },
+      Commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1, name: "Commander"),
+      CommanderPartner = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: 1, name: "Partner"),
+    });
     vm.NewGame();
 
     return vm;

@@ -1,70 +1,34 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTGApplication.ViewModels;
 
 public partial class MTGDeckTestingViewModel : ViewModelBase
 {
-  public MTGDeckTestingViewModel(ICardAPI<MTGCard> cardAPI)
+  public MTGDeckTestingViewModel(MTGCardDeck deck, DeckTestingMTGCardViewModel[] tokens = null)
   {
-    CardAPI = cardAPI;
-    PropertyChanged += MTGDeckTestingViewModel_PropertyChanged;
-  }
-
-  private async void MTGDeckTestingViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(CardDeck))
-    {
-      await FetchTokens();
-    }
+    CardDeck = deck;
+    Tokens = tokens ?? Array.Empty<DeckTestingMTGCardViewModel>();
   }
 
   public ObservableCollection<DeckTestingMTGCardViewModel> Library { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> Graveyard { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> Exile { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> Hand { get; set; } = new();
-  public ObservableCollection<DeckTestingMTGCardViewModel> Tokens { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> CommandZone { get; set; } = new();
+  public DeckTestingMTGCardViewModel[] Tokens { get; set; }
 
   public event Action NewGameStarted;
   public event Action NewTurnStarted;
 
-  [ObservableProperty]
-  private int playerHP = 40;
-  [ObservableProperty]
-  private int enemyHP = 40;
-  [ObservableProperty]
-  private MTGCardDeck cardDeck;
-  [ObservableProperty]
-  private int turnCount;
+  public MTGCardDeck CardDeck { get; }
 
-  private ICardAPI<MTGCard> CardAPI { get; }
-
-  /// <summary>
-  /// Fetches and adds tokens from the deck to the token collection
-  /// </summary>
-  private async Task FetchTokens()
-  {
-    var stringBuilder = new StringBuilder();
-
-    foreach (var card in CardDeck.DeckCards)
-    {
-      foreach (var token in card.Info.Tokens)
-      {
-        stringBuilder.AppendLine(token.ScryfallId.ToString());
-      }
-    }
-
-    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new DeckTestingMTGCardViewModel(x) { IsToken = true }).ToList();
-    tokens.ForEach(x => Tokens.Add(x));
-  }
+  [ObservableProperty] private int playerHP = 40;
+  [ObservableProperty] private int enemyHP = 40;
+  [ObservableProperty] private int turnCount;
 
   /// <summary>
   /// Resets game state
