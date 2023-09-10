@@ -26,7 +26,7 @@ public interface ICardAPI<T>
     public T[] Found { get; set; }
     public int NotFoundCount { get; set; }
     public string NextPageUri { get; set; }
-    
+
     /// <summary>
     /// Total item count across all pages
     /// </summary>

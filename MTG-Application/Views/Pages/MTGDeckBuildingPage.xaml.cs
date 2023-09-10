@@ -23,23 +23,21 @@ namespace MTGApplication.Views.Pages;
 [ObservableObject]
 public sealed partial class MTGDeckBuildingPage : Page, ISavable
 {
-  public MTGDeckBuildingPage(FrameworkElement dialogRoot = null)
+  public MTGDeckBuildingPage()
   {
     InitializeComponent();
-    DialogService = new();
 
-    Loaded += MTGDeckBuildingPage_Loaded;
+    Loaded += (s, e) => DialogWrapper.XamlRoot = XamlRoot;
 
     NotificationService.OnNotification += Notifications_OnNotification;
-
-    // Set dialog root
-    if (dialogRoot != null)
-      dialogRoot.Loaded += (s, e) => { DialogService.XamlRoot = dialogRoot.XamlRoot; };
-    else
-      Loaded += (s, e) => { DialogService.XamlRoot = XamlRoot; };
+    DialogService.OnGetDialogWrapper += (s, args) =>
+    {
+      if ((XamlRoot)s == this.XamlRoot)
+      {
+        args.DialogWrapper = DialogWrapper;
+      }
+    };
   }
-
-  private void MTGDeckBuildingPage_Loaded(object sender, RoutedEventArgs e) => DialogService.XamlRoot = XamlRoot;
 
   private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
   {
@@ -61,7 +59,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
 
   public CardPreviewProperties CardPreviewProperties { get; } = new();
-  public DialogService DialogService { get; }
+  public DialogService.DialogWrapper DialogWrapper { get; } = new();
 
   /// <summary>
   /// Opens and closes search panel
@@ -94,7 +92,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
 
   private void TabView_AddTabButtonClick(TabView tabView, object args)
   {
-    var newItem = new DeckBuilderTabView(CardPreviewProperties, DialogService);
+    var newItem = new DeckBuilderTabView(CardPreviewProperties);
     TabViews.Add(newItem);
     tabView.SelectedItem = newItem;
   }
@@ -109,7 +107,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
     }
   }
 
-  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView(CardPreviewProperties, DialogService)); // Add default tab
+  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView(CardPreviewProperties)); // Add default tab
 
   private void TabView_TabItemsChanged(TabView tabView, IVectorChangedEventArgs args)
   {

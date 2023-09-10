@@ -23,13 +23,14 @@ namespace MTGApplication.Views.Pages.Tabs;
 [ObservableObject]
 public sealed partial class DeckBuilderTabView : UserControl, ISavable
 {
-  public DeckBuilderTabView(CardPreviewProperties previewProperties, DialogService dialogService)
+  public DeckBuilderTabView(CardPreviewProperties previewProperties)
   {
     InitializeComponent();
     CardPreviewProperties = previewProperties;
 
-    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new(dialogService));
+    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new());
     DeckBuilderViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
+    DeckBuilderViewModel.OnGetDialogWrapper += (s, args) => DialogService.ShowAsync(XamlRoot, args);
   }
 
   public DeckBuilderViewModel DeckBuilderViewModel { get; }

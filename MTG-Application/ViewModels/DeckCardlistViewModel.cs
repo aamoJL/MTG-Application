@@ -11,17 +11,34 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Services.CommandService;
+using static MTGApplication.Services.DialogService;
 using static MTGApplication.Services.MTGService;
-using static MTGApplication.ViewModels.DeckBuilderViewModel;
 
 namespace MTGApplication.ViewModels;
 
-public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
+public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, IDialogNotifier
 {
-  public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, DeckBuilderViewDialogs dialogs, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGCardSortProperties sortProperties = null)
+  public class DeckCardlistViewDialogs
+  {
+    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
+
+    public virtual TextAreaDialog GetImportDialog()
+      => new("Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+
+    public virtual TextAreaDialog GetExportDialog(string text)
+      => new("Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+
+    public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
+      => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+
+    public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
+      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+  }
+
+  public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGCardSortProperties sortProperties = null)
   {
     Cardlist = cardlist;
-    Dialogs = dialogs;
     CardAPI = cardAPI;
     CardFilters = cardFilters ?? new();
     SortProperties = sortProperties ?? new();
@@ -119,12 +136,12 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
   }
 
   private ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
-  private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
 
   [ObservableProperty] private ObservableCollection<MTGCard> cardlist;
   [ObservableProperty] private bool isBusy;
 
+  public DeckCardlistViewDialogs Dialogs { get; set; } = new();
   public IOService.ClipboardService ClipboardService { get; init; } = new();
   public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
   public MTGCardSortProperties SortProperties { get; }
@@ -143,11 +160,22 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
   public float EuroPrice => CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count);
 
   #region IInAppNotifier implementation
-  
+
   public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
 
   public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
 
+  #endregion
+
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
   #endregion
 
   #region Relay Commands
@@ -157,7 +185,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
   [RelayCommand]
   public async Task ImportToCardlistDialog()
   {
-    if (await Dialogs.GetImportDialog().ShowAsync() is string importText)
+    if (await Dialogs.GetImportDialog().ShowAsync(GetDialogWrapper()) is string importText)
     {
       await Import(importText);
     }
@@ -170,7 +198,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
   [RelayCommand]
   public async Task ExportDeckCardsDialog(string exportProperty = "Name")
   {
-    if (await Dialogs.GetExportDialog(MTGService.GetExportString(Cardlist.ToArray(), exportProperty)).ShowAsync() is var response && !string.IsNullOrEmpty(response))
+    if (await Dialogs.GetExportDialog(MTGService.GetExportString(Cardlist.ToArray(), exportProperty)).ShowAsync(GetDialogWrapper()) is var response && !string.IsNullOrEmpty(response))
     {
       ClipboardService.Copy(response);
       RaiseInAppNotification(NotificationService.NotificationType.Info, "Copied to clipboard.");
@@ -203,7 +231,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
     }
     IsBusy = false;
 
-    if (await Dialogs.GetCardPrintDialog(printVMs.ToArray()).ShowAsync() is MTGCardViewModel newPrint)
+    if (await Dialogs.GetCardPrintDialog(printVMs.ToArray()).ShowAsync(GetDialogWrapper()) is MTGCardViewModel newPrint)
     {
       // Replace card
       card.Info = newPrint.Model.Info;
@@ -235,7 +263,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
           // Card exist in the deck, ask if want to import, unless user has checked the dialog skip checkbox in the dialog
           if (skipDialog is not true)
           {
-            (import, skipDialog) = await Dialogs.GetMultipleCardsAlreadyInDeckDialog(card.Info.Name).ShowAsync();
+            (import, skipDialog) = await Dialogs.GetMultipleCardsAlreadyInDeckDialog(card.Info.Name).ShowAsync(GetDialogWrapper());
           }
 
           if (import is true) { importCards.Add(card); }
@@ -267,7 +295,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
   {
     if (Cardlist.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
     {
-      if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync()) is true)
+      if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync(GetDialogWrapper())) is true)
       {
         CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.AddCardsToCardlistCommand(Cardlist, new[] { card }));
       }
@@ -286,7 +314,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier
     }
     else if (Cardlist.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
     {
-      if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync()) is true)
+      if ((await Dialogs.GetCardAlreadyInCardlistDialog(card.Info.Name, Name).ShowAsync(GetDialogWrapper())) is true)
       {
         CommandService.Execute(new CombinedCommand(new ICommand[]
         {

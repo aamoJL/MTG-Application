@@ -20,48 +20,44 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Card Collections Tab view model
 /// </summary>
-public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppNotifier
+public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
 {
   /// <summary>
   /// Card Collections tab dialogs
   /// </summary>
   public class CardCollectionsDialogs
   {
-    public CardCollectionsDialogs(DialogService service) => Service = service;
-
-    protected DialogService Service { get; }
-
     public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
-      => new(Service, "Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
+      => new("Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
 
-    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new(Service, "Add new list");
+    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new("Add new list");
 
     public virtual ConfirmationDialog GetDeleteCollectionDialog(string name)
-      => new(Service, "Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
+      => new("Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetDeleteListDialog(string name)
-      => new(Service, "Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
+      => new("Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new(Service, "Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
+      => new("Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
 
     public virtual ConfirmationDialog GetSaveUnsavedDialog()
-      => new(Service, "Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
+      => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
 
     public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new(Service, "Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+      => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new(Service, "Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+      => new("Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
     public virtual TextBoxDialog GetSaveDialog(string name)
-      => new(Service, "Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+      => new("Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetExportDialog(string text)
-      => new(Service, "Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+      => new("Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
 
     public virtual TextAreaDialog GetImportDialog()
-      => new(Service, "Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+      => new("Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
 
     public class CollectionListContentDialog : Dialog<MTGCardCollectionList>
     {
@@ -71,11 +67,11 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
       public string NameInputText { get; set; }
       public string QueryInputText { get; set; }
 
-      public CollectionListContentDialog(DialogService service, string title = "") : base(service, title) { }
+      public CollectionListContentDialog(string title = "") : base(title) { }
 
-      public override ContentDialog GetDialog()
+      public override ContentDialog GetDialog(XamlRoot root)
       {
-        var dialog = base.GetDialog();
+        var dialog = base.GetDialog(root);
 
         nameBox = new()
         {
@@ -147,13 +143,12 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
     }
   }
 
-  public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, CardCollectionsDialogs dialogs, ClipboardService clipboardService = default)
+  public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, ClipboardService clipboardService = default)
   {
     CardAPI = cardAPI;
     CollectionRepository = collectionRepository;
     MTGSearchViewModel = new(CardAPI);
     ClipboardService = clipboardService ?? new();
-    Dialogs = dialogs;
 
     PropertyChanged += CardCollectionsViewModel_PropertyChanged;
     MTGSearchViewModel.PropertyChanged += MTGSearchViewModel_PropertyChanged;
@@ -243,7 +238,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   private bool isBusy = false;
 
   public MTGAPISearch<MTGCardCollectionCardViewModelSource, MTGCardCollectionCardViewModel> MTGSearchViewModel { get; }
-  public CardCollectionsDialogs Dialogs { get; }
+  public CardCollectionsDialogs Dialogs { get; set; } = new();
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
 
   private IRepository<MTGCardCollection> CollectionRepository { get; }
@@ -263,6 +258,17 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
 
   public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
 
+  #endregion
+
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
   #endregion
 
   #region Relay Commands
@@ -285,7 +291,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   {
     if (await ShowUnsavedDialogs())
     {
-      var loadName = await Dialogs.GetLoadDialog((await CollectionRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray()).ShowAsync();
+      var loadName = await Dialogs.GetLoadDialog(
+        (await CollectionRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray()).ShowAsync(GetDialogWrapper());
       if (loadName != null)
       {
         await LoadCollection(loadName);
@@ -299,16 +306,14 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand(CanExecute = nameof(SaveCollectionCommandCanExecute))]
   public async Task SaveCollectionDialog()
   {
-    var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync();
-    if (string.IsNullOrEmpty(saveName))
-    { return; }
+    var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync(GetDialogWrapper());
+    if (string.IsNullOrEmpty(saveName)) { return; }
     else
     {
       if (saveName != Collection.Name && await CollectionRepository.Exists(saveName))
       {
         // Collection exists already
-        if (await Dialogs.GetOverrideDialog(saveName).ShowAsync() == null)
-        { return; }
+        if (await Dialogs.GetOverrideDialog(saveName).ShowAsync(GetDialogWrapper()) == null) { return; }
       }
     }
 
@@ -321,9 +326,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand(CanExecute = nameof(DeleteCollectionCommandCanExecute))]
   public async Task DeleteCollectionDialog()
   {
-    if (!await CollectionRepository.Exists(Collection.Name))
-    { return; }
-    else if (await Dialogs.GetDeleteCollectionDialog(Collection.Name).ShowAsync() is true)
+    if (!await CollectionRepository.Exists(Collection.Name)) { return; }
+    else if (await Dialogs.GetDeleteCollectionDialog(Collection.Name).ShowAsync(GetDialogWrapper()) is true)
     {
       await DeleteCollection();
     }
@@ -335,7 +339,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand]
   public async Task NewCollectionListDialog()
   {
-    if (await Dialogs.GetNewCollectionListDialog().ShowAsync() is MTGCardCollectionList newList)
+    if (await Dialogs.GetNewCollectionListDialog().ShowAsync(GetDialogWrapper()) is MTGCardCollectionList newList)
     {
       NewCollectionList(newList);
     }
@@ -347,7 +351,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
   public async Task EditCollectionListDialog()
   {
-    if (SelectedList != null && await Dialogs.GetEditCollectionListDialog(SelectedList.Name, SelectedList.SearchQuery).ShowAsync() is MTGCardCollectionList updatedList)
+    if (SelectedList != null && await Dialogs.GetEditCollectionListDialog(
+      SelectedList.Name, SelectedList.SearchQuery).ShowAsync(GetDialogWrapper()) is MTGCardCollectionList updatedList)
     {
       UpdateSelectedCollectionList(updatedList);
     }
@@ -365,9 +370,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
   public async Task DeleteCollectionListDialog()
   {
-    if (SelectedList == null)
-    { return; }
-    else if (await Dialogs.GetDeleteListDialog(SelectedList.Name).ShowAsync() is true)
+    if (SelectedList == null) { return; }
+    else if (await Dialogs.GetDeleteListDialog(SelectedList.Name).ShowAsync(GetDialogWrapper()) is true)
     {
       DeleteSelectedCollectionList();
     }
@@ -379,7 +383,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
   public async Task ImportCollectionListDialog()
   {
-    if (await Dialogs.GetImportDialog().ShowAsync() is string importText)
+    if (await Dialogs.GetImportDialog().ShowAsync(GetDialogWrapper()) is string importText)
     {
       await ImportCards(importText);
     }
@@ -391,7 +395,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   [RelayCommand(CanExecute = nameof(SelectedListCommandCanExecute))]
   public async Task ExportCollectionListDialog()
   {
-    var response = await Dialogs.GetExportDialog(GetExportString()).ShowAsync();
+    var response = await Dialogs.GetExportDialog(GetExportString()).ShowAsync(GetDialogWrapper());
     if (!string.IsNullOrEmpty(response))
     {
       ClipboardService.Copy(response);
@@ -419,7 +423,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
     var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
     IsBusy = false;
 
-    await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync();
+    await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(GetDialogWrapper());
   }
   #endregion
 
@@ -597,7 +601,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
     if (HasUnsavedChanges)
     {
       // Collection has unsaved changes
-      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(force: true);
+      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog().ShowAsync(GetDialogWrapper(), force: true);
       if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
@@ -608,14 +612,14 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
           RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Collection can't be saved, because it has no lists.");
           return false;
         }
-        var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync();
+        var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync(GetDialogWrapper());
         if (string.IsNullOrEmpty(saveName)) { return false; }
         else
         {
           if (saveName != Collection.Name && await CollectionRepository.Exists(saveName))
           {
             // Collection exists already
-            var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync();
+            var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync(GetDialogWrapper());
             if (overrideConfirmed == null) { return false; }
             else if (overrideConfirmed is true)
             {

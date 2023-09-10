@@ -31,7 +31,7 @@
                  CompactPaneLength="0"
                  DisplayMode="CompactInline" BorderThickness="0">
         <SplitView.Pane>
-          <customcontrols:CardAPISearchControl CardPreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}" DialogService="{x:Bind DialogService}"/>
+          <customcontrols:CardAPISearchControl CardPreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
         </SplitView.Pane>
         <Grid>
           <TabView IsAddTabButtonVisible="True" 

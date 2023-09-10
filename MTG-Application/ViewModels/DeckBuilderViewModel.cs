@@ -16,7 +16,6 @@ using System.Text;
 using System.Threading.Tasks;
 using static MTGApplication.Enums;
 using static MTGApplication.Services.CommandService;
-using static MTGApplication.Services.DialogService;
 using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels;
@@ -24,77 +23,60 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Deck Builder tab view model
 /// </summary>
-public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier
+public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
 {
   /// <summary>
   /// Deck Builder tab dialogs
   /// </summary>
   public class DeckBuilderViewDialogs
   {
-    public DeckBuilderViewDialogs(DialogService service) => Service = service;
+    public virtual DialogService.ConfirmationDialog GetOverrideDialog(string name)
+      => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
 
-    protected DialogService Service { get; }
+    public virtual DialogService.ConfirmationDialog GetDeleteDialog(string name)
+      => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
 
-    public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
-      => new(Service, "Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+    public virtual DialogService.ConfirmationDialog GetSaveUnsavedDialog(string name = "")
+      => new("Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
 
-    public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new(Service, "Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
+    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
 
-    public virtual ConfirmationDialog GetDeleteDialog(string name)
-      => new(Service, "Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
+    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
 
-    public virtual ConfirmationDialog GetSaveUnsavedDialog(string name = "")
-      => new(Service, "Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
+    public virtual DialogService.ComboBoxDialog GetLoadDialog(string[] names)
+      => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
-    public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
-      => new(Service, "Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
-
-    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new(Service, "Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
-
-    public virtual GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
-      => new(Service, "Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
-
-    public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new(Service, "Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
-
-    public virtual TextAreaDialog GetExportDialog(string text)
-      => new(Service, "Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
-
-    public virtual TextAreaDialog GetImportDialog()
-      => new(Service, "Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
-
-    public virtual TextBoxDialog GetSaveDialog(string name)
-      => new(Service, "Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+    public virtual DialogService.TextBoxDialog GetSaveDialog(string name)
+      => new("Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
   }
 
-  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, DeckBuilderViewDialogs dialogs, IOService.ClipboardService clipboardService = null)
+  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = null)
   {
     DeckRepository = deckRepository;
     CardAPI = cardAPI;
-    Dialogs = dialogs;
     clipboardService ??= new();
 
-    DeckCards = new DeckCardlistViewModel(CardDeck.DeckCards, Dialogs, CardAPI, CardFilters, SortProperties)
+    DeckCards = new DeckCardlistViewModel(CardDeck.DeckCards, CardAPI, CardFilters, SortProperties)
     {
       ClipboardService = clipboardService,
       CommandService = CommandService,
       Name = "Deck",
     };
-    WishlistCards = new DeckCardlistViewModel(CardDeck.Wishlist, Dialogs, CardAPI, CardFilters, SortProperties)
+    WishlistCards = new DeckCardlistViewModel(CardDeck.Wishlist, CardAPI, CardFilters, SortProperties)
     {
       ClipboardService = clipboardService,
       CommandService = CommandService,
       Name = "Wishlist",
     };
-    MaybelistCards = new DeckCardlistViewModel(CardDeck.Maybelist, Dialogs, CardAPI, CardFilters, SortProperties)
+    MaybelistCards = new DeckCardlistViewModel(CardDeck.Maybelist, CardAPI, CardFilters, SortProperties)
     {
       ClipboardService = clipboardService,
       CommandService = CommandService,
       Name = "Maybelist",
     };
-    RemovelistCards = new DeckCardlistViewModel(CardDeck.Removelist, Dialogs, CardAPI, CardFilters, SortProperties)
+    RemovelistCards = new DeckCardlistViewModel(CardDeck.Removelist, CardAPI, CardFilters, SortProperties)
     {
       ClipboardService = clipboardService,
       CommandService = CommandService,
@@ -110,6 +92,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     WishlistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
     MaybelistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
     RemovelistCards.OnNotification += (s, args) => OnNotification?.Invoke(s, args);
+
+    DeckCards.OnGetDialogWrapper += (s, args) => OnGetDialogWrapper?.Invoke(s, args);
+    WishlistCards.OnGetDialogWrapper += (s, args) => OnGetDialogWrapper?.Invoke(s, args);
+    MaybelistCards.OnGetDialogWrapper += (s, args) => OnGetDialogWrapper?.Invoke(s, args);
+    RemovelistCards.OnGetDialogWrapper += (s, args) => OnGetDialogWrapper?.Invoke(s, args);
 
     PropertyChanged += DeckBuilderViewModel_PropertyChanged;
     CardDeck.PropertyChanged += CardDeck_PropertyChanged;
@@ -185,7 +172,6 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   }
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
-  private DeckBuilderViewDialogs Dialogs { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
   private IMTGCommanderAPI CommanderAPI { get; } = new EDHRECCommanderAPI();
 
@@ -198,6 +184,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   [ObservableProperty] private MTGCardViewModel commander;
   [ObservableProperty] private MTGCardViewModel commanderPartner;
 
+  public DeckBuilderViewDialogs Dialogs { get; set; } = new();
   public DeckCardlistViewModel DeckCards { get; }
   public DeckCardlistViewModel WishlistCards { get; }
   public DeckCardlistViewModel MaybelistCards { get; }
@@ -230,19 +217,19 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     if (HasUnsavedChanges)
     {
       // Deck has unsaved changes
-      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog(CardDeck.Name).ShowAsync(force: true);
+      var wantSaveConfirmed = await Dialogs.GetSaveUnsavedDialog(CardDeck.Name).ShowAsync(GetDialogWrapper(), force: true);
       if (wantSaveConfirmed == null) { return false; }
       else if (wantSaveConfirmed is true)
       {
         // User wants to save the unsaved changes
-        var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync();
+        var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync(GetDialogWrapper());
         if (string.IsNullOrEmpty(saveName)) { return false; }
         else
         {
           if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
           {
             // Deck exists already
-            var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync();
+            var overrideConfirmed = await Dialogs.GetOverrideDialog(saveName).ShowAsync(GetDialogWrapper());
             if (overrideConfirmed == null) { return false; }
             else if (overrideConfirmed is true)
             {
@@ -259,11 +246,21 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   #endregion
 
   #region IINAppNotifier implementation
-
   public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
 
-  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text)
+    => OnNotification?.Invoke(this, new(type, text));
+  #endregion
 
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogService.DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogService.DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogService.DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
   #endregion
 
   #region Relay Commands
@@ -289,7 +286,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   {
     if (await SaveUnsavedChanges())
     {
-      var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray()).ShowAsync();
+      var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray())
+        .ShowAsync(GetDialogWrapper());
       if (loadName != null)
       {
         IsBusy = true;
@@ -317,14 +315,14 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   [RelayCommand]
   public async Task SaveDeckDialog()
   {
-    var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync();
+    var saveName = await Dialogs.GetSaveDialog(CardDeck.Name).ShowAsync(GetDialogWrapper());
     if (string.IsNullOrEmpty(saveName)) { return; }
     else
     {
       if (saveName != CardDeck.Name && await DeckRepository.Exists(saveName))
       {
         // Deck with the given name exists already
-        if (await Dialogs.GetOverrideDialog(saveName).ShowAsync() == null) { return; }
+        if (await Dialogs.GetOverrideDialog(saveName).ShowAsync(GetDialogWrapper()) == null) { return; }
       }
     }
 
@@ -338,7 +336,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   public async Task DeleteDeckDialog()
   {
     if (!await DeckRepository.Exists(CardDeck.Name)) { return; }
-    if (await Dialogs.GetDeleteDialog(CardDeck.Name).ShowAsync() is true)
+    if (await Dialogs.GetDeleteDialog(CardDeck.Name).ShowAsync(GetDialogWrapper()) is true)
     {
       IsBusy = true;
       if (await Task.Run(() => DeckRepository.Remove(CardDeck)))
@@ -405,7 +403,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     }
 
     var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToArray();
-    await Dialogs.GetTokenPrintDialog(tokens).ShowAsync();
+    await Dialogs.GetTokenPrintDialog(tokens).ShowAsync(GetDialogWrapper());
   }
 
   /// <summary>
@@ -484,7 +482,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     }
     IsBusy = false;
 
-    if (await Dialogs.GetCardPrintDialog(printVMs.ToArray()).ShowAsync() is MTGCardViewModel newPrint)
+    if (await Dialogs.GetCardPrintDialog(printVMs.ToArray()).ShowAsync(GetDialogWrapper()) is MTGCardViewModel newPrint)
     {
       // Replace card
       card.Info = newPrint.Model.Info;

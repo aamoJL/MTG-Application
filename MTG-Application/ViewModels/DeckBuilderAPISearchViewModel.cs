@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
-using MTGApplication.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,38 +12,32 @@ using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels;
 
-public partial class DeckBuilderAPISearchViewModel : ViewModelBase
+public partial class DeckBuilderAPISearchViewModel : ViewModelBase, IDialogNotifier
 {
   public class DeckBuilderAPISearchViewModelDialogs
   {
-    public DeckBuilderAPISearchViewModelDialogs(DialogService service) => Service = service;
-
-    private DialogService Service { get; }
-
     public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-        => new(Service, "Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
     {
-      public DraggableMTGCardViewModelGridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title, itemTemplate, gridStyle)
-      {
-      }
+      public DraggableMTGCardViewModelGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle) { }
 
-      protected override void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
+      protected override void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e)
       {
         if (e.Items[0] is MTGCardViewModel vm)
         {
           e.Data.SetText(vm.Model.ToJSON());
           e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
         }
-        base.DraggableGridViewDialog_DragItemsStarting(sender, e);
+        base.DraggableGridViewDialog_DragItemsStarting(dialog, e);
       }
     }
   }
 
-  public DeckBuilderAPISearchViewModel(ICardAPI<MTGCard> cardAPI, DialogService dialogService)
+  public DeckBuilderAPISearchViewModel(ICardAPI<MTGCard> cardAPI)
   {
-    Dialogs = new(dialogService);
+    Dialogs = new();
     APISearch = new(cardAPI);
     APISearch.PropertyChanged += SearchViewModel_PropertyChanged;
   }
@@ -52,6 +46,17 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
 
   public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> APISearch { get; }
   public DeckBuilderAPISearchViewModelDialogs Dialogs { get; }
+
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
+  #endregion
 
   private void SearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
@@ -98,6 +103,6 @@ public partial class DeckBuilderAPISearchViewModel : ViewModelBase
     var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
     IsBusy = false;
 
-    await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync();
+    await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(GetDialogWrapper());
   }
 }

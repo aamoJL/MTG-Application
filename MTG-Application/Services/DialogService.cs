@@ -11,22 +11,27 @@ namespace MTGApplication.Services;
 
 /// <summary>
 /// Service to show dialogs on windows.
-/// One window should have only one Dialog Service
-/// Dialog service shows dialogs on the window it was initialized
 /// </summary>
-public class DialogService
+public static class DialogService
 {
+  #region Classes
+  public class DialogEventArgs : EventArgs
+  {
+    public DialogWrapper DialogWrapper { get; set; }
+  }
+
   /// <summary>
   /// Class that can be used to call dialog's showAsync method.
   /// <see cref="TestDialogWrapper"/> can be used to unit test dialogs without calling UI thread.
   /// </summary>
   public class DialogWrapper
   {
+    public XamlRoot XamlRoot { get; set; }
     public ContentDialog CurrentDialog { get; private set; }
 
     public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog, bool force = false)
     {
-      var contentDialog = dialog.GetDialog();
+      var contentDialog = dialog.GetDialog(XamlRoot);
 
       // Only one dialog can be open at once on the window
       if (force && CurrentDialog != null) { CurrentDialog.Hide(); CurrentDialog = null; }
@@ -47,24 +52,19 @@ public class DialogService
     public string PrimaryButtonText { get; init; } = "Yes";
     public string SecondaryButtonText { get; init; } = "No";
     public string CloseButtonText { get; init; } = "Cancel";
-    public DialogService DialogService { get; init; }
 
-    public Dialog(DialogService service, string title)
-    {
-      DialogService = service;
-      Title = title;
-    }
+    public Dialog(string title) => Title = title;
 
     /// <summary>
     /// Creates the <see cref="ContentDialog"/>
     /// </summary>
     /// <returns></returns>
-    public virtual ContentDialog GetDialog()
+    public virtual ContentDialog GetDialog(XamlRoot root)
     {
       var dialog = new ContentDialog()
       {
         Title = Title,
-        XamlRoot = DialogService.XamlRoot,
+        XamlRoot = root,
         RequestedTheme = AppConfig.LocalSettings.AppTheme,
         DefaultButton = ContentDialogButton.Primary,
         PrimaryButtonText = PrimaryButtonText,
@@ -96,7 +96,11 @@ public class DialogService
     /// <summary>
     /// Shows the dialog to the user using <see cref="Wrapper"/>
     /// </summary>
-    public async Task<ContentDialogResult> ShowAsync(bool force = false) => await DialogService.Wrapper.ShowAsync(this, force);
+    public async Task<ContentDialogResult> ShowAsync(DialogWrapper wrapper, bool force = false)
+    {
+      if (wrapper == null) { return ContentDialogResult.None; }
+      return await wrapper.ShowAsync(this, force);
+    }
   }
 
   /// <summary>
@@ -105,7 +109,7 @@ public class DialogService
   /// </summary>
   public abstract class Dialog<T> : Dialog
   {
-    public Dialog(DialogService service, string title) : base(service, title) { }
+    public Dialog(string title) : base(title) { }
 
     /// <summary>
     /// Returns a value depending on the <paramref name="result"/>
@@ -116,26 +120,32 @@ public class DialogService
     /// Shows the dialog to the user and returns <typeparamref name="T"/>.
     /// The returned value depends on the user's answer.
     /// </summary>
-    public new async Task<T> ShowAsync(bool force = false) => ProcessResult(await base.ShowAsync(force));
+    public new async Task<T> ShowAsync(DialogWrapper wrapper, bool force = false)
+      => ProcessResult(await base.ShowAsync(wrapper, force));
   }
+  #endregion
 
-  public XamlRoot XamlRoot { get; set; } // Root that will be used to show the dialogs
-  public DialogWrapper Wrapper { get; set; } = new(); // Wrapper that will be used to show the dialogs
+  #region Events
+  public static event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+  #endregion
+
+  #region Properties
+  public static void ShowAsync(XamlRoot root, DialogEventArgs args) => OnGetDialogWrapper?.Invoke(root, args);
+  #endregion
 
   #region Dialog Types
-
   /// <summary>
-  /// Dialog that asks confirmation from the used.
+  /// Dialog that asks confirmation from the user.
   /// </summary>
   public class ConfirmationDialog : Dialog<bool?>
   {
     public string Message { get; set; }
 
-    public ConfirmationDialog(DialogService service, string title = "") : base(service, title) { }
+    public ConfirmationDialog(string title = "") : base(title) { }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = Message;
       return dialog;
     }
@@ -159,11 +169,11 @@ public class DialogService
   {
     public string Message { get; set; }
 
-    public MessageDialog(DialogService service, string title = "") : base(service, title) { }
+    public MessageDialog(string title = "") : base(title) { }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = Message;
       dialog.CloseButtonText = "Close";
       dialog.PrimaryButtonText = string.Empty;
@@ -187,9 +197,9 @@ public class DialogService
     public bool? IsChecked { get; set; }
     public bool InputDefaultValue { get; set; }
 
-    public CheckBoxDialog(DialogService service, string title = "") : base(service, title) { }
+    public CheckBoxDialog(string title = "") : base(title) { }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
       checkBox = new()
       {
@@ -201,7 +211,7 @@ public class DialogService
         Text = Message
       };
 
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = new StackPanel()
       {
         Orientation = Orientation.Vertical,
@@ -240,9 +250,9 @@ public class DialogService
     public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
     public bool IsSpellCheckEnabled { get; set; }
 
-    public TextBoxDialog(DialogService service, string title = "") : base(service, title) { }
+    public TextBoxDialog(string title = "") : base(title) { }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
       textBox = new()
       {
@@ -252,7 +262,7 @@ public class DialogService
         Text = TextInputText,
         SelectionStart = TextInputText.Length,
       };
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = textBox;
 
       if (InvalidInputCharacters.Length > 0)
@@ -299,9 +309,9 @@ public class DialogService
     public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
     public bool IsSpellCheckEnabled { get; set; }
 
-    public TextAreaDialog(DialogService service, string title = "") : base(service, title) { }
+    public TextAreaDialog(string title = "") : base(title) { }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
       textBox = new()
       {
@@ -314,7 +324,7 @@ public class DialogService
         Height = 500,
         Width = 800,
       };
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = textBox;
 
       if (InvalidInputCharacters.Length > 0)
@@ -359,16 +369,16 @@ public class DialogService
     public string InputHeader { get; set; }
     public string[] Items { get; set; }
 
-    public ComboBoxDialog(DialogService service, string title = "") : base(service, title) { }
+    public ComboBoxDialog(string title = "") : base(title) { }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
       comboBox = new ComboBox()
       {
         ItemsSource = Items,
         Header = InputHeader,
       };
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = comboBox;
 
       comboBox.SelectionChanged += (s, e) => { Selection = (string)comboBox.SelectedValue; };
@@ -398,13 +408,13 @@ public class DialogService
     public object GridStyle { get; }
     public object GridItemTemplate { get; }
 
-    public GridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title)
+    public GridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title)
     {
       GridStyle = gridStyle;
       GridItemTemplate = itemTemplate;
     }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
       Application.Current.Resources.TryGetValue(GridItemTemplate, out var template);
       Application.Current.Resources.TryGetValue(GridStyle, out var style);
@@ -417,7 +427,7 @@ public class DialogService
         ItemsSource = Items,
       };
 
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
       dialog.Content = gridView;
 
       gridView.SelectionChanged += (s, e) => { Selection = (T)gridView.SelectedItem; };
@@ -432,11 +442,14 @@ public class DialogService
         {
           var PrimaryFeap = FrameworkElementAutomationPeer.FromElement(primaryButton) as ButtonAutomationPeer;
           if (PrimaryFeap != null)
-          { PrimaryFeap?.Invoke(); } // Click the primary button
+          {
+            // Click the primary button
+            PrimaryFeap?.Invoke();
+          }
           else
           {
             // If primary button is not available, close the dialog
-            DialogService.Wrapper.CurrentDialog.Hide();
+            dialog.Hide();
           }
         };
       };
@@ -460,24 +473,23 @@ public class DialogService
   /// <typeparam name="T">Items type</typeparam>
   public class DraggableGridViewDialog<T> : GridViewDialog<T>
   {
-    public DraggableGridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title, itemTemplate, gridStyle)
+    public DraggableGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle)
     {
     }
 
-    public override ContentDialog GetDialog()
+    public override ContentDialog GetDialog(XamlRoot root)
     {
-      var dialog = base.GetDialog();
+      var dialog = base.GetDialog(root);
 
       var gridview = (dialog.Content as GridView);
       gridview.CanDragItems = true;
 
-      (dialog.Content as GridView).DragItemsStarting += DraggableGridViewDialog_DragItemsStarting;
+      (dialog.Content as GridView).DragItemsStarting += (s, e) => DraggableGridViewDialog_DragItemsStarting(dialog, e);
 
       return dialog;
     }
 
-    protected virtual void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e) => DialogService.Wrapper.CurrentDialog.Hide();
+    protected virtual void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e) => dialog.Hide();
   }
-
   #endregion
 }

@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using MTGApplication.API;
-using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
@@ -15,27 +14,15 @@ public sealed partial class CardAPISearchControl : UserControl
 {
   public CardAPISearchControl() => InitializeComponent();
 
-  public DeckBuilderAPISearchViewModel SearchViewModel { get; set; }
+  public DeckBuilderAPISearchViewModel SearchViewModel { get; } = new(new ScryfallAPI());
   public CardPreviewProperties CardPreviewProperties
   {
     get => (CardPreviewProperties)GetValue(CardPreviewPropertiesProperty);
     set => SetValue(CardPreviewPropertiesProperty, value);
   }
-  public DialogService DialogService
-  {
-    get => (DialogService)GetValue(DialogServiceProperty);
-    set
-    {
-      SetValue(DialogServiceProperty, value);
-      SearchViewModel = new(new ScryfallAPI(), DialogService);
-    }
-  }
 
   public static readonly DependencyProperty CardPreviewPropertiesProperty =
       DependencyProperty.Register("CardPreviewProperties", typeof(CardPreviewProperties), typeof(CardAPISearchControl), new PropertyMetadata(0));
-
-  public static readonly DependencyProperty DialogServiceProperty =
-      DependencyProperty.Register("DialogService", typeof(DialogService), typeof(CardAPISearchControl), new PropertyMetadata(0));
 
   [ObservableProperty] private double searchDesiredItemWidth = 250;
 

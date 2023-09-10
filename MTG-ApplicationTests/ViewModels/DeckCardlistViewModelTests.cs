@@ -7,14 +7,63 @@ using MTGApplication.ViewModels;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
 using static MTGApplication.Enums;
+using static MTGApplication.Services.DialogService;
 using static MTGApplication.Services.MTGService;
-using static MTGApplicationTests.ViewModels.DeckBuilderViewModelTests;
+using static MTGApplication.ViewModels.DeckCardlistViewModel;
+using static MTGApplicationTests.Services.TestDialogService;
 
 namespace MTGApplicationTests.ViewModels;
 
 [TestClass]
 public partial class DeckCardlistViewModelTests
 {
+  public class TestDeckCardlistViewDialogs : DeckCardlistViewDialogs
+  {
+    public TestDeckCardlistViewDialogs(DeckCardlistViewModel vm) => ViewModel = vm;
+
+    public DeckCardlistViewModel ViewModel { get; }
+
+    public TestDialogResult<MTGCardViewModel> CardPrintDialog { get; set; } = new();
+    public TestDialogResult<string> ImportDialog { get; set; } = new();
+    public TestDialogResult<string> ExportDialog { get; set; } = new();
+    public TestDialogResult<bool?> MultipleCardsAlreadyInDeckDialog { get; set; } = new();
+    public TestDialogResult CardAlreadyInDeckDialog { get; set; } = new();
+
+    public override GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+    {
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(CardPrintDialog.Result);
+      var dialog = base.GetCardPrintDialog(printViewModels);
+      dialog.Selection = CardPrintDialog.Values;
+      return dialog;
+    }
+    public override ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName = "")
+    {
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
+      var dialog = base.GetCardAlreadyInCardlistDialog(cardName, listName);
+      return dialog;
+    }
+    public override CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
+    {
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(MultipleCardsAlreadyInDeckDialog.Result);
+      var dialog = base.GetMultipleCardsAlreadyInDeckDialog(name);
+      dialog.IsChecked = MultipleCardsAlreadyInDeckDialog.Values;
+      return dialog;
+    }
+    public override TextAreaDialog GetExportDialog(string text)
+    {
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(ExportDialog.Result);
+      var dialog = base.GetExportDialog(text);
+      return dialog;
+    }
+    public override TextAreaDialog GetImportDialog()
+    {
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(ImportDialog.Result);
+      var dialog = base.GetImportDialog();
+      dialog.TextInputText = ImportDialog.Values;
+      return dialog;
+    }
+  }
+
   #region Import & Export
   [TestMethod]
   public async Task ImportToDeckCardsDialogTest()
@@ -26,10 +75,11 @@ public partial class DeckCardlistViewModelTests
       Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
     };
 
-    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       ImportDialog = new() { Values = nameof(importedCards) },
-    });
+    };
 
     await vm.DeckCards.ImportToCardlistDialog();
     Assert.AreEqual(3, vm.DeckCards.CardlistSize);
@@ -45,10 +95,11 @@ public partial class DeckCardlistViewModelTests
       Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
     };
 
-    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       ImportDialog = new() { Values = nameof(importedCards) },
-    });
+    };
 
     await vm.DeckCards.ImportToCardlistDialog();
 
@@ -69,11 +120,12 @@ public partial class DeckCardlistViewModelTests
       Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third"),
     };
 
-    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(new TestCardAPI(importedCards), null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       ImportDialog = new() { Values = nameof(importedCards) },
       MultipleCardsAlreadyInDeckDialog = new() { Values = true },
-    });
+    };
 
     await vm.DeckCards.ImportToCardlistDialog();
     await vm.DeckCards.ImportToCardlistDialog();
@@ -97,11 +149,12 @@ public partial class DeckCardlistViewModelTests
     };
 
     var cardAPI = new TestCardAPI(firstImport);
-    DeckBuilderViewModel vm = new(cardAPI, null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(cardAPI, null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       ImportDialog = new() { Values = nameof(firstImport) },
       MultipleCardsAlreadyInDeckDialog = new() { Result = ContentDialogResult.None, Values = true }
-    });
+    };
 
     await vm.DeckCards.ImportToCardlistDialog();
     cardAPI.ExpectedCards = secondImport;
@@ -127,10 +180,11 @@ public partial class DeckCardlistViewModelTests
     var expectedText = MTGService.GetExportString(cardlist.Cardlist.ToArray(), "Name");
 
     using TestIO.TestClipboard clipboard = new();
-    DeckBuilderViewModel vm = new(cardAPI: null, deckRepository: null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(cardAPI: null, deckRepository: null, clipboardService: clipboard);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       ExportDialog = new() { Values = expectedText },
-    }, clipboardService: clipboard);
+    };
 
     foreach (var item in cards)
     {
@@ -339,10 +393,11 @@ public partial class DeckCardlistViewModelTests
   {
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid());
     var newPrint = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()));
-    DeckBuilderViewModel vm = new(new TestCardAPI(), null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(new TestCardAPI(), null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       CardPrintDialog = new() { Values = newPrint },
-    });
+    };
 
     await vm.DeckCards.Add(card);
     vm.HasUnsavedChanges = false; // Change unsaved state to false without saving
@@ -368,10 +423,11 @@ public partial class DeckCardlistViewModelTests
   public async Task AddToCardlistCommandTest_AlreadyExists_Add()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new DeckCardlistViewModel(deck.DeckCards, new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null);
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       CardAlreadyInDeckDialog = new(),
-    }, null);
+    };
 
     await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 1));
     await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 2));
@@ -382,10 +438,11 @@ public partial class DeckCardlistViewModelTests
   public async Task AddToCardlistCommandTest_AlreadyExists_Skip()
   {
     var deck = new MTGCardDeck();
-    var cardlist = new DeckCardlistViewModel(deck.DeckCards, new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(deck.DeckCards, null);
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       CardAlreadyInDeckDialog = new() { Result = ContentDialogResult.None }
-    }, null);
+    };
 
     await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 1));
     await cardlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", count: 2));
@@ -519,10 +576,11 @@ public partial class DeckCardlistViewModelTests
   {
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid());
     var newPrint = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()));
-    DeckBuilderViewModel vm = new(new TestCardAPI(), null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(new TestCardAPI(), null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       CardPrintDialog = new() { Values = newPrint }
-    });
+    };
 
     await vm.DeckCards.Add(card);
 
@@ -561,10 +619,11 @@ public partial class DeckCardlistViewModelTests
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid());
     var cardlist = new DeckCardlistViewModel(new MTGCardDeck { DeckCards = new() { card } }.DeckCards, null, null);
     var newPrint = new MTGCardViewModel(Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()));
-    DeckBuilderViewModel vm = new(new TestCardAPI(), null, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(new TestCardAPI(), null);
+    vm.DeckCards.Dialogs = new TestDeckCardlistViewDialogs(vm.DeckCards)
     {
       CardPrintDialog = new() { Values = newPrint }
-    });
+    };
 
     await vm.DeckCards.Add(card);
 

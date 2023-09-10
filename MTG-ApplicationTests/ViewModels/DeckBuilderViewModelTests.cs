@@ -18,80 +18,44 @@ public class DeckBuilderViewModelTests
 {
   public class TestDeckBuilderViewDialogs : DeckBuilderViewDialogs
   {
-    public TestDeckBuilderViewDialogs() : base(service: new()) { }
+    public TestDeckBuilderViewDialogs(DeckBuilderViewModel vm) => ViewModel = vm;
 
-    public TestDialogResult<MTGCardViewModel> CardPrintDialog { get; set; } = new();
-    public TestDialogResult<bool?> MultipleCardsAlreadyInDeckDialog { get; set; } = new();
+    public DeckBuilderViewModel ViewModel { get; }
+
     public TestDialogResult<string> LoadDialog { get; set; } = new();
-    public TestDialogResult<string> ImportDialog { get; set; } = new();
-    public TestDialogResult<string> ExportDialog { get; set; } = new();
     public TestDialogResult<string> SaveDialog { get; set; } = new();
-    public TestDialogResult CardAlreadyInDeckDialog { get; set; } = new();
     public TestDialogResult SaveUnsavedDialog { get; set; } = new();
     public TestDialogResult OverrideDialog { get; set; } = new();
     public TestDialogResult DeleteDialog { get; set; } = new();
 
-    public override ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName = "")
-    {
-      Service.Wrapper = new TestDialogWrapper(CardAlreadyInDeckDialog.Result);
-      var dialog = base.GetCardAlreadyInCardlistDialog(cardName, listName);
-      return dialog;
-    }
     public override ConfirmationDialog GetOverrideDialog(string name)
     {
-      Service.Wrapper = new TestDialogWrapper(OverrideDialog.Result);
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(OverrideDialog.Result);
       var dialog = base.GetOverrideDialog(name);
       return dialog;
     }
     public override ConfirmationDialog GetDeleteDialog(string name)
     {
-      Service.Wrapper = new TestDialogWrapper(DeleteDialog.Result);
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(DeleteDialog.Result);
       var dialog = base.GetDeleteDialog(name);
       return dialog;
     }
     public override ConfirmationDialog GetSaveUnsavedDialog(string name = "")
     {
-      Service.Wrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(SaveUnsavedDialog.Result);
       var dialog = base.GetSaveUnsavedDialog();
-      return dialog;
-    }
-    public override CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
-    {
-      Service.Wrapper = new TestDialogWrapper(MultipleCardsAlreadyInDeckDialog.Result);
-      var dialog = base.GetMultipleCardsAlreadyInDeckDialog(name);
-      dialog.IsChecked = MultipleCardsAlreadyInDeckDialog.Values;
-      return dialog;
-    }
-    public override GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-    {
-      Service.Wrapper = new TestDialogWrapper(CardPrintDialog.Result);
-      var dialog = base.GetCardPrintDialog(printViewModels);
-      dialog.Selection = CardPrintDialog.Values;
       return dialog;
     }
     public override ComboBoxDialog GetLoadDialog(string[] names)
     {
-      Service.Wrapper = new TestDialogWrapper(LoadDialog.Result);
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(LoadDialog.Result);
       var dialog = base.GetLoadDialog(names);
       dialog.Selection = LoadDialog.Values;
       return dialog;
     }
-    public override TextAreaDialog GetExportDialog(string text)
-    {
-      Service.Wrapper = new TestDialogWrapper(ExportDialog.Result);
-      var dialog = base.GetExportDialog(text);
-      return dialog;
-    }
-    public override TextAreaDialog GetImportDialog()
-    {
-      Service.Wrapper = new TestDialogWrapper(ImportDialog.Result);
-      var dialog = base.GetImportDialog();
-      dialog.TextInputText = ImportDialog.Values;
-      return dialog;
-    }
     public override TextBoxDialog GetSaveDialog(string name)
     {
-      Service.Wrapper = new TestDialogWrapper(SaveDialog.Result);
+      ViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = new TestDialogWrapper(SaveDialog.Result);
       var dialog = base.GetSaveDialog(name);
       dialog.TextInputText = SaveDialog.Values;
       return dialog;
@@ -105,10 +69,11 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveUnsavedDialog = new() { Result = ContentDialogResult.Secondary }, // No save
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -140,11 +105,12 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveUnsavedDialog = new(), // Save
       SaveDialog = new() { Values = deckName }, // Give deck name
-    });
+    };
 
     // Add a card to the deck so the unsaved dialog appears
     await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
@@ -164,12 +130,13 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveUnsavedDialog = new(), // Save
       SaveDialog = new() { Values = deckName }, // Give deck name
       OverrideDialog = new() { Result = ContentDialogResult.Secondary }, // Don't override
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -201,12 +168,13 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveUnsavedDialog = new(), // Save
       SaveDialog = new() { Values = deckName }, // Give name
       OverrideDialog = new() // Override
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -237,12 +205,13 @@ public class DeckBuilderViewModelTests
   {
     var deckName = "First";
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveUnsavedDialog = new(), // Save
       SaveDialog = new() { Values = deckName }, // Give name
       OverrideDialog = new() { Result = ContentDialogResult.None } // Cancel
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -276,11 +245,12 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveUnsavedDialog = new() { Result = ContentDialogResult.Secondary }, // No Save
       LoadDialog = new() { Values = deckName }, // Load deck
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -337,10 +307,11 @@ public class DeckBuilderViewModelTests
     var partner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner");
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       LoadDialog = new() { Values = deckName }, // Load deck
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -368,10 +339,11 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveUnsavedDialog = new() { Result = ContentDialogResult.None },
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -414,10 +386,11 @@ public class DeckBuilderViewModelTests
     {
       ExpectedCards = cards.ToArray()
     });
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       LoadDialog = new() { Values = dbDeck.Name }, // Load deck
-    });
+    };
 
     await repo.Add(dbDeck);
 
@@ -438,10 +411,11 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveDialog = new() { Values = deckName }, // Save deck
-    });
+    };
 
     await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     await vm.MaybelistCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
@@ -470,11 +444,12 @@ public class DeckBuilderViewModelTests
     var partner = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Partner");
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveDialog = new() { Values = deckName }, // Save deck
       OverrideDialog = new() { Result = ContentDialogResult.Primary },
-    });
+    };
 
     vm.SetCommander(commander);
     Assert.IsTrue(vm.HasUnsavedChanges);
@@ -508,11 +483,12 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = deckName }, // Save
       OverrideDialog = new() // Override
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -543,12 +519,13 @@ public class DeckBuilderViewModelTests
     var saveName = "Second";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = saveName },
       OverrideDialog = new(),
       LoadDialog = new() { Values = loadName }
-    });
+    };
 
     var dbDeck = new MTGCardDeck()
     {
@@ -579,11 +556,12 @@ public class DeckBuilderViewModelTests
   public async Task SaveDeckDialogCommandTest_Cancel()
   {
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       OverrideDialog = new() { Result = ContentDialogResult.None },
       SaveDialog = new() { Result = ContentDialogResult.None, Values = "Name" },
-    });
+    };
 
     // Add card so the deck has unsaved changes
     await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
@@ -601,10 +579,11 @@ public class DeckBuilderViewModelTests
   public async Task DeleteDeckDialogCommandTest_CanExecute()
   {
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = "First" }
-    });
+    };
 
     // The deck should not be possible to be deleted if the deck has no name
     Assert.IsFalse(vm.DeleteDeckDialogCommand.CanExecute(null));
@@ -619,11 +598,12 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = deckName }, // Save deck
       DeleteDialog = new(), // Delete
-    });
+    };
 
     await vm.SaveDeckDialog();
     Assert.AreEqual(deckName, vm.CardDeck.Name);
@@ -639,11 +619,12 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = deckName }, // Save
       DeleteDialog = new() { Result = ContentDialogResult.None } // Cancel
-    });
+    };
 
     await vm.SaveDeckDialog();
     Assert.AreEqual(deckName, vm.CardDeck.Name);
@@ -659,11 +640,12 @@ public class DeckBuilderViewModelTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = deckName }, // Save deck
       DeleteDialog = new() { Result = ContentDialogResult.Secondary }, // Reject deletion
-    });
+    };
 
     await vm.SaveDeckDialog();
     Assert.AreEqual(deckName, vm.CardDeck.Name);
@@ -814,12 +796,13 @@ public class DeckBuilderViewModelTests
   {
     var deckName = "deck";
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveDialog = new() { Values = deckName }, // Save deck
       SaveUnsavedDialog = new() { Result = ContentDialogResult.Primary },
       LoadDialog = new() { Values = deckName, Result = ContentDialogResult.Primary }
-    });
+    };
     await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.IsFalse(vm.DeckHasName());

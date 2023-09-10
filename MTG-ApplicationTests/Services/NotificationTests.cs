@@ -6,6 +6,7 @@ using MTGApplicationTests.API;
 using static MTGApplication.Services.NotificationService;
 using static MTGApplicationTests.Database.InMemoryMTGDeckRepositoryTests;
 using static MTGApplicationTests.ViewModels.DeckBuilderViewModelTests;
+using static MTGApplicationTests.ViewModels.DeckCardlistViewModelTests;
 
 namespace MTGApplicationTests.Services;
 
@@ -62,10 +63,11 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success);
 
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI(expectedCards, 0));
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ImportDialog = new() { Values = nameof(expectedCards) },
-    }, new TestCardAPI(expectedCards, 0));
+    };
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -82,10 +84,11 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Warning);
 
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI(expectedCards, 3));
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ImportDialog = new() { Values = nameof(expectedCards) },
-    }, new TestCardAPI(expectedCards, 3));
+    };
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -95,10 +98,11 @@ public class NotificationTests
   {
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI(null, 3));
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ImportDialog = new() { Values = "notFound" },
-    }, new TestCardAPI(null, 3));
+    };
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -108,10 +112,11 @@ public class NotificationTests
   {
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI(null, 0));
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ImportDialog = new() { Values = string.Empty },
-    }, new TestCardAPI(null, 0));
+    };
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -128,10 +133,11 @@ public class NotificationTests
 
     using var asserter = new NotificationAsserter(NotificationType.Success) { WillFail = true };
 
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI(expectedCards, 3));
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ImportDialog = new() { Result = ContentDialogResult.None, Values = "NotFound" }, // Cancel dialog
-    }, new TestCardAPI(expectedCards, 3));
+    };
 
     await cardlist.ImportToCardlistDialog();
   }
@@ -139,11 +145,14 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Copy()
   {
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI())
+    { 
+      ClipboardService = new TestIO.TestClipboard() 
+    };
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ExportDialog = new() { Values = "Text" },
-    }, new TestCardAPI())
-    { ClipboardService = new TestIO.TestClipboard() };
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Info);
 
@@ -153,11 +162,14 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Empty()
   {
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI())
+    { 
+      ClipboardService = new TestIO.TestClipboard() 
+    };
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ExportDialog = new() { Values = string.Empty },
-    }, new TestCardAPI())
-    { ClipboardService = new TestIO.TestClipboard() };
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Info);
 
@@ -167,11 +179,14 @@ public class NotificationTests
   [TestMethod]
   public async Task CardExportTest_Canceled()
   {
-    var cardlist = new DeckCardlistViewModel(new(), new TestDeckBuilderViewDialogs()
+    var cardlist = new DeckCardlistViewModel(new(), new TestCardAPI())
+    { 
+      ClipboardService = new TestIO.TestClipboard() 
+    };
+    cardlist.Dialogs = new TestDeckCardlistViewDialogs(cardlist)
     {
       ExportDialog = new() { Result = ContentDialogResult.None, Values = null }, // Cancel dialog
-    }, new TestCardAPI())
-    { ClipboardService = new TestIO.TestClipboard() };
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Error) { WillFail = true };
 
@@ -186,10 +201,11 @@ public class NotificationTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveDialog = new() { Values = deckName }, // Save deck
-    });
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Success);
 
@@ -203,10 +219,11 @@ public class NotificationTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new() { WillFail = true };
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       SaveDialog = new() { Values = deckName }, // Save deck
-    });
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Error);
 
@@ -220,10 +237,11 @@ public class NotificationTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       LoadDialog = new() { Values = deckName }, // Load deck
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -248,10 +266,11 @@ public class NotificationTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new() { WillFail = true };
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       LoadDialog = new() { Values = deckName }, // Load deck
-    });
+    };
 
     // Add deck with the same name to the database
     var dbDeck = new MTGCardDeck()
@@ -274,10 +293,11 @@ public class NotificationTests
   public async Task DeckLoadingTest_Cancel()
   {
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs() // Override dialogs
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm) // Override dialogs
     {
       LoadDialog = new() { Result = ContentDialogResult.None, Values = null }, // Cancel
-    });
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Success) { WillFail = true };
 
@@ -290,11 +310,12 @@ public class NotificationTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new();
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = deckName }, // Save deck
       DeleteDialog = new(),
-    });
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Success);
 
@@ -308,11 +329,12 @@ public class NotificationTests
     var deckName = "First";
 
     using TestInMemoryMTGDeckRepository repo = new() { WillFail = true };
-    DeckBuilderViewModel vm = new(null, repo, dialogs: new TestDeckBuilderViewDialogs()
+    DeckBuilderViewModel vm = new(null, repo);
+    vm.Dialogs = new TestDeckBuilderViewDialogs(vm)
     {
       SaveDialog = new() { Values = deckName }, // Save deck
       DeleteDialog = new(),
-    });
+    };
 
     using var asserter = new NotificationAsserter(NotificationType.Error);
 

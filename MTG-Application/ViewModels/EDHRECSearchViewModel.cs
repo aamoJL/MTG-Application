@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Models.Structs;
-using MTGApplication.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,37 +13,33 @@ using static MTGApplication.Services.DialogService;
 
 namespace MTGApplication.ViewModels;
 
-public partial class EDHRECSearchViewModel : ObservableObject
+public partial class EDHRECSearchViewModel : ObservableObject, IDialogNotifier
 {
   public class EDHRECSearchViewModelDialogs
   {
-    public EDHRECSearchViewModelDialogs(DialogService service) => Service = service;
-
-    private DialogService Service { get; }
-
     public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-        => new(Service, "Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
         { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
 
     public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
     {
-      public DraggableMTGCardViewModelGridViewDialog(DialogService service, string title = "", string itemTemplate = "", string gridStyle = "") : base(service, title, itemTemplate, gridStyle) { }
+      public DraggableMTGCardViewModelGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle) { }
 
-      protected override void DraggableGridViewDialog_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
+      protected override void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e)
       {
         if (e.Items[0] is MTGCardViewModel vm)
         {
           e.Data.SetText(vm.Model.ToJSON());
           e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
         }
-        base.DraggableGridViewDialog_DragItemsStarting(sender, e);
+        base.DraggableGridViewDialog_DragItemsStarting(dialog, e);
       }
     }
   }
 
-  public EDHRECSearchViewModel(IMTGCommanderAPI commanderAPI, ICardAPI<MTGCard> cardAPI, DialogService dialogService)
+  public EDHRECSearchViewModel(IMTGCommanderAPI commanderAPI, ICardAPI<MTGCard> cardAPI)
   {
-    Dialogs = new(dialogService);
+    Dialogs = new();
     CommanderAPI = commanderAPI;
     APISearch = new(cardAPI);
 
@@ -91,6 +87,17 @@ public partial class EDHRECSearchViewModel : ObservableObject
   [ObservableProperty] private CommanderTheme[] commanderThemes;
   [ObservableProperty] private CommanderTheme selectedTheme;
 
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
+  #endregion
+
   /// <summary>
   /// Shows a dialog with the card's prints
   /// </summary>
@@ -111,7 +118,7 @@ public partial class EDHRECSearchViewModel : ObservableObject
     var printViewModels = prints.Select(x => new MTGCardViewModel(x)).ToArray();
     IsBusy = false;
 
-    await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync();
+    await Dialogs.GetCardPrintDialog(printViewModels).ShowAsync(GetDialogWrapper());
   }
 
   /// <summary>

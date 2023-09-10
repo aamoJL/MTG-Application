@@ -1,9 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API;
 using MTGApplication.Models.Structs;
-using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -15,17 +13,10 @@ namespace MTGApplication.Views.Pages;
 [ObservableObject]
 public sealed partial class EDHRECSearchPage : Page
 {
-  public EDHRECSearchPage(CommanderTheme[] themes, FrameworkElement dialogRoot = null)
+  public EDHRECSearchPage(CommanderTheme[] themes)
   {
     InitializeComponent();
-    var dialogService = new DialogService();
-    SearchViewModel = new(new EDHRECCommanderAPI(), new ScryfallAPI(), dialogService) { CommanderThemes = themes };
-
-    // Set dialog root
-    if (dialogRoot != null)
-      dialogRoot.Loaded += (s, e) => { dialogService.XamlRoot = dialogRoot.XamlRoot; };
-    else
-      Loaded += (s, e) => { dialogService.XamlRoot = XamlRoot; };
+    SearchViewModel = new(new EDHRECCommanderAPI(), new ScryfallAPI()) { CommanderThemes = themes };
   }
 
   public EDHRECSearchViewModel SearchViewModel { get; }
