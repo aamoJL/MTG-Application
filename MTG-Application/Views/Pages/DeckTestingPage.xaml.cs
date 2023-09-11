@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.Extensions;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
@@ -14,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using Windows.Foundation;
+using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
 namespace MTGApplication.Views.Pages;
 
@@ -37,9 +37,11 @@ public sealed partial class DeckTestingPage : Page
   }
 
   [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
+  [ObservableProperty] private CardPreviewProperties cardPreviewProperties = new();
 
   public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; }
-  public Vector2 BattlefieldCardDimensions { get; } = new(215, 300);
+  public Vector2 BattlefieldCardSize { get; } = new(215, 300);
+  public Vector2 CardPreviewSize { get; } = new(251, 350);
 
   private void MTGDeckTestingViewModel_NewTurnStarted()
   {
@@ -129,65 +131,48 @@ public sealed partial class DeckTestingPage : Page
     // Change card preview image to hovered item
     if (sender is FrameworkElement { DataContext: DeckTestingMTGCardViewModel cardVM })
     {
-      PreviewImage.Visibility = Visibility.Visible;
-      PreviewImage.Source = new BitmapImage(new(cardVM.SelectedFaceUri));
+      CardPreviewProperties = new()
+      {
+        CardViewModel = cardVM,
+        XMirror = true,
+        Offset = new(175, 100)
+      };
     }
   }
 
   private void CardListViewItem_PointerMoved(object sender, PointerRoutedEventArgs e)
-  {
     // Move card preview image to mouse position when hovering over on list view item.
-    // The position is clamped to element size
-    var windowBounds = ActualSize;
-    var pointerPosition = e.GetCurrentPoint(null).Position;
-
-    pointerPosition.X -= ActualOffset.X; // Apply element offset
-    pointerPosition.Y -= ActualOffset.Y;
-
-    var xOffsetFromPointer = (windowBounds.X - pointerPosition.X) > PreviewImage.ActualWidth ? 50 : -50 - PreviewImage.ActualWidth;
-    var yOffsetFromPointer = -100;
-
-    PreviewImage.SetValue(Canvas.LeftProperty, Math.Max(Math.Clamp(pointerPosition.X + xOffsetFromPointer, 0, Math.Max(ActualSize.X - PreviewImage.ActualWidth, 0)), 0));
-    PreviewImage.SetValue(Canvas.TopProperty, Math.Max(Math.Clamp(pointerPosition.Y + yOffsetFromPointer, 0, Math.Max(ActualSize.Y - PreviewImage.ActualHeight, 0)), 0));
-  }
+    => CardPreviewProperties.Coordinates = e.GetCurrentPoint(null).Position.ToVector2();
 
   private void CardListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
-  {
-    PreviewImage.Visibility = Visibility.Collapsed;
     // Change placeholder image to the old hovered card's image so the placeholder won't flicker
-    PreviewImage.PlaceholderSource = PreviewImage.Source as ImageSource;
+    => CardPreviewProperties.CardViewModel = null;
+
+  private void HandCard_PointerEntered(object sender, PointerRoutedEventArgs e)
+  {
+    // Change card preview image to hovered item
+    if (sender is FrameworkElement { DataContext: DeckTestingMTGCardViewModel cardVM })
+    {
+      CardPreviewProperties = new()
+      {
+        CardViewModel = cardVM,
+        Coordinates = ((sender as FrameworkElement).TransformToVisual(null).TransformPoint(new()).ToVector2()) + new Vector2(CardPreviewSize.X / 4),
+      };
+    }
   }
 
   private void HandCard_PointerMoved(object sender, PointerRoutedEventArgs e)
   {
-    var pointerPoint = e.GetCurrentPoint(null);
-    if (!pointerPoint.Properties.IsLeftButtonPressed)
-    {
-      PreviewImage.Visibility = Visibility.Visible;
-      // Move card preview image to mouse position when hovering over on hand card.
-      // The position is clamped to element size
-      var element = (sender as FrameworkElement);
-      var elementPosition = element.TransformToVisual(null).TransformPoint(new());
-
-      var xOffsetFromPointer = -(PreviewImage.ActualWidth / 2) + (element.ActualWidth / 2);
-      var yOffsetFromPointer = 0;
-
-      PreviewImage.SetValue(Canvas.LeftProperty, Math.Max(Math.Clamp(elementPosition.X + xOffsetFromPointer, 0, Math.Max(ActualSize.X - PreviewImage.ActualWidth, 0)), 0));
-      PreviewImage.SetValue(Canvas.TopProperty, Math.Max(Math.Clamp(elementPosition.Y + yOffsetFromPointer, 0, Math.Max(ActualSize.Y - PreviewImage.ActualHeight, 0)), 0));
-    }
-    else
+    if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
       // Dont show preview image if the user is dragging a card
-      PreviewImage.Visibility = Visibility.Collapsed;
+      CardPreviewProperties.CardViewModel = null;
     }
   }
 
   private void HandCard_PointerExited(object sender, PointerRoutedEventArgs e)
-  {
-    PreviewImage.Visibility = Visibility.Collapsed;
     // Change placeholder image to the old hovered card's image so the placeholder won't flicker
-    PreviewImage.PlaceholderSource = null;
-  }
+    => CardPreviewProperties.CardViewModel = null;
 
   // ------------------ Item Drag & Drop ----------------------
 
@@ -223,7 +208,7 @@ public sealed partial class DeckTestingPage : Page
   {
     if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
-      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
+      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardSize.X / 2, -BattlefieldCardSize.Y / 2));
 
       DragArgs.Completed += (item) =>
       {
@@ -243,7 +228,7 @@ public sealed partial class DeckTestingPage : Page
   {
     if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
-      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardDimensions.X / 2, -BattlefieldCardDimensions.Y / 2));
+      DragArgs = new((sender as FrameworkElement).DataContext as DeckTestingMTGCardViewModel, new(-BattlefieldCardSize.X / 2, -BattlefieldCardSize.Y / 2));
 
       var pointerPosition = e.GetCurrentPoint(null).Position;
       DragPreviewImage.Source = DragArgs?.Item.SelectedFaceUri;
@@ -382,8 +367,8 @@ public sealed partial class DeckTestingPage : Page
               SelectedFaceSide = card.SelectedFaceSide,
               IsToken = card.IsToken,
             },
-            CardHeight = BattlefieldCardDimensions.Y,
-            CardWidth = BattlefieldCardDimensions.X,
+            CardHeight = BattlefieldCardSize.Y,
+            CardWidth = BattlefieldCardSize.X,
           };
 
           cardImg.PointerEntered += BattlefieldCard_PointerEntered;
@@ -479,6 +464,5 @@ public sealed partial class DeckTestingPage : Page
       DragArgs.Complete();
     }
   }
-
   #endregion
 }

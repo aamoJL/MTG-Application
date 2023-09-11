@@ -5,7 +5,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-  xmlns:controls1="using:MTGApplication.Views.Controls" 
+  xmlns:customcontrols="using:MTGApplication.Views.Controls" 
   xmlns:viewmodels="using:MTGApplication.ViewModels"
   xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:sys="using:System"
@@ -46,11 +46,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="0 0 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="0 0 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="{x:Bind sys:String.Format('Turn {0}', MTGDeckTestingViewModel.TurnCount), Mode=OneWay}"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <Grid Grid.Row="1" BorderThickness="0 0 1 0" BorderBrush="{ThemeResource RegionBrush}" Padding="0 0 10 0 ">
             <Grid.RowDefinitions>
               <RowDefinition Height="*"/>
@@ -79,11 +79,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="10 0 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="{x:Bind sys:String.Format('Hand ({0})', MTGDeckTestingViewModel.Hand.Count), Mode=OneWay}"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
                     ItemsSource="{x:Bind MTGDeckTestingViewModel.Hand}"
                     ScrollViewer.HorizontalScrollMode="Enabled"
@@ -112,7 +112,7 @@
                                   Style="{StaticResource PlaceholderImageStyle}"
                                   CornerRadius="7"
                                   PointerPressed="DraggableListItem_PointerPressed"
-                                  PointerEntered="CardListViewItem_PointerEntered"
+                                  PointerEntered="HandCard_PointerEntered"
                                   PointerMoved="HandCard_PointerMoved"
                                   PointerExited="HandCard_PointerExited">
                   <controls:ImageEx.ContextFlyout>
@@ -130,11 +130,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="10 0 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="Command Zone"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
                     ItemsSource="{x:Bind MTGDeckTestingViewModel.CommandZone}"
                     MaxWidth="300"
@@ -166,7 +166,7 @@
                                   Style="{StaticResource PlaceholderImageStyle}"
                                   CornerRadius="7"
                                   PointerPressed="DraggableListItem_PointerPressed"
-                                  PointerEntered="CardListViewItem_PointerEntered"
+                                  PointerEntered="HandCard_PointerEntered"
                                   PointerMoved="HandCard_PointerMoved"
                                   PointerExited="HandCard_PointerExited">
                   <controls:ImageEx.ContextFlyout>
@@ -184,11 +184,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="10 0 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="Tokens"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
                     ItemsSource="{x:Bind MTGDeckTestingViewModel.Tokens, Mode=OneWay}"
                     SelectionMode="None"
@@ -225,11 +225,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="10 0 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="10 0 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="{x:Bind sys:String.Format('Library ({0})', MTGDeckTestingViewModel.Library.Count), Mode=OneWay}"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <Grid Grid.Row="1" RowSpacing="10">
             <Grid.RowDefinitions>
               <RowDefinition Height="*"/>
@@ -305,11 +305,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="10 5 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="10 5 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="{x:Bind sys:String.Format('Graveyard ({0})', MTGDeckTestingViewModel.Graveyard.Count), Mode=OneWay}"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
                     ItemsSource="{x:Bind MTGDeckTestingViewModel.Graveyard}"
                     SelectionMode="None"
@@ -339,11 +339,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-          <controls1:LinedHeader Grid.Row="0" Margin="10 5 10 0">
-            <controls1:LinedHeader.Header>
+          <customcontrols:LinedHeader Grid.Row="0" Margin="10 5 10 0">
+            <customcontrols:LinedHeader.Header>
               <TextBlock Text="{x:Bind sys:String.Format('Exile ({0})', MTGDeckTestingViewModel.Exile.Count), Mode=OneWay}"/>
-            </controls1:LinedHeader.Header>
-          </controls1:LinedHeader>
+            </customcontrols:LinedHeader.Header>
+          </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
                     ItemsSource="{x:Bind MTGDeckTestingViewModel.Exile}"
                     SelectionMode="None"
@@ -385,21 +385,11 @@
       </Grid>
     </controls:DockPanel>
     <!--Preview image-->
-    <Canvas>
-      <controls:ImageEx x:Name="PreviewImage" 
-                        Height="350" 
-                        IsHitTestVisible="False" 
-                        CornerRadius="12"
-                        Visibility="Collapsed" 
-                        PlaceholderStretch="Fill" 
-                        CacheMode="BitmapCache" 
-                        IsCacheEnabled="True"
-                        Style="{StaticResource PreviewImagePlaceholderStyle}"/>
-    </Canvas>
+    <customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneWay}"/>
     <Canvas>
       <controls:ImageEx x:Name="DragPreviewImage" 
-                        MaxWidth="{x:Bind BattlefieldCardDimensions.X}"
-                        MaxHeight="{x:Bind BattlefieldCardDimensions.Y}"
+                        MaxWidth="{x:Bind BattlefieldCardSize.X}"
+                        MaxHeight="{x:Bind BattlefieldCardSize.Y}"
                         IsHitTestVisible="False" 
                         CornerRadius="12"
                         Visibility="Collapsed" 
