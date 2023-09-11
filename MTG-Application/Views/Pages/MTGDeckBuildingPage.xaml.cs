@@ -58,8 +58,28 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   [ObservableProperty] private bool searchPanelOpen = false;
   [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
 
-  public CardPreviewProperties CardPreviewProperties { get; } = new();
+  public CardPreviewProperties CardPreviewProperties { get; } = new() { XMirror = true, Offset = new(175, 100) };
   public DialogService.DialogWrapper DialogWrapper { get; } = new();
+
+  #region ISavable Implementation
+  public bool HasUnsavedChanges
+  {
+    get => TabViews.FirstOrDefault(x => x.HasUnsavedChanges == true) != null;
+    set { return; }
+  }
+
+  public async Task<bool> SaveUnsavedChanges()
+  {
+    foreach (var item in TabViews)
+    {
+      if (!await item.SaveUnsavedChanges())
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  #endregion
 
   /// <summary>
   /// Opens and closes search panel
@@ -121,24 +141,4 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
       TabViews[0].IsClosable = true;
     }
   }
-
-  #region ISavable Implementation
-  public bool HasUnsavedChanges
-  {
-    get => TabViews.FirstOrDefault(x => x.HasUnsavedChanges == true) != null;
-    set { return; }
-  }
-
-  public async Task<bool> SaveUnsavedChanges()
-  {
-    foreach (var item in TabViews)
-    {
-      if (!await item.SaveUnsavedChanges())
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-  #endregion
 }

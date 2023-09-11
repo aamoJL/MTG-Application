@@ -9,18 +9,19 @@
   mc:Ignorable="d">
 
   <Canvas>
-    <controls:ImageEx x:Name="PreviewImage"
-                      Canvas.Left="{x:Bind PreviewPosition.X, Mode=OneWay}"
+    <controls:ImageEx Canvas.Left="{x:Bind PreviewPosition.X, Mode=OneWay}"
                       Canvas.Top="{x:Bind PreviewPosition.Y, Mode=OneWay}"
-                      Height="350" 
+                      Height="{x:Bind PreviewProperties.Height, Mode=OneWay}"
+                      Width="{x:Bind PreviewProperties.Width, Mode=OneWay}"
                       IsHitTestVisible="False" 
                       CornerRadius="12"
-                      Visibility="{x:Bind PreviewVisibility, Mode=OneWay}" 
-                      PlaceholderStretch="Fill" 
+                      Visibility="{x:Bind PreviewVisibility, Mode=OneWay}"
+                      PlaceholderStretch="Fill"
                       CacheMode="BitmapCache" 
                       IsCacheEnabled="True"
                       PlaceholderSource="{x:Bind PreviewPlaceholderSource, Mode=OneWay}"
                       Source="{x:Bind PreviewSource, Mode=OneWay}"
-                      Style="{StaticResource PreviewImagePlaceholderStyle}"/>
+                      Style="{StaticResource PreviewImagePlaceholderStyle}">
+    </controls:ImageEx>
   </Canvas>
 </UserControl>
