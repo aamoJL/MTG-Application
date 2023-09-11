@@ -303,7 +303,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   /// <summary>
   /// Saves the current <see cref="Collection"/> with the given name to the database
   /// </summary>
-  [RelayCommand(CanExecute = nameof(SaveCollectionCommandCanExecute))]
+  [RelayCommand]
   public async Task SaveCollectionDialog()
   {
     var saveName = await Dialogs.GetSaveDialog(Collection.Name).ShowAsync(GetDialogWrapper());

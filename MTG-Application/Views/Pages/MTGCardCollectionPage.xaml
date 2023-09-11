@@ -40,6 +40,7 @@
 
   <Grid>
     <VisualStateManager.VisualStateGroups>
+      
       <VisualStateGroup x:Name="CollectionNameTitleSaveStatus">
         <VisualState>
           <VisualState.StateTriggers>
@@ -60,6 +61,18 @@
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
+
+      <VisualStateGroup x:Name="CollectionSaveButtonState">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind CardCollectionsViewModel.Collection.CollectionLists.Count, Mode=OneWay}" To="0"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SaveButton.IsEnabled" Value="False"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+
     </VisualStateManager.VisualStateGroups>
 
     <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
@@ -81,7 +94,7 @@
                     <KeyboardAccelerator Key="O" Modifiers="Control"/>
                   </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Save..." Command="{x:Bind CardCollectionsViewModel.SaveCollectionDialogCommand}">
+                <MenuFlyoutItem x:Name="SaveButton" Text="Save..." Command="{x:Bind CardCollectionsViewModel.SaveCollectionDialogCommand}">
                   <MenuFlyoutItem.KeyboardAccelerators>
                     <KeyboardAccelerator Key="S" Modifiers="Control"/>
                   </MenuFlyoutItem.KeyboardAccelerators>
