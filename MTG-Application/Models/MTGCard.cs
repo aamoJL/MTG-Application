@@ -11,7 +11,56 @@ namespace MTGApplication.Models;
 /// </summary>
 public partial class MTGCard : ObservableObject
 {
-  #region Structs
+  [JsonConstructor]
+  public MTGCard(MTGCardInfo info, int count = 1)
+  {
+    Info = info;
+    Count = count;
+  }
+
+  protected int count = 1;
+
+  #region Properties
+  [ObservableProperty] private MTGCardInfo info;
+
+  /// <summary>
+  /// Name of the API, that was used to fetch this card
+  /// </summary>
+  public string APIName => Info.APIName;
+
+  /// <summary>
+  /// Card count. Minimum is 1
+  /// </summary>
+  public int Count
+  {
+    get => count;
+    set
+    {
+      value = Math.Max(1, value);
+      if (count != value)
+      {
+        count = value;
+        OnPropertyChanged(nameof(Count));
+      }
+    }
+  }
+  #endregion
+
+  /// <summary>
+  /// Returns the card info and count as a Json string
+  /// </summary>
+  public string ToJSON()
+  {
+    return JsonSerializer.Serialize(new
+    {
+      Info,
+      Count
+    });
+  }
+}
+
+public partial class MTGCard
+{
   [Serializable]
   public readonly struct CardToken
   {
@@ -20,6 +69,7 @@ public partial class MTGCard : ObservableObject
     [JsonConstructor]
     public CardToken(Guid scryfallId) => ScryfallId = scryfallId;
   }
+
   [Serializable]
   public readonly struct CardFace
   {
@@ -39,6 +89,7 @@ public partial class MTGCard : ObservableObject
       OracleText = oracleText;
     }
   }
+
   [Serializable]
   public readonly struct MTGCardInfo
   {
@@ -57,7 +108,6 @@ public partial class MTGCard : ObservableObject
     public CardFace? BackFace { get; }
     public string PrintSearchUri { get; }
     public CardToken[] Tokens { get; }
-
     public RarityTypes RarityType { get; }
     public ColorTypes[] Colors { get; }
     public SpellType[] SpellTypes { get; }
@@ -110,7 +160,6 @@ public partial class MTGCard : ObservableObject
       BackFace = backFace;
       PrintSearchUri = printSearchUri;
       Tokens = tokens;
-
       RarityType = rarityType;
       Colors = GetColors(FrontFace, BackFace);
       SpellTypes = GetSpellTypes(TypeLine);
@@ -118,47 +167,5 @@ public partial class MTGCard : ObservableObject
       ProducedMana = producedMana;
       APIName = apiName;
     }
-  }
-  #endregion
-
-  [JsonConstructor]
-  public MTGCard(MTGCardInfo info, int count = 1)
-  {
-    Info = info;
-    Count = count;
-  }
-
-  protected int count = 1;
-
-  [ObservableProperty] private MTGCardInfo info;
-
-  public string APIName => Info.APIName;
-  /// <summary>
-  /// Card count. Minimum is 1
-  /// </summary>
-  public int Count
-  {
-    get => count;
-    set
-    {
-      value = Math.Max(1, value);
-      if (count != value)
-      {
-        count = value;
-        OnPropertyChanged(nameof(Count));
-      }
-    }
-  }
-
-  /// <summary>
-  /// Returns the card info and count as a Json string
-  /// </summary>
-  public string ToJSON()
-  {
-    return JsonSerializer.Serialize(new
-    {
-      Info,
-      Count
-    });
   }
 }

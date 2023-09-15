@@ -11,29 +11,8 @@ namespace MTGApplication.Services;
 /// <summary>
 /// Service that handles file systems and networking
 /// </summary>
-public static class IOService
+public static partial class IOService
 {
-  /// <summary>
-  /// Service that handles clipboard
-  /// </summary>
-  public class ClipboardService
-  {
-    /// <summary>
-    /// Adds the <paramref name="text"/> to the clipboard
-    /// </summary>
-    public virtual void Copy(string text)
-    {
-      DataPackage dataPackage = new();
-      dataPackage.SetText(text);
-      SetClipboardContent(dataPackage);
-    }
-
-    /// <summary>
-    /// Sets the clipboard content to the <paramref name="dataPackage"/>
-    /// </summary>
-    protected virtual void SetClipboardContent(DataPackage dataPackage) => Clipboard.SetContent(dataPackage);
-  }
-
   public static readonly HttpClient HttpClient = new();
 
   #region//-----------------File-------------------//
@@ -155,4 +134,29 @@ public static class IOService
   /// </summary>
   public static async Task<bool> OpenUri(string uri) => await Launcher.LaunchUriAsync(new(uri));
   #endregion
+}
+
+// Clipboard service
+public static partial class IOService
+{
+  /// <summary>
+  /// Service that handles clipboard
+  /// </summary>
+  public class ClipboardService
+  {
+    /// <summary>
+    /// Adds the <paramref name="text"/> to the clipboard
+    /// </summary>
+    public virtual void Copy(string text)
+    {
+      DataPackage dataPackage = new();
+      dataPackage.SetText(text);
+      SetClipboardContent(dataPackage);
+    }
+
+    /// <summary>
+    /// Sets the clipboard content to the <paramref name="dataPackage"/>
+    /// </summary>
+    protected virtual void SetClipboardContent(DataPackage dataPackage) => Clipboard.SetContent(dataPackage);
+  }
 }

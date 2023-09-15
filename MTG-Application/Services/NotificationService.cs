@@ -30,7 +30,7 @@ public static class NotificationService
   public static event EventHandler<NotificationEventArgs> OnNotification;
 
   /// <summary>
-  /// Sends notification
+  /// Invokes <see cref="OnNotification"/> event
   /// </summary>
   public static void RaiseNotification(XamlRoot root, NotificationEventArgs args) => OnNotification?.Invoke(root, args);
 }

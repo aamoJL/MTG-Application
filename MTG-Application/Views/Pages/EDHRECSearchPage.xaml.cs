@@ -19,9 +19,9 @@ public sealed partial class EDHRECSearchPage : Page
     SearchViewModel = new(new EDHRECCommanderAPI(), new ScryfallAPI()) { CommanderThemes = themes };
   }
 
-  public EDHRECSearchViewModel SearchViewModel { get; }
-
   [ObservableProperty] private double searchDesiredItemWidth = 250;
+
+  public EDHRECSearchViewModel SearchViewModel { get; }
 
   private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
   {

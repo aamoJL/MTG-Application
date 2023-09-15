@@ -7,14 +7,15 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
   xmlns:viewmodels="using:MTGApplication.ViewModels" 
-  xmlns:ui="using:CommunityToolkit.WinUI.UI"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
+  xmlns:converters="using:MTGApplication.Views.BindingHelpers.Converters"
   d:DataContext="{d:DesignInstance Type=viewmodels:DeckTestingMTGCardViewModel}"
   mc:Ignorable="d">
 
   <UserControl.Resources>
-    <local:PlusCounterConverter x:Key="PlusCounterConverter"/>
-    <local:IntMoreThanToVisibilityConverter x:Key="IntMoreThanToVisibilityConverter"/>
-    <local:BoolToIntConverter x:Key="BoolToIntConverter"/>
+    <converters:PlusCounterConverter x:Key="PlusCounterConverter"/>
+    <converters:IntMoreThanToVisibilityConverter x:Key="IntMoreThanToVisibilityConverter"/>
+    <converters:BoolToIntConverter x:Key="BoolToIntConverter"/>
   </UserControl.Resources>
 
   <Grid RenderTransformOrigin="0.5,0.5" PointerReleased="Root_PointerReleased" PointerPressed="Root_PointerPressed" PointerMoved="Root_PointerMoved">

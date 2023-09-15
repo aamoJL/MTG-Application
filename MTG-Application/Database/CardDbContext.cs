@@ -10,16 +10,27 @@ namespace MTGApplication.Database;
 /// </summary>
 public class CardDbContext : DbContext
 {
+  public CardDbContext(DbContextOptions options) : base(options) { }
+
+  #region Properties
   public DbSet<MTGCardDeckDTO> MTGDecks { get; set; }
   public DbSet<MTGCardDTO> MTGCards { get; set; }
   public DbSet<MTGCardCollectionDTO> MTGCardCollections { get; set; }
   public DbSet<MTGCardCollectionListDTO> MTGCardCollectionLists { get; set; }
-
-  public CardDbContext(DbContextOptions options) : base(options) { }
+  #endregion
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
-    #region MTGCardDeckDTO
+    OnMTGCardDeckDTOCreating(modelBuilder);
+    OnMTGCardCollectionDTOCreating(modelBuilder);
+    OnMTGCardCollectionListDTOCreating(modelBuilder);
+  }
+
+  /// <summary>
+  /// <see cref="MTGCardDeckDTO"/> model creation
+  /// </summary>
+  protected void OnMTGCardDeckDTOCreating(ModelBuilder modelBuilder)
+  {
     modelBuilder.Entity<MTGCardDeckDTO>()
       .HasMany(c => c.DeckCards)
       .WithOne()
@@ -55,22 +66,29 @@ public class CardDbContext : DbContext
       .WithOne()
       .HasForeignKey<MTGCardDTO>("DeckCommanderPartnerId")
       .OnDelete(DeleteBehavior.Cascade);
-    #endregion
+  }
 
-    #region MTGCardCollectionDTO
+  /// <summary>
+  /// <see cref="MTGCardCollectionDTO"/> model creation
+  /// </summary>
+  protected void OnMTGCardCollectionDTOCreating(ModelBuilder modelBuilder)
+  {
     modelBuilder.Entity<MTGCardCollectionDTO>()
       .HasMany(c => c.CollectionLists)
       .WithOne()
       .HasForeignKey("CollectionId")
       .OnDelete(DeleteBehavior.Cascade);
-    #endregion
+  }
 
-    #region MTGCardCollectionListDTO
+  /// <summary>
+  /// <see cref="MTGCardCollectionListDTO"/> model creation
+  /// </summary>
+  protected void OnMTGCardCollectionListDTOCreating(ModelBuilder modelBuilder)
+  {
     modelBuilder.Entity<MTGCardCollectionListDTO>()
       .HasMany(c => c.Cards)
       .WithOne()
       .HasForeignKey("CollectionListId")
       .OnDelete(DeleteBehavior.Cascade);
-    #endregion
   }
 }

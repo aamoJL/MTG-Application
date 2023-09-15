@@ -9,7 +9,13 @@ namespace MTGApplication.Interfaces;
 /// </summary>
 public interface IInAppNotifier
 {
+  /// <summary>
+  /// Event, that will be invoked when in app notification should be shown
+  /// </summary>
   public event EventHandler<NotificationEventArgs> OnNotification;
 
+  /// <summary>
+  /// Shows in app notification on a window
+  /// </summary>
   public void RaiseInAppNotification(NotificationType type, string text);
 }

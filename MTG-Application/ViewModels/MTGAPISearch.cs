@@ -16,12 +16,14 @@ public partial class MTGAPISearch<TSource, IType> : ObservableObject where TSour
 {
   public MTGAPISearch(ICardAPI<MTGCard> cardAPI) => this.CardAPI = cardAPI;
 
-  public ICardAPI<MTGCard> CardAPI { get; }
-
+  #region Properties
   [ObservableProperty] private IncrementalLoadingCollection<TSource, IType> searchCards = new();
   [ObservableProperty] private int totalCardCount;
   [ObservableProperty] private string searchQuery;
   [ObservableProperty] private bool isBusy;
+
+  public ICardAPI<MTGCard> CardAPI { get; }
+  #endregion
 
   /// <summary>
   /// Fetches cards from the API using selected query, and replaces current cards with the fetched cards

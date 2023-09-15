@@ -12,8 +12,10 @@ namespace MTGApplication.Database.Repositories;
 /// </summary>
 public class InMemoryMTGCardCollectionRepository : IRepository<MTGCardCollection>
 {
+  #region Properties
   protected static List<MTGCardCollectionDTO> Collections { get; } = new();
   protected ICardAPI<MTGCard> CardAPI { get; set; }
+  #endregion
 
   public InMemoryMTGCardCollectionRepository(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
 

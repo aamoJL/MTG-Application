@@ -5,7 +5,6 @@ using System.Windows.Input;
 
 namespace MTGApplication.Views.Controls;
 
-#region Enums
 public enum MTGSearchFormatTypes
 {
   Any, Modern, Standard, Commander,
@@ -22,7 +21,6 @@ public enum MTGSearchDirectionTypes
 {
   Asc, Desc
 }
-#endregion
 
 /// <summary>
 /// Control that returns formatted search query for <see cref="API.ScryfallAPI"/>
@@ -30,30 +28,9 @@ public enum MTGSearchDirectionTypes
 [ObservableObject]
 public sealed partial class ScryfallSearchBarControl : UserControl
 {
-  public ICommand SearchSubmitCommand { get; set; }
-  public string SearchQuery
-  {
-    get => (string)GetValue(SearchQueryProperty);
-    set => SetValue(SearchQueryProperty, value);
-  }
-
-  public static readonly DependencyProperty SearchQueryProperty =
-      DependencyProperty.Register("SearchQuery", typeof(string), typeof(ScryfallSearchBarControl), new PropertyMetadata(null));
-
-  [ObservableProperty]
-  private string searchText;
-  [ObservableProperty]
-  private MTGSearchFormatTypes searchFormat;
-  [ObservableProperty]
-  private MTGSearchUniqueTypes searchUnique;
-  [ObservableProperty]
-  private MTGSearchOrderTypes searchOrder;
-  [ObservableProperty]
-  private MTGSearchDirectionTypes searchDirection;
-
   public ScryfallSearchBarControl()
   {
-    this.InitializeComponent();
+    InitializeComponent();
 
     PropertyChanged += delegate
     {
@@ -65,6 +42,26 @@ public sealed partial class ScryfallSearchBarControl : UserControl
       $"format:{SearchFormat}";
     };
   }
+
+  #region Properties
+  [ObservableProperty] private string searchText;
+  [ObservableProperty] private MTGSearchFormatTypes searchFormat;
+  [ObservableProperty] private MTGSearchUniqueTypes searchUnique;
+  [ObservableProperty] private MTGSearchOrderTypes searchOrder;
+  [ObservableProperty] private MTGSearchDirectionTypes searchDirection;
+
+  public ICommand SearchSubmitCommand { get; set; }
+  public string SearchQuery
+  {
+    get => (string)GetValue(SearchQueryProperty);
+    set => SetValue(SearchQueryProperty, value);
+  }
+  #endregion
+
+  #region Dependency Properties
+  public static readonly DependencyProperty SearchQueryProperty =
+      DependencyProperty.Register("SearchQuery", typeof(string), typeof(ScryfallSearchBarControl), new PropertyMetadata(null));
+  #endregion
 
   private void SearchButton_Click(object sender, RoutedEventArgs e)
   {

@@ -15,13 +15,13 @@ namespace MTGApplication.Database.Repositories;
 /// </summary>
 public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
 {
-  protected readonly CardDbContextFactory cardDbContextFactory;
-
   public SQLiteMTGDeckRepository(ICardAPI<MTGCard> cardAPI, CardDbContextFactory cardDbContextFactory)
   {
     CardAPI = cardAPI;
     this.cardDbContextFactory = cardDbContextFactory;
   }
+
+  protected readonly CardDbContextFactory cardDbContextFactory;
 
   public ICardAPI<MTGCard> CardAPI { get; init; }
 

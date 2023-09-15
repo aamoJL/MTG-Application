@@ -17,7 +17,76 @@ namespace MTGApplication.Services;
 /// </summary>
 public static partial class MTGService
 {
-  #region Enums
+  /// <summary>
+  /// Returns exportable string of the cards using the <paramref name="exportProperty"/>
+  /// </summary>
+  public static string GetExportString(MTGCard[] cards, string exportProperty = "Name")
+  {
+    StringBuilder stringBuilder = new();
+    foreach (var item in cards)
+    {
+      if (exportProperty == "Name")
+      {
+        stringBuilder.AppendLine($"{item.Count} {item.Info.Name}");
+      }
+      else if (exportProperty == "Id")
+      {
+        stringBuilder.AppendLine($"{item.Count} {item.Info.ScryfallId}");
+      }
+    }
+
+    return stringBuilder.ToString();
+  }
+
+  /// <summary>
+  /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
+  /// </summary>
+  public static SpellType[] GetSpellTypes(string typeLine)
+  {
+    List<SpellType> types = new();
+    var typeStrings = typeLine.Split('\u0020'); // 'Space'
+
+    foreach (var typeString in typeStrings)
+    {
+      if (Enum.TryParse(typeString, true, out SpellType spellType))
+      {
+        types.Add(spellType);
+      }
+    }
+
+    if (types.Count == 0) { types.Add(SpellType.Other); }
+    return types.OrderBy(x => x).ToArray();
+  }
+
+  /// <summary>
+  /// Returns all the <see cref="ColorTypes"/> that the given faces have
+  /// </summary>
+  public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
+  {
+    var colors = new List<ColorTypes>();
+
+    foreach (var color in frontFace.Colors)
+    {
+      if (!colors.Contains(color)) { colors.Add(color); }
+    }
+
+    if (backFace != null)
+    {
+      foreach (var color in backFace?.Colors)
+      {
+        if (!colors.Contains(color)) { colors.Add(color); }
+      }
+    }
+
+    // Card is colorless if it has no other colors
+    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
+    return colors.ToArray();
+  }
+}
+
+// MTG Service enums
+public static partial class MTGService
+{
   public enum RarityTypes
   {
     Common = 0,
@@ -27,10 +96,12 @@ public static partial class MTGService
     Special = 4,
     Bonus = 5,
   }
+
   public enum ColorTypes
   {
     W, U, B, R, G, M, C
   }
+
   public enum SpellType
   {
     Land,
@@ -42,6 +113,7 @@ public static partial class MTGService
     Sorcery,
     Other
   }
+
   public enum CardSide
   {
     Front, Back
@@ -63,8 +135,11 @@ public static partial class MTGService
       _ => "Colorless",
     };
   }
-  #endregion
+}
 
+// MTG Service classes
+public static partial class MTGService
+{
   /// <summary>
   /// Class that has properties to filter MTG card lists
   /// </summary>
@@ -166,71 +241,5 @@ public static partial class MTGService
     [ObservableProperty] public MTGSortProperty primarySortProperty;
     [ObservableProperty] public MTGSortProperty secondarySortProperty;
     [ObservableProperty] public SortDirection sortDirection;
-  }
-
-  /// <summary>
-  /// Returns exportable string of the cards using the <paramref name="exportProperty"/>
-  /// </summary>
-  public static string GetExportString(MTGCard[] cards, string exportProperty = "Name")
-  {
-    StringBuilder stringBuilder = new();
-    foreach (var item in cards)
-    {
-      if (exportProperty == "Name")
-      {
-        stringBuilder.AppendLine($"{item.Count} {item.Info.Name}");
-      }
-      else if (exportProperty == "Id")
-      {
-        stringBuilder.AppendLine($"{item.Count} {item.Info.ScryfallId}");
-      }
-    }
-
-    return stringBuilder.ToString();
-  }
-
-  /// <summary>
-  /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
-  /// </summary>
-  public static SpellType[] GetSpellTypes(string typeLine)
-  {
-    List<SpellType> types = new();
-    var typeStrings = typeLine.Split('\u0020'); // 'Space'
-
-    foreach (var typeString in typeStrings)
-    {
-      if (Enum.TryParse(typeString, true, out SpellType spellType))
-      {
-        types.Add(spellType);
-      }
-    }
-
-    if (types.Count == 0) { types.Add(SpellType.Other); }
-    return types.OrderBy(x => x).ToArray();
-  }
-
-  /// <summary>
-  /// Returns all the <see cref="ColorTypes"/> that the given faces have
-  /// </summary>
-  public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
-  {
-    var colors = new List<ColorTypes>();
-
-    foreach (var color in frontFace.Colors)
-    {
-      if (!colors.Contains(color)) { colors.Add(color); }
-    }
-
-    if (backFace != null)
-    {
-      foreach (var color in backFace?.Colors)
-      {
-        if (!colors.Contains(color)) { colors.Add(color); }
-      }
-    }
-
-    // Card is colorless if it has no other colors
-    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
-    return colors.ToArray();
   }
 }

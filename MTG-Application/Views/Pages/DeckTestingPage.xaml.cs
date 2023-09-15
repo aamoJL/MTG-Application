@@ -36,71 +36,15 @@ public sealed partial class DeckTestingPage : Page
     Loaded += (s, e) => MTGDeckTestingViewModel.NewGame(); // Start new game when page loads
   }
 
+  private CustomDragArgs<DeckTestingMTGCardViewModel> dragArgs;
+
+  #region Properties
   [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
   [ObservableProperty] private CardPreviewProperties cardPreviewProperties = new();
 
   public MTGDeckTestingViewModel MTGDeckTestingViewModel { get; }
   public Vector2 BattlefieldCardSize { get; } = new(215, 300);
   public Vector2 CardPreviewSize { get; } = new(251, 350);
-
-  private void MTGDeckTestingViewModel_NewTurnStarted()
-  {
-    foreach (var child in BattlefieldCanvas.Children)
-    {
-      if ((child as FrameworkElement).DataContext is DeckTestingMTGCardViewModel cardVM)
-      {
-        cardVM.IsTapped = false;
-      }
-    }
-  }
-
-  private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
-
-  [RelayCommand]
-  public void LibraryVisibilitySwitch() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-
-  #region Pointer Events
-
-  public class CustomDragArgs<T>
-  {
-    public CustomDragArgs(T item, Point dragOffset)
-    {
-      Item = item;
-      DragOffset = dragOffset;
-    }
-
-    public T Item { get; }
-    public Point DragOffset { get; }
-    public event Action<T> Started;
-    public event Action<T> Completed;
-    public event Action<T> Canceled;
-    public bool IsDragging { get; private set; } = false;
-    public bool IsCompleted { get; private set; } = false;
-
-    public static float UndroppableOpacity { get; } = .3f;
-    public static float DroppableOpacity { get; } = .8f;
-
-    public void Start()
-    {
-      IsDragging = true;
-      Started?.Invoke(Item);
-    }
-
-    public void Complete()
-    {
-      IsCompleted = true;
-      IsDragging = false;
-      Completed?.Invoke(Item);
-    }
-
-    public void Cancel()
-    {
-      if (!IsCompleted || IsDragging) Canceled?.Invoke(Item);
-      IsDragging = false;
-    }
-  }
-
-  private CustomDragArgs<DeckTestingMTGCardViewModel> dragArgs;
   private CustomDragArgs<DeckTestingMTGCardViewModel> DragArgs
   {
     get => dragArgs;
@@ -123,7 +67,27 @@ public sealed partial class DeckTestingPage : Page
       }
     }
   }
+  #endregion
 
+  #region Event Methods
+  private void MTGDeckTestingViewModel_NewTurnStarted()
+  {
+    foreach (var child in BattlefieldCanvas.Children)
+    {
+      if ((child as FrameworkElement).DataContext is DeckTestingMTGCardViewModel cardVM)
+      {
+        cardVM.IsTapped = false;
+      }
+    }
+  }
+
+  private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
+  #endregion
+
+  [RelayCommand]
+  public void LibraryVisibilitySwitch() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+
+  #region Pointer Events
   // ---------------- Item Pointer Movement -------------------
 
   private void CardListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -465,4 +429,47 @@ public sealed partial class DeckTestingPage : Page
     }
   }
   #endregion
+}
+
+// Drag args
+public sealed partial class DeckTestingPage
+{
+  public class CustomDragArgs<T>
+  {
+    public CustomDragArgs(T item, Point dragOffset)
+    {
+      Item = item;
+      DragOffset = dragOffset;
+    }
+
+    public T Item { get; }
+    public Point DragOffset { get; }
+    public event Action<T> Started;
+    public event Action<T> Completed;
+    public event Action<T> Canceled;
+    public bool IsDragging { get; private set; } = false;
+    public bool IsCompleted { get; private set; } = false;
+
+    public static float UndroppableOpacity { get; } = .3f;
+    public static float DroppableOpacity { get; } = .8f;
+
+    public void Start()
+    {
+      IsDragging = true;
+      Started?.Invoke(Item);
+    }
+
+    public void Complete()
+    {
+      IsCompleted = true;
+      IsDragging = false;
+      Completed?.Invoke(Item);
+    }
+
+    public void Cancel()
+    {
+      if (!IsCompleted || IsDragging) Canceled?.Invoke(Item);
+      IsDragging = false;
+    }
+  }
 }

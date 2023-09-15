@@ -25,10 +25,8 @@ public class MTGCardDeckDTO
 
   [Key] public int Id { get; init; }
   public string Name { get; init; }
-
   public MTGCardDTO Commander { get; set; }
   public MTGCardDTO CommanderPartner { get; set; }
-
   public List<MTGCardDTO> DeckCards { get; init; } = new();
   public List<MTGCardDTO> WishlistCards { get; init; } = new();
   public List<MTGCardDTO> MaybelistCards { get; init; } = new();

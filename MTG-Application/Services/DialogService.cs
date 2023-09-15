@@ -12,9 +12,19 @@ namespace MTGApplication.Services;
 /// <summary>
 /// Service to show dialogs on windows.
 /// </summary>
-public static class DialogService
+public static partial class DialogService
 {
-  #region Classes
+  public static event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public static void ShowAsync(XamlRoot root, DialogEventArgs args) => OnGetDialogWrapper?.Invoke(root, args);
+}
+
+// Dialog Service classes
+public static partial class DialogService
+{
+  /// <summary>
+  /// Event args for dialog events
+  /// </summary>
   public class DialogEventArgs : EventArgs
   {
     public DialogWrapper DialogWrapper { get; set; }
@@ -123,16 +133,11 @@ public static class DialogService
     public new async Task<T> ShowAsync(DialogWrapper wrapper, bool force = false)
       => ProcessResult(await base.ShowAsync(wrapper, force));
   }
-  #endregion
+}
 
-  #region Events
-  public static event EventHandler<DialogEventArgs> OnGetDialogWrapper;
-  #endregion
-
-  #region Properties
-  public static void ShowAsync(XamlRoot root, DialogEventArgs args) => OnGetDialogWrapper?.Invoke(root, args);
-  #endregion
-
+// Basic dialog types
+public static partial class DialogService
+{
   #region Dialog Types
   /// <summary>
   /// Dialog that asks confirmation from the user.

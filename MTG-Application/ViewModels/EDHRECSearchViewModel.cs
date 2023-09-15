@@ -15,28 +15,6 @@ namespace MTGApplication.ViewModels;
 
 public partial class EDHRECSearchViewModel : ObservableObject, IDialogNotifier
 {
-  public class EDHRECSearchViewModelDialogs
-  {
-    public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
-        { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
-
-    public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
-    {
-      public DraggableMTGCardViewModelGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle) { }
-
-      protected override void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e)
-      {
-        if (e.Items[0] is MTGCardViewModel vm)
-        {
-          e.Data.SetText(vm.Model.ToJSON());
-          e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-        }
-        base.DraggableGridViewDialog_DragItemsStarting(dialog, e);
-      }
-    }
-  }
-
   public EDHRECSearchViewModel(IMTGCommanderAPI commanderAPI, ICardAPI<MTGCard> cardAPI)
   {
     Dialogs = new();
@@ -47,6 +25,28 @@ public partial class EDHRECSearchViewModel : ObservableObject, IDialogNotifier
     APISearch.PropertyChanged += APISearch_PropertyChanged;
   }
 
+  #region Properties
+  [ObservableProperty] private bool isBusy;
+  [ObservableProperty] private CommanderTheme[] commanderThemes;
+  [ObservableProperty] private CommanderTheme selectedTheme;
+
+  public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> APISearch { get; }
+  public EDHRECSearchViewModelDialogs Dialogs { get; }
+  private IMTGCommanderAPI CommanderAPI { get; }
+  #endregion
+
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
+  #endregion
+
+  #region OnPropertyChanged events
   private void APISearch_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(APISearch.IsBusy))
@@ -76,25 +76,6 @@ public partial class EDHRECSearchViewModel : ObservableObject, IDialogNotifier
     {
       await APISearch.SearchWithNames(await FetchNewCardNames(SelectedTheme));
     }
-  }
-
-  public MTGAPISearch<MTGCardViewModelSource, MTGCardViewModel> APISearch { get; }
-  public EDHRECSearchViewModelDialogs Dialogs { get; }
-
-  private IMTGCommanderAPI CommanderAPI { get; }
-
-  [ObservableProperty] private bool isBusy;
-  [ObservableProperty] private CommanderTheme[] commanderThemes;
-  [ObservableProperty] private CommanderTheme selectedTheme;
-
-  #region IDialogNotifier implementation
-  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
-
-  public DialogWrapper GetDialogWrapper()
-  {
-    var args = new DialogEventArgs();
-    OnGetDialogWrapper?.Invoke(this, args);
-    return args.DialogWrapper;
   }
   #endregion
 
@@ -130,5 +111,31 @@ public partial class EDHRECSearchViewModel : ObservableObject, IDialogNotifier
     var result = await CommanderAPI.FetchNewCards(theme.Uri);
     IsBusy = false;
     return result;
+  }
+}
+
+// Dialogs
+public partial class EDHRECSearchViewModel
+{
+  public class EDHRECSearchViewModelDialogs
+  {
+    public virtual DraggableMTGCardViewModelGridViewDialog GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+        => new("Card prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+        { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+
+    public class DraggableMTGCardViewModelGridViewDialog : DraggableGridViewDialog<MTGCardViewModel>
+    {
+      public DraggableMTGCardViewModelGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle) { }
+
+      protected override void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e)
+      {
+        if (e.Items[0] is MTGCardViewModel vm)
+        {
+          e.Data.SetText(vm.Model.ToJSON());
+          e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
+        }
+        base.DraggableGridViewDialog_DragItemsStarting(dialog, e);
+      }
+    }
   }
 }

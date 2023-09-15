@@ -18,24 +18,6 @@ namespace MTGApplication.ViewModels;
 
 public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, IDialogNotifier
 {
-  public class DeckCardlistViewDialogs
-  {
-    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
-
-    public virtual TextAreaDialog GetImportDialog()
-      => new("Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
-
-    public virtual TextAreaDialog GetExportDialog(string text)
-      => new("Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
-
-    public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
-      => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
-
-    public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
-      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
-  }
-
   public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGCardSortProperties sortProperties = null)
   {
     Cardlist = cardlist;
@@ -55,6 +37,51 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
     OnPropertyChanged(nameof(Cardlist));
   }
 
+  #region Properties
+  [ObservableProperty] private ObservableCollection<MTGCard> cardlist;
+  [ObservableProperty] private bool isBusy;
+
+  private ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
+  private ICardAPI<MTGCard> CardAPI { get; }
+  public DeckCardlistViewDialogs Dialogs { get; set; } = new();
+  public IOService.ClipboardService ClipboardService { get; init; } = new();
+  public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
+  public MTGCardSortProperties SortProperties { get; }
+  public CommandService CommandService { get; init; } = new();
+  public MTGCardFilters CardFilters { get; }
+  public Action SavableChangesOccurred { get; set; }
+  public string Name { get; init; }
+
+  /// <summary>
+  /// Returns total card count of the cardlist cards
+  /// </summary>
+  public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
+  /// <summary>
+  /// Returns total euro price of the cardlist cards
+  /// </summary>
+  public float EuroPrice => CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count);
+  #endregion
+
+  #region IInAppNotifier implementation
+
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+
+  #endregion
+
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
+  #endregion
+
+  #region OnPropertyChanged events
   private void SortProperties_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(SortProperties.PrimarySortProperty), SortProperties.SortDirection);
@@ -133,48 +160,6 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
         break;
     }
     SavableChangesOccurred?.Invoke();
-  }
-
-  private ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
-  private ICardAPI<MTGCard> CardAPI { get; }
-
-  [ObservableProperty] private ObservableCollection<MTGCard> cardlist;
-  [ObservableProperty] private bool isBusy;
-
-  public DeckCardlistViewDialogs Dialogs { get; set; } = new();
-  public IOService.ClipboardService ClipboardService { get; init; } = new();
-  public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
-  public MTGCardSortProperties SortProperties { get; }
-  public CommandService CommandService { get; init; } = new();
-  public MTGCardFilters CardFilters { get; }
-  public Action SavableChangesOccurred { get; set; }
-  public string Name { get; init; }
-
-  /// <summary>
-  /// Returns total card count of the cardlist cards
-  /// </summary>
-  public int CardlistSize => CardViewModels.Sum(x => x.Model.Count);
-  /// <summary>
-  /// Returns total euro price of the cardlist cards
-  /// </summary>
-  public float EuroPrice => CardViewModels.Sum(x => x.Model.Info.Price * x.Model.Count);
-
-  #region IInAppNotifier implementation
-
-  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
-
-  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
-
-  #endregion
-
-  #region IDialogNotifier implementation
-  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
-
-  public DialogWrapper GetDialogWrapper()
-  {
-    var args = new DialogEventArgs();
-    OnGetDialogWrapper?.Invoke(this, args);
-    return args.DialogWrapper;
   }
   #endregion
 
@@ -337,4 +322,26 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
   /// Removes given card from the deck cardlist
   /// </summary>
   public void Remove(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(Cardlist, new[] { card }));
+}
+
+// Dialogs
+public partial class DeckCardlistViewModel
+{
+  public class DeckCardlistViewDialogs
+  {
+    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
+
+    public virtual TextAreaDialog GetImportDialog()
+      => new("Import cards") { InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+
+    public virtual TextAreaDialog GetExportDialog(string text)
+      => new("Export deck") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+
+    public virtual CheckBoxDialog GetMultipleCardsAlreadyInDeckDialog(string name)
+      => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+
+    public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
+      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+  }
 }

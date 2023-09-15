@@ -17,6 +17,9 @@ public sealed partial class ThemedWindow : Window
     Closed += ThemedWindow_Closed;
   }
 
+  private bool close = false; // Temp variable for window closing
+
+  #region Properties
   /// <summary>
   /// <inheritdoc cref="Window.Content"/>
   /// </summary>
@@ -52,8 +55,15 @@ public sealed partial class ThemedWindow : Window
     get => AppWindow.Size.Height;
     set => AppWindow.Resize(new(Width, value));
   }
+  #endregion
 
-  private bool close = false; // Temp variable for window closing
+  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
+    {
+      (Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
+    }
+  }
 
   private async void ThemedWindow_Closed(object sender, WindowEventArgs args)
   {
@@ -77,14 +87,6 @@ public sealed partial class ThemedWindow : Window
       Content = null;
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
       Close();
-    }
-  }
-
-  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
-    {
-      (Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
     }
   }
 }

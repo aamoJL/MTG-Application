@@ -17,9 +17,18 @@ namespace MTGApplication.ViewModels.Charts;
 /// </summary>
 public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : ObservableObject
 {
-  protected ObservableCollection<TModel> Models { get; }
+  public CardModelSeries(TModel model)
+  {
+    Models = new();
+    Models.CollectionChanged += Models_CollectionChanged;
+
+    AddItem(model);
+  }
+
   protected double primaryValue;
 
+  #region Properties
+  protected ObservableCollection<TModel> Models { get; }
   public virtual double PrimaryValue
   {
     get => primaryValue;
@@ -30,18 +39,13 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
     }
   }
   public virtual double SecondaryValue { get; protected set; }
+  #endregion
 
-  public CardModelSeries(TModel model)
-  {
-    Models = new();
-    Models.CollectionChanged += Models_CollectionChanged;
-
-    AddItem(model);
-  }
-
+  #region OnPropertyChanged events
   protected virtual void Model_PropertyChanged(object sender, PropertyChangedEventArgs e) { }
 
   protected virtual void Models_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { }
+  #endregion
 
   /// <summary>
   /// Adds <paramref name="item"/> to the series
@@ -170,6 +174,7 @@ public class MTGCardModelCountSeries : CardModelSeries<MTGCard>
 {
   public MTGCardModelCountSeries(MTGCard model) : base(model) { }
 
+  #region OnPropertyChanged events
   protected override void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     base.Model_PropertyChanged(sender, e);
@@ -181,6 +186,7 @@ public class MTGCardModelCountSeries : CardModelSeries<MTGCard>
     base.Models_CollectionChanged(sender, e);
     UpdateCardCount();
   }
+  #endregion
 
   /// <summary>
   /// Updates the primary value

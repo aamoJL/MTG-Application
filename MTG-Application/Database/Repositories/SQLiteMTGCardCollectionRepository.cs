@@ -14,13 +14,13 @@ namespace MTGApplication.Database.Repositories;
 /// </summary>
 public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
 {
-  protected readonly CardDbContextFactory cardDbContextFactory;
-
   public SQLiteMTGCardCollectionRepository(ICardAPI<MTGCard> cardAPI, CardDbContextFactory cardDbContextFactory)
   {
     CardAPI = cardAPI;
     this.cardDbContextFactory = cardDbContextFactory;
   }
+
+  protected readonly CardDbContextFactory cardDbContextFactory;
 
   public ICardAPI<MTGCard> CardAPI { get; init; }
 

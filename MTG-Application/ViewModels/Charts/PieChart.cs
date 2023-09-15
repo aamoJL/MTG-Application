@@ -83,9 +83,9 @@ public class MTGManaProductionPieChart : MTGPieChart<ColorTypes>
 /// </summary>
 public class MTGColorPieChart : MTGPieChart<ColorTypes>
 {
-  public int InnerRadius { get; }
-
   public MTGColorPieChart(int innerRadius = 0) => InnerRadius = innerRadius;
+
+  public int InnerRadius { get; }
 
   protected override CardModelSeries<MTGCard> FindSecondaryItem(ISeries series, MTGCard model) => null;
 

@@ -14,22 +14,24 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     Tokens = tokens ?? Array.Empty<DeckTestingMTGCardViewModel>();
   }
 
+  #region Properties
+  [ObservableProperty] private int playerHP = 40;
+  [ObservableProperty] private int enemyHP = 40;
+  [ObservableProperty] private int turnCount;
+
   public ObservableCollection<DeckTestingMTGCardViewModel> Library { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> Graveyard { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> Exile { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> Hand { get; set; } = new();
   public ObservableCollection<DeckTestingMTGCardViewModel> CommandZone { get; set; } = new();
   public DeckTestingMTGCardViewModel[] Tokens { get; set; }
+  public MTGCardDeck CardDeck { get; }
+  #endregion
 
   public event Action NewGameStarted;
   public event Action NewTurnStarted;
 
-  public MTGCardDeck CardDeck { get; }
-
-  [ObservableProperty] private int playerHP = 40;
-  [ObservableProperty] private int enemyHP = 40;
-  [ObservableProperty] private int turnCount;
-
+  #region Relay Commands
   /// <summary>
   /// Resets game state
   /// </summary>
@@ -109,6 +111,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
       (list[n], list[k]) = (list[k], list[n]);
     }
   }
+  #endregion
 
   /// <summary>
   /// Adds given card to the bottom of the library

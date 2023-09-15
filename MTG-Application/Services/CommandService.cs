@@ -8,38 +8,6 @@ namespace MTGApplication.Services;
 /// </summary>
 public partial class CommandService
 {
-  public interface ICommand
-  {
-    public void Execute();
-    public void Undo();
-  }
-
-  /// <summary>
-  /// Command that executes multiple commands at once
-  /// </summary>
-  public class CombinedCommand : ICommand
-  {
-    private ICommand[] Commands { get; }
-
-    public CombinedCommand(ICommand[] commands) => Commands = commands;
-
-    public void Execute()
-    {
-      foreach (var command in Commands)
-      {
-        command.Execute();
-      }
-    }
-
-    public void Undo()
-    {
-      foreach (var command in Commands)
-      {
-        command.Undo();
-      }
-    }
-  }
-
   // TODO: Limit undo stack?
   public Stack<ICommand> UndoCommandStack { get; } = new();
   public Stack<ICommand> RedoCommandStack { get; } = new();
@@ -89,5 +57,43 @@ public partial class CommandService
   {
     UndoCommandStack.Clear();
     RedoCommandStack.Clear();
+  }
+}
+
+public partial class CommandService
+{
+  /// <summary>
+  /// Interface for <see cref="CommandService"/> commands
+  /// </summary>
+  public interface ICommand
+  {
+    public void Execute();
+    public void Undo();
+  }
+
+  /// <summary>
+  /// Command that executes multiple commands at once
+  /// </summary>
+  public class CombinedCommand : ICommand
+  {
+    private ICommand[] Commands { get; }
+
+    public CombinedCommand(ICommand[] commands) => Commands = commands;
+
+    public void Execute()
+    {
+      foreach (var command in Commands)
+      {
+        command.Execute();
+      }
+    }
+
+    public void Undo()
+    {
+      foreach (var command in Commands)
+      {
+        command.Undo();
+      }
+    }
   }
 }

@@ -14,17 +14,21 @@ public sealed partial class CardAPISearchControl : UserControl
 {
   public CardAPISearchControl() => InitializeComponent();
 
+  #region Properties
+  [ObservableProperty] private double searchDesiredItemWidth = 250;
+
   public DeckBuilderAPISearchViewModel SearchViewModel { get; } = new(new ScryfallAPI());
   public CardPreviewProperties CardPreviewProperties
   {
     get => (CardPreviewProperties)GetValue(CardPreviewPropertiesProperty);
     set => SetValue(CardPreviewPropertiesProperty, value);
   }
+  #endregion
 
+  #region Dependency Properties
   public static readonly DependencyProperty CardPreviewPropertiesProperty =
       DependencyProperty.Register("CardPreviewProperties", typeof(CardPreviewProperties), typeof(CardAPISearchControl), new PropertyMetadata(0));
-
-  [ObservableProperty] private double searchDesiredItemWidth = 250;
+  #endregion
 
   private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
   {
@@ -35,8 +39,8 @@ public sealed partial class CardAPISearchControl : UserControl
     }
   }
 
-  // Change card preview image to hovered item
   private void PreviewableCard_PointerEntered(object sender, PointerRoutedEventArgs e)
+    // Change card preview image to hovered item
     => CardPreviewProperties.CardViewModel = (sender as FrameworkElement)?.DataContext as MTGCardViewModel;
 
   private void PreviewableCard_PointerMoved(object sender, PointerRoutedEventArgs e)

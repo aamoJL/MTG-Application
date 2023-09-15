@@ -39,27 +39,13 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
     };
   }
 
-  private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
-  {
-    if ((XamlRoot)sender == this.XamlRoot)
-    {
-      InAppNotification.Background = e.Type switch
-      {
-        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
-        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
-        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
-        _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
-      };
-      InAppNotification.RequestedTheme = ElementTheme.Light;
-      InAppNotification.Show(e.Text, NotificationService.NotificationDuration);
-    }
-  }
-
+  #region Properties
   [ObservableProperty] private bool searchPanelOpen = false;
   [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
 
   public CardPreviewProperties CardPreviewProperties { get; } = new() { XMirror = true, Offset = new(175, 100) };
   public DialogService.DialogWrapper DialogWrapper { get; } = new();
+  #endregion
 
   #region ISavable Implementation
   public bool HasUnsavedChanges
@@ -81,6 +67,23 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   }
   #endregion
 
+  private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
+  {
+    if ((XamlRoot)sender == this.XamlRoot)
+    {
+      InAppNotification.Background = e.Type switch
+      {
+        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+        _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
+      };
+      InAppNotification.RequestedTheme = ElementTheme.Light;
+      InAppNotification.Show(e.Text, NotificationService.NotificationDuration);
+    }
+  }
+
+  #region Relay Commands
   /// <summary>
   /// Opens and closes search panel
   /// </summary>
@@ -109,6 +112,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
       Title = "MTG Card Collections"
     }.Activate();
   }
+  #endregion
 
   private void TabView_AddTabButtonClick(TabView tabView, object args)
   {

@@ -16,34 +16,13 @@ namespace MTGApplication.Views.Controls;
 [ObservableObject]
 public sealed partial class MTGCardPreviewControl : UserControl
 {
-  public partial class CardPreviewProperties : ObservableObject
-  {
-    [ObservableProperty] private MTGCardViewModel cardViewModel;
-    [ObservableProperty] private Vector2 coordinates;
-
-    /// <summary>
-    /// Position offset from the coordinates
-    /// </summary>
-    public Vector2 Offset { get; init; } = Vector2.Zero;
-    /// <summary>
-    /// Mirror the X-axis offset, instead of clamping, if the image does not fit into the window
-    /// </summary>
-    public bool XMirror { get; init; } = false;
-    /// <summary>
-    /// Mirror the Y-axis offset, instead of clamping, if the image does not fit into the window
-    /// </summary>
-    public bool YMirror { get; init; } = false;
-    /// <summary>
-    /// Image height
-    /// </summary>
-    public int Height { get; init; } = 350;
-    /// <summary>
-    /// Image width
-    /// </summary>
-    public int Width { get; init; } = 251;
-  }
-
   public MTGCardPreviewControl() => InitializeComponent();
+
+  #region Properties
+  [ObservableProperty] private Visibility previewVisibility = Visibility.Collapsed;
+  [ObservableProperty] private ImageSource previewPlaceholderSource = null;
+  [ObservableProperty] private ImageSource previewSource = null;
+  [ObservableProperty] private Vector2 previewPosition = Vector2.Zero;
 
   public CardPreviewProperties PreviewProperties
   {
@@ -54,15 +33,14 @@ public sealed partial class MTGCardPreviewControl : UserControl
       InitPreviewImage();
     }
   }
+  #endregion
 
-  [ObservableProperty] private Visibility previewVisibility = Visibility.Collapsed;
-  [ObservableProperty] private ImageSource previewPlaceholderSource = null;
-  [ObservableProperty] private ImageSource previewSource = null;
-  [ObservableProperty] private Vector2 previewPosition = Vector2.Zero;
-
+  #region Dependency Properties
   public static readonly DependencyProperty PreviewPropertiesProperty =
       DependencyProperty.Register(nameof(PreviewProperties), typeof(CardPreviewProperties), typeof(MTGCardPreviewControl), new PropertyMetadata(0));
+  #endregion
 
+  #region OnPropertyChanged events
   private void PreviewProperties_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
@@ -78,6 +56,7 @@ public sealed partial class MTGCardPreviewControl : UserControl
         break;
     }
   }
+  #endregion
 
   /// <summary>
   /// Initializes preview image
@@ -148,5 +127,35 @@ public sealed partial class MTGCardPreviewControl : UserControl
       x: (float)Math.Max(Math.Clamp(position.X, 0, Math.Max(windowBounds.X - PreviewProperties.Width, 0)), 0),
       y: (float)Math.Max(Math.Clamp(position.Y, 0, Math.Max(windowBounds.Y - PreviewProperties.Height, 0)), 0)
     );
+  }
+}
+
+public sealed partial class MTGCardPreviewControl
+{
+  public partial class CardPreviewProperties : ObservableObject
+  {
+    [ObservableProperty] private MTGCardViewModel cardViewModel;
+    [ObservableProperty] private Vector2 coordinates;
+
+    /// <summary>
+    /// Position offset from the coordinates
+    /// </summary>
+    public Vector2 Offset { get; init; } = Vector2.Zero;
+    /// <summary>
+    /// Mirror the X-axis offset, instead of clamping, if the image does not fit into the window
+    /// </summary>
+    public bool XMirror { get; init; } = false;
+    /// <summary>
+    /// Mirror the Y-axis offset, instead of clamping, if the image does not fit into the window
+    /// </summary>
+    public bool YMirror { get; init; } = false;
+    /// <summary>
+    /// Image height
+    /// </summary>
+    public int Height { get; init; } = 350;
+    /// <summary>
+    /// Image width
+    /// </summary>
+    public int Width { get; init; } = 251;
   }
 }

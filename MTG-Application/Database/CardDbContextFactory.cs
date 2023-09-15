@@ -9,9 +9,6 @@ namespace MTGApplication.Database;
 /// </summary>
 public class CardDbContextFactory
 {
-  protected string connectionString;
-  public readonly static string DbFileName = "database.db";
-
   public CardDbContextFactory(string connectionString = "")
   {
     if (string.IsNullOrEmpty(connectionString))
@@ -21,6 +18,9 @@ public class CardDbContextFactory
     }
     this.connectionString = connectionString;
   }
+
+  protected string connectionString;
+  public readonly static string DbFileName = "database.db";
 
   /// <summary>
   /// Returns <see cref="CardDbContext"/> with the <see cref="connectionString"/> options

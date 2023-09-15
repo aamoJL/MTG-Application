@@ -1,27 +1,18 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
 using MTGApplication.ViewModels;
-using System;
 
 namespace MTGApplication.Views.Controls;
+
 public sealed partial class DeckTestingBattlefieldCardControl : UserControl
 {
-  /// <summary>
-  /// Custom args for root clicking so the middle mouse click could be separated from left click
-  /// </summary>
-  private struct ClickArgs
-  {
-    public bool MiddleMouse;
-    public bool LeftMouse;
-  }
-
   public DeckTestingBattlefieldCardControl()
   {
     InitializeComponent();
     DataContextChanged += DeckTestingBattlefieldCardControl_DataContextChanged;
   }
 
+  #region Properties
   public float CardWidth
   {
     get => (float)GetValue(CardWidthProperty);
@@ -32,14 +23,17 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
     get => (float)GetValue(CardHeightProperty);
     set => SetValue(CardHeightProperty, value);
   }
-
   private ClickArgs? RootClickArgs { get; set; }
+  #endregion
 
+  #region Dependency Properties
   public static readonly DependencyProperty CardWidthProperty =
       DependencyProperty.Register(nameof(CardWidth), typeof(float), typeof(DeckTestingBattlefieldCardControl), new PropertyMetadata(0));
   public static readonly DependencyProperty CardHeightProperty =
       DependencyProperty.Register(nameof(CardHeight), typeof(float), typeof(DeckTestingBattlefieldCardControl), new PropertyMetadata(0));
+  #endregion
 
+  #region OnPropertyChanged events
   private void DeckTestingBattlefieldCardControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
   {
     if (args.NewValue is DeckTestingMTGCardViewModel vm && vm != null && vm.IsToken)
@@ -47,6 +41,7 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
       CountCounter.Visibility = Visibility.Visible;
     }
   }
+  #endregion
 
   private void PlusCounterFlyoutButton_Click(object sender, RoutedEventArgs e)
     => PlusCounter.Visibility = PlusCounter.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
@@ -114,44 +109,15 @@ public sealed partial class DeckTestingBattlefieldCardControl : UserControl
   private void Root_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e) => RootClickArgs = null;
 }
 
-#region Value Converters
-public class PlusCounterConverter : IValueConverter
-{
-  public object Convert(object value, Type targetType, object parameter, string language)
-    => value is not null and int count ? $"+{count}" : "";
-
-  public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
-}
-
-public class IntMoreThanToVisibilityConverter : IValueConverter
+// Args
+public sealed partial class DeckTestingBattlefieldCardControl
 {
   /// <summary>
-  /// Returns <see cref="Visibility"/> depending on the <paramref name="value"/> being more than the <paramref name="parameter"/>
+  /// Custom args for root clicking so the middle mouse click could be separated from left click
   /// </summary>
-  /// <param name="parameter">value being on the right side of the More than comparison</param>
-  public object Convert(object value, Type targetType, object parameter, string language)
+  private struct ClickArgs
   {
-    if (double.TryParse((string)parameter, out var comparer))
-    {
-      return value is not null and int number && number > comparer ? Visibility.Visible : Visibility.Collapsed;
-    }
-    return Visibility.Collapsed;
+    public bool MiddleMouse;
+    public bool LeftMouse;
   }
-
-  public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
 }
-
-public class BoolToIntConverter : IValueConverter
-{
-  public object Convert(object value, Type targetType, object parameter, string language)
-  {
-    if (parameter != null && int.TryParse((string)parameter, out var angle))
-    {
-      return (bool)value ? angle : 0;
-    }
-    return 0;
-  }
-
-  public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
-}
-#endregion

@@ -22,127 +22,6 @@ namespace MTGApplication.ViewModels;
 /// </summary>
 public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
 {
-  /// <summary>
-  /// Card Collections tab dialogs
-  /// </summary>
-  public class CardCollectionsDialogs
-  {
-    public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
-      => new("Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
-
-    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new("Add new list");
-
-    public virtual ConfirmationDialog GetDeleteCollectionDialog(string name)
-      => new("Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
-
-    public virtual ConfirmationDialog GetDeleteListDialog(string name)
-      => new("Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
-
-    public virtual ConfirmationDialog GetOverrideDialog(string name)
-      => new("Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
-
-    public virtual ConfirmationDialog GetSaveUnsavedDialog()
-      => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
-
-    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
-
-    public virtual ComboBoxDialog GetLoadDialog(string[] names)
-      => new("Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
-
-    public virtual TextBoxDialog GetSaveDialog(string name)
-      => new("Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
-
-    public virtual TextAreaDialog GetExportDialog(string text)
-      => new("Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
-
-    public virtual TextAreaDialog GetImportDialog()
-      => new("Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
-
-    public class CollectionListContentDialog : Dialog<MTGCardCollectionList>
-    {
-      protected TextBox nameBox;
-      protected TextBox searchQueryBox;
-
-      public string NameInputText { get; set; }
-      public string QueryInputText { get; set; }
-
-      public CollectionListContentDialog(string title = "") : base(title) { }
-
-      public override ContentDialog GetDialog(XamlRoot root)
-      {
-        var dialog = base.GetDialog(root);
-
-        nameBox = new()
-        {
-          PlaceholderText = "List name...",
-          Header = "Name",
-          Text = NameInputText,
-          IsSpellCheckEnabled = false,
-          Margin = new() { Bottom = 10 },
-        };
-        searchQueryBox = new()
-        {
-          PlaceholderText = "Search query...",
-          Text = QueryInputText,
-          Header = new StackPanel()
-          {
-            Children =
-            {
-              new TextBlock(){ Text = "Search query" },
-              new HyperlinkButton()
-              {
-                Content = "syntax?",
-                NavigateUri = new Uri("https://scryfall.com/docs/syntax"),
-                Foreground = new SolidColorBrush((Windows.UI.Color)Application.Current.Resources["SystemAccentColorDark2"]),
-                Padding = new Thickness(5, 0, 5, 0),
-                Margin = new Thickness(5, 0, 5, 0),
-              }
-            },
-            Orientation = Orientation.Horizontal,
-          },
-          IsSpellCheckEnabled = false,
-        };
-
-        nameBox.TextChanged += (sender, args) =>
-        {
-          dialog.IsPrimaryButtonEnabled = nameBox.Text != string.Empty && searchQueryBox.Text != string.Empty;
-          NameInputText = nameBox.Text;
-        };
-        searchQueryBox.TextChanged += (sender, args) =>
-        {
-          dialog.IsPrimaryButtonEnabled = nameBox.Text != string.Empty && searchQueryBox.Text != string.Empty;
-          QueryInputText = searchQueryBox.Text;
-        };
-
-        dialog.Content = new StackPanel()
-        {
-          Children =
-          {
-            nameBox,
-            searchQueryBox,
-          },
-          Orientation = Orientation.Vertical,
-        };
-
-        dialog.IsPrimaryButtonEnabled = !string.IsNullOrEmpty(nameBox.Text) && !string.IsNullOrEmpty(searchQueryBox.Text);
-        dialog.SecondaryButtonText = string.Empty;
-        dialog.PrimaryButtonText = "Add";
-
-        return dialog;
-      }
-
-      public override MTGCardCollectionList ProcessResult(ContentDialogResult result)
-      {
-        return result switch
-        {
-          ContentDialogResult.Primary => new MTGCardCollectionList() { Name = NameInputText, SearchQuery = QueryInputText },
-          _ => null
-        };
-      }
-    }
-  }
-
   public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, ClipboardService clipboardService = default)
   {
     CardAPI = cardAPI;
@@ -154,6 +33,48 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
     MTGSearchViewModel.PropertyChanged += MTGSearchViewModel_PropertyChanged;
   }
 
+  #region Properties
+  [ObservableProperty,
+    NotifyCanExecuteChangedFor(nameof(EditCollectionListDialogCommand)),
+    NotifyCanExecuteChangedFor(nameof(DeleteCollectionListDialogCommand)),
+    NotifyCanExecuteChangedFor(nameof(ImportCollectionListDialogCommand)),
+    NotifyCanExecuteChangedFor(nameof(ExportCollectionListDialogCommand))]
+  private MTGCardCollectionList selectedList;
+  [ObservableProperty] private MTGCardCollection collection = new();
+  [ObservableProperty] private bool isBusy = false;
+
+  public MTGAPISearch<MTGCardCollectionCardViewModelSource, MTGCardCollectionCardViewModel> MTGSearchViewModel { get; }
+  public CardCollectionsDialogs Dialogs { get; set; } = new();
+  public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
+  private IRepository<MTGCardCollection> CollectionRepository { get; }
+  private ICardAPI<MTGCard> CardAPI { get; }
+  private ClipboardService ClipboardService { get; set; }
+  #endregion
+
+  #region ISavable implementation
+  [ObservableProperty] private bool hasUnsavedChanges = false;
+
+  public async Task<bool> SaveUnsavedChanges() => await ShowUnsavedDialogs();
+  #endregion
+
+  #region IINAppNotifier implementation
+  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
+
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+  #endregion
+
+  #region IDialogNotifier implementation
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
+
+  public DialogWrapper GetDialogWrapper()
+  {
+    var args = new DialogEventArgs();
+    OnGetDialogWrapper?.Invoke(this, args);
+    return args.DialogWrapper;
+  }
+  #endregion
+
+  #region OnPropertyChanged events
   private async void MTGSearchViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
@@ -224,50 +145,6 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
 
     HasUnsavedChanges = true;
     OnPropertyChanged(nameof(SelectedListCardCount));
-  }
-
-  [ObservableProperty,
-    NotifyCanExecuteChangedFor(nameof(EditCollectionListDialogCommand)),
-    NotifyCanExecuteChangedFor(nameof(DeleteCollectionListDialogCommand)),
-    NotifyCanExecuteChangedFor(nameof(ImportCollectionListDialogCommand)),
-    NotifyCanExecuteChangedFor(nameof(ExportCollectionListDialogCommand))]
-  private MTGCardCollectionList selectedList;
-  [ObservableProperty]
-  private MTGCardCollection collection = new();
-  [ObservableProperty]
-  private bool isBusy = false;
-
-  public MTGAPISearch<MTGCardCollectionCardViewModelSource, MTGCardCollectionCardViewModel> MTGSearchViewModel { get; }
-  public CardCollectionsDialogs Dialogs { get; set; } = new();
-  public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
-
-  private IRepository<MTGCardCollection> CollectionRepository { get; }
-  private ICardAPI<MTGCard> CardAPI { get; }
-  private ClipboardService ClipboardService { get; set; }
-
-  #region ISavable implementation
-  [ObservableProperty]
-  private bool hasUnsavedChanges = false;
-
-  public async Task<bool> SaveUnsavedChanges() => await ShowUnsavedDialogs();
-  #endregion
-
-  #region IINAppNotifier implementation
-
-  public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
-
-  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
-
-  #endregion
-
-  #region IDialogNotifier implementation
-  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
-
-  public DialogWrapper GetDialogWrapper()
-  {
-    var args = new DialogEventArgs();
-    OnGetDialogWrapper?.Invoke(this, args);
-    return args.DialogWrapper;
   }
   #endregion
 
@@ -641,4 +518,131 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
 
   private bool SelectedListCommandCanExecute() => SelectedList != null;
   #endregion
+}
+
+// Dialogs
+public partial class CardCollectionsViewModel
+{
+  /// <summary>
+  /// Card Collections tab dialogs
+  /// </summary>
+  public class CardCollectionsDialogs
+  {
+    #region Dialog Getters
+    public virtual CollectionListContentDialog GetEditCollectionListDialog(string nameInputText, string queryInputText)
+      => new("Edit list") { NameInputText = nameInputText, QueryInputText = queryInputText, PrimaryButtonText = "Update" };
+
+    public virtual CollectionListContentDialog GetNewCollectionListDialog() => new("Add new list");
+
+    public virtual ConfirmationDialog GetDeleteCollectionDialog(string name)
+      => new("Delete collection?") { Message = $"Are you sure you want to delete collection '{name}'?", SecondaryButtonText = string.Empty };
+
+    public virtual ConfirmationDialog GetDeleteListDialog(string name)
+      => new("Delete list?") { Message = $"Are you sure you want to delete list '{name}'?", SecondaryButtonText = string.Empty };
+
+    public virtual ConfirmationDialog GetOverrideDialog(string name)
+      => new("Override existing collection?") { Message = $"Collection '{name}' already exist. Would you like to override the collection?", SecondaryButtonText = string.Empty };
+
+    public virtual ConfirmationDialog GetSaveUnsavedDialog()
+      => new("Save unsaved changes?") { Message = "Collection has unsaved changes. Would you like to save the collection?", PrimaryButtonText = "Save" };
+
+    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Illustration prints", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty, CloseButtonText = "Close" };
+
+    public virtual ComboBoxDialog GetLoadDialog(string[] names)
+      => new("Open collection") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+
+    public virtual TextBoxDialog GetSaveDialog(string name)
+      => new("Save your collection?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+
+    public virtual TextAreaDialog GetExportDialog(string text)
+      => new("Export list") { TextInputText = text, PrimaryButtonText = "Copy to Clipboard", SecondaryButtonText = string.Empty };
+
+    public virtual TextAreaDialog GetImportDialog()
+      => new("Import list") { InputPlaceholderText = "Black lotus\nMox Ruby", SecondaryButtonText = string.Empty, PrimaryButtonText = "Add to Collection" };
+    #endregion
+
+    public class CollectionListContentDialog : Dialog<MTGCardCollectionList>
+    {
+      public CollectionListContentDialog(string title = "") : base(title) { }
+
+      protected TextBox nameBox;
+      protected TextBox searchQueryBox;
+
+      public string NameInputText { get; set; }
+      public string QueryInputText { get; set; }
+
+      public override ContentDialog GetDialog(XamlRoot root)
+      {
+        var dialog = base.GetDialog(root);
+
+        nameBox = new()
+        {
+          PlaceholderText = "List name...",
+          Header = "Name",
+          Text = NameInputText,
+          IsSpellCheckEnabled = false,
+          Margin = new() { Bottom = 10 },
+        };
+        searchQueryBox = new()
+        {
+          PlaceholderText = "Search query...",
+          Text = QueryInputText,
+          Header = new StackPanel()
+          {
+            Children =
+            {
+              new TextBlock(){ Text = "Search query" },
+              new HyperlinkButton()
+              {
+                Content = "syntax?",
+                NavigateUri = new Uri("https://scryfall.com/docs/syntax"),
+                Foreground = new SolidColorBrush((Windows.UI.Color)Application.Current.Resources["SystemAccentColorDark2"]),
+                Padding = new Thickness(5, 0, 5, 0),
+                Margin = new Thickness(5, 0, 5, 0),
+              }
+            },
+            Orientation = Orientation.Horizontal,
+          },
+          IsSpellCheckEnabled = false,
+        };
+
+        nameBox.TextChanged += (sender, args) =>
+        {
+          dialog.IsPrimaryButtonEnabled = nameBox.Text != string.Empty && searchQueryBox.Text != string.Empty;
+          NameInputText = nameBox.Text;
+        };
+        searchQueryBox.TextChanged += (sender, args) =>
+        {
+          dialog.IsPrimaryButtonEnabled = nameBox.Text != string.Empty && searchQueryBox.Text != string.Empty;
+          QueryInputText = searchQueryBox.Text;
+        };
+
+        dialog.Content = new StackPanel()
+        {
+          Children =
+          {
+            nameBox,
+            searchQueryBox,
+          },
+          Orientation = Orientation.Vertical,
+        };
+
+        dialog.IsPrimaryButtonEnabled = !string.IsNullOrEmpty(nameBox.Text) && !string.IsNullOrEmpty(searchQueryBox.Text);
+        dialog.SecondaryButtonText = string.Empty;
+        dialog.PrimaryButtonText = "Add";
+
+        return dialog;
+      }
+
+      public override MTGCardCollectionList ProcessResult(ContentDialogResult result)
+      {
+        return result switch
+        {
+          ContentDialogResult.Primary => new MTGCardCollectionList() { Name = NameInputText, SearchQuery = QueryInputText },
+          _ => null
+        };
+      }
+    }
+  }
 }

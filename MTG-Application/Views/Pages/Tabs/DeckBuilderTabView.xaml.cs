@@ -33,38 +33,27 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
     DeckBuilderViewModel.OnGetDialogWrapper += (s, args) => DialogService.ShowAsync(XamlRoot, args);
   }
 
+  private DragArgs dragArgs;
+
+  #region Properties
+  [ObservableProperty] private double deckDesiredItemWidth = 250;
+  [ObservableProperty] private bool isClosable = true;
+
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
   public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
   public CardPreviewProperties CardPreviewProperties { get; }
+  #endregion
 
-  [ObservableProperty] private double deckDesiredItemWidth = 250;
-  [ObservableProperty] private bool isClosable = true;
+  #region ISavable Implementation
+  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
+
+  public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
+  #endregion
 
   public async Task<bool> TabCloseRequested() => !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
 
   #region Pointer Events
-
-  /// <summary>
-  /// Custom drag and drop args.
-  /// This class is used for card drag and drop actions because the default drag and drop system did not work well with async methods.
-  /// </summary>
-  public class DragArgs
-  {
-    public DragArgs(object dragStartElement, DeckCardlistViewModel dragOrigin, MTGCard dragItem)
-    {
-      DragStartElement = dragStartElement;
-      DragOriginList = dragOrigin;
-      DragItem = dragItem;
-    }
-
-    public object DragStartElement { get; set; }
-    public DeckCardlistViewModel DragOriginList { get; set; }
-    public MTGCard DragItem { get; set; }
-  }
-
-  private DragArgs dragArgs;
-
-  #region Card Preview
+  // Preview
   private void PreviewableCard_PointerEntered(object sender, PointerRoutedEventArgs e)
     // Change card preview image to hovered item
     => CardPreviewProperties.CardViewModel = (sender as FrameworkElement)?.DataContext as MTGCardViewModel;
@@ -79,8 +68,8 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
 
   private void PreviewableCard_PointerExited(object sender, PointerRoutedEventArgs e)
     => CardPreviewProperties.CardViewModel = null;
-  #endregion
 
+  // Drag and drop
   private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
   {
     if (e.Items[0] is MTGCardViewModel vm)
@@ -243,7 +232,6 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
     }
     def.Complete();
   }
-
   #endregion
 
   private void CardView_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -272,10 +260,26 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
     }
     else { args.Cancel = true; }
   }
+}
 
-  #region ISavable Implementation
-  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
+// Drag args
+public sealed partial class DeckBuilderTabView
+{
+  /// <summary>
+  /// Custom drag and drop args.
+  /// This class is used for card drag and drop actions because the default drag and drop system did not work well with async methods.
+  /// </summary>
+  public class DragArgs
+  {
+    public DragArgs(object dragStartElement, DeckCardlistViewModel dragOrigin, MTGCard dragItem)
+    {
+      DragStartElement = dragStartElement;
+      DragOriginList = dragOrigin;
+      DragItem = dragItem;
+    }
 
-  public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
-  #endregion
+    public object DragStartElement { get; set; }
+    public DeckCardlistViewModel DragOriginList { get; set; }
+    public MTGCard DragItem { get; set; }
+  }
 }

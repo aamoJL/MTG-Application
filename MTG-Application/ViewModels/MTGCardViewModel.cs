@@ -9,6 +9,9 @@ using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels;
 
+/// <summary>
+/// View model for MTG cards
+/// </summary>
 public partial class MTGCardViewModel : ViewModelBase
 {
   public MTGCardViewModel(MTGCard model)
@@ -18,6 +21,29 @@ public partial class MTGCardViewModel : ViewModelBase
     PropertyChanged += MTGCardViewModel_PropertyChanged;
   }
 
+  #region Properties
+  [ObservableProperty] protected CardSide selectedFaceSide;
+
+  public MTGCard Model { get; }
+  public string SelectedFaceUri => SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
+  public bool HasBackFaceImage => Model.Info.BackFace?.ImageUri != null;
+  public string ModelAPIName => Model.APIName;
+  public ColorTypes ColorType => Model.Info.Colors.Length > 1 ? ColorTypes.M : Model.Info.Colors[0];
+  public SpellType PrimaryType => Model.Info.SpellTypes[0];
+  public RarityTypes Rarity => Model.Info.RarityType;
+  public ColorTypes[] Colors => Model.Info.Colors;
+  public string TypeLine => Model.Info.TypeLine;
+  public string SetName => Model.Info.SetName;
+  public float Price => Model.Info.Price;
+  public string Name => Model.Info.Name;
+  public int CMC => Model.Info.CMC;
+  public int Count { get => Model.Count; set => Model.Count = value; }
+  #endregion
+
+  public ICommand DeleteCardCommand { get; set; }
+  public ICommand ShowPrintsDialogCommand { get; set; }
+
+  #region OnPropertyChanged events
   protected void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(SelectedFaceSide)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
@@ -35,29 +61,7 @@ public partial class MTGCardViewModel : ViewModelBase
         break;
     }
   }
-
-  public MTGCard Model { get; }
-
-  [ObservableProperty]
-  protected CardSide selectedFaceSide;
-
-  public string SelectedFaceUri => SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
-  public bool HasBackFaceImage => Model.Info.BackFace?.ImageUri != null;
-  public string ModelAPIName => Model.APIName;
-
-  public ColorTypes ColorType => Model.Info.Colors.Length > 1 ? ColorTypes.M : Model.Info.Colors[0];
-  public SpellType PrimaryType => Model.Info.SpellTypes[0];
-  public RarityTypes Rarity => Model.Info.RarityType;
-  public ColorTypes[] Colors => Model.Info.Colors;
-  public string TypeLine => Model.Info.TypeLine;
-  public string SetName => Model.Info.SetName;
-  public float Price => Model.Info.Price;
-  public string Name => Model.Info.Name;
-  public int CMC => Model.Info.CMC;
-  public int Count { get => Model.Count; set => Model.Count = value; }
-
-  public ICommand DeleteCardCommand { get; set; }
-  public ICommand ShowPrintsDialogCommand { get; set; }
+  #endregion
 
   /// <summary>
   /// Changes selected face image if possible

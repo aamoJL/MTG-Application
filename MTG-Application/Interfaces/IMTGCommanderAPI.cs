@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Interfaces;
 
+/// <summary>
+/// Interface for MTG Commander card search APIs
+/// </summary>
 public interface IMTGCommanderAPI
 {
   /// <summary>

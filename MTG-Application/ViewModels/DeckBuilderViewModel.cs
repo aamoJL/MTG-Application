@@ -25,33 +25,6 @@ namespace MTGApplication.ViewModels;
 /// </summary>
 public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
 {
-  /// <summary>
-  /// Deck Builder tab dialogs
-  /// </summary>
-  public class DeckBuilderViewDialogs
-  {
-    public virtual DialogService.ConfirmationDialog GetOverrideDialog(string name)
-      => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
-
-    public virtual DialogService.ConfirmationDialog GetDeleteDialog(string name)
-      => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
-
-    public virtual DialogService.ConfirmationDialog GetSaveUnsavedDialog(string name = "")
-      => new("Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
-
-    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
-
-    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
-      => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
-
-    public virtual DialogService.ComboBoxDialog GetLoadDialog(string[] names)
-      => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
-
-    public virtual DialogService.TextBoxDialog GetSaveDialog(string name)
-      => new("Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
-  }
-
   public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = null)
   {
     DeckRepository = deckRepository;
@@ -109,72 +82,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     UpdateCharts();
   }
 
-  private void DeckCards_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(DeckCardlistViewModel.CardlistSize))
-    {
-      OnPropertyChanged(nameof(DeckSize));
-    }
-  }
-
-  private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    /// NOTE: Remember to set changes also on the <see cref="DeckBuilderViewModel_PropertyChanged"/>
-    switch (e.PropertyName)
-    {
-      case nameof(CardDeck.Commander):
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        HasUnsavedChanges = true;
-        OnPropertyChanged(nameof(DeckSize));
-        break;
-      case nameof(CardDeck.CommanderPartner):
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        HasUnsavedChanges = true;
-        OnPropertyChanged(nameof(DeckSize));
-        break;
-      case nameof(CardDeck.Name):
-        OnPropertyChanged(nameof(DeckName));
-        break;
-    }
-  }
-
-  private void DeckCardlistViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    switch (e.PropertyName)
-    {
-      case nameof(DeckCardlistViewModel.IsBusy):
-        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy || RemovelistCards.IsBusy; break;
-    }
-  }
-
-  private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    switch (e.PropertyName)
-    {
-      case nameof(CardDeck):
-        CardDeck.PropertyChanged += CardDeck_PropertyChanged;
-        DeckCards.Cardlist = CardDeck.DeckCards;
-        WishlistCards.Cardlist = CardDeck.Wishlist;
-        MaybelistCards.Cardlist = CardDeck.Maybelist;
-        RemovelistCards.Cardlist = CardDeck.Removelist;
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        CommandService.Clear();
-        UpdateCharts();
-        HasUnsavedChanges = false;
-        OnPropertyChanged(nameof(DeckName));
-        break;
-      case nameof(DeckSize):
-        OnPropertyChanged(nameof(DeckPrice));
-        OpenPlaytestWindowCommand.NotifyCanExecuteChanged();
-        break;
-    }
-  }
-
-  private IRepository<MTGCardDeck> DeckRepository { get; }
-  private ICardAPI<MTGCard> CardAPI { get; }
-  private IMTGCommanderAPI CommanderAPI { get; } = new EDHRECCommanderAPI();
-
+  #region Properties
   [ObservableProperty] private MTGCardDeck cardDeck = new();
   [ObservableProperty] private MTGManaProductionPieChart manaProductionChart;
   [ObservableProperty] private MTGSpellTypePieChart spellTypeChart;
@@ -184,6 +92,9 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   [ObservableProperty] private MTGCardViewModel commander;
   [ObservableProperty] private MTGCardViewModel commanderPartner;
 
+  private IRepository<MTGCardDeck> DeckRepository { get; }
+  private ICardAPI<MTGCard> CardAPI { get; }
+  private IMTGCommanderAPI CommanderAPI { get; } = new EDHRECCommanderAPI();
   public DeckBuilderViewDialogs Dialogs { get; set; } = new();
   public DeckCardlistViewModel DeckCards { get; }
   public DeckCardlistViewModel WishlistCards { get; }
@@ -198,6 +109,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     => DeckCards.CardlistSize + (CardDeck.Commander != null ? 1 : 0) + (CardDeck.CommanderPartner != null ? 1 : 0);
   public float DeckPrice
     => DeckCards.EuroPrice + (CardDeck.Commander != null ? CardDeck.Commander.Info.Price : 0) + (CardDeck.CommanderPartner != null ? CardDeck.CommanderPartner.Info.Price : 0);
+  #endregion
 
   #region ISavable implementation
   private bool hasUnsavedChanges = false;
@@ -260,6 +172,70 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     var args = new DialogService.DialogEventArgs();
     OnGetDialogWrapper?.Invoke(this, args);
     return args.DialogWrapper;
+  }
+  #endregion
+
+  #region OnPropertyChanged events
+  private void DeckCards_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(DeckCardlistViewModel.CardlistSize))
+    {
+      OnPropertyChanged(nameof(DeckSize));
+    }
+  }
+
+  private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    /// NOTE: Remember to set changes also on the <see cref="DeckBuilderViewModel_PropertyChanged"/>
+    switch (e.PropertyName)
+    {
+      case nameof(CardDeck.Commander):
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckSize));
+        break;
+      case nameof(CardDeck.CommanderPartner):
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckSize));
+        break;
+      case nameof(CardDeck.Name):
+        OnPropertyChanged(nameof(DeckName));
+        break;
+    }
+  }
+
+  private void DeckCardlistViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(DeckCardlistViewModel.IsBusy):
+        IsBusy = DeckCards.IsBusy || WishlistCards.IsBusy || MaybelistCards.IsBusy || RemovelistCards.IsBusy; break;
+    }
+  }
+
+  private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(CardDeck):
+        CardDeck.PropertyChanged += CardDeck_PropertyChanged;
+        DeckCards.Cardlist = CardDeck.DeckCards;
+        WishlistCards.Cardlist = CardDeck.Wishlist;
+        MaybelistCards.Cardlist = CardDeck.Maybelist;
+        RemovelistCards.Cardlist = CardDeck.Removelist;
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+        CommandService.Clear();
+        UpdateCharts();
+        HasUnsavedChanges = false;
+        OnPropertyChanged(nameof(DeckName));
+        break;
+      case nameof(DeckSize):
+        OnPropertyChanged(nameof(DeckPrice));
+        OpenPlaytestWindowCommand.NotifyCanExecuteChanged();
+        break;
+    }
   }
   #endregion
 
@@ -611,4 +587,35 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   /// </summary>
   public bool DeckHasCommanders() => Commander != null || CommanderPartner != null;
   #endregion
+}
+
+// Dialogs
+public partial class DeckBuilderViewModel
+{
+  /// <summary>
+  /// Deck Builder tab dialogs
+  /// </summary>
+  public class DeckBuilderViewDialogs
+  {
+    public virtual DialogService.ConfirmationDialog GetOverrideDialog(string name)
+      => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
+
+    public virtual DialogService.ConfirmationDialog GetDeleteDialog(string name)
+      => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
+
+    public virtual DialogService.ConfirmationDialog GetSaveUnsavedDialog(string name = "")
+      => new("Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
+
+    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
+
+    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
+      => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
+
+    public virtual DialogService.ComboBoxDialog GetLoadDialog(string[] names)
+      => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
+
+    public virtual DialogService.TextBoxDialog GetSaveDialog(string name)
+      => new("Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
+  }
 }

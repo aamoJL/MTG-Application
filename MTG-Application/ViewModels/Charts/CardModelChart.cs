@@ -11,8 +11,11 @@ namespace MTGApplication.ViewModels.Charts;
 /// </summary>
 public abstract class CardModelChart<TPrimaryType, TModel> where TModel : ObservableObject
 {
+  public CardModelChart() { }
+
   protected ObservableCollection<TModel> models = new();
 
+  #region Properties
   public ObservableCollection<ISeries> Series { get; } = new();
   public ObservableCollection<TModel> Models
   {
@@ -29,9 +32,9 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
     }
   }
   public abstract bool HasSecondaryValues { get; }
+  #endregion
 
-  public CardModelChart() { }
-
+  #region OnPropertyChanged events
   protected virtual void Models_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
   {
     switch (e.Action)
@@ -49,6 +52,7 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
         break;
     }
   }
+  #endregion
 
   /// <summary>
   /// Adds series to the chart and sorts all the series
