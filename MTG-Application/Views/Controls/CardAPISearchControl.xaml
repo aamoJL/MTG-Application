@@ -21,16 +21,16 @@
           <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}">
             <controls:ImageEx.ContextFlyout>
               <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints..."/>
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
-                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>
+                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Text="{x:Bind ModelAPIName, Mode=OneTime}"/>
+                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
               </MenuFlyout>
             </controls:ImageEx.ContextFlyout>
           </controls:ImageEx>
         </Grid>
-        <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}" HorizontalAlignment="Center" FontSize="11"/>
+        <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}" HorizontalAlignment="Center" FontSize="11"/>
       </StackPanel>
     </DataTemplate>
     <DataTemplate x:Key="SearchListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
@@ -40,17 +40,17 @@
                PointerMoved="PreviewableCard_PointerMoved">
         <StackPanel.ContextFlyout>
           <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-            <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+            <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints..."/>
-            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Text="{x:Bind ModelAPIName}"/>
-            <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+            <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>
+            <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Text="{x:Bind ModelAPIName, Mode=OneTime}"/>
+            <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
           </MenuFlyout>
         </StackPanel.ContextFlyout>
-        <Image Width="20" Source="{x:Bind Model.Info.SetIconUri}"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine}" Width="250"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price)}"/>
+        <Image Width="20" Source="{x:Bind Model.Info.SetIconUri, Mode=OneTime}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneTime}" Width="250"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}"/>
       </StackPanel>
     </DataTemplate>
   </UserControl.Resources>
@@ -87,7 +87,7 @@
       <!--Search controls-->
       <customcontrols:ScryfallSearchBarControl controls:DockPanel.Dock="Top" 
                                            Margin="0 10 0 0" 
-                                           SearchSubmitCommand="{x:Bind SearchViewModel.APISearch.SearchWithQueryCommand}"
+                                           SearchSubmitCommand="{x:Bind SearchViewModel.APISearch.SearchWithQueryCommand, Mode=OneTime}"
                                            SearchQuery="{x:Bind SearchViewModel.APISearch.SearchQuery, Mode=TwoWay}"/>
       <!-- View commands -->
       <Grid controls:DockPanel.Dock="Top">
@@ -129,7 +129,7 @@
         <controls:AdaptiveGridView x:Name="CardSearchImagesDisplay"
                                    Style="{StaticResource MTGAdaptiveGridViewStyle}"
                                    SelectionMode="None"
-                                   DesiredWidth="{x:Bind SearchDesiredItemWidth, Mode=TwoWay}"
+                                   DesiredWidth="{x:Bind SearchDesiredItemWidth, Mode=OneWay}"
                                    ItemsSource="{x:Bind SearchViewModel.APISearch.SearchCards, Mode=OneWay}"
                                    Visibility="Collapsed"
                                    CanDragItems="True"

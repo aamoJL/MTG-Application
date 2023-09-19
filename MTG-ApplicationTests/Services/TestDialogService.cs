@@ -3,7 +3,7 @@ using static MTGApplication.Services.DialogService;
 
 namespace MTGApplicationTests.Services;
 
-  public static class TestDialogService
+public static class TestDialogService
 {
   public class TestDialogResult
   {
@@ -20,7 +20,7 @@ namespace MTGApplicationTests.Services;
   {
     public ContentDialogResult Result { get; set; }
 
-    public TestDialogWrapper(ContentDialogResult result) => Result = result;
+    public TestDialogWrapper(ContentDialogResult result) : base(null) => Result = result;
 
     public override async Task<ContentDialogResult> ShowAsync(Dialog dialog, bool force = false) => await Task.Run(() => Result);
   }

@@ -14,14 +14,6 @@ namespace MTGApplication.Services;
 /// </summary>
 public static partial class DialogService
 {
-  public static event EventHandler<DialogEventArgs> OnGetDialogWrapper;
-
-  public static void ShowAsync(XamlRoot root, DialogEventArgs args) => OnGetDialogWrapper?.Invoke(root, args);
-}
-
-// Dialog Service classes
-public static partial class DialogService
-{
   /// <summary>
   /// Event args for dialog events
   /// </summary>
@@ -36,6 +28,8 @@ public static partial class DialogService
   /// </summary>
   public class DialogWrapper
   {
+    public DialogWrapper(XamlRoot xamlRoot) => XamlRoot = xamlRoot;
+
     public XamlRoot XamlRoot { get; set; }
     public ContentDialog CurrentDialog { get; private set; }
 

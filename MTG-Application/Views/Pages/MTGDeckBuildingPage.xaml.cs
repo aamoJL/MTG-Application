@@ -21,22 +21,15 @@ namespace MTGApplication.Views.Pages;
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
 [ObservableObject]
-public sealed partial class MTGDeckBuildingPage : Page, ISavable
+public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresenter
 {
   public MTGDeckBuildingPage()
   {
     InitializeComponent();
 
-    Loaded += (s, e) => DialogWrapper.XamlRoot = XamlRoot;
+    Loaded += (s, e) => DialogWrapper = new(XamlRoot);
 
     NotificationService.OnNotification += Notifications_OnNotification;
-    DialogService.OnGetDialogWrapper += (s, args) =>
-    {
-      if ((XamlRoot)s == this.XamlRoot)
-      {
-        args.DialogWrapper = DialogWrapper;
-      }
-    };
   }
 
   #region Properties
@@ -44,7 +37,6 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
   [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
 
   public CardPreviewProperties CardPreviewProperties { get; } = new() { XMirror = true, Offset = new(175, 100) };
-  public DialogService.DialogWrapper DialogWrapper { get; } = new();
   #endregion
 
   #region ISavable Implementation
@@ -65,6 +57,10 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable
     }
     return true;
   }
+  #endregion
+
+  #region IDialogPresenter implementation
+  public DialogService.DialogWrapper DialogWrapper { get; private set; }
   #endregion
 
   private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)

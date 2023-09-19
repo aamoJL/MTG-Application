@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using MTGApplication.API;
+using MTGApplication.Interfaces;
 using MTGApplication.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
@@ -12,7 +13,17 @@ namespace MTGApplication.Views.Controls;
 [ObservableObject]
 public sealed partial class CardAPISearchControl : UserControl
 {
-  public CardAPISearchControl() => InitializeComponent();
+  public CardAPISearchControl()
+  {
+    InitializeComponent();
+    SearchViewModel.OnGetDialogWrapper += (s, args) =>
+    {
+      if (XamlRoot.Content is IDialogPresenter presenter && presenter.DialogWrapper != null)
+      {
+        args.DialogWrapper = presenter.DialogWrapper;
+      }
+    };
+  }
 
   #region Properties
   [ObservableProperty] private double searchDesiredItemWidth = 250;

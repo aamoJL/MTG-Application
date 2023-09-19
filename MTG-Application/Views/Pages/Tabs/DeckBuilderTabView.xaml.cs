@@ -30,7 +30,13 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
 
     DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new());
     DeckBuilderViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
-    DeckBuilderViewModel.OnGetDialogWrapper += (s, args) => DialogService.ShowAsync(XamlRoot, args);
+    DeckBuilderViewModel.OnGetDialogWrapper += (s, args) =>
+    {
+      if (XamlRoot.Content is IDialogPresenter presenter && presenter.DialogWrapper != null)
+      {
+        args.DialogWrapper = presenter.DialogWrapper;
+      }
+    };
   }
 
   private DragArgs dragArgs;

@@ -24,14 +24,14 @@
             <controls:ImageEx.ContextFlyout>
               <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
                 <CommandBarFlyout.PrimaryCommands>
-                  <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+                  <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                   <AppBarSeparator />
-                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}" ToolTipService.ToolTip="API Website"/>
-                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-                  <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
+                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                  <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                 </CommandBarFlyout.PrimaryCommands>
                 <CommandBarFlyout.SecondaryCommands>
-                  <AppBarButton Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+                  <AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
                   <!-- Count controls -->
                   <AppBarSeparator/>
                   <AppBarElementContainer AllowFocusOnInteraction="True">
@@ -46,9 +46,9 @@
           </controls:ImageEx>
         </Grid>
         <Grid>
-          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11" Padding="0 0 5 0"/>
+          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}" HorizontalAlignment="Right" FontSize="11" Padding="0 0 5 0"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="{Binding Model.Count}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Model.Count, Mode=OneWay}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
           </StackPanel>
         </Grid>
       </StackPanel>
@@ -61,14 +61,14 @@
         <StackPanel.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
-              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+              <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}" ToolTipService.ToolTip="API Website"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-              <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
-              <AppBarButton Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+              <AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
               <!-- Count controls -->
               <AppBarSeparator/>
               <AppBarElementContainer AllowFocusOnInteraction="True">
@@ -81,10 +81,10 @@
           </CommandBarFlyout>
         </StackPanel.ContextFlyout>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}" Width="30"/>
-        <Image Width="20" Source="{x:Bind Model.Info.SetIconUri}"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine}" Width="250"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+        <Image Width="20" Source="{x:Bind Model.Info.SetIconUri, Mode=OneTime}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneTime}" Width="250"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}"/>
       </StackPanel>
     </DataTemplate>
     <!--Sidelists-->
@@ -97,14 +97,14 @@
         <StackPanel.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
-              <AppBarButton Command="{x:Bind FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+              <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand}" Icon="world" Label="{x:Bind ModelAPIName}" ToolTipService.ToolTip="API Website"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-              <AppBarButton Command="{x:Bind DeleteCardCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
-              <AppBarButton Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+              <AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
               <!-- Count controls -->
               <AppBarSeparator/>
               <AppBarElementContainer AllowFocusOnInteraction="True">
@@ -123,8 +123,8 @@
             <ColumnDefinition Width="auto"/>
           </Grid.ColumnDefinitions>
           <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
-          <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" TextTrimming="CharacterEllipsis"/>
-          <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+          <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" TextTrimming="CharacterEllipsis"/>
+          <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}"/>
         </Grid>
       </StackPanel>
     </DataTemplate>
@@ -250,18 +250,18 @@
                   <TextBlock.ContextFlyout >
                     <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
                       <CommandBarFlyout.PrimaryCommands>
-                        <AppBarButton Command="{Binding FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+                        <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                         <AppBarSeparator />
-                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Label="{Binding ModelAPIName}" ToolTipService.ToolTip="API Website"/>
-                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-                        <AppBarButton Command="{Binding DeleteCardCommand}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
+                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                       </CommandBarFlyout.PrimaryCommands>
                       <CommandBarFlyout.SecondaryCommands>
-                        <AppBarButton Command="{Binding ShowPrintsDialogCommand}" CommandParameter="{Binding Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+                        <AppBarButton Command="{Binding ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{Binding Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
                       </CommandBarFlyout.SecondaryCommands>
                     </CommandBarFlyout>
                   </TextBlock.ContextFlyout>
-                    <Run Text="{Binding Name}"/>
+                    <Run Text="{Binding Name, Mode=OneTime}"/>
                 </TextBlock>
                 <TextBlock DataContext="{x:Bind DeckBuilderViewModel.CommanderPartner, Mode=OneWay}"
                               Text="Partner: " 
@@ -277,18 +277,18 @@
                   <TextBlock.ContextFlyout >
                     <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
                       <CommandBarFlyout.PrimaryCommands>
-                        <AppBarButton Command="{Binding FlipCardCommand}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+                        <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                         <AppBarSeparator />
-                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand}" Icon="world" Label="{Binding ModelAPIName}" ToolTipService.ToolTip="API Website"/>
-                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-                        <AppBarButton Command="{Binding DeleteCardCommand}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
+                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                       </CommandBarFlyout.PrimaryCommands>
                       <CommandBarFlyout.SecondaryCommands>
-                        <AppBarButton Command="{Binding ShowPrintsDialogCommand}" CommandParameter="{Binding Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+                        <AppBarButton Command="{Binding ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{Binding Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
                       </CommandBarFlyout.SecondaryCommands>
                     </CommandBarFlyout>
                   </TextBlock.ContextFlyout>
-                    <Run Text="{Binding Name}"/>
+                    <Run Text="{Binding Name, Mode=OneTime}"/>
                 </TextBlock>
               </StackPanel>
               <customcontrols:LinedHeader Grid.Row="1">
@@ -296,12 +296,12 @@
                   <TextBlock Text="Maybe">
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>
                         <MenuFlyoutSubItem Text="Export...">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
@@ -309,8 +309,8 @@
               </customcontrols:LinedHeader>
               <ListView Grid.Row="2"
                         x:Name="DeckMaybeDisplay"
-                        DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards}"
-                        ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                        DataContext="{x:Bind DeckBuilderViewModel.MaybelistCards, Mode=OneTime}"
+                        ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
                         Style="{StaticResource MTGListViewStyle}"
                         SelectionMode="Single"
                         CanDragItems="True"
@@ -326,12 +326,12 @@
                   <TextBlock Text="Wishlist">
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>
                         <MenuFlyoutSubItem Text="Export...">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
@@ -339,8 +339,8 @@
               </customcontrols:LinedHeader>
               <ListView Grid.Row="4"
                           x:Name="DeckWishlistDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.WishlistCards}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                          DataContext="{x:Bind DeckBuilderViewModel.WishlistCards, Mode=OneTime}"
+                          ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
                           Style="{StaticResource MTGListViewStyle}"
                           SelectionMode="Single"
                           CanDragItems="True"
@@ -356,12 +356,12 @@
                   <TextBlock Text="Remove">
                     <TextBlock.ContextFlyout>
                       <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>
                         <MenuFlyoutSubItem Text="Export...">
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                          <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ClearCommand}" Text="Clear" Background="IndianRed"/>
+                        <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.RemovelistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                       </MenuFlyout>
                     </TextBlock.ContextFlyout>
                   </TextBlock>
@@ -369,8 +369,8 @@
               </customcontrols:LinedHeader>
               <ListView Grid.Row="6"
                           x:Name="DeckRemovelistDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                          DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards, Mode=OneTime}"
+                          ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
                           Style="{StaticResource MTGListViewStyle}"
                           SelectionMode="Single"
                           CanDragItems="True"
@@ -391,14 +391,14 @@
                       <Run Text="{x:Bind helpers:Format.EuroToString(DeckBuilderViewModel.DeckPrice, 0), Mode=OneWay}" />
                 </TextBlock>
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                  <Button Content="Tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand}"/>
+                  <Button Content="Tokens" Style="{StaticResource PrimaryButtonStyle}" Command="{x:Bind DeckBuilderViewModel.TokensDialogCommand, Mode=OneTime}"/>
                   <Button Content="EDHREC"
                             Style="{StaticResource PrimaryButtonStyle}"
-                            Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWindowCommand}"
+                            Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWindowCommand, Mode=OneTime}"
                             CommandParameter="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}"/>
                   <Button Content="Playtest" 
                             Style="{StaticResource PrimaryButtonStyle}" 
-                            Command="{x:Bind DeckBuilderViewModel.OpenPlaytestWindowCommand}" 
+                            Command="{x:Bind DeckBuilderViewModel.OpenPlaytestWindowCommand, Mode=OneTime}" 
                             CommandParameter="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}"/>
                 </StackPanel>
                 <!--Charts-->
@@ -409,23 +409,23 @@
                 </customcontrols:LinedHeader>
                 <lvc:CartesianChart Height="250" 
                                       DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" 
-                                      Series="{Binding Series}"
-                                      XAxes="{Binding XAxes}"
-                                      YAxes="{Binding YAxes}"/>
+                                      Series="{Binding Series, Mode=OneTime}"
+                                      XAxes="{Binding XAxes, Mode=OneTime}"
+                                      YAxes="{Binding YAxes, Mode=OneTime}"/>
                 <customcontrols:LinedHeader>
                   <customcontrols:LinedHeader.Header>
                     <TextBlock Text="Type Chart"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
-                <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series}"/>
+                <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
                 <customcontrols:LinedHeader>
                   <customcontrols:LinedHeader.Header>
                     <TextBlock Text="Color &amp; Mana Chart"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
                 <Grid Height="170" Width="170" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 10">
-                  <lvc:PieChart DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series}"/>
-                  <lvc:PieChart Height="110" Width="110" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series}"/>
+                  <lvc:PieChart DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
+                  <lvc:PieChart Height="110" Width="110" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
                 </Grid>
               </StackPanel>
             </ScrollViewer>
@@ -442,55 +442,55 @@
             <AppBarButton Icon="OpenFile" Label="File">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.NewDeckDialogCommand}" Icon="NewFolder" Text="New">
+                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.NewDeckDialogCommand, Mode=OneTime}" Icon="NewFolder" Text="New">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="N" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
-                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.LoadDeckDialogCommand}" Icon="OpenFile" Text="Open...">
+                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.LoadDeckDialogCommand, Mode=OneTime}" Icon="OpenFile" Text="Open...">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="O" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
-                  <MenuFlyoutItem x:Name="SaveButton" Command="{x:Bind DeckBuilderViewModel.SaveDeckDialogCommand}" Icon="Save" Text="Save...">
+                  <MenuFlyoutItem x:Name="SaveButton" Command="{x:Bind DeckBuilderViewModel.SaveDeckDialogCommand, Mode=OneTime}" Icon="Save" Text="Save...">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="S" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import...">
-                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" CommandParameter="Id" Text="To Deck"/>
-                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand}" CommandParameter="Id" Text="To Maybelist"/>
-                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand}" CommandParameter="Id" Text="To Wishlist"/>
+                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="To Deck"/>
+                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="To Maybelist"/>
+                    <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ImportToCardlistDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="To Wishlist"/>
                   </MenuFlyoutSubItem>
                   <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export...">
                     <MenuFlyoutSubItem Text="Deck...">
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                     </MenuFlyoutSubItem>
                     <MenuFlyoutSubItem Text="Maybelist...">
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                     </MenuFlyoutSubItem>
                     <MenuFlyoutSubItem Text="Wishlist...">
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                      <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                     </MenuFlyoutSubItem>
                   </MenuFlyoutSubItem>
                   <MenuFlyoutSeparator/>
-                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeleteDeckDialogCommand}" Background="IndianRed" Icon="Delete" Text="Delete"/>
+                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeleteDeckDialogCommand, Mode=OneTime}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarButton Icon="Edit" Label="Edit">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.UndoCommand}" Icon="Undo" Text="Undo">
+                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.UndoCommand, Mode=OneTime}" Icon="Undo" Text="Undo">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="Z" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
-                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.RedoCommand}" Icon="Redo" Text="Redo">
+                  <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.RedoCommand, Mode=OneTime}" Icon="Redo" Text="Redo">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="Y" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
@@ -525,20 +525,20 @@
             <AppBarButton Icon="Sort" Label="Sort" AutomationProperties.Name="Order">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand, Mode=OneTime}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand, Mode=OneTime}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
                   <MenuFlyoutSeparator/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Type" Text="Type" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Type" Text="Type" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>
                   <MenuFlyoutSeparator />
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -562,11 +562,11 @@
                       <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind DeckBuilderViewModel.CardFilters.Colorless, Mode=TwoWay}"/>
                     </StackPanel>
                     <RadioButtons Header="Color group" MaxColumns="3" SelectedIndex="0">
-                      <RadioButton Content="All" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="All"/>
-                      <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="Mono"/>
-                      <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand}" CommandParameter="Multi"/>
+                      <RadioButton Content="All" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="All"/>
+                      <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Mono"/>
+                      <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind DeckBuilderViewModel.CardFilters.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Multi"/>
                     </RadioButtons>
-                    <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.CardFilters.ResetCommand}"/>
+                    <Button Content="Reset filters" Command="{x:Bind DeckBuilderViewModel.CardFilters.ResetCommand, Mode=OneTime}"/>
                   </StackPanel>
                 </Flyout>
               </AppBarButton.Flyout>
@@ -582,10 +582,10 @@
           <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckSize), Mode=OneWay}" HorizontalAlignment="Right"/>
           <StackPanel.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand}" Text="Import..."/>
+              <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>
               <MenuFlyoutSubItem Text="Export...">
-                <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Name" Text="By Name"/>
-                <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand}" CommandParameter="Id" Text="By Id"/>
+                <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                <MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
               </MenuFlyoutSubItem>
             </MenuFlyout>
           </StackPanel.ContextFlyout>
@@ -595,8 +595,8 @@
       <Grid controls:DockPanel.Dock="Top">
         <controls:AdaptiveGridView x:Name="DeckImagesDisplay"
                                    Style="{StaticResource MTGAdaptiveGridViewStyle}"
-                                   DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
-                                   ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                                   DataContext="{x:Bind DeckBuilderViewModel.DeckCards, Mode=OneTime}"
+                                   ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
                                    DesiredWidth="{x:Bind DeckDesiredItemWidth, Mode=OneWay}"
                                    BorderBrush="{ThemeResource RegionColor}"
                                    SelectionMode="Single"
@@ -612,8 +612,8 @@
                                    BorderThickness="0"/>
         <ListView x:Name="DeckListDisplay"
                   Style="{StaticResource MTGListViewStyle}"
-                  DataContext="{x:Bind DeckBuilderViewModel.DeckCards}"
-                  ItemsSource="{Binding FilteredAndSortedCardViewModels}"
+                  DataContext="{x:Bind DeckBuilderViewModel.DeckCards, Mode=OneTime}"
+                  ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
                   SelectionMode="Single"
                   Visibility="Collapsed"
                   CanDragItems="True"

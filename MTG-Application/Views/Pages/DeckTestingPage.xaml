@@ -31,7 +31,7 @@
     <controls:DockPanel LastChildFill="True">
       <MenuBar controls:DockPanel.Dock="Top">
         <MenuBarItem Title="File">
-          <MenuFlyoutItem Text="New Game" Command="{x:Bind MTGDeckTestingViewModel.NewGameCommand}"/>
+          <MenuFlyoutItem Text="New Game" Command="{x:Bind MTGDeckTestingViewModel.NewGameCommand, Mode=OneTime}"/>
         </MenuBarItem>
       </MenuBar>
       <Grid controls:DockPanel.Dock="Bottom" Height="200">
@@ -57,7 +57,7 @@
               <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Button Grid.Row="0" 
-                    Command="{x:Bind MTGDeckTestingViewModel.DrawCommand}" 
+                    Command="{x:Bind MTGDeckTestingViewModel.DrawCommand, Mode=OneTime}" 
                     Content="Draw a Card"
                     FontSize="24"
                     FontWeight="Bold"
@@ -65,7 +65,7 @@
                     VerticalAlignment="Stretch"
                     Margin="0 5 0 0"/>
             <Button Grid.Row="1" 
-                    Command="{x:Bind MTGDeckTestingViewModel.NewTurnCommand}" 
+                    Command="{x:Bind MTGDeckTestingViewModel.NewTurnCommand, Mode=OneTime}" 
                     Content="New Turn"
                     FontSize="24"
                     FontWeight="Bold"
@@ -85,7 +85,7 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
-                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Hand}"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Hand, Mode=OneTime}"
                     ScrollViewer.HorizontalScrollMode="Enabled"
                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                     ScrollViewer.IsHorizontalRailEnabled="True"
@@ -117,7 +117,7 @@
                                   PointerExited="HandCard_PointerExited">
                   <controls:ImageEx.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                     </MenuFlyout>
                   </controls:ImageEx.ContextFlyout>
                 </controls:ImageEx>
@@ -136,7 +136,7 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
-                    ItemsSource="{x:Bind MTGDeckTestingViewModel.CommandZone}"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.CommandZone, Mode=OneTime}"
                     MaxWidth="300"
                     ScrollViewer.HorizontalScrollMode="Enabled"
                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
@@ -171,7 +171,7 @@
                                   PointerExited="HandCard_PointerExited">
                   <controls:ImageEx.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                     </MenuFlyout>
                   </controls:ImageEx.ContextFlyout>
                 </controls:ImageEx>
@@ -190,7 +190,7 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
-                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Tokens, Mode=OneWay}"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Tokens, Mode=OneTime}"
                     SelectionMode="None"
                     BorderBrush="{ThemeResource RegionBrush}"
                     BorderThickness="1 0 0 0"
@@ -204,10 +204,10 @@
                             PointerPressed="TokenListView_PointerPressed">
                   <StackPanel.ContextFlyout>
                     <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                     </MenuFlyout>
                   </StackPanel.ContextFlyout>
-                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
                 </StackPanel>
               </DataTemplate>
             </ListView.ItemTemplate>
@@ -236,7 +236,7 @@
               <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <ListView Grid.Row="0"
-                      ItemsSource="{x:Bind MTGDeckTestingViewModel.Library}"
+                      ItemsSource="{x:Bind MTGDeckTestingViewModel.Library, Mode=OneTime}"
                       SelectionMode="None"
                       PointerReleased="DroppableList_PointerReleased"
                       PointerEntered="Droppable_PointerEntered"
@@ -251,10 +251,10 @@
                               PointerPressed="DraggableListItem_PointerPressed">
                     <StackPanel.ContextFlyout>
                       <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                        <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                        <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                       </MenuFlyout>
                     </StackPanel.ContextFlyout>
-                    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
                   </StackPanel>
                 </DataTemplate>
               </ListView.ItemTemplate>
@@ -292,10 +292,10 @@
             <StackPanel Grid.Row="1" Margin="10 0" Spacing="10">
               <Button HorizontalAlignment="Stretch"
                       Content="Shuffle"
-                      Command="{x:Bind MTGDeckTestingViewModel.ShuffleCommand}"/>
+                      Command="{x:Bind MTGDeckTestingViewModel.ShuffleCommand, Mode=OneTime}"/>
               <Button x:Name="LibraryVisibilitySwitchButton" 
                       HorizontalAlignment="Stretch"
-                      Command="{x:Bind LibraryVisibilitySwitchCommand}" 
+                      Command="{x:Bind LibraryVisibilitySwitchCommand, Mode=OneTime}" 
                       Content="Show library"/>
             </StackPanel>
           </Grid>
@@ -311,7 +311,7 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
-                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Graveyard}"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Graveyard, Mode=OneTime}"
                     SelectionMode="None"
                     PointerReleased="DroppableList_PointerReleased"
                     PointerEntered="Droppable_PointerEntered"
@@ -325,10 +325,10 @@
                             PointerPressed="DraggableListItem_PointerPressed">
                   <StackPanel.ContextFlyout>
                     <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                     </MenuFlyout>
                   </StackPanel.ContextFlyout>
-                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
                 </StackPanel>
               </DataTemplate>
             </ListView.ItemTemplate>
@@ -345,7 +345,7 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView Grid.Row="1"
-                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Exile}"
+                    ItemsSource="{x:Bind MTGDeckTestingViewModel.Exile, Mode=OneTime}"
                     SelectionMode="None"
                     PointerReleased="DroppableList_PointerReleased"
                     PointerEntered="Droppable_PointerEntered"
@@ -359,10 +359,10 @@
                             PointerPressed="DraggableListItem_PointerPressed">
                   <StackPanel.ContextFlyout>
                     <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                     </MenuFlyout>
                   </StackPanel.ContextFlyout>
-                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name}" Width="200"/>
+                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
                 </StackPanel>
               </DataTemplate>
             </ListView.ItemTemplate>
@@ -388,8 +388,8 @@
     <customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneWay}"/>
     <Canvas>
       <controls:ImageEx x:Name="DragPreviewImage" 
-                        MaxWidth="{x:Bind BattlefieldCardSize.X}"
-                        MaxHeight="{x:Bind BattlefieldCardSize.Y}"
+                        MaxWidth="{x:Bind BattlefieldCardSize.X, Mode=OneTime}"
+                        MaxHeight="{x:Bind BattlefieldCardSize.Y, Mode=OneTime}"
                         IsHitTestVisible="False" 
                         CornerRadius="12"
                         Visibility="Collapsed" 

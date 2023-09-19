@@ -25,11 +25,11 @@
                           Tapped="GridViewItemImage_Tapped">
             <controls:ImageEx.ContextFlyout>
               <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                <MenuFlyoutItem Command="{x:Bind FlipCardCommand}" Icon="sync" Text="Flip"/>
+                <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Text="Show prints..."/>
-                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand}" Icon="World" Text="{x:Bind ModelAPIName}"/>
-                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+                <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>
+                <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="World" Text="{x:Bind ModelAPIName, Mode=OneTime}"/>
+                <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
               </MenuFlyout>
             </controls:ImageEx.ContextFlyout>
           </controls:ImageEx>
@@ -84,32 +84,32 @@
             </AppBarButton.Icon>
             <AppBarButton.Flyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                <MenuFlyoutItem Text="New..." Command="{x:Bind CardCollectionsViewModel.NewCollectionDialogCommand}">
+                <MenuFlyoutItem Text="New..." Command="{x:Bind CardCollectionsViewModel.NewCollectionDialogCommand, Mode=OneTime}">
                   <MenuFlyoutItem.KeyboardAccelerators>
                     <KeyboardAccelerator Key="N" Modifiers="Control"/>
                   </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Open..." Command="{x:Bind CardCollectionsViewModel.LoadCollectionDialogCommand}">
+                <MenuFlyoutItem Text="Open..." Command="{x:Bind CardCollectionsViewModel.LoadCollectionDialogCommand, Mode=OneTime}">
                   <MenuFlyoutItem.KeyboardAccelerators>
                     <KeyboardAccelerator Key="O" Modifiers="Control"/>
                   </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
-                <MenuFlyoutItem x:Name="SaveButton" Text="Save..." Command="{x:Bind CardCollectionsViewModel.SaveCollectionDialogCommand}">
+                <MenuFlyoutItem x:Name="SaveButton" Text="Save..." Command="{x:Bind CardCollectionsViewModel.SaveCollectionDialogCommand, Mode=OneTime}">
                   <MenuFlyoutItem.KeyboardAccelerators>
                     <KeyboardAccelerator Key="S" Modifiers="Control"/>
                   </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Import List..." Command="{x:Bind CardCollectionsViewModel.ImportCollectionListDialogCommand}" />
-                <MenuFlyoutItem Text="Export List..." Command="{x:Bind CardCollectionsViewModel.ExportCollectionListDialogCommand}" />
-                <MenuFlyoutItem Text="Delete List..." Command="{x:Bind CardCollectionsViewModel.DeleteCollectionListDialogCommand}" Background="IndianRed"/>
+                <MenuFlyoutItem Text="Import List..." Command="{x:Bind CardCollectionsViewModel.ImportCollectionListDialogCommand, Mode=OneTime}" />
+                <MenuFlyoutItem Text="Export List..." Command="{x:Bind CardCollectionsViewModel.ExportCollectionListDialogCommand, Mode=OneTime}" />
+                <MenuFlyoutItem Text="Delete List..." Command="{x:Bind CardCollectionsViewModel.DeleteCollectionListDialogCommand, Mode=OneTime}" Background="IndianRed"/>
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Delete Collection..." Command="{x:Bind CardCollectionsViewModel.DeleteCollectionDialogCommand}" Background="IndianRed"/>
+                <MenuFlyoutItem Text="Delete Collection..." Command="{x:Bind CardCollectionsViewModel.DeleteCollectionDialogCommand, Mode=OneTime}" Background="IndianRed"/>
               </MenuFlyout>
             </AppBarButton.Flyout>
           </AppBarButton>
           <AppBarSeparator/>
-          <AppBarButton Command="{x:Bind CardCollectionsViewModel.NewCollectionListDialogCommand}"
+          <AppBarButton Command="{x:Bind CardCollectionsViewModel.NewCollectionListDialogCommand, Mode=OneTime}"
                     VerticalAlignment="Top"
                     Label="Add"
                     Width="50">
@@ -117,7 +117,7 @@
               <FontIcon Glyph="&#xE710;"/>
             </AppBarButton.Icon>
           </AppBarButton>
-          <AppBarButton Command="{x:Bind CardCollectionsViewModel.EditCollectionListDialogCommand}"
+          <AppBarButton Command="{x:Bind CardCollectionsViewModel.EditCollectionListDialogCommand, Mode=OneTime}"
                     VerticalAlignment="Top"
                     Label="Edit"
                     Width="50">
@@ -133,7 +133,7 @@
                  IsEnabled="{x:Bind helpers:Comparison.MoreThan(CardCollectionsViewModel.Collection.CollectionLists.Count, 0), Mode=OneWay}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding Name}"/>
+                <TextBlock Text="{Binding Name, Mode=OneTime}"/>
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>

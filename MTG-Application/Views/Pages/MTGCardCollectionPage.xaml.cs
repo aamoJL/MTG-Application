@@ -15,7 +15,7 @@ namespace MTGApplication.Views.Pages;
 /// <summary>
 /// Page that shows MTG card collections
 /// </summary>
-public sealed partial class MTGCardCollectionPage : Page, ISavable
+public sealed partial class MTGCardCollectionPage : Page, ISavable, IDialogPresenter
 {
   public MTGCardCollectionPage()
   {
@@ -24,20 +24,13 @@ public sealed partial class MTGCardCollectionPage : Page, ISavable
     CardCollectionsViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
     CardCollectionsViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = DialogWrapper;
 
-    Loaded += (s, e) => DialogWrapper.XamlRoot = XamlRoot;
+    Loaded += (s, e) => DialogWrapper = new(XamlRoot);
 
     NotificationService.OnNotification += Notifications_OnNotification;
-    DialogService.OnGetDialogWrapper += (s, args) =>
-    {
-      if ((XamlRoot)s == this.XamlRoot)
-      {
-        args.DialogWrapper = DialogWrapper;
-      }
-    };
   }
 
   public CardCollectionsViewModel CardCollectionsViewModel { get; }
-  public DialogService.DialogWrapper DialogWrapper { get; } = new();
+  public DialogService.DialogWrapper DialogWrapper { get; private set; }
 
   #region ISavable implementation
   public bool HasUnsavedChanges { get => CardCollectionsViewModel.HasUnsavedChanges; set => CardCollectionsViewModel.HasUnsavedChanges = value; }
