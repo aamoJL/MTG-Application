@@ -68,7 +68,7 @@ public partial class MTGCardDeck : ObservableObject
       {
         if (existingCard.Count <= item.Count)
         {
-          cardlist.Remove(item);
+          cardlist.Remove(existingCard);
         }
         else
         {

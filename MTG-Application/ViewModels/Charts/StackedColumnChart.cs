@@ -14,16 +14,7 @@ namespace MTGApplication.ViewModels.Charts;
 /// </summary>
 public abstract class StackedColumnChart<TPrimaryType, TModel> : CardModelChart<TPrimaryType, TModel> where TModel : ObservableObject
 {
-  public StackedColumnChart() => AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
-
-  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
-    {
-      (XAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
-      (YAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
-    }
-  }
+  public StackedColumnChart() { }
 
   public override bool HasSecondaryValues => true;
 
@@ -43,6 +34,15 @@ public abstract class StackedColumnChart<TPrimaryType, TModel> : CardModelChart<
       LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
     }
   };
+
+  /// <summary>
+  /// Sets Axis colors for the selected theme
+  /// </summary>
+  public void UpdateTheme()
+  {
+    (XAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
+    (YAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
+  }
 }
 
 /// <summary>

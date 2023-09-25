@@ -92,7 +92,9 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
               case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                 var newCard = e.NewItems[0] as MTGCardCollectionCardViewModel;
                 if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == newCard.Model.Info.ScryfallId) != null)
-                { newCard.IsOwned = true; }
+                {
+                  newCard.IsOwned = true;
+                }
                 newCard.ShowPrintsDialogCommand = ShowCardIllustrationsCommand;
                 break;
               default:
@@ -127,7 +129,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
         {
-          if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
+          if (MTGSearchViewModel.SearchCards.FirstOrDefault(x
+            => x.Model.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
           {
             cardVM.IsOwned = true;
           }
@@ -135,7 +138,8 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
         }
       case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
         {
-          if (MTGSearchViewModel.SearchCards.FirstOrDefault(x => x.Model.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
+          if (MTGSearchViewModel.SearchCards.FirstOrDefault(x
+            => x.Model.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId) is MTGCardCollectionCardViewModel cardVM)
           {
             cardVM.IsOwned = false;
           }
@@ -453,8 +457,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
           // Card is not in the list
           SelectedList.AddToList(card);
         }
-        else
-        { notImportedCount++; }
+        else { notImportedCount++; }
       }
     }
 

@@ -23,9 +23,9 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
 {
   #region Statics
   private readonly static string API_URL = "https://api.scryfall.com";
+  private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
   private static string CARDS_URL => $"{API_URL}/cards";
   private static string COLLECTION_URL => $"{CARDS_URL}/collection";
-  private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
 
   /// <summary>
   /// How many cards can be fetched in one query using identifiers

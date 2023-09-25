@@ -8,7 +8,8 @@
   xmlns:customcontrols="using:MTGApplication.Views.Controls" 
   xmlns:viewmodels="using:MTGApplication.ViewModels"
   xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:sys="using:System"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:sys="using:System"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 

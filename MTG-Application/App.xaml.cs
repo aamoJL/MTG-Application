@@ -2,7 +2,10 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
+using MTGApplication.API;
 using MTGApplication.Database;
+using MTGApplication.Interfaces;
+using MTGApplication.Models;
 using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 
@@ -13,7 +16,7 @@ namespace MTGApplication;
 /// </summary>
 public partial class App : Application
 {
-  public static Window DeckBuilderWindow { get; private set; }
+  public static ICardAPI<MTGCard> MTGCardAPI { get; } = new ScryfallAPI();
 
   /// <summary>
   /// Initializes the singleton application object.  This is the first line of authored code

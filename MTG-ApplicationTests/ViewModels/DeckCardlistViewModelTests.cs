@@ -177,7 +177,7 @@ public partial class DeckCardlistViewModelTests
       DeckCards = cards,
     };
     var cardlist = new DeckCardlistViewModel(deck.DeckCards, null, null);
-    var expectedText = MTGService.GetExportString(cardlist.Cardlist.ToArray(), "Name");
+    var expectedText = GetExportString(cardlist.Cardlist.ToArray(), "Name");
 
     using TestIO.TestClipboard clipboard = new();
     DeckBuilderViewModel vm = new(cardAPI: null, deckRepository: null, clipboardService: clipboard);

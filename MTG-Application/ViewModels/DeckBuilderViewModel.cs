@@ -82,19 +82,70 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     UpdateCharts();
   }
 
+  private MTGCardDeck cardDeck = new();
+  private MTGCardViewModel commander;
+  private MTGCardViewModel commanderPartner;
+
   #region Properties
-  [ObservableProperty] private MTGCardDeck cardDeck = new();
   [ObservableProperty] private MTGManaProductionPieChart manaProductionChart;
   [ObservableProperty] private MTGSpellTypePieChart spellTypeChart;
   [ObservableProperty] private MTGCMCStackedColumnChart cMCChart;
   [ObservableProperty] private MTGColorPieChart colorChart;
   [ObservableProperty] private bool isBusy;
-  [ObservableProperty] private MTGCardViewModel commander;
-  [ObservableProperty] private MTGCardViewModel commanderPartner;
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
   private IMTGCommanderAPI CommanderAPI { get; } = new EDHRECCommanderAPI();
+  public MTGCardDeck CardDeck
+  {
+    get => cardDeck;
+    set
+    {
+      if (cardDeck != null)
+      {
+        cardDeck.PropertyChanged -= CardDeck_PropertyChanged;
+      }
+
+      cardDeck = value;
+
+      DeckCards.Cardlist = cardDeck.DeckCards;
+      WishlistCards.Cardlist = cardDeck.Wishlist;
+      MaybelistCards.Cardlist = cardDeck.Maybelist;
+      RemovelistCards.Cardlist = cardDeck.Removelist;
+      Commander = cardDeck?.Commander != null ? new(cardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+      CommanderPartner = cardDeck?.CommanderPartner != null ? new(cardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
+      CommandService.Clear();
+      UpdateCharts();
+      HasUnsavedChanges = false;
+      cardDeck.PropertyChanged += CardDeck_PropertyChanged;
+      OnPropertyChanged(nameof(CardDeck));
+      OnPropertyChanged(nameof(DeckName));
+    }
+  }
+  public MTGCardViewModel Commander
+  {
+    get => commander;
+    set
+    {
+      commander = value;
+      OnPropertyChanged(nameof(Commander));
+      OnPropertyChanged(nameof(DeckSize));
+      OnPropertyChanged(nameof(DeckPrice));
+      HasUnsavedChanges = true;
+    }
+  }
+  public MTGCardViewModel CommanderPartner
+  {
+    get => commanderPartner;
+    set
+    {
+      commanderPartner = value;
+      OnPropertyChanged(nameof(CommanderPartner));
+      OnPropertyChanged(nameof(DeckSize));
+      OnPropertyChanged(nameof(DeckPrice));
+      HasUnsavedChanges = true;
+    }
+  }
   public DeckBuilderViewDialogs Dialogs { get; set; } = new();
   public DeckCardlistViewModel DeckCards { get; }
   public DeckCardlistViewModel WishlistCards { get; }
@@ -112,13 +163,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   #endregion
 
   #region ISavable implementation
-  private bool hasUnsavedChanges = false;
-
-  public bool HasUnsavedChanges
-  {
-    get => hasUnsavedChanges;
-    set => SetProperty(ref hasUnsavedChanges, value);
-  }
+  [ObservableProperty] private bool hasUnsavedChanges = false;
 
   /// <summary>
   /// Shows dialog that asks the user if they want to save unsaved changes
@@ -178,26 +223,32 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   #region OnPropertyChanged events
   private void DeckCards_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(DeckCardlistViewModel.CardlistSize))
+    switch (e.PropertyName)
     {
-      OnPropertyChanged(nameof(DeckSize));
+      case nameof(DeckCardlistViewModel.CardlistSize):
+        OnPropertyChanged(nameof(DeckSize)); break;
+      case nameof(DeckCardlistViewModel.EuroPrice):
+        OnPropertyChanged(nameof(DeckPrice)); break;
     }
   }
 
   private void CardDeck_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    /// NOTE: Remember to set changes also on the <see cref="DeckBuilderViewModel_PropertyChanged"/>
     switch (e.PropertyName)
     {
       case nameof(CardDeck.Commander):
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        HasUnsavedChanges = true;
-        OnPropertyChanged(nameof(DeckSize));
+        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander)
+        {
+          DeleteCardCommand = SetCommanderCommand,
+          ShowPrintsDialogCommand = ChangePrintDialogCommand
+        } : null;
         break;
       case nameof(CardDeck.CommanderPartner):
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        HasUnsavedChanges = true;
-        OnPropertyChanged(nameof(DeckSize));
+        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner)
+        {
+          DeleteCardCommand = SetCommanderPartnerCommand,
+          ShowPrintsDialogCommand = ChangePrintDialogCommand
+        } : null;
         break;
       case nameof(CardDeck.Name):
         OnPropertyChanged(nameof(DeckName));
@@ -218,19 +269,6 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   {
     switch (e.PropertyName)
     {
-      case nameof(CardDeck):
-        CardDeck.PropertyChanged += CardDeck_PropertyChanged;
-        DeckCards.Cardlist = CardDeck.DeckCards;
-        WishlistCards.Cardlist = CardDeck.Wishlist;
-        MaybelistCards.Cardlist = CardDeck.Maybelist;
-        RemovelistCards.Cardlist = CardDeck.Removelist;
-        Commander = CardDeck?.Commander != null ? new(CardDeck.Commander) { DeleteCardCommand = SetCommanderCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        CommanderPartner = CardDeck?.CommanderPartner != null ? new(CardDeck.CommanderPartner) { DeleteCardCommand = SetCommanderPartnerCommand, ShowPrintsDialogCommand = ChangePrintDialogCommand } : null;
-        CommandService.Clear();
-        UpdateCharts();
-        HasUnsavedChanges = false;
-        OnPropertyChanged(nameof(DeckName));
-        break;
       case nameof(DeckSize):
         OnPropertyChanged(nameof(DeckPrice));
         OpenPlaytestWindowCommand.NotifyCanExecuteChanged();
@@ -378,7 +416,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
       }
     }
 
-    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new MTGCardViewModel(x)).ToArray();
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x
+      => new MTGCardViewModel(x)).ToArray();
     await Dialogs.GetTokenPrintDialog(tokens).ShowAsync(GetDialogWrapper());
   }
 
@@ -398,7 +437,8 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
       }
     }
 
-    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x => new DeckTestingMTGCardViewModel(x) { IsToken = true })
+    var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x
+      => new DeckTestingMTGCardViewModel(x) { IsToken = true })
       .DistinctBy(x => x.Model.Info.OracleId).ToArray(); // Filter duplicates out using oracleId
 
     new ThemedWindow()
@@ -429,14 +469,16 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   /// <summary>
   /// Sets deck's commander to the given card
   /// </summary>
-  public void SetCommander(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderCommand(CardDeck, card));
+  public void SetCommander(MTGCard card)
+    => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderCommand(CardDeck, card));
 
   [RelayCommand]
   /// <summary>
   /// Sets deck's commander partner to the given card
   /// </summary>
   /// <param name="card"></param>
-  public void SetCommanderPartner(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card));
+  public void SetCommanderPartner(MTGCard card)
+    => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.SetCommanderPartnerCommand(CardDeck, card));
 
   /// <summary>
   /// Shows a dialog with cards prints and changes the cards print to the selected print

@@ -6,13 +6,16 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.Interfaces;
 using MTGApplication.Services;
+using MTGApplication.Views.Controls;
 using MTGApplication.Views.Pages.Tabs;
 using MTGApplication.Views.Windows;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using static MTGApplication.Services.NotificationService;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
 namespace MTGApplication.Views.Pages;
@@ -27,22 +30,23 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   {
     InitializeComponent();
 
-    Loaded += (s, e) => DialogWrapper = new(XamlRoot);
-
-    NotificationService.OnNotification += Notifications_OnNotification;
+    Loaded += MTGDeckBuildingPage_Loaded;
+    Unloaded += MTGDeckBuildingPage_Unloaded;
   }
 
   #region Properties
-  [ObservableProperty] private bool searchPanelOpen = false;
-  [ObservableProperty] private ObservableCollection<DeckBuilderTabView> tabViews = new();
+  public static string TabDefaultName { get; } = "New Deck";
 
+  [ObservableProperty] private bool searchPanelOpen = false;
+
+  public ObservableCollection<TabViewItem> TabViews { get; } = new();
   public CardPreviewProperties CardPreviewProperties { get; } = new() { XMirror = true, Offset = new(175, 100) };
   #endregion
 
   #region ISavable Implementation
   public bool HasUnsavedChanges
   {
-    get => TabViews.FirstOrDefault(x => x.HasUnsavedChanges == true) != null;
+    get => TabViews.FirstOrDefault(x => x.Content is ISavable { HasUnsavedChanges: true }) != null;
     set { return; }
   }
 
@@ -50,9 +54,9 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   {
     foreach (var item in TabViews)
     {
-      if (!await item.SaveUnsavedChanges())
+      if (item.Content is ISavable { HasUnsavedChanges: true } savable)
       {
-        return false;
+        if (!await savable.SaveUnsavedChanges()) return false;
       }
     }
     return true;
@@ -63,21 +67,51 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   public DialogService.DialogWrapper DialogWrapper { get; private set; }
   #endregion
 
-  private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
+  #region Events
+  private void MTGDeckBuildingPage_Loaded(object sender, RoutedEventArgs e)
   {
-    if ((XamlRoot)sender == this.XamlRoot)
+    DialogWrapper = new(XamlRoot);
+    OnNotification += Notifications_OnNotification;
+    TabViews.Add(CreateNewTab());
+  }
+
+  private void MTGDeckBuildingPage_Unloaded(object sender, RoutedEventArgs e)
+    => OnNotification -= Notifications_OnNotification;
+
+  private void Notifications_OnNotification(object sender, NotificationEventArgs e)
+  {
+    if ((XamlRoot)sender == XamlRoot)
     {
       InAppNotification.Background = e.Type switch
       {
-        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
-        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
-        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+        NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+        NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+        NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
         _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
       };
       InAppNotification.RequestedTheme = ElementTheme.Light;
-      InAppNotification.Show(e.Text, NotificationService.NotificationDuration);
+      InAppNotification.Show(e.Text, NotificationDuration);
     }
   }
+
+  private void TabContent_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    // NOTE: Header is set here because XALM bindings did not work for the TabViewItems for some reason
+    var content = sender as DeckBuilderTabView;
+    var tab = TabViews.FirstOrDefault(x => x.Content == sender);
+
+    if (tab != null)
+    {
+      switch (e.PropertyName)
+      {
+        case nameof(DeckBuilderTabView.Header):
+          (tab.Header as DeckBuilderTabHeaderControl).Text = string.IsNullOrEmpty(content.Header) ? TabDefaultName : content.Header; break;
+        case nameof(DeckBuilderTabView.HasUnsavedChanges):
+          (tab.Header as DeckBuilderTabHeaderControl).HasUnsavedChanges = content.HasUnsavedChanges; break;
+      }
+    }
+  }
+  #endregion
 
   #region Relay Commands
   /// <summary>
@@ -112,22 +146,21 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
 
   private void TabView_AddTabButtonClick(TabView tabView, object args)
   {
-    var newItem = new DeckBuilderTabView(CardPreviewProperties);
-    TabViews.Add(newItem);
-    tabView.SelectedItem = newItem;
+    var tab = CreateNewTab();
+    TabViews.Add(tab);
+    tabView.SelectedItem = tab;
   }
 
   private async void TabView_TabCloseRequested(TabView tabView, TabViewTabCloseRequestedEventArgs args)
   {
     // Request tab closing from the tab items Content
-    if ((args.Tab.Content as ContentPresenter).Content is DeckBuilderTabView deckBuilder
-      && await deckBuilder.TabCloseRequested())
+    if (args.Tab.Content is DeckBuilderTabView content && await content.TabCloseRequested())
     {
-      TabViews.Remove(deckBuilder);
+      TabViews.Remove(args.Tab);
+      content.PropertyChanged -= TabContent_PropertyChanged;
+      args.Tab.Content = null;
     }
   }
-
-  private void TabView_Loaded(object sender, RoutedEventArgs e) => TabViews.Add(new DeckBuilderTabView(CardPreviewProperties)); // Add default tab
 
   private void TabView_TabItemsChanged(TabView tabView, IVectorChangedEventArgs args)
   {
@@ -140,5 +173,22 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
     {
       TabViews[0].IsClosable = true;
     }
+  }
+
+  /// <summary>
+  /// Returns new TabViewItem with DeckBuilderTabView as a content
+  /// </summary>
+  private TabViewItem CreateNewTab()
+  {
+    var content = new DeckBuilderTabView(CardPreviewProperties);
+    var tabItem = new TabViewItem()
+    {
+      Header = new DeckBuilderTabHeaderControl() { Text = TabDefaultName },
+      Content = content,
+    };
+
+    content.PropertyChanged += TabContent_PropertyChanged;
+
+    return tabItem;
   }
 }
