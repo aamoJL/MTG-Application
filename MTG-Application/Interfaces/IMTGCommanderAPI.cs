@@ -17,4 +17,9 @@ public interface IMTGCommanderAPI
   /// Retrns array of card names that are in the gicen theme and has been marked as new by the API
   /// </summary>
   public Task<string[]> FetchNewCards(string uri);
+
+  /// <summary>
+  /// Returns API's website uri for the given commanders
+  /// </summary>
+  public string GetCommanderWebsiteUri(Commanders commanders, string themeSuffix = "");
 }

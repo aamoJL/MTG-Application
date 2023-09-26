@@ -25,8 +25,8 @@
                 <CommandBarFlyout.PrimaryCommands>
                   <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                   <AppBarSeparator />
-                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
                   <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                 </CommandBarFlyout.PrimaryCommands>
                 <CommandBarFlyout.SecondaryCommands>
@@ -63,8 +63,8 @@
             <CommandBarFlyout.PrimaryCommands>
               <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
               <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
@@ -100,8 +100,8 @@
             <CommandBarFlyout.PrimaryCommands>
               <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
               <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
@@ -254,8 +254,9 @@
                       <CommandBarFlyout.PrimaryCommands>
                         <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                         <AppBarSeparator />
-                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
+                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" Label="EDHREC" ToolTipService.ToolTip="EDHREC" />
                         <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                       </CommandBarFlyout.PrimaryCommands>
                       <CommandBarFlyout.SecondaryCommands>
@@ -281,8 +282,9 @@
                       <CommandBarFlyout.PrimaryCommands>
                         <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                         <AppBarSeparator />
-                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
+                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" Label="EDHREC" ToolTipService.ToolTip="EDHREC" />
                         <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                       </CommandBarFlyout.PrimaryCommands>
                       <CommandBarFlyout.SecondaryCommands>

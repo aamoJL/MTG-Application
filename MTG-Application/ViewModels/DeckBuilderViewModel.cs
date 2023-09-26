@@ -529,6 +529,16 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
       card.Info = newPrint.Model.Info;
     }
   }
+
+  /// <summary>
+  /// Opens website page for the deck's commanders using the commander API
+  /// </summary>
+  [RelayCommand]
+  public async Task OpenEDHRECWebsite()
+  {
+    await IOService.OpenUri(CommanderAPI.GetCommanderWebsiteUri(new(
+        Commander?.Name ?? string.Empty, CommanderPartner?.Name ?? string.Empty)));
+  }
   #endregion
 
   /// <summary>

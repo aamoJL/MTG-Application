@@ -27,11 +27,13 @@
   <ItemGroup>
     <None Remove="appsettings - Template.json" />
     <None Remove="appsettings.json" />
+    <None Remove="Assets\CardmarketLogoBlack3.png" />
     <None Remove="Assets\ColorIcons\B.svg" />
     <None Remove="Assets\ColorIcons\G.svg" />
     <None Remove="Assets\ColorIcons\R.svg" />
     <None Remove="Assets\ColorIcons\U.svg" />
     <None Remove="Assets\ColorIcons\W.svg" />
+    <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
@@ -100,6 +102,12 @@
     <Content Update="Assets\back.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\CardmarketLogo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\CardmarketLogoBlack3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\ColorIcons\B.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -115,12 +123,18 @@
     <Content Update="Assets\ColorIcons\W.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\EDHREC.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\magic_logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\scryfallIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

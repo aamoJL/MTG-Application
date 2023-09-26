@@ -26,8 +26,8 @@
         <CommandBarFlyout.PrimaryCommands>
           <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
           <AppBarSeparator />
-          <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-          <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+          <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
+          <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
         </CommandBarFlyout.PrimaryCommands>
         <CommandBarFlyout.SecondaryCommands>
           <AppBarButton Label="Toggle +1/+1 counters" Click="PlusCounterFlyoutButton_Click"/>
