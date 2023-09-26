@@ -127,19 +127,34 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     get => commander;
     set
     {
+      if (commander != null)
+        commander.PropertyChanged -= Commanders_PropertyChanged;
+
       commander = value;
+
+      if (commander != null)
+        commander.PropertyChanged += Commanders_PropertyChanged;
+
       OnPropertyChanged(nameof(Commander));
       OnPropertyChanged(nameof(DeckSize));
       OnPropertyChanged(nameof(DeckPrice));
       HasUnsavedChanges = true;
     }
   }
+
   public MTGCardViewModel CommanderPartner
   {
     get => commanderPartner;
     set
     {
+      if (commanderPartner != null)
+        commanderPartner.PropertyChanged -= Commanders_PropertyChanged;
+
       commanderPartner = value;
+
+      if (commanderPartner != null)
+        commanderPartner.PropertyChanged += Commanders_PropertyChanged;
+
       OnPropertyChanged(nameof(CommanderPartner));
       OnPropertyChanged(nameof(DeckSize));
       OnPropertyChanged(nameof(DeckPrice));
@@ -274,6 +289,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
         OpenPlaytestWindowCommand.NotifyCanExecuteChanged();
         break;
     }
+  }
+
+  private void Commanders_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(Commander.Price)) OnPropertyChanged(nameof(DeckPrice));
   }
   #endregion
 
