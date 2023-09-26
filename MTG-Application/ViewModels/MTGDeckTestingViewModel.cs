@@ -10,7 +10,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
 {
   public MTGDeckTestingViewModel(MTGCardDeck deck, DeckTestingMTGCardViewModel[] tokens = null)
   {
-    CardDeck = deck;
+    CardDeck = deck.GetCopy();
     Tokens = tokens ?? Array.Empty<DeckTestingMTGCardViewModel>();
   }
 
@@ -52,9 +52,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     foreach (var item in CardDeck.DeckCards)
     {
       for (var i = 0; i < item.Count; i++)
-      {
         Library.Add(new(item)); // Add as many of the same cards as the card's Count property
-      }
     }
 
     Shuffle();
@@ -64,9 +62,7 @@ public partial class MTGDeckTestingViewModel : ViewModelBase
     if (CardDeck.CommanderPartner != null) { CommandZone.Add(new(CardDeck.CommanderPartner)); }
 
     for (var i = 0; i < 7; i++)
-    {
       Draw(); // Draw 7 cards from library to hand
-    }
 
     NewGameStarted?.Invoke(); // Clear battlefield
   }

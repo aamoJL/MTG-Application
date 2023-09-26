@@ -30,12 +30,12 @@ public partial class MTGCardDeck : ObservableObject
     return new()
     {
       Name = Name,
-      Commander = Commander,
-      CommanderPartner = CommanderPartner,
-      DeckCards = DeckCards,
-      Maybelist = Maybelist,
-      Wishlist = Wishlist,
-      Removelist = Removelist,
+      Commander = Commander != null ? new(Commander.Info) : null,
+      CommanderPartner = CommanderPartner != null ? new(CommanderPartner.Info) : null,
+      DeckCards = new(DeckCards.Select(x => new MTGCard(x.Info, x.Count))),
+      Maybelist = new(Maybelist.Select(x => new MTGCard(x.Info, x.Count))),
+      Wishlist = new(Wishlist.Select(x => new MTGCard(x.Info, x.Count))),
+      Removelist = new(Removelist.Select(x => new MTGCard(x.Info, x.Count))),
     };
   }
 
