@@ -41,6 +41,10 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
         args.DialogWrapper = presenter.DialogWrapper;
       }
     };
+
+    DeckBuilderViewModel.OnNotification += OnNotificationHandler;
+    DeckBuilderViewModel.OnGetDialogWrapper += OnGetDialogWrapperHandler;
+    DeckBuilderViewModel.PropertyChanged += DeckBuilderViewModel_PropertyChanged;
   }
 
   private DragArgs dragArgs;
@@ -76,6 +80,9 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
       foreach (var item in SidebarTabs.TabItems)
       {
         (item as TabViewItem).Content = null;
+        DeckBuilderViewModel.OnNotification -= OnNotificationHandler;
+        DeckBuilderViewModel.OnGetDialogWrapper -= OnGetDialogWrapperHandler;
+        DeckBuilderViewModel.PropertyChanged -= DeckBuilderViewModel_PropertyChanged;
       }
     }
 
@@ -84,20 +91,10 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
 
   #region Events
   private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e)
-  {
-    AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
-    DeckBuilderViewModel.OnNotification += OnNotificationHandler;
-    DeckBuilderViewModel.OnGetDialogWrapper += OnGetDialogWrapperHandler;
-    DeckBuilderViewModel.PropertyChanged += DeckBuilderViewModel_PropertyChanged;
-  }
+    => AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
   private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e)
-  {
-    AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
-    DeckBuilderViewModel.OnNotification -= OnNotificationHandler;
-    DeckBuilderViewModel.OnGetDialogWrapper -= OnGetDialogWrapperHandler;
-    DeckBuilderViewModel.PropertyChanged -= DeckBuilderViewModel_PropertyChanged;
-  }
+    => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
 
   private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {

@@ -56,6 +56,7 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
     {
       if (item.Content is ISavable { HasUnsavedChanges: true } savable)
       {
+        item.IsSelected = true;
         if (!await savable.SaveUnsavedChanges()) return false;
       }
     }
