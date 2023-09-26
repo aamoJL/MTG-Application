@@ -14,6 +14,7 @@ public static class Mocker
     /// </summary>
     public static MTGCard CreateMTGCardModel(
         Guid? scryfallId = null,
+        Guid? oracleId = null,
         CardFace? frontFace = null,
         CardFace? backFace = null,
         int cmc = 4,
@@ -34,12 +35,13 @@ public static class Mocker
     {
       producedMana ??= Array.Empty<ColorTypes>();
       scryfallId ??= Guid.NewGuid();
+      oracleId ??= Guid.NewGuid();
       frontFace ??= CreateCardFace();
       tokens ??= Array.Empty<CardToken>();
 
       return new MTGCard(new(
-        scryfallId: (Guid)scryfallId,
-        frontFace: (CardFace)frontFace,
+        scryfallId: scryfallId.Value,
+        frontFace: frontFace.Value,
         backFace: backFace,
         cmc: cmc,
         name: name,
@@ -54,7 +56,8 @@ public static class Mocker
         producedMana: producedMana,
         printSearchUri: printSearchUri,
         cardMarketUri: cardMarketUri,
-        tokens: tokens), count);
+        tokens: tokens,
+        oracleId: oracleId.Value), count);
     }
 
     /// <summary>

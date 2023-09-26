@@ -141,7 +141,6 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
       HasUnsavedChanges = true;
     }
   }
-
   public MTGCardViewModel CommanderPartner
   {
     get => commanderPartner;
@@ -293,7 +292,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
 
   private void Commanders_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(Commander.Price)) OnPropertyChanged(nameof(DeckPrice));
+    if (e.PropertyName == nameof(Commander.Price))
+    {
+      OnPropertyChanged(nameof(DeckPrice));
+      HasUnsavedChanges = true;
+    }
   }
   #endregion
 
@@ -601,6 +604,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   /// <summary>
   /// Saves current deck with the given <paramref name="name"/>
   /// </summary>
+  /// <exception cref="ArgumentNullException" />
   private async Task SaveDeck(string name)
   {
     IsBusy = true;
@@ -609,7 +613,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     if (await Task.Run(() => DeckRepository.AddOrUpdate(tempDeck)))
     {
       // TODO: can the temp deck be moved to the AddOrUpdate method?
-      // Maybe add Remove(string name) method?
+      // Maybe add AddOrRename method?
       if (!string.IsNullOrEmpty(CardDeck?.Name) && name != CardDeck.Name)
       {
         await DeckRepository.Remove(CardDeck); // Delete old deck if the name was changed
@@ -618,7 +622,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
       HasUnsavedChanges = false;
       RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was saved successfully.");
     }
-    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not save the deck."); }
+    else { RaiseInAppNotification(NotificationService.NotificationType.Error, "Error: Could not save the deck."); }
     IsBusy = false;
   }
 

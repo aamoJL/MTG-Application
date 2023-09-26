@@ -84,37 +84,37 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
     {
       // Remove unused cards from the database
       List<MTGCardDTO> missingCards = new();
-      missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => x.Info.ScryfallId).ToList().Contains(cardDTO.ScryfallId)).ToList());
-      missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.Wishlist.Select(x => x.Info.ScryfallId).ToList().Contains(cardDTO.ScryfallId)).ToList());
-      missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.Maybelist.Select(x => x.Info.ScryfallId).ToList().Contains(cardDTO.ScryfallId)).ToList());
-      missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.Removelist.Select(x => x.Info.ScryfallId).ToList().Contains(cardDTO.ScryfallId)).ToList());
+      missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
+      missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.Wishlist.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
+      missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.Maybelist.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
+      missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.Removelist.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
 
       db.RemoveRange(missingCards);
 
       // Add new cards to the deckDTO
       foreach (var card in item.DeckCards)
       {
-        if (DbDeckDTO.DeckCards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+        if (DbDeckDTO.DeckCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
         else { DbDeckDTO.DeckCards.Add(new MTGCardDTO(card)); }
       }
       foreach (var card in item.Wishlist)
       {
-        if (DbDeckDTO.WishlistCards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+        if (DbDeckDTO.WishlistCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
         else { DbDeckDTO.WishlistCards.Add(new MTGCardDTO(card)); }
       }
       foreach (var card in item.Maybelist)
       {
-        if (DbDeckDTO.MaybelistCards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+        if (DbDeckDTO.MaybelistCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
         else { DbDeckDTO.MaybelistCards.Add(new MTGCardDTO(card)); }
       }
       foreach (var card in item.Removelist)
       {
-        if (DbDeckDTO.RemovelistCards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+        if (DbDeckDTO.RemovelistCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
         else { DbDeckDTO.RemovelistCards.Add(new MTGCardDTO(card)); }
       }
 
       // Remove old commander and add new one if the commander changed
-      if (DbDeckDTO.Commander?.Name != item.Commander?.Info.Name)
+      if (DbDeckDTO.Commander?.OracleId != item.Commander?.Info.OracleId)
       {
         if (DbDeckDTO.Commander != null)
         {
@@ -122,7 +122,7 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
         }
         DbDeckDTO.Commander = item.Commander != null ? new(item.Commander) : null;
       }
-      if (DbDeckDTO.CommanderPartner?.Name != item.CommanderPartner?.Info.Name)
+      if (DbDeckDTO.CommanderPartner?.OracleId != item.CommanderPartner?.Info.OracleId)
       {
         if (DbDeckDTO.CommanderPartner != null)
         {

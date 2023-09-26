@@ -270,15 +270,11 @@ public abstract class MTGDeckRepositoryTestsBase
     Assert.AreEqual(commander.Info.Name, (await repo.Get(deck.Name)).Commander?.Info.Name);
     Assert.AreEqual(partner.Info.Name, (await repo.Get(deck.Name)).CommanderPartner?.Info.Name);
 
-    // Check if all cards has been deleted from the database
-    //Assert.AreEqual(deck.DeckCards.Count + 2, (await GetCards()).Length);
-
     deck.CommanderPartner = null!;
 
     await repo.Update(deck);
     Assert.AreEqual(commander.Info.Name, (await repo.Get(deck.Name)).Commander?.Info.Name);
     Assert.AreEqual(null, (await repo.Get(deck.Name)).CommanderPartner?.Info.Name);
-    //Assert.AreEqual(deck.DeckCards.Count + 1, (await GetCards()).Length);
   }
 
   public virtual async Task AddAndUpdateTest()
@@ -311,13 +307,11 @@ public abstract class MTGDeckRepositoryTestsBase
     deck1.Wishlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     deck1.DeckCards[0].Count = 3;
     deck1.DeckCards.RemoveAt(1);
-    var expectedCardCount = deck1.DeckCards.Count + deck1.Wishlist.Count + deck2.DeckCards.Count;
 
     await repo.AddOrUpdate(deck1);
     Assert.AreEqual(2, (await repo.Get()).ToList().Count);
     Assert.AreEqual(1, (await repo.Get(deck1.Name)).Wishlist.Count);
     Assert.AreEqual(2, (await repo.Get(deck1.Name)).DeckCards.Count);
     Assert.AreEqual(4, (await repo.Get(deck1.Name)).DeckCards.Sum(x => x.Count));
-    //Assert.AreEqual(expectedCardCount, (await GetCards()).Length);
   }
 }

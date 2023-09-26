@@ -23,7 +23,6 @@ public partial class MTGCardDeck : ObservableObject
 
   /// <summary>
   /// Returns copy of the card deck.
-  /// Used for saving the deck to a database
   /// </summary>
   public MTGCardDeck GetCopy()
   {
