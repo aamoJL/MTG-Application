@@ -322,6 +322,7 @@
                         DragOver="CardView_DragOver"
                         Drop="CardView_Drop"
                         DragItemsStarting="CardView_DragItemsStarting"
+                        DragItemsCompleted="CardView_DragItemsCompleted"
                         ItemTemplate="{StaticResource SideListViewItemTemplate}"
                         KeyDown="CardView_KeyDown"
                         LosingFocus="CardView_LosingFocus"/>
@@ -342,19 +343,20 @@
                 </customcontrols:LinedHeader.Header>
               </customcontrols:LinedHeader>
               <ListView Grid.Row="4"
-                          x:Name="DeckWishlistDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.WishlistCards, Mode=OneTime}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
-                          Style="{StaticResource MTGListViewStyle}"
-                          SelectionMode="Single"
-                          CanDragItems="True"
-                          AllowDrop="True"
-                          DragOver="CardView_DragOver"
-                          Drop="CardView_Drop"
-                          DragItemsStarting="CardView_DragItemsStarting"
-                          ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                          KeyDown="CardView_KeyDown"
-                          LosingFocus="CardView_LosingFocus"/>
+                        x:Name="DeckWishlistDisplay"
+                        DataContext="{x:Bind DeckBuilderViewModel.WishlistCards, Mode=OneTime}"
+                        ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
+                        Style="{StaticResource MTGListViewStyle}"
+                        SelectionMode="Single"
+                        CanDragItems="True"
+                        AllowDrop="True"
+                        DragOver="CardView_DragOver"
+                        Drop="CardView_Drop"
+                        DragItemsStarting="CardView_DragItemsStarting"
+                        DragItemsCompleted="CardView_DragItemsCompleted"
+                        ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                        KeyDown="CardView_KeyDown"
+                        LosingFocus="CardView_LosingFocus"/>
               <customcontrols:LinedHeader Grid.Row="5">
                 <customcontrols:LinedHeader.Header>
                   <TextBlock Text="Remove">
@@ -372,19 +374,20 @@
                 </customcontrols:LinedHeader.Header>
               </customcontrols:LinedHeader>
               <ListView Grid.Row="6"
-                          x:Name="DeckRemovelistDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards, Mode=OneTime}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
-                          Style="{StaticResource MTGListViewStyle}"
-                          SelectionMode="Single"
-                          CanDragItems="True"
-                          AllowDrop="True"
-                          DragOver="CardView_DragOver"
-                          Drop="CardView_Drop"
-                          DragItemsStarting="CardView_DragItemsStarting"
-                          ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                          KeyDown="CardView_KeyDown"
-                          LosingFocus="CardView_LosingFocus"/>
+                        x:Name="DeckRemovelistDisplay"
+                        DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards, Mode=OneTime}"
+                        ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
+                        Style="{StaticResource MTGListViewStyle}"
+                        SelectionMode="Single"
+                        CanDragItems="True"
+                        AllowDrop="True"
+                        DragOver="CardView_DragOver"
+                        Drop="CardView_Drop"
+                        DragItemsStarting="CardView_DragItemsStarting"
+                        DragItemsCompleted="CardView_DragItemsCompleted"
+                        ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                        KeyDown="CardView_KeyDown"
+                        LosingFocus="CardView_LosingFocus"/>
             </Grid>
           </TabViewItem>
           <TabViewItem Header="Info" IsClosable="False">
@@ -613,6 +616,7 @@
                                    DragOver="CardView_DragOver"
                                    Drop="CardView_Drop"
                                    DragItemsStarting="CardView_DragItemsStarting"
+                                   DragItemsCompleted="CardView_DragItemsCompleted"
                                    ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
                                    KeyDown="CardView_KeyDown"
                                    LosingFocus="CardView_LosingFocus"
@@ -628,6 +632,7 @@
                   DragOver="CardView_DragOver"
                   Drop="CardView_Drop"
                   DragItemsStarting="CardView_DragItemsStarting"
+                  DragItemsCompleted="CardView_DragItemsCompleted"
                   ItemTemplate="{StaticResource DeckListViewItemTemplate}"
                   KeyDown="CardView_KeyDown"
                   LosingFocus="CardView_LosingFocus"/>

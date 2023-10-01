@@ -198,9 +198,11 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
       }
     }
 
-    dragArgs = null;
     def.Complete();
   }
+
+  private void CardView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    => dragArgs = null;
 
   private void CommanderView_DragOver(object sender, DragEventArgs e)
   {
