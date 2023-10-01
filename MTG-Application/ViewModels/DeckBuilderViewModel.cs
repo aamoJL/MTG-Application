@@ -434,13 +434,23 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     foreach (var card in CardDeck.DeckCards)
     {
       foreach (var token in card.Info.Tokens)
-      {
         stringBuilder.AppendLine(token.ScryfallId.ToString());
-      }
+    }
+
+    if (Commander != null)
+    {
+      foreach (var token in Commander.Model.Info.Tokens)
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
+    }
+
+    if (CommanderPartner != null)
+    {
+      foreach (var token in CommanderPartner.Model.Info.Tokens)
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
     }
 
     var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x
-      => new MTGCardViewModel(x)).ToArray();
+      => new MTGCardViewModel(x)).DistinctBy(x => x.Model.Info.OracleId).ToArray(); // Filter duplicates out using oracleId
     await Dialogs.GetTokenPrintDialog(tokens).ShowAsync(GetDialogWrapper());
   }
 
@@ -455,9 +465,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     foreach (var card in CardDeck.DeckCards)
     {
       foreach (var token in card.Info.Tokens)
-      {
         stringBuilder.AppendLine(token.ScryfallId.ToString());
-      }
     }
 
     var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x
