@@ -12,8 +12,12 @@ public class MTGCardDTO : CardDTO
   {
     ScryfallId = card.Info.ScryfallId;
     OracleId = card.Info.OracleId;
+    SetCode = card.Info.SetCode;
+    CollectorNumber = card.Info.CollectorNumber;
   }
 
   public Guid ScryfallId { get; init; }
   public Guid OracleId { get; init; }
+  public string SetCode { get; init; }
+  public string CollectorNumber { get; init; }
 }

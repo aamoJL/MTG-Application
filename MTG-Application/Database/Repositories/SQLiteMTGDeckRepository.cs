@@ -58,11 +58,11 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
   public virtual async Task<MTGCardDeck> Get(string name)
   {
     using var db = cardDbContextFactory.CreateDbContext();
-    var deck = db.MTGDecks
-      .WithDefaultIncludes()
-      .Where(x => x.Name == name)
-      .FirstOrDefault();
-    return await deck.AsMTGCardDeck(CardAPI);
+    db.ChangeTracker.LazyLoadingEnabled = false;
+    db.ChangeTracker.AutoDetectChangesEnabled = false;
+    var deck = db.MTGDecks.Where(x => x.Name == name).WithDefaultIncludes().FirstOrDefault();
+    db.ChangeTracker.AutoDetectChangesEnabled = true;
+    return await deck?.AsMTGCardDeck(CardAPI);
   }
 
   public virtual async Task<bool> Remove(MTGCardDeck item)
@@ -77,61 +77,87 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
   public virtual async Task<bool> Update(MTGCardDeck item)
   {
     using var db = cardDbContextFactory.CreateDbContext();
+    db.ChangeTracker.LazyLoadingEnabled = false;
+    db.ChangeTracker.AutoDetectChangesEnabled = false;
     if (db.MTGDecks
-      .WithDefaultIncludes()
       .Where(x => x.Name == item.Name)
+      .WithDefaultIncludes()
       .FirstOrDefault() is MTGCardDeckDTO DbDeckDTO)
     {
+      db.ChangeTracker.AutoDetectChangesEnabled = true;
       // Remove unused cards from the database
       List<MTGCardDTO> missingCards = new();
-      missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
-      missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.Wishlist.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
-      missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.Maybelist.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
-      missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.Removelist.Select(x => x.Info.OracleId).ToList().Contains(cardDTO.OracleId)).ToList());
+
+      var missingCardsTasks = new List<Task>()
+      {
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => (name:x.Info.Name , setCode: x.Info.SetCode, collectorNumber: x.Info.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.Wishlist.Select(x => (name:x.Info.Name , setCode: x.Info.SetCode, collectorNumber: x.Info.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.Maybelist.Select(x =>(name : x.Info.Name, setCode : x.Info.SetCode, collectorNumber : x.Info.CollectorNumber)).Contains((name : cardDTO.Name, setCode : cardDTO.SetCode, collectorNumber : cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.Removelist.Select(x =>(name : x.Info.Name, setCode : x.Info.SetCode, collectorNumber : x.Info.CollectorNumber)).Contains((name : cardDTO.Name, setCode : cardDTO.SetCode, collectorNumber : cardDTO.CollectorNumber))))),
+      };
+
+      await Task.WhenAll(missingCardsTasks);
 
       db.RemoveRange(missingCards);
 
       // Add new cards to the deckDTO
-      foreach (var card in item.DeckCards)
+      var updateCardsTasks = new List<Task>()
       {
-        if (DbDeckDTO.DeckCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-        else { DbDeckDTO.DeckCards.Add(new MTGCardDTO(card)); }
-      }
-      foreach (var card in item.Wishlist)
-      {
-        if (DbDeckDTO.WishlistCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-        else { DbDeckDTO.WishlistCards.Add(new MTGCardDTO(card)); }
-      }
-      foreach (var card in item.Maybelist)
-      {
-        if (DbDeckDTO.MaybelistCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-        else { DbDeckDTO.MaybelistCards.Add(new MTGCardDTO(card)); }
-      }
-      foreach (var card in item.Removelist)
-      {
-        if (DbDeckDTO.RemovelistCards.FirstOrDefault(x => x.OracleId == card.Info.OracleId) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-        else { DbDeckDTO.RemovelistCards.Add(new MTGCardDTO(card)); }
-      }
+        Task.Run(() =>
+        {
+          foreach (var card in item.DeckCards)
+          {
+            if (DbDeckDTO.DeckCards.FirstOrDefault(x => x.Name == card.Info.Name && x.SetCode == card.Info.SetCode && x.CollectorNumber == card.Info.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { DbDeckDTO.DeckCards.Add(new MTGCardDTO(card)); }
+          }
+        }),
+        Task.Run(() =>
+        {
+          foreach (var card in item.Wishlist)
+          {
+            if (DbDeckDTO.WishlistCards.FirstOrDefault(x => x.Name == card.Info.Name && x.SetCode == card.Info.SetCode && x.CollectorNumber == card.Info.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { DbDeckDTO.WishlistCards.Add(new MTGCardDTO(card)); }
+          }
+        }),
+        Task.Run(() =>
+        {
+          foreach (var card in item.Maybelist)
+          {
+            if (DbDeckDTO.MaybelistCards.FirstOrDefault(x => x.Name == card.Info.Name && x.SetCode == card.Info.SetCode && x.CollectorNumber == card.Info.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { DbDeckDTO.MaybelistCards.Add(new MTGCardDTO(card)); }
+          }
+        }),
+        Task.Run(() =>
+        {
+          foreach (var card in item.Removelist)
+          {
+            if (DbDeckDTO.RemovelistCards.FirstOrDefault(x => x.Name == card.Info.Name && x.SetCode == card.Info.SetCode && x.CollectorNumber == card.Info.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { DbDeckDTO.RemovelistCards.Add(new MTGCardDTO(card)); }
+          }
+        })
+      };
+
+      await Task.WhenAll(updateCardsTasks);
 
       // Remove old commander and add new one if the commander changed
-      if (DbDeckDTO.Commander?.OracleId != item.Commander?.Info.OracleId)
+      if (DbDeckDTO.Commander?.SetCode != item.Commander?.Info.SetCode || DbDeckDTO.Commander?.CollectorNumber != item.Commander?.Info.CollectorNumber)
       {
         if (DbDeckDTO.Commander != null)
         {
-          _ = db.Remove(DbDeckDTO.Commander);
+          db.Remove(DbDeckDTO.Commander);
         }
         DbDeckDTO.Commander = item.Commander != null ? new(item.Commander) : null;
       }
-      if (DbDeckDTO.CommanderPartner?.OracleId != item.CommanderPartner?.Info.OracleId)
+      if (DbDeckDTO.CommanderPartner?.SetCode != item.CommanderPartner?.Info.SetCode || DbDeckDTO.CommanderPartner?.CollectorNumber != item.CommanderPartner?.Info.CollectorNumber)
       {
         if (DbDeckDTO.CommanderPartner != null)
         {
-          _ = db.Remove(DbDeckDTO.CommanderPartner);
+          db.Remove(DbDeckDTO.CommanderPartner);
         }
         DbDeckDTO.CommanderPartner = item.CommanderPartner != null ? new(item.CommanderPartner) : null;
       }
 
-      var updatedDTO = db.Update(DbDeckDTO);
+      db.Update(DbDeckDTO);
     }
 
     return await db.SaveChangesAsync() > 0;

@@ -280,14 +280,15 @@ public abstract class MTGDeckRepositoryTestsBase
   public virtual async Task AddAndUpdateTest()
   {
     using var repo = GetRepository();
+    var firstCardGUID = new Guid();
     var deck1 = new MTGCardDeck()
     {
       Name = "First",
       DeckCards = new System.Collections.ObjectModel.ObservableCollection<MTGCard>
       {
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third"),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first", setCode: "neo", collectionNumber: "1", scryfallId: firstCardGUID, oracleId: firstCardGUID),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second", setCode: "neo", collectionNumber: "2"),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third", setCode: "neo", collectionNumber: "3"),
       }
     };
     var deck2 = new MTGCardDeck()
@@ -305,13 +306,20 @@ public abstract class MTGDeckRepositoryTestsBase
     await repo.AddOrUpdate(deck2);
 
     deck1.Wishlist.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
-    deck1.DeckCards[0].Count = 3;
-    deck1.DeckCards.RemoveAt(1);
+    // Change first card print
+    var firstCard = deck1.DeckCards.First(x => x.Info.Name == "first");
+    firstCard.Count = 3;
+    firstCard.Info = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+      name: "first", setCode: "new", collectionNumber: "1", scryfallId: firstCardGUID, oracleId: firstCardGUID).Info;
+    // Remove second card
+    deck1.DeckCards.Remove(deck1.DeckCards.First(x => x.Info.Name == "second"));
 
     await repo.AddOrUpdate(deck1);
+    var loadedDeck1 = await repo.Get(deck1.Name);
     Assert.AreEqual(2, (await repo.Get()).ToList().Count);
-    Assert.AreEqual(1, (await repo.Get(deck1.Name)).Wishlist.Count);
-    Assert.AreEqual(2, (await repo.Get(deck1.Name)).DeckCards.Count);
-    Assert.AreEqual(4, (await repo.Get(deck1.Name)).DeckCards.Sum(x => x.Count));
+    Assert.AreEqual(1, loadedDeck1.Wishlist.Count);
+    Assert.AreEqual(2, loadedDeck1.DeckCards.Count);
+    Assert.AreEqual(4, loadedDeck1.DeckCards.Sum(x => x.Count));
+    Assert.AreEqual("new", loadedDeck1.DeckCards.First(x => x.Info.Name == "first").Info.SetCode);
   }
 }

@@ -39,6 +39,7 @@ public static class Mocker
       frontFace ??= CreateCardFace();
       tokens ??= Array.Empty<CardToken>();
 
+      // NOTE: Remember to also update FromDTO method !
       return new MTGCard(new(
         scryfallId: scryfallId.Value,
         frontFace: frontFace.Value,
@@ -88,7 +89,10 @@ public static class Mocker
       return CreateMTGCardModel(
         name: dto.Name,
         scryfallId: dto.ScryfallId,
-        count: dto.Count
+        count: dto.Count,
+        oracleId: dto.OracleId,
+        setCode: dto.SetCode,
+        collectionNumber: dto.CollectorNumber
         );
     }
   }
