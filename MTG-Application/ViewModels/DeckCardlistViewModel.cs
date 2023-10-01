@@ -379,6 +379,6 @@ public partial class DeckCardlistViewModel
       => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
-      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+      => new("Card already in the list") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
   }
 }
