@@ -30,10 +30,9 @@ public sealed partial class DeckTestingPage : Page
     PointerReleased += Root_PointerReleased;
 
     MTGDeckTestingViewModel = new MTGDeckTestingViewModel(cardDeck, tokens);
-    MTGDeckTestingViewModel.NewGameStarted += MTGDeckTestingViewModel_NewGameStarted;
-    MTGDeckTestingViewModel.NewTurnStarted += MTGDeckTestingViewModel_NewTurnStarted;
 
-    Loaded += (s, e) => MTGDeckTestingViewModel.NewGame(); // Start new game when page loads
+    Loaded += DeckTestingPage_Loaded;
+    Unloaded += DeckTestingPage_Unloaded;
   }
 
   private CustomDragArgs<DeckTestingMTGCardViewModel> dragArgs;
@@ -54,22 +53,27 @@ public sealed partial class DeckTestingPage : Page
 
       if (dragArgs != null)
       {
-        DragArgs.Completed += (item) =>
-        {
-          DragPreviewImage.Visibility = Visibility.Collapsed;
-          dragArgs = null;
-        };
-        DragArgs.Canceled += (item) =>
-        {
-          DragPreviewImage.Visibility = Visibility.Collapsed;
-          dragArgs = null;
-        };
+        dragArgs.Completed += DragArgs_DragEnded;
+        dragArgs.Canceled += DragArgs_DragEnded;
       }
     }
   }
   #endregion
 
   #region Event Methods
+  private void DeckTestingPage_Loaded(object sender, RoutedEventArgs e)
+  {
+    MTGDeckTestingViewModel.NewGameStarted += MTGDeckTestingViewModel_NewGameStarted;
+    MTGDeckTestingViewModel.NewTurnStarted += MTGDeckTestingViewModel_NewTurnStarted;
+    MTGDeckTestingViewModel.NewGame(); // Start new game when page loads
+  }
+
+  private void DeckTestingPage_Unloaded(object sender, RoutedEventArgs e)
+  {
+    MTGDeckTestingViewModel.NewGameStarted -= MTGDeckTestingViewModel_NewGameStarted;
+    MTGDeckTestingViewModel.NewTurnStarted -= MTGDeckTestingViewModel_NewTurnStarted;
+  }
+
   private void MTGDeckTestingViewModel_NewTurnStarted()
   {
     foreach (var child in BattlefieldCanvas.Children)
@@ -82,6 +86,12 @@ public sealed partial class DeckTestingPage : Page
   }
 
   private void MTGDeckTestingViewModel_NewGameStarted() => BattlefieldCanvas.Children.Clear();
+
+  private void DragArgs_DragEnded(DeckTestingMTGCardViewModel obj)
+  {
+    DragPreviewImage.Visibility = Visibility.Collapsed;
+    DragArgs = null;
+  }
   #endregion
 
   [RelayCommand]
@@ -326,7 +336,7 @@ public sealed partial class DeckTestingPage : Page
           // Add card to the canvas
           var cardImg = new DeckTestingBattlefieldCardControl()
           {
-            DataContext = new DeckTestingMTGCardViewModel(card.Model)
+            DataContext = new DeckTestingMTGCardViewModel(new(card.Model.Info))
             {
               SelectedFaceSide = card.SelectedFaceSide,
               IsToken = card.IsToken,
@@ -337,6 +347,18 @@ public sealed partial class DeckTestingPage : Page
 
           cardImg.PointerEntered += BattlefieldCard_PointerEntered;
           cardImg.PointerPressed += BattlefieldCard_PointerPressed;
+
+          // TODO: Item repeater for canvas items?
+          // CanvasView: https://dev.azure.com/dotnet/CommunityToolkit/_artifacts/feed/CommunityToolkit-Labs/NuGet/CommunityToolkit.Labs.WinUI.CanvasView/overview/0.1.230830
+          // Events needs to be unsubscribed on unload so the Page could be destroyerd on GC
+          canvas.Unloaded += (s, e) =>
+          {
+            if (cardImg != null)
+            {
+              cardImg.PointerEntered -= BattlefieldCard_PointerEntered;
+              cardImg.PointerPressed -= BattlefieldCard_PointerPressed;
+            }
+          };
 
           Canvas.SetLeft(cardImg, pos.X + DragArgs.DragOffset.X);
           Canvas.SetTop(cardImg, pos.Y + DragArgs.DragOffset.Y);

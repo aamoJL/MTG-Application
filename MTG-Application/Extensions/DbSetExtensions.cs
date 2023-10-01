@@ -6,11 +6,15 @@ namespace MTGApplication.Extensions;
 
 public static class DbSetExtensions
 {
-  public static IQueryable<MTGCardDeckDTO> WithDefaultIncludes(this DbSet<MTGCardDeckDTO> dbSet)
-    => dbSet.Include(x => x.DeckCards)
-    .Include(x => x.WishlistCards)
-    .Include(x => x.MaybelistCards)
-    .Include(x => x.RemovelistCards)
-    .Include(x => x.Commander)
-    .Include(x => x.CommanderPartner);
+  public static IQueryable<MTGCardDeckDTO> WithDefaultIncludes(this IQueryable<MTGCardDeckDTO> dbSet)
+  {
+    dbSet.Include(x => x.DeckCards).Load();
+    dbSet.Include(x => x.WishlistCards).Load();
+    dbSet.Include(x => x.MaybelistCards).Load();
+    dbSet.Include(x => x.RemovelistCards).Load();
+    dbSet.Include(x => x.Commander).Load();
+    dbSet.Include(x => x.CommanderPartner).Load();
+
+    return dbSet;
+  }
 }

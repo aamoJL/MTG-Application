@@ -86,6 +86,7 @@ public sealed partial class ThemedWindow : Window
       args.Handled = false;
       Content = null;
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
+      Closed -= ThemedWindow_Closed;
       Close();
     }
   }

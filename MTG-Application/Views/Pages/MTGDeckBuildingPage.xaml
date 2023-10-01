@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="MTGApplication.Views.Pages.MTGDeckBuildingPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:customcontrols="using:MTGApplication.Views.Controls" 
-    xmlns:viewmodels="using:MTGApplication.ViewModels" 
-    xmlns:tabs="using:MTGApplication.Views.Pages.Tabs" 
-    xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  x:Class="MTGApplication.Views.Pages.MTGDeckBuildingPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:customcontrols="using:MTGApplication.Views.Controls"
+  mc:Ignorable="d"
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
     <controls:DockPanel LastChildFill="True">
@@ -34,37 +31,16 @@
           <customcontrols:CardAPISearchControl CardPreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
         </SplitView.Pane>
         <Grid>
+          <!-- NOTE: Tab item reordering crashes the app -->
           <TabView IsAddTabButtonVisible="True" 
                    VerticalAlignment="Stretch"
                    HorizontalAlignment="Stretch" 
                    CloseButtonOverlayMode="OnPointerOver"
                    AddTabButtonClick="TabView_AddTabButtonClick"
                    TabCloseRequested="TabView_TabCloseRequested"
-                   Loaded="TabView_Loaded"
                    CanReorderTabs="False"
                    TabItemsChanged="TabView_TabItemsChanged"
-                   TabItemsSource="{x:Bind TabViews, Mode=OneTime}">
-            <!--NOTE: Tab item reordering crashes the app-->
-            <TabView.TabItemTemplate>
-              <DataTemplate x:DataType="tabs:DeckBuilderTabView">
-                <TabViewItem Header="{x:Bind DeckBuilderViewModel, Mode=OneTime}" IsClosable="{x:Bind IsClosable, Mode=OneWay}">
-                  <TabViewItem.HeaderTemplate>
-                    <DataTemplate x:DataType="viewmodels:DeckBuilderViewModel">
-                      <StackPanel Orientation="Horizontal" Spacing="5">
-                        <Ellipse Fill="{ThemeResource SystemAccentColorLight1}" 
-                                 Height="10" 
-                                 Width="10" 
-                                 StrokeThickness="0"
-                                 Visibility="{x:Bind helpers:VisibilityHelpers.BooleanToVisibility(HasUnsavedChanges), Mode=OneWay}"/>
-                        <TextBlock Text="{x:Bind helpers:Format.StringWithDefault(DeckName, 'New Deck'), Mode=OneWay}"/>
-                      </StackPanel>
-                    </DataTemplate>
-                  </TabViewItem.HeaderTemplate>
-                  <ContentPresenter Content="{Binding}"/>
-                </TabViewItem>
-              </DataTemplate>
-            </TabView.TabItemTemplate>
-          </TabView>
+                   TabItemsSource="{x:Bind TabViews, Mode=OneWay}"/>
           <!--Top-right corner buttons-->
           <StackPanel Height="40" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Margin="0 0 5 0">
             <Button MinWidth="40" Height="30" Content="Collections" Command="{x:Bind OpenCollectionsWindowCommand, Mode=OneTime}"/>

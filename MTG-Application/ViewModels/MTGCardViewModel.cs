@@ -1,7 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.Helpers;
 using MTGApplication.Models;
 using MTGApplication.Services;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using static MTGApplication.Enums;
@@ -17,17 +18,33 @@ public partial class MTGCardViewModel : ViewModelBase
   public MTGCardViewModel(MTGCard model)
   {
     Model = model;
-    model.PropertyChanged += Model_PropertyChanged;
-    PropertyChanged += MTGCardViewModel_PropertyChanged;
+
+    var inpc = Model as INotifyPropertyChanged;
+    var weakPropertyChangedListener = new WeakEventListener<MTGCardViewModel, object, PropertyChangedEventArgs>(this)
+    {
+      OnEventAction = static (instance, source, eventArgs) => instance.Model_PropertyChanged(source, eventArgs),
+      OnDetachAction = (weakEventListener) => inpc.PropertyChanged -= weakEventListener.OnEvent // Use Local References Only
+    };
+    inpc.PropertyChanged += weakPropertyChangedListener.OnEvent;
   }
 
-  #region Properties
-  [ObservableProperty] protected CardSide selectedFaceSide;
+  protected CardSide selectedFaceSide;
 
+  #region Properties
   public MTGCard Model { get; }
   public string SelectedFaceUri => SelectedFaceSide == CardSide.Front ? Model.Info.FrontFace.ImageUri : Model.Info.BackFace?.ImageUri;
   public bool HasBackFaceImage => Model.Info.BackFace?.ImageUri != null;
   public string ModelAPIName => Model.APIName;
+  public CardSide SelectedFaceSide
+  {
+    get => selectedFaceSide;
+    set
+    {
+      selectedFaceSide = value;
+      OnPropertyChanged(nameof(SelectedFaceSide));
+      OnPropertyChanged(nameof(SelectedFaceUri));
+    }
+  }
   public ColorTypes ColorType => Model.Info.Colors.Length > 1 ? ColorTypes.M : Model.Info.Colors[0];
   public SpellType PrimaryType => Model.Info.SpellTypes[0];
   public RarityTypes Rarity => Model.Info.RarityType;
@@ -43,13 +60,7 @@ public partial class MTGCardViewModel : ViewModelBase
   public ICommand DeleteCardCommand { get; set; }
   public ICommand ShowPrintsDialogCommand { get; set; }
 
-  #region OnPropertyChanged events
-  protected void MTGCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(SelectedFaceSide)) { OnPropertyChanged(nameof(SelectedFaceUri)); }
-  }
-
-  protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  protected void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
     {
@@ -61,7 +72,6 @@ public partial class MTGCardViewModel : ViewModelBase
         break;
     }
   }
-  #endregion
 
   /// <summary>
   /// Changes selected face image if possible

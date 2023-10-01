@@ -23,9 +23,9 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
 {
   #region Statics
   private readonly static string API_URL = "https://api.scryfall.com";
+  private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
   private static string CARDS_URL => $"{API_URL}/cards";
   private static string COLLECTION_URL => $"{CARDS_URL}/collection";
-  private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
 
   /// <summary>
   /// How many cards can be fetched in one query using identifiers
@@ -123,8 +123,8 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
 
   public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)
   {
-    var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x as MTGCardDTO));
-    return await FetchWithIdentifiers(identifiers.ToArray());
+    var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x as MTGCardDTO)).ToArray();
+    return await FetchWithIdentifiers(identifiers);
   }
   #endregion
 
@@ -328,7 +328,7 @@ public partial class ScryfallAPI
   {
     public enum IdentifierSchema
     {
-      ID, ILLUSTRATION_ID, NAME, NAME_SET
+      ID, ILLUSTRATION_ID, NAME, NAME_SET, COLLECTORNUMBER_SET
     }
 
     public ScryfallIdentifier() { }
@@ -339,6 +339,8 @@ public partial class ScryfallAPI
         ScryfallId = card.ScryfallId;
         Name = card.Name;
         CardCount = card.Count;
+        SetCode = card.SetCode;
+        CollectorNumber = card.CollectorNumber;
       }
     }
 
@@ -348,6 +350,7 @@ public partial class ScryfallAPI
     public string Name { get; init; } = string.Empty;
     public Guid IllustrationId { get; init; } = Guid.Empty;
     public string SetCode { get; init; } = string.Empty;
+    public string CollectorNumber { get; init; } = string.Empty;
     public IdentifierSchema PreferedSchema { get; init; } = IdentifierSchema.ID;
     #endregion
 
@@ -365,18 +368,27 @@ public partial class ScryfallAPI
           if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
           break;
         case IdentifierSchema.NAME:
-          if (Name != string.Empty) { return new { name = Name }; }
+          if (!string.IsNullOrEmpty(Name)) { return new { name = Name }; }
           break;
         case IdentifierSchema.NAME_SET:
-          if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
+          if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return new { name = Name, set = SetCode }; }
+          break;
+        case IdentifierSchema.COLLECTORNUMBER_SET:
+          if (!string.IsNullOrEmpty(CollectorNumber) && !string.IsNullOrEmpty(SetCode)) { return new { set = SetCode, collector_number = CollectorNumber }; }
           break;
       }
 
       // If prefered schema does not work, select secondary if possible
+      // Scryfall Id
       if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
+      // Set Code + Collector Number
+      else if (!string.IsNullOrEmpty(SetCode) && !string.IsNullOrEmpty(CollectorNumber)) { return new { set = SetCode, collector_number = CollectorNumber }; }
+      // Illustration Id
       else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
-      else if (Name != string.Empty && SetCode != string.Empty) { return new { name = Name, set = SetCode }; }
-      else if (Name != string.Empty) { return new { name = Name }; }
+      // Name + Set Code
+      else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return new { name = Name, set = SetCode }; }
+      // Name
+      else if (!string.IsNullOrEmpty(Name)) { return new { name = Name }; }
       else { return string.Empty; }
     }
 
@@ -386,8 +398,8 @@ public partial class ScryfallAPI
     public bool Compare(MTGCardInfo? info)
     {
       if (ScryfallId != Guid.Empty) { return info?.ScryfallId == ScryfallId; }
-      else if (Name != string.Empty && SetCode != string.Empty) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }
-      else if (Name != string.Empty) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase); }
+      else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }
+      else if (!string.IsNullOrEmpty(Name)) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase); }
       else { return false; }
     }
   }

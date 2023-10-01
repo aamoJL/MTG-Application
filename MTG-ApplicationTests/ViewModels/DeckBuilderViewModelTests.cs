@@ -711,7 +711,6 @@ public class DeckBuilderViewModelTests
   #endregion
 
   #region Deck Properties
-
   [TestMethod]
   public async Task DeckSizeTest()
   {
@@ -825,6 +824,5 @@ public class DeckBuilderViewModelTests
     await vm.DeckCards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     Assert.IsTrue(vm.DeckHasCards());
   }
-
   #endregion
 }

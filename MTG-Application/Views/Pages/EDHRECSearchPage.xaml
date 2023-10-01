@@ -79,8 +79,8 @@
                         <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>
-                        <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Text="{x:Bind ModelAPIName, Mode=OneTime}"/>
-                        <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Text="Cardmarket"/>
+                        <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Text="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+                        <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Text="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
                       </MenuFlyout>
                     </controls:ImageEx.ContextFlyout>
                   </controls:ImageEx>

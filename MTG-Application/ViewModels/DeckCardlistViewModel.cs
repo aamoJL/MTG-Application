@@ -20,7 +20,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
 {
   public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGCardSortProperties sortProperties = null)
   {
-    Cardlist = cardlist;
+    Cardlist = cardlist ?? new();
     CardAPI = cardAPI;
     CardFilters = cardFilters ?? new();
     SortProperties = sortProperties ?? new();
@@ -34,15 +34,39 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
     CardViewModels.CollectionChanged += CardViewModels_CollectionChanged;
     SortProperties.PropertyChanged += SortProperties_PropertyChanged;
 
-    OnPropertyChanged(nameof(Cardlist));
+    foreach (var card in Cardlist.ToArray())
+      CardViewModels.Add(CreateNewCardViewModel(card));
   }
 
+  private ObservableCollection<MTGCard> cardlist;
+
   #region Properties
-  [ObservableProperty] private ObservableCollection<MTGCard> cardlist;
   [ObservableProperty] private bool isBusy;
 
   private ObservableCollection<MTGCardViewModel> CardViewModels { get; } = new();
   private ICardAPI<MTGCard> CardAPI { get; }
+  public ObservableCollection<MTGCard> Cardlist
+  {
+    get => cardlist;
+    set
+    {
+      if (cardlist != null)
+        cardlist.CollectionChanged -= CardCollection_CollectionChanged;
+
+      foreach (var item in CardViewModels)
+        item.PropertyChanged -= CardViewModel_PropertyChanged;
+
+      for (var i = CardViewModels.Count - 1; i >= 0; i--)
+        CardViewModels.RemoveAt(i);
+
+      cardlist = value;
+
+      if (cardlist != null)
+        cardlist.CollectionChanged += CardCollection_CollectionChanged;
+
+      OnPropertyChanged(nameof(Cardlist));
+    }
+  }
   public DeckCardlistViewDialogs Dialogs { get; set; } = new();
   public IOService.ClipboardService ClipboardService { get; init; } = new();
   public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
@@ -66,7 +90,8 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
 
   public event EventHandler<NotificationService.NotificationEventArgs> OnNotification;
 
-  public void RaiseInAppNotification(NotificationService.NotificationType type, string text) => OnNotification?.Invoke(this, new(type, text));
+  public void RaiseInAppNotification(NotificationService.NotificationType type, string text)
+    => OnNotification?.Invoke(this, new(type, text));
 
   #endregion
 
@@ -84,20 +109,20 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
   #region OnPropertyChanged events
   private void SortProperties_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    FilteredAndSortedCardViewModels.SortDescriptions[0] = new SortDescription(MTGCardViewModel.GetPropertyName(SortProperties.PrimarySortProperty), SortProperties.SortDirection);
-    FilteredAndSortedCardViewModels.SortDescriptions[1] = new SortDescription(MTGCardViewModel.GetPropertyName(SortProperties.SecondarySortProperty), SortProperties.SortDirection);
+    FilteredAndSortedCardViewModels.SortDescriptions[0]
+      = new SortDescription(MTGCardViewModel.GetPropertyName(SortProperties.PrimarySortProperty), SortProperties.SortDirection);
+    FilteredAndSortedCardViewModels.SortDescriptions[1]
+      = new SortDescription(MTGCardViewModel.GetPropertyName(SortProperties.SecondarySortProperty), SortProperties.SortDirection);
   }
 
-  private void CardViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnPropertyChanged(nameof(CardlistSize));
+  private void CardViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    => OnPropertyChanged(nameof(CardlistSize));
 
   private void Filters_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (CardFilters.FiltersApplied)
     {
-      FilteredAndSortedCardViewModels.Filter = x =>
-      {
-        return CardFilters.CardValidation((MTGCardViewModel)x);
-      };
+      FilteredAndSortedCardViewModels.Filter = x => CardFilters.CardValidation((MTGCardViewModel)x);
       FilteredAndSortedCardViewModels.RefreshFilter();
     }
     else { FilteredAndSortedCardViewModels.Filter = null; }
@@ -117,21 +142,13 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
     switch (e.PropertyName)
     {
       case nameof(Cardlist):
-        Cardlist.CollectionChanged += CardCollection_CollectionChanged;
-        CardViewModels.Clear();
         foreach (var card in Cardlist.ToArray())
         {
-          var vm = new MTGCardViewModel(card) { DeleteCardCommand = new RelayCommand<MTGCard>(Remove), ShowPrintsDialogCommand = new AsyncRelayCommand<MTGCard>(ChangePrintDialog) };
-          vm.PropertyChanged += CardViewModel_PropertyChanged;
-          CardViewModels.Add(vm);
+          CardViewModels.Add(CreateNewCardViewModel(card));
         }
         break;
-      case nameof(CardlistSize):
-        OnPropertyChanged(nameof(EuroPrice));
-        break;
-      case nameof(EuroPrice):
-        SavableChangesOccurred?.Invoke();
-        break;
+      case nameof(CardlistSize): OnPropertyChanged(nameof(EuroPrice)); break;
+      case nameof(EuroPrice): SavableChangesOccurred?.Invoke(); break;
     }
   }
 
@@ -142,11 +159,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
     switch (e.Action)
     {
       case NotifyCollectionChangedAction.Add:
-        // Add CardViewModels
-        vm = new MTGCardViewModel(e.NewItems[0] as MTGCard) { DeleteCardCommand = new RelayCommand<MTGCard>(Remove), ShowPrintsDialogCommand = new AsyncRelayCommand<MTGCard>(ChangePrintDialog) };
-        vm.PropertyChanged += CardViewModel_PropertyChanged;
-        CardViewModels.Add(vm);
-        break;
+        CardViewModels.Add(CreateNewCardViewModel(e.NewItems[0] as MTGCard)); break;
       case NotifyCollectionChangedAction.Remove:
         vm = CardViewModels.FirstOrDefault(x => x.Model == e.OldItems[0] as MTGCard);
         if (vm != null)
@@ -156,9 +169,13 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
         }
         break;
       case NotifyCollectionChangedAction.Reset:
-        CardViewModels.Clear();
+        for (var i = CardViewModels.Count - 1; i >= 0; i--)
+        {
+          CardViewModels.RemoveAt(i);
+        }
         break;
     }
+
     SavableChangesOccurred?.Invoke();
   }
   #endregion
@@ -183,7 +200,8 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
   [RelayCommand]
   public async Task ExportDeckCardsDialog(string exportProperty = "Name")
   {
-    if (await Dialogs.GetExportDialog(MTGService.GetExportString(Cardlist.ToArray(), exportProperty)).ShowAsync(GetDialogWrapper()) is var response && !string.IsNullOrEmpty(response))
+    if (await Dialogs.GetExportDialog(GetExportString(Cardlist.ToArray(), exportProperty))
+      .ShowAsync(GetDialogWrapper()) is var response && !string.IsNullOrEmpty(response))
     {
       ClipboardService.Copy(response);
       RaiseInAppNotification(NotificationService.NotificationType.Info, "Copied to clipboard.");
@@ -194,7 +212,9 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
   /// Removes all items in the card list
   /// </summary>
   [RelayCommand]
-  public void Clear() => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(Cardlist, Cardlist.ToArray()));
+  public void Clear()
+    => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands
+      .RemoveCardsFromCardlistCommand(Cardlist, Cardlist.ToArray()));
   #endregion
 
   /// <summary>
@@ -321,7 +341,24 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
   /// <summary>
   /// Removes given card from the deck cardlist
   /// </summary>
-  public void Remove(MTGCard card) => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands.RemoveCardsFromCardlistCommand(Cardlist, new[] { card }));
+  public void Remove(MTGCard card)
+    => CommandService.Execute(new MTGCardDeck.MTGCardDeckCommands
+      .RemoveCardsFromCardlistCommand(Cardlist, new[] { card }));
+
+  /// <summary>
+  /// Returns new card view model for viewmodel collection
+  /// </summary>
+  private MTGCardViewModel CreateNewCardViewModel(MTGCard model)
+  {
+    var vm = new MTGCardViewModel(model)
+    {
+      DeleteCardCommand = new RelayCommand<MTGCard>(Remove),
+      ShowPrintsDialogCommand = new AsyncRelayCommand<MTGCard>(ChangePrintDialog)
+    };
+    vm.PropertyChanged += CardViewModel_PropertyChanged;
+
+    return vm;
+  }
 }
 
 // Dialogs
@@ -342,6 +379,6 @@ public partial class DeckCardlistViewModel
       => new("Card already in the deck") { Message = $"'{name}' is already in the deck. Do you still want to add it?", InputText = "Same for all cards.", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
 
     public virtual ConfirmationDialog GetCardAlreadyInCardlistDialog(string cardName, string listName)
-      => new("Card already in the deck") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
+      => new("Card already in the list") { Message = $"Card '{cardName}' is already in the {listName}. Do you still want to add it?", SecondaryButtonText = string.Empty, CloseButtonText = "No" };
   }
 }

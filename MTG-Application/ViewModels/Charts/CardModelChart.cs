@@ -164,14 +164,12 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
   /// </summary>
   protected virtual void RemoveFromChartSeries(TModel model)
   {
-    if (!ModelValidation(model))
-    { return; }
+    if (!ModelValidation(model)) { return; }
 
     foreach (var primaryItem in GetPrimaryItems(model))
     {
       var series = FindPrimarySeries(model, primaryItem);
-      if (series == null)
-      { return; }
+      if (series == null) { return; }
 
       if (HasSecondaryValues)
       {
@@ -179,7 +177,10 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
         {
           secondaryItem.RemoveItem(model);
           if (secondaryItem.PrimaryValue == 0)
-          { (series.Values as ObservableCollection<CardModelSeries<TModel>>).Remove(secondaryItem); } // remove secondary item if its count is zero
+          {
+            // remove secondary item if its count is zero
+            (series.Values as ObservableCollection<CardModelSeries<TModel>>).Remove(secondaryItem);
+          }
         }
 
         if ((series.Values as ObservableCollection<CardModelSeries<TModel>>).Count == 0)
@@ -191,8 +192,7 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
       {
         var valueObject = (series.Values as ObservableCollection<CardModelSeries<TModel>>)[0];
         valueObject.RemoveItem(model);
-        if (valueObject.PrimaryValue == 0)
-        { Series.Remove(series); }
+        if (valueObject.PrimaryValue == 0) { Series.Remove(series); }
       }
     }
   }

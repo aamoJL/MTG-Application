@@ -17,6 +17,7 @@ namespace MTGApplication.API;
 public class EDHRECCommanderAPI : IMTGCommanderAPI
 {
   private readonly string BASE_URI = "https://json.edhrec.com/pages/commanders";
+  private readonly string WEBSITE_BASE_URI = "https://edhrec.com/commanders";
 
   /// <summary>
   /// Returns the api uri for the given commanders
@@ -31,12 +32,7 @@ public class EDHRECCommanderAPI : IMTGCommanderAPI
 
     var stringBuilder = new StringBuilder();
     stringBuilder.Append($"{BASE_URI}/");
-    stringBuilder.Append(commanders.Commander.ToKebabCase().ToLower());
-
-    if (!string.IsNullOrEmpty(commanders.Partner))
-    {
-      stringBuilder.Append($"-{commanders.Partner.ToKebabCase().ToLower()}");
-    }
+    stringBuilder.Append(commanders.AsKebabString());
 
     if (!string.IsNullOrEmpty(themeSuffix))
     {
@@ -53,29 +49,26 @@ public class EDHRECCommanderAPI : IMTGCommanderAPI
   {
     var uri = GetUri(commanders);
 
-    if (string.IsNullOrEmpty(uri))
+    if (string.IsNullOrEmpty(uri)) return Array.Empty<CommanderTheme>();
+
+    var jsonString = await IOService.FetchStringFromURL(uri);
+    
+    if (string.IsNullOrEmpty(jsonString))
       return Array.Empty<CommanderTheme>();
 
-    var json = JsonNode.Parse(await IOService.FetchStringFromURL(uri));
-
-    if (json is null) { return Array.Empty<CommanderTheme>(); }
-
-    var themeNodes = json["panels"]?["tribelinks"]?["themes"]?.AsArray();
-
-    /* Example theme node:
-     * {
-     *   "count":3204,
-     *   "href-suffix":"/lifegain",
-     *   "value":"Lifegain"
-     *  }
-     */
-
-    return themeNodes?.Select(
-      x => new CommanderTheme(
-        x["value"].GetValue<string>(),
-        GetUri(commanders, Regex.Replace(x["href-suffix"].GetValue<string>(), @"^\/", string.Empty))))
-      .ToArray()
-     ?? Array.Empty<CommanderTheme>();
+    try
+    {
+      var json = JsonNode.Parse(jsonString) ?? throw new Exception();
+      var themeNodes = json["panels"]?["tribelinks"]?["themes"]?.AsArray();
+      
+      return themeNodes?.Select(
+        x => new CommanderTheme(
+          x["value"].GetValue<string>(),
+          GetUri(commanders, Regex.Replace(x["href-suffix"].GetValue<string>(), @"^\/", string.Empty))))
+        .ToArray()
+       ?? Array.Empty<CommanderTheme>();
+    }
+    catch (Exception) { return Array.Empty<CommanderTheme>(); }
   }
 
   public async Task<string[]> FetchNewCards(string uri)
@@ -88,6 +81,20 @@ public class EDHRECCommanderAPI : IMTGCommanderAPI
       .FirstOrDefault(x => x["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
       .Select(x => x["name"]!.GetValue<string>()).ToArray()
       ?? Array.Empty<string>();
+  }
+
+  public string GetCommanderWebsiteUri(Commanders commanders, string themeSuffix = "")
+  {
+    var stringBuilder = new StringBuilder();
+    stringBuilder.Append($"{WEBSITE_BASE_URI}/");
+    stringBuilder.Append(commanders.AsKebabString());
+
+    if (!string.IsNullOrEmpty(themeSuffix))
+    {
+      stringBuilder.Append($"/{themeSuffix.ToKebabCase().ToLower()}");
+    }
+
+    return stringBuilder.ToString();
   }
   #endregion
 }

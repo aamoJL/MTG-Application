@@ -7,8 +7,10 @@ using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Services;
 using MTGApplication.ViewModels;
+using System;
 using System.Threading.Tasks;
 using Windows.UI;
+using static MTGApplication.Services.NotificationService;
 
 namespace MTGApplication.Views.Pages;
 
@@ -21,16 +23,19 @@ public sealed partial class MTGCardCollectionPage : Page, ISavable, IDialogPrese
   {
     InitializeComponent();
     CardCollectionsViewModel = new(new ScryfallAPI(), new SQLiteMTGCardCollectionRepository(new ScryfallAPI(), new()), new());
-    CardCollectionsViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
-    CardCollectionsViewModel.OnGetDialogWrapper += (s, args) => args.DialogWrapper = DialogWrapper;
 
-    Loaded += (s, e) => DialogWrapper = new(XamlRoot);
+    Loaded += MTGCardCollectionPage_Loaded;
+    Unloaded += MTGCardCollectionPage_Unloaded;
 
-    NotificationService.OnNotification += Notifications_OnNotification;
+    OnNotificationHandler = (s, args) => { RaiseNotification(XamlRoot, args); };
+    OnGetDialogWrapperHandler = (s, args) => { args.DialogWrapper = DialogWrapper; };
   }
 
   public CardCollectionsViewModel CardCollectionsViewModel { get; }
   public DialogService.DialogWrapper DialogWrapper { get; private set; }
+
+  private EventHandler<NotificationEventArgs> OnNotificationHandler { get; }
+  private EventHandler<DialogService.DialogEventArgs> OnGetDialogWrapperHandler { get; }
 
   #region ISavable implementation
   public bool HasUnsavedChanges { get => CardCollectionsViewModel.HasUnsavedChanges; set => CardCollectionsViewModel.HasUnsavedChanges = value; }
@@ -38,21 +43,38 @@ public sealed partial class MTGCardCollectionPage : Page, ISavable, IDialogPrese
   public async Task<bool> SaveUnsavedChanges() => await CardCollectionsViewModel.SaveUnsavedChanges();
   #endregion
 
-  private void Notifications_OnNotification(object sender, NotificationService.NotificationEventArgs e)
+  #region Events
+  private void MTGCardCollectionPage_Loaded(object sender, RoutedEventArgs e)
   {
-    if ((XamlRoot)sender == this.XamlRoot)
+    DialogWrapper = new(XamlRoot);
+    OnNotification += Notifications_OnNotification;
+    CardCollectionsViewModel.OnNotification += OnNotificationHandler;
+    CardCollectionsViewModel.OnGetDialogWrapper += OnGetDialogWrapperHandler;
+  }
+
+  private void MTGCardCollectionPage_Unloaded(object sender, RoutedEventArgs e)
+  {
+    OnNotification -= Notifications_OnNotification;
+    CardCollectionsViewModel.OnNotification -= OnNotificationHandler;
+    CardCollectionsViewModel.OnGetDialogWrapper -= OnGetDialogWrapperHandler;
+  }
+
+  private void Notifications_OnNotification(object sender, NotificationEventArgs e)
+  {
+    if ((XamlRoot)sender == XamlRoot)
     {
       InAppNotification.Background = e.Type switch
       {
-        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
-        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
-        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+        NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+        NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+        NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
         _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
       };
       InAppNotification.RequestedTheme = ElementTheme.Light;
-      InAppNotification.Show(e.Text, NotificationService.NotificationDuration);
+      InAppNotification.Show(e.Text, NotificationDuration);
     }
   }
+  #endregion
 
   #region Pointer events
   private void GridViewItemImage_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)

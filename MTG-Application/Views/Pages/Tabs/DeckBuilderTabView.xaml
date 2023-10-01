@@ -1,4 +1,4 @@
-<UserControl
+<Page
   x:Class="MTGApplication.Views.Pages.Tabs.DeckBuilderTabView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -11,11 +11,10 @@
   xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
   xmlns:customcontrols="using:MTGApplication.Views.Controls"
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-  xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI" 
-  xmlns:converters="using:MTGApplication.Views.BindingHelpers.Converters"
+  xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
   mc:Ignorable="d">
 
-  <UserControl.Resources>
+  <Page.Resources>
     <!--Deck-->
     <DataTemplate x:Key="DeckImageViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
@@ -26,8 +25,8 @@
                 <CommandBarFlyout.PrimaryCommands>
                   <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                   <AppBarSeparator />
-                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                  <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+                  <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
                   <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                 </CommandBarFlyout.PrimaryCommands>
                 <CommandBarFlyout.SecondaryCommands>
@@ -46,13 +45,14 @@
           </controls:ImageEx>
         </Grid>
         <Grid>
-          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}" HorizontalAlignment="Right" FontSize="11" Padding="0 0 5 0"/>
+          <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11" Padding="0 0 5 0"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="{Binding Model.Count, Mode=OneWay}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{x:Bind Model.Count, Mode=OneWay}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
           </StackPanel>
         </Grid>
       </StackPanel>
     </DataTemplate>
+
     <DataTemplate x:Key="DeckListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel Style="{StaticResource MTGListViewItemStyle}"
                   PointerEntered="PreviewableCard_PointerEntered"
@@ -63,8 +63,8 @@
             <CommandBarFlyout.PrimaryCommands>
               <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
               <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
@@ -84,9 +84,10 @@
         <Image Width="20" Source="{x:Bind Model.Info.SetIconUri, Mode=OneTime}"/>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
         <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneTime}" Width="250"/>
-        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}"/>
+        <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
       </StackPanel>
     </DataTemplate>
+
     <!--Sidelists-->
     <DataTemplate x:Key="SideListViewItemTemplate" x:DataType="viewmodels:MTGCardViewModel">
       <StackPanel Background="Transparent"
@@ -99,8 +100,8 @@
             <CommandBarFlyout.PrimaryCommands>
               <AppBarButton Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{x:Bind ModelAPIName, Mode=OneTime}"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
               <AppBarButton Command="{x:Bind DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
@@ -124,7 +125,7 @@
           </Grid.ColumnDefinitions>
           <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
           <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" TextTrimming="CharacterEllipsis"/>
-          <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneTime}"/>
+          <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
         </Grid>
       </StackPanel>
     </DataTemplate>
@@ -133,8 +134,7 @@
       <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
     </Style>
 
-    <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter"/>
-  </UserControl.Resources>
+  </Page.Resources>
 
   <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
     <Grid.KeyboardAccelerators>
@@ -210,8 +210,10 @@
     <controls:DockPanel LastChildFill="True" 
                         Padding="0 0 10 10" 
                         Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
       <!--Sidebar-->
-      <TabView controls:DockPanel.Dock="Right"
+      <TabView x:Name="SidebarTabs"
+               controls:DockPanel.Dock="Right"
                IsAddTabButtonVisible="False" 
                Width="250" 
                Margin="10 7 0 0" 
@@ -252,8 +254,9 @@
                       <CommandBarFlyout.PrimaryCommands>
                         <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                         <AppBarSeparator />
-                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
+                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" Label="EDHREC" ToolTipService.ToolTip="EDHREC" />
                         <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                       </CommandBarFlyout.PrimaryCommands>
                       <CommandBarFlyout.SecondaryCommands>
@@ -279,8 +282,9 @@
                       <CommandBarFlyout.PrimaryCommands>
                         <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
                         <AppBarSeparator />
-                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="world" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="API Website"/>
-                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:FontIcon Glyph=&#xE7BF;}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
+                        <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+                        <AppBarButton Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" Label="EDHREC" ToolTipService.ToolTip="EDHREC" />
                         <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
                       </CommandBarFlyout.PrimaryCommands>
                       <CommandBarFlyout.SecondaryCommands>
@@ -318,6 +322,7 @@
                         DragOver="CardView_DragOver"
                         Drop="CardView_Drop"
                         DragItemsStarting="CardView_DragItemsStarting"
+                        DragItemsCompleted="CardView_DragItemsCompleted"
                         ItemTemplate="{StaticResource SideListViewItemTemplate}"
                         KeyDown="CardView_KeyDown"
                         LosingFocus="CardView_LosingFocus"/>
@@ -338,19 +343,20 @@
                 </customcontrols:LinedHeader.Header>
               </customcontrols:LinedHeader>
               <ListView Grid.Row="4"
-                          x:Name="DeckWishlistDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.WishlistCards, Mode=OneTime}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
-                          Style="{StaticResource MTGListViewStyle}"
-                          SelectionMode="Single"
-                          CanDragItems="True"
-                          AllowDrop="True"
-                          DragOver="CardView_DragOver"
-                          Drop="CardView_Drop"
-                          DragItemsStarting="CardView_DragItemsStarting"
-                          ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                          KeyDown="CardView_KeyDown"
-                          LosingFocus="CardView_LosingFocus"/>
+                        x:Name="DeckWishlistDisplay"
+                        DataContext="{x:Bind DeckBuilderViewModel.WishlistCards, Mode=OneTime}"
+                        ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
+                        Style="{StaticResource MTGListViewStyle}"
+                        SelectionMode="Single"
+                        CanDragItems="True"
+                        AllowDrop="True"
+                        DragOver="CardView_DragOver"
+                        Drop="CardView_Drop"
+                        DragItemsStarting="CardView_DragItemsStarting"
+                        DragItemsCompleted="CardView_DragItemsCompleted"
+                        ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                        KeyDown="CardView_KeyDown"
+                        LosingFocus="CardView_LosingFocus"/>
               <customcontrols:LinedHeader Grid.Row="5">
                 <customcontrols:LinedHeader.Header>
                   <TextBlock Text="Remove">
@@ -368,19 +374,20 @@
                 </customcontrols:LinedHeader.Header>
               </customcontrols:LinedHeader>
               <ListView Grid.Row="6"
-                          x:Name="DeckRemovelistDisplay"
-                          DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards, Mode=OneTime}"
-                          ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
-                          Style="{StaticResource MTGListViewStyle}"
-                          SelectionMode="Single"
-                          CanDragItems="True"
-                          AllowDrop="True"
-                          DragOver="CardView_DragOver"
-                          Drop="CardView_Drop"
-                          DragItemsStarting="CardView_DragItemsStarting"
-                          ItemTemplate="{StaticResource SideListViewItemTemplate}"
-                          KeyDown="CardView_KeyDown"
-                          LosingFocus="CardView_LosingFocus"/>
+                        x:Name="DeckRemovelistDisplay"
+                        DataContext="{x:Bind DeckBuilderViewModel.RemovelistCards, Mode=OneTime}"
+                        ItemsSource="{Binding FilteredAndSortedCardViewModels, Mode=OneTime}"
+                        Style="{StaticResource MTGListViewStyle}"
+                        SelectionMode="Single"
+                        CanDragItems="True"
+                        AllowDrop="True"
+                        DragOver="CardView_DragOver"
+                        Drop="CardView_Drop"
+                        DragItemsStarting="CardView_DragItemsStarting"
+                        DragItemsCompleted="CardView_DragItemsCompleted"
+                        ItemTemplate="{StaticResource SideListViewItemTemplate}"
+                        KeyDown="CardView_KeyDown"
+                        LosingFocus="CardView_LosingFocus"/>
             </Grid>
           </TabViewItem>
           <TabViewItem Header="Info" IsClosable="False">
@@ -401,17 +408,17 @@
                             Command="{x:Bind DeckBuilderViewModel.OpenPlaytestWindowCommand, Mode=OneTime}" 
                             CommandParameter="{x:Bind DeckBuilderViewModel.CardDeck, Mode=OneWay}"/>
                 </StackPanel>
-                <!--Charts-->
+                <!-- Charts -->
                 <customcontrols:LinedHeader>
                   <customcontrols:LinedHeader.Header>
                     <TextBlock Text="Mana Curve"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
                 <lvc:CartesianChart Height="250" 
-                                      DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" 
-                                      Series="{Binding Series, Mode=OneTime}"
-                                      XAxes="{Binding XAxes, Mode=OneTime}"
-                                      YAxes="{Binding YAxes, Mode=OneTime}"/>
+                                    DataContext="{x:Bind DeckBuilderViewModel.CMCChart, Mode=OneWay}" 
+                                    Series="{Binding Series, Mode=OneTime}"
+                                    XAxes="{Binding XAxes, Mode=OneTime}"
+                                    YAxes="{Binding YAxes, Mode=OneTime}"/>
                 <customcontrols:LinedHeader>
                   <customcontrols:LinedHeader.Header>
                     <TextBlock Text="Type Chart"/>
@@ -432,7 +439,8 @@
           </TabViewItem>
         </TabView.TabItems>
       </TabView>
-      <!--Commands-->
+
+      <!-- Commands -->
       <Grid controls:DockPanel.Dock="Top" 
               Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
               BorderThickness="0 0 0 1"
@@ -576,7 +584,8 @@
             </AppBarElementContainer>
           </CommandBar>
         </StackPanel>
-        <!--Info-->
+
+        <!-- Info -->
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
           <TextBlock x:Name="SelectedDeckNameTitle" Text="{x:Bind DeckBuilderViewModel.CardDeck.Name, Mode=OneWay}" FontWeight="Bold" HorizontalAlignment="Right"/>
           <TextBlock Text="{x:Bind sys:String.Format('{0} cards', DeckBuilderViewModel.DeckSize), Mode=OneWay}" HorizontalAlignment="Right"/>
@@ -591,6 +600,7 @@
           </StackPanel.ContextFlyout>
         </StackPanel>
       </Grid>
+
       <!--Deck View-->
       <Grid controls:DockPanel.Dock="Top">
         <controls:AdaptiveGridView x:Name="DeckImagesDisplay"
@@ -606,6 +616,7 @@
                                    DragOver="CardView_DragOver"
                                    Drop="CardView_Drop"
                                    DragItemsStarting="CardView_DragItemsStarting"
+                                   DragItemsCompleted="CardView_DragItemsCompleted"
                                    ItemTemplate="{StaticResource DeckImageViewItemTemplate}"
                                    KeyDown="CardView_KeyDown"
                                    LosingFocus="CardView_LosingFocus"
@@ -621,10 +632,11 @@
                   DragOver="CardView_DragOver"
                   Drop="CardView_Drop"
                   DragItemsStarting="CardView_DragItemsStarting"
+                  DragItemsCompleted="CardView_DragItemsCompleted"
                   ItemTemplate="{StaticResource DeckListViewItemTemplate}"
                   KeyDown="CardView_KeyDown"
                   LosingFocus="CardView_LosingFocus"/>
       </Grid>
     </controls:DockPanel>
   </Grid>
-</UserControl>
+</Page>

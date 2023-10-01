@@ -3,16 +3,16 @@ using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using MTGApplication.API;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
-using MTGApplication.Services;
 using MTGApplication.ViewModels;
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using static MTGApplication.Services.DialogService;
+using static MTGApplication.Services.NotificationService;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
 namespace MTGApplication.Views.Pages.Tabs;
@@ -21,42 +21,99 @@ namespace MTGApplication.Views.Pages.Tabs;
 /// Code behind for DeckBuilder Tab
 /// </summary>
 [ObservableObject]
-public sealed partial class DeckBuilderTabView : UserControl, ISavable
+public sealed partial class DeckBuilderTabView : Page, ISavable
 {
   public DeckBuilderTabView(CardPreviewProperties previewProperties)
   {
     InitializeComponent();
     CardPreviewProperties = previewProperties;
 
-    DeckBuilderViewModel = new(CardAPI, new SQLiteMTGDeckRepository(CardAPI, cardDbContextFactory: new()), new());
-    DeckBuilderViewModel.OnNotification += (s, args) => NotificationService.RaiseNotification(XamlRoot, args);
-    DeckBuilderViewModel.OnGetDialogWrapper += (s, args) =>
+    DeckBuilderViewModel = new(App.MTGCardAPI, new SQLiteMTGDeckRepository(App.MTGCardAPI, cardDbContextFactory: new()), new());
+
+    Loaded += DeckBuilderTabView_Loaded;
+    Unloaded += DeckBuilderTabView_Unloaded;
+
+    OnNotificationHandler = (s, args) => { RaiseNotification(XamlRoot, args); };
+    OnGetDialogWrapperHandler = (s, args) =>
     {
       if (XamlRoot.Content is IDialogPresenter presenter && presenter.DialogWrapper != null)
       {
         args.DialogWrapper = presenter.DialogWrapper;
       }
     };
+
+    DeckBuilderViewModel.OnNotification += OnNotificationHandler;
+    DeckBuilderViewModel.OnGetDialogWrapper += OnGetDialogWrapperHandler;
+    DeckBuilderViewModel.PropertyChanged += DeckBuilderViewModel_PropertyChanged;
   }
 
   private DragArgs dragArgs;
 
   #region Properties
   [ObservableProperty] private double deckDesiredItemWidth = 250;
-  [ObservableProperty] private bool isClosable = true;
 
+  public string Header => DeckBuilderViewModel.DeckName;
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
-  public ICardAPI<MTGCard> CardAPI { get; } = new ScryfallAPI();
   public CardPreviewProperties CardPreviewProperties { get; }
+
+  private EventHandler<NotificationEventArgs> OnNotificationHandler { get; }
+  private EventHandler<DialogEventArgs> OnGetDialogWrapperHandler { get; }
   #endregion
 
   #region ISavable Implementation
-  public bool HasUnsavedChanges { get => DeckBuilderViewModel.HasUnsavedChanges; set => DeckBuilderViewModel.HasUnsavedChanges = value; }
+  public bool HasUnsavedChanges
+  {
+    get => DeckBuilderViewModel.HasUnsavedChanges;
+    set => DeckBuilderViewModel.HasUnsavedChanges = value;
+  }
 
   public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
   #endregion
 
-  public async Task<bool> TabCloseRequested() => !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
+  public async Task<bool> TabCloseRequested()
+  {
+    var result = !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
+
+    if (result)
+    {
+      //Set tab contents to null, so the GC can destroy this object
+      foreach (var item in SidebarTabs.TabItems)
+      {
+        (item as TabViewItem).Content = null;
+        DeckBuilderViewModel.OnNotification -= OnNotificationHandler;
+        DeckBuilderViewModel.OnGetDialogWrapper -= OnGetDialogWrapperHandler;
+        DeckBuilderViewModel.PropertyChanged -= DeckBuilderViewModel_PropertyChanged;
+      }
+    }
+
+    return result;
+  }
+
+  #region Events
+  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e)
+    => AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
+
+  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e)
+    => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
+
+  private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(DeckBuilderViewModel.DeckName): OnPropertyChanged(nameof(Header)); break;
+      case nameof(DeckBuilderViewModel.HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
+    }
+  }
+
+  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    // TODO: better system to update axis colors. Maybe Custom Control?
+    if (e.PropertyName == nameof(AppConfig.LocalAppSettings.AppTheme))
+    {
+      DeckBuilderViewModel.CMCChart?.UpdateTheme();
+    }
+  }
+  #endregion
 
   #region Pointer Events
   // Preview
@@ -141,9 +198,11 @@ public sealed partial class DeckBuilderTabView : UserControl, ISavable
       }
     }
 
-    dragArgs = null;
     def.Complete();
   }
+
+  private void CardView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    => dragArgs = null;
 
   private void CommanderView_DragOver(object sender, DragEventArgs e)
   {

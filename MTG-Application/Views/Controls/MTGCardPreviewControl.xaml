@@ -17,8 +17,6 @@
                       CornerRadius="12"
                       Visibility="{x:Bind PreviewVisibility, Mode=OneWay}"
                       PlaceholderStretch="Fill"
-                      CacheMode="BitmapCache" 
-                      IsCacheEnabled="True"
                       PlaceholderSource="{x:Bind PreviewPlaceholderSource, Mode=OneWay}"
                       Source="{x:Bind PreviewSource, Mode=OneWay}"
                       Style="{StaticResource PreviewImagePlaceholderStyle}">
