@@ -468,6 +468,18 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
         stringBuilder.AppendLine(token.ScryfallId.ToString());
     }
 
+    if (Commander != null)
+    {
+      foreach (var token in Commander.Model.Info.Tokens)
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
+    }
+
+    if (CommanderPartner != null)
+    {
+      foreach (var token in CommanderPartner.Model.Info.Tokens)
+        stringBuilder.AppendLine(token.ScryfallId.ToString());
+    }
+
     var tokens = (await CardAPI.FetchFromString(stringBuilder.ToString())).Found.Select(x
       => new DeckTestingMTGCardViewModel(x) { IsToken = true })
       .DistinctBy(x => x.Model.Info.OracleId).ToArray(); // Filter duplicates out using oracleId
