@@ -239,16 +239,17 @@
               </Grid.RowDefinitions>
               <StackPanel Grid.Row="0" Orientation="Vertical">
                 <TextBlock DataContext="{x:Bind DeckBuilderViewModel.Commander, Mode=OneWay}"
-                              Text="Commander: " 
-                              TextTrimming="CharacterEllipsis"
-                              AllowDrop="True"
-                              DragOver="CommanderView_DragOver"
-                              Drop="CommanderView_Drop"
-                              CanDrag="True"
-                              PointerEntered="PreviewableCard_PointerEntered"
-                              PointerExited="PreviewableCard_PointerExited"
-                              PointerMoved="PreviewableCard_PointerMoved"
-                              DragStarting="CommanderView_DragStarting">
+                           Text="Commander: " 
+                           TextTrimming="CharacterEllipsis"
+                           AllowDrop="True"
+                           DragOver="CommanderView_DragOver"
+                           Drop="CommanderView_Drop"
+                           CanDrag="True"
+                           PointerEntered="PreviewableCard_PointerEntered"
+                           PointerExited="PreviewableCard_PointerExited"
+                           PointerMoved="PreviewableCard_PointerMoved"
+                           DragStarting="CommanderView_DragStarting"
+                           DropCompleted="CommanderView_DropCompleted">
                   <TextBlock.ContextFlyout >
                     <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
                       <CommandBarFlyout.PrimaryCommands>
@@ -267,16 +268,17 @@
                     <Run Text="{Binding Name, Mode=OneTime}"/>
                 </TextBlock>
                 <TextBlock DataContext="{x:Bind DeckBuilderViewModel.CommanderPartner, Mode=OneWay}"
-                              Text="Partner: " 
-                              TextTrimming="CharacterEllipsis"
-                              AllowDrop="True"
-                              DragOver="CommanderPartnerView_DragOver"
-                              Drop="CommanderPartnerView_Drop"
-                              CanDrag="True"
-                              PointerEntered="PreviewableCard_PointerEntered"
-                              PointerExited="PreviewableCard_PointerExited"
-                              PointerMoved="PreviewableCard_PointerMoved"
-                              DragStarting="CommanderView_DragStarting">
+                           Text="Partner: " 
+                           TextTrimming="CharacterEllipsis"
+                           AllowDrop="True"
+                           DragOver="CommanderPartnerView_DragOver"
+                           Drop="CommanderPartnerView_Drop"
+                           CanDrag="True"
+                           PointerEntered="PreviewableCard_PointerEntered"
+                           PointerExited="PreviewableCard_PointerExited"
+                           PointerMoved="PreviewableCard_PointerMoved"
+                           DragStarting="CommanderView_DragStarting"
+                           DropCompleted="CommanderView_DropCompleted">
                   <TextBlock.ContextFlyout >
                     <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
                       <CommandBarFlyout.PrimaryCommands>

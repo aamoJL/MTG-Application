@@ -251,6 +251,20 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
     def.Complete();
   }
 
+  private void CommanderView_DragStarting(UIElement sender, DragStartingEventArgs args)
+  {
+    if ((sender as FrameworkElement).DataContext is MTGCardViewModel vm && vm != null)
+    {
+      args.Data.SetText(vm.Model.ToJSON());
+      args.Data.RequestedOperation = DataPackageOperation.Copy;
+      dragArgs = new(sender, null, vm.Model);
+    }
+    else { args.Cancel = true; }
+  }
+
+  private void CommanderView_DropCompleted(UIElement sender, DropCompletedEventArgs args)
+    => dragArgs = null;
+
   private void CommanderPartnerView_DragOver(object sender, DragEventArgs e)
   {
     if (e.DataView.Contains(StandardDataFormats.Text) && !sender.Equals(dragArgs?.DragStartElement))
@@ -314,17 +328,6 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
 
   private void Root_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     => DeckBuilderViewModel.CardFilters.Reset();
-
-  private void CommanderView_DragStarting(UIElement sender, DragStartingEventArgs args)
-  {
-    if ((sender as FrameworkElement).DataContext is MTGCardViewModel vm && vm != null)
-    {
-      args.Data.SetText(vm.Model.ToJSON());
-      args.Data.RequestedOperation = DataPackageOperation.Copy;
-      dragArgs = new(sender, null, vm.Model);
-    }
-    else { args.Cancel = true; }
-  }
 }
 
 // Drag args
