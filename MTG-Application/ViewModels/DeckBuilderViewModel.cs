@@ -25,11 +25,12 @@ namespace MTGApplication.ViewModels;
 /// </summary>
 public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
 {
-  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = null)
+  public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = default, IMTGCommanderAPI commanderAPI = default)
   {
     DeckRepository = deckRepository;
     CardAPI = cardAPI;
     clipboardService ??= new();
+    CommanderAPI = commanderAPI ?? new EDHRECCommanderAPI();
 
     DeckCards = new DeckCardlistViewModel(CardDeck.DeckCards, CardAPI, CardFilters, SortProperties)
     {
@@ -91,11 +92,13 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   [ObservableProperty] private MTGSpellTypePieChart spellTypeChart;
   [ObservableProperty] private MTGCMCStackedColumnChart cMCChart;
   [ObservableProperty] private MTGColorPieChart colorChart;
+  [ObservableProperty] private MTGColorDevotionPolarChart colorDevotionChart;
   [ObservableProperty] private bool isBusy;
 
   private IRepository<MTGCardDeck> DeckRepository { get; }
   private ICardAPI<MTGCard> CardAPI { get; }
-  private IMTGCommanderAPI CommanderAPI { get; } = new EDHRECCommanderAPI();
+  private IMTGCommanderAPI CommanderAPI { get; }
+
   public MTGCardDeck CardDeck
   {
     get => cardDeck;
@@ -665,6 +668,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     SpellTypeChart = new MTGSpellTypePieChart() { Models = CardDeck.DeckCards };
     ManaProductionChart = new MTGManaProductionPieChart() { Models = CardDeck.DeckCards };
     ColorChart = new MTGColorPieChart(innerRadius: 60) { Models = CardDeck.DeckCards };
+    ColorDevotionChart = new MTGColorDevotionPolarChart() { Models = CardDeck.DeckCards };
   }
 
   #region RelayCommand CanExecute Methods

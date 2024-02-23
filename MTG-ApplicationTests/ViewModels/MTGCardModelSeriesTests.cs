@@ -14,7 +14,7 @@ namespace MTGApplicationTests.ViewModels
       var secondCount = 5;
       var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: firstCount);
       var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: secondCount);
-      var series = new MTGCardModelCMCSeries(firstCard);
+      var series = new MTGCardModelCMCSeriesItem(firstCard);
 
       series.AddItem(secondCard);
       Assert.AreEqual(series.PrimaryValue, firstCount + secondCount);
@@ -28,7 +28,7 @@ namespace MTGApplicationTests.ViewModels
       var secondCount = 5;
       var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: firstCount);
       var secondCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: secondCount);
-      var series = new MTGCardModelCMCSeries(firstCard);
+      var series = new MTGCardModelCMCSeriesItem(firstCard);
 
       series.AddItem(secondCard);
 
@@ -42,7 +42,7 @@ namespace MTGApplicationTests.ViewModels
     {
       var firstCount = 13;
       var firstCard = Mocker.MTGCardModelMocker.CreateMTGCardModel(count: firstCount);
-      var series = new MTGCardModelCMCSeries(firstCard);
+      var series = new MTGCardModelCMCSeriesItem(firstCard);
 
       firstCard.Count++;
       Assert.AreEqual(series.PrimaryValue, firstCount + 1);

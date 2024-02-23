@@ -436,6 +436,17 @@
                   <lvc:PieChart DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
                   <lvc:PieChart Height="110" Width="110" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
                 </Grid>
+                <customcontrols:LinedHeader>
+                  <customcontrols:LinedHeader.Header>
+                    <TextBlock Text="Color Devotion Chart"/>
+                  </customcontrols:LinedHeader.Header>
+                </customcontrols:LinedHeader>
+                <lvc:PolarChart 
+                  Height="300" 
+                  DataContext="{x:Bind DeckBuilderViewModel.ColorDevotionChart, Mode=OneWay}" 
+                  Series="{Binding Series, Mode=OneTime}"
+                  AngleAxes="{Binding AngleAxes, Mode=OneTime}"
+                  RadiusAxes="{Binding RadiusAxes, Mode=OneTime}"/>
               </StackPanel>
             </ScrollViewer>
           </TabViewItem>
