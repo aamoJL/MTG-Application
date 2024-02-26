@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MTGApplication.Models;
+using System.Collections.ObjectModel;
 using System.Linq;
 using static MTGApplication.Services.MTGService;
 
@@ -16,12 +16,11 @@ public abstract class StackedColumnChart<TPrimaryType, TModel> : CardModelChart<
 {
   public StackedColumnChart() { }
 
-  public override bool HasSecondaryValues => true;
+  public override bool HasSecondarySeriesItems => true;
 
   public ICartesianAxis[] XAxes { get; set; } = new Axis[]
   {
-    new Axis
-    {
+    new() {
       LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       ForceStepToMin = true,
       MinStep = 1,
@@ -29,9 +28,11 @@ public abstract class StackedColumnChart<TPrimaryType, TModel> : CardModelChart<
   };
   public ICartesianAxis[] YAxes { get; set; } = new Axis[]
   {
-    new Axis
-    {
+    new() {
       LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
+      ForceStepToMin = true,
+      MinStep = 5,
+      MinLimit = 0,
     }
   };
 
@@ -54,21 +55,21 @@ public class MTGCMCStackedColumnChart : StackedColumnChart<ColorTypes, MTGCard>
 
   protected override bool ModelValidation(MTGCard model) => !model.Info.SpellTypes.Contains(SpellType.Land); // Don't count Lands as a color
 
-  protected override StackedColumnSeries<CardModelSeries<MTGCard>> FindPrimarySeries(MTGCard model, ColorTypes item)
+  protected override StackedColumnSeries<CardModelSeriesItem<MTGCard>> FindSeries(MTGCard model, ColorTypes item)
   {
-    if (Series.FirstOrDefault(x => x.Name == item.GetFullName()) is StackedColumnSeries<CardModelSeries<MTGCard>> series)
+    if (Series.FirstOrDefault(x => x.Name == item.GetFullName()) is StackedColumnSeries<CardModelSeriesItem<MTGCard>> series)
     {
       return series;
     }
     else { return null; }
   }
 
-  protected override ColorTypes[] GetPrimaryItems(MTGCard model) => model.Info.Colors.Length > 1 ? new ColorTypes[] { ColorTypes.M } : new ColorTypes[] { model.Info.Colors[0] };
+  protected override ColorTypes[] GetPrimaryProperties(MTGCard model) => model.Info.Colors.Length > 1 ? new[] { ColorTypes.M } : new[] { model.Info.Colors[0] };
 
-  protected override StackedColumnSeries<CardModelSeries<MTGCard>> CreateNewSeries(ColorTypes item) => CardModelSeries<MTGCard>.CreateStackedColumnSeriesByColor(item);
+  protected override StackedColumnSeries<CardModelSeriesItem<MTGCard>> CreateNewSeries(ColorTypes item) => CardModelSeriesItem<MTGCard>.CreateStackedColumnSeriesByColor(item);
 
-  protected override CardModelSeries<MTGCard> FindSecondaryItem(ISeries series, MTGCard model)
-    => ((StackedColumnSeries<CardModelSeries<MTGCard>>)series).Values.FirstOrDefault(x => x.SecondaryValue == model.Info.CMC); // Find series' cmc object
+  protected override CardModelSeriesItem<MTGCard> CreateNewSecondarySeriesItem(MTGCard model) => new MTGCardModelCMCSeriesItem(model); // Create new cmc object
 
-  protected override CardModelSeries<MTGCard> CreateNewSecondarySeries(MTGCard model) => new MTGCardModelCMCSeries(model); // Create new cmc object
+  protected override CardModelSeriesItem<MTGCard> FindSecondarySeriesItem(ObservableCollection<CardModelSeriesItem<MTGCard>> items, ColorTypes primaryProperty, MTGCard model)
+    => items?.FirstOrDefault(x => x.SecondaryValue == model.Info.CMC, null); // Find series' cmc object
 }

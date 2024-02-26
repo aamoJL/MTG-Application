@@ -31,7 +31,7 @@
           <customcontrols:CardAPISearchControl CardPreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
         </SplitView.Pane>
         <Grid>
-          <!-- NOTE: Tab item reordering crashes the app -->
+          <!-- NOTE: CanReorderTabs needs to be 'false', otherwise the app crashes when trying to reorder -->
           <TabView IsAddTabButtonVisible="True" 
                    VerticalAlignment="Stretch"
                    HorizontalAlignment="Stretch" 

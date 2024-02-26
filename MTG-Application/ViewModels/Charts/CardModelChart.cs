@@ -17,7 +17,7 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
 
   #region Properties
   public ObservableCollection<ISeries> Series { get; } = new();
-  public ObservableCollection<TModel> Models
+  public virtual ObservableCollection<TModel> Models
   {
     get => models;
     init
@@ -31,7 +31,8 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
       models.CollectionChanged += Models_CollectionChanged;
     }
   }
-  public abstract bool HasSecondaryValues { get; }
+  public abstract bool HasSecondarySeriesItems { get; }
+  public virtual bool RemoveEmptySeries { get; } = true;
   #endregion
 
   #region OnPropertyChanged events
@@ -71,35 +72,38 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
     if (!ModelValidation(model))
     { return; }
 
-    foreach (var primaryItem in GetPrimaryItems(model))
+    var primaryProperties = GetPrimaryProperties(model);
+    foreach (var primaryProperty in primaryProperties)
     {
-      var series = FindPrimarySeries(model, primaryItem);
+      var series = FindSeries(model, primaryProperty);
 
       if (series == null)
       {
-        series = CreateNewSeries(primaryItem);
+        series = CreateNewSeries(primaryProperty);
         AddAndSortSeries(series);
       }
 
-      if (HasSecondaryValues)
+      if (HasSecondarySeriesItems)
       {
-        if (FindSecondaryItem(series, model) is CardModelSeries<TModel> secondaryItem)
+        if (series.Values is ObservableCollection<CardModelSeriesItem<TModel>> primaryValues && FindSecondarySeriesItem(primaryValues, primaryProperty, model)
+          is CardModelSeriesItem<TModel> secondaryItem)
         {
           // Add to existing item
           secondaryItem.AddItem(model);
         }
         else
         {
-          (series.Values as ObservableCollection<CardModelSeries<TModel>>).Add(CreateNewSecondarySeries(model));
+          (series.Values as ObservableCollection<CardModelSeriesItem<TModel>>).Add(CreateNewSecondarySeriesItem(model));
         }
       }
       else
       {
-        if (series.Values is ObservableCollection<CardModelSeries<TModel>> values)
+        if (series.Values is ObservableCollection<CardModelSeriesItem<TModel>> values)
         {
           if (values.Count == 0)
           {
-            values.Add(CreateNewSecondarySeries(model));
+            var secondarySeries = CreateNewSecondarySeriesItem(model);
+            if (secondarySeries != null) values.Add(secondarySeries);
           }
           else
           {
@@ -135,14 +139,14 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
   protected virtual bool ModelValidation(TModel model) => true;
 
   /// <summary>
-  /// Returns existing <see cref="ISeries"/> object
-  /// </summary>
-  protected abstract ISeries FindPrimarySeries(TModel model, TPrimaryType item);
-
-  /// <summary>
   /// Returns array of properties from <paramref name="model"/> that will be used to populate the chart series
   /// </summary>
-  protected abstract TPrimaryType[] GetPrimaryItems(TModel model);
+  protected abstract TPrimaryType[] GetPrimaryProperties(TModel model);
+
+  /// <summary>
+  /// Returns existing <see cref="ISeries"/> object
+  /// </summary>
+  protected abstract ISeries FindSeries(TModel model, TPrimaryType item);
 
   /// <summary>
   /// Returns new <see cref="ISeries"/>
@@ -152,12 +156,12 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
   /// <summary>
   /// Returns secondary series from the <paramref name="series"/> object's values.
   /// </summary>
-  protected abstract CardModelSeries<TModel> FindSecondaryItem(ISeries series, TModel model);
+  protected abstract CardModelSeriesItem<TModel> FindSecondarySeriesItem(ObservableCollection<CardModelSeriesItem<TModel>> items, TPrimaryType primaryProperty, TModel model);
 
   /// <summary>
   /// Returns new secondary series
   /// </summary>
-  protected abstract CardModelSeries<TModel> CreateNewSecondarySeries(TModel model);
+  protected abstract CardModelSeriesItem<TModel> CreateNewSecondarySeriesItem(TModel model);
 
   /// <summary>
   /// Removes model from the chart
@@ -166,33 +170,34 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
   {
     if (!ModelValidation(model)) { return; }
 
-    foreach (var primaryItem in GetPrimaryItems(model))
+    foreach (var primaryProperty in GetPrimaryProperties(model))
     {
-      var series = FindPrimarySeries(model, primaryItem);
+      var series = FindSeries(model, primaryProperty);
       if (series == null) { return; }
 
-      if (HasSecondaryValues)
+      if (HasSecondarySeriesItems)
       {
-        if (FindSecondaryItem(series, model) is CardModelSeries<TModel> secondaryItem)
+        if (series.Values is ObservableCollection<CardModelSeriesItem<TModel>> primaryValues && FindSecondarySeriesItem(primaryValues, primaryProperty, model)
+          is CardModelSeriesItem<TModel> secondaryItem)
         {
           secondaryItem.RemoveItem(model);
-          if (secondaryItem.PrimaryValue == 0)
+          if (RemoveEmptySeries && secondaryItem.PrimaryValue == 0)
           {
             // remove secondary item if its count is zero
-            (series.Values as ObservableCollection<CardModelSeries<TModel>>).Remove(secondaryItem);
+            (series.Values as ObservableCollection<CardModelSeriesItem<TModel>>).Remove(secondaryItem);
           }
         }
 
-        if ((series.Values as ObservableCollection<CardModelSeries<TModel>>).Count == 0)
+        if (RemoveEmptySeries && (series.Values as ObservableCollection<CardModelSeriesItem<TModel>>).Count == 0)
         {
           Series.Remove(series);
         }
       }
       else
       {
-        var valueObject = (series.Values as ObservableCollection<CardModelSeries<TModel>>)[0];
+        var valueObject = (series.Values as ObservableCollection<CardModelSeriesItem<TModel>>)[0];
         valueObject.RemoveItem(model);
-        if (valueObject.PrimaryValue == 0) { Series.Remove(series); }
+        if (RemoveEmptySeries && valueObject.PrimaryValue == 0) { Series.Remove(series); }
       }
     }
   }

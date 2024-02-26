@@ -426,16 +426,18 @@
                     <TextBlock Text="Type Chart"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
-                <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
+                <lvc:PieChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
                 <customcontrols:LinedHeader>
                   <customcontrols:LinedHeader.Header>
                     <TextBlock Text="Color &amp; Mana Chart"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
-                <Grid Height="170" Width="170" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 10">
-                  <lvc:PieChart DataContext="{x:Bind DeckBuilderViewModel.ColorChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
-                  <lvc:PieChart Height="110" Width="110" DataContext="{x:Bind DeckBuilderViewModel.ManaProductionChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
-                </Grid>
+                <lvc:PolarChart 
+                  Height="250" 
+                  DataContext="{x:Bind DeckBuilderViewModel.ColorDevotionChart, Mode=OneWay}" 
+                  Series="{Binding Series, Mode=OneTime}"
+                  AngleAxes="{Binding AngleAxes, Mode=OneTime}"
+                  RadiusAxes="{Binding RadiusAxes, Mode=OneTime}"/>
               </StackPanel>
             </ScrollViewer>
           </TabViewItem>

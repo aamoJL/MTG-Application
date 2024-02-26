@@ -15,15 +15,15 @@ namespace MTGApplication.ViewModels.Charts;
 /// <summary>
 /// Base class for card model series
 /// </summary>
-public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : ObservableObject
+public abstract class CardModelSeriesItem<TModel> : ViewModelBase where TModel : ObservableObject
 {
-  public CardModelSeries(TModel model)
+  protected CardModelSeriesItem()
   {
     Models = new();
-    Models.CollectionChanged += Models_CollectionChanged;
-
-    AddItem(model);
+    Models.CollectionChanged += Models_CollectionChanged; 
   }
+
+  public CardModelSeriesItem(TModel model) : this() => AddItem(model);
 
   protected double primaryValue;
 
@@ -72,12 +72,12 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
   /// <summary>
   /// Returns StackedColumnSeries using the given <paramref name="color"/>
   /// </summary>
-  public static StackedColumnSeries<CardModelSeries<TModel>> CreateStackedColumnSeriesByColor(ColorTypes color)
+  public static StackedColumnSeries<CardModelSeriesItem<TModel>> CreateStackedColumnSeriesByColor(ColorTypes color)
   {
-    return new StackedColumnSeries<CardModelSeries<TModel>>
+    return new StackedColumnSeries<CardModelSeriesItem<TModel>>
     {
       Name = color.GetFullName(),
-      Values = new ObservableCollection<CardModelSeries<TModel>>(),
+      Values = new ObservableCollection<CardModelSeriesItem<TModel>>(),
       Stroke = new SolidColorPaint(SKColors.Gray) { StrokeThickness = 1 },
       Fill = color switch
       {
@@ -95,22 +95,19 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       DataLabelsPaint = new SolidColorPaint(ChartColorPalette.LightThemeText),
       DataLabelsSize = 10,
       DataLabelsPosition = DataLabelsPosition.Middle,
-      Mapping = (value, point) =>
-      {
-        point.Coordinate = new(value.SecondaryValue, value.PrimaryValue);
-      }
+      Mapping = (value, index) => new(value.SecondaryValue, value.PrimaryValue)
     };
   }
 
   /// <summary>
   /// Returns PieSeries using the given <paramref name="color"/>
   /// </summary>
-  public static PieSeries<CardModelSeries<TModel>> CreatePieSeriesByColor(ColorTypes color)
+  public static PieSeries<CardModelSeriesItem<TModel>> CreatePieSeriesByColor(ColorTypes color)
   {
-    return new PieSeries<CardModelSeries<TModel>>
+    return new PieSeries<CardModelSeriesItem<TModel>>
     {
       Name = color.GetFullName(),
-      Values = new ObservableCollection<CardModelSeries<TModel>>(),
+      Values = new ObservableCollection<CardModelSeriesItem<TModel>>(),
       Stroke = new SolidColorPaint(SKColors.Gray) { StrokeThickness = 1 },
       Fill = color switch
       {
@@ -127,22 +124,19 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       DataLabelsSize = 10,
       DataLabelsPosition = PolarLabelsPosition.Outer,
       DataLabelsFormatter = p => p.Context.Series.Name,
-      Mapping = (value, point) =>
-      {
-        point.Coordinate = new(value.SecondaryValue, value.PrimaryValue);
-      },
+      Mapping = (value, index) => new(value.SecondaryValue, value.PrimaryValue)
     };
   }
 
   /// <summary>
   /// Returns PieSeries using the given <paramref name="spellType"/>
   /// </summary>
-  public static PieSeries<CardModelSeries<TModel>> CreateSeriesGroupBySpellType(SpellType spellType)
+  public static PieSeries<CardModelSeriesItem<TModel>> CreatePieSeriesBySpellType(SpellType spellType)
   {
-    return new PieSeries<CardModelSeries<TModel>>
+    return new PieSeries<CardModelSeriesItem<TModel>>
     {
       Name = spellType.ToString(),
-      Values = new ObservableCollection<CardModelSeries<TModel>>(),
+      Values = new ObservableCollection<CardModelSeriesItem<TModel>>(),
       Stroke = new SolidColorPaint(SKColors.Gray) { StrokeThickness = 1 },
       Fill = spellType switch
       {
@@ -159,10 +153,19 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
       DataLabelsSize = 10,
       DataLabelsPosition = PolarLabelsPosition.Outer,
       DataLabelsFormatter = p => p.Context.Series.Name,
-      Mapping = (value, point) =>
-      {
-        point.Coordinate = new(value.SecondaryValue, value.PrimaryValue);
-      }
+      Mapping = (value, index) => new(value.SecondaryValue, value.PrimaryValue)
+    };
+  }
+
+  public static PolarLineSeries<CardModelSeriesItem<TModel>> CreatePolarLineSeries(CardModelSeriesItem<TModel>[] secondarySeriesItems = null)
+  {
+    return new PolarLineSeries<CardModelSeriesItem<TModel>>
+    {
+      Values = new ObservableCollection<CardModelSeriesItem<TModel>>(secondarySeriesItems),
+      LineSmoothness = 0,
+      GeometrySize = 0,
+      Fill = new SolidColorPaint(SKColors.Blue.WithAlpha(90)),
+      Mapping = (value, index) => new(index, value.PrimaryValue)
     };
   }
 }
@@ -170,9 +173,10 @@ public abstract class CardModelSeries<TModel> : ViewModelBase where TModel : Obs
 /// <summary>
 /// MTG card model series that has the sum of the card counts as the primary value
 /// </summary>
-public class MTGCardModelCountSeries : CardModelSeries<MTGCard>
+public class MTGCardModelCountSeriesItem : CardModelSeriesItem<MTGCard>
 {
-  public MTGCardModelCountSeries(MTGCard model) : base(model) { }
+  public MTGCardModelCountSeriesItem() { }
+  public MTGCardModelCountSeriesItem(MTGCard model) : base(model) { }
 
   #region OnPropertyChanged events
   protected override void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -198,7 +202,7 @@ public class MTGCardModelCountSeries : CardModelSeries<MTGCard>
 /// MTG card model series that has the sum of the card counts as the primary value
 /// and model CMC as the secondary value
 /// </summary>
-public class MTGCardModelCMCSeries : MTGCardModelCountSeries
+public class MTGCardModelCMCSeriesItem : MTGCardModelCountSeriesItem
 {
-  public MTGCardModelCMCSeries(MTGCard model) : base(model) => SecondaryValue = model.Info.CMC;
+  public MTGCardModelCMCSeriesItem(MTGCard model) : base(model) => SecondaryValue = model.Info.CMC;
 }
