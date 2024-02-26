@@ -157,7 +157,7 @@ public abstract class CardModelSeriesItem<TModel> : ViewModelBase where TModel :
     };
   }
 
-  public static PolarLineSeries<CardModelSeriesItem<TModel>> CreatePolarLineSeries(CardModelSeriesItem<TModel>[] secondarySeriesItems)
+  public static PolarLineSeries<CardModelSeriesItem<TModel>> CreatePolarLineSeries(CardModelSeriesItem<TModel>[] secondarySeriesItems = null)
   {
     return new PolarLineSeries<CardModelSeriesItem<TModel>>
     {
