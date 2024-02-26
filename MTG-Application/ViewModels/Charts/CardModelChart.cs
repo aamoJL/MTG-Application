@@ -13,10 +13,10 @@ public abstract class CardModelChart<TPrimaryType, TModel> where TModel : Observ
 {
   public CardModelChart() { }
 
-  protected ObservableCollection<TModel> models = [];
+  protected ObservableCollection<TModel> models = new();
 
   #region Properties
-  public ObservableCollection<ISeries> Series { get; } = [];
+  public ObservableCollection<ISeries> Series { get; } = new();
   public virtual ObservableCollection<TModel> Models
   {
     get => models;

@@ -3,7 +3,6 @@ using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MTGApplication.Models;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static MTGApplication.Services.MTGService;
@@ -65,7 +64,7 @@ public class MTGCMCStackedColumnChart : StackedColumnChart<ColorTypes, MTGCard>
     else { return null; }
   }
 
-  protected override ColorTypes[] GetPrimaryProperties(MTGCard model) => model.Info.Colors.Length > 1 ? [ColorTypes.M] : [model.Info.Colors[0]];
+  protected override ColorTypes[] GetPrimaryProperties(MTGCard model) => model.Info.Colors.Length > 1 ? new[] { ColorTypes.M } : new[] { model.Info.Colors[0] };
 
   protected override StackedColumnSeries<CardModelSeriesItem<MTGCard>> CreateNewSeries(ColorTypes item) => CardModelSeriesItem<MTGCard>.CreateStackedColumnSeriesByColor(item);
 

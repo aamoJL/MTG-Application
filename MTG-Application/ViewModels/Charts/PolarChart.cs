@@ -38,13 +38,13 @@ public class MTGColorPolarChart : MTGPolarChart<ColorTypes>
 {
 
   protected static readonly ColorTypes[] colorRange =
-  [
+  {
     ColorTypes.W,
     ColorTypes.U,
     ColorTypes.B,
     ColorTypes.R,
     ColorTypes.G,
-  ];
+  };
 
   public override IPolarAxis[] AngleAxes { get; set; } = new PolarAxis[]
   {
@@ -109,7 +109,7 @@ public class MTGColorAndManaPolarChart
     colorChart = new() { Models = models };
     manaChart = new() { Models = models };
 
-    Series = [
+    Series = new[] {
       new PolarLineSeries<CardModelSeriesItem<MTGCard>>
       {
         Name = "Color",
@@ -136,6 +136,6 @@ public class MTGColorAndManaPolarChart
         Mapping = (value, index) => new(index, value.PrimaryValue),
         IsVisibleAtLegend = true,
       }
-    ];
+    };
   }
 }

@@ -19,7 +19,7 @@ public abstract class CardModelSeriesItem<TModel> : ViewModelBase where TModel :
 {
   protected CardModelSeriesItem()
   {
-    Models = [];
+    Models = new();
     Models.CollectionChanged += Models_CollectionChanged; 
   }
 
