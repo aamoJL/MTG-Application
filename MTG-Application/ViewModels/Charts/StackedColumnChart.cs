@@ -31,6 +31,9 @@ public abstract class StackedColumnChart<TPrimaryType, TModel> : CardModelChart<
   {
     new() {
       LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
+      ForceStepToMin = true,
+      MinStep = 5,
+      MinLimit = 0,
     }
   };
 

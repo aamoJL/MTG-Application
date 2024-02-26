@@ -426,14 +426,14 @@
                     <TextBlock Text="Type Chart"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
-                <lvc:PieChart Height="170" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
+                <lvc:PieChart Height="250" DataContext="{x:Bind DeckBuilderViewModel.SpellTypeChart, Mode=OneWay}" Series="{Binding Series, Mode=OneTime}"/>
                 <customcontrols:LinedHeader>
                   <customcontrols:LinedHeader.Header>
                     <TextBlock Text="Color &amp; Mana Chart"/>
                   </customcontrols:LinedHeader.Header>
                 </customcontrols:LinedHeader>
                 <lvc:PolarChart 
-                  Height="300" 
+                  Height="250" 
                   DataContext="{x:Bind DeckBuilderViewModel.ColorDevotionChart, Mode=OneWay}" 
                   Series="{Binding Series, Mode=OneTime}"
                   AngleAxes="{Binding AngleAxes, Mode=OneTime}"
