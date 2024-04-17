@@ -49,6 +49,8 @@
     <None Remove="README.md" />
     <None Remove="Views\Pages\MTGCardCollectionPage.xaml" />
     <None Remove="Views\Pages\MTGDeckBuildingPage.xaml" />
+    <None Remove="Views\Pages\Tabs\DeckBuilderDeckDisplayTabView.xaml" />
+    <None Remove="Views\Pages\Tabs\DeckBuilderTabFrame.xaml" />
     <None Remove="Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
     <None Remove="Views\Styles\CustomListViewStyle.xaml" />
     <None Remove="Views\Styles\MTGPrintGridViewItemTemplate.xaml" />
@@ -192,6 +194,16 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="Views\Styles\Template\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\Tabs\DeckBuilderTabFrame.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\Tabs\DeckBuilderDeckDisplayTabView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Controls\DeckBuilderTabHeaderControl.xaml">

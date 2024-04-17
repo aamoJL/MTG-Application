@@ -40,7 +40,8 @@
                    TabCloseRequested="TabView_TabCloseRequested"
                    CanReorderTabs="False"
                    TabItemsChanged="TabView_TabItemsChanged"
-                   TabItemsSource="{x:Bind TabViews, Mode=OneWay}"/>
+                   TabItemsSource="{x:Bind TabViews, Mode=OneWay}">
+          </TabView>
           <!--Top-right corner buttons-->
           <StackPanel Height="40" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Margin="0 0 5 0">
             <Button MinWidth="40" Height="30" Content="Collections" Command="{x:Bind OpenCollectionsWindowCommand, Mode=OneTime}"/>

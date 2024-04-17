@@ -11,6 +11,7 @@ using MTGApplication.Views.Pages.Tabs;
 using MTGApplication.Views.Windows;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;
@@ -95,20 +96,20 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
     }
   }
 
-  private void TabContent_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void TabContent_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     // NOTE: Header is set here because XALM bindings did not work for the TabViewItems for some reason
-    var content = sender as DeckBuilderTabView;
+    var content = sender as ITabViewTab;
     var tab = TabViews.FirstOrDefault(x => x.Content == sender);
 
     if (tab != null)
     {
       switch (e.PropertyName)
       {
-        case nameof(DeckBuilderTabView.Header):
+        case nameof(ITabViewTab.Header):
           (tab.Header as DeckBuilderTabHeaderControl).Text = string.IsNullOrEmpty(content.Header) ? TabDefaultName : content.Header; break;
-        case nameof(DeckBuilderTabView.HasUnsavedChanges):
-          (tab.Header as DeckBuilderTabHeaderControl).HasUnsavedChanges = content.HasUnsavedChanges; break;
+        case nameof(ISavable.HasUnsavedChanges):
+          (tab.Header as DeckBuilderTabHeaderControl).HasUnsavedChanges = (content as ISavable)?.HasUnsavedChanges ?? false; break;
       }
     }
   }
@@ -155,12 +156,14 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   private async void TabView_TabCloseRequested(TabView tabView, TabViewTabCloseRequestedEventArgs args)
   {
     // Request tab closing from the tab items Content
-    if (args.Tab.Content is DeckBuilderTabView content && await content.TabCloseRequested())
+    if (args.Tab.Content is ITabViewTab content)
     {
-      TabViews.Remove(args.Tab);
+      if (!await content.TabCloseRequested()) { return; }
       content.PropertyChanged -= TabContent_PropertyChanged;
-      args.Tab.Content = null;
     }
+
+    TabViews.Remove(args.Tab);
+    args.Tab.Content = null;
   }
 
   private void TabView_TabItemsChanged(TabView tabView, IVectorChangedEventArgs args)
@@ -181,10 +184,12 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   /// </summary>
   private TabViewItem CreateNewTab()
   {
-    var content = new DeckBuilderTabView(CardPreviewProperties);
+    var content = new DeckBuilderTabFrame(CardPreviewProperties);
+    content.Init();
+
     var tabItem = new TabViewItem()
     {
-      Header = new DeckBuilderTabHeaderControl() { Text = TabDefaultName },
+      Header = new DeckBuilderTabHeaderControl() { Text = content.Header },
       Content = content,
     };
 

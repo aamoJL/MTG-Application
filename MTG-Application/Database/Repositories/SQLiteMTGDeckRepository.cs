@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MTGApplication.Database.Repositories;
 
@@ -62,7 +63,20 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
     db.ChangeTracker.AutoDetectChangesEnabled = false;
     var deck = db.MTGDecks.Where(x => x.Name == name).WithDefaultIncludes().FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
-    return await deck?.AsMTGCardDeck(CardAPI);
+    
+    if (deck == null) return null;
+    else return await deck.AsMTGCardDeck(CardAPI);
+  }
+
+  public async Task<IEnumerable<MTGCardDeck>> GetDecksWithCommanders()
+  {
+    using var db = cardDbContextFactory.CreateDbContext();
+    db.ChangeTracker.LazyLoadingEnabled = false;
+    db.ChangeTracker.AutoDetectChangesEnabled = false;
+    var decks = db.MTGDecks.Include(x => x.Commander).Include(x => x.CommanderPartner).ToList();
+    db.ChangeTracker.AutoDetectChangesEnabled = true;
+
+    return await Task.WhenAll(db.MTGDecks.Select(x => x.AsMTGCardDeck(CardAPI)));
   }
 
   public virtual async Task<bool> Remove(MTGCardDeck item)

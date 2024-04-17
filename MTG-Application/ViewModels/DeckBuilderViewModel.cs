@@ -328,24 +328,29 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     {
       var loadName = await Dialogs.GetLoadDialog((await DeckRepository.Get()).Select(x => x.Name).OrderBy(x => x).ToArray())
         .ShowAsync(GetDialogWrapper());
-      if (loadName != null)
+      await LoadDeck(loadName);
+    }
+  }
+
+  public async Task LoadDeck(string name)
+  {
+    if (name != null)
+    {
+      IsBusy = true;
+      try
       {
-        IsBusy = true;
-        try
+        if (await Task.Run(() => DeckRepository.Get(name)) is MTGCardDeck loadedDeck)
         {
-          if (await Task.Run(() => DeckRepository.Get(loadName)) is MTGCardDeck loadedDeck)
-          {
-            CardDeck = loadedDeck;
-            RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
-          }
-          else { throw new Exception(); }
+          CardDeck = loadedDeck;
+          RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was loaded successfully.");
         }
-        catch (Exception)
-        {
-          RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
-        }
-        IsBusy = false;
+        else { throw new Exception(); }
       }
+      catch (Exception)
+      {
+        RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the deck.");
+      }
+      IsBusy = false;
     }
   }
 
