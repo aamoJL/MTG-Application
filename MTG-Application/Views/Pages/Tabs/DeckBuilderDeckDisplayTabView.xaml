@@ -28,7 +28,7 @@
         Margin="5 0 5 10"
         FontWeight="SemiBold"
         FontSize="24"
-        Content="Add new deck" 
+        Content="+ Add new deck" 
         Command="{x:Bind ViewModel.SelectDeckCommand, ConverterParameter={x:Null}, Mode=OneTime}"/>
       <GridView 
         Grid.Row="1"

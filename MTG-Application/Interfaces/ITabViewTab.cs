@@ -6,7 +6,7 @@ namespace MTGApplication.Interfaces;
 /// <summary>
 /// Interface for <see cref="TabView"/> tabs
 /// </summary>
-internal interface ITabViewTab : INotifyPropertyChanged
+public interface ITabViewTab : INotifyPropertyChanged
 {
   public string Header { get; }
 

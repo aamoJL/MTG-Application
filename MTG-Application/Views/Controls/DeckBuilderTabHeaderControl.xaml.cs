@@ -1,18 +1,21 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Interfaces;
 
 namespace MTGApplication.Views.Controls;
 
 public sealed partial class DeckBuilderTabHeaderControl : UserControl
 {
-  public DeckBuilderTabHeaderControl() => InitializeComponent();
-
+  public string DefaultHeaderText { get; } = "New Deck";
   public string Text
   {
     get => (string)GetValue(TextProperty);
-    set => SetValue(TextProperty, value);
+    set
+    {
+      if (string.IsNullOrEmpty(value)) value = DefaultHeaderText;
+      SetValue(TextProperty, value);
+    }
   }
-
   public bool HasUnsavedChanges
   {
     get => (bool)GetValue(HasUnsavedChangesProperty);
@@ -24,4 +27,24 @@ public sealed partial class DeckBuilderTabHeaderControl : UserControl
 
   public static readonly DependencyProperty HasUnsavedChangesProperty =
       DependencyProperty.Register(nameof(HasUnsavedChanges), typeof(bool), typeof(DeckBuilderTabHeaderControl), new PropertyMetadata(false));
+
+  public DeckBuilderTabHeaderControl(ITabViewTab tab)
+  {
+    InitializeComponent();
+
+    Text = tab.Header;
+    tab.PropertyChanged += Tab_PropertyChanged;
+  }
+
+  private void Tab_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(ITabViewTab.Header):
+        Text = (sender as ITabViewTab)?.Header ?? string.Empty; break;
+      case nameof(ISavable.HasUnsavedChanges):
+        HasUnsavedChanges = (sender as ISavable)?.HasUnsavedChanges ?? false; break;
+      default: break;
+    }
+  }
 }

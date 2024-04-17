@@ -20,7 +20,7 @@ namespace MTGApplication.Views.Pages.Tabs;
 /// <summary>
 /// Code behind for DeckBuilder Tab
 /// </summary>
-public sealed partial class DeckBuilderTabView : Page, ISavable, ITabViewTab
+public sealed partial class DeckBuilderTabView : Page, ISavable
 {
   public DeckBuilderTabView()
   {
@@ -78,41 +78,17 @@ public sealed partial class DeckBuilderTabView : Page, ISavable, ITabViewTab
   public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
   #endregion
 
-  #region ITabViewTab implementation
-  public string Header => DeckBuilderViewModel.DeckName;
-
-  public async Task<bool> TabCloseRequested()
-  {
-    var result = !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
-
-    if (result)
-    {
-      //Set tab contents to null, so the GC can destroy this object
-      foreach (var item in SidebarTabs.TabItems)
-      {
-        (item as TabViewItem).Content = null;
-        DeckBuilderViewModel.OnNotification -= OnNotificationHandler;
-        DeckBuilderViewModel.OnGetDialogWrapper -= OnGetDialogWrapperHandler;
-        DeckBuilderViewModel.PropertyChanged -= DeckBuilderViewModel_PropertyChanged;
-      }
-    }
-
-    return result;
-  }
-  #endregion
-
   #region Events
-  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e)
+  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e) 
     => AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
-  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e)
+  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e) 
     => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
 
   private void DeckBuilderViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
     {
-      case nameof(DeckBuilderViewModel.DeckName): PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Header))); break;
       case nameof(DeckBuilderViewModel.HasUnsavedChanges): PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasUnsavedChanges))); break;
     }
   }

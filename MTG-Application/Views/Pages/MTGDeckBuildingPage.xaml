@@ -39,7 +39,6 @@
                    AddTabButtonClick="TabView_AddTabButtonClick"
                    TabCloseRequested="TabView_TabCloseRequested"
                    CanReorderTabs="False"
-                   TabItemsChanged="TabView_TabItemsChanged"
                    TabItemsSource="{x:Bind TabViews, Mode=OneWay}">
           </TabView>
           <!--Top-right corner buttons-->

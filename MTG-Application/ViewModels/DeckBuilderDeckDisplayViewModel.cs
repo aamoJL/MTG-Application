@@ -33,12 +33,10 @@ public partial class DeckBuilderDeckDisplayViewModel : ViewModelBase
 
   public event EventHandler<DeckSelectedEventArgs> DeckSelected;
 
-  public DeckBuilderDeckDisplayViewModel() { }
-
   [RelayCommand]
   public void SelectDeck(DeckItemViewModel deckItem) => DeckSelected?.Invoke(this, new(deckItem?.Title));
   
-  public async Task Init()
+  public async Task LoadDeckItems()
   {
     IsBusy = true;
 
