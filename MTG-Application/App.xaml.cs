@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using MTGApplication.API;
 using MTGApplication.Database;
+using MTGApplication.Features.CardSearch;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Views.Pages;
@@ -38,10 +39,12 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
+    //var page = new MTGDeckBuildingPage();
+    var page = new MTGCardSearchView();
     new ThemedWindow
     {
       Title = "Deck Builder",
-      Content = new MTGDeckBuildingPage(),
+      Content = page,
     }.Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());

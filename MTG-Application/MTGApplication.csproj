@@ -36,6 +36,8 @@
     <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
+    <None Remove="Features\MTGCardSearch\Controls\ScryfallCardSearchControl.xaml" />
+    <None Remove="Features\MTGCardSearch\MTGCardSearchView.xaml" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
     <None Remove="Views\Controls\DeckBuilderTabHeaderControl.xaml" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
@@ -257,6 +259,16 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Styles\Themes\VioletTheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\CardSearch\MTGCardSearchView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\MTGCardSearch\Controls\ScryfallCardSearchControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

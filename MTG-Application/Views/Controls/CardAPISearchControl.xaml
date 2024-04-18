@@ -58,7 +58,6 @@
   <Grid>
 
     <VisualStateManager.VisualStateGroups>
-      
       <VisualStateGroup x:Name="CardSearchDisplayStates">
         <VisualState>
           <VisualState.StateTriggers>
@@ -77,7 +76,6 @@
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
-    
     </VisualStateManager.VisualStateGroups>
 
     <controls:DockPanel Grid.Column="0" 
