@@ -28,10 +28,13 @@ public partial class ScryfallCardSearchControlViewModel : ViewModelBase
   {
     get
     {
+      // Search query needs to be completely empty, if the SearchText is empty,
+      // Otherwise the API would return all the available cards matching the other properties
+      if(string.IsNullOrEmpty(SearchText)) return string.Empty;
+      
       var sb = new StringBuilder();
 
-      if (!string.IsNullOrEmpty(SearchText))
-        sb.Append($"{SearchText}+");
+      sb.Append($"{SearchText}+");
 
       if (SearchGameFormat != MTGSearchGameFormat.Any)
         sb.Append($"format:{SearchGameFormat.ToString()}+");

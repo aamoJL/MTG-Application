@@ -25,12 +25,17 @@
       BorderThickness="1"
       Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
       <TextBox.Header>
-        <TextBlock VerticalAlignment="Center">
-          <Run Text="Scryfall search" />
-          <Hyperlink 
-            Foreground="{ThemeResource SystemAccentColorDark1}"
-            NavigateUri="{x:Bind api:ScryfallAPI.API_REFERENCE_URL, Mode=OneTime}">syntax?</Hyperlink>
-        </TextBlock>
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Scryfall search"/>
+          <TextBlock Margin="10 0 0 0">
+            <Hyperlink
+              Foreground="{ThemeResource SystemAccentColorDark1}"
+              NavigateUri="{x:Bind api:ScryfallAPI.API_REFERENCE_URL, Mode=OneTime}"
+              ToolTipService.ToolTip="{x:Bind api:ScryfallAPI.API_REFERENCE_URL, Mode=OneTime}">
+              <Run Text="syntax?"/>
+            </Hyperlink>
+          </TextBlock>
+        </StackPanel>
       </TextBox.Header>
     </TextBox>
     <StackPanel Grid.Column="1" Orientation="Horizontal">

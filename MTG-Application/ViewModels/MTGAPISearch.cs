@@ -14,7 +14,7 @@ namespace MTGApplication.ViewModels;
 /// </summary>
 public partial class MTGAPISearch<TSource, IType> : ObservableObject where TSource : MTGCardSource<IType>, new() where IType : MTGCardViewModel
 {
-  public MTGAPISearch(ICardAPI<MTGCard> cardAPI) => this.CardAPI = cardAPI;
+  public MTGAPISearch(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
 
   #region Properties
   [ObservableProperty] private IncrementalLoadingCollection<TSource, IType> searchCards = new();
