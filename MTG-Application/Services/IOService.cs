@@ -124,9 +124,10 @@ public static partial class IOService
   {
     try
     {
-      return await HttpClient.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, "application/json")).Result.Content.ReadAsStringAsync();
+      var result = await HttpClient.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, "application/json"));
+      return await result.Content.ReadAsStringAsync();
     }
-    catch (Exception) { return ""; }
+    catch (Exception) { throw; }
   }
 
   /// <summary>

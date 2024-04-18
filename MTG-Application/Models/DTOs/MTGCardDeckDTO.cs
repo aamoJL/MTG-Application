@@ -37,6 +37,8 @@ public class MTGCardDeckDTO
   /// </summary>
   public async Task<MTGCardDeck> AsMTGCardDeck(ICardAPI<MTGCard> api)
   {
+    if (this == null) return null;
+    
     return new MTGCardDeck()
     {
       Name = Name,

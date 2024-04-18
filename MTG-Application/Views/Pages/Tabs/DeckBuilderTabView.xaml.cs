@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -8,6 +7,7 @@ using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System;
+using System.ComponentModel;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -20,13 +20,11 @@ namespace MTGApplication.Views.Pages.Tabs;
 /// <summary>
 /// Code behind for DeckBuilder Tab
 /// </summary>
-[ObservableObject]
 public sealed partial class DeckBuilderTabView : Page, ISavable
 {
-  public DeckBuilderTabView(CardPreviewProperties previewProperties)
+  public DeckBuilderTabView()
   {
     InitializeComponent();
-    CardPreviewProperties = previewProperties;
 
     DeckBuilderViewModel = new(App.MTGCardAPI, new SQLiteMTGDeckRepository(App.MTGCardAPI, cardDbContextFactory: new()), new());
 
@@ -50,11 +48,21 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
   private DragArgs dragArgs;
 
   #region Properties
-  [ObservableProperty] private double deckDesiredItemWidth = 250;
+  private double deckDesiredItemWidth = 250;
+  public double DeckDesiredItemWidth
+  {
+    get => deckDesiredItemWidth;
+    set
+    {
+      deckDesiredItemWidth = value;
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeckDesiredItemWidth)));
+    }
+  }
 
-  public string Header => DeckBuilderViewModel.DeckName;
+  public event PropertyChangedEventHandler PropertyChanged;
+
   public DeckBuilderViewModel DeckBuilderViewModel { get; }
-  public CardPreviewProperties CardPreviewProperties { get; }
+  public CardPreviewProperties CardPreviewProperties { get; set; } = new();
 
   private EventHandler<NotificationEventArgs> OnNotificationHandler { get; }
   private EventHandler<DialogEventArgs> OnGetDialogWrapperHandler { get; }
@@ -70,42 +78,22 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
   public async Task<bool> SaveUnsavedChanges() => await DeckBuilderViewModel.SaveUnsavedChanges();
   #endregion
 
-  public async Task<bool> TabCloseRequested()
-  {
-    var result = !DeckBuilderViewModel.HasUnsavedChanges || await DeckBuilderViewModel.SaveUnsavedChanges();
-
-    if (result)
-    {
-      //Set tab contents to null, so the GC can destroy this object
-      foreach (var item in SidebarTabs.TabItems)
-      {
-        (item as TabViewItem).Content = null;
-        DeckBuilderViewModel.OnNotification -= OnNotificationHandler;
-        DeckBuilderViewModel.OnGetDialogWrapper -= OnGetDialogWrapperHandler;
-        DeckBuilderViewModel.PropertyChanged -= DeckBuilderViewModel_PropertyChanged;
-      }
-    }
-
-    return result;
-  }
-
   #region Events
-  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e)
+  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e) 
     => AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
-  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e)
+  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e) 
     => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
 
-  private void DeckBuilderViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckBuilderViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
     {
-      case nameof(DeckBuilderViewModel.DeckName): OnPropertyChanged(nameof(Header)); break;
-      case nameof(DeckBuilderViewModel.HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
+      case nameof(DeckBuilderViewModel.HasUnsavedChanges): PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasUnsavedChanges))); break;
     }
   }
 
-  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void LocalSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     // TODO: better system to update axis colors. Maybe Custom Control?
     if (e.PropertyName == nameof(AppConfig.LocalAppSettings.AppTheme))

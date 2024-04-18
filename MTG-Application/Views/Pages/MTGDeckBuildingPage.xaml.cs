@@ -13,7 +13,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Foundation.Collections;
 using Windows.UI;
 using static MTGApplication.Services.NotificationService;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
@@ -35,8 +34,6 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   }
 
   #region Properties
-  public static string TabDefaultName { get; } = "New Deck";
-
   [ObservableProperty] private bool searchPanelOpen = false;
 
   public ObservableCollection<TabViewItem> TabViews { get; } = new();
@@ -95,21 +92,26 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
     }
   }
 
-  private void TabContent_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void TabView_AddTabButtonClick(TabView tabView, object args)
   {
-    // NOTE: Header is set here because XALM bindings did not work for the TabViewItems for some reason
-    var content = sender as DeckBuilderTabView;
-    var tab = TabViews.FirstOrDefault(x => x.Content == sender);
+    var tab = CreateNewTab();
+    TabViews.Add(tab);
+    tabView.SelectedItem = tab;
+  }
 
-    if (tab != null)
+  private async void TabView_TabCloseRequested(TabView tabView, TabViewTabCloseRequestedEventArgs args)
+  {
+    // Request tab closing from the tab items Content
+    if (!await (args.Tab.Content as ITabViewTab)?.TabCloseRequested()) { return; }
+
+    TabViews.Remove(args.Tab);
+    args.Tab.Content = null;
+
+    if (TabViews.Count == 0)
     {
-      switch (e.PropertyName)
-      {
-        case nameof(DeckBuilderTabView.Header):
-          (tab.Header as DeckBuilderTabHeaderControl).Text = string.IsNullOrEmpty(content.Header) ? TabDefaultName : content.Header; break;
-        case nameof(DeckBuilderTabView.HasUnsavedChanges):
-          (tab.Header as DeckBuilderTabHeaderControl).HasUnsavedChanges = content.HasUnsavedChanges; break;
-      }
+      var newTab = CreateNewTab();
+      TabViews.Add(newTab);
+      tabView.SelectedItem = newTab;
     }
   }
   #endregion
@@ -145,51 +147,17 @@ public sealed partial class MTGDeckBuildingPage : Page, ISavable, IDialogPresent
   }
   #endregion
 
-  private void TabView_AddTabButtonClick(TabView tabView, object args)
-  {
-    var tab = CreateNewTab();
-    TabViews.Add(tab);
-    tabView.SelectedItem = tab;
-  }
-
-  private async void TabView_TabCloseRequested(TabView tabView, TabViewTabCloseRequestedEventArgs args)
-  {
-    // Request tab closing from the tab items Content
-    if (args.Tab.Content is DeckBuilderTabView content && await content.TabCloseRequested())
-    {
-      TabViews.Remove(args.Tab);
-      content.PropertyChanged -= TabContent_PropertyChanged;
-      args.Tab.Content = null;
-    }
-  }
-
-  private void TabView_TabItemsChanged(TabView tabView, IVectorChangedEventArgs args)
-  {
-    // Disable tab closing if there are only one tab
-    if (TabViews.Count == 1)
-    {
-      TabViews[0].IsClosable = false;
-    }
-    else if (TabViews.Count > 1)
-    {
-      TabViews[0].IsClosable = true;
-    }
-  }
-
   /// <summary>
   /// Returns new TabViewItem with DeckBuilderTabView as a content
   /// </summary>
   private TabViewItem CreateNewTab()
   {
-    var content = new DeckBuilderTabView(CardPreviewProperties);
-    var tabItem = new TabViewItem()
+    var content = new DeckBuilderTabFrame(CardPreviewProperties).Init();
+
+    return new TabViewItem()
     {
-      Header = new DeckBuilderTabHeaderControl() { Text = TabDefaultName },
+      Header = new DeckBuilderTabHeaderControl(content),
       Content = content,
     };
-
-    content.PropertyChanged += TabContent_PropertyChanged;
-
-    return tabItem;
   }
 }
