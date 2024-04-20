@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using MTGApplication.API;
+using MTGApplication.API.CardAPI;
 using MTGApplication.Interfaces;
 using MTGApplication.ViewModels;
 using Windows.ApplicationModel.DataTransfer;

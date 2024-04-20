@@ -3,19 +3,24 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using MTGApplication.API;
+using MTGApplication.API.CardAPI;
+using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
+using MTGApplication.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI;
 using static MTGApplication.Services.DialogService;
 using static MTGApplication.Services.IOService;
 
-namespace MTGApplication.ViewModels;
+namespace MTGApplication.General;
 
 /// <summary>
 /// Card Collections Tab view model
@@ -600,7 +605,7 @@ public partial class CardCollectionsViewModel
               {
                 Content = "syntax?",
                 NavigateUri = new Uri("https://scryfall.com/docs/syntax"),
-                Foreground = new SolidColorBrush((Windows.UI.Color)Application.Current.Resources["SystemAccentColorDark2"]),
+                Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColorDark2"]),
                 Padding = new Thickness(5, 0, 5, 0),
                 Margin = new Thickness(5, 0, 5, 0),
               }

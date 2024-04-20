@@ -9,17 +9,22 @@ namespace MTGApplication.Views.Windows;
 /// </summary>
 public sealed partial class ThemedWindow : Window
 {
-  public ThemedWindow(string iconUri = "Assets/Icon.ico") : base()
+  private static readonly string DEFAULT_ICON_URI = "Assets/Icon.ico";
+
+  private bool _close = false; // Temp variable for window closing
+
+  public ThemedWindow() : base()
   {
     InitializeComponent();
-    AppWindow.SetIcon(iconUri);
+
+    IconUri = DEFAULT_ICON_URI;
 
     Closed += ThemedWindow_Closed;
+    AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
   }
 
-  private bool close = false; // Temp variable for window closing
+  public string IconUri { set => AppWindow.SetIcon(value); }
 
-  #region Properties
   /// <summary>
   /// <inheritdoc cref="Window.Content"/>
   /// </summary>
@@ -29,12 +34,9 @@ public sealed partial class ThemedWindow : Window
     set
     {
       base.Content = value;
-      // Set theme
-      if (value != null)
-      {
-        (value as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
-        AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
-      }
+
+      if (value is FrameworkElement element)
+        element.RequestedTheme = AppConfig.LocalSettings.AppTheme; // Set theme
     }
   }
 
@@ -55,14 +57,13 @@ public sealed partial class ThemedWindow : Window
     get => AppWindow.Size.Height;
     set => AppWindow.Resize(new(Width, value));
   }
-  #endregion
 
   private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
+    if (Content is not FrameworkElement element) return;
+
     if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
-    {
-      (Content as FrameworkElement).RequestedTheme = AppConfig.LocalSettings.AppTheme;
-    }
+      element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
   private async void ThemedWindow_Closed(object sender, WindowEventArgs args)
@@ -70,7 +71,7 @@ public sealed partial class ThemedWindow : Window
     // The Window will close if the close variable has been set to true.
     // Otherwise the user will be asked to save unsaved changes.
     // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
-    if (close) { return; }
+    if (_close) { return; }
 
     var canceled = false;
 
@@ -82,7 +83,7 @@ public sealed partial class ThemedWindow : Window
 
     if (!canceled)
     {
-      close = true;
+      _close = true;
       args.Handled = false;
       Content = null;
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;

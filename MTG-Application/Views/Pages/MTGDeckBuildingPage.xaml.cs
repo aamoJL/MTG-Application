@@ -4,6 +4,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using MTGApplication.General.Views;
 using MTGApplication.Interfaces;
 using MTGApplication.Services;
 using MTGApplication.Views.Controls;

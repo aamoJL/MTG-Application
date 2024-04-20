@@ -1,4 +1,4 @@
-﻿using MTGApplication.Interfaces;
+﻿using MTGApplication.API.CardAPI;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -38,7 +38,7 @@ public class MTGCardDeckDTO
   public async Task<MTGCardDeck> AsMTGCardDeck(ICardAPI<MTGCard> api)
   {
     if (this == null) return null;
-    
+
     return new MTGCardDeck()
     {
       Name = Name,

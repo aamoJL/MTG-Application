@@ -2,6 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using MTGApplication.API;
+using MTGApplication.API.CardAPI;
+using MTGApplication.Database.Repositories;
+using MTGApplication.General;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;

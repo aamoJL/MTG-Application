@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using MTGApplication.Features.CardDeck;
+using MTGApplication.General.Views;
 using MTGApplication.Interfaces;
 using MTGApplication.ViewModels;
 using System.ComponentModel;
@@ -27,7 +29,7 @@ public sealed partial class DeckBuilderTabFrame : Page, ITabViewTab, ISavable
   }
 
   public CardPreviewProperties PreviewProperties { get; }
-  
+
   public bool HasUnsavedChanges
   {
     get => (BaseFrame.Content as ISavable)?.HasUnsavedChanges ?? false;
@@ -40,31 +42,32 @@ public sealed partial class DeckBuilderTabFrame : Page, ITabViewTab, ISavable
   {
     if (BaseFrame.Content is ISavable savable)
       return !savable.HasUnsavedChanges || await savable.SaveUnsavedChanges();
-    else 
+    else
       return await Task.FromResult(true);
   }
 
   /// <summary>
   /// Initializer for the frame.
-  /// The frame will navigate to <see cref="DeckBuilderDeckDisplayTabView"/>
+  /// The frame will navigate to <see cref="MTGDeckSelectorView"/>
   /// </summary>
   /// <returns></returns>
   public DeckBuilderTabFrame Init()
   {
-    if (BaseFrame.Navigate(typeof(DeckBuilderDeckDisplayTabView), null, new SuppressNavigationTransitionInfo()))
+    if (BaseFrame.Navigate(typeof(MTGDeckSelectorView), null, new SuppressNavigationTransitionInfo()))
     {
-      var deckDisplayContent = (BaseFrame.Content as DeckBuilderDeckDisplayTabView);
-      _ = deckDisplayContent.Init();
+      var deckDisplayContent = (BaseFrame.Content as MTGDeckSelectorView);
+      //_ = deckDisplayContent.Init();
+      //TODO: init
 
-      deckDisplayContent.ViewModel.DeckSelected += DeckDisplayViewModel_DeckSelected;
+      //deckDisplayContent.ViewModel.DeckSelected += DeckDisplayViewModel_DeckSelected;
     }
-    
+
     return this;
   }
 
-  private async void DeckDisplayViewModel_DeckSelected(object sender, DeckBuilderDeckDisplayViewModel.DeckSelectedEventArgs e)
+  private async void DeckDisplayViewModel_DeckSelected(object sender, MTGDeckSelectorViewModel.DeckSelectedEventArgs e)
   {
-    (sender as DeckBuilderDeckDisplayViewModel).DeckSelected -= DeckDisplayViewModel_DeckSelected;
+    //(sender as MTGDeckSelectorViewModel).DeckSelected -= DeckDisplayViewModel_DeckSelected;
 
     if (BaseFrame.Navigate(typeof(DeckBuilderTabView), null, new SuppressNavigationTransitionInfo()))
     {

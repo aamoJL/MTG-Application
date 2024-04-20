@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.General.Views;
 using MTGApplication.Interfaces;
 
 namespace MTGApplication.Views.Controls;

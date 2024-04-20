@@ -1,4 +1,4 @@
-﻿using MTGApplication.Interfaces;
+﻿using MTGApplication.API.CardAPI;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System.Collections.Generic;

@@ -19,9 +19,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Views\Styles\Template\**" />
+    <Compile Remove="Windows\**" />
     <EmbeddedResource Remove="Views\Styles\Template\**" />
+    <EmbeddedResource Remove="Windows\**" />
     <None Remove="Views\Styles\Template\**" />
+    <None Remove="Windows\**" />
     <Page Remove="Views\Styles\Template\**" />
+    <Page Remove="Windows\**" />
   </ItemGroup>
   
   <ItemGroup>
@@ -36,8 +40,8 @@
     <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
-    <None Remove="Features\MTGCardSearch\Controls\ScryfallCardSearchControl.xaml" />
-    <None Remove="Features\MTGCardSearch\MTGCardSearchView.xaml" />
+    <None Remove="Features\CardSearch\Controls\ScryfallCardSearchInputControl.xaml" />
+    <None Remove="Features\CardSearch\MTGCardSearchView.xaml" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
     <None Remove="Views\Controls\DeckBuilderTabHeaderControl.xaml" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
@@ -268,8 +272,21 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\MTGCardSearch\Controls\ScryfallCardSearchControl.xaml">
+    <Page Update="Features\MTGCardSearch\Controls\ScryfallCardSearchInputControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\MTGDeckBuilder\MTGDeckBuilderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\MTGDeckView\MTGDeckView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Windows\**" />
   </ItemGroup>
 </Project>

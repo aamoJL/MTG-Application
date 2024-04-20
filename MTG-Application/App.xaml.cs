@@ -2,12 +2,10 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
-using MTGApplication.API;
+using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
-using MTGApplication.Features.CardSearch;
-using MTGApplication.Interfaces;
+using MTGApplication.General.Views;
 using MTGApplication.Models;
-using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 
 namespace MTGApplication;
@@ -39,12 +37,10 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    //var page = new MTGDeckBuildingPage();
-    var page = new MTGCardSearchView();
-    new ThemedWindow
+    new ThemedWindow()
     {
-      Title = "Deck Builder",
-      Content = page,
+      Content = new MTGDeckBuilderPage(),
+      Title = "Deck Builder"
     }.Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());

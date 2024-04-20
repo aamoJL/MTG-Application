@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Extensions;
+using MTGApplication.General.Extensions;
 
 namespace MTGApplicationTests.Extensions;
 

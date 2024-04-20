@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Common.Collections;
-using MTGApplication.Interfaces;
+using MTGApplication.API.CardAPI;
 using MTGApplication.Models;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.API.CardAPI;
+using MTGApplication.General;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using System;

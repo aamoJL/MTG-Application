@@ -1,4 +1,4 @@
-﻿using MTGApplication.Interfaces;
+﻿using MTGApplication.API.CardAPI;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Helpers;
+using MTGApplication.General;
 using MTGApplication.Models;
 using MTGApplication.Services;
 using System.ComponentModel;

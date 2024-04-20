@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Interfaces;
+namespace MTGApplication.API.CardAPI;
 
 /// <summary>
 /// Generic card API

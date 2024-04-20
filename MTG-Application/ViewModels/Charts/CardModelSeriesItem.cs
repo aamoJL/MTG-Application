@@ -2,6 +2,7 @@
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MTGApplication.General;
 using MTGApplication.Models;
 using SkiaSharp;
 using System.Collections.ObjectModel;

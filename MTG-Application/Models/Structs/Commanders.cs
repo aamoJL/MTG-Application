@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
-using MTGApplication.Extensions;
+using MTGApplication.General.Extensions;
 
 namespace MTGApplication.Models.Structs;
 
