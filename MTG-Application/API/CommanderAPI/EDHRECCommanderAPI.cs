@@ -1,7 +1,6 @@
 ﻿using MTGApplication.General.Extensions;
-using MTGApplication.Interfaces;
 using MTGApplication.Models.Structs;
-using MTGApplication.Services;
+using MTGApplication.Services.IOService;
 using System;
 using System.Linq;
 using System.Text;

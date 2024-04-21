@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using MTGApplication.API;
 using MTGApplication.API.CardAPI;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
@@ -18,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI;
 using static MTGApplication.Services.DialogService;
-using static MTGApplication.Services.IOService;
+using static MTGApplication.Services.IOService.IOService;
 
 namespace MTGApplication.General;
 

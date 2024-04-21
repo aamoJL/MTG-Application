@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
-namespace MTGApplication.Services;
+namespace MTGApplication.Services.IOService;
 
 /// <summary>
 /// Service that handles file systems and networking

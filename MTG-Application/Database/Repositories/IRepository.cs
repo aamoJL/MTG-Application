@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using MTGApplication.Models.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Database.Repositories;
@@ -41,5 +44,5 @@ public interface IRepository<T>
   /// <summary>
   /// Returns an item with the given <paramref name="name"/> from the database.
   /// </summary>
-  public Task<T> Get(string name);
+  public Task<T> Get(string name, Expression<Func<T, object>>[] Includes = null);
 }

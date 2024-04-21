@@ -6,6 +6,7 @@ using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Database.Repositories;
@@ -55,7 +56,7 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
     return decks;
   }
 
-  public virtual async Task<MTGCardDeck> Get(string name)
+  public virtual async Task<MTGCardDeck> Get(string name, Expression<Func<MTGCardDeck, object>>[] Includes = null)
   {
     using var db = cardDbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;

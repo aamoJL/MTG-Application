@@ -1,4 +1,7 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using MTGApplication.Features.CardDeck;
 
 namespace MTGApplication.General.Views;
 /// <summary>
@@ -8,13 +11,20 @@ public class CreateNewDeckViewTabItemUseCase : UseCase<TabViewItem>
 {
   public override TabViewItem Execute()
   {
-    //var content = new DeckBuilderTabFrame(CardPreviewProperties).Init();
-    var frame = new Frame();
+    var tabFrame = new Frame();
+
+    tabFrame.Content = new MTGDeckSelectorView()
+    {
+      DeckSelected = new RelayCommand<string>((string selectedDeck) =>
+      {
+        tabFrame.Navigate(typeof(MTGDeckEditorView), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
+      }),
+    };
 
     return new TabViewItem()
     {
-      Header = new TextBlock() { Text = "New tab" }, //new DeckBuilderTabHeaderControl(content),
-      Content = frame,
+      Header = new TextBlock() { Text = "New tab" },
+      Content = tabFrame,
     };
   }
 }

@@ -2,6 +2,7 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
 using MTGApplication.General.Views;
@@ -37,9 +38,12 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
+    var mainFrame = new Frame();
+    mainFrame.Navigate(typeof(MTGDeckBuilderPage));
+
     new ThemedWindow()
     {
-      Content = new MTGDeckBuilderPage(),
+      Content = mainFrame,
       Title = "Deck Builder"
     }.Activate();
 

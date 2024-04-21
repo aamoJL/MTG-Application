@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using MTGApplication.Services;
+using MTGApplication.Services.IOService;
 using System.IO;
 
 namespace MTGApplication.Database;

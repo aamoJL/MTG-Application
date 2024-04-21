@@ -40,6 +40,8 @@
     <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
+    <None Remove="Features\CardDeck\DeckEditor\Controls\DeckEditorCardImageView.xaml" />
+    <None Remove="Features\CardDeck\DeckEditor\Controls\DeckEditorCardTextView.xaml" />
     <None Remove="Features\CardSearch\Controls\ScryfallCardSearchInputControl.xaml" />
     <None Remove="Features\CardSearch\MTGCardSearchView.xaml" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
@@ -288,5 +290,15 @@
   </ItemGroup>
   <ItemGroup>
     <PRIResource Remove="Windows\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\CardDeck\DeckEditor\Controls\DeckEditorCardTextView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\CardDeck\DeckEditor\Controls\DeckEditorCardImageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

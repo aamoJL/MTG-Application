@@ -28,5 +28,7 @@ public sealed partial class MTGDeckSelectorView : Page
     }
   }
 
-  [RelayCommand] public void SelectDeck(MTGDeckSelectionListItem item) => DeckSelected.Execute(item?.Title ?? string.Empty);
+  [RelayCommand]
+  public void SelectDeck(MTGDeckSelectionListItem item)
+    => DeckSelected.Execute(item?.Title ?? string.Empty);
 }

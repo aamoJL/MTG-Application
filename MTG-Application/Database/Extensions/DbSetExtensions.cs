@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.Models.DTOs;
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace MTGApplication.Database.Extensions;
 
@@ -16,5 +18,18 @@ public static class DbSetExtensions
     dbSet.Include(x => x.CommanderPartner).Load();
 
     return dbSet;
+  }
+
+  public static IQueryable<MTGCardDeckDTO> SetIncludesOrDefault(this IQueryable<MTGCardDeckDTO> value, Expression<Func<MTGCardDeckDTO, object>>[] includes = null)
+  {
+    if (includes == null) { value.WithDefaultIncludes(); }
+    else
+    {
+      foreach (var include in includes)
+      {
+        value.Include(include).Load();
+      }
+    }
+    return value;
   }
 }

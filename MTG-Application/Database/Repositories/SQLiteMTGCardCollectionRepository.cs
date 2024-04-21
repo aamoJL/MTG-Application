@@ -5,6 +5,7 @@ using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Database.Repositories;
@@ -53,7 +54,7 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
     return await Task.WhenAll(db.MTGCardCollections.Select(x => x.AsMTGCardCollection(CardAPI)));
   }
 
-  public async Task<MTGCardCollection> Get(string name)
+  public async Task<MTGCardCollection> Get(string name, Expression<Func<MTGCardCollection, object>>[] Includes = null)
   {
     using var db = cardDbContextFactory.CreateDbContext();
     var collection = await db.MTGCardCollections.Where(x => x.Name == name).Include(x => x.CollectionLists).ThenInclude(x => x.Cards).FirstOrDefaultAsync();

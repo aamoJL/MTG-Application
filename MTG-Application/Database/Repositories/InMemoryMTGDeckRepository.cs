@@ -1,8 +1,10 @@
 ﻿using MTGApplication.API.CardAPI;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Database.Repositories;
@@ -40,7 +42,7 @@ public class InMemoryMTGDeckRepository : IRepository<MTGCardDeck>
 
   public virtual async Task<IEnumerable<MTGCardDeck>> Get() => await Task.WhenAll(Decks.Select(x => x.AsMTGCardDeck(CardAPI)));
 
-  public virtual async Task<MTGCardDeck> Get(string name) => await Decks.FirstOrDefault(x => x.Name == name)?.AsMTGCardDeck(CardAPI);
+  public virtual async Task<MTGCardDeck> Get(string name, Expression<Func<MTGCardDeck, object>>[] Includes = null) => await Decks.FirstOrDefault(x => x.Name == name)?.AsMTGCardDeck(CardAPI);
 
   public virtual async Task<bool> Remove(MTGCardDeck item) => await Task.Run(() => Decks.Remove(Decks.FirstOrDefault(x => x.Name == item.Name)));
 

@@ -2,8 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
-using MTGApplication.Features.CardDeck;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.General.Views;
@@ -14,7 +12,7 @@ public sealed partial class MTGDeckBuilderPage : Page
   {
     InitializeComponent();
 
-    TabViewItems.Add(CreateNewTab());
+    TabViewItems.Add(new CreateNewDeckViewTabItemUseCase().Execute());
   }
 
   public ObservableCollection<TabViewItem> TabViewItems { get; } = new();
@@ -40,7 +38,7 @@ public sealed partial class MTGDeckBuilderPage : Page
 
     if (TabViewItems.Count == 0)
     {
-      var newTab = CreateNewTab();
+      var newTab = new CreateNewDeckViewTabItemUseCase().Execute();
       TabViewItems.Add(newTab);
       sender.SelectedItem = newTab;
     }
@@ -48,27 +46,8 @@ public sealed partial class MTGDeckBuilderPage : Page
 
   private void TabView_AddTabButtonClick(TabView sender, object args)
   {
-    var newTab = CreateNewTab();
+    var newTab = new CreateNewDeckViewTabItemUseCase().Execute();
     TabViewItems.Add(newTab);
     sender.SelectedItem = newTab;
-  }
-
-  private TabViewItem CreateNewTab()
-  {
-    var tabFrame = new Frame();
-
-    tabFrame.Content = new MTGDeckSelectorView()
-    {
-      DeckSelected = new RelayCommand<string>((string selectedDeck) =>
-      {
-        tabFrame.Navigate(typeof(Page), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
-      }),
-    };
-
-    return new TabViewItem()
-    {
-      Header = new TextBlock() { Text = "New tab" },
-      Content = tabFrame,
-    };
   }
 }
