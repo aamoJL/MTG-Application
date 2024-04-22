@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.API.CardAPI;
-using MTGApplication.Database.Extensions;
+using MTGApplication.General.Databases;
+using MTGApplication.General.Databases.Repositories;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System;
@@ -49,7 +50,7 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
     return await db.MTGDecks.FirstOrDefaultAsync(x => x.Name == name) != null;
   }
 
-  public virtual async Task<IEnumerable<MTGCardDeck>> Get()
+  public virtual async Task<IEnumerable<MTGCardDeck>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
   {
     using var db = cardDbContextFactory.CreateDbContext();
     var decks = await Task.WhenAll(db.MTGDecks.Select(x => x.AsMTGCardDeck(CardAPI)));
@@ -61,7 +62,7 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
     using var db = cardDbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
-    var deck = db.MTGDecks.Where(x => x.Name == name).WithDefaultIncludes().FirstOrDefault();
+    var deck = db.MTGDecks.Where(x => x.Name == name).SetIncludesOrDefault().FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
 
     if (deck == null) return null;
@@ -84,7 +85,7 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
     db.ChangeTracker.AutoDetectChangesEnabled = false;
     if (db.MTGDecks
       .Where(x => x.Name == item.Name)
-      .WithDefaultIncludes()
+      .SetIncludesOrDefault()
       .FirstOrDefault() is MTGCardDeckDTO DbDeckDTO)
     {
       db.ChangeTracker.AutoDetectChangesEnabled = true;

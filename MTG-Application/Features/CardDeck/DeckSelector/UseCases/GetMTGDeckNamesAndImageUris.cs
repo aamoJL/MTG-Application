@@ -1,14 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.API.CardAPI;
+﻿using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
 using MTGApplication.General;
+using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using MTGApplication.Models;
+using MTGApplication.Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardDeck;
-public class GetMTGDeckNamesAndImageUris : UseCase<Task<List<(string Name, string ImageUri)>>>
+public class GetMTGDeckNamesAndImageUris : UseCase<Task<IEnumerable<(string Name, string ImageUri)>>>
 {
   public GetMTGDeckNamesAndImageUris(CardDbContextFactory contextFactory, ICardAPI<MTGCard> cardAPI)
   {
@@ -19,20 +22,17 @@ public class GetMTGDeckNamesAndImageUris : UseCase<Task<List<(string Name, strin
   public CardDbContextFactory ContextFactory { get; }
   public ICardAPI<MTGCard> CardAPI { get; }
 
-  public async override Task<List<(string Name, string ImageUri)>> Execute()
+  public async override Task<IEnumerable<(string Name, string ImageUri)>> Execute()
   {
-    using var db = ContextFactory.CreateDbContext();
-    db.ChangeTracker.LazyLoadingEnabled = false;
-    db.ChangeTracker.AutoDetectChangesEnabled = false;
+    var decks = await new GetDecksUseCase(new DeckDTORepository(), CardAPI)
+    {
+      Includes = new Expression<Func<MTGCardDeckDTO, object>>[]
+    {
+      x => x.Commander
+    }
+    }
+    .Execute();
 
-    var decks = await Task.WhenAll(
-      db.MTGDecks
-      .Include(x => x.Commander)
-      .Include(x => x.CommanderPartner)
-      .Select(x => x.AsMTGCardDeck(CardAPI)));
-
-    db.ChangeTracker.AutoDetectChangesEnabled = true;
-
-    return decks.Select(x => (x.Name, x.Commander?.Info.FrontFace.ImageUri ?? string.Empty)).ToList();
+    return decks.Select(x => (x.Name, x.Commander?.Info.FrontFace.ImageUri ?? string.Empty));
   }
 }

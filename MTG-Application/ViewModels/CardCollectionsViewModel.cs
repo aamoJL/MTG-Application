@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.API.CardAPI;
-using MTGApplication.Database.Repositories;
+using MTGApplication.General.Databases.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;

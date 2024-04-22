@@ -5,8 +5,6 @@ using System.Windows.Input;
 namespace MTGApplication.Features.CardDeck;
 public sealed partial class MTGDeckSelectorView : Page
 {
-  private bool _initialized = false;
-
   public MTGDeckSelectorView()
   {
     InitializeComponent();
@@ -20,12 +18,9 @@ public sealed partial class MTGDeckSelectorView : Page
 
   private async void MTGDeckSelectorView_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
   {
-    if (!_initialized)
-    {
-      _initialized = true;
+    Loaded -= MTGDeckSelectorView_Loaded;
 
-      await ViewModel.LoadDecksCommand.ExecuteAsync(null);
-    }
+    await ViewModel.LoadDecksCommand.ExecuteAsync(null);
   }
 
   [RelayCommand]

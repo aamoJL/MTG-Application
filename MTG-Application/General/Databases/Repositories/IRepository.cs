@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Database.Repositories;
+namespace MTGApplication.General.Databases.Repositories;
 
 /// <summary>
 /// Interface for database repositories
@@ -39,7 +39,7 @@ public interface IRepository<T>
   /// <summary>
   /// Returns all the items from the database.
   /// </summary>
-  public Task<IEnumerable<T>> Get();
+  public Task<IEnumerable<T>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null);
 
   /// <summary>
   /// Returns an item with the given <paramref name="name"/> from the database.

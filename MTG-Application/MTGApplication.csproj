@@ -301,4 +301,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\CardDeck\DeckEditor\Controls\CardView\" />
+  </ItemGroup>
 </Project>

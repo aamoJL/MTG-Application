@@ -7,9 +7,9 @@ namespace MTGApplication.General.Views;
 /// <summary>
 /// Use case to create new tab item with <see cref=""/> as the content
 /// </summary>
-public class CreateNewDeckViewTabItemUseCase : UseCase<TabViewItem>
+public class CreateNewDeckViewTabItemUseCase : UseCase<CustomTabViewItem>
 {
-  public override TabViewItem Execute()
+  public override CustomTabViewItem Execute()
   {
     var tabFrame = new Frame();
 
@@ -21,10 +21,9 @@ public class CreateNewDeckViewTabItemUseCase : UseCase<TabViewItem>
       }),
     };
 
-    return new TabViewItem()
+    return new CustomTabViewItem()
     {
-      Header = new TextBlock() { Text = "New tab" },
-      Content = tabFrame,
+      Frame = tabFrame,
     };
   }
 }

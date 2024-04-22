@@ -15,7 +15,7 @@ public sealed partial class MTGDeckBuilderPage : Page
     TabViewItems.Add(new CreateNewDeckViewTabItemUseCase().Execute());
   }
 
-  public ObservableCollection<TabViewItem> TabViewItems { get; } = new();
+  public ObservableCollection<CustomTabViewItem> TabViewItems { get; } = new();
 
   [ObservableProperty] private bool isSearchPaneOpen = false;
 
@@ -33,7 +33,7 @@ public sealed partial class MTGDeckBuilderPage : Page
     // Request tab closing from the tab items Content
     if (args.Tab.Content is ITabViewTab tabContent && !await tabContent.TabCloseRequested()) return;
 
-    TabViewItems.Remove(args.Tab);
+    TabViewItems.Remove(args.Item as CustomTabViewItem);
     args.Tab.Content = null;
 
     if (TabViewItems.Count == 0)

@@ -1,33 +1,103 @@
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using MTGApplication.API.CardAPI;
-using MTGApplication.Database;
-using MTGApplication.Database.Extensions;
-using MTGApplication.Database.Repositories;
-using MTGApplication.General;
-using MTGApplication.Models;
+using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Extensions;
+using MTGApplication.Interfaces;
 using MTGApplication.Models.DTOs;
-using System;
-using System.Collections.Generic;
+using MTGApplication.Services;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
+using static MTGApplication.ViewModels.DeckBuilderViewModel;
 
 namespace MTGApplication.Features.CardDeck;
-public sealed partial class MTGDeckEditorView : Page
+public sealed partial class MTGDeckEditorView : Page, IDialogPresenter
 {
   public MTGDeckEditorView()
   {
     InitializeComponent();
+
+    // TODO: notification system
   }
 
   public MTGDeckEditorViewModel ViewModel { get; set; } = new();
+  public DeckBuilderViewDialogs Dialogs { get; set; } = new();
+
+  public DialogService.DialogWrapper DialogWrapper => new(XamlRoot);
+
+  [RelayCommand]
+  private void NewDeck()
+  {
+    // TODO: unsaved dialog
+    if (ViewModel.NewDeckCommand.CanExecute(null)) ViewModel.NewDeckCommand.Execute(null);
+  }
+
+  [RelayCommand]
+  private async Task OpenDeck()
+  {
+    // TODO: unsaved dialog
+    var loadName = await Dialogs.GetLoadDialog(
+      names: (await new GetDecksUseCase(new DeckDTORepository(), App.MTGCardAPI)
+      {
+        Includes = ExpressionExtensions.EmptyArray<MTGCardDeckDTO>()
+      }
+      .Execute())
+      .Select(x => x.Name).OrderBy(x => x).ToArray())
+      .ShowAsync(DialogWrapper);
+
+    if (loadName is not null)
+    {
+      if (ViewModel.LoadDeckCommand.CanExecute(loadName)) ViewModel.LoadDeckCommand.Execute(loadName);
+    }
+  }
+
+  [RelayCommand]
+  private async Task SaveDeck()
+  {
+    var saveName = await Dialogs.GetSaveDialog(ViewModel.Deck.Name).ShowAsync(DialogWrapper);
+
+    if (string.IsNullOrEmpty(saveName)) return;
+
+    if (saveName != ViewModel.Deck.Name && await new DeckExistsUseCase(saveName, new DeckDTORepository()).Execute())
+    {
+      // Deck with the given name exists already
+      var overrideConfirmation = await Dialogs.GetOverrideDialog(saveName).ShowAsync(DialogWrapper);
+
+      if (overrideConfirmation is not true) return;
+    }
+
+    if (ViewModel.SaveDeckCommand.CanExecute(saveName)) ViewModel.SaveDeckCommand.Execute(saveName);
+  }
+
+  [RelayCommand]
+  private void ImportToDeckCards()
+  {
+    // TODO: import dialog
+    var importText = "";
+
+    if (!string.IsNullOrEmpty(importText))
+    {
+      if (ViewModel.ImportDeckCardsCommand.CanExecute(importText)) ViewModel.ImportDeckCardsCommand.Execute(importText);
+    }
+  }
+
+  [RelayCommand]
+  private async Task DeleteDeck()
+  {
+    if (await Dialogs.GetDeleteDialog(ViewModel.Deck.Name).ShowAsync(DialogWrapper) is true)
+    {
+      if (ViewModel.DeleteDeckCommand.CanExecute(null)) ViewModel.DeleteDeckCommand.Execute(null);
+    }
+  }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
     base.OnNavigatedTo(e);
 
-    if (e.Parameter is string deckName) ViewModel.OpenDeckCommand.Execute(deckName);
+    if (e.Parameter is string deckName && ViewModel.LoadDeckCommand.CanExecute(deckName))
+      ViewModel.LoadDeckCommand.Execute(deckName);
+    else if (ViewModel.NewDeckCommand.CanExecute(null))
+      ViewModel.NewDeckCommand.Execute(null);
   }
 
   private void CardView_DragOver(object sender, Microsoft.UI.Xaml.DragEventArgs e)
@@ -59,50 +129,4 @@ public sealed partial class MTGDeckEditorView : Page
   {
     //TODO: event
   }
-}
-
-public class GetDeckOrDefaultUseCase : UseCase<Task<MTGCardDeck>>
-{
-  public GetDeckOrDefaultUseCase(string name, IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
-  {
-    Name = name;
-    Repository = repository;
-    CardAPI = cardAPI;
-  }
-
-  public string Name { get; }
-  public IRepository<MTGCardDeckDTO> Repository { get; }
-  public ICardAPI<MTGCard> CardAPI { get; }
-
-  public async override Task<MTGCardDeck> Execute()
-  {
-    if (string.IsNullOrEmpty(Name)) return default;
-
-    return await (await Repository.Get(Name)).AsMTGCardDeck(CardAPI);
-  }
-}
-
-public class DeckDTORepository : IRepository<MTGCardDeckDTO>
-{
-  public DeckDTORepository(CardDbContextFactory dbContextFactory) => DbContextFactory = dbContextFactory;
-
-  public CardDbContextFactory DbContextFactory { get; }
-
-  public Task<bool> Add(MTGCardDeckDTO item) => throw new NotImplementedException();
-  public Task<bool> AddOrUpdate(MTGCardDeckDTO item) => throw new NotImplementedException();
-  public Task<bool> Exists(string name) => throw new NotImplementedException();
-  public Task<IEnumerable<MTGCardDeckDTO>> Get() => throw new NotImplementedException();
-
-  public async Task<MTGCardDeckDTO> Get(string name, Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
-  {
-    using var db = DbContextFactory.CreateDbContext();
-    db.ChangeTracker.LazyLoadingEnabled = false;
-    db.ChangeTracker.AutoDetectChangesEnabled = false;
-    var deck = db.MTGDecks.Where(x => x.Name == name).SetIncludesOrDefault(Includes).FirstOrDefault();
-    db.ChangeTracker.AutoDetectChangesEnabled = true;
-    return await Task.FromResult(deck);
-  }
-
-  public Task<bool> Remove(MTGCardDeckDTO item) => throw new NotImplementedException();
-  public Task<bool> Update(MTGCardDeckDTO item) => throw new NotImplementedException();
 }

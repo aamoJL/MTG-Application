@@ -1,7 +1,9 @@
 ﻿using MTGApplication.API.CardAPI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Models.DTOs;
@@ -11,6 +13,16 @@ namespace MTGApplication.Models.DTOs;
 /// </summary>
 public class MTGCardDeckDTO
 {
+  public static Expression<Func<MTGCardDeckDTO, object>>[] DefaultIncludes => new Expression<Func<MTGCardDeckDTO, object>>[]
+  {
+    x => x.DeckCards,
+    x => x.WishlistCards,
+    x => x.MaybelistCards,
+    x => x.RemovelistCards,
+    x => x.Commander,
+    x => x.CommanderPartner,
+  };
+
   private MTGCardDeckDTO() { }
   public MTGCardDeckDTO(MTGCardDeck deck)
   {

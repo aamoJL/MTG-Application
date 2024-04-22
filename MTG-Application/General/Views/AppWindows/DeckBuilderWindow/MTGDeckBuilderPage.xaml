@@ -6,7 +6,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:cardsearch="using:MTGApplication.Features.CardSearch"
+  xmlns:cardsearch="using:MTGApplication.Features.CardSearch" xmlns:views="using:MTGApplication.General.Views"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -36,14 +36,23 @@
           <!-- Deck View -->
           <!--NOTE: CanReorderTabs needs to be 'false', otherwise the app crashes when trying to reorder-->
           <TabView
+            TabItemsSource="{x:Bind TabViewItems, Mode=OneWay}"
             IsAddTabButtonVisible="True" 
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" 
             CloseButtonOverlayMode="Auto"
             AddTabButtonClick="TabView_AddTabButtonClick"
             TabCloseRequested="TabView_TabCloseRequested"
-            CanReorderTabs="False"
-            TabItemsSource="{x:Bind TabViewItems, Mode=OneWay}">
+            CanReorderTabs="False">
+            <TabView.TabItemTemplate>
+              <DataTemplate x:DataType="views:CustomTabViewItem">
+                <TabViewItem Header="{x:Bind Header, Mode=OneTime}">
+                  <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
+                    <ContentPresenter Content="{x:Bind Frame, Mode=OneTime}"/>
+                  </Grid>
+                </TabViewItem>
+              </DataTemplate>
+            </TabView.TabItemTemplate>
           </TabView>
           <!--Top-right corner buttons-->
           <StackPanel Height="40" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Margin="0 0 5 0">

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.API.CardAPI;
+using MTGApplication.General.Databases.Repositories;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System;
@@ -48,7 +49,7 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
     return await db.MTGCardCollections.FirstOrDefaultAsync(x => x.Name == name) != null;
   }
 
-  public async Task<IEnumerable<MTGCardCollection>> Get()
+  public async Task<IEnumerable<MTGCardCollection>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
   {
     using var db = cardDbContextFactory.CreateDbContext();
     return await Task.WhenAll(db.MTGCardCollections.Select(x => x.AsMTGCardCollection(CardAPI)));
