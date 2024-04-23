@@ -1,4 +1,4 @@
-﻿namespace MTGApplication.General;
+﻿namespace MTGApplication.General.UseCases;
 
 public abstract class UseCase
 {

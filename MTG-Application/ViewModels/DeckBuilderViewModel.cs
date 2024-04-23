@@ -7,6 +7,7 @@ using MTGApplication.General.Databases.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
+using MTGApplication.Services.DialogService;
 using MTGApplication.Services.IOService;
 using MTGApplication.ViewModels.Charts;
 using MTGApplication.Views.Pages;

@@ -1,4 +1,4 @@
-﻿using MTGApplication.General;
+﻿using MTGApplication.General.UseCases;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Services.IOService;

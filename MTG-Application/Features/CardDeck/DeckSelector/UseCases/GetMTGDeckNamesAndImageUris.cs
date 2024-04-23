@@ -1,7 +1,7 @@
 ﻿using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
-using MTGApplication.General;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.UseCases;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System;

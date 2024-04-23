@@ -1,4 +1,4 @@
-﻿using MTGApplication.General;
+﻿using MTGApplication.General.UseCases;
 using MTGApplication.Models;
 using System.Threading.Tasks;
 

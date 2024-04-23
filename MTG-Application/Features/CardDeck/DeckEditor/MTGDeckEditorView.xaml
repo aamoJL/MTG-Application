@@ -58,24 +58,24 @@
             <AppBarButton Icon="OpenFile" Label="File">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <MenuFlyoutItem Command="{x:Bind NewDeckCommand, Mode=OneTime}" Icon="NewFolder" Text="New">
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.NewDeckCommand, Mode=OneTime}" Icon="NewFolder" Text="New">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="N" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
-                  <MenuFlyoutItem Command="{x:Bind OpenDeckCommand, Mode=OneTime}" Icon="OpenFile" Text="Open...">
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.OpenDeckCommand, Mode=OneTime}" Icon="OpenFile" Text="Open...">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="O" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
-                  <MenuFlyoutItem Command="{x:Bind SaveDeckCommand, Mode=OneTime}" Icon="Save" Text="Save...">
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.SaveDeckCommand, Mode=OneTime}" Icon="Save" Text="Save...">
                     <MenuFlyoutItem.KeyboardAccelerators>
                       <KeyboardAccelerator Key="S" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                   </MenuFlyoutItem>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import...">
-                    <MenuFlyoutItem Command="{x:Bind ImportToDeckCardsCommand, Mode=OneTime}" Text="To Deck"/>
+                    <!--<MenuFlyoutItem Command="{x:Bind ImportToDeckCardsCommand, Mode=OneTime}" Text="To Deck"/>-->
                     <!--<MenuFlyoutItem Command="{x:Bind ImportToMaybelistCommand, Mode=OneTime}" Text="To Maybelist"/>-->
                     <!--<MenuFlyoutItem Command="{x:Bind ImportToWishlistCommand, Mode=OneTime}" Text="To Wishlist"/>-->
                   </MenuFlyoutSubItem>
@@ -94,7 +94,7 @@
                     </MenuFlyoutSubItem>
                   </MenuFlyoutSubItem>
                   <MenuFlyoutSeparator/>
-                  <MenuFlyoutItem Command="{x:Bind DeleteDeckCommand, Mode=OneTime}" Background="IndianRed" Icon="Delete" Text="Delete"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteDeckCommand, Mode=OneTime}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>

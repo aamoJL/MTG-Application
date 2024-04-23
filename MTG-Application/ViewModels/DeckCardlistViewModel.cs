@@ -5,6 +5,7 @@ using MTGApplication.API.CardAPI;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
+using MTGApplication.Services.DialogService;
 using MTGApplication.Services.IOService;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Services.CommandService;
-using static MTGApplication.Services.DialogService;
+using static MTGApplication.Services.DialogService.DialogService;
 using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.ViewModels;

@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.General.Views;
 using MTGApplication.Interfaces;
-using MTGApplication.Services;
+using MTGApplication.Services.DialogService;
 using MTGApplication.Views.Controls;
 using MTGApplication.Views.Pages.Tabs;
 using MTGApplication.Views.Windows;

@@ -1,6 +1,4 @@
-﻿using MTGApplication.Services;
-
-namespace MTGApplication.Interfaces;
+﻿namespace MTGApplication.Services.DialogService;
 
 /// <summary>
 /// Interface for root pages that can show dialogs

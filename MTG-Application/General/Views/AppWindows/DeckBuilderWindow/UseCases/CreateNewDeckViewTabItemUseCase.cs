@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using MTGApplication.Features.CardDeck;
+using MTGApplication.General.UseCases;
 
 namespace MTGApplication.General.Views;
 /// <summary>

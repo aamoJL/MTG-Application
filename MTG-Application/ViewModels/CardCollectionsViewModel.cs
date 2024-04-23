@@ -8,6 +8,7 @@ using MTGApplication.General.Databases.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
+using MTGApplication.Services.DialogService;
 using MTGApplication.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI;
-using static MTGApplication.Services.DialogService;
+using static MTGApplication.Services.DialogService.DialogService;
 using static MTGApplication.Services.IOService.IOService;
 
 namespace MTGApplication.General;

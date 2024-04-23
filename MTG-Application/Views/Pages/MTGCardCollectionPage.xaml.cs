@@ -6,7 +6,7 @@ using MTGApplication.API.CardAPI;
 using MTGApplication.Database.Repositories;
 using MTGApplication.General;
 using MTGApplication.Interfaces;
-using MTGApplication.Services;
+using MTGApplication.Services.DialogService;
 using MTGApplication.ViewModels;
 using System;
 using System.Threading.Tasks;

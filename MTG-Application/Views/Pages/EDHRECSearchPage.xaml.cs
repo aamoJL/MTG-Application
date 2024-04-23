@@ -1,9 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API.CardAPI;
-using MTGApplication.Interfaces;
 using MTGApplication.Models.Structs;
-using MTGApplication.Services;
+using MTGApplication.Services.DialogService;
 using MTGApplication.ViewModels;
 using System;
 using Windows.ApplicationModel.DataTransfer;

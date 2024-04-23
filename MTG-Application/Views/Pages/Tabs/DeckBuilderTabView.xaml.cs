@@ -5,13 +5,14 @@ using Microsoft.UI.Xaml.Input;
 using MTGApplication.Database.Repositories;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
+using MTGApplication.Services.DialogService;
 using MTGApplication.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using static MTGApplication.Services.DialogService;
+using static MTGApplication.Services.DialogService.DialogService;
 using static MTGApplication.Services.NotificationService;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 
@@ -79,10 +80,10 @@ public sealed partial class DeckBuilderTabView : Page, ISavable
   #endregion
 
   #region Events
-  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e) 
+  private void DeckBuilderTabView_Loaded(object sender, RoutedEventArgs e)
     => AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
 
-  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e) 
+  private void DeckBuilderTabView_Unloaded(object sender, RoutedEventArgs e)
     => AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
 
   private void DeckBuilderViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

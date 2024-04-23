@@ -1,4 +1,5 @@
 ﻿using MTGApplication.API.CardAPI;
+using MTGApplication.General.UseCases;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System;

@@ -1,4 +1,5 @@
-﻿using MTGApplication.Models.DTOs;
+﻿using MTGApplication.General.UseCases;
+using MTGApplication.Models.DTOs;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Databases.Repositories.MTGDeckRepository;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.UseCases;
 
 namespace MTGApplication.General.Views;
 /// <summary>

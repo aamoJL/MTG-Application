@@ -1,7 +1,7 @@
 ﻿using System;
-using static MTGApplication.Services.DialogService;
+using static MTGApplication.Services.DialogService.DialogService;
 
-namespace MTGApplication.Interfaces;
+namespace MTGApplication.Services.DialogService;
 
 /// <summary>
 /// Interface for classes that want to show content dialogs

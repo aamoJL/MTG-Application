@@ -1,4 +1,5 @@
-﻿using MTGApplication.Views.Pages;
+﻿using MTGApplication.General.UseCases;
+using MTGApplication.Views.Pages;
 using MTGApplication.Views.Windows;
 
 namespace MTGApplication.General.Views;
