@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General;
+using MTGApplication.General.ViewModels;
 using System.Text;
 using System.Windows.Input;
 

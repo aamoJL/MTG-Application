@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
 using MTGApplication.API.CardAPI;
-using MTGApplication.General;
+using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
 using MTGApplication.ViewModels;
 using System.Linq;

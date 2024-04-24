@@ -46,7 +46,7 @@ public class InMemoryMTGCardCollectionRepositoryTests
       return await base.Get(name);
     }
     
-    public override async Task<bool> Remove(MTGCardCollection item) => await base.Remove(item);
+    public override async Task<bool> Delete(MTGCardCollection item) => await base.Delete(item);
     
     public override async Task<bool> Update(MTGCardCollection item)
     {
@@ -134,7 +134,7 @@ public class InMemoryMTGCardCollectionRepositoryTests
     await repo.Add(new() { Name = secondCollectionName });
     var firstDeck = await repo.Get(firstCollectionName);
 
-    if(firstDeck != null) await repo.Remove(firstDeck);
+    if(firstDeck != null) await repo.Delete(firstDeck);
     Assert.AreEqual(1, repo.Get().Result.ToList().Count);
   }
 

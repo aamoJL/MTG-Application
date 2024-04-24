@@ -5,10 +5,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
+using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.ViewModels;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
-using MTGApplication.Services.DialogService;
 using MTGApplication.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI;
-using static MTGApplication.Services.DialogService.DialogService;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 using static MTGApplication.Services.IOService.IOService;
 
 namespace MTGApplication.General;
@@ -337,7 +338,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
     {
       if (!string.IsNullOrEmpty(Collection.Name) && Collection.Name != name)
       {
-        await CollectionRepository.Remove(Collection); // Delete old collection if the name was changed
+        await CollectionRepository.Delete(Collection); // Delete old collection if the name was changed
       }
       Collection.Name = name;
       HasUnsavedChanges = false;
@@ -372,7 +373,7 @@ public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppN
   private async Task DeleteCollection()
   {
     IsBusy = true;
-    if (await Task.Run(() => CollectionRepository.Remove(Collection)))
+    if (await Task.Run(() => CollectionRepository.Delete(Collection)))
     {
       Collection = new();
       HasUnsavedChanges = false;

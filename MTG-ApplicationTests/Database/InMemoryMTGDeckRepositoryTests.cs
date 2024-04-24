@@ -42,10 +42,10 @@ public class InMemoryMTGDeckRepositoryTests : MTGDeckRepositoryTestsBase
 #pragma warning restore CS8603 // Possible null reference return.
       return await base.Get(name);
     }
-    public override async Task<bool> Remove(MTGCardDeck item)
+    public override async Task<bool> Delete(MTGCardDeck item)
     {
       if (WillFail) { return false; }
-      return await base.Remove(item);
+      return await base.Delete(item);
     }
     public override async Task<bool> Update(MTGCardDeck item)
     {

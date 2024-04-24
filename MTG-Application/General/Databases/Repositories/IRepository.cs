@@ -27,14 +27,14 @@ public interface IRepository<T>
   public Task<bool> Update(T item);
 
   /// <summary>
-  /// Adds the given <paramref name="item"/> to the database, if it does not exist, otherwise updates the item.
+  /// Adds the given <paramref name="item"/> to the database if it does not exist, otherwise updates the item.
   /// </summary>
   public Task<bool> AddOrUpdate(T item);
 
   /// <summary>
   /// Removes the given <paramref name="item"/> from the database
   /// </summary>
-  public Task<bool> Remove(T item);
+  public Task<bool> Delete(T item);
 
   /// <summary>
   /// Returns all the items from the database.

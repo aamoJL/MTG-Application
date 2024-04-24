@@ -1,5 +1,5 @@
-﻿using MTGApplication.Services.DialogService;
-using static MTGApplication.Services.DialogService.DialogService;
+﻿using MTGApplication.General.Services.ConfirmationService;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardDeck;
 

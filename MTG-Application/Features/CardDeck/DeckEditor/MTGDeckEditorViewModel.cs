@@ -1,53 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.General;
+using MTGApplication.API.CardAPI;
+using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
-using MTGApplication.General.Extensions;
+using MTGApplication.General.ViewModels;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardDeck;
-
-public interface IWorker
-{
-  public bool IsBusy { get; set; }
-
-  /// <summary>
-  /// Sets the <see cref="IsBusy"/> property to <see langword="true"/> for the duration of the <paramref name="task"/>
-  /// </summary>
-  public abstract Task<T> DoWork<T>(Task<T> task);
-}
-
-public class Confirmation<TReturn>
-{
-  public record ConfirmationData(string Title, string Message);
-
-  public Func<ConfirmationData, Task<TReturn>> OnConfirm { get; set; }
-
-  public async Task<TReturn> Confirm(string title, string message)
-    => OnConfirm == null ? default : await OnConfirm.Invoke(new(title, message));
-}
-
-public class Confirmation<TArgs, TReturn>
-{
-  public record ConfirmationData(string Title, string Message, TArgs Data);
-
-  public Func<ConfirmationData, Task<TReturn>> OnConfirm { get; set; }
-
-  public async Task<TReturn> Confirm(string title, string message, TArgs data)
-    => OnConfirm == null ? default : await OnConfirm.Invoke(new(title, message, data));
-}
-
-public class MTGDeckEditorViewModelConfirmer
-{
-  public Confirmation<bool?> SaveUnsavedChanges { get; set; } = new();
-  public Confirmation<string[], string> LoadDeck { get; set; } = new();
-}
-
 public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
   [ObservableProperty] private MTGCardDeck deck = new();
@@ -55,6 +17,8 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [ObservableProperty] private bool hasUnsavedChanges;
 
   public MTGDeckEditorViewModelConfirmer Confirmer { get; init; } = new();
+  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository(new());
+  public ICardAPI<MTGCard> CardAPI { get; init; } = App.MTGCardAPI;
 
   [RelayCommand]
   private async Task NewDeck()
@@ -68,7 +32,7 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
       {
         if (SaveDeckCommand.CanExecute(Deck)) SaveDeckCommand.Execute(Deck);
       }
-      else return;
+      else return; // Canceled
     }
 
     Deck = new();
@@ -77,41 +41,42 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [RelayCommand]
   private async Task OpenDeck(string loadName = null)
   {
+    if (loadName == string.Empty) return;
+
     if (HasUnsavedChanges)
     {
       return;
     }
 
-    loadName ??= await Confirmer.LoadDeck.Confirm(
-      title: "Open deck", 
-      message: "Name", 
-      data: (await new GetDecksUseCase(new DeckDTORepository(), App.MTGCardAPI) { Includes = ExpressionExtensions.EmptyArray<MTGCardDeckDTO>() }
-      .Execute()).Select(x => x.Name).OrderBy(x => x).ToArray());
-
-    if (loadName is not null)
+    var loadTask = new LoadDeckUseCase(Repository, CardAPI)
     {
-      var loadedDeck = await DoWork(new GetDeckUseCase(
-        name: loadName,
-        repository: new DeckDTORepository(new()),
-        cardAPI: App.MTGCardAPI)
-      .Execute());
+      LoadConfirmation = Confirmer.LoadDeck,
+      Worker = this
+    };
 
-      if (loadedDeck != null) Deck = loadedDeck;
-      else
-      {
-        // TODO: error
-      }
+    switch (await loadTask.Execute(loadName))
+    {
+      case MTGCardDeck deck: Deck = deck; break; // Success
+      default: break; // Error
     }
   }
 
-  [RelayCommand]
-  private void SaveDeck(string newName)
+  [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
+  private async Task SaveDeck(string saveName = null)
   {
-    IsBusy = true;
+    var saveTask = new SaveDeckUseCase(Repository)
+    {
+      SaveConfirmation = Confirmer.SaveDeck,
+      OverrideConfirmation = Confirmer.OverrideDeck,
+      Worker = this
+    };
 
-    // TODO: save
-
-    IsBusy = false;
+    switch (await saveTask.Execute(new(Deck, saveName)))
+    {
+      case true: return; // Success
+      case false: return; // Error
+      case null: return; // Cancel
+    }
   }
 
   [RelayCommand] private void RemoveDeckCard(MTGCard card) => Deck.DeckCards.Remove(card);
@@ -141,37 +106,8 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
     IsBusy = false;
     return result;
   }
-}
 
-public partial class MTGDeckEditorViewModel
-{
+  private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
+
   private bool CanExecuteDeleteDeckCommand() => !string.IsNullOrEmpty(Deck.Name);
-}
-
-public class SaveUseCase : UseCase<string, bool>
-{
-  public SaveUseCase(MTGDeckEditorViewModel viewModel) => ViewModel = viewModel;
-
-  public MTGDeckEditorViewModel ViewModel { get; }
-
-  public override bool Execute(string newName)
-    => new SaveDeckUseCase(new(ViewModel.Deck)).Execute(newName);
-}
-
-public class SaveDeckUseCase : UseCase<string, bool>
-{
-  public SaveDeckUseCase(MTGCardDeckDTO deck)
-  {
-    Deck = deck;
-  }
-
-  public MTGCardDeckDTO Deck { get; }
-
-  // TODO: Save deck to DB
-  public override bool Execute(string newName) => false;
-}
-
-public abstract class UseCase<TArg, TReturn>
-{
-  public abstract TReturn Execute(TArg arg);
 }

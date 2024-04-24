@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.CardDeck;
@@ -12,7 +13,7 @@ public sealed partial class MTGDeckSelectorView : Page
     Loaded += MTGDeckSelectorView_Loaded;
   }
 
-  public MTGDeckSelectorViewModel ViewModel { get; } = new();
+  public MTGDeckSelectorViewModel ViewModel { get; } = new(new DeckDTORepository(new()), App.MTGCardAPI);
 
   public ICommand DeckSelected { get; set; }
 

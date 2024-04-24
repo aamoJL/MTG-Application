@@ -62,7 +62,7 @@ public class SQLiteMTGCardCollectionRepository : IRepository<MTGCardCollection>
     return await collection.AsMTGCardCollection(CardAPI);
   }
 
-  public async Task<bool> Remove(MTGCardCollection item)
+  public async Task<bool> Delete(MTGCardCollection item)
   {
     using var db = cardDbContextFactory.CreateDbContext();
     var dbItem = await db.MTGCardCollections.FirstOrDefaultAsync(x => x.Name == item.Name);

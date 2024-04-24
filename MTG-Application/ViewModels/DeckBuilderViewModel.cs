@@ -2,12 +2,12 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using MTGApplication.API.CardAPI;
-using MTGApplication.General;
 using MTGApplication.General.Databases.Repositories;
+using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.ViewModels;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Services;
-using MTGApplication.Services.DialogService;
 using MTGApplication.Services.IOService;
 using MTGApplication.ViewModels.Charts;
 using MTGApplication.Views.Pages;
@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static MTGApplication.Enums;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 using static MTGApplication.Services.CommandService;
 using static MTGApplication.Services.MTGService;
 
@@ -231,11 +232,11 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
   #endregion
 
   #region IDialogNotifier implementation
-  public event EventHandler<DialogService.DialogEventArgs> OnGetDialogWrapper;
+  public event EventHandler<DialogEventArgs> OnGetDialogWrapper;
 
-  public DialogService.DialogWrapper GetDialogWrapper()
+  public DialogWrapper GetDialogWrapper()
   {
-    var args = new DialogService.DialogEventArgs();
+    var args = new DialogEventArgs();
     OnGetDialogWrapper?.Invoke(this, args);
     return args.DialogWrapper;
   }
@@ -388,7 +389,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
     if (await Dialogs.GetDeleteDialog(CardDeck.Name).ShowAsync(GetDialogWrapper()) is true)
     {
       IsBusy = true;
-      if (await Task.Run(() => DeckRepository.Remove(CardDeck)))
+      if (await Task.Run(() => DeckRepository.Delete(CardDeck)))
       {
         CardDeck = new();
         RaiseInAppNotification(NotificationService.NotificationType.Success, "The deck was deleted successfully.");
@@ -658,7 +659,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotif
       // Maybe add AddOrRename method?
       if (!string.IsNullOrEmpty(CardDeck?.Name) && name != CardDeck.Name)
       {
-        await DeckRepository.Remove(CardDeck); // Delete old deck if the name was changed
+        await DeckRepository.Delete(CardDeck); // Delete old deck if the name was changed
       }
       CardDeck.Name = name;
       HasUnsavedChanges = false;
@@ -706,25 +707,25 @@ public partial class DeckBuilderViewModel
   /// </summary>
   public class DeckBuilderViewDialogs
   {
-    public virtual DialogService.ConfirmationDialog GetOverrideDialog(string name)
+    public virtual ConfirmationDialog GetOverrideDialog(string name)
       => new("Override existing deck?") { Message = $"Deck '{name}' already exist. Would you like to override the deck?", SecondaryButtonText = string.Empty };
 
-    public virtual DialogService.ConfirmationDialog GetDeleteDialog(string name)
+    public virtual ConfirmationDialog GetDeleteDialog(string name)
       => new("Delete deck?") { Message = $"Are you sure you want to delete '{name}'?", SecondaryButtonText = string.Empty };
 
-    public virtual DialogService.ConfirmationDialog GetSaveUnsavedDialog(string name = "")
+    public virtual ConfirmationDialog GetSaveUnsavedDialog(string name = "")
       => new("Save unsaved changes?") { Message = $"{(string.IsNullOrEmpty(name) ? "Unnamed deck" : $"'{name}'")} has unsaved changes. Would you like to save the deck?", PrimaryButtonText = "Save" };
 
-    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+    public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
 
-    public virtual DialogService.GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
+    public virtual GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
       => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
 
-    public virtual DialogService.ComboBoxDialog GetLoadDialog(string[] names)
+    public virtual ComboBoxDialog GetLoadDialog(string[] names)
       => new("Open deck") { InputHeader = "Name", Items = names, PrimaryButtonText = "Open", SecondaryButtonText = string.Empty };
 
-    public virtual DialogService.TextBoxDialog GetSaveDialog(string name)
+    public virtual TextBoxDialog GetSaveDialog(string name)
       => new("Save your deck?") { InvalidInputCharacters = Path.GetInvalidFileNameChars(), TextInputText = name, PrimaryButtonText = "Save", SecondaryButtonText = string.Empty };
   }
 }

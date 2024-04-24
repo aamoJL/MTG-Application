@@ -1,4 +1,4 @@
-﻿namespace MTGApplication.Services.DialogService;
+﻿namespace MTGApplication.General.Services.ConfirmationService;
 
 /// <summary>
 /// Interface for root pages that can show dialogs

@@ -2,9 +2,9 @@
 using MTGApplication.General.UseCases;
 using System;
 using System.Threading.Tasks;
-using static MTGApplication.Services.DialogService.DialogService;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.Services.DialogService;
+namespace MTGApplication.General.Services.ConfirmationService;
 
 public abstract class ShowDialogUseCase<T> : UseCase<Task>
 {

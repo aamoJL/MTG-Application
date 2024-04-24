@@ -7,7 +7,7 @@ using MTGApplication.General.Extensions;
 using System;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Services.DialogService;
+namespace MTGApplication.General.Services.ConfirmationService;
 
 /// <summary>
 /// Service to show dialogs on windows.

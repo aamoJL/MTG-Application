@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MTGApplication.General;
+namespace MTGApplication.General.ViewModels;
 
 /// <summary>
 /// Base class for view models

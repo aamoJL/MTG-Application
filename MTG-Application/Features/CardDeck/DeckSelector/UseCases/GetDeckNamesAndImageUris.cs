@@ -1,5 +1,5 @@
 ﻿using MTGApplication.API.CardAPI;
-using MTGApplication.Database;
+using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using MTGApplication.General.UseCases;
 using MTGApplication.Models;
@@ -11,20 +11,20 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardDeck;
-public class GetMTGDeckNamesAndImageUris : UseCase<Task<IEnumerable<(string Name, string ImageUri)>>>
+public class GetDeckNamesAndImageUris : UseCase<Task<IEnumerable<(string Name, string ImageUri)>>>
 {
-  public GetMTGDeckNamesAndImageUris(CardDbContextFactory contextFactory, ICardAPI<MTGCard> cardAPI)
+  public GetDeckNamesAndImageUris(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
   {
-    ContextFactory = contextFactory;
+    Repository = repository;
     CardAPI = cardAPI;
   }
 
-  public CardDbContextFactory ContextFactory { get; }
+  public IRepository<MTGCardDeckDTO> Repository { get; }
   public ICardAPI<MTGCard> CardAPI { get; }
 
   public async override Task<IEnumerable<(string Name, string ImageUri)>> Execute()
   {
-    var decks = await new GetDecksUseCase(new DeckDTORepository(), CardAPI)
+    var decks = await new GetDecksUseCase(Repository, CardAPI)
     {
       Includes = new Expression<Func<MTGCardDeckDTO, object>>[]
     {

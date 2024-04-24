@@ -45,7 +45,7 @@ public class InMemoryMTGCardCollectionRepository : IRepository<MTGCardCollection
 
   public virtual async Task<MTGCardCollection> Get(string name, Expression<Func<MTGCardCollection, object>>[] Includes = null) => await Collections.FirstOrDefault(x => x.Name == name)?.AsMTGCardCollection(CardAPI);
 
-  public virtual async Task<bool> Remove(MTGCardCollection item) => await Task.Run(() => Collections.Remove(Collections.FirstOrDefault(x => x.Name == item.Name)));
+  public virtual async Task<bool> Delete(MTGCardCollection item) => await Task.Run(() => Collections.Remove(Collections.FirstOrDefault(x => x.Name == item.Name)));
 
   public virtual async Task<bool> Update(MTGCardCollection item)
   {

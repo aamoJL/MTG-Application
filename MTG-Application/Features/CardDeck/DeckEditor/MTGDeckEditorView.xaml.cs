@@ -1,7 +1,8 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using MTGApplication.Services.DialogService;
-using static MTGApplication.Services.DialogService.DialogService;
+using MTGApplication.General.Services.ConfirmationService;
+using System.IO;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardDeck;
 public sealed partial class MTGDeckEditorView : Page, IDialogPresenter
@@ -10,7 +11,7 @@ public sealed partial class MTGDeckEditorView : Page, IDialogPresenter
   {
     InitializeComponent();
 
-    SetConfirmDialogs(ViewModel.Confirmer);
+    RegisterConfirmDialogs(ViewModel.Confirmer);
   }
 
   // TODO: notification system
@@ -62,10 +63,12 @@ public sealed partial class MTGDeckEditorView : Page, IDialogPresenter
 
 public sealed partial class MTGDeckEditorView
 {
-  public void SetConfirmDialogs(MTGDeckEditorViewModelConfirmer confirmer)
+  public void RegisterConfirmDialogs(MTGDeckEditorViewModelConfirmer confirmer)
   {
-    confirmer.SaveUnsavedChanges = new() { OnConfirm = async (msg) => await GetUnsavedChangesDialog(msg.Title, msg.Message).ShowAsync(DialogWrapper) };
-    confirmer.LoadDeck = new() { OnConfirm = async (msg) => await GetOpenDeckDialog(msg.Title, msg.Message, msg.Data).ShowAsync(DialogWrapper) };
+    confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await GetUnsavedChangesDialog(msg.Title, msg.Message).ShowAsync(DialogWrapper) };
+    confirmer.LoadDeck = new() { OnConfirm = async msg => await GetOpenDeckDialog(msg.Title, msg.Message, msg.Data).ShowAsync(DialogWrapper) };
+    confirmer.SaveDeck = new() { OnConfirm = async msg => await GetSaveDeckDialog(msg.Title, msg.Message, msg.Data).ShowAsync(DialogWrapper) };
+    confirmer.OverrideDeck = new() { OnConfirm = async msg => await GetOverrideDeckDialog(msg.Title, msg.Message).ShowAsync(DialogWrapper) };
   }
 
   public Dialog<bool?> GetUnsavedChangesDialog(string title, string message) => new ConfirmationDialog(title)
@@ -79,6 +82,20 @@ public sealed partial class MTGDeckEditorView
     InputHeader = message,
     Items = deckNames,
     PrimaryButtonText = "Open",
+    SecondaryButtonText = string.Empty
+  };
+
+  public Dialog<string> GetSaveDeckDialog(string title, string message, string initName) => new TextBoxDialog(title)
+  {
+    InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+    TextInputText = initName,
+    PrimaryButtonText = "Save",
+    SecondaryButtonText = string.Empty
+  };
+
+  public Dialog<bool?> GetOverrideDeckDialog(string title, string message) => new ConfirmationDialog(title)
+  {
+    Message = message,
     SecondaryButtonText = string.Empty
   };
 }

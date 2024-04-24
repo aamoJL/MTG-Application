@@ -4,16 +4,11 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 
-public class DeckExistsUseCase : UseCase<Task<bool>>
+public class DeckExistsUseCase : UseCase<string, Task<bool>>
 {
-  public DeckExistsUseCase(string name, IRepository<MTGCardDeckDTO> repository)
-  {
-    Name = name;
-    Repository = repository;
-  }
+  public DeckExistsUseCase(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
 
-  public string Name { get; }
   public IRepository<MTGCardDeckDTO> Repository { get; init; }
 
-  public async override Task<bool> Execute() => await Repository.Exists(Name);
+  public async override Task<bool> Execute(string name) => await Repository.Exists(name);
 }

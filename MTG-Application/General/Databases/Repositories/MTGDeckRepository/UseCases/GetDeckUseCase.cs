@@ -6,23 +6,21 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 
-public class GetDeckUseCase : UseCase<Task<MTGCardDeck>>
+public class GetDeckUseCase : UseCase<string, Task<MTGCardDeck>>
 {
-  public GetDeckUseCase(string name, IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
+  public GetDeckUseCase(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
   {
-    Name = name;
     Repository = repository;
     CardAPI = cardAPI;
   }
 
-  public string Name { get; }
   public IRepository<MTGCardDeckDTO> Repository { get; }
   public ICardAPI<MTGCard> CardAPI { get; }
 
-  public async override Task<MTGCardDeck> Execute()
+  public async override Task<MTGCardDeck> Execute(string name)
   {
-    if (string.IsNullOrEmpty(Name)) return null;
+    if (string.IsNullOrEmpty(name)) return null;
 
-    return await (await Repository.Get(Name)).AsMTGCardDeck(CardAPI);
+    return await (await Repository.Get(name)).AsMTGCardDeck(CardAPI);
   }
 }

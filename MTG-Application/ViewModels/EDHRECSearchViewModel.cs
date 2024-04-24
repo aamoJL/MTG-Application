@@ -2,15 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API.CardAPI;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.Models;
 using MTGApplication.Models.Structs;
-using MTGApplication.Services.DialogService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using static MTGApplication.Services.DialogService.DialogService;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.ViewModels;
 

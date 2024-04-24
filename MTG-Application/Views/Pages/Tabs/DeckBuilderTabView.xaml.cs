@@ -3,16 +3,16 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using MTGApplication.Database.Repositories;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;
-using MTGApplication.Services.DialogService;
 using MTGApplication.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using static MTGApplication.Services.DialogService.DialogService;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 using static MTGApplication.Services.NotificationService;
 using static MTGApplication.Views.Controls.MTGCardPreviewControl;
 

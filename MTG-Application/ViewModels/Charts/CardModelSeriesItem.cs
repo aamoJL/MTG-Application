@@ -2,7 +2,7 @@
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using MTGApplication.General;
+using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
 using SkiaSharp;
 using System.Collections.ObjectModel;
@@ -21,7 +21,7 @@ public abstract class CardModelSeriesItem<TModel> : ViewModelBase where TModel :
   protected CardModelSeriesItem()
   {
     Models = new();
-    Models.CollectionChanged += Models_CollectionChanged; 
+    Models.CollectionChanged += Models_CollectionChanged;
   }
 
   public CardModelSeriesItem(TModel model) : this() => AddItem(model);

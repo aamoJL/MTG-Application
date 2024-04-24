@@ -121,7 +121,7 @@ namespace MTGApplicationTests.Database
       await repo.Add(new() { Name = secondCollectionName });
       var firstCollection = await repo.Get(firstCollectionName);
 
-      await repo.Remove(firstCollection);
+      await repo.Delete(firstCollection);
       Assert.AreEqual(1, (await repo.Get()).ToList().Count);
       Assert.AreEqual(0, (await repo.GetCards()).ToList().Count);
     }

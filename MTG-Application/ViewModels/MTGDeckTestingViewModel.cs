@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.General;
+using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
 using System;
 using System.Collections.ObjectModel;

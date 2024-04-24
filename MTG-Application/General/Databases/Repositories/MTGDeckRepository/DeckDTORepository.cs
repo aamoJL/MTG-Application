@@ -1,4 +1,5 @@
-﻿using MTGApplication.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using MTGApplication.Database;
 using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,15 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
     return await Task.FromResult(deck);
   }
 
-  public Task<bool> Remove(MTGCardDeckDTO item) => throw new NotImplementedException();
+  public async Task<bool> Delete(MTGCardDeckDTO item)
+  {
+    using var db = DbContextFactory.CreateDbContext();
+
+    if (await db.MTGDecks.FirstOrDefaultAsync(x => x.Name == item.Name) is MTGCardDeckDTO existingItem)
+      db.Remove(existingItem);
+
+    return await db.SaveChangesAsync() > 0;
+  }
 
   public async Task<bool> Update(MTGCardDeckDTO item)
   {
@@ -70,10 +79,10 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
 
       var missingCardsTasks = new List<Task>()
       {
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => (name:x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.WishlistCards.Select(x => (name:x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.MaybelistCards.Select(x =>(name : x.Name, setCode : x.SetCode, collectorNumber : x.CollectorNumber)).Contains((name : cardDTO.Name, setCode : cardDTO.SetCode, collectorNumber : cardDTO.CollectorNumber))))),
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.RemovelistCards.Select(x =>(name : x.Name, setCode : x.SetCode, collectorNumber : x.CollectorNumber)).Contains((name : cardDTO.Name, setCode : cardDTO.SetCode, collectorNumber : cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => (name: x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.WishlistCards.Select(x => (name: x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.MaybelistCards.Select(x =>(name: x.Name, setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.RemovelistCards.Select(x =>(name: x.Name, setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
       };
 
       await Task.WhenAll(missingCardsTasks);
