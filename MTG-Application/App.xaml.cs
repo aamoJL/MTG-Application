@@ -7,6 +7,7 @@ using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
 using MTGApplication.Features.CardDeck;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Views;
 using MTGApplication.Views.Windows;
 
 namespace MTGApplication;

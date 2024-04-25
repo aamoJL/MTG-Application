@@ -1,32 +1,47 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.UseCases;
-using System;
+﻿using MTGApplication.General.UseCases;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.General.Services.ConfirmationService;
 
-public abstract class ShowDialogUseCase<T> : UseCase<Task>
+public abstract class ShowDialogUseCase<TReturn> : UseCase<(string title, string message), Task<TReturn>>
 {
-  public ShowDialogUseCase(DialogWrapper wrapper) => DialogWrapper = wrapper;
+  protected ShowDialogUseCase(DialogWrapper dialogWrapper) => DialogWrapper = dialogWrapper;
 
-  protected Dialog<T> Dialog { get; init; }
-  protected DialogWrapper DialogWrapper { get; }
+  public DialogWrapper DialogWrapper { get; }
 
-  public Action<T> OnPrimary { get; init; }
-  public Action<T> OnSecondary { get; init; }
-  public Action<T> OnCancel { get; init; }
-
-  public async override Task Execute()
+  public override async Task<TReturn> Execute((string title, string message) args)
   {
-    var dialogResult = await DialogWrapper.ShowAsync(Dialog);
-    var inputResult = Dialog.ProcessResult(dialogResult);
+    var (title, message) = args;
 
-    switch (dialogResult)
-    {
-      case ContentDialogResult.Primary: OnPrimary?.Invoke(inputResult); break;
-      case ContentDialogResult.Secondary: OnSecondary?.Invoke(inputResult); break;
-      default: OnCancel?.Invoke(inputResult); break;
-    }
+    return await ShowDialog(title, message);
   }
+
+  protected abstract Task<TReturn> ShowDialog(string title, string message);
 }
+
+public abstract class ShowDialogUseCase<TReturn, TData> : UseCase<(string title, string message, TData data), Task<TReturn>>
+{
+  protected ShowDialogUseCase(DialogWrapper dialogWrapper) => DialogWrapper = dialogWrapper;
+
+  public DialogWrapper DialogWrapper { get; }
+
+  public override async Task<TReturn> Execute((string title, string message, TData data) args)
+  {
+    var (title, message, data) = args;
+
+    return await ShowDialog(title, message, data);
+  }
+
+  protected abstract Task<TReturn> ShowDialog(string title, string message, TData data);
+}
+
+// TODO: remove if not needed
+//public class MTGDeckEditorDialogs
+//{
+//  public virtual GridViewDialog<MTGCardViewModel> GetCardPrintDialog(MTGCardViewModel[] printViewModels)
+//    => new("Change card print", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty };
+
+//  public virtual GridViewDialog<MTGCardViewModel> GetTokenPrintDialog(MTGCardViewModel[] printViewModels)
+//    => new("Tokens", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle") { Items = printViewModels, SecondaryButtonText = string.Empty, PrimaryButtonText = string.Empty };
+//}

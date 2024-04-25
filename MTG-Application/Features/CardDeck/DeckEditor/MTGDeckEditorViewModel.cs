@@ -100,14 +100,6 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
     };
   }
 
-  public async Task<T> DoWork<T>(Task<T> task)
-  {
-    IsBusy = true;
-    var result = await task;
-    IsBusy = false;
-    return result;
-  }
-
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 
   private bool CanExecuteDeleteDeckCommand() => !string.IsNullOrEmpty(Deck.Name);
