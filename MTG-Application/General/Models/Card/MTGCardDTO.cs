@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MTGApplication.Models.DTOs;
+namespace MTGApplication.General.Models.Card;
 
 /// <summary>
 /// Data transfer object for <see cref="MTGCard"/> class

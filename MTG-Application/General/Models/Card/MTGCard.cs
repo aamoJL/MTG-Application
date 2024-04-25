@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using static MTGApplication.Services.MTGService;
 
-namespace MTGApplication.Models;
+namespace MTGApplication.General.Models.Card;
 
 /// <summary>
 /// MTG card model

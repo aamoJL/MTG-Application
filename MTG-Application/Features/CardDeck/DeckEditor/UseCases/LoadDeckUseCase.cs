@@ -2,6 +2,7 @@
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using MTGApplication.General.Extensions;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.UseCases;
 using MTGApplication.General.ViewModels;

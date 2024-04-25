@@ -7,7 +7,9 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
   xmlns:local="using:MTGApplication.Features.CardDeck"
-  xmlns:ui="using:CommunityToolkit.WinUI.UI" xmlns:models="using:MTGApplication.Models" xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI"
+  xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
+  xmlns:models="using:MTGApplication.General.Models.Card"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   DataContext="{x:Bind}">

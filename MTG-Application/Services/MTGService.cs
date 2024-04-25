@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
-using MTGApplication.Models;
+using MTGApplication.General.Models.Card;
 using MTGApplication.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static MTGApplication.Enums;
-using static MTGApplication.Models.MTGCard;
+using static MTGApplication.General.Models.Card.MTGCard;
 
 namespace MTGApplication.Services;
 

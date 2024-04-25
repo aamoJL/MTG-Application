@@ -2,8 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.ViewModels;
-using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;

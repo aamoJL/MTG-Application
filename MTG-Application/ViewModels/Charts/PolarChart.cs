@@ -3,6 +3,7 @@ using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MTGApplication.General.Models.Card;
 using MTGApplication.Models;
 using System;
 using System.Collections.ObjectModel;

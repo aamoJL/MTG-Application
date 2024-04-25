@@ -6,8 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
 using MTGApplication.Features.CardDeck;
-using MTGApplication.General.Views;
-using MTGApplication.Models;
+using MTGApplication.General.Models.Card;
 using MTGApplication.Views.Windows;
 
 namespace MTGApplication;

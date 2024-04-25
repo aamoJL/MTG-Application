@@ -15,11 +15,6 @@ public class AddOrUpdateDeckUseCase : UseCase<(MTGCardDeck deck, string saveName
   {
     var (deck, saveName) = args;
 
-    if (await Repository.AddOrUpdate(new MTGCardDeckDTO(deck) { Name = saveName }))
-    {
-      deck.Name = saveName;
-      return true;
-    }
-    else return false;
+    return await Repository.AddOrUpdate(new MTGCardDeckDTO(deck) { Name = saveName });
   }
 }

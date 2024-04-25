@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Models;
+using MTGApplication.General.Models.Card;
 using MTGApplication.Services.IOService;
 using System.Threading.Tasks;
 using System.Windows.Input;

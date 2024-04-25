@@ -2,6 +2,7 @@
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases;
 using MTGApplication.General.Databases.Repositories;
+using MTGApplication.General.Models.Card;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System;
@@ -94,7 +95,13 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
 
       var missingCardsTasks = new List<Task>()
       {
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => (name:x.Info.Name , setCode: x.Info.SetCode, collectorNumber: x.Info.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(
+          cardDTO => 
+          !item.DeckCards.Select(
+            x => 
+            (name:x.Info.Name , setCode: x.Info.SetCode, collectorNumber: x.Info.CollectorNumber))
+          .Contains(
+            (name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
         Task.Run(() => missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.Wishlist.Select(x => (name:x.Info.Name , setCode: x.Info.SetCode, collectorNumber: x.Info.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
         Task.Run(() => missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.Maybelist.Select(x =>(name : x.Info.Name, setCode : x.Info.SetCode, collectorNumber : x.Info.CollectorNumber)).Contains((name : cardDTO.Name, setCode : cardDTO.SetCode, collectorNumber : cardDTO.CollectorNumber))))),
         Task.Run(() => missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.Removelist.Select(x =>(name : x.Info.Name, setCode : x.Info.SetCode, collectorNumber : x.Info.CollectorNumber)).Contains((name : cardDTO.Name, setCode : cardDTO.SetCode, collectorNumber : cardDTO.CollectorNumber))))),

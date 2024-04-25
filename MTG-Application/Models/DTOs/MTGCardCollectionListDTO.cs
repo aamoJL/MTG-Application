@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MTGApplication.General.Models.Card;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 

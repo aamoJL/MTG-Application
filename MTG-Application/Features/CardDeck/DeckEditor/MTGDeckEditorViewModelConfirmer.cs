@@ -8,4 +8,5 @@ public class MTGDeckEditorViewModelConfirmer
   public Confirmation<string, string[]> LoadDeck { get; set; } = new();
   public Confirmation<string, string> SaveDeck { get; set; } = new();
   public Confirmation<ConfirmationResult> OverrideDeck { get; set; } = new();
+  public Confirmation<ConfirmationResult> DeleteDeckUseCase { get; set; } = new();
 }

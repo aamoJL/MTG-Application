@@ -1,4 +1,4 @@
-﻿using MTGApplication.Models.DTOs;
+﻿using MTGApplication.General.Models.Card;
 using System;
 using System.Threading.Tasks;
 

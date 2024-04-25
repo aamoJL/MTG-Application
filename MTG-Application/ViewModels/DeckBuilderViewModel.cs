@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using MTGApplication.Interfaces;

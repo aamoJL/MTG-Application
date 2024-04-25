@@ -43,7 +43,7 @@ public class SaveDeckUseCase : UseCase<SaveDeckUseCase.Args, Task<ConfirmationRe
         }
       }
 
-      var saveTask = Save(deck, saveName, overrideOld, true);
+      var saveTask = Save(deck, saveName, overrideOld, removeOld: saveName != deck.Name);
       var saveResult = Worker != null ? await Worker.DoWork(saveTask) : await saveTask;
 
       return saveResult ? ConfirmationResult.Success : ConfirmationResult.Failure;
@@ -64,7 +64,7 @@ public class SaveDeckUseCase : UseCase<SaveDeckUseCase.Args, Task<ConfirmationRe
       deck.Name = saveName;
 
       if (oldName != saveName && removeOld is true && !string.IsNullOrEmpty(oldName))
-        await new DeleteDeckUseCase(Repository).Execute(oldName);
+        await new General.Databases.Repositories.MTGDeckRepository.DeleteDeckUseCase(Repository).Execute(oldName);
     }
 
     return wasSaved;

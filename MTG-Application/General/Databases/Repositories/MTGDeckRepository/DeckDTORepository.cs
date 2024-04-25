@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.Database;
+using MTGApplication.General.Models.Card;
 using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -71,23 +72,29 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
     if (db.MTGDecks
       .Where(x => x.Name == item.Name)
       .SetIncludesOrDefault()
-      .FirstOrDefault() is MTGCardDeckDTO DbDeckDTO)
+      .FirstOrDefault() is MTGCardDeckDTO existingDTO)
     {
       db.ChangeTracker.AutoDetectChangesEnabled = true;
       // Remove unused cards from the database
-      List<MTGCardDTO> missingCards = new();
+      List<MTGCardDTO> missingDeckCards = new();
+      List<MTGCardDTO> missingWishlistCards = new();
+      List<MTGCardDTO> missingMaybelistCards = new();
+      List<MTGCardDTO> missingRemovelistCards = new();
 
       var missingCardsTasks = new List<Task>()
       {
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => (name: x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.WishlistCards.Where(cardDTO => !item.WishlistCards.Select(x => (name: x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.MaybelistCards.Where(cardDTO => !item.MaybelistCards.Select(x =>(name: x.Name, setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
-        Task.Run(() => missingCards.AddRange(DbDeckDTO.RemovelistCards.Where(cardDTO => !item.RemovelistCards.Select(x =>(name: x.Name, setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingDeckCards.AddRange(existingDTO.DeckCards.Where(cardDTO => !item.DeckCards.Select(x => (name: x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingWishlistCards.AddRange(existingDTO.WishlistCards.Where(cardDTO => !item.WishlistCards.Select(x => (name: x.Name , setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingMaybelistCards.AddRange(existingDTO.MaybelistCards.Where(cardDTO => !item.MaybelistCards.Select(x =>(name: x.Name, setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
+        Task.Run(() => missingRemovelistCards.AddRange(existingDTO.RemovelistCards.Where(cardDTO => !item.RemovelistCards.Select(x =>(name: x.Name, setCode: x.SetCode, collectorNumber: x.CollectorNumber)).Contains((name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),
       };
 
       await Task.WhenAll(missingCardsTasks);
 
-      db.RemoveRange(missingCards);
+      db.RemoveRange(missingDeckCards);
+      db.RemoveRange(missingWishlistCards);
+      db.RemoveRange(missingMaybelistCards);
+      db.RemoveRange(missingRemovelistCards);
 
       // Add new cards to the deckDTO
       var updateCardsTasks = new List<Task>()
@@ -96,32 +103,32 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
         {
           foreach (var card in item.DeckCards)
           {
-            if (DbDeckDTO.DeckCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-            else { DbDeckDTO.DeckCards.Add(card); }
+            if (existingDTO.DeckCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { existingDTO.DeckCards.Add(card); }
           }
         }),
         Task.Run(() =>
         {
           foreach (var card in item.WishlistCards)
           {
-            if (DbDeckDTO.WishlistCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-            else { DbDeckDTO.WishlistCards.Add(card); }
+            if (existingDTO.WishlistCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { existingDTO.WishlistCards.Add(card); }
           }
         }),
         Task.Run(() =>
         {
           foreach (var card in item.MaybelistCards)
           {
-            if (DbDeckDTO.MaybelistCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-            else { DbDeckDTO.MaybelistCards.Add(card); }
+            if (existingDTO.MaybelistCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { existingDTO.MaybelistCards.Add(card); }
           }
         }),
         Task.Run(() =>
         {
           foreach (var card in item.RemovelistCards)
           {
-            if (DbDeckDTO.RemovelistCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-            else { DbDeckDTO.RemovelistCards.Add(card); }
+            if (existingDTO.RemovelistCards.FirstOrDefault(x => x.Name == card.Name && x.SetCode == card.SetCode && x.CollectorNumber == card.CollectorNumber) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { existingDTO.RemovelistCards.Add(card); }
           }
         })
       };
@@ -129,24 +136,24 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
       await Task.WhenAll(updateCardsTasks);
 
       // Remove old commander and add new one if the commander changed
-      if (DbDeckDTO.Commander?.SetCode != item.Commander?.SetCode || DbDeckDTO.Commander?.CollectorNumber != item.Commander?.CollectorNumber)
+      if (existingDTO.Commander?.SetCode != item.Commander?.SetCode || existingDTO.Commander?.CollectorNumber != item.Commander?.CollectorNumber)
       {
-        if (DbDeckDTO.Commander != null)
+        if (existingDTO.Commander != null)
         {
-          db.Remove(DbDeckDTO.Commander);
+          db.Remove(existingDTO.Commander);
         }
-        DbDeckDTO.Commander = item.Commander != null ? item.Commander : null;
+        existingDTO.Commander = item.Commander != null ? item.Commander : null;
       }
-      if (DbDeckDTO.CommanderPartner?.SetCode != item.CommanderPartner?.SetCode || DbDeckDTO.CommanderPartner?.CollectorNumber != item.CommanderPartner?.CollectorNumber)
+      if (existingDTO.CommanderPartner?.SetCode != item.CommanderPartner?.SetCode || existingDTO.CommanderPartner?.CollectorNumber != item.CommanderPartner?.CollectorNumber)
       {
-        if (DbDeckDTO.CommanderPartner != null)
+        if (existingDTO.CommanderPartner != null)
         {
-          db.Remove(DbDeckDTO.CommanderPartner);
+          db.Remove(existingDTO.CommanderPartner);
         }
-        DbDeckDTO.CommanderPartner = item.CommanderPartner != null ? item.CommanderPartner : null;
+        existingDTO.CommanderPartner = item.CommanderPartner != null ? item.CommanderPartner : null;
       }
 
-      db.Update(DbDeckDTO);
+      db.Update(existingDTO);
     }
 
     return await db.SaveChangesAsync() > 0;

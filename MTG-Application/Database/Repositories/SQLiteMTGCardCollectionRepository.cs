@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
+using MTGApplication.General.Models.Card;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System;

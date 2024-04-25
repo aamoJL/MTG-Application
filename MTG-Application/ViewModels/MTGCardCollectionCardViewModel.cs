@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.Models;
+using MTGApplication.General.Models.Card;
 
 namespace MTGApplication.ViewModels;
 

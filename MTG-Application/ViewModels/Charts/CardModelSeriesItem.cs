@@ -2,8 +2,8 @@
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.ViewModels;
-using MTGApplication.Models;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;

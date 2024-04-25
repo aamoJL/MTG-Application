@@ -1,5 +1,5 @@
-﻿using MTGApplication.General.UseCases;
-using MTGApplication.Models;
+﻿using MTGApplication.General.Models.Card;
+using MTGApplication.General.UseCases;
 using System.Threading.Tasks;
 
 namespace MTGApplication.API.CardAPI;

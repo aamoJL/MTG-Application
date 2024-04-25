@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using MTGApplication.API.CardAPI;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.Interfaces;
 using MTGApplication.Models;

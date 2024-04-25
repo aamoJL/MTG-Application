@@ -1,5 +1,4 @@
-﻿using MTGApplication.Models;
-using MTGApplication.Models.DTOs;
+﻿using MTGApplication.General.Models.Card;
 using MTGApplication.Services.IOService;
 using System;
 using System.Collections.Generic;
@@ -9,8 +8,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static MTGApplication.API.CardAPI.ICardAPI<MTGApplication.Models.MTGCard>;
-using static MTGApplication.Models.MTGCard;
+using static MTGApplication.API.CardAPI.ICardAPI<MTGApplication.General.Models.Card.MTGCard>;
+using static MTGApplication.General.Models.Card.MTGCard;
 using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.API.CardAPI;

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
@@ -40,7 +41,8 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
       {
         case ConfirmationResult.Success: Deck = loadResult.Deck; break; // TODO: Success
         case ConfirmationResult.Failure: break; // TODO: Error
-        default: break; // Cancel
+        case ConfirmationResult.Cancel:
+        default: break;
       }
     }
   }
@@ -48,11 +50,15 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
   private async Task SaveDeck(string saveName = null)
   {
+    if (!CanExecuteDeleteDeckCommand()) return;
+
     switch (await SaveDeckUseCase.Execute(new(Deck, saveName)))
     {
       case ConfirmationResult.Success: break; // TODO: Success
       case ConfirmationResult.Failure: return; // TODO: Error
-      default: break;
+      case ConfirmationResult.Cancel:
+      default:
+        break;
     }
   }
 
@@ -65,28 +71,33 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckCommand))]
-  private void DeleteDeck()
+  private async Task DeleteDeck()
   {
-    IsBusy = true;
-    // TODO: delete deck
-    var deleted = true;
-    if (deleted) Deck = new();
-    IsBusy = false;
+    if (!CanExecuteDeleteDeckCommand()) return;
+
+    if (await ConfirmUnsavedChanges())
+    {
+      switch (await DeleteDeckUseCase.Execute(Deck))
+      {
+        case ConfirmationResult.Success: Deck = new(); return;
+        case ConfirmationResult.Failure: return; // TODO: Error
+        case ConfirmationResult.Cancel:
+        default: return;
+      }
+    }
   }
 
   public async Task<bool> ConfirmUnsavedChanges()
   {
-    if (HasUnsavedChanges)
-    {
-      return await SaveUnsavedChangesUseCase.Execute(new(Deck)) switch
-      {
-        ConfirmationResult.Success => true,
-        ConfirmationResult.Failure => false, // TODO: Error
-        _ => false,
-      };
-    }
+    if (!HasUnsavedChanges) return true;
 
-    return true;
+    return await SaveUnsavedChangesUseCase.Execute(new(Deck)) switch
+    {
+      ConfirmationResult.Success => true,
+      ConfirmationResult.Failure => false, // TODO: Error
+      ConfirmationResult.Cancel => false,
+      _ => false,
+    };
   }
 
   public async Task<T> DoWork<T>(Task<T> task)
@@ -122,6 +133,12 @@ public partial class MTGDeckEditorViewModel
   {
     SaveConfirmation = Confirmer.SaveDeck,
     OverrideConfirmation = Confirmer.OverrideDeck,
+    Worker = this
+  };
+
+  private DeleteDeckUseCase DeleteDeckUseCase => new(Repository)
+  {
+    DeleteConfirmation = Confirmer.DeleteDeckUseCase,
     Worker = this
   };
 }

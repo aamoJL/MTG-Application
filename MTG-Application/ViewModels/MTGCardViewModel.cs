@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Helpers;
-using MTGApplication.General;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.ViewModels;
-using MTGApplication.Models;
 using MTGApplication.Services.IOService;
 using System.ComponentModel;
 using System.Threading.Tasks;

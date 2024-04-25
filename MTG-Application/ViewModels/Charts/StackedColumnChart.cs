@@ -2,7 +2,7 @@
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using MTGApplication.Models;
+using MTGApplication.General.Models.Card;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static MTGApplication.Services.MTGService;

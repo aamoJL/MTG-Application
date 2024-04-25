@@ -2,9 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API.CardAPI;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
-using MTGApplication.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

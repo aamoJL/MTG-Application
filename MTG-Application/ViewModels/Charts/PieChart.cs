@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
-using MTGApplication.Models;
-using System.Collections.Generic;
+using MTGApplication.General.Models.Card;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static MTGApplication.Services.MTGService;
