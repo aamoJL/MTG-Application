@@ -26,7 +26,7 @@ namespace MTGApplication.General;
 /// <summary>
 /// Card Collections Tab view model
 /// </summary>
-public partial class CardCollectionsViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
+public partial class CardCollectionsViewModel : ViewModelBase, Interfaces.ISavable, IInAppNotifier, IDialogNotifier
 {
   public CardCollectionsViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardCollection> collectionRepository, ClipboardService clipboardService = default)
   {

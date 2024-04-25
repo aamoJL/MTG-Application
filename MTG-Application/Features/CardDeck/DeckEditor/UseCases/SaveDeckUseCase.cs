@@ -1,5 +1,6 @@
 ﻿using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.UseCases;
 using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
@@ -7,19 +8,19 @@ using MTGApplication.Models.DTOs;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardDeck;
-public class SaveDeckUseCase : UseCase<SaveDeckUseCase.Args, Task<bool?>>
+public class SaveDeckUseCase : UseCase<SaveDeckUseCase.Args, Task<ConfirmationResult>>
 {
-  public record Args(MTGCardDeck Deck, string SaveName);
+  public record Args(MTGCardDeck Deck, string SaveName = null);
 
   public SaveDeckUseCase(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
 
   public IRepository<MTGCardDeckDTO> Repository { get; }
 
   public Confirmation<string, string> SaveConfirmation { get; set; } = new();
-  public Confirmation<bool?> OverrideConfirmation { get; set; } = new();
+  public Confirmation<ConfirmationResult> OverrideConfirmation { get; set; } = new();
   public IWorker Worker { get; set; }
 
-  public override async Task<bool?> Execute(Args args)
+  public override async Task<ConfirmationResult> Execute(Args args)
   {
     var (deck, saveName) = args;
 
@@ -30,21 +31,25 @@ public class SaveDeckUseCase : UseCase<SaveDeckUseCase.Args, Task<bool?>>
       if (saveName != deck.Name && await new DeckExistsUseCase(Repository).Execute(saveName))
       {
         // Deck with the given name exists already
-        if (await OverrideConfirmation.Confirm(
+        var overrideResult = await OverrideConfirmation.Confirm(
           title: "Override existing deck?",
-          message: $"Deck '{saveName}' already exist. Would you like to override the deck?") is true)
+          message: $"Deck '{saveName}' already exist. Would you like to override the deck?");
+
+        switch (overrideResult)
         {
-          overrideOld = true;
+          case ConfirmationResult.Success: overrideOld = true; break;
+          case ConfirmationResult.Failure: return ConfirmationResult.Failure;
+          default: return ConfirmationResult.Cancel;
         }
-        else return null; // Canceled
       }
 
       var saveTask = Save(deck, saveName, overrideOld, true);
+      var saveResult = Worker != null ? await Worker.DoWork(saveTask) : await saveTask;
 
-      return Worker != null ? await Worker.DoWork(saveTask) : await saveTask;
+      return saveResult ? ConfirmationResult.Success : ConfirmationResult.Failure;
     }
 
-    return null;
+    return ConfirmationResult.Cancel;
   }
 
   private async Task<bool> Save(MTGCardDeck deck, string saveName, bool overrideExisting, bool removeOld)

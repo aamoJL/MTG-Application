@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
-using MTGApplication.Interfaces;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System.Threading.Tasks;
@@ -17,25 +17,14 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [ObservableProperty] private bool hasUnsavedChanges;
 
   public MTGDeckEditorViewModelConfirmer Confirmer { get; init; } = new();
-  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository(new());
+  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
   public ICardAPI<MTGCard> CardAPI { get; init; } = App.MTGCardAPI;
 
   [RelayCommand]
   private async Task NewDeck()
   {
-    if (HasUnsavedChanges)
-    {
-      if (await Confirmer.SaveUnsavedChanges.Confirm(
-        title: "Save unsaved changes?",
-        message: $"{(string.IsNullOrEmpty(Deck.Name) ? "Unnamed deck" : $"'{Deck.Name}'")} has unsaved changes. Would you like to save the deck?"
-        ) is true)
-      {
-        if (SaveDeckCommand.CanExecute(Deck)) SaveDeckCommand.Execute(Deck);
-      }
-      else return; // Canceled
-    }
-
-    Deck = new();
+    if (await ConfirmUnsavedChanges())
+      Deck = new();
   }
 
   [RelayCommand]
@@ -43,39 +32,27 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (loadName == string.Empty) return;
 
-    if (HasUnsavedChanges)
+    if (await ConfirmUnsavedChanges())
     {
-      return;
-    }
+      var loadResult = await LoadDeckUseCase.Execute(loadName);
 
-    var loadTask = new LoadDeckUseCase(Repository, CardAPI)
-    {
-      LoadConfirmation = Confirmer.LoadDeck,
-      Worker = this
-    };
-
-    switch (await loadTask.Execute(loadName))
-    {
-      case MTGCardDeck deck: Deck = deck; break; // Success
-      default: break; // Error
+      switch (loadResult.ConfirmResult)
+      {
+        case ConfirmationResult.Success: Deck = loadResult.Deck; break; // TODO: Success
+        case ConfirmationResult.Failure: break; // TODO: Error
+        default: break; // Cancel
+      }
     }
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
   private async Task SaveDeck(string saveName = null)
   {
-    var saveTask = new SaveDeckUseCase(Repository)
+    switch (await SaveDeckUseCase.Execute(new(Deck, saveName)))
     {
-      SaveConfirmation = Confirmer.SaveDeck,
-      OverrideConfirmation = Confirmer.OverrideDeck,
-      Worker = this
-    };
-
-    switch (await saveTask.Execute(new(Deck, saveName)))
-    {
-      case true: return; // Success
-      case false: return; // Error
-      case null: return; // Cancel
+      case ConfirmationResult.Success: break; // TODO: Success
+      case ConfirmationResult.Failure: return; // TODO: Error
+      default: break;
     }
   }
 
@@ -97,7 +74,20 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
     IsBusy = false;
   }
 
-  public async Task<bool> SaveUnsavedChanges() => await Task.FromResult(true);
+  public async Task<bool> ConfirmUnsavedChanges()
+  {
+    if (HasUnsavedChanges)
+    {
+      return await SaveUnsavedChangesUseCase.Execute(new(Deck)) switch
+      {
+        ConfirmationResult.Success => true,
+        ConfirmationResult.Failure => false, // TODO: Error
+        _ => false,
+      };
+    }
+
+    return true;
+  }
 
   public async Task<T> DoWork<T>(Task<T> task)
   {
@@ -110,4 +100,28 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 
   private bool CanExecuteDeleteDeckCommand() => !string.IsNullOrEmpty(Deck.Name);
+}
+
+public partial class MTGDeckEditorViewModel
+{
+  private SaveUnsavedChangesUseCase SaveUnsavedChangesUseCase => new(Repository)
+  {
+    UnsavedChangesConfirmation = Confirmer.SaveUnsavedChanges,
+    SaveConfirmation = Confirmer.SaveDeck,
+    OverrideConfirmation = Confirmer.OverrideDeck,
+    Worker = this
+  };
+
+  private LoadDeckUseCase LoadDeckUseCase => new(Repository, CardAPI)
+  {
+    LoadConfirmation = Confirmer.LoadDeck,
+    Worker = this
+  };
+
+  private SaveDeckUseCase SaveDeckUseCase => new(Repository)
+  {
+    SaveConfirmation = Confirmer.SaveDeck,
+    OverrideConfirmation = Confirmer.OverrideDeck,
+    Worker = this
+  };
 }

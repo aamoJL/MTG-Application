@@ -28,7 +28,7 @@ namespace MTGApplication.ViewModels;
 /// <summary>
 /// Deck Builder tab view model
 /// </summary>
-public partial class DeckBuilderViewModel : ViewModelBase, ISavable, IInAppNotifier, IDialogNotifier
+public partial class DeckBuilderViewModel : ViewModelBase, Interfaces.ISavable, IInAppNotifier, IDialogNotifier
 {
   public DeckBuilderViewModel(ICardAPI<MTGCard> cardAPI, IRepository<MTGCardDeck> deckRepository, IOService.ClipboardService clipboardService = default, IMTGCommanderAPI commanderAPI = default)
   {

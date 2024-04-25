@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.General.Services.ConfirmationService;
 using System.IO;
+using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardDeck;
@@ -65,37 +66,37 @@ public sealed partial class MTGDeckEditorView
 {
   public void RegisterConfirmDialogs(MTGDeckEditorViewModelConfirmer confirmer)
   {
-    confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await GetUnsavedChangesDialog(msg.Title, msg.Message).ShowAsync(DialogWrapper) };
-    confirmer.LoadDeck = new() { OnConfirm = async msg => await GetOpenDeckDialog(msg.Title, msg.Message, msg.Data).ShowAsync(DialogWrapper) };
-    confirmer.SaveDeck = new() { OnConfirm = async msg => await GetSaveDeckDialog(msg.Title, msg.Message, msg.Data).ShowAsync(DialogWrapper) };
-    confirmer.OverrideDeck = new() { OnConfirm = async msg => await GetOverrideDeckDialog(msg.Title, msg.Message).ShowAsync(DialogWrapper) };
+    confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await ShowUnsavedChangesDialog(msg.Title, msg.Message) };
+    confirmer.LoadDeck = new() { OnConfirm = async msg => await ShowOpenDeckDialog(msg.Title, msg.Message, msg.Data) };
+    confirmer.SaveDeck = new() { OnConfirm = async msg => await ShowSaveDeckDialog(msg.Title, msg.Message, msg.Data) };
+    confirmer.OverrideDeck = new() { OnConfirm = async msg => await ShowOverrideDeckDialog(msg.Title, msg.Message) };
   }
 
-  public Dialog<bool?> GetUnsavedChangesDialog(string title, string message) => new ConfirmationDialog(title)
+  public async Task<ConfirmationResult> ShowUnsavedChangesDialog(string title, string message) => (await new ConfirmationDialog(title)
   {
     Message = message,
     PrimaryButtonText = "Save"
-  };
+  }.ShowAsync(DialogWrapper)).ToConfirmationResult();
 
-  public Dialog<string> GetOpenDeckDialog(string title, string message, string[] deckNames) => new ComboBoxDialog(title)
+  public async Task<string> ShowOpenDeckDialog(string title, string message, string[] deckNames) => (await new ComboBoxDialog(title)
   {
     InputHeader = message,
     Items = deckNames,
     PrimaryButtonText = "Open",
     SecondaryButtonText = string.Empty
-  };
+  }.ShowAsync(DialogWrapper));
 
-  public Dialog<string> GetSaveDeckDialog(string title, string message, string initName) => new TextBoxDialog(title)
+  public async Task<string> ShowSaveDeckDialog(string title, string message, string initName) => (await new TextBoxDialog(title)
   {
     InvalidInputCharacters = Path.GetInvalidFileNameChars(),
     TextInputText = initName,
     PrimaryButtonText = "Save",
     SecondaryButtonText = string.Empty
-  };
+  }.ShowAsync(DialogWrapper));
 
-  public Dialog<bool?> GetOverrideDeckDialog(string title, string message) => new ConfirmationDialog(title)
+  public async Task<ConfirmationResult> ShowOverrideDeckDialog(string title, string message) => (await new ConfirmationDialog(title)
   {
     Message = message,
     SecondaryButtonText = string.Empty
-  };
+  }.ShowAsync(DialogWrapper)).ToConfirmationResult();
 }
