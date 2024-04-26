@@ -303,6 +303,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardDeck\DeckEditor\Controls\CardView\" />
-    <Folder Include="Features\CardDeck\DeckEditor\UseCases\DialogUseCases\" />
   </ItemGroup>
 </Project>

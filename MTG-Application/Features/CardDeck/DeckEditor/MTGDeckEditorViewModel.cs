@@ -4,11 +4,11 @@ using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.CardDeck;
 public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
@@ -17,7 +17,8 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
 
-  public MTGDeckEditorViewModelConfirmer Confirmer { get; init; } = new();
+  public DeckEditorConfirmers Confirmers { get; init; } = new();
+  public DeckEditorNotifier Notifier { get; init; } = new();
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
   public ICardAPI<MTGCard> CardAPI { get; init; } = App.MTGCardAPI;
 
@@ -39,9 +40,10 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
       switch (loadResult.ConfirmResult)
       {
-        case ConfirmationResult.Success: Deck = loadResult.Deck; break; // TODO: Success
-        case ConfirmationResult.Failure: break; // TODO: Error
-        case ConfirmationResult.Cancel:
+        case ConfirmationResult.Yes:
+          Deck = loadResult.Deck;
+          Notifier.Notify(Notifier.Notifications.LoadSuccessNotification); break;
+        case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.LoadErrorNotification); break;
         default: break;
       }
     }
@@ -54,11 +56,9 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
     switch (await SaveDeckUseCase.Execute(new(Deck, saveName)))
     {
-      case ConfirmationResult.Success: break; // TODO: Success
-      case ConfirmationResult.Failure: return; // TODO: Error
-      case ConfirmationResult.Cancel:
-      default:
-        break;
+      case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); break;
+      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return;
+      default: break;
     }
   }
 
@@ -75,15 +75,13 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (!CanExecuteDeleteDeckCommand()) return;
 
-    if (await ConfirmUnsavedChanges())
+    switch (await DeleteDeckUseCase.Execute(Deck))
     {
-      switch (await DeleteDeckUseCase.Execute(Deck))
-      {
-        case ConfirmationResult.Success: Deck = new(); return;
-        case ConfirmationResult.Failure: return; // TODO: Error
-        case ConfirmationResult.Cancel:
-        default: return;
-      }
+      case ConfirmationResult.Yes:
+        Deck = new();
+        Notifier.Notify(Notifier.Notifications.DeleteSuccessNotification); break;
+      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.DeleteErrorNotification); break;
+      default: return;
     }
   }
 
@@ -91,13 +89,13 @@ public partial class MTGDeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (!HasUnsavedChanges) return true;
 
-    return await SaveUnsavedChangesUseCase.Execute(new(Deck)) switch
+    switch (await SaveUnsavedChangesUseCase.Execute(new(Deck)))
     {
-      ConfirmationResult.Success => true,
-      ConfirmationResult.Failure => false, // TODO: Error
-      ConfirmationResult.Cancel => false,
-      _ => false,
-    };
+      case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); return true;
+      case ConfirmationResult.No: return true;
+      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return false;
+      default: return false;
+    }
   }
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
@@ -109,28 +107,28 @@ public partial class MTGDeckEditorViewModel
 {
   private SaveUnsavedChangesUseCase SaveUnsavedChangesUseCase => new(Repository)
   {
-    UnsavedChangesConfirmation = Confirmer.SaveUnsavedChanges,
-    SaveConfirmation = Confirmer.SaveDeck,
-    OverrideConfirmation = Confirmer.OverrideDeck,
+    UnsavedChangesConfirmation = Confirmers.SaveUnsavedChanges,
+    SaveConfirmation = Confirmers.SaveDeck,
+    OverrideConfirmation = Confirmers.OverrideDeck,
     Worker = this
   };
 
   private LoadDeckUseCase LoadDeckUseCase => new(Repository, CardAPI)
   {
-    LoadConfirmation = Confirmer.LoadDeck,
+    LoadConfirmation = Confirmers.LoadDeck,
     Worker = this
   };
 
   private SaveDeckUseCase SaveDeckUseCase => new(Repository)
   {
-    SaveConfirmation = Confirmer.SaveDeck,
-    OverrideConfirmation = Confirmer.OverrideDeck,
+    SaveConfirmation = Confirmers.SaveDeck,
+    OverrideConfirmation = Confirmers.OverrideDeck,
     Worker = this
   };
 
   private DeleteDeckUseCase DeleteDeckUseCase => new(Repository)
   {
-    DeleteConfirmation = Confirmer.DeleteDeckUseCase,
+    DeleteConfirmation = Confirmers.DeleteDeckUseCase,
     Worker = this
   };
 }

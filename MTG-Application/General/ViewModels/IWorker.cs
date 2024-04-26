@@ -17,3 +17,8 @@ public interface IWorker
     return result;
   }
 }
+
+public class DefaultWorker : IWorker
+{
+  public bool IsBusy { get; set; }
+}

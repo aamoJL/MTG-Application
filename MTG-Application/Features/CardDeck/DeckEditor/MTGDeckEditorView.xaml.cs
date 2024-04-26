@@ -10,7 +10,7 @@ public sealed partial class MTGDeckEditorView : Page, IDialogPresenter
   {
     InitializeComponent();
 
-    RegisterConfirmDialogs(ViewModel.Confirmer);
+    RegisterConfirmDialogs(ViewModel.Confirmers);
   }
 
   // TODO: notification system
@@ -62,7 +62,7 @@ public sealed partial class MTGDeckEditorView : Page, IDialogPresenter
 
 public sealed partial class MTGDeckEditorView
 {
-  private void RegisterConfirmDialogs(MTGDeckEditorViewModelConfirmer confirmer)
+  private void RegisterConfirmDialogs(DeckEditorConfirmers confirmer)
   {
     confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await new ShowUnsavedChangesDialogUseCase(DialogWrapper).Execute((msg.Title, msg.Message)) };
     confirmer.LoadDeck = new() { OnConfirm = async msg => await new ShowOpenDialogUseCase(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data)) };

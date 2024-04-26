@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.General.Services.ConfirmationService;

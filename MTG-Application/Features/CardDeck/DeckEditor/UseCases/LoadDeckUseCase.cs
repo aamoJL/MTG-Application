@@ -3,13 +3,13 @@ using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.UseCases;
 using MTGApplication.General.ViewModels;
 using MTGApplication.Models;
 using MTGApplication.Models.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.CardDeck;
 
@@ -26,23 +26,23 @@ public class LoadDeckUseCase : UseCase<string, Task<LoadDeckUseCase.ReturnArgs>>
   public IRepository<MTGCardDeckDTO> Repository { get; }
   public ICardAPI<MTGCard> CardAPI { get; }
 
-  public Confirmation<string, string[]> LoadConfirmation { get; set; } = new();
-  public IWorker Worker { get; set; }
+  public Confirmer<string, string[]> LoadConfirmation { get; set; } = new();
+  public IWorker Worker { get; set; } = new DefaultWorker();
 
   public override async Task<ReturnArgs> Execute(string loadName)
   {
-    loadName ??= await LoadConfirmation.Confirm(
-      title: "Open deck",
-      message: "Name",
-      data: (await Repository.Get(ExpressionExtensions.EmptyArray<MTGCardDeckDTO>())).Select(x => x.Name).OrderBy(x => x).ToArray());
+    loadName ??= await LoadConfirmation.Confirm(new(
+      Title: "Open deck",
+      Message: "Name",
+      Data: (await Repository.Get(ExpressionExtensions.EmptyArray<MTGCardDeckDTO>())).Select(x => x.Name).OrderBy(x => x).ToArray()));
 
-    if (loadName is not null)
+    switch (!string.IsNullOrEmpty(loadName))
     {
-      var loadTask = new GetDeckUseCase(Repository, CardAPI).Execute(loadName);
-      var loadResult = Worker != null ? await Worker.DoWork(loadTask) : await loadTask;
-
-      return new(loadResult, Confirmation.FailureFromNull(loadResult));
+      case true:
+        var loadResult = await Worker.DoWork(new GetDeckUseCase(Repository, CardAPI).Execute(loadName));
+        return new(loadResult, FailureFromNull(loadResult));
+      case false:
+      default: return new(Deck: null, ConfirmResult: ConfirmationResult.Cancel);
     }
-    else return new(Deck: null, ConfirmResult: ConfirmationResult.Cancel);
   }
 }
