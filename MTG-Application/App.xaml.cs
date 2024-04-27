@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
 using MTGApplication.Features.CardDeck;
+using MTGApplication.Features.CardSearch;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Views;
 using MTGApplication.Views.Windows;
@@ -42,6 +43,7 @@ public partial class App : Application
     var mainFrame = new Frame();
     mainFrame.Navigate(typeof(MTGDeckEditorView));
     //mainFrame.Navigate(typeof(MTGDeckBuilderPage));
+    //mainFrame.Navigate(typeof(MTGCardSearchView));
 
     new ThemedWindow()
     {

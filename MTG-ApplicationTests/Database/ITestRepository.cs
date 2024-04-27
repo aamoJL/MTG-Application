@@ -1,7 +1,7 @@
-﻿using MTGApplication.Interfaces;
+﻿//using MTGApplication.Interfaces;
 
-namespace MTGApplicationTests.Database;
+//namespace MTGApplicationTests.Database;
 
-public interface ITestRepository<T> : IDisposable, IRepository<T>
-{
-}
+//public interface ITestRepository<T> : IDisposable, IRepository<T>
+//{
+//}

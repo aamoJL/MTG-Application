@@ -13,11 +13,12 @@ namespace MTGApplication.ViewModels;
 /// </summary>
 public abstract class MTGCardSource<T> : IIncrementalSource<T> where T : MTGCardViewModel
 {
+  // TODO: delete when refactored
+
   public List<MTGCard> Cards { get; set; } = new();
   public ICardAPI<MTGCard> CardAPI { get; init; }
   public string NextPage { get; set; }
 
-  #region IIncrementalSource implementation
   public async Task<IEnumerable<T>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
   {
     if (!string.IsNullOrEmpty(NextPage))
@@ -32,7 +33,6 @@ public abstract class MTGCardSource<T> : IIncrementalSource<T> where T : MTGCard
     }
     return await Task.Run(() => (from p in Cards select p).Skip(pageIndex * pageSize).Take(pageSize).Select(x => GetCardViewModel(x)));
   }
-  #endregion
 
   /// <summary>
   /// Returns the given <paramref name="card"/> as a <typeparamref name="T"/>
@@ -45,6 +45,8 @@ public abstract class MTGCardSource<T> : IIncrementalSource<T> where T : MTGCard
 /// </summary>
 public class MTGCardViewModelSource : MTGCardSource<MTGCardViewModel>
 {
+  // TODO: delete when refactored
+
   public MTGCardViewModelSource() : base() { }
 
   protected override MTGCardViewModel GetCardViewModel(MTGCard card) => new(card);
@@ -55,6 +57,8 @@ public class MTGCardViewModelSource : MTGCardSource<MTGCardViewModel>
 /// </summary>
 public class MTGCardCollectionCardViewModelSource : MTGCardSource<MTGCardCollectionCardViewModel>
 {
+  // TODO: delete when refactored
+
   public MTGCardCollectionCardViewModelSource() : base() { }
 
   protected override MTGCardCollectionCardViewModel GetCardViewModel(MTGCard card) => new(card);

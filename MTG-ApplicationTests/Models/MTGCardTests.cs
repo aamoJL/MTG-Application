@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Models;
+using MTGApplication.General.Models.Card;
 using MTGApplicationTests.Services;
 using System.Text.Json;
 using static MTGApplication.Services.MTGService;

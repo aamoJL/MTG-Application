@@ -1,10 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.API;
-using MTGApplication.Models;
-using MTGApplication.Models.DTOs;
+using MTGApplication.API.CardAPI;
+using MTGApplication.General.Models.Card;
 using MTGApplicationTests.Services;
 using System.Text.Json;
-using static MTGApplication.API.ScryfallAPI;
+using static MTGApplication.API.CardAPI.ScryfallAPI;
 
 namespace MTGApplicationTests.API;
 

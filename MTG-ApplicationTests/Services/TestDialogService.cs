@@ -1,5 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using static MTGApplication.Services.DialogService;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplicationTests.Services;
 

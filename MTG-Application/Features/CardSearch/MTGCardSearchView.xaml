@@ -19,9 +19,12 @@
       LastChildFill="True" 
       Padding="10 0 10 10"
       Background="Transparent">
-      <!-- Search controls -->
+
+      <!--#region Search Input -->
       <customControls:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" Submit="{x:Bind ViewModel.SubmitSearchCommand}"/>
-      <!-- View commands -->
+      <!--#endregion-->
+
+      <!--#region Commandbar -->
       <Grid controls:DockPanel.Dock="Top">
         <StackPanel Orientation="Horizontal">
           <CommandBar IsOpen="False" DefaultLabelPosition="Right" HorizontalAlignment="Left">
@@ -56,18 +59,19 @@
         <TextBlock 
           HorizontalAlignment="Right" 
           VerticalAlignment="Bottom"
-          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1}', ViewModel.Cards.Count, ViewModel.TotalCardCount), Mode=OneWay}">
+          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1}', ViewModel.Cards.Collection.Count, ViewModel.Cards.TotalCardCount), Mode=OneWay}">
         </TextBlock>
       </Grid>
-      <!-- Card view -->
+      <!--#endregion-->
+
+      <!--#region Card View -->
       <Grid controls:DockPanel.Dock="Top">
-        <controls:AdaptiveGridView 
-          x:Name="CardSearchImagesDisplay"
+        <controls:AdaptiveGridView
+          ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
+          Visibility="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
+          DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
           Style="{StaticResource MTGAdaptiveGridViewStyle}"
           SelectionMode="None"
-          DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
-          ItemsSource="{x:Bind ViewModel.Cards, Mode=OneWay}"
-          Visibility="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
           CanDragItems="True"
           DragItemsStarting="CardView_DragItemsStarting"
           BorderBrush="{ThemeResource RegionColor}">
@@ -92,12 +96,11 @@
             </DataTemplate>
           </controls:AdaptiveGridView.ItemTemplate>
         </controls:AdaptiveGridView>
-        <ListView 
-          x:Name="CardSearchListDisplay"
+        <ListView
+          ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
+          Visibility="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
           Style="{StaticResource MTGListViewStyle}"
           SelectionMode="Single"
-          ItemsSource="{x:Bind ViewModel.Cards, Mode=OneWay}"
-          Visibility="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
           CanDragItems="True"
           DragItemsStarting="CardView_DragItemsStarting">
           <ListView.ItemTemplate>
@@ -125,6 +128,8 @@
           </ListView.ItemTemplate>
         </ListView>
       </Grid>
+      <!--#endregion-->
+      
     </controls:DockPanel>
   </Grid>
 </Page>
