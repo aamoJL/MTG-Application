@@ -1,9 +1,9 @@
-﻿using MTGApplication.API.CardAPI;
-using MTGApplication.General.Databases.Repositories;
+﻿using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.UseCases;
-using MTGApplication.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

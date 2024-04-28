@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models.CardDeck;
 using MTGApplication.Models.DTOs;
 
 // Add-migration {name}-001 -OutputDir "Database/Migrations"

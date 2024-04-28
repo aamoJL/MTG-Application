@@ -1,5 +1,5 @@
-﻿using MTGApplication.API.CardAPI;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.API.CardAPI;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;

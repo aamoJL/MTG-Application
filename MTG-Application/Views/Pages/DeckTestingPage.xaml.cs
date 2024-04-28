@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.General.Extensions;
-using MTGApplication.Models;
+using MTGApplication.General.Models.CardDeck;
 using MTGApplication.ViewModels;
 using MTGApplication.Views.Controls;
 using System;

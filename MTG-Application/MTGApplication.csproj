@@ -42,8 +42,8 @@
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Features\CardDeck\DeckEditor\Controls\DeckEditorCardImageView.xaml" />
     <None Remove="Features\CardDeck\DeckEditor\Controls\DeckEditorCardTextView.xaml" />
+    <None Remove="Features\CardSearch\CardSearchView.xaml" />
     <None Remove="Features\CardSearch\Controls\ScryfallCardSearchInputControl.xaml" />
-    <None Remove="Features\CardSearch\MTGCardSearchView.xaml" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
     <None Remove="Views\Controls\DeckBuilderTabHeaderControl.xaml" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
@@ -269,7 +269,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\CardSearch\MTGCardSearchView.xaml">
+    <Page Update="Features\CardSearch\CardSearchView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

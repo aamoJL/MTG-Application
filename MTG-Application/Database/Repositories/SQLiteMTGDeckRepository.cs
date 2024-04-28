@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases;
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Models.Card;
-using MTGApplication.Models;
-using MTGApplication.Models.DTOs;
+using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.API.CardAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,9 +95,9 @@ public class SQLiteMTGDeckRepository : IRepository<MTGCardDeck>
       var missingCardsTasks = new List<Task>()
       {
         Task.Run(() => missingCards.AddRange(DbDeckDTO.DeckCards.Where(
-          cardDTO => 
+          cardDTO =>
           !item.DeckCards.Select(
-            x => 
+            x =>
             (name:x.Info.Name , setCode: x.Info.SetCode, collectorNumber: x.Info.CollectorNumber))
           .Contains(
             (name: cardDTO.Name, setCode: cardDTO.SetCode, collectorNumber: cardDTO.CollectorNumber))))),

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.ViewModels;
-using MTGApplication.Models;
 using System;
 using System.Collections.ObjectModel;
 

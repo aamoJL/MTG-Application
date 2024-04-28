@@ -7,7 +7,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
   xmlns:enums="using:MTGApplication.Features.CardSearch"
-  xmlns:api="using:MTGApplication.API.CardAPI"
+  xmlns:api="using:MTGApplication.General.Services.API.CardAPI"
   mc:Ignorable="d">
 
   <Grid ColumnSpacing="0" VerticalAlignment="Top">

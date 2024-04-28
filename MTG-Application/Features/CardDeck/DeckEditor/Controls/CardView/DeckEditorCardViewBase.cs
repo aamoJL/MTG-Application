@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
-using MTGApplication.Services.IOService;
+using MTGApplication.General.Services.IOService;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -40,12 +40,12 @@ public partial class DeckEditorCardViewBase : UserControl
   /// <summary>
   /// Opens card's API Website in web browser
   /// </summary>
-  [RelayCommand] public async Task OpenAPIWebsite() => await new OpenUriUseCase(Model.Info.APIWebsiteUri).Execute();
+  [RelayCommand] public async Task OpenAPIWebsite() => await new OpenUri().Execute(Model.Info.APIWebsiteUri);
 
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
-  [RelayCommand] public async Task OpenCardmarketWebsite() => await new OpenUriUseCase(Model.Info.CardMarketUri).Execute();
+  [RelayCommand] public async Task OpenCardmarketWebsite() => await new OpenUri().Execute(Model.Info.CardMarketUri);
 
   public static readonly DependencyProperty ModelProperty =
       DependencyProperty.Register(nameof(Model), typeof(MTGCard), typeof(DeckEditorCardViewBase),

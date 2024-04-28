@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
-using MTGApplication.API.CardAPI;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.Interfaces;
-using MTGApplication.Models;
 using MTGApplication.Services;
-using MTGApplication.Services.IOService;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +14,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
+using static MTGApplication.General.Services.IOService.IOService;
 using static MTGApplication.Services.CommandService;
 using static MTGApplication.Services.MTGService;
 
@@ -72,7 +72,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
     }
   }
   public DeckCardlistViewDialogs Dialogs { get; set; } = new();
-  public IOService.ClipboardService ClipboardService { get; init; } = new();
+  public ClipboardService ClipboardService { get; init; } = new();
   public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
   public MTGCardSortProperties SortProperties { get; }
   public CommandService CommandService { get; init; } = new();

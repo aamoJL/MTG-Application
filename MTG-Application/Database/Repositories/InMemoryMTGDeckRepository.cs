@@ -1,8 +1,7 @@
-﻿using MTGApplication.API.CardAPI;
-using MTGApplication.General.Databases.Repositories;
+﻿using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Models.Card;
-using MTGApplication.Models;
-using MTGApplication.Models.DTOs;
+using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.API.CardAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +15,8 @@ namespace MTGApplication.Database.Repositories;
 /// </summary>
 public class InMemoryMTGDeckRepository : IRepository<MTGCardDeck>
 {
-  #region Properties
   protected static List<MTGCardDeckDTO> Decks { get; } = new();
   protected ICardAPI<MTGCard> CardAPI { get; set; }
-  #endregion
 
   public InMemoryMTGDeckRepository(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
 

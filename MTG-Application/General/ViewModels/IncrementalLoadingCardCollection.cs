@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
-using MTGApplication.API.CardAPI;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.API.CardAPI;
 using System.Collections.Generic;
 
 namespace MTGApplication.General.ViewModels;

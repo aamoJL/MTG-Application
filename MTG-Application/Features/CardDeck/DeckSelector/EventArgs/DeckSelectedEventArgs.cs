@@ -1,6 +1,6 @@
 ﻿namespace MTGApplication.Features.CardDeck;
 
-public partial class MTGDeckSelectorViewModel
+public partial class DeckSelectorViewModel
 {
   public class DeckSelectedEventArgs : System.EventArgs
   {

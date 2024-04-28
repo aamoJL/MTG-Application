@@ -3,12 +3,10 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.API.CardAPI;
 using MTGApplication.Database;
 using MTGApplication.Features.CardDeck;
-using MTGApplication.Features.CardSearch;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Views;
+using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.Views.Windows;
 
 namespace MTGApplication;
@@ -41,7 +39,7 @@ public partial class App : Application
     }
 
     var mainFrame = new Frame();
-    mainFrame.Navigate(typeof(MTGDeckEditorView));
+    mainFrame.Navigate(typeof(DeckEditorView));
     //mainFrame.Navigate(typeof(MTGDeckBuilderPage));
     //mainFrame.Navigate(typeof(MTGCardSearchView));
 

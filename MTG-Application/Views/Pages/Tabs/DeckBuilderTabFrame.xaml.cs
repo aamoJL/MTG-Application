@@ -48,14 +48,14 @@ public sealed partial class DeckBuilderTabFrame : Page, ITabViewTab, ISavable
 
   /// <summary>
   /// Initializer for the frame.
-  /// The frame will navigate to <see cref="MTGDeckSelectorView"/>
+  /// The frame will navigate to <see cref="DeckSelectorView"/>
   /// </summary>
   /// <returns></returns>
   public DeckBuilderTabFrame Init()
   {
-    if (BaseFrame.Navigate(typeof(MTGDeckSelectorView), null, new SuppressNavigationTransitionInfo()))
+    if (BaseFrame.Navigate(typeof(DeckSelectorView), null, new SuppressNavigationTransitionInfo()))
     {
-      var deckDisplayContent = (BaseFrame.Content as MTGDeckSelectorView);
+      var deckDisplayContent = (BaseFrame.Content as DeckSelectorView);
       //_ = deckDisplayContent.Init();
       //TODO: init
 
@@ -65,7 +65,7 @@ public sealed partial class DeckBuilderTabFrame : Page, ITabViewTab, ISavable
     return this;
   }
 
-  private async void DeckDisplayViewModel_DeckSelected(object sender, MTGDeckSelectorViewModel.DeckSelectedEventArgs e)
+  private async void DeckDisplayViewModel_DeckSelected(object sender, DeckSelectorViewModel.DeckSelectedEventArgs e)
   {
     //(sender as MTGDeckSelectorViewModel).DeckSelected -= DeckDisplayViewModel_DeckSelected;
 

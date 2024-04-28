@@ -3,9 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using MTGApplication.API.CardAPI;
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using MTGApplication.Interfaces;
@@ -20,7 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
-using static MTGApplication.Services.IOService.IOService;
+using static MTGApplication.General.Services.IOService.IOService;
 
 namespace MTGApplication.General;
 
