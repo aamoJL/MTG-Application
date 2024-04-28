@@ -30,6 +30,13 @@ public class TestCardDbContextFactory : CardDbContextFactory, IDisposable
     db.SaveChanges();
   }
 
+  public void Populate(object entity)
+  {
+    using var db = CreateDbContext();
+    db.Add(entity);
+    db.SaveChanges();
+  }
+
   public void Dispose()
   {
     _connection.Close();

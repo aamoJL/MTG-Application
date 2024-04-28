@@ -48,14 +48,14 @@ public sealed partial class DeckBuilderTabFrame : Page, ITabViewTab, ISavable
 
   /// <summary>
   /// Initializer for the frame.
-  /// The frame will navigate to <see cref="DeckSelectorView"/>
+  /// The frame will navigate to <see cref="DeckSelectorPage"/>
   /// </summary>
   /// <returns></returns>
   public DeckBuilderTabFrame Init()
   {
-    if (BaseFrame.Navigate(typeof(DeckSelectorView), null, new SuppressNavigationTransitionInfo()))
+    if (BaseFrame.Navigate(typeof(DeckSelectorPage), null, new SuppressNavigationTransitionInfo()))
     {
-      var deckDisplayContent = (BaseFrame.Content as DeckSelectorView);
+      var deckDisplayContent = (BaseFrame.Content as DeckSelectorPage);
       //_ = deckDisplayContent.Init();
       //TODO: init
 

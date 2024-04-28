@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Models.Card;
-using MTGApplication.Models;
-using MTGApplication.Models.DTOs;
+using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.Services;
 using System.Collections.ObjectModel;
 

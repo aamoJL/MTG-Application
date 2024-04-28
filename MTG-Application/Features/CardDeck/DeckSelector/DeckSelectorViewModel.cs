@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardDeck;
-public partial class DeckSelectorViewModel : ViewModelBase
+public partial class DeckSelectorViewModel : ViewModelBase, IWorker
 {
   public DeckSelectorViewModel(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
   {
@@ -26,13 +26,11 @@ public partial class DeckSelectorViewModel : ViewModelBase
   [RelayCommand]
   private async Task LoadDecks()
   {
-    IsBusy = true;
-    var deckNameImageTuples = await new GetDeckNamesAndImageUris(Repository, CardAPI).Execute();
+    var deckNameImageTuples = await new GetDeckSelectorListItems(Repository, CardAPI) { Worker = this }.Execute();
 
     DeckItems.Clear();
 
-    foreach (var (Name, ImageUri) in deckNameImageTuples) DeckItems.Add(new(Name, ImageUri));
-
-    IsBusy = false;
+    foreach (var (Name, ImageUri) in deckNameImageTuples) 
+      DeckItems.Add(new(Name, ImageUri));
   }
 }

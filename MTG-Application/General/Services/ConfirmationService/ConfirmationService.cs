@@ -15,7 +15,7 @@ public static partial class ConfirmationService
 
   public class Confirmer<TReturn, TArgs>
   {
-    public Func<Confirmation<TArgs>, Task<TReturn>> OnConfirm { private get; set; }
+    public virtual Func<Confirmation<TArgs>, Task<TReturn>> OnConfirm { protected get; set; }
 
     public async Task<TReturn> Confirm(Confirmation<TArgs> confirmation)
       => OnConfirm == null ? default : await OnConfirm.Invoke(confirmation);
@@ -23,7 +23,7 @@ public static partial class ConfirmationService
 
   public class Confirmer<TReturn>
   {
-    public Func<Confirmation, Task<TReturn>> OnConfirm { private get; set; }
+    public virtual Func<Confirmation, Task<TReturn>> OnConfirm { protected get; set; }
 
     public async Task<TReturn> Confirm(Confirmation confirmation)
       => OnConfirm == null ? default : await OnConfirm.Invoke(confirmation);

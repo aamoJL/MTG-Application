@@ -57,6 +57,8 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
 
   public async Task<bool> Delete(MTGCardDeckDTO item)
   {
+    if (item == null) return false;
+
     using var db = DbContextFactory.CreateDbContext();
 
     if (await db.MTGDecks.FirstOrDefaultAsync(x => x.Name == item.Name) is MTGCardDeckDTO existingItem)

@@ -1,29 +1,32 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.API.CardAPI;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.API.CardAPI;
+using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility;
 
 namespace MTGApplicationTests.General.APITests.CardAPITests;
 [TestClass]
 public partial class GetMTGCardsBySearchQueryTest
 {
-  private readonly ICardAPI<MTGCard> CardAPI = new ScryfallAPI(); // TODO: mock
+  private readonly UseCaseDependencies _dependensies = new();
 
-  [TestMethod("Cards should be found with valid query")]
+  [TestMethod("Cards should be found with a valid query")]
   public async Task Execute_WithValidQuery_CardsFound()
   {
     var query = "asd";
+    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
 
-    var result = await new GetMTGCardsBySearchQuery(CardAPI).Execute(query);
+    var result = await new GetMTGCardsBySearchQuery(_dependensies.CardAPI).Execute(query);
 
     Assert.IsTrue(result.Found.Length > 0, "Cards were not found");
   }
 
-  [TestMethod("Cards should not be found with empty query")]
+  [TestMethod("Cards should not be found with an empty query")]
   public async Task Execute_WithEmptyQuery_CardsNotFound()
   {
     var query = string.Empty;
+    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
 
-    var result = await new GetMTGCardsBySearchQuery(CardAPI).Execute(query);
+    var result = await new GetMTGCardsBySearchQuery(_dependensies.CardAPI).Execute(query);
 
     Assert.AreEqual(0, result.TotalCount, "Cards should not have been found.");
   }
@@ -33,8 +36,9 @@ public partial class GetMTGCardsBySearchQueryTest
   public async Task Execute_WithValidQuery_WorkerBusy()
   {
     var query = string.Empty;
+    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
 
-    await new GetMTGCardsBySearchQuery(CardAPI)
+    await new GetMTGCardsBySearchQuery(_dependensies.CardAPI)
     {
       Worker = new TestExceptionWorker()
     }.Execute(query);

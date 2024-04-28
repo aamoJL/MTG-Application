@@ -47,8 +47,8 @@ public class SaveDeck : UseCase<SaveDeck.Args, Task<ConfirmationResult>>
     {
       deck.Name = saveName;
 
-      if (oldName != saveName && removeOld is true && !string.IsNullOrEmpty(oldName))
-        await new General.Databases.Repositories.MTGDeckRepository.DeleteDeckUseCase(Repository).Execute(oldName);
+      if (oldName != saveName && removeOld && await new DeckExistsUseCase(Repository).Execute(oldName) && !string.IsNullOrEmpty(oldName))
+        await new DeleteDeckUseCase(Repository).Execute(oldName);
     }
 
     return wasSaved;

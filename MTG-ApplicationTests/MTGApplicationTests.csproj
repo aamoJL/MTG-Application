@@ -27,4 +27,8 @@
   <ItemGroup>
     <ProjectCapability Include="TestContainer" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestUtility\API\" />
+  </ItemGroup>
 </Project>

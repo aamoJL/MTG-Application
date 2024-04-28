@@ -1,12 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication;
-using MTGApplication.API.CardAPI;
-using MTGApplication.Database;
-using MTGApplication.Database.Repositories;
-using MTGApplication.General.Models.Card;
-using MTGApplication.Models;
-
-namespace MTGApplicationTests.Database;
+﻿namespace MTGApplicationTests.Database;
 
 //[TestClass]
 //public partial class SQLiteMTGDeckRepositoryTests : MTGDeckRepositoryTestsBase

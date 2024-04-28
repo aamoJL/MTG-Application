@@ -1,13 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.API.CardAPI;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.API.CardAPI;
 using MTGApplicationTests.Services;
 using System.Text.Json;
-using static MTGApplication.API.CardAPI.ScryfallAPI;
+using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
 
 namespace MTGApplicationTests.API;
 
 // TODO: clean
+// TODO: move to integration testing
 
 [TestClass]
 public class ScryfallAPITests
