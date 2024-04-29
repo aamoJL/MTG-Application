@@ -13,7 +13,7 @@ using static MTGApplication.General.Services.ConfirmationService.ConfirmationSer
 
 namespace MTGApplication.Features.CardDeck;
 
-public class LoadDeck : UseCase<string, Task<LoadDeck.ReturnArgs>>
+public class LoadDeck : UseCase<Task<LoadDeck.ReturnArgs>>
 {
   public record ReturnArgs(MTGCardDeck Deck, ConfirmationResult ConfirmResult);
 
@@ -29,13 +29,20 @@ public class LoadDeck : UseCase<string, Task<LoadDeck.ReturnArgs>>
   public Confirmer<string, string[]> LoadConfirmation { get; set; } = new();
   public IWorker Worker { get; set; } = new DefaultWorker();
 
-  public override async Task<ReturnArgs> Execute(string loadName)
+  public override async Task<ReturnArgs> Execute()
   {
-    loadName ??= await LoadConfirmation.Confirm(new(
+    var loadName = await LoadConfirmation.Confirm(new(
       Title: "Open deck",
       Message: "Name",
       Data: (await Repository.Get(ExpressionExtensions.EmptyArray<MTGCardDeckDTO>())).Select(x => x.Name).OrderBy(x => x).ToArray()));
 
+    return await Load(loadName);
+  }
+
+  public async Task<ReturnArgs> Execute(string loadName) => await Load(loadName);
+
+  private async Task<ReturnArgs> Load(string loadName)
+  {
     switch (!string.IsNullOrEmpty(loadName))
     {
       case true:

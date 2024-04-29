@@ -18,23 +18,23 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
 
   public CardDbContextFactory DbContextFactory { get; }
 
-  public async Task<bool> Add(MTGCardDeckDTO item)
+  public virtual async Task<bool> Add(MTGCardDeckDTO item)
   {
     using var db = DbContextFactory.CreateDbContext();
     if (!await Exists(item.Name)) db.Add(item);
     return await db.SaveChangesAsync() > 0;
   }
 
-  public async Task<bool> AddOrUpdate(MTGCardDeckDTO item)
+  public virtual async Task<bool> AddOrUpdate(MTGCardDeckDTO item)
     => await Exists(item.Name) ? await Update(item) : await Add(item);
 
-  public async Task<bool> Exists(string name)
+  public virtual async Task<bool> Exists(string name)
   {
     using var db = DbContextFactory.CreateDbContext();
     return await Task.FromResult(db.MTGDecks.FirstOrDefault(x => x.Name == name) != null);
   }
 
-  public async Task<IEnumerable<MTGCardDeckDTO>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
+  public virtual async Task<IEnumerable<MTGCardDeckDTO>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -45,7 +45,7 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
   }
 
   // TODO: remove task?
-  public async Task<MTGCardDeckDTO> Get(string name, Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
+  public virtual async Task<MTGCardDeckDTO> Get(string name, Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -55,7 +55,7 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
     return await Task.FromResult(deck);
   }
 
-  public async Task<bool> Delete(MTGCardDeckDTO item)
+  public virtual async Task<bool> Delete(MTGCardDeckDTO item)
   {
     if (item == null) return false;
 
@@ -67,7 +67,7 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
     return await db.SaveChangesAsync() > 0;
   }
 
-  public async Task<bool> Update(MTGCardDeckDTO item)
+  public virtual async Task<bool> Update(MTGCardDeckDTO item)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;

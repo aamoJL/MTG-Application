@@ -21,6 +21,8 @@ public class GetDeckUseCase : UseCase<string, Task<MTGCardDeck>>
   {
     if (string.IsNullOrEmpty(name)) return null;
 
-    return await (await Repository.Get(name)).AsMTGCardDeck(CardAPI);
+    var deck = await Repository.Get(name);
+
+    return deck != null ? await deck.AsMTGCardDeck(CardAPI) : null;
   }
 }

@@ -49,11 +49,11 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
-  private async Task SaveDeck(string saveName = null)
+  private async Task SaveDeck()
   {
     if (!CanExecuteDeleteDeckCommand()) return;
 
-    switch (await SaveDeckUseCase.Execute(new(Deck, saveName)))
+    switch (await SaveDeckUseCase.Execute(Deck))
     {
       case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); break;
       case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return;
@@ -88,7 +88,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (!HasUnsavedChanges) return true;
 
-    switch (await SaveUnsavedChangesUseCase.Execute(new(Deck)))
+    switch (await SaveUnsavedChangesUseCase.Execute(Deck))
     {
       case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); return true;
       case ConfirmationResult.No: return true;

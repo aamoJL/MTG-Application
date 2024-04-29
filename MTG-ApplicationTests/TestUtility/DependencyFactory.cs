@@ -8,11 +8,11 @@ public class UseCaseDependencies
   public UseCaseDependencies()
   {
     ContextFactory = new();
-    Repository = new TestSQLiteMTGDeckRepository(ContextFactory);
+    Repository = new TestDeckDTORepository(ContextFactory);
     CardAPI = new TestCardAPI();
   }
 
   public TestCardDbContextFactory ContextFactory { get; }
-  public TestSQLiteMTGDeckRepository Repository { get; }
+  public TestDeckDTORepository Repository { get; }
   public TestCardAPI CardAPI { get; }
 }

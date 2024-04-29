@@ -11,17 +11,15 @@ public class SaveUnsavedChanges : SaveDeck
 
   public Confirmer<ConfirmationResult> UnsavedChangesConfirmation { get; set; } = new();
 
-  public override async Task<ConfirmationResult> Execute(Args args)
+  public override async Task<ConfirmationResult> Execute(MTGCardDeck deck)
   {
-    var deck = args.Deck;
-
     var saveUnsavedResult = await UnsavedChangesConfirmation.Confirm(new(
       Title: "Save unsaved changes?",
       Message: $"{(string.IsNullOrEmpty(deck.Name) ? "Unnamed deck" : $"'{deck.Name}'")} has unsaved changes. Would you like to save the deck?"));
 
     return saveUnsavedResult switch
     {
-      ConfirmationResult.Yes => await base.Execute(args),
+      ConfirmationResult.Yes => await base.Execute(deck),
       ConfirmationResult.No => ConfirmationResult.No,
       _ => saveUnsavedResult,
     };

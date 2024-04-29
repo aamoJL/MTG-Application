@@ -9,7 +9,9 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 public class SaveUnsavedChangesTests
 {
   private readonly UseCaseDependencies _dependencies = new();
-  private readonly MTGCardDeck _deck = new() { Name = "Deck" };
+  private readonly MTGCardDeck _savedDeck = new() { Name = "Deck" };
+
+  public SaveUnsavedChangesTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
 
   [TestMethod("Should show unsaved confirmation when executed")]
   [ExpectedException(typeof(ConfirmationException))]
@@ -18,7 +20,7 @@ public class SaveUnsavedChangesTests
     await new SaveUnsavedChanges(_dependencies.Repository)
     {
       UnsavedChangesConfirmation = new TestExceptionConfirmer<ConfirmationResult>(),
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
   }
 
   [TestMethod("Should show save confirmation when accepted saving")]
@@ -32,7 +34,7 @@ public class SaveUnsavedChangesTests
         OnConfirm = async (arg) => await Task.FromResult(ConfirmationResult.Yes)
       },
       SaveConfirmation = new TestExceptionConfirmer<string, string>(),
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
   }
 
   [TestMethod("Should return NO when declined saving")]
@@ -44,7 +46,7 @@ public class SaveUnsavedChangesTests
       {
         OnConfirm = async (arg) => await Task.FromResult(ConfirmationResult.No)
       },
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
 
     Assert.AreEqual(ConfirmationResult.No, result);
   }
@@ -58,8 +60,25 @@ public class SaveUnsavedChangesTests
       {
         OnConfirm = async (arg) => await Task.FromResult(ConfirmationResult.Cancel)
       },
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
 
     Assert.AreEqual(ConfirmationResult.Cancel, result);
+  }
+
+  [TestMethod("Should return FAILURE when deck could not be saved")]
+  public async Task Execute_Failure_ReturnFailure()
+  {
+    _dependencies.Repository.UpdateFailure = true;
+
+    var result = await new SaveUnsavedChanges(_dependencies.Repository)
+    {
+      UnsavedChangesConfirmation = new()
+      {
+        OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes)
+      },
+      SaveConfirmation = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+    }.Execute(_savedDeck);
+
+    Assert.AreEqual(ConfirmationResult.Failure, result);
   }
 }

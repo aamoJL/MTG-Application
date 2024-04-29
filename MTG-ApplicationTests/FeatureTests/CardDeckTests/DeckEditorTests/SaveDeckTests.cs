@@ -10,7 +10,9 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 public class SaveDeckTests
 {
   private readonly UseCaseDependencies _dependencies = new();
-  private readonly MTGCardDeck _deck = new() { Name = "Deck" };
+  private readonly MTGCardDeck _savedDeck = new() { Name = "SavedDeck" };
+
+  public SaveDeckTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
 
   [TestMethod("Save confirmation should be shown when executed without a name")]
   [ExpectedException(typeof(ConfirmationException))]
@@ -19,16 +21,28 @@ public class SaveDeckTests
     await new SaveDeck(_dependencies.Repository)
     {
       SaveConfirmation = new TestExceptionConfirmer<string, string>()
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
   }
 
-  [TestMethod("Save confirmation should not be shown when executed without a name")]
+  [TestMethod("Save confirmation should not be shown when executed with a name")]
   public async Task Execute_WithName_SaveConfirmNotShown()
   {
     await new SaveDeck(_dependencies.Repository)
     {
       SaveConfirmation = new TestExceptionConfirmer<string, string>()
-    }.Execute(new(Deck: _deck, SaveName: "new name"));
+    }.Execute(_savedDeck, "New name");
+  }
+
+  [TestMethod("Override confirmation should be shown when executed with an existing name")]
+  [ExpectedException(typeof(ConfirmationException))]
+  public async Task Execute_WithExistingName_OverrideConfirmShown()
+  {
+    var newDeck = new MTGCardDeck() { Name = "New Deck" };
+
+    await new SaveDeck(_dependencies.Repository)
+    {
+      OverrideConfirmation = new TestExceptionConfirmer<ConfirmationResult>()
+    }.Execute(newDeck, _savedDeck.Name);
   }
 
   [TestMethod("Should return YES when saving with the same name")]
@@ -38,9 +52,9 @@ public class SaveDeckTests
     {
       SaveConfirmation = new Confirmer<string, string>()
       {
-        OnConfirm = async (arg) => { return await Task.FromResult(_deck.Name); }
+        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
       }
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
 
     Assert.AreEqual(ConfirmationResult.Yes, result);
   }
@@ -52,10 +66,10 @@ public class SaveDeckTests
     {
       SaveConfirmation = new Confirmer<string, string>()
       {
-        OnConfirm = async (arg) => { return await Task.FromResult(_deck.Name); }
+        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
       },
       OverrideConfirmation = new TestExceptionConfirmer<ConfirmationResult>(),
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
   }
 
   [TestMethod("Should return CANCEL when canceling the saving")]
@@ -67,43 +81,27 @@ public class SaveDeckTests
       {
         OnConfirm = async (arg) => { return await Task.FromResult(string.Empty); }
       }
-    }.Execute(new(Deck: _deck));
+    }.Execute(_savedDeck);
 
     Assert.AreEqual(ConfirmationResult.Cancel, result);
   }
 
-  [TestMethod("Override confirmation should be shown when trying to override a deck")]
-  [ExpectedException(typeof(ConfirmationException))]
-  public async Task Execute_Overriding_OverrideConfirmationShown()
-  {
-    var overrideName = "Deck 2";
-    _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(overrideName));
-
-    await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(overrideName); }
-      },
-      OverrideConfirmation = new TestExceptionConfirmer<ConfirmationResult>()
-    }.Execute(new(Deck: _deck));
-  }
-
   [TestMethod("Should return YES when accepting overriding")]
-  [ExpectedException(typeof(ConfirmationException))]
   public async Task Execute_AcceptOverriding_ReturnYes()
   {
-    var overrideName = "Deck 2";
-    _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(overrideName));
+    var newDeck = new MTGCardDeck() { Name = "New Deck" };
 
     var result = await new SaveDeck(_dependencies.Repository)
     {
       SaveConfirmation = new Confirmer<string, string>()
       {
-        OnConfirm = async (arg) => { return await Task.FromResult(overrideName); }
+        OnConfirm = (arg) => Task.FromResult(_savedDeck.Name)
       },
-      OverrideConfirmation = new TestExceptionConfirmer<ConfirmationResult>()
-    }.Execute(new(Deck: _deck));
+      OverrideConfirmation = new Confirmer<ConfirmationResult>()
+      {
+        OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes)
+      }
+    }.Execute(newDeck);
 
     Assert.AreEqual(ConfirmationResult.Yes, result);
   }
@@ -111,21 +109,36 @@ public class SaveDeckTests
   [TestMethod("Should return CANCEL when canceling overriding")]
   public async Task Execute_CancelOverriding_ReturnCancel()
   {
-    var overrideName = "Deck 2";
-    _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(overrideName));
+    var newDeck = new MTGCardDeck() { Name = "New Deck" };
 
     var result = await new SaveDeck(_dependencies.Repository)
     {
       SaveConfirmation = new Confirmer<string, string>()
       {
-        OnConfirm = async (arg) => { return await Task.FromResult(overrideName); }
+        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
       },
       OverrideConfirmation = new Confirmer<ConfirmationResult>()
       {
         OnConfirm = async (arg) => { return await Task.FromResult(ConfirmationResult.Cancel); }
       },
-    }.Execute(new(Deck: _deck));
+    }.Execute(newDeck);
 
     Assert.AreEqual(ConfirmationResult.Cancel, result);
+  }
+
+  [TestMethod("Should return FAILURE when the deck could not be saved")]
+  public async Task Execute_Failure_ReturnFailure()
+  {
+    _dependencies.Repository.UpdateFailure = true;
+
+    var result = await new SaveDeck(_dependencies.Repository)
+    {
+      SaveConfirmation = new Confirmer<string, string>()
+      {
+        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
+      },
+    }.Execute(_savedDeck);
+
+    Assert.AreEqual(ConfirmationResult.Failure, result);
   }
 }
