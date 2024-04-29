@@ -4,11 +4,11 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.UseCases;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+namespace MTGApplication.General.Databases.Repositories.DeckRepository;
 
-public class GetDeckUseCase : UseCase<string, Task<MTGCardDeck>>
+public class GetDeck : UseCase<string, Task<MTGCardDeck>>
 {
-  public GetDeckUseCase(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
+  public GetDeck(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
   {
     Repository = repository;
     CardAPI = cardAPI;

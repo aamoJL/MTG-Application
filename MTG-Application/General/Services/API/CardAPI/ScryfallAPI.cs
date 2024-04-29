@@ -21,7 +21,6 @@ namespace MTGApplication.General.Services.API.CardAPI;
 /// </summary>
 public partial class ScryfallAPI : ICardAPI<MTGCard>
 {
-  #region Static Properties
   private readonly static string API_URL = "https://api.scryfall.com";
   private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
   private static string CARDS_URL => $"{API_URL}/cards";
@@ -33,9 +32,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   /// How many cards can be fetched in one query using identifiers
   /// </summary>
   private static int MaxFetchIdentifierCount => 75;
-  #endregion
 
-  #region ICardAPI implementation
   public string Name => "Scryfall";
   public int PageSize => 175;
 
@@ -128,12 +125,11 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x as MTGCardDTO)).ToArray();
     return await FetchWithIdentifiers(identifiers);
   }
-  #endregion
 
   /// <summary>
   /// Returns <see cref="MTGCard"/> array from the given <paramref name="jsonNode"/>
   /// </summary>
-  private async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
+  protected async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
     var cards = new List<MTGCard>();
     if (jsonNode == null) { return cards.ToArray(); }

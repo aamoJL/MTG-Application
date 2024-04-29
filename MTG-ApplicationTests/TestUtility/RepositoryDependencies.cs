@@ -3,9 +3,9 @@ using MTGApplicationTests.Database;
 
 namespace MTGApplicationTests.TestUtility;
 
-public class UseCaseDependencies
+public class RepositoryDependencies
 {
-  public UseCaseDependencies()
+  public RepositoryDependencies()
   {
     ContextFactory = new();
     Repository = new TestDeckDTORepository(ContextFactory);

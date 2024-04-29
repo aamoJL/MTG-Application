@@ -7,7 +7,7 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckSelectorTests;
 [TestClass]
 public class DeckSelectorViewModelTests
 {
-  private readonly UseCaseDependencies _dependensies = new();
+  private readonly RepositoryDependencies _dependensies = new();
 
   [TestMethod("Deck items should be populated when decks has been loaded")]
   public async Task LoadDecks_DeckItemsPopulated()

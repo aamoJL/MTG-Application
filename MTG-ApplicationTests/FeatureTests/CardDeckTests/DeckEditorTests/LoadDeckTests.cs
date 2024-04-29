@@ -10,7 +10,7 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 [TestClass]
 public class LoadDeckTests
 {
-  private readonly UseCaseDependencies _dependencies = new();
+  private readonly RepositoryDependencies _dependencies = new();
   private readonly MTGCardDeckDTO _savedDeck = MTGCardDeckDTOMocker.Mock("Deck 1");
 
   public LoadDeckTests() => _dependencies.ContextFactory.Populate(_savedDeck);

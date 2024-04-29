@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;

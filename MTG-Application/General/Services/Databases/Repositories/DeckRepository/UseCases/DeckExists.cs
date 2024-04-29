@@ -2,11 +2,11 @@
 using MTGApplication.General.UseCases;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+namespace MTGApplication.General.Databases.Repositories.DeckRepository;
 
-public class DeckExistsUseCase : UseCase<string, Task<bool>>
+public class DeckExists : UseCase<string, Task<bool>>
 {
-  public DeckExistsUseCase(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
+  public DeckExists(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
 
   public IRepository<MTGCardDeckDTO> Repository { get; init; }
 

@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using MTGApplication.General.Services.ConfirmationService;
+using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.General.Services.ConfirmationService;
+namespace MTGApplication.Views.Dialogs;
 
 public class ShowOverrideDialog : ShowDialogUseCase<ConfirmationResult>
 {

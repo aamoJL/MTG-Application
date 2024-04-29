@@ -48,14 +48,14 @@ public class MTGCardDeckDTO
     RemovelistCards = deck.Removelist.Select(x => new MTGCardDTO(x)).ToList();
   }
 
-  [Key] public int Id { get; init; }
-  public string Name { get; init; }
+  [Key] public int Id { get; set; }
+  public string Name { get; set; }
   public MTGCardDTO Commander { get; set; }
   public MTGCardDTO CommanderPartner { get; set; }
-  public List<MTGCardDTO> DeckCards { get; init; } = new();
-  public List<MTGCardDTO> WishlistCards { get; init; } = new();
-  public List<MTGCardDTO> MaybelistCards { get; init; } = new();
-  public List<MTGCardDTO> RemovelistCards { get; init; } = new();
+  public List<MTGCardDTO> DeckCards { get; set; } = new();
+  public List<MTGCardDTO> WishlistCards { get; set; } = new();
+  public List<MTGCardDTO> MaybelistCards { get; set; } = new();
+  public List<MTGCardDTO> RemovelistCards { get; set; } = new();
 
   /// <summary>
   /// Converts the DTO to a <see cref="MTGCardDeck"/> object using the <paramref name="api"/>

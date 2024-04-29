@@ -8,12 +8,7 @@ public static class MTGCardDeckDTOMocker
   {
     return new(
       name: name,
-      commander: mockCommander ? new(
-        scryfallId: new("4f8dc511-e307-4412-bb79-375a6077312d"),
-        oracleId: new("8095ca78-db19-4724-a6ff-eacc85fa2274"),
-        setCode: "otj",
-        collectorNumber: "1") : null
-      );
+      commander: mockCommander ? MTGCardDTOMocker.Mock("Commander") : null);
   }
 
   public static IEnumerable<MTGCardDeckDTO> MockList(int count)

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.General.Services.ConfirmationService;
+namespace MTGApplication.Views.Dialogs;
 
 public abstract class ShowDialogUseCase<TReturn> : UseCase<(string title, string message), Task<TReturn>>
 {

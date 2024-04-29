@@ -8,10 +8,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Databases.Repositories.MTGDeckRepository;
-public class GetDecksUseCase : UseCase<Task<IEnumerable<MTGCardDeck>>>
+namespace MTGApplication.General.Databases.Repositories.DeckRepository;
+public class GetDecks : UseCase<Task<IEnumerable<MTGCardDeck>>>
 {
-  public GetDecksUseCase(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
+  public GetDecks(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI)
   {
     Repository = repository;
     CardAPI = cardAPI;

@@ -24,9 +24,6 @@ public static partial class AppConfig
   /// </summary>
   public static void Initialize()
   {
-    if (!File.Exists("appsettings.json"))
-    { throw new Exception("Error: App settings file not found. Look at 'appsettings - Template.json' file for more information"); }
-
     GlobalSettings.Load();
     LocalSettings.Load();
   }
@@ -46,6 +43,9 @@ public static partial class AppConfig
     /// </summary>
     public void Load()
     {
+      if (!File.Exists(fileName))
+        throw new Exception("Error: App settings file not found. Look at 'appsettings - Template.json' file for more information");
+
       var builder = new ConfigurationBuilder().AddJsonFile(fileName, optional: false);
       configurationRoot = builder.Build();
 

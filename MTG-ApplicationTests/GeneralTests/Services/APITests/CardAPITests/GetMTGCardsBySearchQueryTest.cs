@@ -7,7 +7,7 @@ namespace MTGApplicationTests.General.APITests.CardAPITests;
 [TestClass]
 public partial class GetMTGCardsBySearchQueryTest
 {
-  private readonly UseCaseDependencies _dependensies = new();
+  private readonly RepositoryDependencies _dependensies = new();
 
   [TestMethod("Cards should be found with a valid query")]
   public async Task Execute_WithValidQuery_CardsFound()

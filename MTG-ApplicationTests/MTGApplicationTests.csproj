@@ -29,6 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TestUtility\API\" />
+    <Content Update="Assets\ScryfallAPIDeckSample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

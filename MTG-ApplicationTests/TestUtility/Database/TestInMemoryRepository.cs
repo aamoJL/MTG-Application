@@ -1,5 +1,5 @@
 ﻿using MTGApplication;
-using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.Database;
 using System.Linq.Expressions;

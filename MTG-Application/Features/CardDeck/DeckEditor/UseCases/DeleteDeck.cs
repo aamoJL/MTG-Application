@@ -1,5 +1,5 @@
 ﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.UseCases;
 using MTGApplication.General.ViewModels;
@@ -21,12 +21,12 @@ public class DeleteDeck : UseCase<MTGCardDeck, Task<ConfirmationResult>>
   {
     var deleteConfirmation = await DeleteConfirmation.Confirm(new("Delete deck?", $"Are you sure you want to delete '{deck.Name}'?"));
 
-    if (!await new DeckExistsUseCase(Repository).Execute(deck.Name))
+    if (!await new DeckExists(Repository).Execute(deck.Name))
       return ConfirmationResult.Failure; // Could not find the deck
 
     return deleteConfirmation switch
     {
-      ConfirmationResult.Yes => await Worker.DoWork(new DeleteDeckUseCase(Repository).Execute(deck)) switch
+      ConfirmationResult.Yes => await Worker.DoWork(new General.Databases.Repositories.DeckRepository.DeleteDeck(Repository).Execute(deck)) switch
       {
         true => ConfirmationResult.Yes,
         false => ConfirmationResult.Failure,

@@ -1,5 +1,5 @@
 ﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
@@ -39,14 +39,18 @@ public class LoadDeck : UseCase<Task<LoadDeck.ReturnArgs>>
     return await Load(loadName);
   }
 
-  public async Task<ReturnArgs> Execute(string loadName) => await Load(loadName);
+  public async Task<ReturnArgs> Execute(string loadName)
+  {
+    if (loadName == null) { return await Execute(); }
+    else return await Load(loadName);
+  }
 
   private async Task<ReturnArgs> Load(string loadName)
   {
     switch (!string.IsNullOrEmpty(loadName))
     {
       case true:
-        var loadResult = await Worker.DoWork(new GetDeckUseCase(Repository, CardAPI).Execute(loadName));
+        var loadResult = await Worker.DoWork(new GetDeck(Repository, CardAPI).Execute(loadName));
         return new(loadResult, ConfirmationExtensions.FailureFromNull(loadResult));
       case false:
       default: return new(Deck: null, ConfirmResult: ConfirmationResult.Cancel);

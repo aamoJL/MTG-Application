@@ -1,14 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplicationTests.Services;
-using System.Text.Json;
-using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
+using MTGApplication.General.Services.IOService;
+using System.Text.Json.Nodes;
 
 namespace MTGApplicationTests.API;
 
-// TODO: clean
-// TODO: move to integration testing
+public class TestScryfallAPI() : ScryfallAPI
+{
+  private readonly string _apiSamplePath = Path.Join(IOService.GetAssetDirectoryPath(), "ScryfallAPIDeckSample.json");
+
+  public async Task<MTGCard[]> GetCardsFromSampleJSON()
+  {
+    var jsonNode = JsonNode.Parse(IOService.ReadTextFromFile(_apiSamplePath));
+
+    return await GetCardsFromJsonObject(jsonNode);
+  }
+}
 
 //[TestClass]
 //public class ScryfallAPITests

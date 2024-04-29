@@ -7,7 +7,7 @@ namespace MTGApplicationTests.Features.CardSearch;
 [TestClass]
 public class CardSearchViewModelTests
 {
-  private readonly UseCaseDependencies _dependensies = new();
+  private readonly RepositoryDependencies _dependensies = new();
 
   [TestMethod("Cards should be found with valid query")]
   public async Task SearchCards_WithValidQuery_CardsFound()

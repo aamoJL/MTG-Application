@@ -1,5 +1,5 @@
 ﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.UseCases;
 using MTGApplication.General.ViewModels;
@@ -40,7 +40,7 @@ public class SaveDeck : UseCase<MTGCardDeck, Task<ConfirmationResult>>
 
   private async Task<ConfirmationResult> ConfirmOverride(MTGCardDeck deck, string saveName)
   {
-    if (saveName != deck.Name && await new DeckExistsUseCase(Repository).Execute(saveName))
+    if (saveName != deck.Name && await new DeckExists(Repository).Execute(saveName))
     {
       // Deck with the given name exists already
       var overrideResult = await OverrideConfirmation.Confirm(new(
@@ -56,15 +56,15 @@ public class SaveDeck : UseCase<MTGCardDeck, Task<ConfirmationResult>>
   {
     var oldName = deck.Name;
 
-    if (oldName != saveName && await new DeckExistsUseCase(Repository).Execute(saveName) && !overrideExisting)
+    if (oldName != saveName && await new DeckExists(Repository).Execute(saveName) && !overrideExisting)
       return false; // Cancel because overriding is not enabled
 
-    if (await new AddOrUpdateDeckUseCase(Repository).Execute((deck, saveName)) is bool wasSaved && wasSaved is true)
+    if (await new AddOrUpdateDeck(Repository).Execute((deck, saveName)) is bool wasSaved && wasSaved is true)
     {
       deck.Name = saveName;
 
-      if (oldName != saveName && removeOld && await new DeckExistsUseCase(Repository).Execute(oldName) && !string.IsNullOrEmpty(oldName))
-        await new DeleteDeckUseCase(Repository).Execute(oldName);
+      if (oldName != saveName && removeOld && await new DeckExists(Repository).Execute(oldName) && !string.IsNullOrEmpty(oldName))
+        await new General.Databases.Repositories.DeckRepository.DeleteDeck(Repository).Execute(oldName);
     }
 
     return wasSaved;

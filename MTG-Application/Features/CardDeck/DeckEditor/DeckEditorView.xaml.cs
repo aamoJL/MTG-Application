@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.Views.Dialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardDeck;

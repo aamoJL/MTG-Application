@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.General.Services.ConfirmationService;
+namespace MTGApplication.Views.Dialogs;
 
 public class ShowOpenDialog : ShowDialogUseCase<string, string[]>
 {

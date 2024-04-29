@@ -30,6 +30,8 @@ public static partial class IOService
     return path;
   }
 
+  public static string GetAssetDirectoryPath() => Path.Join(AppDomain.CurrentDomain.BaseDirectory, "Assets");
+
   /// <summary>
   /// Returns array of json file names from a path
   /// </summary>

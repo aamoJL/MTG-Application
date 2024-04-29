@@ -11,7 +11,6 @@ namespace MTGApplication.General.Models.CardDeck;
 /// </summary>
 public partial class MTGCardDeck : ObservableObject
 {
-  #region Properties
   [ObservableProperty] private string name = "";
   [ObservableProperty] private MTGCard commander;
   [ObservableProperty] private MTGCard commanderPartner;
@@ -20,7 +19,6 @@ public partial class MTGCardDeck : ObservableObject
   public ObservableCollection<MTGCard> Wishlist { get; set; } = new();
   public ObservableCollection<MTGCard> Maybelist { get; set; } = new();
   public ObservableCollection<MTGCard> Removelist { get; set; } = new();
-  #endregion
 
   /// <summary>
   /// Returns copy of the card deck.

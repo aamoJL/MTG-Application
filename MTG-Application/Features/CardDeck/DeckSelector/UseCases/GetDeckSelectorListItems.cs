@@ -1,5 +1,5 @@
 ﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.MTGDeckRepository;
+using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
@@ -26,7 +26,7 @@ public class GetDeckSelectorListItems : UseCase<Task<IEnumerable<(string Name, s
 
   public async override Task<IEnumerable<(string Name, string ImageUri)>> Execute()
   {
-    var decks = await Worker.DoWork(new GetDecksUseCase(Repository, CardAPI)
+    var decks = await Worker.DoWork(new GetDecks(Repository, CardAPI)
     {
       Includes = new Expression<Func<MTGCardDeckDTO, object>>[]
     {
