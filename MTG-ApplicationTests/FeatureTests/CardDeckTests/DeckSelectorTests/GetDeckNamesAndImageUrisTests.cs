@@ -17,7 +17,7 @@ public class GetDeckNamesAndImageUrisTests
     {
       MTGCardDeckDTOMocker.Mock("Deck 1"),
       MTGCardDeckDTOMocker.Mock("Deck 2"),
-      MTGCardDeckDTOMocker.Mock("Deck 3", mockCommander: false),
+      MTGCardDeckDTOMocker.Mock("Deck 3", includeCommander: false),
     });
 
     var result = await new GetDeckSelectorListItems(_dependensies.Repository, _dependensies.CardAPI).Execute();

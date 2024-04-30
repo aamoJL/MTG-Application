@@ -21,11 +21,30 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
   public ICardAPI<MTGCard> CardAPI { get; init; } = App.MTGCardAPI;
 
+  public async Task<bool> ConfirmUnsavedChanges()
+  {
+    if (!HasUnsavedChanges) return true;
+
+    switch (await SaveUnsavedChangesUseCase.Execute(Deck))
+    {
+      case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); return true;
+      case ConfirmationResult.No: return true;
+      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return false;
+      default: return false;
+    }
+  }
+}
+
+public partial class DeckEditorViewModel
+{
   [RelayCommand]
   private async Task NewDeck()
   {
     if (await ConfirmUnsavedChanges())
+    {
       Deck = new();
+      HasUnsavedChanges = false;
+    }
   }
 
   [RelayCommand]
@@ -41,6 +60,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       {
         case ConfirmationResult.Yes:
           Deck = loadResult.Deck;
+          HasUnsavedChanges = false;
           Notifier.Notify(Notifier.Notifications.LoadSuccessNotification); break;
         case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.LoadErrorNotification); break;
         default: break;
@@ -51,11 +71,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
   private async Task SaveDeck()
   {
-    if (!CanExecuteDeleteDeckCommand()) return;
+    if (!CanExecuteSaveDeckCommand()) return;
 
     switch (await SaveDeckUseCase.Execute(Deck))
     {
-      case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); break;
+      case ConfirmationResult.Yes:
+        Notifier.Notify(Notifier.Notifications.SaveSuccessNotification);
+        HasUnsavedChanges = false;
+        break;
       case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return;
       default: break;
     }
@@ -78,22 +101,10 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     {
       case ConfirmationResult.Yes:
         Deck = new();
+        HasUnsavedChanges = false;
         Notifier.Notify(Notifier.Notifications.DeleteSuccessNotification); break;
       case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.DeleteErrorNotification); break;
       default: return;
-    }
-  }
-
-  public async Task<bool> ConfirmUnsavedChanges()
-  {
-    if (!HasUnsavedChanges) return true;
-
-    switch (await SaveUnsavedChangesUseCase.Execute(Deck))
-    {
-      case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); return true;
-      case ConfirmationResult.No: return true;
-      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return false;
-      default: return false;
     }
   }
 
@@ -127,7 +138,7 @@ public partial class DeckEditorViewModel
 
   private DeleteDeck DeleteDeckUseCase => new(Repository)
   {
-    DeleteConfirmation = Confirmers.DeleteDeckUseCase,
+    DeleteConfirmation = Confirmers.DeleteDeck,
     Worker = this
   };
 }

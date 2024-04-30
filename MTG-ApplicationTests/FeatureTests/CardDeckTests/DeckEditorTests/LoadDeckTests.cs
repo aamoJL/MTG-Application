@@ -34,6 +34,16 @@ public class LoadDeckTests
     }.Execute(_savedDeck.Name);
   }
 
+  [TestMethod("Should show load confirmation when executed with a null name")]
+  [ExpectedException(typeof(ConfirmationException))]
+  public async Task Execute_WithNull_ConfirmationShown()
+  {
+    await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
+    {
+      LoadConfirmation = new TestExceptionConfirmer<string, string[]>()
+    }.Execute(null);
+  }
+
   [TestMethod("Should return YES and the deck when loading a deck")]
   public async Task Execute_YES_ReturnYesAndDeck()
   {
