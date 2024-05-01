@@ -17,7 +17,7 @@ public class CreateNewDeckViewTabItem : UseCase<CustomTabViewItem>
     {
       DeckSelectedCommand = new RelayCommand<string>((string selectedDeck) =>
       {
-        tabFrame.Navigate(typeof(DeckEditorView), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
+        tabFrame.Navigate(typeof(DeckEditorPage), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
       }),
     };
 

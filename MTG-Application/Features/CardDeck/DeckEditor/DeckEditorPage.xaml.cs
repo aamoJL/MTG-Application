@@ -5,9 +5,9 @@ using MTGApplication.Views.Dialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardDeck;
-public sealed partial class DeckEditorView : Page, IDialogPresenter
+public sealed partial class DeckEditorPage : Page, IDialogPresenter
 {
-  public DeckEditorView()
+  public DeckEditorPage()
   {
     InitializeComponent();
 
@@ -61,7 +61,7 @@ public sealed partial class DeckEditorView : Page, IDialogPresenter
   }
 }
 
-public sealed partial class DeckEditorView
+public sealed partial class DeckEditorPage
 {
   private void RegisterConfirmDialogs(DeckEditorConfirmers confirmer)
   {

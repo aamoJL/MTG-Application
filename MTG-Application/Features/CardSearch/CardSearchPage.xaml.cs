@@ -1,9 +1,9 @@
 using Microsoft.UI.Xaml.Controls;
 
 namespace MTGApplication.Features.CardSearch;
-public sealed partial class CardSearchView : Page
+public sealed partial class CardSearchPage : Page
 {
-  public CardSearchView() => InitializeComponent();
+  public CardSearchPage() => InitializeComponent();
 
   public CardSearchViewModel ViewModel { get; } = new(App.MTGCardAPI);
 

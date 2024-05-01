@@ -42,7 +42,9 @@
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Features\CardDeck\DeckEditor\Controls\DeckEditorCardImageView.xaml" />
     <None Remove="Features\CardDeck\DeckEditor\Controls\DeckEditorCardTextView.xaml" />
-    <None Remove="Features\CardSearch\CardSearchView.xaml" />
+    <None Remove="Features\CardSearch\CardSearchPage.xaml" />
+    <None Remove="Features\CardSearch\Controls\CardSearchCardImageView.xaml" />
+    <None Remove="Features\CardSearch\Controls\CardSearchCardTextView.xaml" />
     <None Remove="Features\CardSearch\Controls\ScryfallCardSearchInputControl.xaml" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
     <None Remove="Views\Controls\DeckBuilderTabHeaderControl.xaml" />
@@ -149,6 +151,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Features\CardSearch\Controls\CardSearchCardTextView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\Styles\MTGPrintGridViewItemTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -269,7 +275,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\CardSearch\CardSearchView.xaml">
+    <Page Update="Features\CardSearch\CardSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -303,5 +309,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardDeck\DeckEditor\Controls\CardView\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\CardSearch\Controls\CardSearchCardImageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

@@ -14,10 +14,10 @@
     <StackPanel.ContextFlyout>
       <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
         <CommandBarFlyout.PrimaryCommands>
-          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+          <AppBarButton Command="{x:Bind ViewModel.SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
           <AppBarSeparator />
-          <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
-          <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+          <AppBarButton Command="{x:Bind ViewModel.OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
+          <AppBarButton Command="{x:Bind ViewModel.OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
           <AppBarButton Command="{x:Bind OnDeleteCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete"  Label="Delete"  ToolTipService.ToolTip="Delete"/>
         </CommandBarFlyout.PrimaryCommands>
         <CommandBarFlyout.SecondaryCommands>

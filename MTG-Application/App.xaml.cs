@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Database;
 using MTGApplication.Features.CardDeck;
+using MTGApplication.Features.CardSearch;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Views;
@@ -40,9 +41,9 @@ public partial class App : Application
     }
 
     var mainFrame = new Frame();
-    mainFrame.Navigate(typeof(DeckEditorView));
+    mainFrame.Navigate(typeof(DeckEditorPage));
     //mainFrame.Navigate(typeof(DeckBuilderPage));
-    //mainFrame.Navigate(typeof(MTGCardSearchView));
+    //mainFrame.Navigate(typeof(CardSearchPage));
 
     new ThemedWindow()
     {

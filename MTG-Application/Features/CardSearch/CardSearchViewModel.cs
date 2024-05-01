@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardSearch;
 /// <summary>
-/// ViewModel for <see cref="CardSearchView"/>
+/// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>
 public partial class CardSearchViewModel : ViewModelBase, IWorker
 {
