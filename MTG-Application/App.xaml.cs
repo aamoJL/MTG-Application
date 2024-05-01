@@ -40,16 +40,19 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    var mainFrame = new Frame();
-    mainFrame.Navigate(typeof(DeckEditorPage));
+    //var mainFrame = new Frame();
+    //mainFrame.Navigate(typeof(DeckEditorPage));
     //mainFrame.Navigate(typeof(DeckBuilderPage));
     //mainFrame.Navigate(typeof(CardSearchPage));
 
-    new ThemedWindow()
+    var mainWindow = new ThemedWindow()
     {
-      Content = mainFrame,
+      //Content = mainFrame,
       Title = "Deck Builder"
-    }.Activate();
+    };
+
+    mainWindow.Navigate(typeof(DeckBuilderPage));
+    mainWindow.Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
   }

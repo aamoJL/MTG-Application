@@ -25,8 +25,10 @@ public sealed partial class DeckBuilderPage : Page
 
   [RelayCommand]
   public void SwitchWindowTheme()
-    => new ChangeWindowTheme(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark
+  {
+    new ChangeWindowTheme(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark
       ? ElementTheme.Light : ElementTheme.Dark).Execute();
+  }
 
   private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
   {

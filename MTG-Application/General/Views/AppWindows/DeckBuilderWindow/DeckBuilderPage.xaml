@@ -6,7 +6,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:cardsearch="using:MTGApplication.Features.CardSearch" xmlns:views="using:MTGApplication.General.Views"
+  xmlns:cardsearch="using:MTGApplication.Features.CardSearch" xmlns:views="using:MTGApplication.General.Views" xmlns:muxc="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -75,12 +75,7 @@
         </Grid>
       </SplitView>
     </controls:DockPanel>
-    <!--<customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>
-
-    <controls:InAppNotification x:Name="InAppNotification"
-                              ShowDismissButton="True"
-                              VerticalOffset="100"
-                              HorizontalOffset="0"
-                              StackMode="Replace"/>-->
+    
+    <!--<customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>-->
   </Grid>
 </Page>

@@ -1,6 +1,10 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.Interfaces;
+using System;
+using Windows.UI;
 
 namespace MTGApplication.Views.Windows;
 
@@ -19,26 +23,12 @@ public sealed partial class ThemedWindow : Window
 
     IconUri = DEFAULT_ICON_URI;
 
+    Activated += ThemedWindow_Activated;
     Closed += ThemedWindow_Closed;
     AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
   }
 
   public string IconUri { set => AppWindow.SetIcon(value); }
-
-  /// <summary>
-  /// <inheritdoc cref="Window.Content"/>
-  /// </summary>
-  public new UIElement Content
-  {
-    get => base.Content;
-    set
-    {
-      base.Content = value;
-
-      if (value is FrameworkElement element)
-        element.RequestedTheme = AppConfig.LocalSettings.AppTheme; // Set theme
-    }
-  }
 
   /// <summary>
   /// Window's width
@@ -56,6 +46,32 @@ public sealed partial class ThemedWindow : Window
   {
     get => AppWindow.Size.Height;
     set => AppWindow.Resize(new(Width, value));
+  }
+
+  public bool Navigate(Type pageType, object parameters = null) => MainFrame.Navigate(pageType, parameters);
+
+  private void ThemedWindow_Activated(object sender, WindowActivatedEventArgs args)
+  {
+    if(Content is FrameworkElement element)
+      element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
+
+    NotificationService.OnShow += NotificationService_OnShow;
+  }
+
+  private void NotificationService_OnShow(object sender, NotificationService.Notification e)
+  {
+    if ((sender as FrameworkElement)?.XamlRoot == Content.XamlRoot)
+    {
+      InAppNotification.Background = e.NotificationType switch
+      {
+        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+        _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
+      };
+      InAppNotification.RequestedTheme = ElementTheme.Light;
+      InAppNotification.Show(e.Message, NotificationService.NotificationDuration);
+    }
   }
 
   private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -85,9 +101,13 @@ public sealed partial class ThemedWindow : Window
     {
       _close = true;
       args.Handled = false;
-      Content = null;
+      
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
+      NotificationService.OnShow -= NotificationService_OnShow;
+      Activated -= ThemedWindow_Activated;
       Closed -= ThemedWindow_Closed;
+      
+      Content = null;
       Close();
     }
   }

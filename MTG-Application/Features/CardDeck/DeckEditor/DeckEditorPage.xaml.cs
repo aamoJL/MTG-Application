@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.Views.Dialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
@@ -12,13 +13,10 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
     InitializeComponent();
 
     RegisterConfirmDialogs(ViewModel.Confirmers);
+    RegisterNotifications(ViewModel.Notifier);
   }
 
-  // TODO: notification system
-
   public DeckEditorViewModel ViewModel { get; } = new();
-
-  public DialogWrapper DialogWrapper => new(XamlRoot);
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
@@ -63,6 +61,8 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
 public sealed partial class DeckEditorPage
 {
+  public DialogWrapper DialogWrapper => new(XamlRoot);
+
   private void RegisterConfirmDialogs(DeckEditorConfirmers confirmer)
   {
     confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await new ShowUnsavedChangesDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
@@ -71,4 +71,10 @@ public sealed partial class DeckEditorPage
     confirmer.OverrideDeck = new() { OnConfirm = async msg => await new ShowOverrideDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
     confirmer.DeleteDeck = new() { OnConfirm = async msg => await new ShowDeleteDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
   }
+}
+
+public sealed partial class DeckEditorPage
+{
+  private void RegisterNotifications(DeckEditorNotifier notifier) 
+    => notifier.OnNotify = (arg) => { NotificationService.RaiseNotification(this, arg); };
 }

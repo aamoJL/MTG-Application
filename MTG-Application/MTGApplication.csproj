@@ -309,6 +309,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardDeck\DeckEditor\Controls\CardView\" />
+    <Folder Include="Features\CardSearch\Controls\CardView\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\CardSearch\Controls\CardSearchCardImageView.xaml">
