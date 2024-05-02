@@ -8,7 +8,7 @@ namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTest
 [TestClass]
 public class AddOrUpdateDeckTests
 {
-  private readonly RepositoryDependencies _dependencies = new();
+  private readonly DeckRepositoryDependencies _dependencies = new();
   private readonly MTGCardDeck _savedDeck = new() { Name = "Saved Deck" };
 
   public AddOrUpdateDeckTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));

@@ -7,7 +7,7 @@ namespace MTGApplicationTests.Features.CardSearch;
 [TestClass]
 public class CardSearchViewModelTests
 {
-  private readonly RepositoryDependencies _dependensies = new();
+  private readonly DeckRepositoryDependencies _dependensies = new();
 
   [TestMethod("Cards should be found with valid query")]
   public async Task SearchCards_WithValidQuery_CardsFound()
@@ -49,14 +49,11 @@ public class CardSearchViewModelTests
   }
 
   [TestMethod("Worker should be busy when searching cards")]
-  [ExpectedException(typeof(IsBusyException))]
   public async Task SearchCards_WithValidQuery_IsWorking()
   {
     var query = "Black Lotus";
     var search = new CardSearchViewModel(_dependensies.CardAPI);
 
-    search.ThrowWhenBusy();
-
-    await search.SubmitSearchCommand.ExecuteAsync(query);
+    await WorkerAssert.IsBusy(search, () => search.SubmitSearchCommand.ExecuteAsync(query));
   }
 }

@@ -2,6 +2,7 @@
 using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.TestUtility;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -142,9 +143,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
       LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
-    vm.ThrowWhenBusy();
-
-    await Assert.ThrowsExceptionAsync<IsBusyException>(() => vm.OpenDeckCommand.ExecuteAsync(null));
+    await WorkerAssert.IsBusy(vm, () => vm.OpenDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Should have no unsaved changes if the deck was loaded")]
@@ -159,5 +158,39 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
     await vm.OpenDeckCommand.ExecuteAsync(null);
 
     Assert.IsFalse(vm.HasUnsavedChanges);
+  }
+
+  [TestMethod("Success notification should be sent when deck has been loaded")]
+  public async Task OpenDeck_Loaded_SuccessNotificationSent()
+  {
+    var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
+    {
+      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
+      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await NotificationAssert.NotificationSent(NotificationType.Success,
+      vm.OpenDeckCommand.ExecuteAsync(null));
+  }
+
+  [TestMethod("Error notification should be sent when there are failure on loading")]
+  public async Task OpenDeck_Failure_ErrorNotificationSent()
+  {
+    _dependencies.Repository.GetFailure = true;
+
+    var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
+    {
+      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
+      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await NotificationAssert.NotificationSent(NotificationType.Error,
+      vm.OpenDeckCommand.ExecuteAsync(null));
   }
 }

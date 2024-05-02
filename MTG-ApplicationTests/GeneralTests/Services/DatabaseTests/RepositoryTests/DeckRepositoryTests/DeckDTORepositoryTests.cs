@@ -7,7 +7,7 @@ namespace MTGApplicationTests.Database;
 [TestClass]
 public class DeckDTORepositoryTests
 {
-  private readonly RepositoryDependencies _dependencies = new();
+  private readonly DeckRepositoryDependencies _dependencies = new();
   private readonly MTGCardDeckDTO _savedDeck = new("Saved Deck")
   {
     DeckCards = [MTGCardDTOMocker.Mock("first"), MTGCardDTOMocker.Mock("second"), MTGCardDTOMocker.Mock("third")],

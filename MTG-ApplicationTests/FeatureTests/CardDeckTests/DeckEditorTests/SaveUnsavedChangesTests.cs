@@ -8,7 +8,7 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 [TestClass]
 public class SaveUnsavedChangesTests
 {
-  private readonly RepositoryDependencies _dependencies = new();
+  private readonly DeckRepositoryDependencies _dependencies = new();
   private readonly MTGCardDeck _savedDeck = new() { Name = "Deck" };
 
   public SaveUnsavedChangesTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));

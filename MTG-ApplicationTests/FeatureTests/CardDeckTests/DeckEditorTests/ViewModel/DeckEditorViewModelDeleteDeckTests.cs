@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplicationTests.TestUtility;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -22,7 +24,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
     Assert.IsFalse(vm.DeleteDeckCommand.CanExecute(null));
   }
 
-  [TestMethod("Deck should be deleted if the deletion was accepted")]
+  [TestMethod("Deck should be deleted if the deletion was confirmed")]
   public async Task DeleteDeck_Accept_DeckDeleted()
   {
     var vm = MockVM(deck: _savedDeck, confirmers: new()
@@ -87,5 +89,37 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
     await vm.DeleteDeckCommand.ExecuteAsync(null);
 
     Assert.IsFalse(vm.HasUnsavedChanges);
+  }
+
+  [TestMethod("Success notification should be sent when the deck was deleted")]
+  public async Task DeleteDeck_Deleted_SuccessNotificationSent()
+  {
+    var vm = MockVM(deck: _savedDeck, confirmers: new()
+    {
+      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await NotificationAssert.NotificationSent(NotificationType.Success,
+      vm.DeleteDeckCommand.ExecuteAsync(null));
+  }
+
+  [TestMethod("Error notification should be sent when there are failure on deletion")]
+  public async Task DeleteDeck_Failure_ErrorNotificationSent()
+  {
+    _dependencies.Repository.DeleteFailure = true;
+
+    var vm = MockVM(deck: _savedDeck, confirmers: new()
+    {
+      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await NotificationAssert.NotificationSent(NotificationType.Error,
+      vm.DeleteDeckCommand.ExecuteAsync(null));
   }
 }

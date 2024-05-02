@@ -5,8 +5,10 @@ using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
+using Windows.UI.Notifications;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.CardDeck;
@@ -27,9 +29,9 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
     switch (await SaveUnsavedChangesUseCase.Execute(Deck))
     {
-      case ConfirmationResult.Yes: Notifier.Notify(Notifier.Notifications.SaveSuccessNotification); return true;
+      case ConfirmationResult.Yes: SendNotification(Notifier.Notifications.SaveSuccessNotification); return true;
       case ConfirmationResult.No: return true;
-      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return false;
+      case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.SaveErrorNotification); return false;
       default: return false;
     }
   }
@@ -61,8 +63,8 @@ public partial class DeckEditorViewModel
         case ConfirmationResult.Yes:
           Deck = loadResult.Deck;
           HasUnsavedChanges = false;
-          Notifier.Notify(Notifier.Notifications.LoadSuccessNotification); break;
-        case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.LoadErrorNotification); break;
+          SendNotification(Notifier.Notifications.LoadSuccessNotification); break;
+        case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.LoadErrorNotification); break;
         default: break;
       }
     }
@@ -76,10 +78,10 @@ public partial class DeckEditorViewModel
     switch (await SaveDeckUseCase.Execute(Deck))
     {
       case ConfirmationResult.Yes:
-        Notifier.Notify(Notifier.Notifications.SaveSuccessNotification);
+        SendNotification(Notifier.Notifications.SaveSuccessNotification);
         HasUnsavedChanges = false;
         break;
-      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.SaveErrorNotification); return;
+      case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.SaveErrorNotification); return;
       default: break;
     }
   }
@@ -102,11 +104,13 @@ public partial class DeckEditorViewModel
       case ConfirmationResult.Yes:
         Deck = new();
         HasUnsavedChanges = false;
-        Notifier.Notify(Notifier.Notifications.DeleteSuccessNotification); break;
-      case ConfirmationResult.Failure: Notifier.Notify(Notifier.Notifications.DeleteErrorNotification); break;
+        SendNotification(Notifier.Notifications.DeleteSuccessNotification); break;
+      case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.DeleteErrorNotification); break;
       default: return;
     }
   }
+
+  private void SendNotification(NotificationService.Notification notification) => Notifier.Notify(notification);
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 

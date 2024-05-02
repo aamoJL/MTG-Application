@@ -7,7 +7,7 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckSelectorTests;
 [TestClass]
 public class DeckSelectorViewModelTests
 {
-  private readonly RepositoryDependencies _dependensies = new();
+  private readonly DeckRepositoryDependencies _dependensies = new();
 
   [TestMethod("Deck items should be populated when decks has been loaded")]
   public async Task LoadDecks_DeckItemsPopulated()
@@ -46,14 +46,11 @@ public class DeckSelectorViewModelTests
   }
 
   [TestMethod("ViewModel should be busy when loading decks")]
-  [ExpectedException(typeof(IsBusyException))]
   public async Task LoadDecks_IsBusy()
   {
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3));
     var vm = new DeckSelectorViewModel(_dependensies.Repository, _dependensies.CardAPI);
 
-    vm.ThrowWhenBusy();
-
-    await vm.LoadDecksCommand.ExecuteAsync(null);
+    await WorkerAssert.IsBusy(vm, () => vm.LoadDecksCommand.ExecuteAsync(null));
   }
 }

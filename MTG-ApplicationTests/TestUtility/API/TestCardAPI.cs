@@ -6,6 +6,8 @@ using static MTGApplication.General.Services.API.CardAPI.ICardAPI<MTGApplication
 
 namespace MTGApplicationTests.API;
 
+// TODO: clean
+
 public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0) : ICardAPI<MTGCard>
 {
   public MTGCard[]? ExpectedCards { get; set; } = expectedCards;

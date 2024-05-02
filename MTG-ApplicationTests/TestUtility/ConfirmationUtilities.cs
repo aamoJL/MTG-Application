@@ -22,4 +22,3 @@ public class TestExceptionConfirmer<TReturn> : Confirmer<TReturn>
     set => base.OnConfirm = value;
   }
 }
-

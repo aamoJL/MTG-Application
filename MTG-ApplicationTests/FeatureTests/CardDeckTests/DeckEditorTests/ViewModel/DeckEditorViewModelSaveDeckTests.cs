@@ -2,6 +2,7 @@
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -129,9 +130,7 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
       SaveDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
-    vm.ThrowWhenBusy();
-
-    await Assert.ThrowsExceptionAsync<IsBusyException>(() => vm.SaveDeckCommand.ExecuteAsync(null));
+    await WorkerAssert.IsBusy(vm, () => vm.SaveDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Should show override confirmation when trying to save over an existing deck")]
@@ -193,5 +192,37 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
 
     var dbDeck = await _dependencies.Repository.Get(_savedDeck.Name);
     Assert.AreEqual(_savedDeck.Commander?.Info.Name, dbDeck?.Commander?.Name);
+  }
+
+  [TestMethod("Success notification should be sent when the deck was saved")]
+  public async Task SaveDeck_Saved_SuccessNotificationSent()
+  {
+    var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+    {
+      SaveDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await NotificationAssert.NotificationSent(NotificationType.Success,
+      vm.SaveDeckCommand.ExecuteAsync(null));
+  }
+
+  [TestMethod("Error notification should be sent when there are failure on saving")]
+  public async Task SaveDeck_Saved_ErrorNotificationSent()
+  {
+    _dependencies.Repository.UpdateFailure = true;
+
+    var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+    {
+      SaveDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await NotificationAssert.NotificationSent(NotificationType.Error,
+      vm.SaveDeckCommand.ExecuteAsync(null));
   }
 }

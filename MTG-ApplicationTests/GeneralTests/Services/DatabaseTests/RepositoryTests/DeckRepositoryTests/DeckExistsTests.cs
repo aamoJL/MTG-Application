@@ -9,7 +9,7 @@ namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTest
 [TestClass]
 public class DeckExistsTests
 {
-  private readonly RepositoryDependencies _dependencies = new();
+  private readonly DeckRepositoryDependencies _dependencies = new();
   private readonly MTGCardDeckDTO _savedDeck = MTGCardDeckDTOMocker.Mock("Deck");
 
   public DeckExistsTests() => _dependencies.ContextFactory.Populate(_savedDeck);

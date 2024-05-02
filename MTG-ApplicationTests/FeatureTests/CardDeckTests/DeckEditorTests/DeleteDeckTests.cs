@@ -9,7 +9,7 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 [TestClass]
 public class DeleteDeckTests
 {
-  private readonly RepositoryDependencies _dependencies = new();
+  private readonly DeckRepositoryDependencies _dependencies = new();
   private readonly MTGCardDeck _savedDeck = new() { Name = "Saved Deck" };
 
   public DeleteDeckTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));

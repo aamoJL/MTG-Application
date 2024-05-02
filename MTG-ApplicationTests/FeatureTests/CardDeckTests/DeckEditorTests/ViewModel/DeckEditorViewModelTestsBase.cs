@@ -7,7 +7,7 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
 public abstract class DeckEditorViewModelTestsBase
 {
-  protected readonly RepositoryDependencies _dependencies = new();
+  protected readonly DeckRepositoryDependencies _dependencies = new();
   protected readonly MTGCardDeck _savedDeck = MTGCardDeckMocker.Mock("Saved Deck");
 
   public DeckEditorViewModelTestsBase()
@@ -16,7 +16,8 @@ public abstract class DeckEditorViewModelTestsBase
   protected DeckEditorViewModel MockVM(
     DeckEditorConfirmers? confirmers = null,
     bool hasUnsavedChanges = false,
-    MTGCardDeck? deck = null)
+    MTGCardDeck? deck = null,
+    DeckEditorNotifier? notifier = null)
   {
     var vm = new DeckEditorViewModel
     {
@@ -24,7 +25,8 @@ public abstract class DeckEditorViewModelTestsBase
       Repository = _dependencies.Repository,
       Confirmers = confirmers ?? new(),
       Deck = deck ?? new(),
-      HasUnsavedChanges = hasUnsavedChanges
+      HasUnsavedChanges = hasUnsavedChanges,
+      Notifier = notifier ?? new()
     };
 
     return vm;

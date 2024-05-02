@@ -8,7 +8,7 @@ namespace MTGApplicationTests.Features.DeckSelector;
 [TestClass]
 public class GetDeckNamesAndImageUrisTests
 {
-  private readonly RepositoryDependencies _dependensies = new();
+  private readonly DeckRepositoryDependencies _dependensies = new();
 
   [TestMethod("Should return names and image URIs for the repository decks")]
   public async Task Execute_HasDecks_ReturnDeckNamesAndImageUris()

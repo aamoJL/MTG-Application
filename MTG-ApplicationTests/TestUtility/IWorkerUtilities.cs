@@ -19,18 +19,23 @@ public partial class TestExceptionWorker : ObservableObject, IWorker
   }
 }
 
-public static class IWorkerExtensions
+public static class WorkerAssert
 {
-  public static void ThrowWhenBusy(this IWorker value)
+  public static async Task IsBusy(IWorker worker, Func<Task> task)
   {
-    if (value is INotifyPropertyChanged propertyNotifier)
-    {
-      propertyNotifier.PropertyChanged += (s, e) =>
-      {
-        if (e.PropertyName == nameof(IWorker.IsBusy)) throw new IsBusyException();
-      };
-    }
-    else throw new AssertFailedException($"Worker does not implement {nameof(INotifyPropertyChanged)} interface");
+    if (worker is not INotifyPropertyChanged propertyNotifier)
+      throw new AssertFailedException($"Worker does not implement {nameof(INotifyPropertyChanged)} interface");
+
+    propertyNotifier.PropertyChanged += WorkerPropertyNotifier_PropertyChanged;
+
+    await Assert.ThrowsExceptionAsync<IsBusyException>(task);
+
+    propertyNotifier.PropertyChanged -= WorkerPropertyNotifier_PropertyChanged;
+  }
+
+  private static void WorkerPropertyNotifier_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(IWorker.IsBusy)) throw new IsBusyException();
   }
 }
 
