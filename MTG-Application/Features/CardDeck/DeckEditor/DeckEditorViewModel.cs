@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI;
 using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
@@ -7,8 +8,8 @@ using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Threading.Tasks;
-using Windows.UI.Notifications;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.CardDeck;
@@ -17,6 +18,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [ObservableProperty] private MTGCardDeck deck = new();
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
+  [ObservableProperty] private MTGCardSortProperties sortProperties = new(MTGCardSortProperties.MTGSortProperty.CMC, MTGCardSortProperties.MTGSortProperty.Name, SortDirection.Ascending);
 
   public DeckEditorConfirmers Confirmers { get; init; } = new();
   public DeckEditorNotifier Notifier { get; init; } = new();
@@ -35,6 +37,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       default: return false;
     }
   }
+
+  private void SendNotification(NotificationService.Notification notification) => Notifier.Notify(notification);
 }
 
 public partial class DeckEditorViewModel
@@ -110,7 +114,26 @@ public partial class DeckEditorViewModel
     }
   }
 
-  private void SendNotification(NotificationService.Notification notification) => Notifier.Notify(notification);
+  [RelayCommand]
+  private void ChangeSortDirection(string direction)
+  {
+    if (Enum.TryParse(direction, true, out SortDirection sortDirection))
+      SortProperties = SortProperties with { SortDirection = sortDirection };
+  }
+
+  [RelayCommand]
+  private void ChangePrimarySortProperty(string property)
+  {
+    if (Enum.TryParse(property, true, out MTGCardSortProperties.MTGSortProperty primaryProperty))
+      SortProperties = SortProperties with { PrimarySortProperty = primaryProperty };
+  }
+
+  [RelayCommand]
+  private void ChangeSecondarySortProperty(string property)
+  {
+    if (Enum.TryParse(property, true, out MTGCardSortProperties.MTGSortProperty secondaryProperty))
+      SortProperties = SortProperties with { SecondarySortProperty = secondaryProperty };
+  }
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 

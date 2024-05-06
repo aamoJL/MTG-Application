@@ -110,7 +110,7 @@ public partial class MTGCardViewModel : ViewModelBase
       MTGSortProperty.Set => nameof(SetName),
       MTGSortProperty.Count => nameof(Count),
       MTGSortProperty.Price => nameof(Price),
-      MTGSortProperty.Type => nameof(PrimaryType),
+      MTGSortProperty.SpellType => nameof(PrimaryType),
       _ => string.Empty,
     };
   }

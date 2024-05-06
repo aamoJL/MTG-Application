@@ -176,7 +176,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, Interfaces.ISavable, 
   public DeckCardlistViewModel RemovelistCards { get; }
   public MTGCardFilters CardFilters { get; } = new();
   public CommandService CommandService { get; } = new();
-  public MTGCardSortProperties SortProperties { get; }
+  public MTGService.MTGCardSortProperties SortProperties { get; }
     = new() { SortDirection = SortDirection.Ascending, PrimarySortProperty = MTGSortProperty.CMC, SecondarySortProperty = MTGSortProperty.Name };
   public string DeckName => CardDeck.Name;
   public int DeckSize

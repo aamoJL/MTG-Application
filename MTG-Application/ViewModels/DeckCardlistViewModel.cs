@@ -22,7 +22,7 @@ namespace MTGApplication.ViewModels;
 
 public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, IDialogNotifier
 {
-  public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGCardSortProperties sortProperties = null)
+  public DeckCardlistViewModel(ObservableCollection<MTGCard> cardlist, ICardAPI<MTGCard> cardAPI, MTGCardFilters cardFilters = null, MTGService.MTGCardSortProperties sortProperties = null)
   {
     Cardlist = cardlist ?? new();
     CardAPI = cardAPI;
@@ -74,7 +74,7 @@ public partial class DeckCardlistViewModel : ObservableObject, IInAppNotifier, I
   public DeckCardlistViewDialogs Dialogs { get; set; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public AdvancedCollectionView FilteredAndSortedCardViewModels { get; }
-  public MTGCardSortProperties SortProperties { get; }
+  public MTGService.MTGCardSortProperties SortProperties { get; }
   public CommandService CommandService { get; init; } = new();
   public MTGCardFilters CardFilters { get; }
   public Action SavableChangesOccurred { get; set; }

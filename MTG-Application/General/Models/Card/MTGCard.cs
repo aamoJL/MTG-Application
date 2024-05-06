@@ -16,11 +16,16 @@ public partial class MTGCard : ObservableObject
   {
     Info = info;
     Count = count;
+
+    ColorType = Info.Colors.Length > 1 ? ColorTypes.M : Info.Colors[0];
+    PrimarySpellType = Info.SpellTypes[0];
   }
 
   protected int count = 1;
 
-  #region Properties
+  public ColorTypes ColorType { get; }
+  public SpellType PrimarySpellType { get; }
+
   [ObservableProperty] private MTGCardInfo info;
 
   /// <summary>
@@ -44,7 +49,6 @@ public partial class MTGCard : ObservableObject
       }
     }
   }
-  #endregion
 
   /// <summary>
   /// Returns the card info and count as a Json string

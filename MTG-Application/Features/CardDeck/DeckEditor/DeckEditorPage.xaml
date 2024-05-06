@@ -9,7 +9,8 @@
   xmlns:local="using:MTGApplication.Features.CardDeck"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
   xmlns:helpers="using:MTGApplication.Views.BindingHelpers" 
-  xmlns:models="using:MTGApplication.General.Models.Card"
+  xmlns:models="using:MTGApplication.General.Models.Card" 
+  xmlns:customControls="using:MTGApplication.Features.CardDeck.DeckEditor.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   DataContext="{x:Bind}">
@@ -148,26 +149,26 @@
             <AppBarButton Icon="Sort" Label="Sort" AutomationProperties.Name="Order">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <!--<RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand, Mode=OneTime}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SortByDirectionCommand, Mode=OneTime}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />-->
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSortDirectionCommand, Mode=OneTime}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSortDirectionCommand, Mode=OneTime}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
                   <MenuFlyoutSeparator/>
-                  <!--<RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Type" Text="Type" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetPrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>-->
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Type" Text="Type" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>
                   <MenuFlyoutSeparator />
-                  <!--<RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Type" Text="Type" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.SetSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="SecondaryDeckSortProperty"/>-->
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Type" Text="Type" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="SecondaryDeckSortProperty"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -215,10 +216,11 @@
 
       <!--#region Deck View -->
       <Grid controls:DockPanel.Dock="Top">
-        <controls:AdaptiveGridView
+        <customControls:AdvancedAdaptiveCardGridView
           x:Name="DeckCardsGridView"
           DataContext="{x:Bind ViewModel, Mode=OneWay}"
           ItemsSource="{Binding Deck.DeckCards, Mode=OneWay}"
+          SortProperties="{x:Bind ViewModel.SortProperties, Mode=OneWay}"
           Style="{StaticResource MTGAdaptiveGridViewStyle}"
           BorderBrush="{ThemeResource RegionColor}"
           SelectionMode="Single"
@@ -240,10 +242,11 @@
                 OnDeleteCommand="{Binding Path=DataContext.RemoveDeckCardCommand, ElementName=DeckCardsGridView, Mode=OneWay}"/>
             </DataTemplate>
           </controls:AdaptiveGridView.ItemTemplate>
-        </controls:AdaptiveGridView>
-        <ListView
+        </customControls:AdvancedAdaptiveCardGridView>
+        <customControls:AdvancedCardListView
           DataContext="{x:Bind ViewModel, Mode=OneWay}"
           ItemsSource="{Binding Deck.DeckCards, Mode=OneWay}"
+          SortProperties="{x:Bind ViewModel.SortProperties, Mode=OneWay}"
           Style="{StaticResource MTGListViewStyle}"
           SelectionMode="Single"
           Visibility="{Binding ElementName=DeckCardTextViewToggle, Path=IsChecked, Mode=OneWay}"
@@ -262,7 +265,7 @@
                 OnDeleteCommand="{Binding Path=DataContext.RemoveDeckCardCommand, ElementName=DeckCardsGridView, Mode=OneWay}"/>
             </DataTemplate>
           </ListView.ItemTemplate>
-        </ListView>
+        </customControls:AdvancedCardListView>
       </Grid>
       <!--#endregion-->
       
