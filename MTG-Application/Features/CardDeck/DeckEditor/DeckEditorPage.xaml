@@ -342,7 +342,13 @@
           SelectionMode="Single"
           Visibility="{Binding ElementName=DeckCardImageViewToggle, Path=IsChecked, Mode=OneWay}"
           BorderThickness="0"
-          DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}">
+          DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
+          CanDragItems="True"
+          AllowDrop="True"
+          DragItemsStarting="{x:Bind DeckCardDragAndDrop.DragStarting, Mode=OneTime}"
+          DragItemsCompleted="{x:Bind DeckCardDragAndDrop.DragCompleted, Mode=OneTime}"
+          DragOver="{x:Bind DeckCardDragAndDrop.DragOver, Mode=OneTime}"
+          Drop="{x:Bind DeckCardDragAndDrop.Drop, Mode=OneTime}">
           <controls:AdaptiveGridView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardImageView

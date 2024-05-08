@@ -17,7 +17,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   public DeckEditorViewModel()
   {
-    DeckCards = new() { OnChange = OnDeckCardsChanged };
+    DeckCards = new(CardAPI) { OnChange = OnDeckCardsChanged };
   }
 
   public DeckEditorViewModel(MTGCardDeck deck) : this() => Deck = deck;
@@ -52,7 +52,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public DeckEditorNotifier Notifier { get; init; } = new();
 
   public CardListViewModel DeckCards { get; }
-  
+
   public MTGCard Commander
   {
     get => Deck.Commander;

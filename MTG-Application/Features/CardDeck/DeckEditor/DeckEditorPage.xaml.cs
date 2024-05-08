@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.NotificationService;
+using MTGApplication.General.Views;
 using MTGApplication.Views.Dialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
@@ -14,10 +15,18 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
     RegisterConfirmDialogs(ViewModel.Confirmers);
     RegisterNotifications(ViewModel.Notifier);
+
+    DeckCardDragAndDrop = new()
+    {
+      OnAdd = (arg) => ViewModel.DeckCards.AddCardCommand.Execute(arg),
+      OnMove = (arg) => ViewModel.DeckCards.MoveCardCommand.Execute(arg),
+      OnImport = (arg) => ViewModel.DeckCards.ImportCardsCommand.Execute(arg),
+    };
   }
 
   public DeckEditorViewModel ViewModel { get; } = new();
   public DialogWrapper DialogWrapper => new(XamlRoot);
+  public CardDragAndDrop DeckCardDragAndDrop { get; }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {

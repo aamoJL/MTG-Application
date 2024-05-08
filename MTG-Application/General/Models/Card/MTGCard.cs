@@ -50,6 +50,7 @@ public partial class MTGCard : ObservableObject
     }
   }
 
+  // TODO: remove
   /// <summary>
   /// Returns the card info and count as a Json string
   /// </summary>
