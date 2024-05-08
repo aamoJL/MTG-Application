@@ -46,7 +46,8 @@ public partial class App : Application
       Title = "Deck Builder"
     };
 
-    mainWindow.Navigate(typeof(DeckEditorPage), "mass test");
+    //mainWindow.Navigate(typeof(DeckEditorPage), "mass test");
+    mainWindow.Navigate(typeof(DeckBuilderPage));
     mainWindow.Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());

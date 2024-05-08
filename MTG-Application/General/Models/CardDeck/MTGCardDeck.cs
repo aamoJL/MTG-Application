@@ -20,6 +20,8 @@ public partial class MTGCardDeck : ObservableObject
   public ObservableCollection<MTGCard> Maybelist { get; set; } = new();
   public ObservableCollection<MTGCard> Removelist { get; set; } = new();
 
+  public int DeckSize => DeckCards.Sum(x => x.Count) + (Commander != null ? 1 : 0) + (CommanderPartner != null ? 1 : 0);
+
   /// <summary>
   /// Returns copy of the card deck.
   /// </summary>

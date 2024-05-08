@@ -47,7 +47,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(string.Empty, vm.Deck.Name);
+    Assert.AreEqual(string.Empty, vm.DeckName);
   }
 
   [TestMethod("Deck should not reset if there are a failure when deleting the deck")]
@@ -62,7 +62,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(_savedDeck.Name, vm.Deck.Name);
+    Assert.AreEqual(_savedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("Deck should not be deleted if the deletion was canceled")]

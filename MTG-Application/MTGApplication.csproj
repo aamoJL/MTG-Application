@@ -46,6 +46,7 @@
     <None Remove="Features\CardSearch\Controls\CardSearchCardImageView.xaml" />
     <None Remove="Features\CardSearch\Controls\CardSearchCardTextView.xaml" />
     <None Remove="Features\CardSearch\Controls\ScryfallCardSearchInputControl.xaml" />
+    <None Remove="General\Views\Controls\LinedHeader.xaml" />
     <None Remove="Views\Controls\CardAPISearchControl.xaml" />
     <None Remove="Views\Controls\DeckBuilderTabHeaderControl.xaml" />
     <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
@@ -154,6 +155,9 @@
     <Page Update="Features\CardSearch\Controls\CardSearchCardTextView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="General\Views\Controls\LinedHeader.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Views\Styles\MTGPrintGridViewItemTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>

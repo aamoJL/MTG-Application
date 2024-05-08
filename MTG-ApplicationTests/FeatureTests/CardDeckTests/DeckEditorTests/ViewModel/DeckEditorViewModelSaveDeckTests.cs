@@ -119,7 +119,7 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
 
     await vm.SaveDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(newName, vm.Deck.Name);
+    Assert.AreEqual(newName, vm.DeckName);
   }
 
   [TestMethod("ViewModel should be busy when saving the deck")]

@@ -3,39 +3,43 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using MTGApplication.General.Models.Card;
 using System.Collections;
-using static MTGApplication.General.Models.Card.MTGCardSortProperties;
+using System.Collections.Generic;
+using static MTGApplication.General.Models.Card.CardSortProperties;
 
 namespace MTGApplication.Features.CardDeck.DeckEditor.Controls;
 public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 {
   public new static readonly DependencyProperty ItemsSourceProperty =
-      DependencyProperty.Register(nameof(ItemsSource), typeof(IList), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
+      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<MTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
 
   public static readonly DependencyProperty SortPropertiesProperty =
-      DependencyProperty.Register(nameof(SortProperties), typeof(MTGCardSortProperties), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
-        new MTGCardSortProperties(MTGSortProperty.CMC, MTGSortProperty.Name, SortDirection.Ascending), OnDependencyPropertyChanged));
+      DependencyProperty.Register(nameof(SortProperties), typeof(CardSortProperties), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
+        new CardSortProperties(MTGSortProperty.CMC, MTGSortProperty.Name, SortDirection.Ascending), OnDependencyPropertyChanged));
 
-  public AdvancedAdaptiveCardGridView()
-  {
-    var source = new AdvancedCollectionView();
-    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardComparer(SortProperties.PrimarySortProperty)));
-    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardComparer(SortProperties.SecondarySortProperty)));
-    FilteredAndSortedCardSource = source;
-  }
+  public static readonly DependencyProperty FilterPropertiesProperty =
+      DependencyProperty.Register(nameof(FilterProperties), typeof(CardFilters), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
+        new CardFilters(), OnDependencyPropertyChanged));
 
-  public new IList ItemsSource
+  private AdvancedCollectionView filteredAndSortedCardSource = new();
+
+  public new IList<MTGCard> ItemsSource
   {
-    get => (IList)GetValue(ItemsSourceProperty);
+    get => (IList<MTGCard>)GetValue(ItemsSourceProperty);
     set => SetValue(ItemsSourceProperty, value);
   }
 
-  public MTGCardSortProperties SortProperties
+  public CardSortProperties SortProperties
   {
-    get => (MTGCardSortProperties)GetValue(SortPropertiesProperty);
+    get => (CardSortProperties)GetValue(SortPropertiesProperty);
     set => SetValue(SortPropertiesProperty, value);
   }
 
-  private AdvancedCollectionView filteredAndSortedCardSource = new();
+  public CardFilters FilterProperties
+  {
+    get => (CardFilters)GetValue(FilterPropertiesProperty);
+    set => SetValue(FilterPropertiesProperty, value);
+  }
+
   private AdvancedCollectionView FilteredAndSortedCardSource
   {
     get => filteredAndSortedCardSource;
@@ -50,17 +54,36 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
   {
     if (list is null) return;
 
-    FilteredAndSortedCardSource.Source = list;
+    var source = new AdvancedCollectionView(list, true);
+    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardComparer(SortProperties.PrimarySortProperty)));
+    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardComparer(SortProperties.SecondarySortProperty)));
+    FilteredAndSortedCardSource = source;
   }
 
-  private void OnSortPropertiesDependencyPropertyChanged(MTGCardSortProperties sortProperties)
+  private void OnSortPropertiesDependencyPropertyChanged(CardSortProperties sortProperties)
   {
-    if (sortProperties is null) return;
+    if (sortProperties is null || FilteredAndSortedCardSource.SortDescriptions.Count == 0) return;
 
     FilteredAndSortedCardSource.SortDescriptions[0]
       = new(sortProperties.SortDirection, new MTGCardComparer(sortProperties.PrimarySortProperty));
     FilteredAndSortedCardSource.SortDescriptions[1]
       = new(sortProperties.SortDirection, new MTGCardComparer(sortProperties.SecondarySortProperty));
+  }
+
+  private void OnFilterPropertiesDependencyPropertyChanged(CardFilters filterProperties)
+  {
+    if (filterProperties is not null)
+      filterProperties.PropertyChanged += FilterProperties_PropertyChanged;
+  }
+
+  private void FilterProperties_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (FilterProperties.FiltersApplied)
+    {
+      FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as MTGCard);
+      FilteredAndSortedCardSource.RefreshFilter();
+    }
+    else { FilteredAndSortedCardSource.Filter = null; }
   }
 
   private static void OnDependencyPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -71,6 +94,9 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
       view.OnItemsSourceDependencyPropertyChanged(e.NewValue as IList);
 
     if (e.Property == SortPropertiesProperty)
-      view.OnSortPropertiesDependencyPropertyChanged(e.NewValue as MTGCardSortProperties);
+      view.OnSortPropertiesDependencyPropertyChanged(e.NewValue as CardSortProperties);
+
+    if (e.Property == FilterPropertiesProperty)
+      view.OnFilterPropertiesDependencyPropertyChanged(e.NewValue as CardFilters);
   }
 }

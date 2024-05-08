@@ -1,17 +1,18 @@
 ﻿using CommunityToolkit.WinUI.UI;
 using System;
 using System.Collections;
-using static MTGApplication.General.Models.Card.MTGCardSortProperties;
+using static MTGApplication.General.Models.Card.CardSortProperties;
+using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.General.Models.Card;
 
 /// <summary>
 /// Record that has properties to sort MTG card lists
 /// </summary>
-public record MTGCardSortProperties(
-  MTGSortProperty PrimarySortProperty,
-  MTGSortProperty SecondarySortProperty,
-  SortDirection SortDirection)
+public record CardSortProperties(
+  MTGSortProperty PrimarySortProperty = MTGSortProperty.CMC,
+  MTGSortProperty SecondarySortProperty = MTGSortProperty.Name,
+  SortDirection SortDirection = SortDirection.Ascending)
 {
   public enum MTGSortProperty { CMC, Name, Rarity, Color, Set, Count, Price, SpellType }
 
@@ -19,8 +20,9 @@ public record MTGCardSortProperties(
   {
     public MTGCardComparer(MTGSortProperty sortProperty) => SortProperty = sortProperty;
 
-    public MTGSortProperty SortProperty { get; }
+    public MTGSortProperty SortProperty { get; set; }
 
+    // TODO: unit test
     public int Compare(object x, object y)
     {
       var cx = GetComparable(x as MTGCard, SortProperty);
@@ -36,12 +38,12 @@ public record MTGCardSortProperties(
         MTGSortProperty.CMC => card.Info.CMC,
         MTGSortProperty.Name => card.Info.Name,
         MTGSortProperty.Rarity => card.Info.RarityType,
-        MTGSortProperty.Color => card.ColorType,
+        MTGSortProperty.Color => card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0],
         MTGSortProperty.Set => card.Info.SetCode,
         MTGSortProperty.Count => card.Count,
         MTGSortProperty.Price => card.Info.Price,
-        MTGSortProperty.SpellType => card.PrimarySpellType,
-        _ => card.Info.Name
+        MTGSortProperty.SpellType => card.Info.SpellTypes[0],
+        _ => null
       };
     }
   }

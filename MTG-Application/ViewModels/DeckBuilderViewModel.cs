@@ -79,7 +79,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, Interfaces.ISavable, 
     RemovelistCards.OnGetDialogWrapper += (s, args) => OnGetDialogWrapper?.Invoke(s, args);
 
     PropertyChanged += DeckBuilderViewModel_PropertyChanged;
-    CardDeck.PropertyChanged += CardDeck_PropertyChanged;
+    //CardDeck.PropertyChanged += CardDeck_PropertyChanged;
     DeckCards.PropertyChanged += DeckCards_PropertyChanged;
     DeckCards.PropertyChanged += DeckCardlistViewModel_PropertyChanged;
     WishlistCards.PropertyChanged += DeckCardlistViewModel_PropertyChanged;
@@ -112,7 +112,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, Interfaces.ISavable, 
     {
       if (cardDeck != null)
       {
-        cardDeck.PropertyChanged -= CardDeck_PropertyChanged;
+        //cardDeck.PropertyChanged -= CardDeck_PropertyChanged;
       }
 
       cardDeck = value;
@@ -126,7 +126,7 @@ public partial class DeckBuilderViewModel : ViewModelBase, Interfaces.ISavable, 
       CommandService.Clear();
       UpdateCharts();
       HasUnsavedChanges = false;
-      cardDeck.PropertyChanged += CardDeck_PropertyChanged;
+      //cardDeck.PropertyChanged += CardDeck_PropertyChanged;
       OnPropertyChanged(nameof(CardDeck));
       OnPropertyChanged(nameof(DeckName));
     }

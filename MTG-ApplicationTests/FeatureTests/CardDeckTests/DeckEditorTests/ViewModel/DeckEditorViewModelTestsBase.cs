@@ -19,15 +19,15 @@ public abstract class DeckEditorViewModelTestsBase
     MTGCardDeck? deck = null,
     DeckEditorNotifier? notifier = null)
   {
-    var vm = new DeckEditorViewModel
+    var vm = new DeckEditorViewModel(deck ?? new())
     {
       CardAPI = _dependencies.CardAPI,
       Repository = _dependencies.Repository,
       Confirmers = confirmers ?? new(),
-      Deck = deck ?? new(),
-      HasUnsavedChanges = hasUnsavedChanges,
       Notifier = notifier ?? new()
     };
+
+    vm.HasUnsavedChanges = hasUnsavedChanges;
 
     return vm;
   }

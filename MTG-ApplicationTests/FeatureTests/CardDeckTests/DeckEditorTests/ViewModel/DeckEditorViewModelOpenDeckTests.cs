@@ -9,13 +9,13 @@ namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 [TestClass]
 public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 {
-  [TestMethod("Should be able to execute with string, empty string or null")]
+  [TestMethod("Should be able to execute with a string or null")]
   public void OpenDeck_CanExecute()
   {
     var vm = MockVM();
 
     Assert.IsTrue(vm.OpenDeckCommand.CanExecute(null));
-    Assert.IsTrue(vm.OpenDeckCommand.CanExecute(string.Empty));
+    Assert.IsFalse(vm.OpenDeckCommand.CanExecute(string.Empty));
     Assert.IsTrue(vm.OpenDeckCommand.CanExecute("Name"));
   }
 
@@ -27,7 +27,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     await vm.OpenDeckCommand.ExecuteAsync(string.Empty);
 
-    Assert.AreEqual(unsavedDeck, vm.Deck);
+    Assert.AreEqual(unsavedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("Unsaved changes confirmation should be shown when loading a deck if there are unsaved changes")]
@@ -73,7 +73,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(_savedDeck.Name, vm.Deck.Name);
+    Assert.AreEqual(_savedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("Dec should be the loaded deck if unsaved changes confirmation were not canceled")]
@@ -87,7 +87,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(_savedDeck.Name, vm.Deck.Name);
+    Assert.AreEqual(_savedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("Deck should be the same if the loading fails when loading a deck")]
@@ -103,7 +103,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(unsavedDeck.Name, vm.Deck.Name);
+    Assert.AreEqual(unsavedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("Deck should be the same if the loading was canceled when loading a deck")]
@@ -117,7 +117,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(unsavedDeck.Name, vm.Deck.Name);
+    Assert.AreEqual(unsavedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("Deck should be the same if the unsaved changes saving was canceled when loading a deck")]
@@ -132,7 +132,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(unsavedDeck.Name, vm.Deck.Name);
+    Assert.AreEqual(unsavedDeck.Name, vm.DeckName);
   }
 
   [TestMethod("ViewModel should be busy when loading a deck")]

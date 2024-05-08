@@ -17,6 +17,7 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
   }
 
   public DeckEditorViewModel ViewModel { get; } = new();
+  public DialogWrapper DialogWrapper => new(XamlRoot);
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
@@ -28,41 +29,6 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
     }
   }
 
-  private void CardView_DragOver(object sender, Microsoft.UI.Xaml.DragEventArgs e)
-  {
-    //TODO: event
-  }
-
-  private void CardView_Drop(object sender, Microsoft.UI.Xaml.DragEventArgs e)
-  {
-    //TODO: event
-  }
-
-  private void CardView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
-  {
-    //TODO: event
-  }
-
-  private void CardView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-  {
-    //TODO: event
-  }
-
-  private void CardView_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
-  {
-    //TODO: event
-  }
-
-  private void CardView_LosingFocus(Microsoft.UI.Xaml.UIElement sender, Microsoft.UI.Xaml.Input.LosingFocusEventArgs args)
-  {
-    //TODO: event
-  }
-}
-
-public sealed partial class DeckEditorPage
-{
-  public DialogWrapper DialogWrapper => new(XamlRoot);
-
   private void RegisterConfirmDialogs(DeckEditorConfirmers confirmer)
   {
     confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await new ShowUnsavedChangesDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
@@ -71,10 +37,27 @@ public sealed partial class DeckEditorPage
     confirmer.OverrideDeck = new() { OnConfirm = async msg => await new ShowOverrideDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
     confirmer.DeleteDeck = new() { OnConfirm = async msg => await new ShowDeleteDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
   }
-}
 
-public sealed partial class DeckEditorPage
-{
-  private void RegisterNotifications(DeckEditorNotifier notifier) 
+  private void RegisterNotifications(DeckEditorNotifier notifier)
     => notifier.OnNotify = (arg) => { NotificationService.RaiseNotification(this, arg); };
+
+  private void SaveDeckKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+  {
+    if (ViewModel.SaveDeckCommand.CanExecute(null)) ViewModel.SaveDeckCommand.Execute(null);
+  }
+
+  private void OpenDeckKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+  {
+    if (ViewModel.OpenDeckCommand.CanExecute(null)) ViewModel.OpenDeckCommand.Execute(null);
+  }
+
+  private void NewDeckKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+  {
+    if (ViewModel.NewDeckCommand.CanExecute(null)) ViewModel.NewDeckCommand.Execute(null);
+  }
+
+  private void ResetFiltersKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+  {
+    if (ViewModel.CardFilters.ResetCommand.CanExecute(null)) ViewModel.CardFilters.ResetCommand.Execute(null);
+  }
 }
