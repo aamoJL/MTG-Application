@@ -8,6 +8,7 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.CardDeck;
@@ -17,7 +18,9 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   public DeckEditorViewModel()
   {
-    DeckCards = new(CardAPI) { OnChange = OnDeckCardsChanged };
+    CardImporter = new(CardAPI);
+    DeckCards = new(CardImporter) { OnChange = OnDeckCardsChanged };
+    MaybeCards = new(CardImporter) { OnChange = OnDeckCardsChanged };
   }
 
   public DeckEditorViewModel(MTGCardDeck deck) : this() => Deck = deck;
@@ -30,6 +33,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       deck = value;
 
       DeckCards.Cards = deck.DeckCards;
+      MaybeCards.Cards = deck.Maybelist;
       HasUnsavedChanges = true;
 
       OnPropertyChanged(nameof(DeckSize));
@@ -44,6 +48,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
 
+  public CardImporter CardImporter { get; set; }
   public CardFilters CardFilters { get; } = new();
   public CardSorter CardSorter { get; } = new();
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
@@ -52,6 +57,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public DeckEditorNotifier Notifier { get; init; } = new();
 
   public CardListViewModel DeckCards { get; }
+  public CardListViewModel MaybeCards { get; }
 
   public MTGCard Commander
   {
@@ -196,9 +202,24 @@ public partial class DeckEditorViewModel
     }
   }
 
+  [RelayCommand]
+  private async Task ExternalCardImport(ExternalCardImportArgs args)
+  {
+    var (data, addCommand, removeCommand) = args;
+
+    if ((await CardImporter.Import(data)).Found?[0] is MTGCard card)
+    {
+      // TODO: combine commands
+      addCommand?.Execute(card);
+      removeCommand?.Execute(card);
+    }
+  }
+
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 
   private bool CanExecuteDeleteDeckCommand() => !string.IsNullOrEmpty(Deck.Name);
 
   private bool CanExecuteOpenDeckCommand(string name) => name != string.Empty;
+
+  public record ExternalCardImportArgs(string Data, ICommand AddCommand, ICommand RemoveCommand);
 }

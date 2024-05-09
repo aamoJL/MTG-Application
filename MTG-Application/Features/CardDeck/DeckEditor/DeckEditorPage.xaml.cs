@@ -15,18 +15,13 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
     RegisterConfirmDialogs(ViewModel.Confirmers);
     RegisterNotifications(ViewModel.Notifier);
-
-    DeckCardDragAndDrop = new()
-    {
-      OnAdd = (arg) => ViewModel.DeckCards.AddCardCommand.Execute(arg),
-      OnMove = (arg) => ViewModel.DeckCards.MoveCardCommand.Execute(arg),
-      OnImport = (arg) => ViewModel.DeckCards.ImportCardsCommand.Execute(arg),
-    };
+    RegisterDragAndDropCommands();
   }
 
   public DeckEditorViewModel ViewModel { get; } = new();
   public DialogWrapper DialogWrapper => new(XamlRoot);
-  public CardDragAndDrop DeckCardDragAndDrop { get; }
+  public ListViewDragAndDrop DeckCardDragAndDrop { get; set; }
+  public ListViewDragAndDrop MaybeCardDragAndDrop { get; set; }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
@@ -49,6 +44,24 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
   private void RegisterNotifications(DeckEditorNotifier notifier)
     => notifier.OnNotify = (arg) => { NotificationService.RaiseNotification(this, arg); };
+
+  private void RegisterDragAndDropCommands()
+  {
+    DeckCardDragAndDrop = new()
+    {
+      AddCommand = ViewModel.DeckCards.AddCardCommand,
+      RemoveCommand = ViewModel.DeckCards.RemoveCardCommand,
+      OnCopy = async (cmd, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, null)),
+      OnMove = async (cmd, cmd2, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, cmd2))
+    };
+    MaybeCardDragAndDrop = new()
+    {
+      AddCommand = ViewModel.MaybeCards.AddCardCommand,
+      RemoveCommand = ViewModel.MaybeCards.RemoveCardCommand,
+      OnCopy = async (cmd, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, null)),
+      OnMove = async (cmd, cmd2, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, cmd2))
+    };
+  }
 
   private void SaveDeckKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {

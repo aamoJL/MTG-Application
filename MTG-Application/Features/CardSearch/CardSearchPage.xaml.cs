@@ -7,5 +7,5 @@ public sealed partial class CardSearchPage : Page
   public CardSearchPage() => InitializeComponent();
 
   public CardSearchViewModel ViewModel { get; } = new(App.MTGCardAPI);
-  public CardDragAndDrop CardDragAndDrop { get; } = new();
+  public ListViewDragAndDrop CardDragAndDrop { get; } = new() { AcceptMove = false };
 }

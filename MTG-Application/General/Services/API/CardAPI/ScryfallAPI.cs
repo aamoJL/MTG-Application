@@ -60,64 +60,38 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
 
   public async Task<Result> FetchFromString(string importText)
   {
-    var card = new Func<MTGCard>(() =>
+    var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    // Convert each line to scryfall identifier objects
+    var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>
     {
-      // Try to import from JSON
-      try
+      // Format: {Count (optional)} {Name} OR {Count (optional)} {Scryfall Id}
+      // Multiface cards will be formatted as {front} // {back}, so the name search will stop at '/' so only the first name will be used.
+      var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
+      var match = regexGroups.Match(line);
+
+      var countMatch = match.Groups["Count"]?.Value;
+      var nameMatch = match.Groups["Name"]?.Value;
+
+      if (Guid.TryParse(nameMatch, out var id))
       {
-        var card = JsonSerializer.Deserialize<MTGCard>(importText);
-        if (string.IsNullOrEmpty(card?.Info.Name))
-        { throw new Exception("Card does not have name"); }
-        return card;
-      }
-      catch { return null; }
-    })();
-
-    if (card != null)
-    {
-      return new Result(new[] { card }, 0, 1);
-    }
-    else
-    {
-      if (Uri.TryCreate(importText, UriKind.Absolute, out var uri) && uri.Host == "edhrec.com")
-      {
-        // Imported from EDHREC.com
-        importText = uri.Segments[^1]; // Get the last part of the url, which should be the card's name
-      }
-
-      var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-      // Convert each line to scryfall identifier objects
-      var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>
-      {
-        // Format: {Count (optional)} {Name} OR {Count (optional)} {Scryfall Id}
-        // Multiface cards will be formatted as {front} // {back}, so the name search will stop at '/' so only the first name will be used.
-        var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
-        var match = regexGroups.Match(line);
-
-        var countMatch = match.Groups["Count"]?.Value;
-        var nameMatch = match.Groups["Name"]?.Value;
-
-        if (Guid.TryParse(nameMatch, out var id))
+        return new ScryfallIdentifier()
         {
-          return new ScryfallIdentifier()
-          {
-            ScryfallId = id,
-            CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
-          };
-        }
-        else
+          ScryfallId = id,
+          CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+        };
+      }
+      else
+      {
+        return new ScryfallIdentifier()
         {
-          return new ScryfallIdentifier()
-          {
-            Name = nameMatch.Trim(),
-            CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
-          };
-        }
-      })));
+          Name = nameMatch.Trim(),
+          CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
+        };
+      }
+    })));
 
-      return await FetchWithIdentifiers(identifiers);
-    }
+    return await FetchWithIdentifiers(identifiers);
   }
 
   public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)

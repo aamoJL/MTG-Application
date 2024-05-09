@@ -140,7 +140,48 @@
             </StackPanel>
 
             <!--#region Maybelist -->
-            
+            <generalControls:LinedHeader Grid.Row="1">
+              <generalControls:LinedHeader.Header>
+                <TextBlock Text="Maybe">
+                  <TextBlock.ContextFlyout>
+                    <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
+                      <MenuFlyoutSubItem Text="Export...">
+                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
+                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
+                      </MenuFlyoutSubItem>
+                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>-->
+                    </MenuFlyout>
+                  </TextBlock.ContextFlyout>
+                </TextBlock>
+              </generalControls:LinedHeader.Header>
+            </generalControls:LinedHeader>
+            <localControls:AdvancedCardListView
+              x:Name="MaybeCardsListView"
+              Grid.Row="2"
+              DataContext="{x:Bind ViewModel.MaybeCards, Mode=OneWay}"
+              ItemsSource="{Binding Cards, Mode=OneWay}"
+              SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
+              FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
+              Style="{StaticResource MTGListViewStyle}"
+              BorderBrush="{ThemeResource RegionColor}"
+              SelectionMode="Single"
+              BorderThickness="0"
+              CanDragItems="True"
+              AllowDrop="True"
+              DragItemsStarting="{x:Bind MaybeCardDragAndDrop.DragStarting, Mode=OneTime}"
+              DragItemsCompleted="{x:Bind MaybeCardDragAndDrop.DragCompleted, Mode=OneTime}"
+              DragOver="{x:Bind MaybeCardDragAndDrop.DragOver, Mode=OneTime}"
+              Drop="{x:Bind MaybeCardDragAndDrop.Drop, Mode=OneTime}">
+              <localControls:AdvancedCardListView.ItemTemplate>
+                <DataTemplate x:DataType="models:MTGCard">
+                  <local:DeckEditorCardTextView
+                    Model="{Binding Mode=OneWay}" 
+                    OnDeleteCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
+                    OnChangeCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
+                </DataTemplate>
+              </localControls:AdvancedCardListView.ItemTemplate>
+            </localControls:AdvancedCardListView>
             <!--#endregion-->
             
           </Grid>
