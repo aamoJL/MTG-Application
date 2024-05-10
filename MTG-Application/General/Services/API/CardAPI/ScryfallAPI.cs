@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using static MTGApplication.General.Models.Card.MTGCard;
 using static MTGApplication.General.Services.API.CardAPI.ICardAPI<MTGApplication.General.Models.Card.MTGCard>;
 using static MTGApplication.General.Services.IOService.IOService;
-using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.General.Services.API.CardAPI;
 

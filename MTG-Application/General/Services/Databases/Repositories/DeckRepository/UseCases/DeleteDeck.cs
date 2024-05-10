@@ -1,6 +1,6 @@
 ﻿using MTGApplication.General.Extensions;
 using MTGApplication.General.Models.CardDeck;
-using MTGApplication.General.UseCases;
+using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Databases.Repositories.DeckRepository;

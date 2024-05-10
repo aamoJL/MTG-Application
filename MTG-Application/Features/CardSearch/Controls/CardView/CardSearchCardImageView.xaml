@@ -8,7 +8,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:ui="using:CommunityToolkit.WinUI.UI" 
-  xmlns:helpers="using:MTGApplication.Views.BindingHelpers"
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d">
 
   <StackPanel Orientation="Vertical">

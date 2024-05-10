@@ -1,5 +1,4 @@
-﻿using MTGApplication.Features.CardDeck;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.Database;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using System;

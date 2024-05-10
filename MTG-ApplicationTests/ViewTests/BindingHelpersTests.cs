@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Views.BindingHelpers;
+using MTGApplication.General.Views.BindingHelpers;
 
 namespace MTGApplicationTests.BindingHelpers;
 

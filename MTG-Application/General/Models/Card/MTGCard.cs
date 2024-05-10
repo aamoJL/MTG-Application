@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
-using static MTGApplication.Services.MTGService;
 
 namespace MTGApplication.General.Models.Card;
 
@@ -11,6 +11,12 @@ namespace MTGApplication.General.Models.Card;
 /// </summary>
 public partial class MTGCard : ObservableObject
 {
+  public enum ColorTypes { W, U, B, R, G, M, C }
+  public enum SpellType { Land, Creature, Artifact, Enchantment, Planeswalker, Instant, Sorcery, Other }
+  public enum RarityTypes { Common, Uncommon, Rare, Mythic, Special, Bonus }
+
+  protected int count = 1;
+
   [JsonConstructor]
   public MTGCard(MTGCardInfo info, int count = 1)
   {
@@ -20,8 +26,6 @@ public partial class MTGCard : ObservableObject
     ColorType = Info.Colors.Length > 1 ? ColorTypes.M : Info.Colors[0];
     PrimarySpellType = Info.SpellTypes[0];
   }
-
-  protected int count = 1;
 
   public ColorTypes ColorType { get; }
   public SpellType PrimarySpellType { get; }
@@ -50,22 +54,6 @@ public partial class MTGCard : ObservableObject
     }
   }
 
-  // TODO: remove
-  /// <summary>
-  /// Returns the card info and count as a Json string
-  /// </summary>
-  public string ToJSON()
-  {
-    return JsonSerializer.Serialize(new
-    {
-      Info,
-      Count
-    });
-  }
-}
-
-public partial class MTGCard
-{
   [Serializable]
   public readonly struct CardToken
   {
@@ -172,5 +160,50 @@ public partial class MTGCard
       ProducedMana = producedMana;
       APIName = apiName;
     }
+  }
+
+  /// <summary>
+  /// Returns all the <see cref="ColorTypes"/> that the given faces have
+  /// </summary>
+  public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
+  {
+    var colors = new List<ColorTypes>();
+
+    foreach (var color in frontFace.Colors)
+    {
+      if (!colors.Contains(color)) { colors.Add(color); }
+    }
+
+    if (backFace != null)
+    {
+      foreach (var color in backFace?.Colors)
+      {
+        if (!colors.Contains(color)) { colors.Add(color); }
+      }
+    }
+
+    // Card is colorless if it has no other colors
+    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
+    return colors.ToArray();
+  }
+
+  /// <summary>
+  /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
+  /// </summary>
+  public static SpellType[] GetSpellTypes(string typeLine)
+  {
+    List<SpellType> types = new();
+    var typeStrings = typeLine.Split('\u0020'); // 'Space'
+
+    foreach (var typeString in typeStrings)
+    {
+      if (Enum.TryParse(typeString, true, out SpellType spellType))
+      {
+        types.Add(spellType);
+      }
+    }
+
+    if (types.Count == 0) { types.Add(SpellType.Other); }
+    return types.OrderBy(x => x).ToArray();
   }
 }

@@ -1,13 +1,15 @@
-﻿using MTGApplication.General.UseCases;
-using MTGApplication.Views.Pages;
-using MTGApplication.Views.Windows;
+﻿using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.General.Views;
+namespace MTGApplication.General.Views.AppWindows;
 public class OpenMTGCardCollectionWindow : UseCase
 {
-  public override void Execute() => new ThemedWindow
+  public override void Execute()
   {
-    Content = new MTGCardCollectionPage(),
-    Title = "MTG Card Collections"
-  }.Activate();
+    // TODO: Card collection page opening
+    //new ThemedWindow
+    //{
+    //  Content = new MTGCardCollectionPage(),
+    //  Title = "MTG Card Collections"
+    //}.Activate();
+  }
 }

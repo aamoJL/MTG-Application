@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.CardDeck;
+using MTGApplication.Features.DeckSelector;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
 

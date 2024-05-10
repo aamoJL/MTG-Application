@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:DeckEditorCardViewBase
+  x:Class="MTGApplication.Features.DeckEditor.DeckEditorCardImageView"
+  xmlns:local="using:MTGApplication.Features.DeckEditor"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
+  mc:Ignorable="d">
+
+  <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
+    <Grid>
+      <controls:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind ViewModel.SelectedFaceUri, Mode=OneWay}">
+        <controls:ImageEx.ContextFlyout>
+          <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+            <CommandBarFlyout.PrimaryCommands>
+              <AppBarButton Command="{x:Bind ViewModel.SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+              <AppBarSeparator />
+              <AppBarButton Command="{x:Bind ViewModel.OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
+              <AppBarButton Command="{x:Bind ViewModel.OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+              <AppBarButton Command="{x:Bind OnDeleteCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+            </CommandBarFlyout.PrimaryCommands>
+            <CommandBarFlyout.SecondaryCommands>
+              <!--<AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>-->
+              <AppBarSeparator/>
+              <AppBarElementContainer AllowFocusOnInteraction="True">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+                  <NumberBox Grid.Column="1" Value="{x:Bind Model.Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
+                </StackPanel>
+              </AppBarElementContainer>
+            </CommandBarFlyout.SecondaryCommands>
+          </CommandBarFlyout>
+        </controls:ImageEx.ContextFlyout>
+      </controls:ImageEx>
+    </Grid>
+    <Grid>
+      <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Right" FontSize="11" Padding="0 0 5 0"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <TextBlock Text="{x:Bind Model.Count, Mode=OneWay}" Margin="0 5 0 0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</local:DeckEditorCardViewBase>

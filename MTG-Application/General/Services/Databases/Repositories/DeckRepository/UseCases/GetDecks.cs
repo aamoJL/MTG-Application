@@ -1,7 +1,7 @@
 ﻿using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.UseCases;
+using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

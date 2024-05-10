@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using MTGApplication.Database;
+using MTGApplication.General.Databases;
 
 namespace MTGApplicationTests.Database;
 

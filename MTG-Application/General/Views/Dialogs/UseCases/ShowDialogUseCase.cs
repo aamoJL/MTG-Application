@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.UseCases;
+﻿using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 

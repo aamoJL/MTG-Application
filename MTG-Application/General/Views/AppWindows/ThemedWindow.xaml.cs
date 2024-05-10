@@ -2,11 +2,11 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.General.Services.NotificationService;
-using MTGApplication.Interfaces;
+using MTGApplication.General.ViewModels;
 using System;
 using Windows.UI;
 
-namespace MTGApplication.Views.Windows;
+namespace MTGApplication.General.Views.AppWindows;
 
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
@@ -52,7 +52,7 @@ public sealed partial class ThemedWindow : Window
 
   private void ThemedWindow_Activated(object sender, WindowActivatedEventArgs args)
   {
-    if(Content is FrameworkElement element)
+    if (Content is FrameworkElement element)
       element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
 
     NotificationService.OnShow += NotificationService_OnShow;
@@ -94,19 +94,19 @@ public sealed partial class ThemedWindow : Window
     if (Content is ISavable savableContent)
     {
       args.Handled = savableContent.HasUnsavedChanges;
-      canceled = !await savableContent.SaveUnsavedChanges();
+      canceled = !await savableContent.ConfirmUnsavedChanges();
     }
 
     if (!canceled)
     {
       _close = true;
       args.Handled = false;
-      
+
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
       NotificationService.OnShow -= NotificationService_OnShow;
       Activated -= ThemedWindow_Activated;
       Closed -= ThemedWindow_Closed;
-      
+
       Content = null;
       Close();
     }

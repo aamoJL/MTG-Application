@@ -2,9 +2,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.General.Views.Controls;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.General.Views;
+namespace MTGApplication.General.Views.AppWindows;
 [ObservableObject]
 public sealed partial class DeckBuilderPage : Page
 {

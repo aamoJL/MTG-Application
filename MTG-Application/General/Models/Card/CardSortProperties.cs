@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using static MTGApplication.General.Models.Card.CardSortProperties;
-using static MTGApplication.Services.MTGService;
+using static MTGApplication.General.Models.Card.MTGCard;
 
 namespace MTGApplication.General.Models.Card;
 

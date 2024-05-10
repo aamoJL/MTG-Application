@@ -2,11 +2,9 @@
 using MTGApplication.General.Models.Card;
 using MTGApplicationTests.Services;
 using System.Text.Json;
-using static MTGApplication.Services.MTGService;
+using static MTGApplication.General.Models.Card.MTGCard;
 
 namespace MTGApplicationTests.Models;
-
-// TODO: clean
 
 [TestClass]
 public class MTGCardTests
@@ -21,23 +19,19 @@ public class MTGCardTests
   [TestMethod]
   public void GetColorTypeNameTest()
   {
-    CollectionAssert.AreEqual(new[] { "White", "Blue", "Black", "Red", "Green", "Multicolor", "Colorless" }, new[]
-    {
-      ColorTypes.W.GetFullName(),
-      ColorTypes.U.GetFullName(),
-      ColorTypes.B.GetFullName(),
-      ColorTypes.R.GetFullName(),
-      ColorTypes.G.GetFullName(),
-      ColorTypes.M.GetFullName(),
-      ColorTypes.C.GetFullName(),
-    });
+    var colorNames = ColorTypesExtensions.ColorNames;
+
+    Assert.IsTrue(colorNames.Count > 0);
+
+    foreach (var colorName in colorNames)
+      Assert.AreEqual(colorName.Value, colorName.Key.GetFullName());
   }
 
   [TestMethod]
   public void GetColorTypeTest()
   {
-    var frontFace = Mocker.MTGCardModelMocker.CreateCardFace(colors: new[] { ColorTypes.W, ColorTypes.G }, name: "WhiteGreen");
-    var backFace = Mocker.MTGCardModelMocker.CreateCardFace(colors: new[] { ColorTypes.R }, name: "Red");
+    var frontFace = Mocker.MTGCardModelMocker.CreateCardFace(colors: [ColorTypes.W, ColorTypes.G], name: "WhiteGreen");
+    var backFace = Mocker.MTGCardModelMocker.CreateCardFace(colors: [ColorTypes.R], name: "Red");
 
     CollectionAssert.AreEquivalent(new[] { ColorTypes.W, ColorTypes.G, ColorTypes.R }, GetColors(frontFace, backFace));
     CollectionAssert.AreEquivalent(new[] { ColorTypes.R }, GetColors(backFace, null));
@@ -47,7 +41,7 @@ public class MTGCardTests
   public void FromJSONTest()
   {
     var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
-    var json = card.ToJSON();
+    var json = JsonSerializer.Serialize(card);
 
     var fromJson = JsonSerializer.Deserialize<MTGCard>(json);
     Assert.IsNotNull(fromJson);

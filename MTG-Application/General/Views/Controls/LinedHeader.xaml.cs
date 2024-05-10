@@ -7,7 +7,7 @@ public sealed partial class LinedHeader : UserControl
 {
   public static readonly DependencyProperty HeaderProperty =
       DependencyProperty.Register(nameof(Header), typeof(TextBlock), typeof(LinedHeader), new PropertyMetadata(null));
-  
+
   public LinedHeader() => InitializeComponent();
 
   public TextBlock Header
@@ -15,5 +15,4 @@ public sealed partial class LinedHeader : UserControl
     get => (TextBlock)GetValue(HeaderProperty);
     set => SetValue(HeaderProperty, value);
   }
-
 }
