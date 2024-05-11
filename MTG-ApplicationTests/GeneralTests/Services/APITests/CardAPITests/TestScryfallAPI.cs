@@ -7,13 +7,15 @@ namespace MTGApplicationTests.API;
 
 public class TestScryfallAPI() : ScryfallAPI
 {
-  private readonly string _apiSamplePath = Path.Join(IOService.GetAssetDirectoryPath(), "ScryfallAPIDeckSample.json");
+  private readonly string _apiSamplePath = Path.Join(FileService.GetAssetDirectoryPath(), "ScryfallAPIDeckSample.json");
 
   public async Task<MTGCard[]> GetCardsFromSampleJSON()
   {
-    var jsonNode = JsonNode.Parse(IOService.ReadTextFromFile(_apiSamplePath));
+    FileService.TryReadTextFromFile(_apiSamplePath, out string data);
 
-    return await GetCardsFromJsonObject(jsonNode);
+    var jsonNode = JsonNode.Parse(data);
+
+    return (await GetCardsFromJsonObject(jsonNode)).ToArray();
   }
 }
 

@@ -13,7 +13,7 @@ public class CardDbContextFactory
   {
     if (string.IsNullOrEmpty(connectionString))
     {
-      var dbPath = Path.Join(IOService.GetAppDataPath(), DbFileName);
+      var dbPath = Path.Join(FileService.GetAppDataPath(), DbFileName);
       connectionString = $"Data Source={dbPath}";
     }
     this.connectionString = connectionString;

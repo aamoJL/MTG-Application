@@ -1,35 +1,35 @@
-﻿using System;
-using System.Windows.Input;
+﻿using MTGApplication.General.Services;
+using System;
 
 namespace MTGApplication.General.Views;
 
 public abstract class DragAndDrop<T>
 {
+  protected DragAndDrop(IClassCopier<T> itemCopier) => ItemCopier = itemCopier;
+
   public static DragAndDrop<T> DragOrigin { get; set; }
+  public static T Item { get; set; }
 
-  public bool AcceptMove { get; init; } = true;
+  public IClassCopier<T> ItemCopier { get; }
+  public object DataContext { get; set; }
+  public bool AcceptMove { get; set; } = true;
 
-  public ICommand AddCommand { get; init; }
-  public ICommand RemoveCommand { get; init; }
+  public Action<T> OnCopy { get; set; }
+  public Action<T> OnBeginMoveTo { get; set; }
+  public Action<T> OnBeginMoveFrom { get; set; }
+  public Action<T> OnExecuteMove { get; set; }
+  public Action<T> OnRemove { get; set; }
+  public Action<string> OnExternalImport { get; set; }
 
-  /// <summary>
-  /// Action that will be invoked when an item would be copied to the target source.
-  /// <para>The <see cref="ICommand"/> is the <see cref="AddCommand"/></para>
-  /// <para>The <see cref="string"/> is the copied data</para>
-  /// </summary>
-  public Action<ICommand, string> OnCopy { get; init; }
+  public virtual void OnDragStarting(T item)
+  {
+    Item = item;
+    DragOrigin = this;
+  }
 
-  /// <summary> 
-  /// Action that will be invoked when an item would be moved between sources.
-  /// <para>The first <see cref="ICommand"/> is the <see cref="AddCommand"/></para>
-  /// <para>The second <see cref="ICommand"/> is the <see cref="DragOrigin"/>'s <see cref="RemoveCommand"/></para>
-  /// <para>The <see cref="string"/> is the moved data</para>
-  /// </summary>
-  public Action<ICommand, ICommand, string> OnMove { get; init; }
-
-  public virtual void OnDragStarting() => DragOrigin = this;
-
-  public virtual void OnCompleted() => DragOrigin = null;
-
-  protected abstract string SerializeItem(T Item);
+  public virtual void OnCompleted()
+  {
+    Item = default;
+    DragOrigin = null;
+  }
 }

@@ -1,5 +1,4 @@
-﻿using MTGApplication.General.Models;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models.Card;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 

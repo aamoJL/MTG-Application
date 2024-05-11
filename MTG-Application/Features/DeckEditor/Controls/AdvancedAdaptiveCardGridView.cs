@@ -2,13 +2,34 @@
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Views;
 using System.Collections;
 using System.Collections.Generic;
+using System.Windows.Input;
 using static MTGApplication.General.Models.Card.CardSortProperties;
 
 namespace MTGApplication.Features.DeckEditor;
 public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 {
+  public AdvancedAdaptiveCardGridView()
+  {
+    DragAndDrop = new(new MTGCardCopier())
+    {
+      DataContext = DataContext,
+      OnCopy = (item) => OnDropCopy?.Execute(item),
+      OnRemove = (item) => OnDropRemove?.Execute(item),
+      OnExternalImport = (data) => OnDropImport?.Execute(data),
+      OnBeginMoveTo = (item) => OnDropBeginMoveTo?.Execute(item),
+      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
+      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
+    };
+
+    DragItemsStarting += DragAndDrop.DragStarting;
+    DragItemsCompleted += DragAndDrop.DragCompleted;
+    DragOver += DragAndDrop.DragOver;
+    Drop += DragAndDrop.Drop;
+  }
+
   public new static readonly DependencyProperty ItemsSourceProperty =
       DependencyProperty.Register(nameof(ItemsSource), typeof(IList<MTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
 
@@ -21,6 +42,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
         new CardFilters(), OnDependencyPropertyChanged));
 
   private AdvancedCollectionView filteredAndSortedCardSource = new();
+  private ListViewDragAndDrop DragAndDrop { get; }
 
   public new IList<MTGCard> ItemsSource
   {
@@ -39,6 +61,13 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     get => (CardFilters)GetValue(FilterPropertiesProperty);
     set => SetValue(FilterPropertiesProperty, value);
   }
+
+  public ICommand OnDropCopy { get; set; }
+  public ICommand OnDropRemove { get; set; }
+  public ICommand OnDropImport { get; set; }
+  public ICommand OnDropBeginMoveFrom { get; set; }
+  public ICommand OnDropBeginMoveTo { get; set; }
+  public ICommand OnDropExecuteMove { get; set; }
 
   private AdvancedCollectionView FilteredAndSortedCardSource
   {

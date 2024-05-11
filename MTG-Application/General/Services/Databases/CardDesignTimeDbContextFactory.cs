@@ -13,7 +13,7 @@ public class CardDesignTimeDbContextFactory : IDesignTimeDbContextFactory<CardDb
 {
   public CardDbContext CreateDbContext(string[] args)
   {
-    var dbPath = Path.Join(IOService.GetAppDataPath(), CardDbContextFactory.DbFileName);
+    var dbPath = Path.Join(FileService.GetAppDataPath(), CardDbContextFactory.DbFileName);
     var connectionString = $"Data Source={dbPath}";
 
     var options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;

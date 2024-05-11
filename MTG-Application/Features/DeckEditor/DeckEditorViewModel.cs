@@ -6,9 +6,9 @@ using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.NotificationService;
+using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -18,9 +18,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   public DeckEditorViewModel()
   {
-    CardImporter = new(CardAPI);
-    DeckCards = new(CardImporter) { OnChange = OnDeckCardsChanged };
-    MaybeCards = new(CardImporter) { OnChange = OnDeckCardsChanged };
+    DeckCards = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
+    MaybeCards = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
   }
 
   public DeckEditorViewModel(MTGCardDeck deck) : this() => Deck = deck;
@@ -34,7 +33,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
       DeckCards.Cards = deck.DeckCards;
       MaybeCards.Cards = deck.Maybelist;
-      HasUnsavedChanges = true;
+      UndoStack.Clear();
+      HasUnsavedChanges = false;
 
       OnPropertyChanged(nameof(DeckSize));
       OnPropertyChanged(nameof(DeckName));
@@ -44,17 +44,18 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       DeleteDeckCommand.NotifyCanExecuteChanged();
     }
   }
+  private ReversibleCommandStack UndoStack { get; } = new();
+
+  public ICardAPI<MTGCard> CardAPI { private get; init; } = App.MTGCardAPI;
+  public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
 
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
 
-  public CardImporter CardImporter { get; set; }
-  public CardFilters CardFilters { get; } = new();
-  public CardSorter CardSorter { get; } = new();
-  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
-  public ICardAPI<MTGCard> CardAPI { get; init; } = App.MTGCardAPI;
   public DeckEditorConfirmers Confirmers { get; init; } = new();
   public DeckEditorNotifier Notifier { get; init; } = new();
+  public CardFilters CardFilters { get; init; } = new();
+  public CardSorter CardSorter { get; init; } = new();
 
   public CardListViewModel DeckCards { get; }
   public CardListViewModel MaybeCards { get; }
@@ -125,10 +126,7 @@ public partial class DeckEditorViewModel
   private async Task NewDeck()
   {
     if (await ConfirmUnsavedChanges())
-    {
       Deck = new();
-      HasUnsavedChanges = false;
-    }
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteOpenDeckCommand))]
@@ -148,7 +146,6 @@ public partial class DeckEditorViewModel
       {
         case ConfirmationResult.Yes:
           Deck = loadResult.Deck;
-          HasUnsavedChanges = false;
           SendNotification(Notifier.Notifications.LoadSuccessNotification); break;
         case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.LoadErrorNotification); break;
         default: break;
@@ -195,25 +192,15 @@ public partial class DeckEditorViewModel
     {
       case ConfirmationResult.Yes:
         Deck = new();
-        HasUnsavedChanges = false;
         SendNotification(Notifier.Notifications.DeleteSuccessNotification); break;
       case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.DeleteErrorNotification); break;
       default: return;
     }
   }
 
-  [RelayCommand]
-  private async Task ExternalCardImport(ExternalCardImportArgs args)
-  {
-    var (data, addCommand, removeCommand) = args;
+  [RelayCommand(CanExecute = nameof(CanExecuteUndoCommand))] private void Undo() => UndoStack.Undo();
 
-    if ((await CardImporter.Import(data)).Found?[0] is MTGCard card)
-    {
-      // TODO: combine commands
-      addCommand?.Execute(card);
-      removeCommand?.Execute(card);
-    }
-  }
+  [RelayCommand(CanExecute = nameof(CanExecuteRedoCommand))] private void Redo() => UndoStack.Redo();
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 
@@ -221,5 +208,7 @@ public partial class DeckEditorViewModel
 
   private bool CanExecuteOpenDeckCommand(string name) => name != string.Empty;
 
-  public record ExternalCardImportArgs(string Data, ICommand AddCommand, ICommand RemoveCommand);
+  private bool CanExecuteUndoCommand() => UndoStack.CanUndo;
+
+  private bool CanExecuteRedoCommand() => UndoStack.CanRedo;
 }

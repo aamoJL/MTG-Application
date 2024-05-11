@@ -1,9 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.NotificationService;
-using MTGApplication.General.Views;
 using MTGApplication.Views.Dialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
@@ -16,13 +14,10 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
     RegisterConfirmDialogs(ViewModel.Confirmers);
     RegisterNotifications(ViewModel.Notifier);
-    RegisterDragAndDropCommands();
   }
 
   public DeckEditorViewModel ViewModel { get; } = new();
   public DialogWrapper DialogWrapper => new(XamlRoot);
-  public ListViewDragAndDrop<MTGCard> DeckCardDragAndDrop { get; set; }
-  public ListViewDragAndDrop<MTGCard> MaybeCardDragAndDrop { get; set; }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
@@ -46,24 +41,6 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
   private void RegisterNotifications(DeckEditorNotifier notifier)
     => notifier.OnNotify = (arg) => { NotificationService.RaiseNotification(this, arg); };
 
-  private void RegisterDragAndDropCommands()
-  {
-    DeckCardDragAndDrop = new()
-    {
-      AddCommand = ViewModel.DeckCards.AddCardCommand,
-      RemoveCommand = ViewModel.DeckCards.RemoveCardCommand,
-      OnCopy = async (cmd, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, null)),
-      OnMove = async (cmd, cmd2, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, cmd2))
-    };
-    MaybeCardDragAndDrop = new()
-    {
-      AddCommand = ViewModel.MaybeCards.AddCardCommand,
-      RemoveCommand = ViewModel.MaybeCards.RemoveCardCommand,
-      OnCopy = async (cmd, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, null)),
-      OnMove = async (cmd, cmd2, data) => await ViewModel.ExternalCardImportCommand.ExecuteAsync(new(data, cmd, cmd2))
-    };
-  }
-
   private void SaveDeckKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {
     if (ViewModel.SaveDeckCommand.CanExecute(null)) ViewModel.SaveDeckCommand.Execute(null);
@@ -82,5 +59,15 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
   private void ResetFiltersKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {
     if (ViewModel.CardFilters.ResetCommand.CanExecute(null)) ViewModel.CardFilters.ResetCommand.Execute(null);
+  }
+
+  private void UndoKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+  {
+    if (ViewModel.UndoCommand.CanExecute(null)) ViewModel.UndoCommand.Execute(null);
+  }
+
+  private void RedoboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+  {
+    if (ViewModel.RedoCommand.CanExecute(null)) ViewModel.RedoCommand.Execute(null);
   }
 }

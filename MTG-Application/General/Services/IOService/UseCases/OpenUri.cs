@@ -5,5 +5,5 @@ namespace MTGApplication.General.Services.IOService;
 
 public class OpenUri : UseCase<string, Task>
 {
-  public async override Task Execute(string uri) => await IOService.OpenUri(uri);
+  public async override Task Execute(string uri) => await NetworkService.OpenUri(uri);
 }

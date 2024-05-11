@@ -1,4 +1,5 @@
 ﻿using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.IOService;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,11 +10,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static MTGApplication.General.Models.Card.MTGCard;
 using static MTGApplication.General.Services.API.CardAPI.ICardAPI<MTGApplication.General.Models.Card.MTGCard>;
-using static MTGApplication.General.Services.IOService.IOService;
 
 namespace MTGApplication.General.Services.API.CardAPI;
-
-// TODO: clean
 
 /// <summary>
 /// Scryfall API calls and helper functions
@@ -35,8 +33,6 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   public string Name => "Scryfall";
   public int PageSize => 175;
 
-  public string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";
-
   public async Task<Result> FetchCardsWithSearchQuery(string searchParams)
   {
     if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
@@ -45,8 +41,11 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
 
   public async Task<Result> FetchFromUri(string pageUri, bool paperOnly = false)
   {
-    var rootNode = await FetchScryfallJsonObject(pageUri);
-    if (rootNode == null) { return Result.Empty(); }
+    if (await NetworkService.TryFetchStringFromUrlGetAsync(pageUri) is not string data)
+      return Result.Empty();
+
+    if (!JsonService.TryParseJson(data, out var rootNode))
+      return Result.Empty();
 
     List<MTGCard> found = new();
 
@@ -102,7 +101,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   /// <summary>
   /// Returns <see cref="MTGCard"/> array from the given <paramref name="jsonNode"/>
   /// </summary>
-  protected async Task<MTGCard[]> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
+  protected async Task<IEnumerable<MTGCard>> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
     var cards = new List<MTGCard>();
     if (jsonNode == null) { return cards.ToArray(); }
@@ -122,19 +121,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
       }
     }
 
-    return cards.ToArray();
-  }
-
-  /// <summary>
-  /// Fetches json object that contains list of MTG cards using the Scryfall API
-  /// </summary>
-  private static async Task<JsonNode> FetchScryfallJsonObject(string searchUri)
-  {
-    try
-    {
-      return JsonNode.Parse(await FetchStringFromURL(searchUri));
-    }
-    catch (Exception) { return null; }
+    return cards;
   }
 
   /// <summary>
@@ -249,34 +236,28 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
     {
-      var identifiersJson = JsonSerializer.Serialize(new
-      {
-        identifiers = chunk.Select(x => x.ToObject())
-      });
+      var identifiersJson = JsonSerializer.Serialize(new { identifiers = chunk.Select(x => x.ToObject()) });
 
-      List<MTGCard> fetchedCards = new();
+      var fetchedCards = new List<MTGCard>();
       var notFoundCount = 0;
 
       // Fetch and covert the JSON to card objects
-      try
+      if (JsonService.TryParseJson(await NetworkService.TryFetchStringFromUrlPostAsync(COLLECTION_URL, identifiersJson), out var rootNode))
       {
-        var rootNode = JsonNode.Parse(await FetchStringFromURLPost(COLLECTION_URL, identifiersJson));
-        var dataNode = rootNode?["data"];
         notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
-        if (dataNode != null)
+
+        if (rootNode?["data"]?.AsArray() is JsonArray dataArray)
         {
-          foreach (var item in dataNode.AsArray())
+          foreach (var item in dataArray)
           {
-            var cardInfo = GetCardInfoFromJSON(item);
-            if (cardInfo != null)
+            if (GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
             {
               var count = chunk.FirstOrDefault(x => x.Compare(cardInfo)).CardCount;
-              fetchedCards.Add(new((MTGCardInfo)cardInfo, count));
+              fetchedCards.Add(new(cardInfo, count));
             }
           }
         }
       }
-      catch (Exception) { throw; }
 
       return (Found: fetchedCards, NotFoundCount: notFoundCount);
     })));
@@ -287,91 +268,6 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
 
     return new(found, notFoundCount, totalCount);
   }
-}
 
-public partial class ScryfallAPI
-{
-  /// <summary>
-  /// Scryfall collection fetch identifier object.
-  /// Scryfall documentation: <see href="https://scryfall.com/docs/api/cards/collection"/>
-  /// </summary>
-  public readonly struct ScryfallIdentifier
-  {
-    public enum IdentifierSchema
-    {
-      ID, ILLUSTRATION_ID, NAME, NAME_SET, COLLECTORNUMBER_SET
-    }
-
-    public ScryfallIdentifier() { }
-    public ScryfallIdentifier(MTGCardDTO card)
-    {
-      if (card != null)
-      {
-        ScryfallId = card.ScryfallId;
-        Name = card.Name;
-        CardCount = card.Count;
-        SetCode = card.SetCode;
-        CollectorNumber = card.CollectorNumber;
-      }
-    }
-
-    #region Properties
-    public Guid ScryfallId { get; init; } = Guid.Empty;
-    public int CardCount { get; init; } = 1;
-    public string Name { get; init; } = string.Empty;
-    public Guid IllustrationId { get; init; } = Guid.Empty;
-    public string SetCode { get; init; } = string.Empty;
-    public string CollectorNumber { get; init; } = string.Empty;
-    public IdentifierSchema PreferedSchema { get; init; } = IdentifierSchema.ID;
-    #endregion
-
-    /// <summary>
-    /// Return object that contains the scryfall API identifier variables. This method should only be used for JSON serialization.
-    /// </summary>
-    public object ToObject()
-    {
-      switch (PreferedSchema)
-      {
-        case IdentifierSchema.ID:
-          if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
-          break;
-        case IdentifierSchema.ILLUSTRATION_ID:
-          if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
-          break;
-        case IdentifierSchema.NAME:
-          if (!string.IsNullOrEmpty(Name)) { return new { name = Name }; }
-          break;
-        case IdentifierSchema.NAME_SET:
-          if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return new { name = Name, set = SetCode }; }
-          break;
-        case IdentifierSchema.COLLECTORNUMBER_SET:
-          if (!string.IsNullOrEmpty(CollectorNumber) && !string.IsNullOrEmpty(SetCode)) { return new { set = SetCode, collector_number = CollectorNumber }; }
-          break;
-      }
-
-      // If prefered schema does not work, select secondary if possible
-      // Scryfall Id
-      if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
-      // Set Code + Collector Number
-      else if (!string.IsNullOrEmpty(SetCode) && !string.IsNullOrEmpty(CollectorNumber)) { return new { set = SetCode, collector_number = CollectorNumber }; }
-      // Illustration Id
-      else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
-      // Name + Set Code
-      else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return new { name = Name, set = SetCode }; }
-      // Name
-      else if (!string.IsNullOrEmpty(Name)) { return new { name = Name }; }
-      else { return string.Empty; }
-    }
-
-    /// <summary>
-    /// Returns true, if the identifier applies to the given <paramref name="info"/>
-    /// </summary>
-    public bool Compare(MTGCardInfo? info)
-    {
-      if (ScryfallId != Guid.Empty) { return info?.ScryfallId == ScryfallId; }
-      else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }
-      else if (!string.IsNullOrEmpty(Name)) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase); }
-      else { return false; }
-    }
-  }
+  private static string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";
 }

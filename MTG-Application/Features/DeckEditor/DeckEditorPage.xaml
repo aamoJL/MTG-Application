@@ -20,6 +20,8 @@
     <!--#region Keyboard Accelerators -->
     <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened--> 
     <Grid.KeyboardAccelerators>
+      <KeyboardAccelerator Key="Z" Modifiers="Control" Invoked="UndoKeyboardAccelerator_Invoked"/>
+      <KeyboardAccelerator Key="Y" Modifiers="Control" Invoked="RedoboardAccelerator_Invoked"/>
       <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="SaveDeckKeyboardAccelerator_Invoked" />
       <KeyboardAccelerator Modifiers="Control" Key="O" Invoked="OpenDeckKeyboardAccelerator_Invoked" />
       <KeyboardAccelerator Modifiers="Control" Key="N" Invoked="NewDeckKeyboardAccelerator_Invoked" />
@@ -75,6 +77,7 @@
         CanDragTabs="False"
         CanReorderTabs="False">  
         <TabViewItem Header="Side lists" IsClosable="False">
+          
           <!--#region Side Lists -->
           <Grid>
             <Grid.RowDefinitions>
@@ -166,11 +169,7 @@
               SelectionMode="Single"
               BorderThickness="0"
               CanDragItems="True"
-              AllowDrop="True"
-              DragItemsStarting="{x:Bind MaybeCardDragAndDrop.DragStarting, Mode=OneTime}"
-              DragItemsCompleted="{x:Bind MaybeCardDragAndDrop.DragCompleted, Mode=OneTime}"
-              DragOver="{x:Bind MaybeCardDragAndDrop.DragOver, Mode=OneTime}"
-              Drop="{x:Bind MaybeCardDragAndDrop.Drop, Mode=OneTime}">
+              AllowDrop="True">
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
@@ -184,6 +183,7 @@
             
           </Grid>
           <!--#endregion Side Lists-->
+          
         </TabViewItem>
         <TabViewItem Header="Info" IsClosable="False">
           
@@ -242,16 +242,8 @@
             <AppBarButton Icon="Edit" Label="Edit">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.UndoCommand, Mode=OneTime}" Icon="Undo" Text="Undo">
-                    <MenuFlyoutItem.KeyboardAccelerators>
-                      <KeyboardAccelerator Key="Z" Modifiers="Control"/>
-                    </MenuFlyoutItem.KeyboardAccelerators>
-                  </MenuFlyoutItem>-->
-                  <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.CommandService.RedoCommand, Mode=OneTime}" Icon="Redo" Text="Redo">
-                    <MenuFlyoutItem.KeyboardAccelerators>
-                      <KeyboardAccelerator Key="Y" Modifiers="Control"/>
-                    </MenuFlyoutItem.KeyboardAccelerators>
-                  </MenuFlyoutItem>-->
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.UndoCommand, Mode=OneTime}" Icon="Undo" Text="Undo" KeyboardAcceleratorTextOverride="Ctrl+Z"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.RedoCommand, Mode=OneTime}" Icon="Redo" Text="Redo" KeyboardAcceleratorTextOverride="Ctrl+Y"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -372,8 +364,8 @@
         <!--#region Grid View -->
         <local:AdvancedAdaptiveCardGridView
           x:Name="DeckCardsGridView"
-          DataContext="{x:Bind ViewModel.DeckCards, Mode=OneWay}"
-          ItemsSource="{Binding Cards, Mode=OneWay}"
+          DataContext="{x:Bind ViewModel, Mode=OneWay}"
+          ItemsSource="{Binding DeckCards.Cards, Mode=OneWay}"
           SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
           Style="{StaticResource MTGAdaptiveGridViewStyle}"
@@ -384,16 +376,18 @@
           DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
           CanDragItems="True"
           AllowDrop="True"
-          DragItemsStarting="{x:Bind DeckCardDragAndDrop.DragStarting, Mode=OneTime}"
-          DragItemsCompleted="{x:Bind DeckCardDragAndDrop.DragCompleted, Mode=OneTime}"
-          DragOver="{x:Bind DeckCardDragAndDrop.DragOver, Mode=OneTime}"
-          Drop="{x:Bind DeckCardDragAndDrop.Drop, Mode=OneTime}">
+          OnDropCopy="{x:Bind ViewModel.DeckCards.AddCardCommand, Mode=OneWay}"
+          OnDropRemove="{x:Bind ViewModel.DeckCards.RemoveCardCommand, Mode=OneWay}"
+          OnDropImport="{x:Bind ViewModel.DeckCards.ImportCardsCommand, Mode=OneWay}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCards.BeginMoveFromCommand, Mode=OneWay}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCards.BeginMoveToCommand, Mode=OneWay}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCards.ExecuteMoveCommand, Mode=OneWay}">
           <local:AdvancedAdaptiveCardGridView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardImageView
                 Model="{Binding Mode=OneWay}" 
-                OnDeleteCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                OnChangeCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
+                OnDeleteCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCards.RemoveCardCommand, Mode=OneTime}"
+                OnChangeCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCards.CardlistCardChangedCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedAdaptiveCardGridView.ItemTemplate>
         </local:AdvancedAdaptiveCardGridView>

@@ -21,11 +21,6 @@ public partial interface ICardAPI<T>
   public int PageSize { get; }
 
   /// <summary>
-  /// Returns API search URI with the <paramref name="searchParams"/>
-  /// </summary>
-  public string GetSearchUri(string searchParams);
-
-  /// <summary>
   /// Fetch cards from the API using API search query
   /// </summary>
   public Task<Result> FetchCardsWithSearchQuery(string searchParams);
@@ -50,6 +45,8 @@ public partial interface ICardAPI<T>
 
 public partial interface ICardAPI<T>
 {
+  // TODO: move to import result
+
   /// <summary>
   /// API fetch result
   /// </summary>
