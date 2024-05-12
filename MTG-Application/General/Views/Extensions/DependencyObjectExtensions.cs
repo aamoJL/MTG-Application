@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
-namespace MTGApplication.General.Extensions;
+namespace MTGApplication.General.Views.Extensions;
 
 public static class DependencyObjectExtensions
 {

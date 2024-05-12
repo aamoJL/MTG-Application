@@ -22,7 +22,6 @@ public record CardSortProperties(
 
     public MTGSortProperty SortProperty { get; set; }
 
-    // TODO: unit test
     public int Compare(object x, object y)
     {
       var cx = GetComparable(x as MTGCard, SortProperty);

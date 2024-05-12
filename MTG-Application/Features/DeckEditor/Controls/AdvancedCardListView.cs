@@ -2,8 +2,10 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
+using MTGApplication.General.Views;
 using System.Collections;
 using System.Collections.Generic;
+using System.Windows.Input;
 using static MTGApplication.General.Models.Card.CardSortProperties;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -20,6 +22,30 @@ public partial class AdvancedCardListView : ListView
   public static readonly DependencyProperty FilterPropertiesProperty =
       DependencyProperty.Register(nameof(FilterProperties), typeof(CardFilters), typeof(AdvancedCardListView), new PropertyMetadata(
         new CardFilters(), OnDependencyPropertyChanged));
+  
+  public AdvancedCardListView()
+  {
+    DragAndDrop = new(new MTGCardCopier())
+    {
+      DataContext = DataContext,
+      OnCopy = (item) => OnDropCopy?.Execute(item),
+      OnRemove = (item) => OnDropRemove?.Execute(item),
+      OnExternalImport = (data) => OnDropImport?.Execute(data),
+      OnBeginMoveTo = (item) => OnDropBeginMoveTo?.Execute(item),
+      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
+      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
+    };
+
+    DragItemsStarting += DragAndDrop.DragStarting;
+    DragItemsCompleted += DragAndDrop.DragCompleted;
+    DragOver += DragAndDrop.DragOver;
+    Drop += DragAndDrop.Drop;
+
+    DataContextChanged += OnDataContextChanged;
+  }
+
+  private void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args) 
+    => DragAndDrop.DataContext = DataContext;
 
   private AdvancedCollectionView filteredAndSortedCardSource = new();
 
@@ -41,6 +67,7 @@ public partial class AdvancedCardListView : ListView
     set => SetValue(FilterPropertiesProperty, value);
   }
 
+  private ListViewDragAndDrop DragAndDrop { get; }
   private AdvancedCollectionView FilteredAndSortedCardSource
   {
     get => filteredAndSortedCardSource;
@@ -50,6 +77,13 @@ public partial class AdvancedCardListView : ListView
       base.ItemsSource = filteredAndSortedCardSource;
     }
   }
+
+  public ICommand OnDropCopy { get; set; }
+  public ICommand OnDropRemove { get; set; }
+  public ICommand OnDropImport { get; set; }
+  public ICommand OnDropBeginMoveFrom { get; set; }
+  public ICommand OnDropBeginMoveTo { get; set; }
+  public ICommand OnDropExecuteMove { get; set; }
 
   private void OnItemsSourceDependencyPropertyChanged(IList list)
   {

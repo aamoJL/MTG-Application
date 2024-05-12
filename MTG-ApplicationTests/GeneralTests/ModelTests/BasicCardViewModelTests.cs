@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Views;
 using MTGApplicationTests.Services;
 
 namespace MTGApplicationTests.Models;

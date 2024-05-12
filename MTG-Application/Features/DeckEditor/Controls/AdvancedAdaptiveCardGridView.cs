@@ -11,6 +11,17 @@ using static MTGApplication.General.Models.Card.CardSortProperties;
 namespace MTGApplication.Features.DeckEditor;
 public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 {
+  public new static readonly DependencyProperty ItemsSourceProperty =
+      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<MTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
+
+  public static readonly DependencyProperty SortPropertiesProperty =
+      DependencyProperty.Register(nameof(SortProperties), typeof(CardSortProperties), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
+        new CardSortProperties(MTGSortProperty.CMC, MTGSortProperty.Name, SortDirection.Ascending), OnDependencyPropertyChanged));
+
+  public static readonly DependencyProperty FilterPropertiesProperty =
+      DependencyProperty.Register(nameof(FilterProperties), typeof(CardFilters), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
+        new CardFilters(), OnDependencyPropertyChanged));
+
   public AdvancedAdaptiveCardGridView()
   {
     DragAndDrop = new(new MTGCardCopier())
@@ -28,21 +39,14 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     DragItemsCompleted += DragAndDrop.DragCompleted;
     DragOver += DragAndDrop.DragOver;
     Drop += DragAndDrop.Drop;
+
+    DataContextChanged += OnDataContextChanged;
   }
 
-  public new static readonly DependencyProperty ItemsSourceProperty =
-      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<MTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
-
-  public static readonly DependencyProperty SortPropertiesProperty =
-      DependencyProperty.Register(nameof(SortProperties), typeof(CardSortProperties), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
-        new CardSortProperties(MTGSortProperty.CMC, MTGSortProperty.Name, SortDirection.Ascending), OnDependencyPropertyChanged));
-
-  public static readonly DependencyProperty FilterPropertiesProperty =
-      DependencyProperty.Register(nameof(FilterProperties), typeof(CardFilters), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
-        new CardFilters(), OnDependencyPropertyChanged));
+  private void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args) 
+    => DragAndDrop.DataContext = DataContext;
 
   private AdvancedCollectionView filteredAndSortedCardSource = new();
-  private ListViewDragAndDrop DragAndDrop { get; }
 
   public new IList<MTGCard> ItemsSource
   {
@@ -62,13 +66,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     set => SetValue(FilterPropertiesProperty, value);
   }
 
-  public ICommand OnDropCopy { get; set; }
-  public ICommand OnDropRemove { get; set; }
-  public ICommand OnDropImport { get; set; }
-  public ICommand OnDropBeginMoveFrom { get; set; }
-  public ICommand OnDropBeginMoveTo { get; set; }
-  public ICommand OnDropExecuteMove { get; set; }
-
+  private ListViewDragAndDrop DragAndDrop { get; }
   private AdvancedCollectionView FilteredAndSortedCardSource
   {
     get => filteredAndSortedCardSource;
@@ -78,6 +76,13 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
       base.ItemsSource = filteredAndSortedCardSource;
     }
   }
+
+  public ICommand OnDropCopy { get; set; }
+  public ICommand OnDropRemove { get; set; }
+  public ICommand OnDropImport { get; set; }
+  public ICommand OnDropBeginMoveFrom { get; set; }
+  public ICommand OnDropBeginMoveTo { get; set; }
+  public ICommand OnDropExecuteMove { get; set; }
 
   private void OnItemsSourceDependencyPropertyChanged(IList list)
   {

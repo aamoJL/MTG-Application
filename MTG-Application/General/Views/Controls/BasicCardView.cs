@@ -2,12 +2,13 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.IOService;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.General.Views;
 
 [ObservableObject]
 public partial class BasicCardView : UserControl

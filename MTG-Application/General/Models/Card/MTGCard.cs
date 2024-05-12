@@ -165,32 +165,29 @@ public partial class MTGCard : ObservableObject
   /// <summary>
   /// Returns all the <see cref="ColorTypes"/> that the given faces have
   /// </summary>
-  public static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
+  private static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
   {
     var colors = new List<ColorTypes>();
 
     foreach (var color in frontFace.Colors)
-    {
       if (!colors.Contains(color)) { colors.Add(color); }
-    }
 
     if (backFace != null)
     {
       foreach (var color in backFace?.Colors)
-      {
         if (!colors.Contains(color)) { colors.Add(color); }
-      }
     }
 
     // Card is colorless if it has no other colors
-    if (colors.Count == 0) { colors.Add(ColorTypes.C); }
+    if (colors.Count == 0) colors.Add(ColorTypes.C);
+
     return colors.ToArray();
   }
 
   /// <summary>
   /// Separates the card types from the <paramref name="typeLine"/> to a <see cref="SpellType"/> array.
   /// </summary>
-  public static SpellType[] GetSpellTypes(string typeLine)
+  private static SpellType[] GetSpellTypes(string typeLine)
   {
     List<SpellType> types = new();
     var typeStrings = typeLine.Split('\u0020'); // 'Space'
@@ -198,12 +195,11 @@ public partial class MTGCard : ObservableObject
     foreach (var typeString in typeStrings)
     {
       if (Enum.TryParse(typeString, true, out SpellType spellType))
-      {
         types.Add(spellType);
-      }
     }
 
-    if (types.Count == 0) { types.Add(SpellType.Other); }
+    if (types.Count == 0) types.Add(SpellType.Other);
+
     return types.OrderBy(x => x).ToArray();
   }
 }

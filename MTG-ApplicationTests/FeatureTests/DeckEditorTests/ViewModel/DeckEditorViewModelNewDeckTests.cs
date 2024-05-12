@@ -30,7 +30,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
     Assert.AreEqual(string.Empty, vm.DeckName);
     Assert.AreEqual(null, vm.Commander);
     Assert.AreEqual(null, vm.Partner);
-    Assert.AreEqual(0, vm.DeckCards.Cards.Count);
+    Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
   }
 
   [TestMethod("Unsaved changes confirmation should be shown when setting new deck if there are unsaved changes")]
@@ -63,7 +63,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
     Assert.AreEqual(string.Empty, vm.DeckName);
     Assert.AreEqual(null, vm.Commander);
     Assert.AreEqual(null, vm.Partner);
-    Assert.AreEqual(0, vm.DeckCards.Cards.Count);
+    Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
   }
 
   [TestMethod("ViewModel should not have unsaved changes if the deck was reset")]

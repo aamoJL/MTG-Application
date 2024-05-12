@@ -51,7 +51,7 @@ public class ListViewDragAndDrop : DragAndDrop<MTGCard>
       }
       else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
       {
-        if (DataContext == null || DataContext == DragOrigin.DataContext)
+        if (DataContext == null || DataContext != DragOrigin.DataContext)
         {
           // Can't move between different datacontexts,
           // instead the item will be copied to the target source and removed from the origin source

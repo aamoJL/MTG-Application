@@ -18,8 +18,10 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   public DeckEditorViewModel()
   {
-    DeckCards = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
-    MaybeCards = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
+    DeckCardList = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
+    MaybeCardList = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
+    WishCardList = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
+    RemoveCardList = new(CardAPI) { OnChange = OnDeckCardsChanged, UndoStack = UndoStack, Worker = this };
   }
 
   public DeckEditorViewModel(MTGCardDeck deck) : this() => Deck = deck;
@@ -31,8 +33,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     {
       deck = value;
 
-      DeckCards.Cards = deck.DeckCards;
-      MaybeCards.Cards = deck.Maybelist;
+      DeckCardList.Cards = deck.DeckCards;
+      MaybeCardList.Cards = deck.Maybelist;
       UndoStack.Clear();
       HasUnsavedChanges = false;
 
@@ -57,8 +59,10 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public CardFilters CardFilters { get; init; } = new();
   public CardSorter CardSorter { get; init; } = new();
 
-  public CardListViewModel DeckCards { get; }
-  public CardListViewModel MaybeCards { get; }
+  public CardListViewModel DeckCardList { get; }
+  public CardListViewModel MaybeCardList { get; }
+  public CardListViewModel WishCardList { get; }
+  public CardListViewModel RemoveCardList { get; }
 
   public MTGCard Commander
   {

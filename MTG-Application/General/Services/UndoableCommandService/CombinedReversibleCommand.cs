@@ -1,10 +1,10 @@
-﻿namespace MTGApplication.General.Services.ReversibleCommandService;
+﻿using System.Collections.Generic;
+
+namespace MTGApplication.General.Services.ReversibleCommandService;
 
 public class CombinedReversibleCommand : IReversibleCommand
 {
-  public CombinedReversibleCommand(IReversibleCommand[] commands) => Commands = commands;
-
-  public IReversibleCommand[] Commands { get; }
+  public List<IReversibleCommand> Commands { get; } = new();
 
   public void Execute()
   {

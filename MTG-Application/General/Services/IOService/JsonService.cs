@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace MTGApplication.General.Services.IOService;
 
@@ -13,5 +15,21 @@ public static class JsonService
     catch { rootNode = null; }
 
     return rootNode != null;
+  }
+
+  public static bool TryDeserializeJson<T>(string json, out T output)
+  {
+    try { output = JsonSerializer.Deserialize<T>(json); }
+    catch { output = default; }
+
+    return !EqualityComparer<T>.Default.Equals(output, default);
+  }
+
+  public static bool TrySerializeObject<T>(T input, out string output)
+  {
+    try { output = JsonSerializer.Serialize(input); }
+    catch { output = null; }
+
+    return output != null;
   }
 }

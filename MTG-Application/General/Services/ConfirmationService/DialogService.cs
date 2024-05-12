@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using MTGApplication.General.Extensions;
+using MTGApplication.General.Views.Extensions;
 using System;
 using System.Threading.Tasks;
 

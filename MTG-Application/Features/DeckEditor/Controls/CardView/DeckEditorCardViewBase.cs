@@ -1,5 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Views;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor;

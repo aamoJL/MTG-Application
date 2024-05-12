@@ -52,22 +52,15 @@ public partial class CardListViewModel : ObservableObject
   }
 
   [RelayCommand]
-  private void BeginMoveFrom(MTGCard card)
-  {
-    // TODO: add undo command
-  }
+  private void BeginMoveFrom(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableRemove });
 
   [RelayCommand]
-  private void BeginMoveTo(MTGCard card)
-  {
-    // TODO: add undo command
-  }
+  private void BeginMoveTo(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableAdd });
 
   [RelayCommand]
-  private void ExecuteMove(MTGCard card)
-  {
-    // TODO: execute undo command
-  }
+  private void ExecuteMove(MTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
 
   [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
 
