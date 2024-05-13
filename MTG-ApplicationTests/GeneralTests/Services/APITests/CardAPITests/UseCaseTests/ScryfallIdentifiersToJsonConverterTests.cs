@@ -1,16 +1,95 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.General.Services.API.CardAPI;
+using System.Text.Json;
+using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
 
 namespace MTGApplicationTests.API;
 
 [TestClass]
-public class ScryfallAPITests
+public class ScryfallIdentifiersToJsonConverterTests
 {
-  [TestMethod("API should convert json file into cards")]
-  public async Task JsonResponse_ConversionToCard_ReturnCard()
+  [TestMethod]
+  public void Execute_ID()
   {
-    var result = await new TestScryfallAPI().GetCardsFromSampleJSON();
+    var scryfallId = Guid.NewGuid();
+    var illustrationId = Guid.NewGuid();
+    var identifier = new ScryfallIdentifier()
+    {
+      ScryfallId = scryfallId,
+      CardCount = 5,
+      Name = "Test",
+      SetCode = "tst",
+      IllustrationId = illustrationId,
+      PreferedSchema = ScryfallIdentifier.IdentifierSchema.ID
+    };
 
-    Assert.IsTrue(result.Length > 0, "Result should have cards");
+    var expected = JsonSerializer.Serialize(new { identifiers = new[] { new { id = scryfallId } } });
+    var result = new ScryfallIdentifiersToJsonConverter().Execute([identifier]);
+
+    Assert.AreEqual(expected, result);
+  }
+
+  [TestMethod]
+  public void Execute_ILLUSTRATION_ID()
+  {
+    var scryfallId = Guid.NewGuid();
+    var illustrationId = Guid.NewGuid();
+    var identifier = new ScryfallIdentifier()
+    {
+      ScryfallId = scryfallId,
+      CardCount = 5,
+      Name = "Test",
+      SetCode = "tst",
+      IllustrationId = illustrationId,
+      PreferedSchema = ScryfallIdentifier.IdentifierSchema.ILLUSTRATION_ID
+    };
+
+    var expected = JsonSerializer.Serialize(new { identifiers = new[] { new { illustration_id = illustrationId } } });
+    var result = new ScryfallIdentifiersToJsonConverter().Execute([identifier]);
+
+    Assert.AreEqual(expected, result);
+  }
+
+  [TestMethod]
+  public void Execute_SET_NAME()
+  {
+    var scryfallId = Guid.NewGuid();
+    var illustrationId = Guid.NewGuid();
+    var identifier = new ScryfallIdentifier()
+    {
+      ScryfallId = scryfallId,
+      CardCount = 5,
+      Name = "Test",
+      SetCode = "tst",
+      IllustrationId = illustrationId,
+      PreferedSchema = ScryfallIdentifier.IdentifierSchema.NAME_SET
+    };
+
+    var expected = JsonSerializer.Serialize(new { identifiers = new[] { new { name = identifier.Name, set = identifier.SetCode } } });
+    var result = new ScryfallIdentifiersToJsonConverter().Execute([identifier]);
+
+    Assert.AreEqual(expected, result);
+  }
+
+  [TestMethod]
+  public void Execute_NAME()
+  {
+    var scryfallId = Guid.NewGuid();
+    var illustrationId = Guid.NewGuid();
+    var identifier = new ScryfallIdentifier()
+    {
+      ScryfallId = scryfallId,
+      CardCount = 5,
+      Name = "Test",
+      SetCode = "tst",
+      IllustrationId = illustrationId,
+      PreferedSchema = ScryfallIdentifier.IdentifierSchema.NAME
+    };
+
+    var expected = JsonSerializer.Serialize(new { identifiers = new[] { new { name = identifier.Name } } });
+    var result = new ScryfallIdentifiersToJsonConverter().Execute([identifier]);
+
+    Assert.AreEqual(expected, result);
   }
 }
 

@@ -23,7 +23,7 @@ public class CardSortPropertiesTests
 
       foreach (var property in Enum.GetNames(typeof(MTGSortProperty)))
       {
-        var comparer = new MTGCardComparer(Enum.Parse<MTGSortProperty>(property));
+        var comparer = new MTGCardPropertyComparer(Enum.Parse<MTGSortProperty>(property));
         Assert.AreEqual(1, comparer.Compare(card2, card1), $"{property} was not compared correctly");
       };
     }

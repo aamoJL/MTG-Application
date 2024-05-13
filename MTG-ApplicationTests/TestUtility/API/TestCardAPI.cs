@@ -2,7 +2,6 @@
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplicationTests.Services;
-using static MTGApplication.General.Services.API.CardAPI.ICardAPI<MTGApplication.General.Models.Card.MTGCard>;
 
 namespace MTGApplicationTests.API;
 
@@ -16,37 +15,35 @@ public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0)
   public int PageSize => 40;
   public string Name => "Test Card API";
 
-  public async Task<Result> FetchCardsWithSearchQuery(string searchParams)
+  public async Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams)
   {
-    if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
-    return await Task.Run(() => ExpectedCards != null ? new Result(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : Result.Empty());
+    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
+    return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : CardImportResult.Empty());
   }
-  
-  public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)
+
+  public async Task<CardImportResult> FetchFromDTOs(CardDTO[] dtoArray)
   {
     var cards = dtoArray.Select(x => Mocker.MTGCardModelMocker.FromDTO((MTGCardDTO)x)).ToArray();
 
-    if (ExpectedCards == null) { return await Task.Run(() => new Result(cards, 0, cards.Length)); }
+    if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length)); }
     else
     {
       var found = ExpectedCards!.Where(ex => cards.FirstOrDefault(x => x.Info.ScryfallId == ex.Info.ScryfallId) != null)?.ToList() ?? new List<MTGCard>();
       var notFoundCount = ExpectedCards!.Length - found.Count;
 
-      return await Task.Run(() => new Result([.. found], notFoundCount, found.Count));
+      return await Task.Run(() => new CardImportResult([.. found], notFoundCount, found.Count));
     }
   }
-  
-  public async Task<Result> FetchFromString(string importText)
-  {
-    return await Task.Run(() => ExpectedCards != null ? new Result(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : Result.Empty());
-  }
-  
-  public async Task<Result> FetchFromUri(string pageUri, bool paperOnly = false)
+
+  public async Task<CardImportResult> FetchFromString(string importText) 
+    => await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : CardImportResult.Empty());
+
+  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false)
   {
     var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
-    return await Task.Run(() => new Result(cards, NotFoundCount, cards.Length));
+    return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length));
   }
-  
+
   public string GetSearchUri(string searchParams) => searchParams;
 }
 

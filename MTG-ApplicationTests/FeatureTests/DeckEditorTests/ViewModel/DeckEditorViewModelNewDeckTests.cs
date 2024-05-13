@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -19,7 +19,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
   public async Task NewDeck_NoUnsavedChanges_DeckIsEmpty()
   {
     var vm = MockVM(
-      deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
+      deck: MTGCardDeckMocker.Mock("Deck"),
       confirmers: new()
       {
         SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
@@ -38,7 +38,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(
       hasUnsavedChanges: true,
-      deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
+      deck: MTGCardDeckMocker.Mock("Deck"),
       confirmers: new()
       {
         SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
@@ -52,7 +52,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(
       hasUnsavedChanges: true,
-      deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
+      deck: MTGCardDeckMocker.Mock("Deck"),
       confirmers: new()
       {
         SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
@@ -71,7 +71,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(
       hasUnsavedChanges: true,
-      deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
+      deck: MTGCardDeckMocker.Mock("Deck"),
       confirmers: new()
       {
         SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
@@ -85,7 +85,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
   [TestMethod("Deck should be the same when canceling the unsaved changes confirmation when setting a new deck")]
   public async Task NewDeck_CancelSaveUnsaved_DeckIsSame()
   {
-    var deck = await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI);
+    var deck = MTGCardDeckMocker.Mock("Deck");
     var vm = MockVM(
       hasUnsavedChanges: true,
       deck: deck,

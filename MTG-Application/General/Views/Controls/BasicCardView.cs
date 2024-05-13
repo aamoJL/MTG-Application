@@ -81,12 +81,12 @@ public partial class BasicCardViewModel : ObservableObject
   /// <summary>
   /// Opens card's API Website in web browser
   /// </summary>
-  [RelayCommand] public async Task OpenAPIWebsite() => await new OpenUri().Execute(Model.Info.APIWebsiteUri);
+  [RelayCommand] public async Task OpenAPIWebsite() => await NetworkService.OpenUri(Model.Info.APIWebsiteUri);
 
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
-  [RelayCommand] public async Task OpenCardmarketWebsite() => await new OpenUri().Execute(Model.Info.CardMarketUri);
+  [RelayCommand] public async Task OpenCardmarketWebsite() => await NetworkService.OpenUri(Model.Info.CardMarketUri);
 
   private void BasicCardViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
   {

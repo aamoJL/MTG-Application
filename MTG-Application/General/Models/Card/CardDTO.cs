@@ -5,7 +5,7 @@ namespace MTGApplication.General.Models.Card;
 /// <summary>
 /// Base class for card data transfer objects
 /// </summary>
-public abstract class CardDTO
+public abstract record CardDTO
 {
   public CardDTO() { }
   public CardDTO(string name, int count)

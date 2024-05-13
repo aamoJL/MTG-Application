@@ -1,24 +1,23 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckSelector;
-using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
 
 namespace MTGApplicationTests.Features.DeckSelector;
 [TestClass]
-public class GetDeckNamesAndImageUrisTests
+public class GetDeckSelectorListItemsTests
 {
   private readonly DeckRepositoryDependencies _dependensies = new();
 
   [TestMethod("Should return names and image URIs for the repository decks")]
   public async Task Execute_HasDecks_ReturnDeckNamesAndImageUris()
   {
-    _dependensies.ContextFactory.Populate(new List<MTGCardDeckDTO>
-    {
+    _dependensies.ContextFactory.Populate(
+    [
       MTGCardDeckDTOMocker.Mock("Deck 1"),
       MTGCardDeckDTOMocker.Mock("Deck 2"),
       MTGCardDeckDTOMocker.Mock("Deck 3", includeCommander: false),
-    });
+    ]);
 
     var result = await new GetDeckSelectorListItems(_dependensies.Repository, _dependensies.CardAPI).Execute();
 

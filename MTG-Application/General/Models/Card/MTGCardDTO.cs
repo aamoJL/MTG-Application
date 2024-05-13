@@ -5,7 +5,7 @@ namespace MTGApplication.General.Models.Card;
 /// <summary>
 /// Data transfer object for <see cref="MTGCard"/> class
 /// </summary>
-public class MTGCardDTO : CardDTO
+public record MTGCardDTO : CardDTO
 {
   private MTGCardDTO() : base() { }
 
@@ -30,20 +30,14 @@ public class MTGCardDTO : CardDTO
   public string SetCode { get; set; }
   public string CollectorNumber { get; set; }
 
-  public MTGCardDTO Copy() => new(Name, ScryfallId, OracleId, SetCode, CollectorNumber, Count);
-
-  public bool Compare(MTGCardDTO other, bool includeId = false, bool includeCount = false)
+  /// <summary>
+  /// Compares DTOs, excluding Id and Count
+  /// </summary>
+  public bool Compare(MTGCardDTO other)
   {
-    if(other == null) return false;
+    var x = this with { Id = 0, Count = 1};
+    var y = other with { Id = 0, Count = 1 };
 
-    if (includeId && Id != other.Id) return false;
-    if (Name != other.Name) return false;
-    if (includeCount && Count != other.Count) return false;
-    if (ScryfallId != other.ScryfallId) return false;
-    if (OracleId != other.OracleId) return false;
-    if (SetCode != other.SetCode) return false;
-    if (CollectorNumber != other.CollectorNumber) return false;
-
-    return true;
+    return x.Equals(y);
   }
 }

@@ -18,14 +18,6 @@ namespace MTGApplication.General.Services.ConfirmationService;
 public static partial class DialogService
 {
   /// <summary>
-  /// Event args for dialog events
-  /// </summary>
-  public class DialogEventArgs : EventArgs
-  {
-    public DialogWrapper DialogWrapper { get; set; }
-  }
-
-  /// <summary>
   /// Class that can be used to call dialog's showAsync method.
   /// <see cref="TestDialogWrapper"/> can be used to unit test dialogs without calling UI thread.
   /// </summary>

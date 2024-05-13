@@ -16,9 +16,9 @@ public record CardSortProperties(
 {
   public enum MTGSortProperty { CMC, Name, Rarity, Color, Set, Count, Price, SpellType }
 
-  public class MTGCardComparer : IComparer
+  public class MTGCardPropertyComparer : IComparer
   {
-    public MTGCardComparer(MTGSortProperty sortProperty) => SortProperty = sortProperty;
+    public MTGCardPropertyComparer(MTGSortProperty sortProperty) => SortProperty = sortProperty;
 
     public MTGSortProperty SortProperty { get; set; }
 

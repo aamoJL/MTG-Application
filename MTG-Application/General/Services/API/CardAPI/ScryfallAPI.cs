@@ -9,7 +9,6 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static MTGApplication.General.Models.Card.MTGCard;
-using static MTGApplication.General.Services.API.CardAPI.ICardAPI<MTGApplication.General.Models.Card.MTGCard>;
 
 namespace MTGApplication.General.Services.API.CardAPI;
 
@@ -33,19 +32,19 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   public string Name => "Scryfall";
   public int PageSize => 175;
 
-  public async Task<Result> FetchCardsWithSearchQuery(string searchParams)
+  public async Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams)
   {
-    if (string.IsNullOrEmpty(searchParams)) { return Result.Empty(); }
+    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
     return await FetchFromUri(GetSearchUri(searchParams));
   }
 
-  public async Task<Result> FetchFromUri(string pageUri, bool paperOnly = false)
+  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false)
   {
     if (await NetworkService.TryFetchStringFromUrlGetAsync(pageUri) is not string data)
-      return Result.Empty();
+      return CardImportResult.Empty();
 
     if (!JsonService.TryParseJson(data, out var rootNode))
-      return Result.Empty();
+      return CardImportResult.Empty();
 
     List<MTGCard> found = new();
 
@@ -53,10 +52,10 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
     var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
 
-    return new Result(found.ToArray(), 0, totalCount, nextPage);
+    return new CardImportResult(found.ToArray(), 0, totalCount, nextPage);
   }
 
-  public async Task<Result> FetchFromString(string importText)
+  public async Task<CardImportResult> FetchFromString(string importText)
   {
     var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -92,7 +91,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     return await FetchWithIdentifiers(identifiers);
   }
 
-  public async Task<Result> FetchFromDTOs(CardDTO[] dtoArray)
+  public async Task<CardImportResult> FetchFromDTOs(CardDTO[] dtoArray)
   {
     var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x as MTGCardDTO)).ToArray();
     return await FetchWithIdentifiers(identifiers);
@@ -232,11 +231,11 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   /// <summary>
   /// Fetches MTGCards from the API using the given identifier objects
   /// </summary>
-  private async Task<Result> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
+  private async Task<CardImportResult> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
     {
-      var identifiersJson = JsonSerializer.Serialize(new { identifiers = chunk.Select(x => x.ToObject()) });
+      var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(identifiers);
 
       var fetchedCards = new List<MTGCard>();
       var notFoundCount = 0;

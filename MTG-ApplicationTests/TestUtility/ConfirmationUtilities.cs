@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
+using MTGApplication.General.Services.ConfirmationService;
 
 namespace MTGApplicationTests.TestUtility;
 

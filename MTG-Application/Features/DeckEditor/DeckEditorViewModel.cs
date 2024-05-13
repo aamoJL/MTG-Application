@@ -5,10 +5,10 @@ using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplication.Features.DeckEditor;
 public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
@@ -97,7 +97,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     if (!HasUnsavedChanges) return true;
 
     switch (await Confirmers.SaveUnsavedChangesConfirmer
-      .Confirm(Confirmers.GetSaveUnsavedChangesConfirmation(DeckName)))
+      .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(DeckName)))
     {
       case ConfirmationResult.Yes: await SaveDeck(); return !HasUnsavedChanges;
       case ConfirmationResult.No: return true;
@@ -128,8 +128,7 @@ public partial class DeckEditorViewModel
       return;
 
     loadName ??= await Confirmers.LoadDeckConfirmer
-      .Confirm(Confirmers
-      .GetLoadDeckConfirmation(await ((IWorker)this).DoWork(new GetDeckNames(Repository).Execute())));
+      .Confirm(DeckEditorConfirmers.GetLoadDeckConfirmation(await ((IWorker)this).DoWork(new GetDeckNames(Repository).Execute())));
 
     if (string.IsNullOrEmpty(loadName))
       return;
@@ -137,10 +136,10 @@ public partial class DeckEditorViewModel
     if (await ((IWorker)this).DoWork(new LoadDeck(Repository, CardAPI).Execute(loadName)) is MTGCardDeck deck)
     {
       Deck = deck;
-      new SendNotification(Notifier).Execute(Notifier.Notifications.LoadSuccessNotification);
+      new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.LoadSuccessNotification);
     }
     else
-      new SendNotification(Notifier).Execute(Notifier.Notifications.LoadErrorNotification);
+      new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.LoadErrorNotification);
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
@@ -151,7 +150,7 @@ public partial class DeckEditorViewModel
     var oldName = DeckName;
     var overrideOld = false;
     var saveName = await Confirmers.SaveDeckConfirmer.Confirm(
-      Confirmers.GetSaveDeckConfirmation(DeckName));
+      DeckEditorConfirmers.GetSaveDeckConfirmation(DeckName));
 
     if (string.IsNullOrEmpty(saveName))
       return;
@@ -159,7 +158,7 @@ public partial class DeckEditorViewModel
     // Override confirmation
     if (saveName != oldName && await new DeckExists(Repository).Execute(saveName))
     {
-      switch (await Confirmers.OverrideDeckConfirmer.Confirm(Confirmers.GetOverrideDeckConfirmation(saveName)))
+      switch (await Confirmers.OverrideDeckConfirmer.Confirm(DeckEditorConfirmers.GetOverrideDeckConfirmation(saveName)))
       {
         case ConfirmationResult.Yes: overrideOld = true; break;
         case ConfirmationResult.Cancel:
@@ -170,11 +169,11 @@ public partial class DeckEditorViewModel
     switch (await ((IWorker)this).DoWork(new SaveDeck(Repository).Execute(new(Deck, saveName, overrideOld))))
     {
       case true:
-        new SendNotification(Notifier).Execute(Notifier.Notifications.SaveSuccessNotification);
+        new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.SaveSuccessNotification);
         OnPropertyChanged(nameof(DeckName));
         HasUnsavedChanges = false;
         break;
-      case false: new SendNotification(Notifier).Execute(Notifier.Notifications.SaveErrorNotification); break;
+      case false: new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.SaveErrorNotification); break;
     }
   }
 
@@ -185,7 +184,7 @@ public partial class DeckEditorViewModel
       return;
 
     var deleteConfirmationResult = await Confirmers.DeleteDeckConfirmer.Confirm(
-      Confirmers.GetDeleteDeckConfirmation(DeckName));
+      DeckEditorConfirmers.GetDeleteDeckConfirmation(DeckName));
 
     switch (deleteConfirmationResult)
     {
@@ -197,8 +196,8 @@ public partial class DeckEditorViewModel
     {
       case true:
         Deck = new();
-        new SendNotification(Notifier).Execute(Notifier.Notifications.DeleteSuccessNotification); break;
-      case false: new SendNotification(Notifier).Execute(Notifier.Notifications.DeleteErrorNotification); break;
+        new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.DeleteSuccessNotification); break;
+      case false: new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.DeleteErrorNotification); break;
     }
   }
 

@@ -13,7 +13,7 @@ public class CardImporter
 
   public ICardAPI<MTGCard> CardAPI { get; }
 
-  public async Task<ICardAPI<MTGCard>.Result> Import(string data)
+  public async Task<CardImportResult> Import(string data)
   {
     if (JsonService.TryDeserializeJson<MTGCard>(data, out var card))
       return new(new MTGCard[] { card }, 0, 1); // Imported from the app

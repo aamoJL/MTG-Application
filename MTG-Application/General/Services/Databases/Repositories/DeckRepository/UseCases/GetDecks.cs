@@ -22,5 +22,8 @@ public class GetDecks : UseCase<Task<IEnumerable<MTGCardDeck>>>
   public Expression<Func<MTGCardDeckDTO, object>>[] Includes { get; init; } = MTGCardDeckDTO.DefaultIncludes;
 
   public async override Task<IEnumerable<MTGCardDeck>> Execute()
-    => await Task.WhenAll((await Repository.Get(Includes)).Select(x => x.AsMTGCardDeck(CardAPI)));
+  {
+    var converter = new DTOToDeckConversion(CardAPI);
+    return await Task.WhenAll((await Repository.Get(Includes)).Select(x => converter.Execute(x)));
+  }
 }

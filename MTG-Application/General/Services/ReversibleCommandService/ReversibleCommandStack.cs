@@ -8,7 +8,7 @@ public class ReversibleCommandStack
   private Stack<IReversibleCommand> RedoStack { get; } = new();
 
   public CombinedReversibleCommand ActiveCombinedCommand { get; set; } = new();
-  
+
   public void Undo()
   {
     if (UndoStack.TryPop(out var command))
@@ -32,7 +32,6 @@ public class ReversibleCommandStack
     UndoStack.Push(command);
     RedoStack.Clear();
     command.Execute();
-    ActiveCombinedCommand = new();
   }
 
   public void PushAndExecuteActiveCombinedCommand()

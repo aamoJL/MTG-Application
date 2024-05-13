@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;

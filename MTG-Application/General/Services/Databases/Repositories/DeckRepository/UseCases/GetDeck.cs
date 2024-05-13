@@ -23,6 +23,6 @@ public class GetDeck : UseCase<string, Task<MTGCardDeck>>
 
     var deck = await Repository.Get(name);
 
-    return deck != null ? await deck.AsMTGCardDeck(CardAPI) : null;
+    return deck != null ? await new DTOToDeckConversion(CardAPI).Execute(deck) : null;
   }
 }

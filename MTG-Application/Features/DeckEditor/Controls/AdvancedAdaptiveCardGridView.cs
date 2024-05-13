@@ -89,8 +89,8 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     if (list is null) return;
 
     var source = new AdvancedCollectionView(list, true);
-    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardComparer(SortProperties.PrimarySortProperty)));
-    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardComparer(SortProperties.SecondarySortProperty)));
+    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardPropertyComparer(SortProperties.PrimarySortProperty)));
+    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardPropertyComparer(SortProperties.SecondarySortProperty)));
     FilteredAndSortedCardSource = source;
   }
 
@@ -99,9 +99,9 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     if (sortProperties is null || FilteredAndSortedCardSource.SortDescriptions.Count == 0) return;
 
     FilteredAndSortedCardSource.SortDescriptions[0]
-      = new(sortProperties.SortDirection, new MTGCardComparer(sortProperties.PrimarySortProperty));
+      = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.PrimarySortProperty));
     FilteredAndSortedCardSource.SortDescriptions[1]
-      = new(sortProperties.SortDirection, new MTGCardComparer(sortProperties.SecondarySortProperty));
+      = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.SecondarySortProperty));
   }
 
   private void OnFilterPropertiesDependencyPropertyChanged(CardFilters filterProperties)

@@ -1,18 +1,16 @@
 ﻿using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace MTGApplication.General.Models.CardDeck;
 
 /// <summary>
 /// Data transfer object for <see cref="MTGCardDeck"/> class
 /// </summary>
-public class MTGCardDeckDTO
+public record MTGCardDeckDTO
 {
   public static Expression<Func<MTGCardDeckDTO, object>>[] DefaultIncludes => new Expression<Func<MTGCardDeckDTO, object>>[]
   {
@@ -56,23 +54,4 @@ public class MTGCardDeckDTO
   public List<MTGCardDTO> WishlistCards { get; set; } = new();
   public List<MTGCardDTO> MaybelistCards { get; set; } = new();
   public List<MTGCardDTO> RemovelistCards { get; set; } = new();
-
-  /// <summary>
-  /// Converts the DTO to a <see cref="MTGCardDeck"/> object using the <paramref name="api"/>
-  /// </summary>
-  public async Task<MTGCardDeck> AsMTGCardDeck(ICardAPI<MTGCard> api)
-  {
-    if (this == null) return null;
-
-    return new MTGCardDeck()
-    {
-      Name = Name,
-      Commander = Commander != null ? (await api.FetchFromDTOs(new CardDTO[] { Commander })).Found.FirstOrDefault() : null,
-      CommanderPartner = CommanderPartner != null ? (await api.FetchFromDTOs(new CardDTO[] { CommanderPartner })).Found.FirstOrDefault() : null,
-      DeckCards = new((await api.FetchFromDTOs(DeckCards.ToArray())).Found),
-      Wishlist = new((await api.FetchFromDTOs(WishlistCards.ToArray())).Found),
-      Maybelist = new((await api.FetchFromDTOs(MaybelistCards.ToArray())).Found),
-      Removelist = new((await api.FetchFromDTOs(RemovelistCards.ToArray())).Found),
-    };
-  }
 }

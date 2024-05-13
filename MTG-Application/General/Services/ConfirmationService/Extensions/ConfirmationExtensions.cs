@@ -1,6 +1,4 @@
-﻿using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
-
-namespace MTGApplication.General.Services.ConfirmationService;
+﻿namespace MTGApplication.General.Services.ConfirmationService;
 
 public static partial class ConfirmationExtensions
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MTGApplication.General.Services.ReversibleCommandService;
+﻿namespace MTGApplication.General.Services.ReversibleCommandService;
 
 public interface IReversibleCommand
 {

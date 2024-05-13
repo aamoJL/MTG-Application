@@ -35,45 +35,6 @@ public partial class ScryfallAPI
     public IdentifierSchema PreferedSchema { get; init; } = IdentifierSchema.ID;
 
     /// <summary>
-    /// Return object that contains the scryfall API identifier variables. This method should only be used for JSON serialization.
-    /// </summary>
-    public object ToObject()
-    {
-      switch (PreferedSchema)
-      {
-        case IdentifierSchema.ID:
-          if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
-          break;
-        case IdentifierSchema.ILLUSTRATION_ID:
-          if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
-          break;
-        case IdentifierSchema.NAME:
-          if (!string.IsNullOrEmpty(Name)) { return new { name = Name }; }
-          break;
-        case IdentifierSchema.NAME_SET:
-          if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return new { name = Name, set = SetCode }; }
-          break;
-        case IdentifierSchema.COLLECTORNUMBER_SET:
-          if (!string.IsNullOrEmpty(CollectorNumber) && !string.IsNullOrEmpty(SetCode)) { return new { set = SetCode, collector_number = CollectorNumber }; }
-          break;
-        default: break;
-      }
-
-      // If prefered schema does not work, select secondary if possible
-      // Scryfall Id
-      if (ScryfallId != Guid.Empty) { return new { id = ScryfallId }; }
-      // Set Code + Collector Number
-      else if (!string.IsNullOrEmpty(SetCode) && !string.IsNullOrEmpty(CollectorNumber)) { return new { set = SetCode, collector_number = CollectorNumber }; }
-      // Illustration Id
-      else if (ScryfallId != Guid.Empty && IllustrationId != Guid.Empty) { return new { illustration_id = IllustrationId }; }
-      // Name + Set Code
-      else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return new { name = Name, set = SetCode }; }
-      // Name
-      else if (!string.IsNullOrEmpty(Name)) { return new { name = Name }; }
-      else { return string.Empty; }
-    }
-
-    /// <summary>
     /// Returns true, if the identifier applies to the given <paramref name="info"/>
     /// </summary>
     public bool Compare(MTGCardInfo? info)
