@@ -5,7 +5,6 @@ using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
@@ -97,25 +96,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (!HasUnsavedChanges) return true;
 
-    var result = await new SaveUnsavedChanges(Repository)
+    switch (await Confirmers.SaveUnsavedChangesConfirmer
+      .Confirm(Confirmers.GetSaveUnsavedChangesConfirmation(DeckName)))
     {
-      UnsavedChangesConfirmation = Confirmers.SaveUnsavedChanges,
-      SaveConfirmation = Confirmers.SaveDeck,
-      OverrideConfirmation = Confirmers.OverrideDeck,
-      Worker = this
-    }.Execute(Deck);
-
-    switch (result)
-    {
-      case ConfirmationResult.Yes: SendNotification(Notifier.Notifications.SaveSuccessNotification); return true;
+      case ConfirmationResult.Yes: await SaveDeck(); return !HasUnsavedChanges;
       case ConfirmationResult.No: return true;
-      case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.SaveErrorNotification); return false;
       default: return false;
-    }
+    };
   }
-
-  private void SendNotification(NotificationService.Notification notification)
-    => Notifier.Notify(notification);
 
   private void OnDeckCardsChanged()
   {
@@ -136,25 +124,23 @@ public partial class DeckEditorViewModel
   [RelayCommand(CanExecute = nameof(CanExecuteOpenDeckCommand))]
   private async Task OpenDeck(string loadName = null)
   {
-    if (!OpenDeckCommand.CanExecute(loadName)) return;
+    if (!OpenDeckCommand.CanExecute(loadName) || !await ConfirmUnsavedChanges())
+      return;
 
-    if (await ConfirmUnsavedChanges())
+    loadName ??= await Confirmers.LoadDeckConfirmer
+      .Confirm(Confirmers
+      .GetLoadDeckConfirmation(await ((IWorker)this).DoWork(new GetDeckNames(Repository).Execute())));
+
+    if (string.IsNullOrEmpty(loadName))
+      return;
+
+    if (await ((IWorker)this).DoWork(new LoadDeck(Repository, CardAPI).Execute(loadName)) is MTGCardDeck deck)
     {
-      var loadResult = await new LoadDeck(Repository, CardAPI)
-      {
-        LoadConfirmation = Confirmers.LoadDeck,
-        Worker = this
-      }.Execute(loadName);
-
-      switch (loadResult.ConfirmResult)
-      {
-        case ConfirmationResult.Yes:
-          Deck = loadResult.Deck;
-          SendNotification(Notifier.Notifications.LoadSuccessNotification); break;
-        case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.LoadErrorNotification); break;
-        default: break;
-      }
+      Deck = deck;
+      new SendNotification(Notifier).Execute(Notifier.Notifications.LoadSuccessNotification);
     }
+    else
+      new SendNotification(Notifier).Execute(Notifier.Notifications.LoadErrorNotification);
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
@@ -162,43 +148,57 @@ public partial class DeckEditorViewModel
   {
     if (!SaveDeckCommand.CanExecute(null)) return;
 
-    var result = await new SaveDeck(Repository)
-    {
-      SaveConfirmation = Confirmers.SaveDeck,
-      OverrideConfirmation = Confirmers.OverrideDeck,
-      Worker = this
-    }.Execute(Deck);
+    var oldName = DeckName;
+    var overrideOld = false;
+    var saveName = await Confirmers.SaveDeckConfirmer.Confirm(
+      Confirmers.GetSaveDeckConfirmation(DeckName));
 
-    switch (result)
+    if (string.IsNullOrEmpty(saveName))
+      return;
+
+    // Override confirmation
+    if (saveName != oldName && await new DeckExists(Repository).Execute(saveName))
     {
-      case ConfirmationResult.Yes:
-        SendNotification(Notifier.Notifications.SaveSuccessNotification);
+      switch (await Confirmers.OverrideDeckConfirmer.Confirm(Confirmers.GetOverrideDeckConfirmation(saveName)))
+      {
+        case ConfirmationResult.Yes: overrideOld = true; break;
+        case ConfirmationResult.Cancel:
+        default: return; // Cancel
+      }
+    }
+
+    switch (await ((IWorker)this).DoWork(new SaveDeck(Repository).Execute(new(Deck, saveName, overrideOld))))
+    {
+      case true:
+        new SendNotification(Notifier).Execute(Notifier.Notifications.SaveSuccessNotification);
         OnPropertyChanged(nameof(DeckName));
         HasUnsavedChanges = false;
         break;
-      case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.SaveErrorNotification); return;
-      default: break;
+      case false: new SendNotification(Notifier).Execute(Notifier.Notifications.SaveErrorNotification); break;
     }
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckCommand))]
   private async Task DeleteDeck()
   {
-    if (!DeleteDeckCommand.CanExecute(null)) return;
+    if (!DeleteDeckCommand.CanExecute(null))
+      return;
 
-    var result = await new DeleteDeck(Repository)
-    {
-      DeleteConfirmation = Confirmers.DeleteDeck,
-      Worker = this
-    }.Execute(Deck);
+    var deleteConfirmationResult = await Confirmers.DeleteDeckConfirmer.Confirm(
+      Confirmers.GetDeleteDeckConfirmation(DeckName));
 
-    switch (result)
+    switch (deleteConfirmationResult)
     {
-      case ConfirmationResult.Yes:
+      case ConfirmationResult.Yes: break;
+      default: return; // Cancel
+    }
+
+    switch (await ((IWorker)this).DoWork(new DeleteDeck(Repository).Execute(Deck)))
+    {
+      case true:
         Deck = new();
-        SendNotification(Notifier.Notifications.DeleteSuccessNotification); break;
-      case ConfirmationResult.Failure: SendNotification(Notifier.Notifications.DeleteErrorNotification); break;
-      default: return;
+        new SendNotification(Notifier).Execute(Notifier.Notifications.DeleteSuccessNotification); break;
+      case false: new SendNotification(Notifier).Execute(Notifier.Notifications.DeleteErrorNotification); break;
     }
   }
 

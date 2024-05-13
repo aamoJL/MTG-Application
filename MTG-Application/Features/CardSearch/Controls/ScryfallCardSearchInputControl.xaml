@@ -46,7 +46,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="85"
-        ItemsSource="{ui:EnumValues Type=enums:MTGSearchGameFormat}"
+        ItemsSource="{ui:EnumValues Type=enums:GameFormat}"
         SelectedItem="{x:Bind ViewModel.SearchGameFormat, Mode=TwoWay}"/>
       <ComboBox 
         Header="Unique"
@@ -55,7 +55,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="85"
-        ItemsSource="{ui:EnumValues Type=enums:MTGSearchCardUniqueness}"
+        ItemsSource="{ui:EnumValues Type=enums:CardUniqueness}"
         SelectedItem="{x:Bind ViewModel.SearchCardUniqueness, Mode=TwoWay}"/>
       <ComboBox 
         Header="Order" 
@@ -64,7 +64,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="105"
-        ItemsSource="{ui:EnumValues Type=enums:MTGSearchOrderProperty}"
+        ItemsSource="{ui:EnumValues Type=enums:SearchOrderProperty}"
         SelectedItem="{x:Bind ViewModel.SearchOrderProperty, Mode=TwoWay}" />
       <ComboBox 
         Header="Direction" 
@@ -73,7 +73,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="80"
-        ItemsSource="{ui:EnumValues Type=enums:MTGSearchOrderDirection}"
+        ItemsSource="{ui:EnumValues Type=enums:SearchOrderDirection}"
         SelectedItem="{x:Bind ViewModel.SearchOrderDirection, Mode=TwoWay}" />
     </StackPanel>
     <Button 

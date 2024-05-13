@@ -30,17 +30,4 @@ public partial class GetMTGCardsBySearchQueryTest
 
     Assert.AreEqual(0, result.TotalCount, "Cards should not have been found.");
   }
-
-  [TestMethod("Worker should be busy when searching cards")]
-  [ExpectedException(typeof(IsBusyException))]
-  public async Task Execute_WithValidQuery_WorkerBusy()
-  {
-    var query = string.Empty;
-    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
-
-    await new GetMTGCardsBySearchQuery(_dependensies.CardAPI)
-    {
-      Worker = new TestExceptionWorker()
-    }.Execute(query);
-  }
 }

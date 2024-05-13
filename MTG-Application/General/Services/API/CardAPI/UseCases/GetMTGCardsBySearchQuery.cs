@@ -9,8 +9,6 @@ public class GetMTGCardsBySearchQuery : UseCase<string, Task<ICardAPI<MTGCard>.R
 
   private ICardAPI<MTGCard> CardAPI { get; }
 
-  public IWorker Worker { get; init; } = new DefaultWorker();
-
   public async override Task<ICardAPI<MTGCard>.Result> Execute(string query)
-    => await Worker.DoWork(CardAPI.FetchCardsWithSearchQuery(query));
+    => await CardAPI.FetchCardsWithSearchQuery(query);
 }

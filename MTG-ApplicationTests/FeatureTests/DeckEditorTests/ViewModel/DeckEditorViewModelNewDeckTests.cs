@@ -22,7 +22,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
       deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
       confirmers: new()
       {
-        SaveUnsavedChanges = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+        SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
       });
 
     await vm.NewDeckCommand.ExecuteAsync(null);
@@ -41,7 +41,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
       deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
       confirmers: new()
       {
-        SaveUnsavedChanges = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+        SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
       });
 
     await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.NewDeckCommand.ExecuteAsync(null));
@@ -55,7 +55,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
       deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
       confirmers: new()
       {
-        SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
+        SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
       });
 
     await vm.NewDeckCommand.ExecuteAsync(null);
@@ -74,7 +74,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
       deck: await MTGCardDeckDTOMocker.Mock("Deck").AsMTGCardDeck(_dependencies.CardAPI),
       confirmers: new()
       {
-        SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
+        SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
       });
 
     await vm.NewDeckCommand.ExecuteAsync(null);
@@ -91,7 +91,7 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
       deck: deck,
       confirmers: new()
       {
-        SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
+        SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
       });
 
     await vm.NewDeckCommand.ExecuteAsync(null);

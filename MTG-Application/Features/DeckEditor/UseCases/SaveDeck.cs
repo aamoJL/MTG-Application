@@ -3,69 +3,33 @@ using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
+using static MTGApplication.Features.DeckEditor.SaveDeck;
 
 namespace MTGApplication.Features.DeckEditor;
-public class SaveDeck : UseCase<MTGCardDeck, Task<ConfirmationResult>>
+public class SaveDeck : UseCase<SaveArgs, Task<bool>>
 {
+  public record SaveArgs(MTGCardDeck Deck, string SaveName, bool OverrideOld = false);
+
   public SaveDeck(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
 
   public IRepository<MTGCardDeckDTO> Repository { get; }
 
-  public Confirmer<string, string> SaveConfirmation { get; set; } = new();
-  public Confirmer<ConfirmationResult> OverrideConfirmation { get; set; } = new();
-  public IWorker Worker { get; set; } = new DefaultWorker();
-
-  public override async Task<ConfirmationResult> Execute(MTGCardDeck deck)
+  public override async Task<bool> Execute(SaveArgs args)
   {
-    var saveName = await SaveConfirmation.Confirm(new(Title: "Save your deck?", Message: string.Empty, deck.Name));
+    var (deck, saveName, overrideOld) = args;
 
-    return await Execute(deck, saveName);
-  }
-
-  public async Task<ConfirmationResult> Execute(MTGCardDeck deck, string saveName)
-  {
-    if (string.IsNullOrEmpty(saveName)) return ConfirmationResult.Cancel;
-
-    var overrideResult = await ConfirmOverride(deck, saveName);
-
-    if (overrideResult == ConfirmationResult.Cancel) return ConfirmationResult.Cancel;
-
-    var overrideOld = overrideResult == ConfirmationResult.Yes;
-
-    return await Worker.DoWork(Save(deck, saveName, overrideOld, removeOld: saveName != deck.Name))
-        ? ConfirmationResult.Yes : ConfirmationResult.Failure;
-  }
-
-  private async Task<ConfirmationResult> ConfirmOverride(MTGCardDeck deck, string saveName)
-  {
-    if (saveName != deck.Name && await new DeckExists(Repository).Execute(saveName))
-    {
-      // Deck with the given name exists already
-      var overrideResult = await OverrideConfirmation.Confirm(new(
-        Title: "Override existing deck?",
-        Message: $"Deck '{saveName}' already exist. Would you like to override the deck?"));
-
-      return overrideResult;
-    }
-    else return ConfirmationResult.No;
-  }
-
-  private async Task<bool> Save(MTGCardDeck deck, string saveName, bool overrideExisting, bool removeOld)
-  {
     var oldName = deck.Name;
 
-    if (oldName != saveName && await new DeckExists(Repository).Execute(saveName) && !overrideExisting)
+    if (oldName != saveName && await new DeckExists(Repository).Execute(saveName) && !overrideOld)
       return false; // Cancel because overriding is not enabled
 
     if (await new AddOrUpdateDeck(Repository).Execute((deck, saveName)) is bool wasSaved && wasSaved is true)
     {
       deck.Name = saveName;
 
-      if (oldName != saveName && removeOld && await new DeckExists(Repository).Execute(oldName) && !string.IsNullOrEmpty(oldName))
+      if (oldName != saveName && await new DeckExists(Repository).Execute(oldName) && !string.IsNullOrEmpty(oldName))
         await new General.Databases.Repositories.DeckRepository.DeleteDeck(Repository).Execute(oldName);
     }
-
     return wasSaved;
   }
 }

@@ -36,7 +36,7 @@ public partial class ScryfallCardSearchControlViewModel : ViewModelBase
 
       sb.Append($"{SearchText}+");
 
-      if (SearchGameFormat != MTGSearchGameFormat.Any)
+      if (SearchGameFormat != GameFormat.Any)
         sb.Append($"format:{SearchGameFormat.ToString()}+");
 
       sb.Append($"order:{SearchOrderProperty.ToString()}+");
@@ -48,8 +48,8 @@ public partial class ScryfallCardSearchControlViewModel : ViewModelBase
   }
 
   [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private string searchText;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private MTGSearchGameFormat searchGameFormat;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private MTGSearchCardUniqueness searchCardUniqueness;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private MTGSearchOrderProperty searchOrderProperty;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private MTGSearchOrderDirection searchOrderDirection;
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private GameFormat searchGameFormat;
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private CardUniqueness searchCardUniqueness;
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private SearchOrderProperty searchOrderProperty;
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private SearchOrderDirection searchOrderDirection;
 }

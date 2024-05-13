@@ -2,7 +2,6 @@
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.TestUtility;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -14,131 +13,41 @@ public class SaveDeckTests
 
   public SaveDeckTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
 
-  [TestMethod("Save confirmation should be shown when executed without a name")]
-  [ExpectedException(typeof(ConfirmationException))]
-  public async Task Execute_SaveConfirmShown()
+  [TestMethod("Should return TRUE when saving with the same name")]
+  public async Task Execute_SameName_ReturnTrue()
   {
-    await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new TestExceptionConfirmer<string, string>()
-    }.Execute(_savedDeck);
+    var result = await new SaveDeck(_dependencies.Repository).Execute(new(_savedDeck, _savedDeck.Name));
+
+    Assert.IsTrue(result);
   }
 
-  [TestMethod("Save confirmation should not be shown when executed with a name")]
-  public async Task Execute_WithName_SaveConfirmNotShown()
-  {
-    await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new TestExceptionConfirmer<string, string>()
-    }.Execute(_savedDeck, "New name");
-  }
-
-  [TestMethod("Override confirmation should be shown when executed with an existing name")]
-  [ExpectedException(typeof(ConfirmationException))]
-  public async Task Execute_WithExistingName_OverrideConfirmShown()
+  [TestMethod("Should return TRUE when overriding existing deck")]
+  public async Task Execute_Exists_OverrideTrue_ReturnTrue()
   {
     var newDeck = new MTGCardDeck() { Name = "New Deck" };
 
-    await new SaveDeck(_dependencies.Repository)
-    {
-      OverrideConfirmation = new TestExceptionConfirmer<ConfirmationResult>()
-    }.Execute(newDeck, _savedDeck.Name);
+    var result = await new SaveDeck(_dependencies.Repository).Execute(new(newDeck, _savedDeck.Name, true));
+
+    Assert.IsTrue(result);
   }
 
-  [TestMethod("Should return YES when saving with the same name")]
-  public async Task Execute_Yes_ReturnYes()
-  {
-    var result = await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
-      }
-    }.Execute(_savedDeck);
-
-    Assert.AreEqual(ConfirmationResult.Yes, result);
-  }
-
-  [TestMethod("Override confirmation should not be shown if saving with the same name")]
-  public async Task Execute_SameName_NoOverrideShown()
-  {
-    var result = await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
-      },
-      OverrideConfirmation = new TestExceptionConfirmer<ConfirmationResult>(),
-    }.Execute(_savedDeck);
-  }
-
-  [TestMethod("Should return CANCEL when canceling the saving")]
-  public async Task Execute_Cancel_ReturnCancel()
-  {
-    var result = await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(string.Empty); }
-      }
-    }.Execute(_savedDeck);
-
-    Assert.AreEqual(ConfirmationResult.Cancel, result);
-  }
-
-  [TestMethod("Should return YES when accepting overriding")]
-  public async Task Execute_AcceptOverriding_ReturnYes()
+  [TestMethod("Should return FALSE when overriding is false and the deck already exists")]
+  public async Task Execute_Exists_OverrideFalse_ReturnFalse()
   {
     var newDeck = new MTGCardDeck() { Name = "New Deck" };
 
-    var result = await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = (arg) => Task.FromResult(_savedDeck.Name)
-      },
-      OverrideConfirmation = new Confirmer<ConfirmationResult>()
-      {
-        OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes)
-      }
-    }.Execute(newDeck);
+    var result = await new SaveDeck(_dependencies.Repository).Execute(new(newDeck, _savedDeck.Name, false));
 
-    Assert.AreEqual(ConfirmationResult.Yes, result);
+    Assert.IsFalse(result);
   }
 
-  [TestMethod("Should return CANCEL when canceling overriding")]
-  public async Task Execute_CancelOverriding_ReturnCancel()
-  {
-    var newDeck = new MTGCardDeck() { Name = "New Deck" };
-
-    var result = await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
-      },
-      OverrideConfirmation = new Confirmer<ConfirmationResult>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(ConfirmationResult.Cancel); }
-      },
-    }.Execute(newDeck);
-
-    Assert.AreEqual(ConfirmationResult.Cancel, result);
-  }
-
-  [TestMethod("Should return FAILURE when the deck could not be saved")]
-  public async Task Execute_Failure_ReturnFailure()
+  [TestMethod("Should return FALSE when the deck could not be saved")]
+  public async Task Execute_Failure_ReturnFalse()
   {
     _dependencies.Repository.UpdateFailure = true;
 
-    var result = await new SaveDeck(_dependencies.Repository)
-    {
-      SaveConfirmation = new Confirmer<string, string>()
-      {
-        OnConfirm = async (arg) => { return await Task.FromResult(_savedDeck.Name); }
-      },
-    }.Execute(_savedDeck);
+    var result = await new SaveDeck(_dependencies.Repository).Execute(new(_savedDeck, _savedDeck.Name));
 
-    Assert.AreEqual(ConfirmationResult.Failure, result);
+    Assert.IsFalse(result);
   }
 }

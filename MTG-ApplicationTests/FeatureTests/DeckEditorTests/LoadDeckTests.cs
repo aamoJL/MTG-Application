@@ -3,7 +3,6 @@ using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
-using static MTGApplication.General.Services.ConfirmationService.ConfirmationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -15,68 +14,20 @@ public class LoadDeckTests
 
   public LoadDeckTests() => _dependencies.ContextFactory.Populate(_savedDeck);
 
-  [TestMethod("Should show load confirmation when executed")]
-  [ExpectedException(typeof(ConfirmationException))]
-  public async Task Execute_LoadConfirmationShown()
+  [TestMethod("Should return the deck when the deck has been loaded")]
+  public async Task Execute_Exists_ReturnDeck()
   {
-    await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
-    {
-      LoadConfirmation = new TestExceptionConfirmer<string, string[]>()
-    }.Execute();
+    var result = await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI).Execute(_savedDeck.Name);
+
+    Assert.IsNotNull(result);
+    Assert.AreEqual(result.Name, _savedDeck.Name);
   }
 
-  [TestMethod("Should not show load confirmation when executed with a name")]
-  public async Task Execute_WithName_ConfirmationNotShown()
+  [TestMethod("Should return FALSE if the deck was not found")]
+  public async Task Execute_DeckNotFound_ReturnFalse()
   {
-    await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
-    {
-      LoadConfirmation = new TestExceptionConfirmer<string, string[]>()
-    }.Execute(_savedDeck.Name);
-  }
+    var result = await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI).Execute("UnsavedDeck2");
 
-  [TestMethod("Should show load confirmation when executed with a null name")]
-  [ExpectedException(typeof(ConfirmationException))]
-  public async Task Execute_WithNull_ConfirmationShown()
-  {
-    await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
-    {
-      LoadConfirmation = new TestExceptionConfirmer<string, string[]>()
-    }.Execute(null);
-  }
-
-  [TestMethod("Should return YES and the deck when loading a deck")]
-  public async Task Execute_YES_ReturnYesAndDeck()
-  {
-    var result = await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
-    {
-      LoadConfirmation = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
-    }.Execute();
-
-    Assert.AreEqual(ConfirmationResult.Yes, result.ConfirmResult);
-    Assert.AreEqual(result.Deck.Name, _savedDeck.Name);
-  }
-
-  [TestMethod("Should return FAILURE if the deck was not found")]
-  public async Task Execute_DeckNotFound_ReturnFailure()
-  {
-    var result = await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
-    {
-      LoadConfirmation = new() { OnConfirm = (arg) => Task.FromResult("UnsavedDeck2") }
-    }.Execute();
-
-    Assert.AreEqual(ConfirmationResult.Failure, result.ConfirmResult);
-    Assert.IsNull(result.Deck, "Deck should not be found");
-  }
-
-  [TestMethod("Should return CANCEL if when canceling the load")]
-  public async Task Execute_Cancel_ReturnCancel()
-  {
-    var result = await new LoadDeck(_dependencies.Repository, _dependencies.CardAPI)
-    {
-      LoadConfirmation = new() { OnConfirm = (arg) => Task.FromResult(string.Empty) }
-    }.Execute();
-
-    Assert.AreEqual(ConfirmationResult.Cancel, result.ConfirmResult);
-    Assert.IsNull(result.Deck, "Deck should not be found");
+    Assert.IsNull(result, "Deck should not have been found");
   }
 }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor;
 
-public partial class CardListViewModel : ObservableObject
+public partial class CardListViewModel : ViewModelBase
 {
   public CardListViewModel(ICardAPI<MTGCard> cardAPI) => CardImporter = new(cardAPI);
 
@@ -26,8 +26,8 @@ public partial class CardListViewModel : ObservableObject
 
   public Action OnChange { get; init; }
 
-  private ReversibleAction<IEnumerable<MTGCard>> ReversableAdd => new() { Action = UndoableAdd, ReverseAction = UndoableRemove };
-  private ReversibleAction<IEnumerable<MTGCard>> ReversableRemove => new() { Action = UndoableRemove, ReverseAction = UndoableAdd };
+  private ReversibleAction<IEnumerable<MTGCard>> ReversableAdd => new() { Action = ReversibleAdd, ReverseAction = ReversibleRemove };
+  private ReversibleAction<IEnumerable<MTGCard>> ReversableRemove => new() { Action = ReversibleRemove, ReverseAction = ReversibleAdd };
 
   [RelayCommand]
   private void AddCard(MTGCard card) => UndoStack.PushAndExecute(
@@ -64,7 +64,7 @@ public partial class CardListViewModel : ObservableObject
 
   [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
 
-  private void UndoableAdd(IEnumerable<MTGCard> cards)
+  private void ReversibleAdd(IEnumerable<MTGCard> cards)
   {
     foreach (var card in cards)
     {
@@ -77,7 +77,7 @@ public partial class CardListViewModel : ObservableObject
     OnChange?.Invoke();
   }
 
-  private void UndoableRemove(IEnumerable<MTGCard> cards)
+  private void ReversibleRemove(IEnumerable<MTGCard> cards)
   {
     foreach (var card in cards)
     {

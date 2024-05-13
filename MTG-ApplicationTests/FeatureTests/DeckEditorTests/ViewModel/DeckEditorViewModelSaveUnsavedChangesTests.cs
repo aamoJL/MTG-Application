@@ -13,8 +13,8 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
   {
     var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
-      SaveDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
+      SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
       OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
@@ -31,8 +31,8 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
 
     var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
-      SaveDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
+      SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
       OnNotify = (arg) => throw new NotificationException(arg.NotificationType)

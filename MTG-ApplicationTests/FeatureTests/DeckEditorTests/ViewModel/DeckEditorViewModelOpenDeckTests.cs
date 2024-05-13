@@ -35,7 +35,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
     });
 
     await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.OpenDeckCommand.ExecuteAsync(null));
@@ -46,7 +46,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(confirmers: new()
     {
-      LoadDeck = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
     });
 
     await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.OpenDeckCommand.ExecuteAsync(null));
@@ -57,7 +57,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(confirmers: new()
     {
-      LoadDeck = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(_savedDeck.Name);
@@ -68,7 +68,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(confirmers: new()
     {
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
@@ -81,8 +81,8 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
@@ -98,7 +98,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
     var unsavedDeck = new MTGCardDeck() { Name = "Unsaved Deck" };
     var vm = MockVM(deck: unsavedDeck, confirmers: new()
     {
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
@@ -112,7 +112,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
     var unsavedDeck = new MTGCardDeck() { Name = "Unsaved Deck" };
     var vm = MockVM(deck: unsavedDeck, confirmers: new()
     {
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult<string?>(null) }
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string?>(null) }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
@@ -126,8 +126,8 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
     var unsavedDeck = new MTGCardDeck() { Name = "Unsaved Deck" };
     var vm = MockVM(deck: unsavedDeck, hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) },
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) },
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
@@ -140,7 +140,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(confirmers: new()
     {
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
     await WorkerAssert.IsBusy(vm, () => vm.OpenDeckCommand.ExecuteAsync(null));
@@ -151,8 +151,8 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(null);
@@ -165,8 +165,8 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
       OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
@@ -183,8 +183,8 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
 
     var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChanges = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
-      LoadDeck = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
+      LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
       OnNotify = (arg) => throw new NotificationException(arg.NotificationType)

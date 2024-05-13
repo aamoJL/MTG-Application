@@ -29,7 +29,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     });
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
@@ -42,7 +42,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     });
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
@@ -57,7 +57,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
 
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     });
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
@@ -70,7 +70,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
     });
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
@@ -83,7 +83,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     });
 
     await vm.DeleteDeckCommand.ExecuteAsync(null);
@@ -96,7 +96,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     }, notifier: new()
     {
       OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
@@ -113,7 +113,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
 
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      DeleteDeck = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+      DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     }, notifier: new()
     {
       OnNotify = (arg) => throw new NotificationException(arg.NotificationType)

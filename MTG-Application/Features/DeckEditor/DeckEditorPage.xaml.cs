@@ -31,11 +31,11 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
   private void RegisterConfirmDialogs(DeckEditorConfirmers confirmer)
   {
-    confirmer.SaveUnsavedChanges = new() { OnConfirm = async msg => await new ShowUnsavedChangesDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
-    confirmer.LoadDeck = new() { OnConfirm = async msg => await new ShowOpenDialog(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data)) };
-    confirmer.SaveDeck = new() { OnConfirm = async msg => await new ShowSaveDialog(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data)) };
-    confirmer.OverrideDeck = new() { OnConfirm = async msg => await new ShowOverrideDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
-    confirmer.DeleteDeck = new() { OnConfirm = async msg => await new ShowDeleteDialog(DialogWrapper).Execute((msg.Title, msg.Message)) };
+    confirmer.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(DialogWrapper).Execute((msg.Title, msg.Message));
+    confirmer.LoadDeckConfirmer.OnConfirm = async msg => await new ShowOpenDialog(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data));
+    confirmer.SaveDeckConfirmer.OnConfirm = async msg => await new ShowSaveDialog(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data));
+    confirmer.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(DialogWrapper).Execute((msg.Title, msg.Message));
+    confirmer.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(DialogWrapper).Execute((msg.Title, msg.Message));
   }
 
   private void RegisterNotifications(DeckEditorNotifier notifier)

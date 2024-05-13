@@ -26,7 +26,7 @@ public partial class CardSearchViewModel : ViewModelBase, IWorker
   [RelayCommand]
   private async Task SubmitSearch(string query)
   {
-    var searchResult = await new GetMTGCardsBySearchQuery(CardAPI) { Worker = this }.Execute(query);
+    var searchResult = await ((IWorker)this).DoWork(new FetchCards(CardAPI).Execute(query));
 
     Cards.SetCollection(searchResult.Found.ToList(), searchResult.NextPageUri, searchResult.TotalCount);
   }

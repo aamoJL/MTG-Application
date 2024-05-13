@@ -26,7 +26,7 @@ public partial class DeckSelectorViewModel : ViewModelBase, IWorker
   [RelayCommand]
   private async Task LoadDecks()
   {
-    var deckNameImageTuples = await new GetDeckSelectorListItems(Repository, CardAPI) { Worker = this }.Execute();
+    var deckNameImageTuples = await ((IWorker)this).DoWork(new GetDeckSelectorListItems(Repository, CardAPI).Execute());
 
     DeckItems.Clear();
 

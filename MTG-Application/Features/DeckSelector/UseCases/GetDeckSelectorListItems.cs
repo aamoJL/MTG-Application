@@ -21,18 +21,14 @@ public class GetDeckSelectorListItems : UseCase<Task<IEnumerable<(string Name, s
 
   public IRepository<MTGCardDeckDTO> Repository { get; }
   public ICardAPI<MTGCard> CardAPI { get; }
-  public IWorker Worker { get; init; } = new DefaultWorker();
 
   public async override Task<IEnumerable<(string Name, string ImageUri)>> Execute()
   {
-    var decks = await Worker.DoWork(new GetDecks(Repository, CardAPI)
+    var decks = await new GetDecks(Repository, CardAPI)
     {
-      Includes = new Expression<Func<MTGCardDeckDTO, object>>[]
-    {
-      x => x.Commander
+      Includes = new Expression<Func<MTGCardDeckDTO, object>>[] { x => x.Commander }
     }
-    }
-    .Execute());
+    .Execute();
 
     return decks.Select(x => (x.Name, x.Commander?.Info.FrontFace.ImageUri ?? string.Empty));
   }
