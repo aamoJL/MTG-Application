@@ -35,10 +35,10 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(hasUnsavedChanges: true, confirmers: new()
     {
-      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
     });
 
-    await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.OpenDeckCommand.ExecuteAsync(null));
+    await ConfirmationAssert.ConfirmationShown(() => vm.OpenDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Load confirmation should be shown when loading a deck without a name")]
@@ -46,10 +46,10 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(confirmers: new()
     {
-      LoadDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      LoadDeckConfirmer = new TestExceptionConfirmer<string, string[]>()
     });
 
-    await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.OpenDeckCommand.ExecuteAsync(null));
+    await ConfirmationAssert.ConfirmationShown(() => vm.OpenDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Load confirmation should not be shown when loading a deck with a name")]
@@ -57,7 +57,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(confirmers: new()
     {
-      LoadDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      LoadDeckConfirmer = new TestExceptionConfirmer<string, string[]>()
     });
 
     await vm.OpenDeckCommand.ExecuteAsync(_savedDeck.Name);
@@ -173,7 +173,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
-      vm.OpenDeckCommand.ExecuteAsync(null));
+      () => vm.OpenDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Error notification should be sent when there are failure on loading")]
@@ -191,6 +191,6 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,
-      vm.OpenDeckCommand.ExecuteAsync(null));
+      () => vm.OpenDeckCommand.ExecuteAsync(null));
   }
 }

@@ -103,7 +103,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
-      vm.DeleteDeckCommand.ExecuteAsync(null));
+      () => vm.DeleteDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Error notification should be sent when there are failure on deletion")]
@@ -120,6 +120,17 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,
-      vm.DeleteDeckCommand.ExecuteAsync(null));
+      () => vm.DeleteDeckCommand.ExecuteAsync(null));
+  }
+
+  [TestMethod]
+  public async Task DeleteDeck_ConfirmationShown()
+  {
+    var vm = MockVM(deck: _savedDeck, confirmers: new()
+    {
+      DeleteDeckConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+    });
+
+    await ConfirmationAssert.ConfirmationShown(() => vm.DeleteDeckCommand.ExecuteAsync(null));
   }
 }

@@ -62,7 +62,9 @@ public class ListViewDragAndDrop : DragAndDrop<MTGCard>
         {
           DragOrigin?.OnBeginMoveFrom?.Invoke(Item);
           OnBeginMoveTo?.Invoke(Item);
+          
           OnExecuteMove?.Invoke(Item);
+          DragOrigin?.OnExecuteMove?.Invoke(Item);
         }
       }
     }

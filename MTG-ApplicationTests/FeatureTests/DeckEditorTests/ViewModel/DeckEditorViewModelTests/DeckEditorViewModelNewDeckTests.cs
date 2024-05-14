@@ -41,10 +41,10 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
       deck: MTGCardDeckMocker.Mock("Deck"),
       confirmers: new()
       {
-        SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+        SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
       });
 
-    await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.NewDeckCommand.ExecuteAsync(null));
+    await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Deck should be new when setting a new deck if unsaved changes will not be saved")]

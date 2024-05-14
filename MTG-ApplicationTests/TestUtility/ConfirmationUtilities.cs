@@ -22,3 +22,9 @@ public class TestExceptionConfirmer<TReturn> : Confirmer<TReturn>
     set => base.OnConfirm = value;
   }
 }
+
+public static class ConfirmationAssert
+{
+  public static async Task ConfirmationShown(Func<Task> task)
+    => await Assert.ThrowsExceptionAsync<ConfirmationException>(task);
+}

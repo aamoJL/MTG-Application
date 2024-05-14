@@ -19,6 +19,7 @@ public abstract class DeckEditorViewModelTestsBase
     MTGCardDeck? deck = null,
     DeckEditorNotifier? notifier = null)
   {
+#pragma warning disable IDE0017 // Simplify object initialization
     var vm = new DeckEditorViewModel(deck ?? new())
     {
       CardAPI = _dependencies.CardAPI,
@@ -26,7 +27,10 @@ public abstract class DeckEditorViewModelTestsBase
       Confirmers = confirmers ?? new(),
       Notifier = notifier ?? new()
     };
+#pragma warning restore IDE0017 // Simplify object initialization
 
+    // Unsaved changes state needs to be se outside of the constructor
+    // because setting the deck will set the unsaved state to false
     vm.HasUnsavedChanges = hasUnsavedChanges;
 
     return vm;

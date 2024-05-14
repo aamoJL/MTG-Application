@@ -21,7 +21,7 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
-      vm.NewDeckCommand.ExecuteAsync(null));
+      () => vm.NewDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Error notification should be sent when there are failure on saving unsaved changes")]
@@ -39,6 +39,21 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,
-      vm.NewDeckCommand.ExecuteAsync(null));
+      () => vm.NewDeckCommand.ExecuteAsync(null));
+  }
+
+  [TestMethod]
+  public async Task SaveUnsaved_Confirm_SaveConfirmationShown()
+  {
+    var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+    {
+      SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
+      SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
+    }, notifier: new()
+    {
+      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+    });
+
+    await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));
   }
 }

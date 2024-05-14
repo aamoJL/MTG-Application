@@ -10,9 +10,9 @@ public class NotificationException(NotificationType notificationType) : UnitTest
 
 public static class NotificationAssert
 {
-  public static async Task NotificationSent(NotificationType notificationType, Task task)
+  public static async Task NotificationSent(NotificationType notificationType, Func<Task> task)
   {
-    try { throw await Assert.ThrowsExceptionAsync<NotificationException>(() => task); }
+    try { throw await Assert.ThrowsExceptionAsync<NotificationException>(task); }
     catch (NotificationException e) { Assert.AreEqual(e.NotificationType, notificationType, "Notification type was wrong"); }
   }
 }

@@ -30,10 +30,10 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
   {
     var vm = MockVM(deck: _savedDeck, confirmers: new()
     {
-      SaveDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
+      SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
     });
 
-    await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.SaveDeckCommand.ExecuteAsync(null));
+    await ConfirmationAssert.ConfirmationShown(() => vm.SaveDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Should save the deck if a name was given to the confirmation")]
@@ -206,7 +206,7 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
-      vm.SaveDeckCommand.ExecuteAsync(null));
+      () => vm.SaveDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod("Error notification should be sent when there are failure on saving")]
@@ -223,6 +223,6 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,
-      vm.SaveDeckCommand.ExecuteAsync(null));
+      () => vm.SaveDeckCommand.ExecuteAsync(null));
   }
 }

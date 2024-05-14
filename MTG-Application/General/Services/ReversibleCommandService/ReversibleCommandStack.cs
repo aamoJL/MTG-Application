@@ -36,6 +36,9 @@ public class ReversibleCommandStack
 
   public void PushAndExecuteActiveCombinedCommand()
   {
+    if (ActiveCombinedCommand.Commands.Count == 0) 
+      return;
+    
     PushAndExecute(ActiveCombinedCommand);
     ActiveCombinedCommand = new();
   }
