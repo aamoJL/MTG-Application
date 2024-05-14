@@ -182,7 +182,6 @@
     <PRIResource Remove="Windows\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\DeckEditor\Controls\CardView\" />
     <Folder Include="Features\CardSearch\Controls\CardView\" />
   </ItemGroup>
   <ItemGroup>

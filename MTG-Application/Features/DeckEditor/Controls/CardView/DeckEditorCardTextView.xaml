@@ -10,8 +10,13 @@
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d">
 
-  <StackPanel Style="{StaticResource MTGListViewItemStyle}">
-    <StackPanel.ContextFlyout>
+  <local:DeckEditorCardViewBase.Resources>
+    <local:BoolToDoubleConverter x:Key="BoolToDoubleConverter"/>
+    <local:BoolToAutoOrGridLengthConverter x:Key="BoolToAutoOrGridLengthConverter"/>
+  </local:DeckEditorCardViewBase.Resources>
+  
+  <Grid HorizontalAlignment="Stretch" Background="Transparent">
+    <Grid.ContextFlyout>
       <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
         <CommandBarFlyout.PrimaryCommands>
           <AppBarButton Command="{x:Bind ViewModel.SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
@@ -25,17 +30,31 @@
           <AppBarSeparator/>
           <AppBarElementContainer AllowFocusOnInteraction="True">
             <StackPanel Orientation="Horizontal">
-              <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
-              <NumberBox Grid.Column="1" Value="{x:Bind Model.Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
+              <TextBlock Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+              <NumberBox Value="{x:Bind Model.Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
             </StackPanel>
           </AppBarElementContainer>
         </CommandBarFlyout.SecondaryCommands>
       </CommandBarFlyout>
-    </StackPanel.ContextFlyout>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}" Width="30"/>
-    <Image Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}" Width="20"/>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneWay}" Width="200"/>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneWay}" Width="250"/>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
-  </StackPanel>
+    </Grid.ContextFlyout>
+    <Grid.ColumnDefinitions>
+      <!--Hack to make the grid aligned to left while being limited to maxwidth and having the column definitions working-->
+      <ColumnDefinition Width="1000*" MaxWidth="600"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Grid Grid.Column="0" ColumnSpacing="5" Height="25">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="16"/>
+        <ColumnDefinition Width="20" MaxWidth="{x:Bind SetIconVisible, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter=20, Mode=OneWay}"/>
+        <ColumnDefinition MaxWidth="240"/>
+        <ColumnDefinition MaxWidth="{x:Bind TypeLineVisible, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter=240, Mode=OneWay}"/>
+        <ColumnDefinition Width="{x:Bind TypeLineVisible, Converter={StaticResource BoolToAutoOrGridLengthConverter}, ConverterParameter=80, Mode=OneWay}"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
+      <Image Visibility="{x:Bind SetIconVisible, Mode=OneWay}" Grid.Column="1" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
+      <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+      <TextBlock Visibility="{x:Bind TypeLineVisible, Mode=OneWay}" Grid.Column="3" VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+      <TextBlock Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+    </Grid>
+  </Grid>
 </local:DeckEditorCardViewBase>

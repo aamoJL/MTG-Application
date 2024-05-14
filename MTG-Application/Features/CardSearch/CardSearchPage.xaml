@@ -45,7 +45,7 @@
         <TextBlock 
           HorizontalAlignment="Right" 
           VerticalAlignment="Bottom"
-          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1}', ViewModel.Cards.Collection.Count, ViewModel.Cards.TotalCardCount), Mode=OneWay}">
+          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1} cards', ViewModel.Cards.Collection.Count, ViewModel.Cards.TotalCardCount), Mode=OneWay}">
         </TextBlock>
       </Grid>
       <!--#endregion-->

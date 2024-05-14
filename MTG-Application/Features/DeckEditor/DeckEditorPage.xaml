@@ -80,7 +80,7 @@
         <TabViewItem Header="Side lists" IsClosable="False">
           
           <!--#region Side Lists -->
-          <Grid>
+          <Grid RowSpacing="5" Margin="0 5 0 0">
             <Grid.RowDefinitions>
               <RowDefinition Height="auto"/>
               <RowDefinition Height="auto"/>
@@ -166,9 +166,7 @@
               SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
               Style="{StaticResource MTGListViewStyle}"
-              BorderBrush="{ThemeResource RegionColor}"
               SelectionMode="Single"
-              BorderThickness="0"
               CanDragItems="True"
               AllowDrop="True"
               OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneWay}"
@@ -180,7 +178,9 @@
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
-                    Model="{Binding Mode=OneWay}" 
+                    Model="{Binding Mode=OneWay}"
+                    SetIconVisible="False"
+                    TypeLineVisible="False"
                     OnDeleteCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.RemoveCardCommand, Mode=OneTime}"
                     OnChangeCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
@@ -213,9 +213,7 @@
               SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
               Style="{StaticResource MTGListViewStyle}"
-              BorderBrush="{ThemeResource RegionColor}"
               SelectionMode="Single"
-              BorderThickness="0"
               CanDragItems="True"
               AllowDrop="True"
               OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneWay}"
@@ -228,6 +226,8 @@
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
                     Model="{Binding Mode=OneWay}" 
+                    SetIconVisible="False"
+                    TypeLineVisible="False"
                     OnDeleteCommand="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.RemoveCardCommand, Mode=OneTime}"
                     OnChangeCommand="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
@@ -260,9 +260,7 @@
               SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
               Style="{StaticResource MTGListViewStyle}"
-              BorderBrush="{ThemeResource RegionColor}"
               SelectionMode="Single"
-              BorderThickness="0"
               CanDragItems="True"
               AllowDrop="True"
               OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneWay}"
@@ -274,7 +272,9 @@
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
-                    Model="{Binding Mode=OneWay}" 
+                    Model="{Binding Mode=OneWay}"
+                    SetIconVisible="False"
+                    TypeLineVisible="False"
                     OnDeleteCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.RemoveCardCommand, Mode=OneTime}"
                     OnChangeCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
@@ -501,11 +501,8 @@
           ItemsSource="{Binding DeckCardList.Cards, Mode=OneWay}"
           SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
-          Style="{StaticResource MTGListViewStyle}"
-          BorderBrush="{ThemeResource RegionColor}"
           SelectionMode="Single"
           Visibility="{Binding ElementName=DeckCardTextViewToggle, Path=IsChecked, Mode=OneWay}"
-          BorderThickness="0"
           CanDragItems="True"
           AllowDrop="True"
           OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
@@ -516,7 +513,7 @@
           OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}">
           <local:AdvancedCardListView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
-              <local:DeckEditorCardImageView
+              <local:DeckEditorCardTextView
                 Model="{Binding Mode=OneWay}" 
                 OnDeleteCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
                 OnChangeCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
