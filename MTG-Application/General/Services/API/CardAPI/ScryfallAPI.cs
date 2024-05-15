@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -235,7 +234,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
     {
-      var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(identifiers);
+      var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(chunk);
 
       var fetchedCards = new List<MTGCard>();
       var notFoundCount = 0;

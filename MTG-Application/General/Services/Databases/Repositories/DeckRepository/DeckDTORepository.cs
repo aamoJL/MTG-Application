@@ -109,18 +109,18 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
         }),
         Task.Run(() =>
         {
-          foreach (var card in item.WishlistCards)
-          {
-            if (existingDeck.WishlistCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
-            else { existingDeck.WishlistCards.Add(card); }
-          }
-        }),
-        Task.Run(() =>
-        {
           foreach (var card in item.MaybelistCards)
           {
             if (existingDeck.MaybelistCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
             else { existingDeck.MaybelistCards.Add(card); }
+          }
+        }),
+        Task.Run(() =>
+        {
+          foreach (var card in item.WishlistCards)
+          {
+            if (existingDeck.WishlistCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            else { existingDeck.WishlistCards.Add(card); }
           }
         }),
         Task.Run(() =>
@@ -132,6 +132,8 @@ public class DeckDTORepository : IRepository<MTGCardDeckDTO>
           }
         })
       };
+
+      await Task.WhenAll(updateCardsTasks);
 
       // Remove old commander and add new one if the commander changed
       if ((existingDeck.Commander != null || item.Commander != null) && existingDeck.Commander?.Compare(item?.Commander) is not true)

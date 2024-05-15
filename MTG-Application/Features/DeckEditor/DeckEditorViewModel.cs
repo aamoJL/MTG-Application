@@ -34,6 +34,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
       DeckCardList.Cards = deck.DeckCards;
       MaybeCardList.Cards = deck.Maybelist;
+      WishCardList.Cards = deck.Wishlist;
+      RemoveCardList.Cards = deck.Removelist;
       UndoStack.Clear();
       HasUnsavedChanges = false;
 
