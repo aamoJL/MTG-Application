@@ -1,6 +1,6 @@
 ﻿using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.General.Views.AppWindows;
+namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 public class OpenMTGCardCollectionWindow : UseCase
 {
   public override void Execute()

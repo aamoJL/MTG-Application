@@ -2,6 +2,7 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow;
 using MTGApplication.General.Databases;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
@@ -36,13 +37,8 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    var mainWindow = new ThemedWindow()
-    {
-      //Content = mainFrame,
-      Title = "Deck Builder"
-    };
+    var mainWindow = new ThemedWindow() { Title = "Deck Builder" };
 
-    //mainWindow.Navigate(typeof(DeckEditorPage), "mass test");
     mainWindow.Navigate(typeof(DeckBuilderPage));
     mainWindow.Activate();
 

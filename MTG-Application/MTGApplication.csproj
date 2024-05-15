@@ -182,6 +182,7 @@
     <PRIResource Remove="Windows\**" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\AppWindows\" />
     <Folder Include="Features\CardSearch\Controls\CardView\" />
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Views.Controls;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.General.Views.AppWindows;
+namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 [ObservableObject]
 public sealed partial class DeckBuilderPage : Page
 {
@@ -36,7 +36,12 @@ public sealed partial class DeckBuilderPage : Page
     // Request tab closing from the tab items Content
     if (args.Tab.Content is ITabViewTab tabContent && !await tabContent.TabCloseRequested()) return;
 
-    TabViewItems.Remove(args.Item as CustomTabViewItem);
+    if(args.Item is CustomTabViewItem tabItem)
+    {
+      tabItem.Close();
+      TabViewItems.Remove(tabItem);
+    }
+
     args.Tab.Content = null;
 
     if (TabViewItems.Count == 0)

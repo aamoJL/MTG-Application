@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.General.Views.AppWindows;
+namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 /// <summary>
 /// Use case to switch window theme between dark and light themes.
 /// </summary>
