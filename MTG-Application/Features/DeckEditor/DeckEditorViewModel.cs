@@ -30,17 +30,21 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     get => deck;
     set
     {
+      var oldName = deck.Name;
+
       deck = value;
 
       DeckCardList.Cards = deck.DeckCards;
       MaybeCardList.Cards = deck.Maybelist;
       WishCardList.Cards = deck.Wishlist;
       RemoveCardList.Cards = deck.Removelist;
+
       UndoStack.Clear();
       HasUnsavedChanges = false;
 
       OnPropertyChanged(nameof(DeckSize));
-      OnPropertyChanged(nameof(DeckName));
+      // Can't invoke changed event for the name if the name was already empty because visual state binding would break.
+      if (DeckName != oldName) OnPropertyChanged(nameof(DeckName));
       OnPropertyChanged(nameof(Commander));
       OnPropertyChanged(nameof(Partner));
       SaveDeckCommand.NotifyCanExecuteChanged();
@@ -83,15 +87,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       OnPropertyChanged(nameof(Partner));
     }
   }
-  public string DeckName
-  {
-    get => Deck.Name;
-    set
-    {
-      Deck.Name = value;
-      OnPropertyChanged(nameof(DeckName));
-    }
-  }
+  public string DeckName => Deck.Name;
   public int DeckSize => Deck.DeckSize;
 
   public async Task<bool> ConfirmUnsavedChanges()
