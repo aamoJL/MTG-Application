@@ -4,16 +4,16 @@ namespace MTGApplication.General.Services.ReversibleCommandService;
 
 public class ReversibleCollectionCommand<T> : IReversibleCommand<IEnumerable<T>>
 {
-  public ReversibleCollectionCommand(T item, IClassCopier<T> copier) : base()
+  public ReversibleCollectionCommand(T item, IClassCopier<T> copier)
   {
     Copier = copier;
-    Items = Copier.Copy(new T[] { item });
+    Items = new List<T>(Copier.Copy(new T[] { item }));
   }
 
-  public ReversibleCollectionCommand(IEnumerable<T> items, IClassCopier<T> copier) : base()
+  public ReversibleCollectionCommand(IEnumerable<T> items, IClassCopier<T> copier)
   {
     Copier = copier;
-    Items = Copier.Copy(items);
+    Items = new List<T>(Copier.Copy(items));
   }
 
   public ReversibleAction<IEnumerable<T>> ReversableAction { get; set; }

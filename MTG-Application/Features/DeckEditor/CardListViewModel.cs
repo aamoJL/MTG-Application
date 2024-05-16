@@ -62,32 +62,48 @@ public partial class CardListViewModel : ViewModelBase
   [RelayCommand]
   private void ExecuteMove(MTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
 
+  [RelayCommand(CanExecute = nameof(CanExecuteClearCommand))]
+  private void Clear() => UndoStack.PushAndExecute(
+    new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversableAction = ReversableRemove });
+
   [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
 
   private void ReversibleAdd(IEnumerable<MTGCard> cards)
   {
+    var addList = new List<MTGCard>();
+
     foreach (var card in cards)
     {
       if (Cards.FirstOrDefault(x => x.Info.Name == card?.Info.Name) is MTGCard existingCard)
         existingCard.Count += card.Count;
       else if (card != null)
-        Cards.Add(card);
+        addList.Add(card);
     }
+
+    foreach (var item in addList)
+      Cards.Add(item);
 
     OnChange?.Invoke();
   }
 
   private void ReversibleRemove(IEnumerable<MTGCard> cards)
   {
+    var removeList = new List<MTGCard>();
+
     foreach (var card in cards)
     {
       if (Cards.FirstOrDefault(x => x.Info.Name == card?.Info.Name) is MTGCard existingCard)
       {
-        if (existingCard.Count <= card.Count) Cards.Remove(existingCard);
+        if (existingCard.Count <= card.Count) removeList.Add(existingCard);
         else existingCard.Count -= card.Count;
       }
     }
 
+    foreach (var item in removeList)
+      Cards.Remove(item);
+
     OnChange?.Invoke();
   }
+
+  private bool CanExecuteClearCommand() => Cards.Any();
 }

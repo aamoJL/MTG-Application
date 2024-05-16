@@ -56,8 +56,6 @@
         </VisualState>
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
-    
-    
     <!--#endregion-->
     
     <controls:DockPanel 
@@ -154,7 +152,7 @@
                         <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
                         <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
                       </MenuFlyoutSubItem>
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>-->
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -201,7 +199,7 @@
                         <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
                         <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
                       </MenuFlyoutSubItem>
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>-->
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -248,7 +246,7 @@
                         <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
                         <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
                       </MenuFlyoutSubItem>
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>-->
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -298,12 +296,14 @@
       </TabView>
       <!--#endregion-->
 
-      <!--#region Command Buttons -->
+      <!--#region Top Bar -->
       <Grid 
         controls:DockPanel.Dock="Top" 
         Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
         BorderThickness="0 0 0 1"
         BorderBrush="{ThemeResource RegionColor}">
+
+        <!--#region Commands -->
         <StackPanel Orientation="Horizontal">
           <CommandBar IsOpen="False" DefaultLabelPosition="Right">
 
@@ -441,6 +441,7 @@
             </AppBarElementContainer>
           </CommandBar>
         </StackPanel>
+        <!--#endregion-->
 
         <!--#region Deck Info -->
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
@@ -453,6 +454,7 @@
                 <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
                 <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
               </MenuFlyoutSubItem>
+              <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
             </MenuFlyout>
           </StackPanel.ContextFlyout>
         </StackPanel>
