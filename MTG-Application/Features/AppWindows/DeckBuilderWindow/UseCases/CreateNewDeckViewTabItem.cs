@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.Features.DeckSelector;
 using MTGApplication.General.ViewModels;
@@ -13,8 +14,14 @@ namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 public class CreateNewDeckViewTabItem : UseCase<CustomTabViewItem>
 {
   private readonly Frame tabFrame = new();
-  private readonly TextBlock tabHeader = new() { Text = "Deck selection" };
+  private readonly TabHeader tabHeader = new() { Text = "Deck selection" };
   private readonly CustomTabViewItem tabItem = new();
+
+  public CreateNewDeckViewTabItem()
+  {
+    tabItem.Header = tabHeader;
+    tabItem.Frame = tabFrame;
+  }
 
   public override CustomTabViewItem Execute()
   {
@@ -27,11 +34,7 @@ public class CreateNewDeckViewTabItem : UseCase<CustomTabViewItem>
     };
 
     tabFrame.Navigated += TabFrame_Navigated;
-
     tabItem.OnClosed += TabItem_OnClosed;
-
-    tabItem.Header = tabHeader;
-    tabItem.Frame = tabFrame;
 
     return tabItem;
   }
@@ -50,8 +53,11 @@ public class CreateNewDeckViewTabItem : UseCase<CustomTabViewItem>
   {
     if (sender is DeckEditorViewModel deckEditorViewModel)
     {
-      if (e.PropertyName == nameof(DeckEditorPage.ViewModel.DeckName))
+      if (e.PropertyName == nameof(deckEditorViewModel.DeckName))
         tabHeader.Text = !string.IsNullOrEmpty(deckEditorViewModel.DeckName) ? deckEditorViewModel.DeckName : "New deck";
+
+      if (e.PropertyName == nameof(deckEditorViewModel.HasUnsavedChanges))
+        tabHeader.UnsavedIndicator = deckEditorViewModel.HasUnsavedChanges;
     }
   }
 

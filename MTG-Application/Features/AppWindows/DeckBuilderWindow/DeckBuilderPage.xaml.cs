@@ -36,7 +36,7 @@ public sealed partial class DeckBuilderPage : Page
     // Request tab closing from the tab items Content
     if (args.Tab.Content is ITabViewTab tabContent && !await tabContent.TabCloseRequested()) return;
 
-    if(args.Item is CustomTabViewItem tabItem)
+    if (args.Item is CustomTabViewItem tabItem)
     {
       tabItem.Close();
       TabViewItems.Remove(tabItem);
