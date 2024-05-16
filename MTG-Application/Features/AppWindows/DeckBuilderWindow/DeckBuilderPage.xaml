@@ -51,17 +51,7 @@
             CloseButtonOverlayMode="Auto"
             AddTabButtonClick="TabView_AddTabButtonClick"
             TabCloseRequested="TabView_TabCloseRequested"
-            CanReorderTabs="False">
-            <TabView.TabItemTemplate>
-              <DataTemplate x:DataType="customControls:CustomTabViewItem">
-                <TabViewItem Header="{x:Bind Header, Mode=OneTime}">
-                  <Grid BorderBrush="{ThemeResource SystemAccentColorLight1}" BorderThickness="0 2 0 0">
-                    <ContentPresenter Content="{x:Bind Frame, Mode=OneTime}"/>
-                  </Grid>
-                </TabViewItem>
-              </DataTemplate>
-            </TabView.TabItemTemplate>
-          </TabView>
+            CanReorderTabs="False" />
           <!--#endregion-->
 
           <!--#region Corner Buttons -->

@@ -40,6 +40,7 @@
     <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\DeckEditor\Controls\DeckEditorCardImageView.xaml" />
     <None Remove="Features\DeckEditor\Controls\DeckEditorCardTextView.xaml" />
@@ -184,6 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardSearch\Controls\CardView\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckEditorTabViewItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml">

@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Views.Controls;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
@@ -16,7 +16,7 @@ public sealed partial class DeckBuilderPage : Page
     TabViewItems.Add(new CreateNewDeckViewTabItem().Execute());
   }
 
-  public ObservableCollection<CustomTabViewItem> TabViewItems { get; } = new();
+  public ObservableCollection<DeckEditorTabViewItem> TabViewItems { get; } = new();
 
   [ObservableProperty] private bool isSearchPaneOpen = false;
 
@@ -31,18 +31,12 @@ public sealed partial class DeckBuilderPage : Page
       ? ElementTheme.Light : ElementTheme.Dark).Execute();
   }
 
-  private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
+  private void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
   {
-    // Request tab closing from the tab items Content
-    if (args.Tab.Content is ITabViewTab tabContent && !await tabContent.TabCloseRequested()) return;
+    if (args.Item is not DeckEditorTabViewItem tabItem) return;
 
-    if (args.Item is CustomTabViewItem tabItem)
-    {
-      tabItem.Close();
-      TabViewItems.Remove(tabItem);
-    }
-
-    args.Tab.Content = null;
+    // TODO: save unsaved changes
+    TabViewItems.Remove(tabItem);
 
     if (TabViewItems.Count == 0)
     {
