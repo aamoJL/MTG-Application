@@ -56,6 +56,8 @@
         </VisualState>
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
+    
+    
     <!--#endregion-->
     
     <controls:DockPanel 
@@ -366,8 +368,8 @@
             <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <RadioMenuFlyoutItem x:Name="DeckCardImageViewToggle" Text="Images" GroupName="DeckDisplayCheck" IsChecked="True" Icon="{ui:SymbolIcon Symbol=Pictures}" />
-                  <RadioMenuFlyoutItem x:Name="DeckCardTextViewToggle" Text="List" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
+                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckImageViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Image" Text="Images" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Pictures}" />
+                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckTextViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Text" Text="Text" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -471,8 +473,8 @@
           FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
           Style="{StaticResource MTGAdaptiveGridViewStyle}"
           BorderBrush="{ThemeResource RegionColor}"
+          Visibility="{x:Bind DeckImageViewVisible, Mode=OneWay}"
           SelectionMode="Single"
-          Visibility="{Binding ElementName=DeckCardImageViewToggle, Path=IsChecked, Mode=OneWay}"
           BorderThickness="0"
           DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
           CanDragItems="True"
@@ -501,8 +503,8 @@
           ItemsSource="{Binding DeckCardList.Cards, Mode=OneWay}"
           SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
+          Visibility="{x:Bind DeckTextViewVisible, Mode=OneWay}"
           SelectionMode="Single"
-          Visibility="{Binding ElementName=DeckCardTextViewToggle, Path=IsChecked, Mode=OneWay}"
           CanDragItems="True"
           AllowDrop="True"
           OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"

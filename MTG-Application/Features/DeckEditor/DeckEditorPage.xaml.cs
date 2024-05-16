@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.General.Services.ConfirmationService;
@@ -6,6 +8,7 @@ using MTGApplication.Views.Dialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.DeckEditor;
+[ObservableObject]
 public sealed partial class DeckEditorPage : Page, IDialogPresenter
 {
   public DeckEditorPage()
@@ -18,6 +21,24 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
 
   public DeckEditorViewModel ViewModel { get; } = new();
   public DialogWrapper DialogWrapper => new(XamlRoot);
+
+  [ObservableProperty] private bool deckImageViewVisible = true;
+  [ObservableProperty] private bool deckTextViewVisible = false;
+
+  [RelayCommand]
+  private void SetDeckDisplayType(string type)
+  {
+    if (type == "Image")
+    {
+      DeckImageViewVisible = true;
+      DeckTextViewVisible = false;
+    }
+    else if (type == "Text")
+    {
+      DeckImageViewVisible = false;
+      DeckTextViewVisible = true;
+    }
+  }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
