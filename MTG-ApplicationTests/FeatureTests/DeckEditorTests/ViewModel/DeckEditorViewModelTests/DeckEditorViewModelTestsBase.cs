@@ -24,7 +24,7 @@ public abstract class DeckEditorViewModelTestsBase
     {
       CardAPI = _dependencies.CardAPI,
       Repository = _dependencies.Repository,
-      Confirmers = confirmers ?? new(),
+      DeckEditorConfirmers = confirmers ?? new(),
       Notifier = notifier ?? new()
     };
 #pragma warning restore IDE0017 // Simplify object initialization

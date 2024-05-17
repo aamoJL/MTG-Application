@@ -1,4 +1,5 @@
 ﻿using Windows.ApplicationModel.DataTransfer;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.General.Services.IOService;
 
@@ -7,6 +8,8 @@ namespace MTGApplication.General.Services.IOService;
 /// </summary>
 public class ClipboardService
 {
+  public static Notification CopiedNotification { get; } = new(NotificationType.Info, "Copied to clipboard");
+
   /// <summary>
   /// Adds the <paramref name="text"/> to the clipboard
   /// </summary>
@@ -20,6 +23,6 @@ public class ClipboardService
   /// <summary>
   /// Sets the clipboard content to the <paramref name="dataPackage"/>
   /// </summary>
-  protected virtual void SetClipboardContent(DataPackage dataPackage) 
+  protected virtual void SetClipboardContent(DataPackage dataPackage)
     => Clipboard.SetContent(dataPackage);
 }

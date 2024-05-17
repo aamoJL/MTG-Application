@@ -15,7 +15,7 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
   {
     InitializeComponent();
 
-    RegisterConfirmDialogs(ViewModel.Confirmers);
+    RegisterConfirmDialogs(ViewModel.DeckEditorConfirmers);
     RegisterNotifications(ViewModel.Notifier);
   }
 
@@ -57,6 +57,8 @@ public sealed partial class DeckEditorPage : Page, IDialogPresenter
     confirmer.SaveDeckConfirmer.OnConfirm = async msg => await new ShowSaveDialog(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data));
     confirmer.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(DialogWrapper).Execute((msg.Title, msg.Message));
     confirmer.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(DialogWrapper).Execute((msg.Title, msg.Message));
+
+    confirmer.CardListConfirmers.ExportConfirmer.OnConfirm = async msg => await new ShowExportDialog(DialogWrapper).Execute((msg.Title, msg.Message, msg.Data));
   }
 
   private void RegisterNotifications(DeckEditorNotifier notifier)

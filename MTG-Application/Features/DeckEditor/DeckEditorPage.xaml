@@ -149,8 +149,8 @@
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
                       <MenuFlyoutSubItem Text="Export...">
-                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
@@ -196,8 +196,8 @@
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
                       <MenuFlyoutSubItem Text="Export...">
-                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
@@ -243,8 +243,8 @@
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
                       <MenuFlyoutSubItem Text="Export...">
-                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                        <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
@@ -314,26 +314,6 @@
                   <MenuFlyoutItem Command="{x:Bind ViewModel.NewDeckCommand, Mode=OneTime}" Icon="NewFolder" Text="New" KeyboardAcceleratorTextOverride="Ctrl+N"/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.OpenDeckCommand, Mode=OneTime}" Icon="OpenFile" Text="Open..." KeyboardAcceleratorTextOverride="Ctrl+O"/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.SaveDeckCommand, Mode=OneTime}" Icon="Save" Text="Save..." KeyboardAcceleratorTextOverride="Ctrl+S"/>
-                  <MenuFlyoutSeparator/>
-                  <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE8B5;}" Text="Import...">
-                    <!--<MenuFlyoutItem Command="{x:Bind ImportToDeckCardsCommand, Mode=OneTime}" Text="To Deck"/>-->
-                    <!--<MenuFlyoutItem Command="{x:Bind ImportToMaybelistCommand, Mode=OneTime}" Text="To Maybelist"/>-->
-                    <!--<MenuFlyoutItem Command="{x:Bind ImportToWishlistCommand, Mode=OneTime}" Text="To Wishlist"/>-->
-                  </MenuFlyoutSubItem>
-                  <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xEDE1;}" Text="Export...">
-                    <MenuFlyoutSubItem Text="Deck...">
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
-                    </MenuFlyoutSubItem>
-                    <MenuFlyoutSubItem Text="Maybelist...">
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
-                    </MenuFlyoutSubItem>
-                    <MenuFlyoutSubItem Text="Wishlist...">
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.WishlistCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
-                    </MenuFlyoutSubItem>
-                  </MenuFlyoutSubItem>
                   <MenuFlyoutSeparator/>
                   <MenuFlyoutItem Command="{x:Bind ViewModel.DeleteDeckCommand, Mode=OneTime}" Background="IndianRed" Icon="Delete" Text="Delete"/>
                 </MenuFlyout>
@@ -451,8 +431,8 @@
             <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
               <!--<MenuFlyoutItem Command="{x:Bind ViewModel.Deck.DeckCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
               <MenuFlyoutSubItem Text="Export...">
-                <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>-->
-                <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.DeckCards.ExportDeckCardsDialogCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>-->
+                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
               </MenuFlyoutSubItem>
               <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
             </MenuFlyout>

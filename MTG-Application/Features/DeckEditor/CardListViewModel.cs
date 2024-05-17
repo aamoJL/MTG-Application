@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor;
 
@@ -22,6 +24,9 @@ public partial class CardListViewModel : ViewModelBase
   private MTGCardCopier CardCopier { get; } = new();
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
+  public CardListConfirmers Confirmers { get; init; } = new();
+  public ClipboardService ClipboardService { get; init; } = new();
+  public Notifier Notifier { get; init; } = new();
   public IWorker Worker { get; init; } = new DefaultWorker();
 
   public Action OnChange { get; init; }
@@ -68,6 +73,29 @@ public partial class CardListViewModel : ViewModelBase
 
   [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
 
+  [RelayCommand(CanExecute = nameof(CanExecuteExportCommand))]
+  private async Task Export(string byProperty)
+  {
+    if (string.IsNullOrEmpty(byProperty)) return;
+
+    var exportString = string.Empty;
+
+    switch (byProperty)
+    {
+      case "Id": exportString = string.Join(Environment.NewLine, Cards.Select(x => x.Info.ScryfallId)); break;
+      case "Name": exportString = string.Join(Environment.NewLine, Cards.Select(x => x.Info.Name)); break;
+      default: break;
+    }
+
+    if (await Confirmers.ExportConfirmer
+      .Confirm(CardListConfirmers.GetExportConfirmation(exportString)) is string response
+      && !string.IsNullOrEmpty(response))
+    {
+      ClipboardService.CopyToClipboard(response);
+      Notifier.Notify(ClipboardService.CopiedNotification);
+    }
+  }
+
   private void ReversibleAdd(IEnumerable<MTGCard> cards)
   {
     var addList = new List<MTGCard>();
@@ -106,4 +134,6 @@ public partial class CardListViewModel : ViewModelBase
   }
 
   private bool CanExecuteClearCommand() => Cards.Any();
+
+  private static bool CanExecuteExportCommand(string byProperty) => byProperty is "Id" or "Name";
 }

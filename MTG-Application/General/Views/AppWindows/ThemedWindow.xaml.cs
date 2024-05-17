@@ -23,9 +23,12 @@ public sealed partial class ThemedWindow : Window
 
     IconUri = DEFAULT_ICON_URI;
 
-    Activated += ThemedWindow_Activated;
     Closed += ThemedWindow_Closed;
     AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
+    NotificationService.OnShow += NotificationService_OnShow;
+
+    if (Content is FrameworkElement element)
+      element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
   public string IconUri { set => AppWindow.SetIcon(value); }
@@ -49,14 +52,6 @@ public sealed partial class ThemedWindow : Window
   }
 
   public bool Navigate(Type pageType, object parameters = null) => MainFrame.Navigate(pageType, parameters);
-
-  private void ThemedWindow_Activated(object sender, WindowActivatedEventArgs args)
-  {
-    if (Content is FrameworkElement element)
-      element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
-
-    NotificationService.OnShow += NotificationService_OnShow;
-  }
 
   private void NotificationService_OnShow(object sender, NotificationService.Notification e)
   {
@@ -104,7 +99,6 @@ public sealed partial class ThemedWindow : Window
 
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
       NotificationService.OnShow -= NotificationService_OnShow;
-      Activated -= ThemedWindow_Activated;
       Closed -= ThemedWindow_Closed;
 
       Content = null;

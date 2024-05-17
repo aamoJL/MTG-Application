@@ -10,6 +10,8 @@ public class DeckEditorConfirmers
   public Confirmer<ConfirmationResult> OverrideDeckConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteDeckConfirmer { get; init; } = new();
 
+  public CardListConfirmers CardListConfirmers { get; init; } = new();
+
   public static Confirmation GetSaveUnsavedChangesConfirmation(string deckName)
   {
     return new(
