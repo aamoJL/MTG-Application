@@ -16,7 +16,7 @@ public class CardImporter
   public async Task<CardImportResult> Import(string data)
   {
     if (JsonService.TryDeserializeJson<MTGCard>(data, out var card))
-      return new(new MTGCard[] { card }, 0, 1); // Imported from the app
+      return new(new MTGCard[] { card }, 0, 1, CardImportResult.ImportSource.Internal); // Imported from the app
 
     if (TryParseNameFromEdhrecUri(data, out var name))
       return await CardAPI.FetchFromString(name); // Imported from EDHREC.com

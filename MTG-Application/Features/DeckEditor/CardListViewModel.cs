@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -10,17 +11,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor;
 
 public partial class CardListViewModel : ViewModelBase
 {
-  public CardListViewModel(ICardAPI<MTGCard> cardAPI) => CardImporter = new(cardAPI);
+  public CardListViewModel(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
 
   [ObservableProperty] private ObservableCollection<MTGCard> cards = new();
 
-  private CardImporter CardImporter { get; }
   private MTGCardCopier CardCopier { get; } = new();
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
@@ -34,6 +35,8 @@ public partial class CardListViewModel : ViewModelBase
   private ReversibleAction<IEnumerable<MTGCard>> ReversableAdd => new() { Action = ReversibleAdd, ReverseAction = ReversibleRemove };
   private ReversibleAction<IEnumerable<MTGCard>> ReversableRemove => new() { Action = ReversibleRemove, ReverseAction = ReversibleAdd };
 
+  public ICardAPI<MTGCard> CardAPI { get; }
+
   [RelayCommand]
   private void AddCard(MTGCard card) => UndoStack.PushAndExecute(
     new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableAdd });
@@ -41,20 +44,6 @@ public partial class CardListViewModel : ViewModelBase
   [RelayCommand]
   private void RemoveCard(MTGCard card) => UndoStack.PushAndExecute(
     new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableRemove });
-
-  [RelayCommand]
-  private async Task ImportCards(string data)
-  {
-    var result = await Worker.DoWork(CardImporter.Import(data));
-
-    if (result.Found.Length > 0)
-    {
-      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(result.Found, CardCopier)
-      {
-        ReversableAction = ReversableAdd,
-      });
-    }
-  }
 
   [RelayCommand]
   private void BeginMoveFrom(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
@@ -71,30 +60,71 @@ public partial class CardListViewModel : ViewModelBase
   private void Clear() => UndoStack.PushAndExecute(
     new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversableAction = ReversableRemove });
 
-  [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
+  [RelayCommand]
+  private async Task ImportCards(string data)
+  {
+    data ??= await Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
+
+    var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
+    
+    var addedCards = new List<MTGCard>();
+    var skipConflictConfirmation = false;
+    var importConflictConfirmationResult = ConfirmationResult.Yes;
+
+    // Confirm imported cards, if already exists
+    foreach (var card in result.Found)
+    {
+      if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is not null)
+      {
+        // Card exist in the list; confirm the import, unless the user skips confirmations
+        if (!skipConflictConfirmation)
+          (importConflictConfirmationResult, skipConflictConfirmation) = await Confirmers.ImportConflictConfirmer.Confirm(
+            CardListConfirmers.GetExistingCardImportConfirmer(card.Info.Name));
+
+        if (importConflictConfirmationResult == ConfirmationResult.Yes) { addedCards.Add(card); }
+      }
+      else { addedCards.Add(card); }
+    }
+
+    // Add cards
+    if(addedCards.Any())
+    {
+      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(addedCards, CardCopier)
+      {
+        ReversableAction = ReversableAdd,
+      });
+    }
+
+    // Notifications
+    if(result.Source == CardImportResult.ImportSource.External)
+    {
+      if (result.Found.Any() && result.NotFoundCount == 0) // All found
+        new SendNotification(Notifier).Execute(new(NotificationType.Success,
+          $"{addedCards.Count} cards imported successfully." + ((result.Found.Length - addedCards.Count) > 0 ? $" ({(result.Found.Length - addedCards.Count)} cards skipped) " : "")));
+      else if (result.Found.Any() && result.NotFoundCount > 0) // Some found
+        new SendNotification(Notifier).Execute(new(NotificationType.Warning,
+          $"{result.Found.Length} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + ((result.Found.Length - addedCards.Count) > 0 ? $" ({(result.Found.Length - addedCards.Count)} cards skipped) " : "")));
+      else if (result.NotFoundCount > 0) // None found
+        new SendNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
+    }
+  }
 
   [RelayCommand(CanExecute = nameof(CanExecuteExportCommand))]
   private async Task Export(string byProperty)
   {
     if (string.IsNullOrEmpty(byProperty)) return;
 
-    var exportString = string.Empty;
+    var exportString = new ExportCards().Execute(new(Cards, byProperty));
 
-    switch (byProperty)
-    {
-      case "Id": exportString = string.Join(Environment.NewLine, Cards.Select(x => x.Info.ScryfallId)); break;
-      case "Name": exportString = string.Join(Environment.NewLine, Cards.Select(x => x.Info.Name)); break;
-      default: break;
-    }
-
-    if (await Confirmers.ExportConfirmer
-      .Confirm(CardListConfirmers.GetExportConfirmation(exportString)) is string response
-      && !string.IsNullOrEmpty(response))
+    if (await Confirmers.ExportConfirmer.Confirm(CardListConfirmers.GetExportConfirmation(exportString))
+      is string response && !string.IsNullOrEmpty(response))
     {
       ClipboardService.CopyToClipboard(response);
-      Notifier.Notify(ClipboardService.CopiedNotification);
+      new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
     }
   }
+
+  [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
 
   private void ReversibleAdd(IEnumerable<MTGCard> cards)
   {

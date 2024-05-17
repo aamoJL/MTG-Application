@@ -313,8 +313,8 @@ public static partial class DialogService
         AcceptsReturn = true,
         IsSpellCheckEnabled = IsSpellCheckEnabled,
         PlaceholderText = InputPlaceholderText,
-        Text = TextInputText,
-        SelectionStart = TextInputText.Length,
+        Text = TextInputText ?? string.Empty,
+        SelectionStart = TextInputText?.Length ?? 0,
         Height = 500,
         Width = 800,
       };

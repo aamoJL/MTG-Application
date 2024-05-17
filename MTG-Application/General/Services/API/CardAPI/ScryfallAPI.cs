@@ -51,11 +51,13 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
     var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
 
-    return new CardImportResult(found.ToArray(), 0, totalCount, nextPage);
+    return new CardImportResult(found.ToArray(), 0, totalCount, CardImportResult.ImportSource.External, nextPage);
   }
 
   public async Task<CardImportResult> FetchFromString(string importText)
   {
+    if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty();
+
     var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     // Convert each line to scryfall identifier objects
@@ -264,7 +266,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     var notFoundCount = fetchResults.Sum(x => x.NotFoundCount);
     var totalCount = found.Length;
 
-    return new(found, notFoundCount, totalCount);
+    return new(found, notFoundCount, totalCount, CardImportResult.ImportSource.External);
   }
 
   private static string GetSearchUri(string searchParams) => string.IsNullOrEmpty(searchParams) ? "" : $"{CARDS_URL}/search?q={searchParams}+game:paper";

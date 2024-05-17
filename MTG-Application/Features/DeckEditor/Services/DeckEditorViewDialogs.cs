@@ -1,0 +1,44 @@
+﻿using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.Views.Dialogs;
+using System;
+using static MTGApplication.General.Services.ConfirmationService.DialogService;
+
+namespace MTGApplication.Features.DeckEditor;
+
+public class DeckEditorViewDialogs
+{
+  public static void RegisterConfirmDialogs(DeckEditorConfirmers confirmer, Func<DialogWrapper> getWrapper)
+  {
+    confirmer.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
+    confirmer.LoadDeckConfirmer.OnConfirm = async msg => await new ShowOpenDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
+    confirmer.SaveDeckConfirmer.OnConfirm = async msg => await new ShowSaveDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
+    confirmer.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
+    confirmer.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
+
+    confirmer.CardListConfirmers.ExportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
+    {
+      TextInputText = msg.Data,
+      PrimaryButtonText = "Copy to Clipboard",
+      SecondaryButtonText = string.Empty
+    }.ShowAsync(getWrapper.Invoke());
+    confirmer.CardListConfirmers.ImportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
+    {
+      TextInputText = msg.Data,
+      InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
+      PrimaryButtonText = "Import",
+      SecondaryButtonText = string.Empty
+    }.ShowAsync(getWrapper.Invoke());
+    confirmer.CardListConfirmers.ImportConflictConfirmer.OnConfirm = async (msg) =>
+    {
+      var (answer, isChecked) = await new CheckBoxDialog(msg.Title)
+      {
+        Message = msg.Message,
+        InputText = "Same for all cards.",
+        SecondaryButtonText = string.Empty,
+        CloseButtonText = "No"
+      }.ShowAsync(getWrapper.Invoke());
+
+      return new(answer.ToConfirmationResult(), isChecked ?? false);
+    };
+  }
+}

@@ -2,6 +2,7 @@
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplicationTests.Services;
+using static MTGApplication.General.Models.Card.CardImportResult;
 
 namespace MTGApplicationTests.API;
 
@@ -18,30 +19,30 @@ public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0)
   public async Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams)
   {
     if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
-    return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : CardImportResult.Empty());
+    return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
   }
 
   public async Task<CardImportResult> FetchFromDTOs(CardDTO[] dtoArray)
   {
     var cards = dtoArray.Select(x => Mocker.MTGCardModelMocker.FromDTO((MTGCardDTO)x)).ToArray();
 
-    if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length)); }
+    if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length, ImportSource.External)); }
     else
     {
       var found = ExpectedCards!.Where(ex => cards.FirstOrDefault(x => x.Info.ScryfallId == ex.Info.ScryfallId) != null)?.ToList() ?? new List<MTGCard>();
       var notFoundCount = ExpectedCards!.Length - found.Count;
 
-      return await Task.Run(() => new CardImportResult([.. found], notFoundCount, found.Count));
+      return await Task.Run(() => new CardImportResult([.. found], notFoundCount, found.Count, ImportSource.External));
     }
   }
 
-  public async Task<CardImportResult> FetchFromString(string importText) 
-    => await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length) : CardImportResult.Empty());
+  public async Task<CardImportResult> FetchFromString(string importText)
+    => await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
 
   public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false)
   {
     var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
-    return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length));
+    return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length, ImportSource.External));
   }
 
   public string GetSearchUri(string searchParams) => searchParams;

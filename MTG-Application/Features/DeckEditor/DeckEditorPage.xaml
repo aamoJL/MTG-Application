@@ -147,7 +147,7 @@
                 <TextBlock Text="Maybe">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
                         <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
@@ -194,7 +194,7 @@
                 <TextBlock Text="Wishlist">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
                         <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
@@ -241,7 +241,7 @@
                 <TextBlock Text="Remove">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <!--<MenuFlyoutItem Command="{x:Bind DeckBuilderViewModel.MaybelistCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
                         <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
@@ -429,7 +429,7 @@
           <TextBlock Text="{x:Bind sys:String.Format('{0} cards', ViewModel.DeckSize), Mode=OneWay}" HorizontalAlignment="Right"/>
           <StackPanel.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-              <!--<MenuFlyoutItem Command="{x:Bind ViewModel.Deck.DeckCards.ImportToCardlistDialogCommand, Mode=OneTime}" Text="Import..."/>-->
+              <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
               <MenuFlyoutSubItem Text="Export...">
                 <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
                 <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
