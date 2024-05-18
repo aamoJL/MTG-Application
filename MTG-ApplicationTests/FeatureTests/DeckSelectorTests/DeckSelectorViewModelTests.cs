@@ -2,6 +2,7 @@
 using MTGApplication.Features.DeckSelector;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckSelectorTests;
 [TestClass]

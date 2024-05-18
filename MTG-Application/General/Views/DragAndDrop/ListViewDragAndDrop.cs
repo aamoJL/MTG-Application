@@ -13,64 +13,21 @@ public class ListViewDragAndDrop : DragAndDrop<MTGCard>
 
   public void DragStarting(object sender, DragItemsStartingEventArgs e)
   {
-    if (e.Items[0] is MTGCard item)
-    {
-      OnDragStarting(item);
-      e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-    }
+    OnDragStarting(e.Items[0] as MTGCard, out var requestedOperation);
+
+    e.Data.RequestedOperation = requestedOperation;
   }
 
-  public void DragOver(object sender, DragEventArgs e)
-  {
-    if (DragOrigin == this || (!e.DataView.Contains(StandardDataFormats.Text) && Item == null))
-      return; // Block dropping if the origin is the same or the item is invalid
-
-    // Change operation to 'Move' if the shift key is down and move is an accepted operation
-    e.AcceptedOperation =
-      ((e.Modifiers & Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift)
-      == Windows.ApplicationModel.DataTransfer.DragDrop.DragDropModifiers.Shift
-      && DragOrigin?.AcceptMove is true
-      && Item != null) // Block Move operation if the drag is not from inside the app
-      ? DataPackageOperation.Move : DataPackageOperation.Copy;
-  }
+  public void DragOver(object sender, DragEventArgs e) => DragOver(e);
 
   public async void Drop(object sender, DragEventArgs e)
   {
-    var operation = e.AcceptedOperation;
+    var def = e.GetDeferral();
 
-    if (DragOrigin == this
-      || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
-        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move))
-      return; // don't drop on the origin and only allow copy and move operations
+    Drop(e.AcceptedOperation, e.DataView.Contains(StandardDataFormats.Text) ? await e.DataView.GetTextAsync() : string.Empty);
 
-    if (Item != null)
-    {
-      if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
-      {
-        OnCopy?.Invoke(Item);
-      }
-      else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
-      {
-        DragOrigin?.OnBeginMoveFrom?.Invoke(Item);
-        OnBeginMoveTo?.Invoke(Item);
-
-        OnExecuteMove?.Invoke(Item);
-        DragOrigin?.OnExecuteMove?.Invoke(Item);
-      }
-    }
-    else
-    {
-      if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
-      {
-        var def = e.GetDeferral();
-
-        var data = await e.DataView.GetTextAsync();
-        OnExternalImport?.Invoke(data);
-
-        def.Complete();
-      }
-    }
+    def.Complete();
   }
 
-  public void DragCompleted(ListViewBase sender, DragItemsCompletedEventArgs e) => OnCompleted();
+  public void DragCompleted(ListViewBase sender, DragItemsCompletedEventArgs e) => DropCompleted();
 }
