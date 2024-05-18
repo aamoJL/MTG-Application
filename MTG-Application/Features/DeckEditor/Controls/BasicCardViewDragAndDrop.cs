@@ -1,21 +1,21 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services;
+using MTGApplication.General.Views;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace MTGApplication.General.Views;
+namespace MTGApplication.Features.DeckEditor;
 
-public class ListViewDragAndDrop : DragAndDrop<MTGCard>
+public class BasicCardViewDragAndDrop : DragAndDrop<MTGCard>
 {
-  public ListViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : base(itemCopier) { }
+  public BasicCardViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : base(itemCopier) { }
 
-  public void DragStarting(object sender, DragItemsStartingEventArgs e)
+  public void DragStarting(UIElement sender, DragStartingEventArgs e)
   {
-    if (e.Items[0] is MTGCard item)
+    if (sender is BasicCardView view && view.Model != null)
     {
-      OnDragStarting(item);
+      OnDragStarting(view.Model);
       e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
     }
   }
@@ -32,6 +32,13 @@ public class ListViewDragAndDrop : DragAndDrop<MTGCard>
       && DragOrigin?.AcceptMove is true
       && Item != null) // Block Move operation if the drag is not from inside the app
       ? DataPackageOperation.Move : DataPackageOperation.Copy;
+
+    if (e.AcceptedOperation == DataPackageOperation.Move && !string.IsNullOrEmpty(MoveCaptionOverride))
+      e.DragUIOverride.Caption = MoveCaptionOverride;
+    else if (e.AcceptedOperation == DataPackageOperation.Copy && !string.IsNullOrEmpty(CopyCaptionOverride))
+      e.DragUIOverride.Caption = CopyCaptionOverride;
+
+    e.DragUIOverride.IsContentVisible = IsContentVisible;
   }
 
   public async void Drop(object sender, DragEventArgs e)
@@ -72,5 +79,5 @@ public class ListViewDragAndDrop : DragAndDrop<MTGCard>
     }
   }
 
-  public void DragCompleted(ListViewBase sender, DragItemsCompletedEventArgs e) => OnCompleted();
+  public void DropCompleted(UIElement sender, DropCompletedEventArgs args) => OnCompleted();
 }

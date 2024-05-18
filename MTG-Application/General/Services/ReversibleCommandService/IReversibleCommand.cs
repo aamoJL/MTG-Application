@@ -8,5 +8,5 @@ public interface IReversibleCommand
 
 public interface IReversibleCommand<T> : IReversibleCommand
 {
-  ReversibleAction<T> ReversableAction { get; set; }
+  ReversibleAction<T> ReversibleAction { get; set; }
 }

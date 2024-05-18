@@ -28,8 +28,8 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
     await vm.NewDeckCommand.ExecuteAsync(null);
 
     Assert.AreEqual(string.Empty, vm.DeckName);
-    Assert.AreEqual(null, vm.Commander);
-    Assert.AreEqual(null, vm.Partner);
+    Assert.AreEqual(null, vm.CommanderViewModel.Card);
+    Assert.AreEqual(null, vm.PartnerViewModel.Card);
     Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
   }
 
@@ -61,8 +61,8 @@ public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase
     await vm.NewDeckCommand.ExecuteAsync(null);
 
     Assert.AreEqual(string.Empty, vm.DeckName);
-    Assert.AreEqual(null, vm.Commander);
-    Assert.AreEqual(null, vm.Partner);
+    Assert.AreEqual(null, vm.CommanderViewModel.Card);
+    Assert.AreEqual(null, vm.PartnerViewModel.Card);
     Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
   }
 

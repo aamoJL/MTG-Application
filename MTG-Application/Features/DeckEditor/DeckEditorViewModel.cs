@@ -6,8 +6,10 @@ using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -57,6 +59,27 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       Confirmers = DeckEditorConfirmers.CardListConfirmers,
       Notifier = Notifier,
     };
+
+    CommanderViewModel = new(CardAPI)
+    {
+      UndoStack = UndoStack,
+      Worker = this,
+      ReversibleChange = new()
+      {
+        Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; },
+        ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; }
+      }
+    };
+    PartnerViewModel = new(CardAPI)
+    {
+      UndoStack = UndoStack,
+      Worker = this,
+      ReversibleChange = new()
+      {
+        Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; },
+        ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; }
+      }
+    };
   }
 
   public DeckEditorViewModel(MTGCardDeck deck) : this() => Deck = deck;
@@ -75,14 +98,15 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       WishCardList.Cards = deck.Wishlist;
       RemoveCardList.Cards = deck.Removelist;
 
+      CommanderViewModel.Card = deck.Commander;
+      PartnerViewModel.Card = deck.CommanderPartner;
+
       UndoStack.Clear();
       HasUnsavedChanges = false;
 
       OnPropertyChanged(nameof(DeckSize));
       // Can't invoke changed event for the name if the name was already empty because visual state binding would break.
       if (DeckName != oldName) OnPropertyChanged(nameof(DeckName));
-      OnPropertyChanged(nameof(Commander));
-      OnPropertyChanged(nameof(Partner));
       SaveDeckCommand.NotifyCanExecuteChanged();
       DeleteDeckCommand.NotifyCanExecuteChanged();
     }
@@ -105,24 +129,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public CardListViewModel WishCardList { get; }
   public CardListViewModel RemoveCardList { get; }
 
-  public MTGCard Commander
-  {
-    get => Deck.Commander;
-    set
-    {
-      Deck.Commander = value;
-      OnPropertyChanged(nameof(Commander));
-    }
-  }
-  public MTGCard Partner
-  {
-    get => Deck.CommanderPartner;
-    set
-    {
-      Deck.CommanderPartner = value;
-      OnPropertyChanged(nameof(Partner));
-    }
-  }
+  public CommanderViewModel CommanderViewModel { get; }
+  public CommanderViewModel PartnerViewModel { get; }
   public string DeckName => Deck.Name;
   public int DeckSize => Deck.DeckSize;
 
@@ -232,6 +240,11 @@ public partial class DeckEditorViewModel
   [RelayCommand(CanExecute = nameof(CanExecuteUndoCommand))] private void Undo() => UndoStack.Undo();
 
   [RelayCommand(CanExecute = nameof(CanExecuteRedoCommand))] private void Redo() => UndoStack.Redo();
+
+  /// <summary>
+  /// Opens card's Cardmarket page in web browser
+  /// </summary>    
+  [RelayCommand] public async Task OpenEDHRECWebsiteCommand() => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(CommanderViewModel.Card, PartnerViewModel.Card));
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 

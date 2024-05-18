@@ -2,9 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.IOService;
-using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -17,95 +17,83 @@ public partial class BasicCardView : UserControl
       DependencyProperty.Register(nameof(Model), typeof(MTGCard), typeof(BasicCardView),
         new PropertyMetadata(default(MTGCard), OnModelPropertyChangedCallback));
 
-  public static readonly DependencyProperty OnChangeCommandProperty =
-      DependencyProperty.Register(nameof(OnChangeCommand), typeof(ICommand), typeof(BasicCardView),
-        new PropertyMetadata(default(ICommand)));
-
   public BasicCardView()
   {
-    ViewModel.OnModelPropertyChange = () =>
+    DragAndDrop = new(new MTGCardCopier())
     {
-      if (OnChangeCommand?.CanExecute(null) is true) OnChangeCommand?.Execute(null);
+      OnCopy = (item) => OnDropCopy?.Execute(item),
+      OnRemove = (item) => OnDropRemove?.Execute(item),
+      OnExternalImport = (data) => OnDropImport?.Execute(data),
+      OnBeginMoveTo = (item) => OnDropBeginMoveTo?.Execute(item),
+      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
+      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
     };
-  }
 
-  public BasicCardViewModel ViewModel { get; set; } = new();
+    DragStarting += DragAndDrop.DragStarting;
+    DropCompleted += DragAndDrop.DropCompleted;
+    DragOver += DragAndDrop.DragOver;
+    Drop += DragAndDrop.Drop;
+  }
 
   public MTGCard Model
   {
     get => (MTGCard)GetValue(ModelProperty);
     set => SetValue(ModelProperty, value);
   }
+  public BasicCardViewDragAndDrop DragAndDrop { get; }
+  public string CardName => Model?.Info.Name ?? string.Empty;
 
-  public ICommand OnChangeCommand
-  {
-    get => (ICommand)GetValue(OnChangeCommandProperty);
-    set => SetValue(OnChangeCommandProperty, value);
-  }
+  [ObservableProperty] protected string selectedFaceUri = "";
 
-  protected static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-  {
-    if (sender is BasicCardView view && e.NewValue is MTGCard newModel)
-    {
-      if (e.Property.Equals(ModelProperty))
-        view.ViewModel.Model = newModel;
-    }
-  }
-}
-
-public partial class BasicCardViewModel : ObservableObject
-{
-  public BasicCardViewModel()
-  {
-    PropertyChanging += BasicCardViewModel_PropertyChanging;
-    PropertyChanged += BasicCardViewModel_PropertyChanged;
-  }
-
-  [ObservableProperty, NotifyCanExecuteChangedFor(nameof(SwitchFaceImageCommand))] private MTGCard model;
-  [ObservableProperty] private string selectedFaceUri = "";
-
-  public Action OnModelPropertyChange { get; set; }
+  public ICommand OnDropCopy { get; set; }
+  public ICommand OnDropRemove { get; set; }
+  public ICommand OnDropImport { get; set; }
+  public ICommand OnDropBeginMoveFrom { get; set; }
+  public ICommand OnDropBeginMoveTo { get; set; }
+  public ICommand OnDropExecuteMove { get; set; }
 
   /// <summary>
   /// Changes selected face image if possible
   /// </summary>
   [RelayCommand(CanExecute = nameof(SwitchFaceImageCanExecute))]
-  public void SwitchFaceImage()
+  protected void SwitchFaceImage()
   {
     if (!SwitchFaceImageCanExecute()) return;
 
-    SelectedFaceUri = Model.Info.FrontFace.ImageUri == SelectedFaceUri
+    SelectedFaceUri = Model?.Info.FrontFace.ImageUri == SelectedFaceUri
       ? Model.Info.BackFace?.ImageUri : Model.Info.FrontFace.ImageUri;
   }
 
   /// <summary>
   /// Opens card's API Website in web browser
   /// </summary>
-  [RelayCommand] public async Task OpenAPIWebsite() => await NetworkService.OpenUri(Model.Info.APIWebsiteUri);
+  [RelayCommand] protected async Task OpenAPIWebsite() => await NetworkService.OpenUri(Model?.Info.APIWebsiteUri);
 
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
-  [RelayCommand] public async Task OpenCardmarketWebsite() => await NetworkService.OpenUri(Model.Info.CardMarketUri);
+  [RelayCommand] protected async Task OpenCardmarketWebsite() => await NetworkService.OpenUri(Model?.Info.CardMarketUri);
 
-  private void BasicCardViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
+  protected bool SwitchFaceImageCanExecute() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);
+
+  protected virtual void OnModelChanging(MTGCard oldValue) { }
+
+  protected virtual void OnModelChanged(MTGCard newValue)
   {
-    if (e.PropertyName == nameof(Model))
-      if (Model != null) Model.PropertyChanged -= Model_PropertyChanged;
+    SelectedFaceUri = newValue?.Info.FrontFace.ImageUri ?? string.Empty;
+
+    OnPropertyChanged(nameof(CardName));
   }
 
-  private void BasicCardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(Model))
+    if (e.Property.Equals(ModelProperty))
     {
-      SelectedFaceUri = Model.Info.FrontFace.ImageUri;
-      if (Model != null) Model.PropertyChanged += Model_PropertyChanged;
+      var view = (sender as BasicCardView);
+
+      view.OnModelChanging((MTGCard)e.OldValue);
+      view.OnModelChanged((MTGCard)e.NewValue);
     }
   }
-
-  private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    => OnModelPropertyChange?.Invoke();
-
-  private bool SwitchFaceImageCanExecute() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);
 }
 

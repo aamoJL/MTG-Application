@@ -27,7 +27,6 @@ public partial class AdvancedCardListView : ListView
   {
     DragAndDrop = new(new MTGCardCopier())
     {
-      DataContext = DataContext,
       OnCopy = (item) => OnDropCopy?.Execute(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),
       OnExternalImport = (data) => OnDropImport?.Execute(data),
@@ -40,12 +39,7 @@ public partial class AdvancedCardListView : ListView
     DragItemsCompleted += DragAndDrop.DragCompleted;
     DragOver += DragAndDrop.DragOver;
     Drop += DragAndDrop.Drop;
-
-    DataContextChanged += OnDataContextChanged;
   }
-
-  private void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args) 
-    => DragAndDrop.DataContext = DataContext;
 
   private AdvancedCollectionView filteredAndSortedCardSource = new();
 

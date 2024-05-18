@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Services;
+﻿using Microsoft.UI.Input.DragDrop;
+using MTGApplication.General.Services;
 using System;
 
 namespace MTGApplication.General.Views;
@@ -11,8 +12,10 @@ public abstract class DragAndDrop<T>
   public static T Item { get; set; }
 
   public IClassCopier<T> ItemCopier { get; }
-  public object DataContext { get; set; }
   public bool AcceptMove { get; set; } = true;
+  public string CopyCaptionOverride { get; set; } = string.Empty;
+  public string MoveCaptionOverride { get; set; } = string.Empty;
+  public bool IsContentVisible { get; set; } = true;
 
   public Action<T> OnCopy { get; set; }
   public Action<T> OnBeginMoveTo { get; set; }

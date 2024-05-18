@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -39,26 +38,26 @@ public partial class CardListViewModel : ViewModelBase
 
   [RelayCommand]
   private void AddCard(MTGCard card) => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableAdd });
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
 
   [RelayCommand]
   private void RemoveCard(MTGCard card) => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableRemove });
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableRemove });
 
   [RelayCommand]
   private void BeginMoveFrom(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableRemove });
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableRemove });
 
   [RelayCommand]
   private void BeginMoveTo(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversableAction = ReversableAdd });
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
 
   [RelayCommand]
   private void ExecuteMove(MTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
 
   [RelayCommand(CanExecute = nameof(CanExecuteClearCommand))]
   private void Clear() => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversableAction = ReversableRemove });
+    new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversibleAction = ReversableRemove });
 
   [RelayCommand]
   private async Task ImportCards(string data)
@@ -66,7 +65,7 @@ public partial class CardListViewModel : ViewModelBase
     data ??= await Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
 
     var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
-    
+
     var addedCards = new List<MTGCard>();
     var skipConflictConfirmation = false;
     var importConflictConfirmationResult = ConfirmationResult.Yes;
@@ -87,16 +86,16 @@ public partial class CardListViewModel : ViewModelBase
     }
 
     // Add cards
-    if(addedCards.Any())
+    if (addedCards.Any())
     {
       UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(addedCards, CardCopier)
       {
-        ReversableAction = ReversableAdd,
+        ReversibleAction = ReversableAdd,
       });
     }
 
     // Notifications
-    if(result.Source == CardImportResult.ImportSource.External)
+    if (result.Source == CardImportResult.ImportSource.External)
     {
       if (result.Found.Any() && result.NotFoundCount == 0) // All found
         new SendNotification(Notifier).Execute(new(NotificationType.Success,

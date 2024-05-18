@@ -16,12 +16,12 @@ public class ReversibleCollectionCommand<T> : IReversibleCommand<IEnumerable<T>>
     Items = new List<T>(Copier.Copy(items));
   }
 
-  public ReversibleAction<IEnumerable<T>> ReversableAction { get; set; }
+  public ReversibleAction<IEnumerable<T>> ReversibleAction { get; set; }
 
   private IEnumerable<T> Items { get; }
   private IClassCopier<T> Copier { get; }
 
-  public void Execute() => ReversableAction?.Action?.Invoke(Copier.Copy(Items));
+  public void Execute() => ReversibleAction?.Action?.Invoke(Copier.Copy(Items));
 
-  public void Undo() => ReversableAction?.ReverseAction?.Invoke(Copier.Copy(Items));
+  public void Undo() => ReversibleAction?.ReverseAction?.Invoke(Copier.Copy(Items));
 }

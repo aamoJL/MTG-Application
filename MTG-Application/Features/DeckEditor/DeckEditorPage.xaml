@@ -93,50 +93,37 @@
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
               
-              <!--#region Commander -->
-              <TextBlock
-                Text="Commander: "
-                TextTrimming="CharacterEllipsis">
-                <!--<TextBlock.ContextFlyout >
-                  <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                    <CommandBarFlyout.PrimaryCommands>
-                      <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
-                      <AppBarSeparator />
-                      <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
-                      <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-                      <AppBarButton Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" Label="EDHREC" ToolTipService.ToolTip="EDHREC" />
-                      <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
-                    </CommandBarFlyout.PrimaryCommands>
-                    <CommandBarFlyout.SecondaryCommands>
-                      <AppBarButton Command="{Binding ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{Binding Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
-                    </CommandBarFlyout.SecondaryCommands>
-                  </CommandBarFlyout>
-                </TextBlock.ContextFlyout>-->
-                <Run Text="{x:Bind ViewModel.Commander.Info.Name, Mode=OneWay}"/>
-              </TextBlock>
-              <!--#endregion-->
-
-              <!--#region Partner -->
-              <TextBlock
-                Text="Partner: " 
-                TextTrimming="CharacterEllipsis">
-                <!--<TextBlock.ContextFlyout >
-                  <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                    <CommandBarFlyout.PrimaryCommands>
-                      <AppBarButton Command="{Binding FlipCardCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
-                      <AppBarSeparator />
-                      <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{Binding ModelAPIName, Mode=OneTime}" ToolTipService.ToolTip="{Binding ModelAPIName, Mode=OneTime}"/>
-                      <AppBarButton Command="{Binding OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-                      <AppBarButton Command="{x:Bind DeckBuilderViewModel.OpenEDHRECWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" Label="EDHREC" ToolTipService.ToolTip="EDHREC" />
-                      <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
-                    </CommandBarFlyout.PrimaryCommands>
-                    <CommandBarFlyout.SecondaryCommands>
-                      <AppBarButton Command="{Binding ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{Binding Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>
-                    </CommandBarFlyout.SecondaryCommands>
-                  </CommandBarFlyout>
-                </TextBlock.ContextFlyout>-->
-                <Run Text="{x:Bind ViewModel.Partner.Info.Name, Mode=OneWay}"/>
-              </TextBlock>
+              <!--#region Commander / Partner -->
+              <local:CommanderTextView 
+                PrefixText="Commander: "
+                Model="{x:Bind ViewModel.CommanderViewModel.Card, Mode=OneWay}"
+                EdhrecButtonClick="{x:Bind ViewModel.OpenEDHRECWebsiteCommandCommand, Mode=OneTime}"
+                DeleteButtonClick="{x:Bind ViewModel.CommanderViewModel.RemoveCommand, Mode=OneTime}"
+                CanDrag="True"
+                AllowDrop="True"
+                DragCopyCaptionText="Copy to Commander"
+                DragMoveCaptionText="Move to Commander"
+                OnDropCopy="{x:Bind ViewModel.CommanderViewModel.ChangeCommand, Mode=OneTime}"
+                OnDropRemove="{x:Bind ViewModel.CommanderViewModel.RemoveCommand, Mode=OneTime}"
+                OnDropBeginMoveFrom="{x:Bind ViewModel.CommanderViewModel.BeginMoveFromCommand, Mode=OneTime}"
+                OnDropBeginMoveTo="{x:Bind ViewModel.CommanderViewModel.BeginMoveToCommand, Mode=OneTime}"
+                OnDropExecuteMove="{x:Bind ViewModel.CommanderViewModel.ExecuteMoveCommand, Mode=OneTime}"
+                OnDropImport="{x:Bind ViewModel.CommanderViewModel.ImportCommand, Mode=OneTime}"/>
+              <local:CommanderTextView 
+                PrefixText="Partner: "
+                Model="{x:Bind ViewModel.PartnerViewModel.Card, Mode=OneWay}"
+                EdhrecButtonClick="{x:Bind ViewModel.OpenEDHRECWebsiteCommandCommand, Mode=OneTime}"
+                DeleteButtonClick="{x:Bind ViewModel.PartnerViewModel.RemoveCommand, Mode=OneTime}"
+                CanDrag="True"
+                AllowDrop="True"
+                DragCopyCaptionText="Copy to Partner"
+                DragMoveCaptionText="Move to Partner"
+                OnDropCopy="{x:Bind ViewModel.PartnerViewModel.ChangeCommand, Mode=OneTime}"
+                OnDropRemove="{x:Bind ViewModel.PartnerViewModel.RemoveCommand, Mode=OneTime}"
+                OnDropBeginMoveFrom="{x:Bind ViewModel.PartnerViewModel.BeginMoveFromCommand, Mode=OneTime}"
+                OnDropBeginMoveTo="{x:Bind ViewModel.PartnerViewModel.BeginMoveToCommand, Mode=OneTime}"
+                OnDropExecuteMove="{x:Bind ViewModel.PartnerViewModel.ExecuteMoveCommand, Mode=OneTime}"
+                OnDropImport="{x:Bind ViewModel.PartnerViewModel.ImportCommand, Mode=OneTime}"/>
               <!--#endregion-->
               
             </StackPanel>
@@ -181,8 +168,8 @@
                     Model="{Binding Mode=OneWay}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    OnDeleteCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.RemoveCardCommand, Mode=OneTime}"
-                    OnChangeCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    DeleteButtonClick="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.RemoveCardCommand, Mode=OneTime}"
+                    OnModelPropertyChangedCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -228,8 +215,8 @@
                     Model="{Binding Mode=OneWay}" 
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    OnDeleteCommand="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.RemoveCardCommand, Mode=OneTime}"
-                    OnChangeCommand="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    DeleteButtonClick="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.RemoveCardCommand, Mode=OneTime}"
+                    OnModelPropertyChangedCommand="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -275,8 +262,8 @@
                     Model="{Binding Mode=OneWay}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    OnDeleteCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.RemoveCardCommand, Mode=OneTime}"
-                    OnChangeCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    DeleteButtonClick="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.RemoveCardCommand, Mode=OneTime}"
+                    OnModelPropertyChangedCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -471,8 +458,8 @@
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardImageView
                 Model="{Binding Mode=OneWay}" 
-                OnDeleteCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
-                OnChangeCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                DeleteButtonClick="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
+                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedAdaptiveCardGridView.ItemTemplate>
         </local:AdvancedAdaptiveCardGridView>
@@ -499,8 +486,8 @@
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardTextView
                 Model="{Binding Mode=OneWay}" 
-                OnDeleteCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
-                OnChangeCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                DeleteButtonClick="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
+                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedCardListView.ItemTemplate>
         </local:AdvancedCardListView>

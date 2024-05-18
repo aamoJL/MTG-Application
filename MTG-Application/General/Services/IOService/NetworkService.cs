@@ -34,5 +34,9 @@ public static class NetworkService
   /// <summary>
   /// Opens the given <paramref name="uri"/> with the default program (probably a web browser)
   /// </summary>
-  public static async Task<bool> OpenUri(string uri) => await Launcher.LaunchUriAsync(new(uri));
+  public static async Task<bool> OpenUri(string uri)
+  {
+    try { return await Launcher.LaunchUriAsync(new(uri)); }
+    catch { return false; }
+  }
 }
