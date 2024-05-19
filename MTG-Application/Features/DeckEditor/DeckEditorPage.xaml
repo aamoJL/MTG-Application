@@ -20,7 +20,7 @@
   <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened--> 
   <Page.KeyboardAccelerators>
     <KeyboardAccelerator Key="Z" Modifiers="Control" Invoked="UndoKeyboardAccelerator_Invoked"/>
-    <KeyboardAccelerator Key="Y" Modifiers="Control" Invoked="RedoboardAccelerator_Invoked"/>
+    <KeyboardAccelerator Key="Y" Modifiers="Control" Invoked="RedoKeyboardAccelerator_Invoked"/>
     <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="SaveDeckKeyboardAccelerator_Invoked" />
     <KeyboardAccelerator Modifiers="Control" Key="O" Invoked="OpenDeckKeyboardAccelerator_Invoked" />
     <KeyboardAccelerator Modifiers="Control" Key="N" Invoked="NewDeckKeyboardAccelerator_Invoked" />
@@ -148,8 +148,8 @@
             <local:AdvancedCardListView
               x:Name="MaybeCardsListView"
               Grid.Row="2"
-              DataContext="{x:Bind ViewModel, Mode=OneWay}"
-              ItemsSource="{Binding MaybeCardList.Cards, Mode=OneWay}"
+              DataContext="{x:Bind ViewModel.MaybeCardList, Mode=OneWay}"
+              ItemsSource="{Binding Cards, Mode=OneWay}"
               SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
               Style="{StaticResource MTGListViewStyle}"
@@ -161,15 +161,19 @@
               OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}">
+              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}"
+              LosingFocus="ListView_LosingFocus">
+              <local:AdvancedCardListView.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+              </local:AdvancedCardListView.KeyboardAccelerators>
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
                     Model="{Binding Mode=OneWay}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    DeleteButtonClick="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.RemoveCardCommand, Mode=OneTime}"
-                    OnModelPropertyChangedCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.MaybeCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    DeleteButtonClick="{Binding ElementName=MaybeCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
+                    OnModelPropertyChangedCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -195,8 +199,8 @@
             <local:AdvancedCardListView
               x:Name="WishCardsListView"
               Grid.Row="4"
-              DataContext="{x:Bind ViewModel, Mode=OneWay}"
-              ItemsSource="{Binding WishCardList.Cards, Mode=OneWay}"
+              DataContext="{x:Bind ViewModel.WishCardList, Mode=OneWay}"
+              ItemsSource="{Binding Cards, Mode=OneWay}"
               SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
               Style="{StaticResource MTGListViewStyle}"
@@ -208,15 +212,19 @@
               OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneWay}">
+              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneWay}"
+              LosingFocus="ListView_LosingFocus">
+              <local:AdvancedCardListView.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+              </local:AdvancedCardListView.KeyboardAccelerators>
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
                     Model="{Binding Mode=OneWay}" 
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    DeleteButtonClick="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.RemoveCardCommand, Mode=OneTime}"
-                    OnModelPropertyChangedCommand="{Binding ElementName=WishCardsListView, Path=DataContext.WishCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    DeleteButtonClick="{Binding ElementName=WishCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
+                    OnModelPropertyChangedCommand="{Binding ElementName=WishCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -242,8 +250,8 @@
             <local:AdvancedCardListView
               x:Name="RemoveCardsListView"
               Grid.Row="6"
-              DataContext="{x:Bind ViewModel, Mode=OneWay}"
-              ItemsSource="{Binding RemoveCardList.Cards, Mode=OneWay}"
+              DataContext="{x:Bind ViewModel.RemoveCardList, Mode=OneWay}"
+              ItemsSource="{Binding Cards, Mode=OneWay}"
               SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
               Style="{StaticResource MTGListViewStyle}"
@@ -255,15 +263,19 @@
               OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneWay}">
+              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneWay}"
+              LosingFocus="ListView_LosingFocus">
+              <local:AdvancedCardListView.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+              </local:AdvancedCardListView.KeyboardAccelerators>
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
                     Model="{Binding Mode=OneWay}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    DeleteButtonClick="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.RemoveCardCommand, Mode=OneTime}"
-                    OnModelPropertyChangedCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    DeleteButtonClick="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
+                    OnModelPropertyChangedCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -436,8 +448,8 @@
         <!--#region Grid View -->
         <local:AdvancedAdaptiveCardGridView
           x:Name="DeckCardsGridView"
-          DataContext="{x:Bind ViewModel, Mode=OneWay}"
-          ItemsSource="{Binding DeckCardList.Cards, Mode=OneWay}"
+          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
+          ItemsSource="{Binding Cards, Mode=OneWay}"
           SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
           Style="{StaticResource MTGAdaptiveGridViewStyle}"
@@ -453,13 +465,17 @@
           OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
           OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}">
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+          LosingFocus="ListView_LosingFocus">
+          <local:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+          </local:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
           <local:AdvancedAdaptiveCardGridView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardImageView
                 Model="{Binding Mode=OneWay}" 
-                DeleteButtonClick="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
-                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                DeleteButtonClick="{Binding ElementName=DeckCardsGridView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
+                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedAdaptiveCardGridView.ItemTemplate>
         </local:AdvancedAdaptiveCardGridView>
@@ -468,8 +484,8 @@
         <!--#region List View -->
         <local:AdvancedCardListView
           x:Name="DeckCardsListView"
-          DataContext="{x:Bind ViewModel, Mode=OneWay}"
-          ItemsSource="{Binding DeckCardList.Cards, Mode=OneWay}"
+          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
+          ItemsSource="{Binding Cards, Mode=OneWay}"
           SortProperties="{x:Bind ViewModel.CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{x:Bind ViewModel.CardFilters, Mode=OneWay}"
           Visibility="{x:Bind DeckTextViewVisible, Mode=OneWay}"
@@ -481,13 +497,17 @@
           OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
           OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}">
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+          LosingFocus="ListView_LosingFocus">
+          <local:AdvancedCardListView.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+          </local:AdvancedCardListView.KeyboardAccelerators>
           <local:AdvancedCardListView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardTextView
                 Model="{Binding Mode=OneWay}" 
-                DeleteButtonClick="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.RemoveCardCommand, Mode=OneTime}"
-                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.DeckCardList.CardlistCardChangedCommand, Mode=OneTime}"/>
+                DeleteButtonClick="{Binding ElementName=DeckCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
+                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedCardListView.ItemTemplate>
         </local:AdvancedCardListView>
