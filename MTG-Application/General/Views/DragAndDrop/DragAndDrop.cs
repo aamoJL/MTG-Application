@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.General.Services;
 using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.ApplicationModel.DataTransfer.DragDrop;
 
@@ -19,12 +20,12 @@ public abstract class DragAndDrop<T>
   public string MoveCaptionOverride { get; set; } = string.Empty;
   public bool IsContentVisible { get; set; } = true;
 
-  public Action<T> OnCopy { get; set; }
-  public Action<T> OnBeginMoveTo { get; set; }
+  public Func<T, Task> OnCopy { get; set; }
+  public Func<T, Task> OnBeginMoveTo { get; set; }
   public Action<T> OnBeginMoveFrom { get; set; }
   public Action<T> OnExecuteMove { get; set; }
   public Action<T> OnRemove { get; set; }
-  public Action<string> OnExternalImport { get; set; }
+  public Func<string, Task> OnExternalImport { get; set; }
 
   public virtual void OnDragStarting(T item, out DataPackageOperation requestedOperation)
   {
@@ -57,7 +58,7 @@ public abstract class DragAndDrop<T>
     eventArgs.DragUIOverride.IsContentVisible = IsContentVisible;
   }
 
-  public virtual void Drop(DataPackageOperation operation, string data)
+  public virtual async Task Drop(DataPackageOperation operation, string data)
   {
     if (DragOrigin == this
       || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
@@ -65,33 +66,33 @@ public abstract class DragAndDrop<T>
       return; // don't drop on the origin and only allow copy and move operations
 
     if (Item == null)
-      OnExternalDrop(operation, data);
+      await OnExternalDrop(operation, data);
     else
-      OnInternalDrop(operation, Item);
+      await OnInternalDrop(operation, Item);
   }
 
-  protected virtual void OnInternalDrop(DataPackageOperation operation, T item)
+  protected virtual async Task OnInternalDrop(DataPackageOperation operation, T item)
   {
     if (item == null) return;
 
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
     {
-      OnCopy?.Invoke(item);
+      await OnCopy?.Invoke(item);
     }
     else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
     {
       DragOrigin?.OnBeginMoveFrom?.Invoke(item);
-      OnBeginMoveTo?.Invoke(item);
+      await OnBeginMoveTo?.Invoke(item);
 
       OnExecuteMove?.Invoke(item);
       DragOrigin?.OnExecuteMove?.Invoke(item);
     }
   }
 
-  protected virtual void OnExternalDrop(DataPackageOperation operation, string data)
+  protected virtual async Task OnExternalDrop(DataPackageOperation operation, string data)
   {
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
-      OnExternalImport?.Invoke(data);
+      await OnExternalImport?.Invoke(data);
   }
 
   public virtual void DropCompleted()

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.WinUI.UI;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using MTGApplication.General.Models.Card;
@@ -26,10 +27,10 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
   {
     DragAndDrop = new(new MTGCardCopier())
     {
-      OnCopy = (item) => OnDropCopy?.Execute(item),
+      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),
-      OnExternalImport = (data) => OnDropImport?.Execute(data),
-      OnBeginMoveTo = (item) => OnDropBeginMoveTo?.Execute(item),
+      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
+      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
       OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
     };
@@ -71,11 +72,11 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     }
   }
 
-  public ICommand OnDropCopy { get; set; }
+  public IAsyncRelayCommand OnDropCopy { get; set; }
   public ICommand OnDropRemove { get; set; }
-  public ICommand OnDropImport { get; set; }
+  public IAsyncRelayCommand OnDropImport { get; set; }
   public ICommand OnDropBeginMoveFrom { get; set; }
-  public ICommand OnDropBeginMoveTo { get; set; }
+  public IAsyncRelayCommand OnDropBeginMoveTo { get; set; }
   public ICommand OnDropExecuteMove { get; set; }
 
   private void OnItemsSourceDependencyPropertyChanged(IList list)

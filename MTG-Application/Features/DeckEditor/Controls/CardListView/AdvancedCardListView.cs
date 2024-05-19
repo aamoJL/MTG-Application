@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.WinUI.UI;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
@@ -22,15 +23,15 @@ public partial class AdvancedCardListView : ListView
   public static readonly DependencyProperty FilterPropertiesProperty =
       DependencyProperty.Register(nameof(FilterProperties), typeof(CardFilters), typeof(AdvancedCardListView), new PropertyMetadata(
         new CardFilters(), OnDependencyPropertyChanged));
-  
+
   public AdvancedCardListView()
   {
     DragAndDrop = new(new MTGCardCopier())
     {
-      OnCopy = (item) => OnDropCopy?.Execute(item),
+      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),
-      OnExternalImport = (data) => OnDropImport?.Execute(data),
-      OnBeginMoveTo = (item) => OnDropBeginMoveTo?.Execute(item),
+      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
+      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
       OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
     };
@@ -72,11 +73,11 @@ public partial class AdvancedCardListView : ListView
     }
   }
 
-  public ICommand OnDropCopy { get; set; }
+  public IAsyncRelayCommand OnDropCopy { get; set; }
   public ICommand OnDropRemove { get; set; }
-  public ICommand OnDropImport { get; set; }
+  public IAsyncRelayCommand OnDropImport { get; set; }
   public ICommand OnDropBeginMoveFrom { get; set; }
-  public ICommand OnDropBeginMoveTo { get; set; }
+  public IAsyncRelayCommand OnDropBeginMoveTo { get; set; }
   public ICommand OnDropExecuteMove { get; set; }
 
   private void OnItemsSourceDependencyPropertyChanged(IList list)

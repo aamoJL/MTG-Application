@@ -32,7 +32,7 @@
         ItemsSource="{x:Bind ViewModel.DeckItems, Mode=OneWay}" 
         IsItemClickEnabled="True"
         SelectionMode="Single"
-        ui:ListViewExtensions.Command="{x:Bind SelectDeckCommand, Mode=OneWay}">
+        ui:ListViewExtensions.Command="{x:Bind SelectDeckCommand, Mode=OneTime}">
         <GridView.ItemTemplate>
           <DataTemplate x:DataType="deckselector:DeckSelectionListItem">
             <StackPanel Background="Transparent" CornerRadius="10" Orientation="Vertical" Margin="5">

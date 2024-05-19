@@ -11,7 +11,7 @@ public partial class CommanderViewModelTests
   public class BeginExecuteMoveTests
   {
     [TestMethod]
-    public void ExecuteMove_CardMovedBetweenViewModels()
+    public async Task ExecuteMove_CardMovedBetweenViewModels()
     {
       var undoStack = new ReversibleCommandStack();
       var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
@@ -26,7 +26,7 @@ public partial class CommanderViewModelTests
       };
 
       origin.BeginMoveFromCommand.Execute(card);
-      target.BeginMoveToCommand.Execute(card);
+      await target.BeginMoveToCommand.ExecuteAsync(card);
 
       origin.ExecuteMoveCommand.Execute(card);
       target.ExecuteMoveCommand.Execute(card);

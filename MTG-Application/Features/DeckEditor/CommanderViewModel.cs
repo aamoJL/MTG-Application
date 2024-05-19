@@ -34,8 +34,11 @@ public partial class CommanderViewModel : ViewModelBase
   private MTGCardCopier CardCopier { get; } = new();
 
   [RelayCommand]
-  private void Change(MTGCard card) => UndoStack.PushAndExecute(
-    new ReversibleCommanderChangeCommand(card, Card, CardCopier) { ReversibleAction = ReversibleChange });
+  private async Task Change(MTGCard card)
+  {
+    UndoStack.PushAndExecute(new ReversibleCommanderChangeCommand(card, Card, CardCopier) { ReversibleAction = ReversibleChange });
+    await Task.Yield();
+  }
 
   [RelayCommand]
   private void Remove(MTGCard card) => UndoStack.PushAndExecute(
@@ -46,8 +49,11 @@ public partial class CommanderViewModel : ViewModelBase
     new ReversibleCommanderChangeCommand(null, Card, CardCopier) { ReversibleAction = ReversibleChange });
 
   [RelayCommand]
-  private void BeginMoveTo(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
-    new ReversibleCommanderChangeCommand(card, Card, CardCopier) { ReversibleAction = ReversibleChange });
+  private async Task BeginMoveTo(MTGCard card)
+  {
+    UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCommanderChangeCommand(card, Card, CardCopier) { ReversibleAction = ReversibleChange });
+    await Task.Yield();
+  }
 
   [RelayCommand]
   private void ExecuteMove(MTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
@@ -68,7 +74,7 @@ public partial class CommanderViewModel : ViewModelBase
     else
     {
       // Only legendary cards are allowed to be commanders
-      Change(result.Found[0]);
+      await Change(result.Found[0]);
 
       new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportSuccess);
     }

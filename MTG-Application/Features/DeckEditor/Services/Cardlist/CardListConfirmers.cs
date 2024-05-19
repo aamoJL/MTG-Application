@@ -6,7 +6,8 @@ public class CardListConfirmers
 {
   public Confirmer<string, string> ExportConfirmer { get; init; } = new();
   public Confirmer<string, string> ImportConfirmer { get; init; } = new();
-  public Confirmer<(ConfirmationResult Result, bool SkipCheck)> ImportConflictConfirmer { get; init; } = new();
+  public Confirmer<(ConfirmationResult Result, bool SkipCheck)> AddMultipleConflictConfirmer { get; init; } = new();
+  public Confirmer<ConfirmationResult> AddSingleConflictConfirmer { get; init; } = new();
 
   public static Confirmation<string> GetExportConfirmation(string data)
   {
@@ -24,10 +25,17 @@ public class CardListConfirmers
       Data: data);
   }
 
-  public static Confirmation GetExistingCardImportConfirmer(string cardName)
+  public static Confirmation GetAddMultipleConflictConfirmer(string cardName)
   {
     return new(
-      Title: "Card already in the deck",
-      Message: $"'{cardName}' is already in the deck. Do you still want to add it?");
+      Title: "Card already exists in the list",
+      Message: $"'{cardName}' already exists in the list. Do you still want to add it?");
+  }
+
+  public static Confirmation GetAddSingleConflictConfirmer(string cardName)
+  {
+    return new(
+      Title: "Card already exists in the list",
+      Message: $"'{cardName}' already exists in the list. Do you still want to add it?");
   }
 }

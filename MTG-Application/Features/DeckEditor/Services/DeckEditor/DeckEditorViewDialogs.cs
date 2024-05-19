@@ -28,7 +28,7 @@ public class DeckEditorViewDialogs
       PrimaryButtonText = "Import",
       SecondaryButtonText = string.Empty
     }.ShowAsync(getWrapper.Invoke());
-    confirmer.CardListConfirmers.ImportConflictConfirmer.OnConfirm = async (msg) =>
+    confirmer.CardListConfirmers.AddMultipleConflictConfirmer.OnConfirm = async (msg) =>
     {
       var (answer, isChecked) = await new CheckBoxDialog(msg.Title)
       {
@@ -40,5 +40,12 @@ public class DeckEditorViewDialogs
 
       return new(answer.ToConfirmationResult(), isChecked ?? false);
     };
+    confirmer.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg) => (await new ConfirmationDialog(msg.Title)
+    {
+      Message = msg.Message,
+      SecondaryButtonText = string.Empty,
+      CloseButtonText = "No",
+      PrimaryButtonText = "Yes"
+    }.ShowAsync(getWrapper.Invoke())).ToConfirmationResult();
   }
 }

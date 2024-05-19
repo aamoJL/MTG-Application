@@ -90,7 +90,7 @@ public class CardListViewModelImportCardsTests
       Confirmers = new()
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
-        ImportConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
+        AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
       }
     };
 
@@ -109,7 +109,7 @@ public class CardListViewModelImportCardsTests
       Confirmers = new()
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
-        ImportConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
+        AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
       }
     };
 
@@ -137,7 +137,7 @@ public class CardListViewModelImportCardsTests
       Confirmers = new()
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-        ImportConflictConfirmer = new()
+        AddMultipleConflictConfirmer = new()
         {
           OnConfirm = async (arg) =>
           {
@@ -174,7 +174,7 @@ public class CardListViewModelImportCardsTests
       Confirmers = new()
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-        ImportConflictConfirmer = new()
+        AddMultipleConflictConfirmer = new()
         {
           OnConfirm = async (arg) =>
           {

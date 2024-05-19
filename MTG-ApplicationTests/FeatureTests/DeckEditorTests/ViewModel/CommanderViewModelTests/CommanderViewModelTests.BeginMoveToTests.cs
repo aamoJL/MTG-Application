@@ -10,12 +10,12 @@ public partial class CommanderViewModelTests
   public class BeginMoveToTests
   {
     [TestMethod]
-    public void BeginMoveTo_CommandAddedToCombinedCommand()
+    public async Task BeginMoveTo_CommandAddedToCombinedCommand()
     {
       var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
       var viewmodel = new CommanderViewModel(new TestCardAPI());
 
-      viewmodel.BeginMoveToCommand.Execute(card);
+      await viewmodel.BeginMoveToCommand.ExecuteAsync(card);
 
       Assert.AreEqual(1, viewmodel.UndoStack.ActiveCombinedCommand.Commands.Count);
     }

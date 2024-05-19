@@ -10,25 +10,25 @@ public partial class CommanderViewModelTests
   public class ChangeTests
   {
     [TestMethod]
-    public void Change_ToCard_CardIsCard()
+    public async Task Change_ToCard_CardIsCard()
     {
       var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
       var viewmodel = new CommanderViewModel(new TestCardAPI());
 
-      viewmodel.ChangeCommand.Execute(card);
+      await viewmodel.ChangeCommand.ExecuteAsync(card);
 
       Assert.AreEqual(card.Info.Name, viewmodel.Card.Info.Name);
     }
 
     [TestMethod]
-    public void Change_ToNull_CardIsNull()
+    public async Task Change_ToNull_CardIsNull()
     {
       var viewmodel = new CommanderViewModel(new TestCardAPI())
       {
         Card = Mocker.MTGCardModelMocker.CreateMTGCardModel()
       };
 
-      viewmodel.ChangeCommand.Execute(null);
+      await viewmodel.ChangeCommand.ExecuteAsync(null);
 
       Assert.IsNull(viewmodel.Card);
     }

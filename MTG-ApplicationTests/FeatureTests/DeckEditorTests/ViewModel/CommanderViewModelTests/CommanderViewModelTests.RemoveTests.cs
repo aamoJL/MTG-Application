@@ -10,14 +10,14 @@ public partial class CommanderViewModelTests
   public class RemoveTests
   {
     [TestMethod]
-    public void Remove_CardIsNull()
+    public async Task Remove_CardIsNull()
     {
       var viewmodel = new CommanderViewModel(new TestCardAPI())
       {
         Card = Mocker.MTGCardModelMocker.CreateMTGCardModel()
       };
 
-      viewmodel.ChangeCommand.Execute(null);
+      await viewmodel.ChangeCommand.ExecuteAsync(null);
 
       Assert.IsNull(viewmodel.Card);
     }

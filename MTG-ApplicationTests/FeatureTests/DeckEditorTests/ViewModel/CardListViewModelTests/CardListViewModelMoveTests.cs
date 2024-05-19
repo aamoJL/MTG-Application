@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplicationTests.API;
 using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -87,5 +89,58 @@ public class CardListViewModelMoveTests
 
     Assert.AreEqual(0, origin.Cards.Count);
     Assert.AreEqual(1, target.Cards.Count);
+  }
+
+  [TestMethod]
+  public async Task MoveTo_AlreadyExists_ConflictConfirmationShown()
+  {
+    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var target = new CardListViewModel(new TestCardAPI())
+    {
+      Cards = [card],
+      Confirmers = new()
+      {
+        AddSingleConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+      }
+    };
+
+    await ConfirmationAssert.ConfirmationShown(() => target.BeginMoveToCommand.ExecuteAsync(card));
+  }
+
+  [TestMethod("Card should change list when executing move command")]
+  public async Task Move_CancelConflict_DoesNotExecute_CardInOriginList()
+  {
+    var undoStack = new ReversibleCommandStack();
+    var originCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var targetCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var target = new CardListViewModel(new TestCardAPI())
+    {
+      Cards = [targetCard],
+      UndoStack = undoStack,
+      Confirmers = new()
+      {
+        AddSingleConflictConfirmer = new()
+        {
+          OnConfirm = async (arg) => await Task.FromResult(ConfirmationResult.No)
+        }
+      }
+    };
+    var origin = new CardListViewModel(new TestCardAPI())
+    {
+      UndoStack = undoStack,
+      Cards = [originCard],
+    };
+
+    origin.BeginMoveFromCommand.Execute(originCard);
+    await target.BeginMoveToCommand.ExecuteAsync(originCard);
+
+    Assert.IsFalse(undoStack.ActiveCombinedCommand.CanExecute());
+
+    target.ExecuteMoveCommand.Execute(originCard);
+    origin.ExecuteMoveCommand.Execute(originCard);
+
+    Assert.IsFalse(undoStack.CanUndo);
+    Assert.AreEqual(originCard, origin.Cards.First());
+    Assert.AreEqual(1, target.Cards.Sum(x => x.Count));
   }
 }

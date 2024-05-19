@@ -24,7 +24,7 @@ public class ListViewDragAndDrop : DragAndDrop<MTGCard>
   {
     var def = e.GetDeferral();
 
-    Drop(e.AcceptedOperation, e.DataView.Contains(StandardDataFormats.Text) ? await e.DataView.GetTextAsync() : string.Empty);
+    await Drop(e.AcceptedOperation, e.DataView.Contains(StandardDataFormats.Text) ? await e.DataView.GetTextAsync() : string.Empty);
 
     def.Complete();
   }

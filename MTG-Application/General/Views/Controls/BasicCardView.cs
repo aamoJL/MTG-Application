@@ -21,10 +21,10 @@ public partial class BasicCardView : UserControl
   {
     DragAndDrop = new(new MTGCardCopier())
     {
-      OnCopy = (item) => OnDropCopy?.Execute(item),
+      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),
-      OnExternalImport = (data) => OnDropImport?.Execute(data),
-      OnBeginMoveTo = (item) => OnDropBeginMoveTo?.Execute(item),
+      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
+      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
       OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
     };
@@ -45,11 +45,11 @@ public partial class BasicCardView : UserControl
 
   [ObservableProperty] protected string selectedFaceUri = "";
 
-  public ICommand OnDropCopy { get; set; }
+  public IAsyncRelayCommand OnDropCopy { get; set; }
   public ICommand OnDropRemove { get; set; }
-  public ICommand OnDropImport { get; set; }
+  public IAsyncRelayCommand OnDropImport { get; set; }
   public ICommand OnDropBeginMoveFrom { get; set; }
-  public ICommand OnDropBeginMoveTo { get; set; }
+  public IAsyncRelayCommand OnDropBeginMoveTo { get; set; }
   public ICommand OnDropExecuteMove { get; set; }
 
   /// <summary>

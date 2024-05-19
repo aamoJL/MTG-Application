@@ -37,8 +37,16 @@ public partial class CardListViewModel : ViewModelBase
   public ICardAPI<MTGCard> CardAPI { get; }
 
   [RelayCommand]
-  private void AddCard(MTGCard card) => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+  private async Task AddCard(MTGCard card)
+  {
+    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
+    {
+      if (await Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmer(card.Info.Name)) is ConfirmationResult.Yes)
+        UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+    }
+    else
+      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+  }
 
   [RelayCommand]
   private void RemoveCard(MTGCard card) => UndoStack.PushAndExecute(
@@ -49,8 +57,18 @@ public partial class CardListViewModel : ViewModelBase
     new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableRemove });
 
   [RelayCommand]
-  private void BeginMoveTo(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+  private async Task BeginMoveTo(MTGCard card)
+  {
+    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
+    {
+      if (await Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmer(card.Info.Name)) is ConfirmationResult.Yes)
+        UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+      else
+        UndoStack.ActiveCombinedCommand.Cancel();
+    }
+    else
+      UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+  }
 
   [RelayCommand]
   private void ExecuteMove(MTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
@@ -68,7 +86,7 @@ public partial class CardListViewModel : ViewModelBase
 
     var addedCards = new List<MTGCard>();
     var skipConflictConfirmation = false;
-    var importConflictConfirmationResult = ConfirmationResult.Yes;
+    var addConflictConfirmationResult = ConfirmationResult.Yes;
 
     // Confirm imported cards, if already exists
     foreach (var card in result.Found)
@@ -77,10 +95,12 @@ public partial class CardListViewModel : ViewModelBase
       {
         // Card exist in the list; confirm the import, unless the user skips confirmations
         if (!skipConflictConfirmation)
-          (importConflictConfirmationResult, skipConflictConfirmation) = await Confirmers.ImportConflictConfirmer.Confirm(
-            CardListConfirmers.GetExistingCardImportConfirmer(card.Info.Name));
+        {
+          (addConflictConfirmationResult, skipConflictConfirmation) = await Confirmers.AddMultipleConflictConfirmer.Confirm(
+            CardListConfirmers.GetAddMultipleConflictConfirmer(card.Info.Name));
+        }
 
-        if (importConflictConfirmationResult == ConfirmationResult.Yes) { addedCards.Add(card); }
+        if (addConflictConfirmationResult == ConfirmationResult.Yes) { addedCards.Add(card); }
       }
       else { addedCards.Add(card); }
     }
