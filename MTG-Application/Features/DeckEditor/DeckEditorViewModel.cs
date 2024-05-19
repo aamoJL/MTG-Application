@@ -10,79 +10,47 @@ using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor;
 public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
   private MTGCardDeck deck = new();
 
-  public DeckEditorViewModel()
+  public DeckEditorViewModel(
+    ICardAPI<MTGCard> cardAPI,
+    MTGCardDeck deck = null,
+    Notifier notifier = null,
+    DeckEditorConfirmers confirmers = null)
   {
-    DeckCardList = new(CardAPI)
-    {
-      Cards = Deck.DeckCards,
-      OnChange = () =>
-      {
-        HasUnsavedChanges = true;
-        OnPropertyChanged(nameof(DeckSize));
-      },
-      UndoStack = UndoStack,
-      Worker = this,
-      Confirmers = DeckEditorConfirmers.CardListConfirmers,
-      Notifier = Notifier,
-    };
-    MaybeCardList = new(CardAPI)
-    {
-      Cards = Deck.Maybelist,
-      OnChange = () => { HasUnsavedChanges = true; },
-      UndoStack = UndoStack,
-      Worker = this,
-      Confirmers = DeckEditorConfirmers.CardListConfirmers,
-      Notifier = Notifier,
-    };
-    WishCardList = new(CardAPI)
-    {
-      Cards = Deck.Wishlist,
-      OnChange = () => { HasUnsavedChanges = true; },
-      UndoStack = UndoStack,
-      Worker = this,
-      Confirmers = DeckEditorConfirmers.CardListConfirmers,
-      Notifier = Notifier,
-    };
-    RemoveCardList = new(CardAPI)
-    {
-      Cards = Deck.Removelist,
-      OnChange = () => { HasUnsavedChanges = true; },
-      UndoStack = UndoStack,
-      Worker = this,
-      Confirmers = DeckEditorConfirmers.CardListConfirmers,
-      Notifier = Notifier,
-    };
+    CardAPI = cardAPI;
+    Notifier = notifier ?? new();
+    DeckEditorConfirmers = confirmers ?? new();
 
-    CommanderViewModel = new(CardAPI)
+    DeckCardList = CreateCardListViewModel(Deck.DeckCards, () =>
     {
-      UndoStack = UndoStack,
-      Worker = this,
-      ReversibleChange = new()
-      {
-        Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; },
-        ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; }
-      }
-    };
-    PartnerViewModel = new(CardAPI)
+      HasUnsavedChanges = true;
+      OnPropertyChanged(nameof(DeckSize));
+    });
+    MaybeCardList = CreateCardListViewModel(Deck.Maybelist, () => { HasUnsavedChanges = true; });
+    WishCardList = CreateCardListViewModel(Deck.Wishlist, () => { HasUnsavedChanges = true; });
+    RemoveCardList = CreateCardListViewModel(Deck.Removelist, () => { HasUnsavedChanges = true; });
+
+    CommanderViewModel = CreateCommanderViewModel(new()
     {
-      UndoStack = UndoStack,
-      Worker = this,
-      ReversibleChange = new()
-      {
-        Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; },
-        ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; }
-      }
-    };
+      Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; },
+      ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; }
+    });
+    PartnerViewModel = CreateCommanderViewModel(new()
+    {
+      Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; },
+      ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; }
+    });
+
+    Deck = deck ?? new();
   }
-
-  public DeckEditorViewModel(MTGCardDeck deck) : this() => Deck = deck;
 
   private MTGCardDeck Deck
   {
@@ -112,25 +80,24 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     }
   }
   private ReversibleCommandStack UndoStack { get; } = new();
+  private ICardAPI<MTGCard> CardAPI { get; }
 
-  public ICardAPI<MTGCard> CardAPI { private get; init; } = App.MTGCardAPI;
-  public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
-
-  [ObservableProperty] private bool isBusy;
-  [ObservableProperty] private bool hasUnsavedChanges;
-
-  public DeckEditorConfirmers DeckEditorConfirmers { get; init; } = new();
-  public DeckEditorNotifier Notifier { get; init; } = new();
-  public CardFilters CardFilters { get; init; } = new();
-  public CardSorter CardSorter { get; init; } = new();
-
+  public DeckEditorConfirmers DeckEditorConfirmers { get; }
+  public Notifier Notifier { get; }
   public CardListViewModel DeckCardList { get; }
   public CardListViewModel MaybeCardList { get; }
   public CardListViewModel WishCardList { get; }
   public CardListViewModel RemoveCardList { get; }
-
   public CommanderViewModel CommanderViewModel { get; }
   public CommanderViewModel PartnerViewModel { get; }
+
+  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
+  public CardFilters CardFilters { get; init; } = new();
+  public CardSorter CardSorter { get; init; } = new();
+
+  [ObservableProperty] private bool isBusy;
+  [ObservableProperty] private bool hasUnsavedChanges;
+
   public string DeckName => Deck.Name;
   public int DeckSize => Deck.DeckSize;
 
@@ -144,6 +111,30 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       case ConfirmationResult.Yes: await SaveDeck(); return !HasUnsavedChanges;
       case ConfirmationResult.No: return true;
       default: return false;
+    };
+  }
+
+  private CardListViewModel CreateCardListViewModel(ObservableCollection<MTGCard> cards, Action onChange)
+  {
+    return new(CardAPI)
+    {
+      Cards = cards,
+      OnChange = onChange,
+      UndoStack = UndoStack,
+      Worker = this,
+      Confirmers = DeckEditorConfirmers.CardListConfirmers,
+      Notifier = Notifier
+    };
+  }
+
+  private CommanderViewModel CreateCommanderViewModel(ReversibleAction<MTGCard> reversibleAction)
+  {
+    return new(CardAPI)
+    {
+      UndoStack = UndoStack,
+      Notifier = Notifier,
+      Worker = this,
+      ReversibleChange = reversibleAction
     };
   }
 }
@@ -172,10 +163,10 @@ public partial class DeckEditorViewModel
     if (await ((IWorker)this).DoWork(new LoadDeck(Repository, CardAPI).Execute(loadName)) is MTGCardDeck deck)
     {
       Deck = deck;
-      new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.LoadSuccessNotification);
+      new SendNotification(Notifier).Execute(DeckEditorNotifications.LoadSuccessNotification);
     }
     else
-      new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.LoadErrorNotification);
+      new SendNotification(Notifier).Execute(DeckEditorNotifications.LoadErrorNotification);
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
@@ -205,11 +196,11 @@ public partial class DeckEditorViewModel
     switch (await ((IWorker)this).DoWork(new SaveDeck(Repository).Execute(new(Deck, saveName, overrideOld))))
     {
       case true:
-        new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.SaveSuccessNotification);
+        new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveSuccessNotification);
         OnPropertyChanged(nameof(DeckName));
         HasUnsavedChanges = false;
         break;
-      case false: new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.SaveErrorNotification); break;
+      case false: new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveErrorNotification); break;
     }
   }
 
@@ -232,8 +223,8 @@ public partial class DeckEditorViewModel
     {
       case true:
         Deck = new();
-        new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.DeleteSuccessNotification); break;
-      case false: new SendNotification(Notifier).Execute(DeckEditorNotifier.DeckEditorNotifications.DeleteErrorNotification); break;
+        new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteSuccessNotification); break;
+      case false: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteErrorNotification); break;
     }
   }
 

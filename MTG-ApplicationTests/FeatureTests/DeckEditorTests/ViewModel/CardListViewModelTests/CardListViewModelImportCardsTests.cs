@@ -195,7 +195,7 @@ public class CardListViewModelImportCardsTests
   {
     var viewmodel = new CardListViewModel(new TestCardAPI())
     {
-      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg.NotificationType) }
+      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
     };
 
     JsonService.TrySerializeObject(Mocker.MTGCardModelMocker.CreateMTGCardModel(), out var json);
@@ -215,7 +215,7 @@ public class CardListViewModelImportCardsTests
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       },
-      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg.NotificationType) }
+      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
     };
 
     await NotificationAssert.NotificationSent(NotificationService.NotificationType.Success,
@@ -235,7 +235,7 @@ public class CardListViewModelImportCardsTests
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       },
-      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg.NotificationType) }
+      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
     };
 
     await NotificationAssert.NotificationSent(NotificationService.NotificationType.Error,
@@ -255,7 +255,7 @@ public class CardListViewModelImportCardsTests
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       },
-      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg.NotificationType) }
+      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
     };
 
     await NotificationAssert.NotificationSent(NotificationService.NotificationType.Warning,

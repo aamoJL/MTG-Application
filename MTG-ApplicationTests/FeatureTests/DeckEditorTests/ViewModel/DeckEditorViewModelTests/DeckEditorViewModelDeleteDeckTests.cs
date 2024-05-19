@@ -99,7 +99,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
       DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
@@ -116,7 +116,7 @@ public class DeckEditorViewModelDeleteDeckTests : DeckEditorViewModelTestsBase
       DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,

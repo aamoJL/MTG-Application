@@ -179,7 +179,7 @@ public class CardListViewModelExportCardTests
         ExportConfirmer = new() { OnConfirm = async (msg) => { return await Task.FromResult(msg.Data); } }
       },
       ClipboardService = clipboard,
-      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg.NotificationType) }
+      Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
     };
 
     await NotificationAssert.NotificationSent(NotificationType.Info, () => viewmodel.ExportCommand.ExecuteAsync("Name"));

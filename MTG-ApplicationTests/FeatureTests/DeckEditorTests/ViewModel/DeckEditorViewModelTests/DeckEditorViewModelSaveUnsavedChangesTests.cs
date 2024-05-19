@@ -17,7 +17,7 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
       SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
@@ -35,7 +35,7 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
       SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,
@@ -51,7 +51,7 @@ public class DeckEditorViewModelSaveUnsavedChangesTests : DeckEditorViewModelTes
       SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));

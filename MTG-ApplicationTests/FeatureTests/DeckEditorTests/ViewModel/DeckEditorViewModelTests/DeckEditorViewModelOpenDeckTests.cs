@@ -169,7 +169,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
       LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Success,
@@ -187,7 +187,7 @@ public class DeckEditorViewModelOpenDeckTests : DeckEditorViewModelTestsBase
       LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
     }, notifier: new()
     {
-      OnNotify = (arg) => throw new NotificationException(arg.NotificationType)
+      OnNotify = (arg) => throw new NotificationException(arg)
     });
 
     await NotificationAssert.NotificationSent(NotificationType.Error,

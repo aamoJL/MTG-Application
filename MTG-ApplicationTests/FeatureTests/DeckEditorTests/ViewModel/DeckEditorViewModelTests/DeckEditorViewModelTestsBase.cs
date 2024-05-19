@@ -2,6 +2,7 @@
 using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.Services;
 using MTGApplicationTests.TestUtility;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
@@ -17,22 +18,16 @@ public abstract class DeckEditorViewModelTestsBase
     DeckEditorConfirmers? confirmers = null,
     bool hasUnsavedChanges = false,
     MTGCardDeck? deck = null,
-    DeckEditorNotifier? notifier = null)
+    Notifier? notifier = null)
   {
-#pragma warning disable IDE0017 // Simplify object initialization
-    var vm = new DeckEditorViewModel(deck ?? new())
+    return new DeckEditorViewModel(
+      cardAPI: _dependencies.CardAPI,
+      deck: deck,
+      notifier: notifier,
+      confirmers)
     {
-      CardAPI = _dependencies.CardAPI,
       Repository = _dependencies.Repository,
-      DeckEditorConfirmers = confirmers ?? new(),
-      Notifier = notifier ?? new()
+      HasUnsavedChanges = hasUnsavedChanges
     };
-#pragma warning restore IDE0017 // Simplify object initialization
-
-    // Unsaved changes state needs to be se outside of the constructor
-    // because setting the deck will set the unsaved state to false
-    vm.HasUnsavedChanges = hasUnsavedChanges;
-
-    return vm;
   }
 }

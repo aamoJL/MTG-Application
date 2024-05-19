@@ -3,9 +3,9 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplicationTests.TestUtility;
 
-public class NotificationException(NotificationType notificationType) : UnitTestAssertException
+public class NotificationException(Notification notification) : UnitTestAssertException
 {
-  public NotificationType NotificationType { get; } = notificationType;
+  public Notification Notification { get; } = notification;
 }
 
 public static class NotificationAssert
@@ -13,6 +13,12 @@ public static class NotificationAssert
   public static async Task NotificationSent(NotificationType notificationType, Func<Task> task)
   {
     try { throw await Assert.ThrowsExceptionAsync<NotificationException>(task); }
-    catch (NotificationException e) { Assert.AreEqual(e.NotificationType, notificationType, "Notification type was wrong"); }
+    catch (NotificationException e) { Assert.AreEqual(notificationType, e.Notification.NotificationType, "Notification type was wrong"); }
+  }
+
+  public static async Task NotificationSent(Notification notification, Func<Task> task)
+  {
+    try { throw await Assert.ThrowsExceptionAsync<NotificationException>(task); }
+    catch (NotificationException e) { Assert.AreEqual(notification, e.Notification, "Notification was wrong"); }
   }
 }

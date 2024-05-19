@@ -40,7 +40,7 @@ public partial class BasicCardView : UserControl
     get => (MTGCard)GetValue(ModelProperty);
     set => SetValue(ModelProperty, value);
   }
-  public BasicCardViewDragAndDrop DragAndDrop { get; }
+  public CommanderTextViewDragAndDrop DragAndDrop { get; }
   public string CardName => Model?.Info.Name ?? string.Empty;
 
   [ObservableProperty] protected string selectedFaceUri = "";

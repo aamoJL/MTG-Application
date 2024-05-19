@@ -6,6 +6,7 @@ using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor;
 
@@ -27,6 +28,7 @@ public partial class CommanderViewModel : ViewModelBase
   public ReversibleAction<MTGCard> ReversibleChange { get; init; }
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public IWorker Worker { get; init; } = new DefaultWorker();
+  public Notifier Notifier { get; init; } = new();
 
   private ICardAPI<MTGCard> CardAPI { get; }
   private MTGCardCopier CardCopier { get; } = new();
@@ -55,8 +57,21 @@ public partial class CommanderViewModel : ViewModelBase
   {
     var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
 
-    if (result.Found.Any())
+    if (!result.Found.Any())
+    {
+      new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportError);
+    }
+    else if (!result.Found[0].Info.TypeLine.Contains("Legendary", System.StringComparison.OrdinalIgnoreCase))
+    {
+      new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportNotLegendaryError);
+    }
+    else
+    {
+      // Only legendary cards are allowed to be commanders
       Change(result.Found[0]);
+
+      new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportSuccess);
+    }
   }
 }
 

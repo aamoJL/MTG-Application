@@ -7,9 +7,9 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor;
 
-public class BasicCardViewDragAndDrop : DragAndDrop<MTGCard>
+public class CommanderTextViewDragAndDrop : DragAndDrop<MTGCard>
 {
-  public BasicCardViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : base(itemCopier) { }
+  public CommanderTextViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : base(itemCopier) { }
 
   public void DragStarting(UIElement sender, DragStartingEventArgs e)
   {
@@ -30,4 +30,15 @@ public class BasicCardViewDragAndDrop : DragAndDrop<MTGCard>
   }
 
   public void DropCompleted(UIElement sender, DropCompletedEventArgs args) => DropCompleted();
+
+  public override void DragOver(DragEventArgs eventArgs)
+  {
+    base.DragOver(eventArgs);
+
+    if (Item?.Info.TypeLine.Contains("Legendary", StringComparison.OrdinalIgnoreCase) is false)
+    {
+      eventArgs.AcceptedOperation = DataPackageOperation.None;
+      eventArgs.DragUIOverride.Caption = "Invalid card";
+    }
+  }
 }

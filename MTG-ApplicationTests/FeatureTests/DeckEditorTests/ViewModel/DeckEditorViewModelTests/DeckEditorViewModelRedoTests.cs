@@ -1,16 +1,15 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor;
 using MTGApplicationTests.Services;
 
 namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
 
 [TestClass]
-public class DeckEditorViewModelRedoTests
+public class DeckEditorViewModelRedoTests : DeckEditorViewModelTestsBase
 {
   [TestMethod]
   public void Redo_NoCommands_CanNotExecute()
   {
-    var viewmodel = new DeckEditorViewModel();
+    var viewmodel = MockVM();
 
     Assert.IsFalse(viewmodel.RedoCommand.CanExecute(null));
   }
@@ -18,7 +17,7 @@ public class DeckEditorViewModelRedoTests
   [TestMethod]
   public void Redo_HasCommand_CanExecute()
   {
-    var viewmodel = new DeckEditorViewModel();
+    var viewmodel = MockVM();
 
     viewmodel.DeckCardList.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
     viewmodel.UndoCommand.Execute(null);
@@ -29,7 +28,7 @@ public class DeckEditorViewModelRedoTests
   [TestMethod]
   public void Redo_Execute_ActionInvokedAgain()
   {
-    var viewmodel = new DeckEditorViewModel();
+    var viewmodel = MockVM();
 
     viewmodel.DeckCardList.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
 
