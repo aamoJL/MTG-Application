@@ -10,10 +10,4 @@
     <Setter Property="BorderThickness" Value="1 1 0 0" />
     <Setter Property="BorderBrush" Value="{ThemeResource RegionColor}" />
   </Style>
-  <Style x:Key="MTGListViewItemStyle" TargetType="StackPanel">
-    <Setter Property="Height" Value="25" />
-    <Setter Property="Orientation" Value="Vertical" />
-    <Setter Property="Spacing" Value="10" />
-    <Setter Property="Background" Value="Transparent" />
-  </Style>
 </ResourceDictionary>

@@ -102,7 +102,10 @@ public partial class CardListViewModel : ViewModelBase
 
         if (addConflictConfirmationResult == ConfirmationResult.Yes) { addedCards.Add(card); }
       }
-      else { addedCards.Add(card); }
+      else if (addedCards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard addedCard)
+        addedCard.Count += card.Count;
+      else
+        addedCards.Add(card);
     }
 
     // Add cards

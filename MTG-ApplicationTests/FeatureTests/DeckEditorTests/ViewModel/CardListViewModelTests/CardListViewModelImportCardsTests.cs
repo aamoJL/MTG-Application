@@ -261,4 +261,21 @@ public class CardListViewModelImportCardsTests
     await NotificationAssert.NotificationSent(NotificationService.NotificationType.Warning,
       () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
   }
+
+  [TestMethod]
+  public async Task Import_SameCardTwice_CardsCombinedIntoOne()
+  {
+    var cardName = "Name";
+    var viewmodel = new CardListViewModel(new TestCardAPI()
+    {
+      ExpectedCards = [
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: cardName),
+        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: cardName),
+        ]
+    });
+
+    await viewmodel.ImportCardsCommand.ExecuteAsync("API import");
+
+    Assert.AreEqual(2, viewmodel.Cards.FirstOrDefault(x => x.Info.Name == cardName)?.Count);
+  }
 }
