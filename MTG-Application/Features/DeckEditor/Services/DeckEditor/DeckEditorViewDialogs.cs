@@ -1,5 +1,5 @@
 ﻿using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.Views.Dialogs;
+using MTGApplication.General.Views.Dialogs;
 using System;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 

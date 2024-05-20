@@ -7,7 +7,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
   xmlns:cardsearch="using:MTGApplication.Features.CardSearch"
-  xmlns:customControls="using:MTGApplication.General.Views.Controls"
+  xmlns:deckeditor="using:MTGApplication.General.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -66,7 +66,10 @@
         </Grid>
       </SplitView>
     </controls:DockPanel>
+
+    <!--#region Card Preview -->
+    <deckeditor:CardPreview/>
+    <!--#endregion-->
     
-    <!--<customcontrols:MTGCardPreviewControl PreviewProperties="{x:Bind CardPreviewProperties, Mode=OneTime}"/>-->
   </Grid>
 </Page>

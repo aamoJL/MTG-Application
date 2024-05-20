@@ -57,12 +57,12 @@
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
     <!--#endregion-->
-    
+
     <controls:DockPanel 
       LastChildFill="True" 
       Padding="0 0 10 10" 
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-      
+
       <!--#region Sidebar -->
       <TabView 
         x:Name="SidebarTabs"
@@ -76,9 +76,9 @@
         BorderBrush="{ThemeResource RegionColor}"
         AllowDropTabs="False"
         CanDragTabs="False"
-        CanReorderTabs="False">  
+        CanReorderTabs="False">
         <TabViewItem Header="Side lists" IsClosable="False">
-          
+
           <!--#region Side Lists -->
           <Grid RowSpacing="5" Margin="0 5 0 0">
             <Grid.RowDefinitions>
@@ -92,7 +92,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
-              
+
               <!--#region Commander / Partner -->
               <local:CommanderTextView 
                 PrefixText="Commander: "
@@ -108,7 +108,8 @@
                 OnDropBeginMoveFrom="{x:Bind ViewModel.CommanderViewModel.BeginMoveFromCommand, Mode=OneTime}"
                 OnDropBeginMoveTo="{x:Bind ViewModel.CommanderViewModel.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.CommanderViewModel.ExecuteMoveCommand, Mode=OneTime}"
-                OnDropImport="{x:Bind ViewModel.CommanderViewModel.ImportCommand, Mode=OneTime}"/>
+                OnDropImport="{x:Bind ViewModel.CommanderViewModel.ImportCommand, Mode=OneTime}"
+                HoverPreviewEnabled="True"/>
               <local:CommanderTextView 
                 PrefixText="Partner: "
                 Model="{x:Bind ViewModel.PartnerViewModel.Card, Mode=OneWay}"
@@ -123,9 +124,10 @@
                 OnDropBeginMoveFrom="{x:Bind ViewModel.PartnerViewModel.BeginMoveFromCommand, Mode=OneTime}"
                 OnDropBeginMoveTo="{x:Bind ViewModel.PartnerViewModel.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.PartnerViewModel.ExecuteMoveCommand, Mode=OneTime}"
-                OnDropImport="{x:Bind ViewModel.PartnerViewModel.ImportCommand, Mode=OneTime}"/>
+                OnDropImport="{x:Bind ViewModel.PartnerViewModel.ImportCommand, Mode=OneTime}"
+                HoverPreviewEnabled="True"/>
               <!--#endregion-->
-              
+
             </StackPanel>
 
             <!--#region Maybelist -->
@@ -173,7 +175,8 @@
                     SetIconVisible="False"
                     TypeLineVisible="False"
                     DeleteButtonClick="{Binding ElementName=MaybeCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                    OnModelPropertyChangedCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    OnModelPropertyChangedCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"
+                    HoverPreviewEnabled="True"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -224,7 +227,8 @@
                     SetIconVisible="False"
                     TypeLineVisible="False"
                     DeleteButtonClick="{Binding ElementName=WishCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                    OnModelPropertyChangedCommand="{Binding ElementName=WishCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    OnModelPropertyChangedCommand="{Binding ElementName=WishCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"
+                    HoverPreviewEnabled="True"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -275,7 +279,8 @@
                     SetIconVisible="False"
                     TypeLineVisible="False"
                     DeleteButtonClick="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                    OnModelPropertyChangedCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
+                    OnModelPropertyChangedCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"
+                    HoverPreviewEnabled="True"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -283,14 +288,14 @@
 
           </Grid>
           <!--#endregion Side Lists-->
-          
+
         </TabViewItem>
         <TabViewItem Header="Info" IsClosable="False">
-          
+
           <!--#region Charts -->
 
           <!--#endregion Charts-->
-          
+
         </TabViewItem>
       </TabView>
       <!--#endregion-->
@@ -438,7 +443,7 @@
           </StackPanel.ContextFlyout>
         </StackPanel>
         <!--#endregion-->
-        
+
       </Grid>
       <!--#endregion-->
 
@@ -507,15 +512,16 @@
               <local:DeckEditorCardTextView
                 Model="{Binding Mode=OneWay}" 
                 DeleteButtonClick="{Binding ElementName=DeckCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"/>
+                OnModelPropertyChangedCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.CardlistCardChangedCommand, Mode=OneTime}"
+                HoverPreviewEnabled="True"/>
             </DataTemplate>
           </local:AdvancedCardListView.ItemTemplate>
         </local:AdvancedCardListView>
         <!--#endregion-->
-        
+
       </Grid>
       <!--#endregion-->
-      
+
     </controls:DockPanel>
   </Grid>
 </Page>

@@ -49,7 +49,7 @@
       <Grid Grid.Column="0">
         <StackPanel Orientation="Horizontal" Spacing="5">
           <TextBlock Width="16" TextAlignment="Right" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
-          <Image Width="20" Visibility="{x:Bind SetIconVisible, Mode=OneWay}" Grid.Column="1" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
+          <Image Width="20" Margin="5 0 5 0" Visibility="{x:Bind SetIconVisible, Mode=OneWay}" Grid.Column="1" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
         </StackPanel>
       </Grid>
       <Grid Grid.Column="1" ColumnSpacing="5">

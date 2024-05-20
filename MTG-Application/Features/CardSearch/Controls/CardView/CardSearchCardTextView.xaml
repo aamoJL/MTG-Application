@@ -10,19 +10,50 @@
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d">
 
-  <StackPanel Style="{StaticResource MTGListViewItemStyle}">
-    <StackPanel.ContextFlyout>
-      <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-        <MenuFlyoutItem Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-        <MenuFlyoutSeparator />
-        <!--<MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>-->
-        <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Text="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
-        <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Text="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-      </MenuFlyout>
-    </StackPanel.ContextFlyout>
-    <Image Width="20" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneWay}" Width="200"/>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneWay}" Width="250"/>
-    <TextBlock VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
-  </StackPanel>
+  <Grid Background="Transparent">
+    <Grid.ContextFlyout>
+      <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+        <CommandBarFlyout.PrimaryCommands>
+          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+          <AppBarSeparator />
+          <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
+          <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+        </CommandBarFlyout.PrimaryCommands>
+        <CommandBarFlyout.SecondaryCommands>
+          <!--<AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>-->
+        </CommandBarFlyout.SecondaryCommands>
+      </CommandBarFlyout>
+    </Grid.ContextFlyout>
+    <Grid.ColumnDefinitions>
+      <!--Hack to make the grid aligned to left while being limited to maxwidth and having the column definitions working-->
+      <ColumnDefinition Width="1000*" MaxWidth="600"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Grid Grid.Column="0" Height="25" ColumnSpacing="5">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Grid Grid.Column="0">
+        <Image Width="20" Margin="5 0 5 0" Grid.Column="1" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
+      </Grid>
+      <Grid Grid.Column="1" ColumnSpacing="5">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+          <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+        </Grid>
+        <Grid Grid.Column="1" ColumnSpacing="5">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+          <TextBlock Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Grid>
 </local:CardSearchCardViewBase>

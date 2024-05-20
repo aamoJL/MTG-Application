@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.IOService;
+using MTGApplication.General.Views.Controls;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -16,6 +17,9 @@ public partial class BasicCardView : UserControl
   public static readonly DependencyProperty ModelProperty =
       DependencyProperty.Register(nameof(Model), typeof(MTGCard), typeof(BasicCardView),
         new PropertyMetadata(default(MTGCard), OnModelPropertyChangedCallback));
+
+  public static readonly DependencyProperty HoverPreviewEnabledProperty =
+      DependencyProperty.Register(nameof(HoverPreviewEnabled), typeof(bool), typeof(BasicCardView), new PropertyMetadata(false));
 
   public BasicCardView()
   {
@@ -33,12 +37,21 @@ public partial class BasicCardView : UserControl
     DropCompleted += DragAndDrop.DropCompleted;
     DragOver += DragAndDrop.DragOver;
     Drop += DragAndDrop.Drop;
+
+    PointerEntered += BasicCardView_PointerEntered;
+    PointerExited += BasicCardView_PointerExited;
+    PointerMoved += BasicCardView_PointerMoved;
   }
 
   public MTGCard Model
   {
     get => (MTGCard)GetValue(ModelProperty);
     set => SetValue(ModelProperty, value);
+  }
+  public bool HoverPreviewEnabled
+  {
+    get => (bool)GetValue(HoverPreviewEnabledProperty);
+    set => SetValue(HoverPreviewEnabledProperty, value);
   }
   public CommanderTextViewDragAndDrop DragAndDrop { get; }
   public string CardName => Model?.Info.Name ?? string.Empty;
@@ -85,15 +98,41 @@ public partial class BasicCardView : UserControl
     OnPropertyChanged(nameof(CardName));
   }
 
+  private void BasicCardView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if (!HoverPreviewEnabled) return;
+
+    CardPreview.Change(this, new(XamlRoot) { Uri = SelectedFaceUri });
+  }
+
+  private void BasicCardView_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if (!HoverPreviewEnabled) return;
+
+    var point = e.GetCurrentPoint(null).Position;
+
+    CardPreview.Change(this, new(XamlRoot)
+    {
+      Uri = SelectedFaceUri,
+      Coordinates = new((float)point.X, (float)point.Y)
+    });
+  }
+
+  private void BasicCardView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if (!HoverPreviewEnabled) return;
+
+    CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
+  }
+
   private static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
+    var view = (sender as BasicCardView);
+
     if (e.Property.Equals(ModelProperty))
     {
-      var view = (sender as BasicCardView);
-
       view.OnModelChanging((MTGCard)e.OldValue);
       view.OnModelChanged((MTGCard)e.NewValue);
     }
   }
 }
-

@@ -78,7 +78,9 @@
           DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="card:MTGCard">
-              <customControls:CardSearchCardTextView Model="{Binding Mode=OneWay}"/>
+              <customControls:CardSearchCardTextView 
+                Model="{Binding Mode=OneWay}"
+                HoverPreviewEnabled="True"/>
             </DataTemplate>
           </ListView.ItemTemplate>
         </ListView>
