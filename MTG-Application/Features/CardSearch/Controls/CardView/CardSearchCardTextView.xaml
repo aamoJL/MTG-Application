@@ -12,17 +12,13 @@
 
   <Grid Background="Transparent">
     <Grid.ContextFlyout>
-      <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
-        <CommandBarFlyout.PrimaryCommands>
-          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
-          <AppBarSeparator />
-          <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
-          <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-        </CommandBarFlyout.PrimaryCommands>
-        <CommandBarFlyout.SecondaryCommands>
-          <!--<AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>-->
-        </CommandBarFlyout.SecondaryCommands>
-      </CommandBarFlyout>
+      <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+        <MenuFlyoutItem Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
+        <MenuFlyoutSeparator />
+        <!--<MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>-->
+        <MenuFlyoutItem Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Text="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
+        <MenuFlyoutItem Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Text="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+      </MenuFlyout>
     </Grid.ContextFlyout>
     <Grid.ColumnDefinitions>
       <!--Hack to make the grid aligned to left while being limited to maxwidth and having the column definitions working-->

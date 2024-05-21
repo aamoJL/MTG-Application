@@ -57,6 +57,7 @@ public static partial class AppConfig
   /// </summary>
   public partial class LocalAppSettings : ObservableObject
   {
+    // Application theme can only set on start, so the themeing needs to be done with ElementThemes
     [ObservableProperty] private ElementTheme appTheme = ElementTheme.Default;
 
     private readonly static string fileName = "settings.json";
@@ -67,7 +68,7 @@ public static partial class AppConfig
     /// <summary>
     /// Saves local settings to json file
     /// </summary>
-    private bool Save() => FileService.TryWriteTextToFile(filePath, JsonSerializer.Serialize(new { AppTheme }));
+    private bool Save() => FileService.TryWriteTextToFile(filePath, JsonSerializer.Serialize(new { AppTheme = AppTheme }));
 
     /// <summary>
     /// Loads local settings from json file

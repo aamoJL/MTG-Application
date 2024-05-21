@@ -95,12 +95,8 @@
           <Color x:Key="SystemAccentColorDark2">#FF6543A9</Color>
           <Color x:Key="SystemAccentColorDark3">#FF543397</Color>
           <Color x:Key="RegionColor">#ededed</Color>
-          
+
           <SolidColorBrush x:Key="RegionBrush" Color="LightGray" />
-          
-          <!--Workaround for broken flyout background colors-->
-          <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="ApplicationPageBackgroundThemeBrush" />
-          <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="ApplicationPageBackgroundThemeBrush" />
         </ResourceDictionary>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
