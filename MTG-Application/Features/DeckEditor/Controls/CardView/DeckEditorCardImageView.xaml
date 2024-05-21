@@ -17,11 +17,11 @@
         <controls:ImageEx.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>
-              <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip" ToolTipService.ToolTip="Flip"/>
+              <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
-              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
-              <AppBarButton Command="{x:Bind DeleteButtonClick, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" Label="Delete" ToolTipService.ToolTip="Delete"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}" IsCompact="True"/>
+              <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
+              <AppBarButton Command="{x:Bind DeleteButtonClick, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
             </CommandBarFlyout.PrimaryCommands>
             <CommandBarFlyout.SecondaryCommands>
               <!--<AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>-->
