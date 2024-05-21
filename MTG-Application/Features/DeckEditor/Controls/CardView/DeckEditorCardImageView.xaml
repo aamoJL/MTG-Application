@@ -26,7 +26,7 @@
             <CommandBarFlyout.SecondaryCommands>
               <!--<AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>-->
               <AppBarSeparator/>
-              <AppBarElementContainer AllowFocusOnInteraction="True">
+              <AppBarElementContainer AllowFocusOnInteraction="True" RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal">
                   <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
                   <NumberBox Grid.Column="1" Value="{x:Bind Model.Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>

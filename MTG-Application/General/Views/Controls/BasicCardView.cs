@@ -25,6 +25,8 @@ public partial class BasicCardView : UserControl
     PointerEntered += BasicCardView_PointerEntered;
     PointerExited += BasicCardView_PointerExited;
     PointerMoved += BasicCardView_PointerMoved;
+
+    AppConfig.LocalSettings.PropertyChanged += AppSettings_PropertyChanged;
   }
 
   public MTGCard Model
@@ -80,6 +82,15 @@ public partial class BasicCardView : UserControl
 
     SwitchFaceImageCommand.NotifyCanExecuteChanged();
     OnPropertyChanged(nameof(CardName));
+  }
+
+  private void AppSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    // Requested theme needs to be changed to the selected theme here, because flyouts will not change theme if
+    // the requested theme is Default.
+    // And ActualThemeChanged event invokes only once when changing the theme
+    if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
+      RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
   private void BasicCardView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)

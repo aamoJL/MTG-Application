@@ -13,12 +13,12 @@
   <local:DeckEditorCardViewBase.Resources>
     <helpers:BooleanToStarOrAutoConverter x:Key="BooleanToStarOrAutoConverter"/>
   </local:DeckEditorCardViewBase.Resources>
-  
+
   <Grid Background="Transparent">
     <Grid.ContextFlyout>
       <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
         <CommandBarFlyout.PrimaryCommands>
-          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneWay}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
           <AppBarSeparator />
           <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}" IsCompact="True"/>
           <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
@@ -27,7 +27,7 @@
         <CommandBarFlyout.SecondaryCommands>
           <!--<AppBarButton Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Label="Show prints..."/>-->
           <AppBarSeparator/>
-          <AppBarElementContainer AllowFocusOnInteraction="True">
+          <AppBarElementContainer AllowFocusOnInteraction="True" RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}">
             <StackPanel Orientation="Horizontal">
               <TextBlock Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
               <NumberBox Value="{x:Bind Model.Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
