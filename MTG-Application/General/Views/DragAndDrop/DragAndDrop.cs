@@ -18,7 +18,7 @@ public abstract class DragAndDrop<T>
   public bool AcceptMove { get; set; } = true;
   public string CopyCaptionOverride { get; set; } = string.Empty;
   public string MoveCaptionOverride { get; set; } = string.Empty;
-  public bool IsContentVisible { get; set; } = true;
+  public bool IsDropContentVisible { get; set; } = true;
 
   public Func<T, Task> OnCopy { get; set; }
   public Func<T, Task> OnBeginMoveTo { get; set; }
@@ -55,7 +55,7 @@ public abstract class DragAndDrop<T>
     else if (eventArgs.AcceptedOperation == DataPackageOperation.Copy && !string.IsNullOrEmpty(CopyCaptionOverride))
       eventArgs.DragUIOverride.Caption = CopyCaptionOverride;
 
-    eventArgs.DragUIOverride.IsContentVisible = IsContentVisible;
+    eventArgs.DragUIOverride.IsContentVisible = IsDropContentVisible;
   }
 
   public virtual async Task Drop(DataPackageOperation operation, string data)

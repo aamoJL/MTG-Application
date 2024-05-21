@@ -11,14 +11,14 @@
   mc:Ignorable="d">
 
   <local:DeckEditorCardViewBase.Resources>
-    <local:BooleanToStarOrAutoConverter x:Key="BooleanToStarOrAutoConverter"/>
+    <helpers:BooleanToStarOrAutoConverter x:Key="BooleanToStarOrAutoConverter"/>
   </local:DeckEditorCardViewBase.Resources>
   
   <Grid Background="Transparent">
     <Grid.ContextFlyout>
       <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
         <CommandBarFlyout.PrimaryCommands>
-          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneWay}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
           <AppBarSeparator />
           <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}" IsCompact="True"/>
           <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>

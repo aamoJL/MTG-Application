@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Views.Controls;
@@ -23,21 +22,6 @@ public partial class BasicCardView : UserControl
 
   public BasicCardView()
   {
-    DragAndDrop = new(new MTGCardCopier())
-    {
-      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
-      OnRemove = (item) => OnDropRemove?.Execute(item),
-      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
-      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
-      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
-      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
-    };
-
-    DragStarting += DragAndDrop.DragStarting;
-    DropCompleted += DragAndDrop.DropCompleted;
-    DragOver += DragAndDrop.DragOver;
-    Drop += DragAndDrop.Drop;
-
     PointerEntered += BasicCardView_PointerEntered;
     PointerExited += BasicCardView_PointerExited;
     PointerMoved += BasicCardView_PointerMoved;
@@ -53,7 +37,6 @@ public partial class BasicCardView : UserControl
     get => (bool)GetValue(HoverPreviewEnabledProperty);
     set => SetValue(HoverPreviewEnabledProperty, value);
   }
-  public CommanderTextViewDragAndDrop DragAndDrop { get; }
   public string CardName => Model?.Info.Name ?? string.Empty;
 
   [ObservableProperty] protected string selectedFaceUri = "";
@@ -95,6 +78,7 @@ public partial class BasicCardView : UserControl
   {
     SelectedFaceUri = newValue?.Info.FrontFace.ImageUri ?? string.Empty;
 
+    SwitchFaceImageCommand.NotifyCanExecuteChanged();
     OnPropertyChanged(nameof(CardName));
   }
 

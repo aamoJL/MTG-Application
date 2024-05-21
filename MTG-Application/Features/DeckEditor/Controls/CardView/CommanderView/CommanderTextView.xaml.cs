@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using MTGApplication.General.Models.Card;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -21,8 +22,24 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
   {
     InitializeComponent();
 
-    DragAndDrop.IsContentVisible = false;
+    DragAndDrop = new(new MTGCardCopier())
+    {
+      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
+      OnRemove = (item) => OnDropRemove?.Execute(item),
+      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
+      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
+      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
+      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item),
+      IsDropContentVisible = false,
+    };
+
+    DragStarting += DragAndDrop.DragStarting;
+    DropCompleted += DragAndDrop.DropCompleted;
+    DragOver += DragAndDrop.DragOver;
+    Drop += DragAndDrop.Drop;
   }
+
+  private CommanderTextViewDragAndDrop DragAndDrop { get; }
 
   public string PrefixText
   {
