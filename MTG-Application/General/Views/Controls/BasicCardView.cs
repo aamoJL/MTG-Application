@@ -26,7 +26,12 @@ public partial class BasicCardView : UserControl
     PointerExited += BasicCardView_PointerExited;
     PointerMoved += BasicCardView_PointerMoved;
 
-    AppConfig.LocalSettings.PropertyChanged += AppSettings_PropertyChanged;
+    Loaded += (_, _) =>
+    {
+      RequestedTheme = AppConfig.LocalSettings.AppTheme;
+      AppConfig.LocalSettings.PropertyChanged += AppSettings_PropertyChanged;
+    };
+    Unloaded += (_, _) => { AppConfig.LocalSettings.PropertyChanged -= AppSettings_PropertyChanged; };
   }
 
   public MTGCard Model
@@ -84,7 +89,7 @@ public partial class BasicCardView : UserControl
     OnPropertyChanged(nameof(CardName));
   }
 
-  private void AppSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  protected void AppSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     // Requested theme needs to be changed to the selected theme here, because flyouts will not change theme if
     // the requested theme is Default.
@@ -93,14 +98,14 @@ public partial class BasicCardView : UserControl
       RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
-  private void BasicCardView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  protected void BasicCardView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
     if (!HoverPreviewEnabled) return;
 
     CardPreview.Change(this, new(XamlRoot) { Uri = SelectedFaceUri });
   }
 
-  private void BasicCardView_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  protected void BasicCardView_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
     if (!HoverPreviewEnabled) return;
 
@@ -113,14 +118,14 @@ public partial class BasicCardView : UserControl
     });
   }
 
-  private void BasicCardView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  protected void BasicCardView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
     if (!HoverPreviewEnabled) return;
 
     CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
   }
 
-  private static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+  protected static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
     var view = (sender as BasicCardView);
 
