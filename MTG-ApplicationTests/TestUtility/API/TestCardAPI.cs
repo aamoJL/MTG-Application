@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Models.Card.CardImportResult;
 
-namespace MTGApplicationTests.API;
+namespace MTGApplicationTests.TestUtility.API;
 
 // TODO: clean
 
@@ -18,13 +18,13 @@ public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0)
 
   public async Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams)
   {
-    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
+    if (string.IsNullOrEmpty(searchParams)) { return Empty(); }
     return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
   }
 
   public async Task<CardImportResult> FetchFromDTOs(CardDTO[] dtoArray)
   {
-    var cards = dtoArray.Select(x => Mocker.MTGCardModelMocker.FromDTO((MTGCardDTO)x)).ToArray();
+    var cards = dtoArray.Select(x => MTGCardModelMocker.FromDTO((MTGCardDTO)x)).ToArray();
 
     if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length, ImportSource.External)); }
     else
@@ -60,7 +60,7 @@ public class TestCardAPITests
 
     api.ExpectedCards =
     [
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
     ];
     Assert.AreEqual(0, (await api.FetchCardsWithSearchQuery(string.Empty)).Found.Length);
     Assert.AreEqual(1, (await api.FetchCardsWithSearchQuery("params")).Found.Length);
@@ -72,9 +72,9 @@ public class TestCardAPITests
     var api = new TestCardAPI();
     var cards = new List<MTGCard>
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
     };
     //No expected cards
     var dtos = cards.Select(x => new MTGCardDTO(x)).ToArray();
@@ -86,7 +86,7 @@ public class TestCardAPITests
     Assert.AreEqual(0, (await api.FetchFromDTOs(dtos)).NotFoundCount);
 
     // Expected cards has one more card than DTOs
-    cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    cards.Add(MTGCardModelMocker.CreateMTGCardModel());
     api.ExpectedCards = [.. cards];
     Assert.AreEqual(3, (await api.FetchFromDTOs(dtos)).Found.Length);
     Assert.AreEqual(1, (await api.FetchFromDTOs(dtos)).NotFoundCount);
@@ -98,9 +98,9 @@ public class TestCardAPITests
     var api = new TestCardAPI();
     var cards = new List<MTGCard>
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
     };
 
     //No expected cards

@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckSelector;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Database;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.Features.DeckSelector;
+namespace MTGApplicationTests.FeatureTests.DeckSelectorTests.UseCaseTests;
 [TestClass]
 public class GetDeckSelectorListItemsTests
 {

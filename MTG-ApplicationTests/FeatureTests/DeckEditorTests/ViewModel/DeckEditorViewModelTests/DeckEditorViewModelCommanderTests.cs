@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests;
 
 [TestClass]
 public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
@@ -22,7 +22,7 @@ public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
   [TestMethod]
   public async Task SetCommander_ToCard()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var deck = MTGCardDeckMocker.Mock("Deck", true, true);
     var viewmodel = MockVM(deck: deck);
 
@@ -57,7 +57,7 @@ public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
   [TestMethod]
   public async Task SetPartner_ToCard()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var deck = MTGCardDeckMocker.Mock("Deck", true, true);
     var viewmodel = MockVM(deck: deck);
 
@@ -69,7 +69,7 @@ public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
   [TestMethod]
   public async Task SetCommander_FromNullToCard_Undo_CommanderIsNull()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: false);
     var viewmodel = MockVM(deck: deck);
 
@@ -82,7 +82,7 @@ public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
   [TestMethod]
   public async Task SetCommander_FromNullToCard_Redo_CommanderIsCardAgain()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: true);
     var viewmodel = MockVM(deck: deck);
 
@@ -96,7 +96,7 @@ public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
   [TestMethod]
   public async Task SetPartner_FromNullToCard_Undo_PartnerIsNull()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: false);
     var viewmodel = MockVM(deck: deck);
 
@@ -109,7 +109,7 @@ public class DeckEditorViewModelCommanderTests : DeckEditorViewModelTestsBase
   [TestMethod]
   public async Task SetPartner_FromNullToCard_Redo_PartnerIsCardAgain()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: true);
     var viewmodel = MockVM(deck: deck);
 

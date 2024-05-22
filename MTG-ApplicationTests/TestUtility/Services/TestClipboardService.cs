@@ -1,7 +1,7 @@
 ﻿using MTGApplication.General.Services.IOService;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace MTGApplicationTests.GeneralTests.Services.IOServiceTests;
+namespace MTGApplicationTests.TestUtility.Services;
 public class TestClipboardService : ClipboardService, IDisposable
 {
   public object? Content { get; set; }

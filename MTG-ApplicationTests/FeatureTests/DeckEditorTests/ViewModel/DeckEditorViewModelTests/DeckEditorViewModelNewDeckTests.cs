@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests;
 
 [TestClass]
 public class DeckEditorViewModelNewDeckTests : DeckEditorViewModelTestsBase

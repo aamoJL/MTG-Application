@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.TestUtility;
+namespace MTGApplicationTests.TestUtility.Services;
 
 public class NotificationException(Notification notification) : UnitTestAssertException
 {

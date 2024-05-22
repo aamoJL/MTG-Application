@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests;
 
 [TestClass]
 public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
@@ -162,7 +162,7 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
   public async Task SaveDeck_Override_OldDeckIsNew()
   {
     var newDeck = MTGCardDeckMocker.Mock("New Deck");
-    newDeck.Commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
+    newDeck.Commander = MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
 
     var vm = MockVM(deck: newDeck, confirmers: new()
     {
@@ -180,7 +180,7 @@ public class DeckEditorViewModelSaveDeckTests : DeckEditorViewModelTestsBase
   public async Task SaveDeck_CancelOverride_DeckNotSaved()
   {
     var newDeck = MTGCardDeckMocker.Mock("New Deck");
-    newDeck.Commander = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
+    newDeck.Commander = MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
 
     var vm = MockVM(deck: newDeck, confirmers: new()
     {

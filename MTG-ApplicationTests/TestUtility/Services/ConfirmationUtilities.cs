@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
 
-namespace MTGApplicationTests.TestUtility;
+namespace MTGApplicationTests.TestUtility.Services;
 
 public class ConfirmationException : UnitTestAssertException { }
 

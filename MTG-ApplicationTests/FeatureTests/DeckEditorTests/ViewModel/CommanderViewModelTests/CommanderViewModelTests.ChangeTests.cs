@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
 public partial class CommanderViewModelTests
@@ -12,7 +12,7 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public async Task Change_ToCard_CardIsCard()
     {
-      var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+      var card = MTGCardModelMocker.CreateMTGCardModel();
       var viewmodel = new CommanderViewModel(new TestCardAPI());
 
       await viewmodel.ChangeCommand.ExecuteAsync(card);
@@ -25,7 +25,7 @@ public partial class CommanderViewModelTests
     {
       var viewmodel = new CommanderViewModel(new TestCardAPI())
       {
-        Card = Mocker.MTGCardModelMocker.CreateMTGCardModel()
+        Card = MTGCardModelMocker.CreateMTGCardModel()
       };
 
       await viewmodel.ChangeCommand.ExecuteAsync(null);

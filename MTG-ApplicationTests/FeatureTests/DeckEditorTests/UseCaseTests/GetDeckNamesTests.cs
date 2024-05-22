@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Database;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.UseCaseTests;
 
 [TestClass]
 public class GetDeckNamesTests
@@ -11,7 +11,7 @@ public class GetDeckNamesTests
   [TestMethod]
   public async Task Execute_ReturnsNames()
   {
-    var factory = new Database.TestCardDbContextFactory();
+    var factory = new TestCardDbContextFactory();
     var repository = new TestDeckDTORepository(factory);
     var decks = MTGCardDeckDTOMocker.MockList(3);
 

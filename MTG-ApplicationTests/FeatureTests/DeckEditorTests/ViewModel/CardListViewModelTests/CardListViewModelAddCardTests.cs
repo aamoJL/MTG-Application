@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 
 [TestClass]
 public class CardListViewModelAddCardTests
@@ -15,7 +15,7 @@ public class CardListViewModelAddCardTests
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
 
-    viewmodel.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.AreEqual(1, viewmodel.Cards.Count);
   }
@@ -25,7 +25,7 @@ public class CardListViewModelAddCardTests
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
 
-    viewmodel.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.AreEqual(1, viewmodel.Cards.Count);
 
@@ -39,7 +39,7 @@ public class CardListViewModelAddCardTests
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
 
-    viewmodel.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.AreEqual(1, viewmodel.Cards.Count);
 
@@ -55,7 +55,7 @@ public class CardListViewModelAddCardTests
   [TestMethod]
   public async Task AddCard_Existing_ConflictConfirmationShown()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var viewmodel = new CardListViewModel(new TestCardAPI())
     {
       Cards = [card],

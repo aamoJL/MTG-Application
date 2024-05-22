@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 
 [TestClass]
 public class CardListViewModelRemoveCardTests
@@ -12,7 +12,7 @@ public class CardListViewModelRemoveCardTests
   public void RemoveCard_CardRemoved()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     viewmodel.AddCardCommand.Execute(card);
     viewmodel.RemoveCardCommand.Execute(card);
@@ -24,7 +24,7 @@ public class CardListViewModelRemoveCardTests
   public void RemoveCard_Undo_CardAdded()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     viewmodel.AddCardCommand.Execute(card);
     viewmodel.RemoveCardCommand.Execute(card);
@@ -37,7 +37,7 @@ public class CardListViewModelRemoveCardTests
   public void RemoveCard_Redo_CardRemovedAgain()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     viewmodel.AddCardCommand.Execute(card);
     viewmodel.RemoveCardCommand.Execute(card);

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MTGApplication.General.Databases;
 
-namespace MTGApplicationTests.Database;
+namespace MTGApplicationTests.TestUtility.Database;
 
 public class TestCardDbContextFactory : CardDbContextFactory, IDisposable
 {

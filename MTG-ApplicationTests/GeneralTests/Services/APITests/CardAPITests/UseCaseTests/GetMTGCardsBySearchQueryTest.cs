@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Database;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.General.APITests.CardAPITests;
+namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
 [TestClass]
 public partial class GetMTGCardsBySearchQueryTest
 {
@@ -13,7 +13,7 @@ public partial class GetMTGCardsBySearchQueryTest
   public async Task Execute_WithValidQuery_CardsFound()
   {
     var query = "asd";
-    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
+    _dependensies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: query)];
 
     var result = await new GetMTGCardsBySearchQuery(_dependensies.CardAPI).Execute(query);
 
@@ -24,7 +24,7 @@ public partial class GetMTGCardsBySearchQueryTest
   public async Task Execute_WithEmptyQuery_CardsNotFound()
   {
     var query = string.Empty;
-    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
+    _dependensies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: query)];
 
     var result = await new GetMTGCardsBySearchQuery(_dependensies.CardAPI).Execute(query);
 

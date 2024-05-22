@@ -2,11 +2,11 @@
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.ReversibleCommandService;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 
 [TestClass]
 public class CardListViewModelMoveTests
@@ -15,7 +15,7 @@ public class CardListViewModelMoveTests
   public void Move_BeginTo_CommandAdded()
   {
     var target = new CardListViewModel(new TestCardAPI());
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     target.BeginMoveToCommand.Execute(card);
 
@@ -27,7 +27,7 @@ public class CardListViewModelMoveTests
   {
     var origin = new CardListViewModel(new TestCardAPI());
 
-    origin.BeginMoveFromCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    origin.BeginMoveFromCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.AreEqual(1, origin.UndoStack.ActiveCombinedCommand.Commands.Count);
   }
@@ -37,7 +37,7 @@ public class CardListViewModelMoveTests
   {
     var target = new CardListViewModel(new TestCardAPI());
     var origin = new CardListViewModel(new TestCardAPI());
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     origin.AddCardCommand.Execute(card);
 
@@ -58,7 +58,7 @@ public class CardListViewModelMoveTests
     var undoStack = new ReversibleCommandStack();
     var target = new CardListViewModel(new TestCardAPI()) { UndoStack = undoStack };
     var origin = new CardListViewModel(new TestCardAPI()) { UndoStack = undoStack };
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     origin.AddCardCommand.Execute(card);
     origin.BeginMoveFromCommand.Execute(card);
@@ -77,7 +77,7 @@ public class CardListViewModelMoveTests
     var undoStack = new ReversibleCommandStack();
     var target = new CardListViewModel(new TestCardAPI()) { UndoStack = undoStack };
     var origin = new CardListViewModel(new TestCardAPI()) { UndoStack = undoStack };
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
 
     origin.AddCardCommand.Execute(card);
     origin.BeginMoveFromCommand.Execute(card);
@@ -94,7 +94,7 @@ public class CardListViewModelMoveTests
   [TestMethod]
   public async Task MoveTo_AlreadyExists_ConflictConfirmationShown()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var target = new CardListViewModel(new TestCardAPI())
     {
       Cards = [card],
@@ -111,8 +111,8 @@ public class CardListViewModelMoveTests
   public async Task Move_CancelConflict_DoesNotExecute_CardInOriginList()
   {
     var undoStack = new ReversibleCommandStack();
-    var originCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
-    var targetCard = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var originCard = MTGCardModelMocker.CreateMTGCardModel();
+    var targetCard = MTGCardModelMocker.CreateMTGCardModel();
     var target = new CardListViewModel(new TestCardAPI())
     {
       Cards = [targetCard],

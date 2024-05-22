@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Models.Card;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.Models;
+namespace MTGApplicationTests.GeneralTests.ModelTests.CardTests;
 
 [TestClass]
 public class MTGCardCopierTests
@@ -10,7 +10,7 @@ public class MTGCardCopierTests
   [TestMethod]
   public void Copy_Single()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "card", cmc: 2, count: 5);
+    var card = MTGCardModelMocker.CreateMTGCardModel(name: "card", cmc: 2, count: 5);
     var copier = new MTGCardCopier();
 
     var result = copier.Copy(card);
@@ -25,9 +25,9 @@ public class MTGCardCopierTests
   {
     var cards = new List<MTGCard>()
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "card1", cmc: 1, count: 1),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "card2", cmc: 2, count: 2),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "card3", cmc: 3, count: 3)
+      MTGCardModelMocker.CreateMTGCardModel(name: "card1", cmc: 1, count: 1),
+      MTGCardModelMocker.CreateMTGCardModel(name: "card2", cmc: 2, count: 2),
+      MTGCardModelMocker.CreateMTGCardModel(name: "card3", cmc: 3, count: 3)
     };
     var copier = new MTGCardCopier();
 

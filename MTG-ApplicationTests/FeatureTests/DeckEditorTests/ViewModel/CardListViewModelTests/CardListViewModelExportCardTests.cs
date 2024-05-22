@@ -1,13 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.Card;
-using MTGApplicationTests.API;
-using MTGApplicationTests.GeneralTests.Services.IOServiceTests;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 
 [TestClass]
 public class CardListViewModelExportCardTests
@@ -41,9 +40,9 @@ public class CardListViewModelExportCardTests
   {
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
     };
 
     var viewmodel = new CardListViewModel(new TestCardAPI())
@@ -63,9 +62,9 @@ public class CardListViewModelExportCardTests
   {
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
     };
 
     var viewmodel = new CardListViewModel(new TestCardAPI())
@@ -87,9 +86,9 @@ public class CardListViewModelExportCardTests
 
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
     };
 
     var viewmodel = new CardListViewModel(new TestCardAPI())
@@ -113,9 +112,9 @@ public class CardListViewModelExportCardTests
 
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
     };
 
     var viewmodel = new CardListViewModel(new TestCardAPI())
@@ -139,9 +138,9 @@ public class CardListViewModelExportCardTests
 
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
     };
     var clipboard = new TestClipboardService();
 
@@ -165,9 +164,9 @@ public class CardListViewModelExportCardTests
   {
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
     };
     var clipboard = new TestClipboardService();
 

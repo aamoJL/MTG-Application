@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests;
 
 [TestClass]
 public class DeckEditorViewModelUndoTests : DeckEditorViewModelTestsBase
@@ -19,7 +19,7 @@ public class DeckEditorViewModelUndoTests : DeckEditorViewModelTestsBase
   {
     var viewmodel = MockVM();
 
-    viewmodel.DeckCardList.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.IsTrue(viewmodel.UndoCommand.CanExecute(null));
   }
@@ -29,7 +29,7 @@ public class DeckEditorViewModelUndoTests : DeckEditorViewModelTestsBase
   {
     var viewmodel = MockVM();
 
-    viewmodel.DeckCardList.AddCardCommand.Execute(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.AreEqual(1, viewmodel.DeckCardList.Cards.Count);
 

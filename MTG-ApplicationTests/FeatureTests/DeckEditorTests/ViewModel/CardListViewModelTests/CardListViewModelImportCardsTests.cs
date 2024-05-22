@@ -4,11 +4,11 @@ using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.NotificationService;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 
 [TestClass]
 public class CardListViewModelImportCardsTests
@@ -17,7 +17,7 @@ public class CardListViewModelImportCardsTests
   public async Task ImportCards_SerializedCardData_CardAdded()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    JsonService.TrySerializeObject(Mocker.MTGCardModelMocker.CreateMTGCardModel(), out var json);
+    JsonService.TrySerializeObject(MTGCardModelMocker.CreateMTGCardModel(), out var json);
 
     await viewmodel.ImportCardsCommand.ExecuteAsync(json);
 
@@ -28,7 +28,7 @@ public class CardListViewModelImportCardsTests
   public async Task ImportCards_SerializedCardData_Undo_CardRemoved()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    JsonService.TrySerializeObject(Mocker.MTGCardModelMocker.CreateMTGCardModel(), out var json);
+    JsonService.TrySerializeObject(MTGCardModelMocker.CreateMTGCardModel(), out var json);
 
     await viewmodel.ImportCardsCommand.ExecuteAsync(json);
     viewmodel.UndoStack.Undo();
@@ -40,7 +40,7 @@ public class CardListViewModelImportCardsTests
   public async Task ImportCards_SerializedCardData_Redo_CardAddedAgain()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    JsonService.TrySerializeObject(Mocker.MTGCardModelMocker.CreateMTGCardModel(), out var json);
+    JsonService.TrySerializeObject(MTGCardModelMocker.CreateMTGCardModel(), out var json);
 
     await viewmodel.ImportCardsCommand.ExecuteAsync(json);
     viewmodel.UndoStack.Undo();
@@ -80,7 +80,7 @@ public class CardListViewModelImportCardsTests
   [TestMethod]
   public async Task ImportCards_CardExists_ConflictImportConfirmationShown()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
       ExpectedCards = [card]
@@ -100,7 +100,7 @@ public class CardListViewModelImportCardsTests
   [TestMethod]
   public async Task ImportCards_CardDoesNotExist_NoConflictImportConfirmationShown()
   {
-    var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+    var card = MTGCardModelMocker.CreateMTGCardModel();
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
       ExpectedCards = [card]
@@ -124,9 +124,9 @@ public class CardListViewModelImportCardsTests
 
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
     };
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
@@ -161,9 +161,9 @@ public class CardListViewModelImportCardsTests
 
     var cards = new MTGCard[]
     {
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
-      Mocker.MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
+      MTGCardModelMocker.CreateMTGCardModel(),
     };
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
@@ -198,7 +198,7 @@ public class CardListViewModelImportCardsTests
       Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
     };
 
-    JsonService.TrySerializeObject(Mocker.MTGCardModelMocker.CreateMTGCardModel(), out var json);
+    JsonService.TrySerializeObject(MTGCardModelMocker.CreateMTGCardModel(), out var json);
 
     await viewmodel.ImportCardsCommand.ExecuteAsync(json);
   }
@@ -208,7 +208,7 @@ public class CardListViewModelImportCardsTests
   {
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
-      ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel()]
+      ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel()]
     })
     {
       Confirmers = new()
@@ -248,7 +248,7 @@ public class CardListViewModelImportCardsTests
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
       NotFoundCount = 1,
-      ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel()]
+      ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel()]
     })
     {
       Confirmers = new()
@@ -269,8 +269,8 @@ public class CardListViewModelImportCardsTests
     var viewmodel = new CardListViewModel(new TestCardAPI()
     {
       ExpectedCards = [
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: cardName),
-        Mocker.MTGCardModelMocker.CreateMTGCardModel(name: cardName),
+        MTGCardModelMocker.CreateMTGCardModel(name: cardName),
+        MTGCardModelMocker.CreateMTGCardModel(name: cardName),
         ]
     });
 

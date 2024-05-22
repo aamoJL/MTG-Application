@@ -1,7 +1,6 @@
-﻿using MTGApplicationTests.API;
-using MTGApplicationTests.Database;
+﻿using MTGApplicationTests.TestUtility.API;
 
-namespace MTGApplicationTests.TestUtility;
+namespace MTGApplicationTests.TestUtility.Database;
 
 public class DeckRepositoryDependencies
 {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 
 [TestClass]
 public class CardListViewModelClearTests
@@ -20,7 +20,7 @@ public class CardListViewModelClearTests
   public void Clear_HasCards_CanExecute()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    viewmodel.Cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.IsTrue(viewmodel.ClearCommand.CanExecute(null));
   }
@@ -29,7 +29,7 @@ public class CardListViewModelClearTests
   public void Clear_Execute_HasNoCards()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    viewmodel.Cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
 
     Assert.IsTrue(viewmodel.Cards.Any());
 
@@ -42,7 +42,7 @@ public class CardListViewModelClearTests
   public void Clear_Undo_HasCards()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    viewmodel.Cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
 
     viewmodel.ClearCommand.Execute(null);
     viewmodel.UndoStack.Undo();
@@ -54,7 +54,7 @@ public class CardListViewModelClearTests
   public void Clear_Redo_HasNoCardsAgain()
   {
     var viewmodel = new CardListViewModel(new TestCardAPI());
-    viewmodel.Cards.Add(Mocker.MTGCardModelMocker.CreateMTGCardModel());
+    viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
 
     viewmodel.ClearCommand.Execute(null);
     viewmodel.UndoStack.Undo();

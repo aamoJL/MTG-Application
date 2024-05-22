@@ -3,7 +3,7 @@ using MTGApplication.General.Services.API.CardAPI;
 using System.Text.Json;
 using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
 
-namespace MTGApplicationTests.API;
+namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
 
 [TestClass]
 public class ScryfallIdentifiersToJsonConverterTests
@@ -158,9 +158,9 @@ public class ScryfallIdentifiersToJsonConverterTests
 //    var api = new ScryfallAPI();
 //    var cards = new MTGCard[]
 //    {
-//      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Against All Odds", scryfallId: Guid.Parse("3cd8dd4e-6892-49d7-8fae-97d04f9f6c84")),
-//      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Annex Sentry", scryfallId: Guid.Parse("04baad61-1b51-4602-9e33-0de4a9f34793")),
-//      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "Apostle of Invasion", scryfallId: Guid.Parse("8a973487-5def-4771-bb77-5748cbd2f469")),
+//      MTGCardModelMocker.CreateMTGCardModel(name: "Against All Odds", scryfallId: Guid.Parse("3cd8dd4e-6892-49d7-8fae-97d04f9f6c84")),
+//      MTGCardModelMocker.CreateMTGCardModel(name: "Annex Sentry", scryfallId: Guid.Parse("04baad61-1b51-4602-9e33-0de4a9f34793")),
+//      MTGCardModelMocker.CreateMTGCardModel(name: "Apostle of Invasion", scryfallId: Guid.Parse("8a973487-5def-4771-bb77-5748cbd2f469")),
 //    };
 
 //    var result = await api.FetchFromDTOs(cards.Select(x => new MTGCardDTO(x)).ToArray());

@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Services.ReversibleCommandService;
-using MTGApplicationTests.API;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
 public partial class CommanderViewModelTests
@@ -14,7 +14,7 @@ public partial class CommanderViewModelTests
     public async Task ExecuteMove_CardMovedBetweenViewModels()
     {
       var undoStack = new ReversibleCommandStack();
-      var card = Mocker.MTGCardModelMocker.CreateMTGCardModel();
+      var card = MTGCardModelMocker.CreateMTGCardModel();
       var origin = new CommanderViewModel(new TestCardAPI())
       {
         Card = card,

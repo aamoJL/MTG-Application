@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.General.Models.CardDeck;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Database;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.UseCaseTests;
 
 [TestClass]
 public class SaveDeckTests

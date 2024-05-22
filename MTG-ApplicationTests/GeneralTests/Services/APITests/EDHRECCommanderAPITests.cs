@@ -1,4 +1,4 @@
-﻿namespace MTGApplicationTests.API;
+﻿namespace MTGApplicationTests.GeneralTests.Services.APITests;
 
 // TODO: clean
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardSearch;
-using MTGApplicationTests.Services;
-using MTGApplicationTests.TestUtility;
+using MTGApplicationTests.TestUtility.Database;
+using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.Features.CardSearch;
+namespace MTGApplicationTests.FeatureTests.CardSearchTests;
 [TestClass]
 public class CardSearchViewModelTests
 {
@@ -13,7 +13,7 @@ public class CardSearchViewModelTests
   public async Task SearchCards_WithValidQuery_CardsFound()
   {
     var query = "Black Lotus";
-    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
+    _dependensies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: query)];
 
     var search = new CardSearchViewModel(_dependensies.CardAPI);
 
@@ -26,7 +26,7 @@ public class CardSearchViewModelTests
   public async Task SearchCards_WithEmptyQuery_CardsNotFound()
   {
     var query = string.Empty;
-    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
+    _dependensies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: query)];
     var search = new CardSearchViewModel(_dependensies.CardAPI);
 
     await search.SubmitSearchCommand.ExecuteAsync(query);
@@ -38,7 +38,7 @@ public class CardSearchViewModelTests
   public async Task SearchCards_WithValidQuery_CardsAreLoaded()
   {
     var query = "Black Lotus";
-    _dependensies.CardAPI.ExpectedCards = [Mocker.MTGCardModelMocker.CreateMTGCardModel(name: query)];
+    _dependensies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: query)];
     var search = new CardSearchViewModel(_dependensies.CardAPI);
 
     await search.SubmitSearchCommand.ExecuteAsync(query);

@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Models.Card;
-using MTGApplicationTests.Services;
+using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Models.Card.CardSortProperties;
 
-namespace MTGApplicationTests.GeneralTests.ModelTests.Card;
+namespace MTGApplicationTests.GeneralTests.ModelTests.CardTests;
 public class CardSortPropertiesTests
 {
   [TestClass]
@@ -12,14 +12,14 @@ public class CardSortPropertiesTests
     [TestMethod]
     public void Compare()
     {
-      var card1 = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+      var card1 = MTGCardModelMocker.CreateMTGCardModel(
         name: "A", cmc: 1, rarity: MTGCard.RarityTypes.Common,
         setCode: "aaa", count: 1, price: 1, typeLine: MTGCard.SpellType.Land.ToString(),
-        frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: [MTGCard.ColorTypes.W]));
-      var card2 = Mocker.MTGCardModelMocker.CreateMTGCardModel(
+        frontFace: MTGCardModelMocker.CreateCardFace(colors: [MTGCard.ColorTypes.W]));
+      var card2 = MTGCardModelMocker.CreateMTGCardModel(
         name: "B", cmc: 2, rarity: MTGCard.RarityTypes.Rare,
         setCode: "bbb", count: 2, price: 2, typeLine: MTGCard.SpellType.Creature.ToString(),
-        frontFace: Mocker.MTGCardModelMocker.CreateCardFace(colors: [MTGCard.ColorTypes.U]));
+        frontFace: MTGCardModelMocker.CreateCardFace(colors: [MTGCard.ColorTypes.U]));
 
       foreach (var property in Enum.GetNames(typeof(MTGSortProperty)))
       {

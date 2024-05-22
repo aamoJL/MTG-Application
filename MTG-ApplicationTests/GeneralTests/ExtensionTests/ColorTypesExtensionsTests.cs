@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Extensions;
 
-namespace MTGApplicationTests.Extensions;
+namespace MTGApplicationTests.GeneralTests.ExtensionTests;
 
 [TestClass]
 public class ColorTypesExtensionsTests

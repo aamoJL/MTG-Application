@@ -1,6 +1,6 @@
 ﻿using MTGApplication.General.Models.CardDeck;
 
-namespace MTGApplicationTests.Services;
+namespace MTGApplicationTests.TestUtility.Mocker;
 
 public static class MTGCardDeckDTOMocker
 {

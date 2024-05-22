@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.CardDeck;
-using MTGApplicationTests.Services;
 
-namespace MTGApplicationTests.Models;
+namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
 
 // TODO: integration tests
 
@@ -16,9 +14,9 @@ public class DTOToDeckConversionTests
   //  {
   //    Name = "First",
   //    DeckCards = new([
-  //      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "first"),
-  //      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "second"),
-  //      Mocker.MTGCardModelMocker.CreateMTGCardModel(name: "third")])
+  //      MTGCardModelMocker.CreateMTGCardModel(name: "first"),
+  //      MTGCardModelMocker.CreateMTGCardModel(name: "second"),
+  //      MTGCardModelMocker.CreateMTGCardModel(name: "third")])
   //  };
   //  var dto = new MTGCardDeckDTO(deck);
 

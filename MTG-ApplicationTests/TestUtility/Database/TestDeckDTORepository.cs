@@ -1,10 +1,9 @@
 ﻿using MTGApplication;
 using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.CardDeck;
-using MTGApplicationTests.Database;
 using System.Linq.Expressions;
 
-namespace MTGApplicationTests.TestUtility;
+namespace MTGApplicationTests.TestUtility.Database;
 public class TestDeckDTORepository : DeckDTORepository, IDisposable
 {
   public TestDeckDTORepository(TestCardDbContextFactory ctxFactory) : base(ctxFactory)

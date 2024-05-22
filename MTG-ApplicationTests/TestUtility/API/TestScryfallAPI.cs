@@ -3,7 +3,7 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.IOService;
 using System.Text.Json.Nodes;
 
-namespace MTGApplicationTests.API;
+namespace MTGApplicationTests.TestUtility.API;
 
 public class TestScryfallAPI() : ScryfallAPI
 {

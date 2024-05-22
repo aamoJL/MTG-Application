@@ -2,7 +2,7 @@
 using MTGApplication.Features.DeckEditor;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.FeatureTests.CardDeckTests.DeckEditorTests;
+namespace MTGApplicationTests.FeatureTests.DeckEditorTests.UseCaseTests;
 
 [TestClass]
 public class SendNotificationTests
