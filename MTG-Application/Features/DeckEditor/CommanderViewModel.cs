@@ -25,7 +25,7 @@ public partial class CommanderViewModel : ViewModelBase
 
   [ObservableProperty] private MTGCard card;
 
-  public ReversibleAction<MTGCard> ReversibleChange { get; init; }
+  public ReversibleAction<MTGCard> ReversibleChange { get; set; }
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public IWorker Worker { get; init; } = new DefaultWorker();
   public Notifier Notifier { get; init; } = new();
@@ -40,7 +40,7 @@ public partial class CommanderViewModel : ViewModelBase
     await Task.Yield();
   }
 
-  [RelayCommand]
+  [RelayCommand(CanExecute = nameof(CanExecuteRemoveCommand))]
   private void Remove(MTGCard card) => UndoStack.PushAndExecute(
     new ReversibleCommanderChangeCommand(null, Card, CardCopier) { ReversibleAction = ReversibleChange });
 
@@ -79,5 +79,7 @@ public partial class CommanderViewModel : ViewModelBase
       new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportSuccess);
     }
   }
+
+  private bool CanExecuteRemoveCommand() => Card != null;
 }
 

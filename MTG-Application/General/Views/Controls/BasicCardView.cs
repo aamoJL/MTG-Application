@@ -58,10 +58,10 @@ public partial class BasicCardView : UserControl
   /// <summary>
   /// Changes selected face image if possible
   /// </summary>
-  [RelayCommand(CanExecute = nameof(SwitchFaceImageCanExecute))]
+  [RelayCommand(CanExecute = nameof(CanExecuteSwitchFaceImage))]
   protected void SwitchFaceImage()
   {
-    if (!SwitchFaceImageCanExecute()) return;
+    if (!CanExecuteSwitchFaceImage()) return;
 
     SelectedFaceUri = Model?.Info.FrontFace.ImageUri == SelectedFaceUri
       ? Model.Info.BackFace?.ImageUri : Model.Info.FrontFace.ImageUri;
@@ -70,14 +70,22 @@ public partial class BasicCardView : UserControl
   /// <summary>
   /// Opens card's API Website in web browser
   /// </summary>
-  [RelayCommand] protected async Task OpenAPIWebsite() => await NetworkService.OpenUri(Model?.Info.APIWebsiteUri);
+  [RelayCommand(CanExecute = nameof(CanExecuteOpenAPIWebsite))]
+  protected async Task OpenAPIWebsite()
+    => await NetworkService.OpenUri(Model?.Info.APIWebsiteUri);
 
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
-  [RelayCommand] protected async Task OpenCardmarketWebsite() => await NetworkService.OpenUri(Model?.Info.CardMarketUri);
+  [RelayCommand(CanExecute = nameof(CanExecuteOpenCardmarketWebsite))]
+  protected async Task OpenCardmarketWebsite()
+    => await NetworkService.OpenUri(Model?.Info.CardMarketUri);
 
-  protected bool SwitchFaceImageCanExecute() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);
+  protected bool CanExecuteSwitchFaceImage() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);
+
+  protected bool CanExecuteOpenAPIWebsite() => Model != null;
+
+  protected bool CanExecuteOpenCardmarketWebsite() => Model != null;
 
   protected virtual void OnModelChanging(MTGCard oldValue) { }
 
@@ -85,8 +93,10 @@ public partial class BasicCardView : UserControl
   {
     SelectedFaceUri = newValue?.Info.FrontFace.ImageUri ?? string.Empty;
 
-    SwitchFaceImageCommand.NotifyCanExecuteChanged();
     OnPropertyChanged(nameof(CardName));
+    SwitchFaceImageCommand.NotifyCanExecuteChanged();
+    OpenAPIWebsiteCommand.NotifyCanExecuteChanged();
+    OpenCardmarketWebsiteCommand.NotifyCanExecuteChanged();
   }
 
   protected void AppSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

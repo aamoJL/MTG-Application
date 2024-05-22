@@ -7,10 +7,8 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor;
 
-public class CommanderTextViewDragAndDrop : DragAndDrop<MTGCard>
+public class CommanderTextViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : DragAndDrop<MTGCard>(itemCopier)
 {
-  public CommanderTextViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : base(itemCopier) { }
-
   public void DragStarting(UIElement sender, DragStartingEventArgs e)
   {
     OnDragStarting((sender as BasicCardView)?.Model, out var requestedOperation);

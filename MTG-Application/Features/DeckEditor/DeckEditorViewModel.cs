@@ -34,16 +34,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     WishCardList = CreateCardListViewModel(Deck.Wishlist, () => { HasUnsavedChanges = true; });
     RemoveCardList = CreateCardListViewModel(Deck.Removelist, () => { HasUnsavedChanges = true; });
 
-    CommanderViewModel = CreateCommanderViewModel(changeAction: new()
-    {
-      Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); },
-      ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); }
-    });
-    PartnerViewModel = CreateCommanderViewModel(changeAction: new()
-    {
-      Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); },
-      ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); }
-    });
+    CommanderViewModel = CreateCommanderViewModel(modelChangeAction: (card) => { Deck.Commander = card; });
+    PartnerViewModel = CreateCommanderViewModel(modelChangeAction: (card) => { Deck.CommanderPartner = card; });
 
     Deck = deck ?? new();
   }
@@ -73,6 +65,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       if (DeckName != oldName) OnPropertyChanged(nameof(DeckName));
       SaveDeckCommand.NotifyCanExecuteChanged();
       DeleteDeckCommand.NotifyCanExecuteChanged();
+      OpenEDHRECWebsiteCommandCommand.NotifyCanExecuteChanged();
     }
   }
   private ReversibleCommandStack UndoStack { get; } = new();
@@ -110,33 +103,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     };
   }
 
-  private CardListViewModel CreateCardListViewModel(ObservableCollection<MTGCard> cards, Action onChange)
-  {
-    return new(CardAPI)
-    {
-      Cards = cards,
-      OnChange = onChange,
-      UndoStack = UndoStack,
-      Worker = this,
-      Confirmers = DeckEditorConfirmers.CardListConfirmers,
-      Notifier = Notifier
-    };
-  }
-
-  private CommanderViewModel CreateCommanderViewModel(ReversibleAction<MTGCard> changeAction)
-  {
-    return new(CardAPI)
-    {
-      UndoStack = UndoStack,
-      Notifier = Notifier,
-      Worker = this,
-      ReversibleChange = changeAction
-    };
-  }
-}
-
-public partial class DeckEditorViewModel
-{
   [RelayCommand]
   private async Task NewDeck()
   {
@@ -231,9 +197,9 @@ public partial class DeckEditorViewModel
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
-  [RelayCommand]
-  public async Task OpenEDHRECWebsiteCommand()
-    => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(CommanderViewModel.Card, PartnerViewModel.Card));
+  [RelayCommand(CanExecute = nameof(CanExecuteOpenEDHRECWebsiteCommand))]
+  private async Task OpenEDHRECWebsiteCommand()
+    => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(Deck.Commander, Deck.CommanderPartner));
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 
@@ -244,4 +210,46 @@ public partial class DeckEditorViewModel
   private bool CanExecuteUndoCommand() => UndoStack.CanUndo;
 
   private bool CanExecuteRedoCommand() => UndoStack.CanRedo;
+
+  private bool CanExecuteOpenEDHRECWebsiteCommand() => Deck.Commander != null;
+
+  private CardListViewModel CreateCardListViewModel(ObservableCollection<MTGCard> cards, Action onChange)
+  {
+    return new(CardAPI)
+    {
+      Cards = cards,
+      OnChange = onChange,
+      UndoStack = UndoStack,
+      Worker = this,
+      Confirmers = DeckEditorConfirmers.CardListConfirmers,
+      Notifier = Notifier
+    };
+  }
+
+  private CommanderViewModel CreateCommanderViewModel(Action<MTGCard> modelChangeAction)
+  {
+    var vm = new CommanderViewModel(CardAPI)
+    {
+      UndoStack = UndoStack,
+      Notifier = Notifier,
+      Worker = this,
+    };
+
+    var action = (MTGCard card) =>
+    {
+      modelChangeAction?.Invoke(card);
+      vm.Card = card;
+      HasUnsavedChanges = true;
+      OnPropertyChanged(nameof(DeckSize));
+      OpenEDHRECWebsiteCommandCommand.NotifyCanExecuteChanged();
+    };
+
+    vm.ReversibleChange = new ReversibleAction<MTGCard>()
+    {
+      Action = action,
+      ReverseAction = action,
+    };
+
+    return vm;
+  }
 }
