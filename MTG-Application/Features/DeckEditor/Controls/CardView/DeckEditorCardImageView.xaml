@@ -28,8 +28,8 @@
               <AppBarSeparator/>
               <AppBarElementContainer AllowFocusOnInteraction="True" RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal">
-                  <TextBlock Grid.Column="0" Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
-                  <NumberBox Grid.Column="1" Value="{x:Bind Model.Count, Mode=TwoWay}" VerticalAlignment="Center" Minimum="1"/>
+                  <TextBlock Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+                  <NumberBox Value="{x:Bind Model.Count, Mode=OneWay}" VerticalAlignment="Center" Minimum="1" ValueChanged="NumberBox_ValueChanged"/>
                 </StackPanel>
               </AppBarElementContainer>
             </CommandBarFlyout.SecondaryCommands>

@@ -19,11 +19,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
   private MTGCardDeck deck = new();
 
-  public DeckEditorViewModel(
-    ICardAPI<MTGCard> cardAPI,
-    MTGCardDeck deck = null,
-    Notifier notifier = null,
-    DeckEditorConfirmers confirmers = null)
+  public DeckEditorViewModel(ICardAPI<MTGCard> cardAPI, MTGCardDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
   {
     CardAPI = cardAPI;
     Notifier = notifier ?? new();
@@ -38,15 +34,15 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     WishCardList = CreateCardListViewModel(Deck.Wishlist, () => { HasUnsavedChanges = true; });
     RemoveCardList = CreateCardListViewModel(Deck.Removelist, () => { HasUnsavedChanges = true; });
 
-    CommanderViewModel = CreateCommanderViewModel(new()
+    CommanderViewModel = CreateCommanderViewModel(changeAction: new()
     {
-      Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; },
-      ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; }
+      Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; HasUnsavedChanges = true; },
+      ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; HasUnsavedChanges = true; }
     });
-    PartnerViewModel = CreateCommanderViewModel(new()
+    PartnerViewModel = CreateCommanderViewModel(changeAction: new()
     {
-      Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; },
-      ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; }
+      Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; HasUnsavedChanges = true; },
+      ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; HasUnsavedChanges = true; }
     });
 
     Deck = deck ?? new();
@@ -127,14 +123,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     };
   }
 
-  private CommanderViewModel CreateCommanderViewModel(ReversibleAction<MTGCard> reversibleAction)
+  private CommanderViewModel CreateCommanderViewModel(ReversibleAction<MTGCard> changeAction)
   {
     return new(CardAPI)
     {
       UndoStack = UndoStack,
       Notifier = Notifier,
       Worker = this,
-      ReversibleChange = reversibleAction
+      ReversibleChange = changeAction
     };
   }
 }
@@ -235,7 +231,9 @@ public partial class DeckEditorViewModel
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
-  [RelayCommand] public async Task OpenEDHRECWebsiteCommand() => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(CommanderViewModel.Card, PartnerViewModel.Card));
+  [RelayCommand]
+  public async Task OpenEDHRECWebsiteCommand()
+    => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(CommanderViewModel.Card, PartnerViewModel.Card));
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 

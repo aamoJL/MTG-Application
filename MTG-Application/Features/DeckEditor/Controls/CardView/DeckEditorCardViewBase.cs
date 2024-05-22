@@ -1,5 +1,4 @@
 ﻿using Microsoft.UI.Xaml;
-using MTGApplication.General.Models.Card;
 using MTGApplication.General.Views;
 using System.Windows.Input;
 
@@ -10,8 +9,8 @@ public partial class DeckEditorCardViewBase : BasicCardView
       DependencyProperty.Register(nameof(DeleteButtonClick), typeof(ICommand), typeof(DeckEditorCardViewBase),
         new PropertyMetadata(default(ICommand)));
 
-  public static readonly DependencyProperty OnModelPropertyChangedCommandProperty =
-      DependencyProperty.Register(nameof(OnModelPropertyChangedCommand), typeof(ICommand), typeof(DeckEditorCardViewBase),
+  public static readonly DependencyProperty CountChangeCommandProperty =
+      DependencyProperty.Register(nameof(CountChangeCommand), typeof(ICommand), typeof(DeckEditorCardViewBase),
         new PropertyMetadata(default(ICommand)));
 
   public ICommand DeleteButtonClick
@@ -19,26 +18,9 @@ public partial class DeckEditorCardViewBase : BasicCardView
     get => (ICommand)GetValue(DeleteButtonClickProperty);
     set => SetValue(DeleteButtonClickProperty, value);
   }
-  public ICommand OnModelPropertyChangedCommand
+  public ICommand CountChangeCommand
   {
-    get => (ICommand)GetValue(OnModelPropertyChangedCommandProperty);
-    set => SetValue(OnModelPropertyChangedCommandProperty, value);
+    get => (ICommand)GetValue(CountChangeCommandProperty);
+    set => SetValue(CountChangeCommandProperty, value);
   }
-
-  protected override void OnModelChanging(MTGCard oldValue)
-  {
-    base.OnModelChanging(oldValue);
-
-    if (oldValue != null) oldValue.PropertyChanged -= Model_PropertyChanged;
-  }
-
-  protected override void OnModelChanged(MTGCard newValue)
-  {
-    base.OnModelChanged(newValue);
-
-    if (newValue != null) newValue.PropertyChanged += Model_PropertyChanged;
-  }
-
-  protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    => OnModelPropertyChangedCommand?.Execute(null);
 }

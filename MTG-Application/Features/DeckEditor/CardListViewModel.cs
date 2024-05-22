@@ -19,7 +19,7 @@ public partial class CardListViewModel : ViewModelBase
 {
   public CardListViewModel(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
 
-  [ObservableProperty] private ObservableCollection<MTGCard> cards = new();
+  [ObservableProperty] private ObservableCollection<MTGCard> cards = [];
 
   private MTGCardCopier CardCopier { get; } = new();
 
@@ -31,8 +31,9 @@ public partial class CardListViewModel : ViewModelBase
 
   public Action OnChange { get; init; }
 
-  private ReversibleAction<IEnumerable<MTGCard>> ReversableAdd => new() { Action = ReversibleAdd, ReverseAction = ReversibleRemove };
-  private ReversibleAction<IEnumerable<MTGCard>> ReversableRemove => new() { Action = ReversibleRemove, ReverseAction = ReversibleAdd };
+  private ReversibleAction<IEnumerable<MTGCard>> ReversibleAddAction => new() { Action = ReversibleAdd, ReverseAction = ReversibleRemove };
+  private ReversibleAction<IEnumerable<MTGCard>> ReversibleRemoveAction => new() { Action = ReversibleRemove, ReverseAction = ReversibleAdd };
+  private ReversibleAction<(MTGCard Card, int Value)> ReversibleCardCountChangeAction => new() { Action = (arg) => ReversibleCardCountChange(arg.Card, arg.Value), ReverseAction = (arg) => ReversibleCardCountChange(arg.Card, arg.Value) };
 
   public ICardAPI<MTGCard> CardAPI { get; }
 
@@ -42,19 +43,19 @@ public partial class CardListViewModel : ViewModelBase
     if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
     {
       if (await Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmer(card.Info.Name)) is ConfirmationResult.Yes)
-        UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+        UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
     }
     else
-      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
   }
 
   [RelayCommand]
   private void RemoveCard(MTGCard card) => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableRemove });
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleRemoveAction });
 
   [RelayCommand]
   private void BeginMoveFrom(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableRemove });
+    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleRemoveAction });
 
   [RelayCommand]
   private async Task BeginMoveTo(MTGCard card)
@@ -62,12 +63,12 @@ public partial class CardListViewModel : ViewModelBase
     if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
     {
       if (await Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmer(card.Info.Name)) is ConfirmationResult.Yes)
-        UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+        UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
       else
         UndoStack.ActiveCombinedCommand.Cancel();
     }
     else
-      UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversableAdd });
+      UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
   }
 
   [RelayCommand]
@@ -75,7 +76,7 @@ public partial class CardListViewModel : ViewModelBase
 
   [RelayCommand(CanExecute = nameof(CanExecuteClearCommand))]
   private void Clear() => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversibleAction = ReversableRemove });
+    new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversibleAction = ReversibleRemoveAction });
 
   [RelayCommand]
   private async Task ImportCards(string data)
@@ -113,7 +114,7 @@ public partial class CardListViewModel : ViewModelBase
     {
       UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(addedCards, CardCopier)
       {
-        ReversibleAction = ReversableAdd,
+        ReversibleAction = ReversibleAddAction,
       });
     }
 
@@ -146,7 +147,23 @@ public partial class CardListViewModel : ViewModelBase
     }
   }
 
-  [RelayCommand] private void CardlistCardChanged() => OnChange?.Invoke();
+  [RelayCommand(CanExecute = nameof(CanExecuteChangeCardCount))]
+  private void ChangeCardCount(CardCountChangeArgs args)
+  {
+    if (!CanExecuteChangeCardCount(args)) return;
+
+    var (card, newValue) = args;
+
+    UndoStack.PushAndExecute(
+      new ReversibleCardCountChangeCommand(card, card.Count, newValue, CardCopier) { ReversibleAction = ReversibleCardCountChangeAction });
+  }
+
+  private bool CanExecuteClearCommand() => Cards.Any();
+
+  private static bool CanExecuteExportCommand(string byProperty) => byProperty is "Id" or "Name";
+
+  private static bool CanExecuteChangeCardCount(CardCountChangeArgs args)
+    => args.Card.Count != args.NewValue && args.NewValue > 0;
 
   private void ReversibleAdd(IEnumerable<MTGCard> cards)
   {
@@ -185,7 +202,12 @@ public partial class CardListViewModel : ViewModelBase
     OnChange?.Invoke();
   }
 
-  private bool CanExecuteClearCommand() => Cards.Any();
-
-  private static bool CanExecuteExportCommand(string byProperty) => byProperty is "Id" or "Name";
+  private void ReversibleCardCountChange(MTGCard card, int value)
+  {
+    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard existingCard)
+    {
+      existingCard.Count = value;
+      OnChange?.Invoke();
+    }
+  }
 }
