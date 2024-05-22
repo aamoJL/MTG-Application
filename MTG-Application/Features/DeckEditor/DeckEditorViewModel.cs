@@ -36,13 +36,13 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
     CommanderViewModel = CreateCommanderViewModel(changeAction: new()
     {
-      Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; HasUnsavedChanges = true; },
-      ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; HasUnsavedChanges = true; }
+      Action = (newCard) => { Deck.Commander = newCard; CommanderViewModel.Card = newCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); },
+      ReverseAction = (oldCard) => { Deck.Commander = oldCard; CommanderViewModel.Card = oldCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); }
     });
     PartnerViewModel = CreateCommanderViewModel(changeAction: new()
     {
-      Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; HasUnsavedChanges = true; },
-      ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; HasUnsavedChanges = true; }
+      Action = (newCard) => { Deck.CommanderPartner = newCard; PartnerViewModel.Card = newCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); },
+      ReverseAction = (oldCard) => { Deck.CommanderPartner = oldCard; PartnerViewModel.Card = oldCard; HasUnsavedChanges = true; OnPropertyChanged(nameof(DeckSize)); }
     });
 
     Deck = deck ?? new();
