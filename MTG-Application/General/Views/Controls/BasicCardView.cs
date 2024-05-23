@@ -22,7 +22,6 @@ public partial class BasicCardView : UserControl
 
   public BasicCardView()
   {
-    PointerEntered += BasicCardView_PointerEntered;
     PointerExited += BasicCardView_PointerExited;
     PointerMoved += BasicCardView_PointerMoved;
 
@@ -106,13 +105,6 @@ public partial class BasicCardView : UserControl
     // And ActualThemeChanged event invokes only once when changing the theme
     if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
       RequestedTheme = AppConfig.LocalSettings.AppTheme;
-  }
-
-  protected void BasicCardView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-  {
-    if (!HoverPreviewEnabled) return;
-
-    CardPreview.Change(this, new(XamlRoot) { Uri = SelectedFaceUri });
   }
 
   protected void BasicCardView_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
