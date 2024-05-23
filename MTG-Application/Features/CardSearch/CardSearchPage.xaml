@@ -9,7 +9,8 @@
   xmlns:customControls="using:MTGApplication.Features.CardSearch.Controls" 
   xmlns:sys="using:System"
   xmlns:ui="using:CommunityToolkit.WinUI.UI" 
-  xmlns:card="using:MTGApplication.General.Models.Card"
+  xmlns:card="using:MTGApplication.General.Models.Card" 
+  xmlns:cardsearch="using:MTGApplication.Features.CardSearch"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -17,7 +18,7 @@
     <controls:DockPanel Grid.Column="0" LastChildFill="True" Background="Transparent">
 
       <!--#region Search Input -->
-      <customControls:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" Submit="{x:Bind ViewModel.SubmitSearchCommand}"/>
+      <customControls:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" Submit="{x:Bind ViewModel.SubmitSearchCommand}" />
       <!--#endregion-->
 
       <!--#region Commandbar -->
@@ -27,7 +28,7 @@
             <AppBarButton Icon="ZoomIn" Label="Zoom" ToolTipService.ToolTip="Zoom">
               <AppBarButton.Flyout>
                 <Flyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <Slider x:Name="CardImageSizeSlider" Header="Card size" Value="250" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside"/>
+                  <Slider x:Name="CardImageSizeSlider" Header="Card size" Value="250" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside" />
                 </Flyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -40,10 +41,10 @@
               </AppBarButton.Flyout>
             </AppBarButton>
           </CommandBar>
-          <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}"/>
+          <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
         </StackPanel>
-        <TextBlock 
-          HorizontalAlignment="Right" 
+        <TextBlock
+          HorizontalAlignment="Right"
           VerticalAlignment="Bottom"
           Text="{x:Bind sys:String.Format(x:Null, '{0} / {1} cards', ViewModel.Cards.Collection.Count, ViewModel.Cards.TotalCardCount), Mode=OneWay}">
         </TextBlock>
@@ -53,6 +54,8 @@
       <!--#region Card View -->
       <Grid controls:DockPanel.Dock="Top">
         <controls:AdaptiveGridView
+          x:Name="SearcCardsImageView"
+          DataContext="{x:Bind ViewModel}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
           Visibility="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
           DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
@@ -64,11 +67,17 @@
           DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
           <controls:AdaptiveGridView.ItemTemplate>
             <DataTemplate x:DataType="card:MTGCard">
-              <customControls:CardSearchCardImageView Model="{Binding Mode=OneWay}"/>
+              <customControls:CardSearchCardImageView
+                d:DataContext="{d:DesignInstance Type=cardsearch:CardSearchViewModel}"
+                DataContext="{Binding ElementName=SearcCardsImageView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneWay}"
+                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
             </DataTemplate>
           </controls:AdaptiveGridView.ItemTemplate>
         </controls:AdaptiveGridView>
         <ListView
+          x:Name="SearcCardsTextView"
+          DataContext="{x:Bind ViewModel}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
           Visibility="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
           Style="{StaticResource MTGListViewStyle}"
@@ -79,7 +88,10 @@
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="card:MTGCard">
               <customControls:CardSearchCardTextView 
-                Model="{Binding Mode=OneWay}"
+                d:DataContext="{d:DesignInstance Type=cardsearch:CardSearchViewModel}"
+                DataContext="{Binding ElementName=SearcCardsTextView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneWay}"
+                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
                 HoverPreviewEnabled="True"/>
             </DataTemplate>
           </ListView.ItemTemplate>

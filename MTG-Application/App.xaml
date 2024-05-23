@@ -15,7 +15,7 @@
         <ResourceDictionary Source="/General/Views/Styles/CustomListViewStyle.xaml"/>
         <ResourceDictionary Source="/General/Views/Styles/CustomAdaptiveGridViewStyle.xaml"/>
         <!--Templates-->
-        <!--<ResourceDictionary Source="/Views/Styles/Templates/MTGPrintGridViewItemTemplate.xaml"/>-->
+        <ResourceDictionary Source="/General/Views/Styles/Templates/MTGPrintGridViewItemTemplate.xaml"/>
       </ResourceDictionary.MergedDictionaries>
       <!-- Other app resources here -->
     </ResourceDictionary>

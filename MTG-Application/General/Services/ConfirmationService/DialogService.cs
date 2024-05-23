@@ -21,11 +21,9 @@ public static partial class DialogService
   /// Class that can be used to call dialog's showAsync method.
   /// <see cref="TestDialogWrapper"/> can be used to unit test dialogs without calling UI thread.
   /// </summary>
-  public class DialogWrapper
+  public class DialogWrapper(XamlRoot xamlRoot)
   {
-    public DialogWrapper(XamlRoot xamlRoot) => XamlRoot = xamlRoot;
-
-    public XamlRoot XamlRoot { get; set; }
+    public XamlRoot XamlRoot { get; set; } = xamlRoot;
     public ContentDialog CurrentDialog { get; private set; }
 
     public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog, bool force = false)
@@ -45,14 +43,12 @@ public static partial class DialogService
   /// <summary>
   /// Base class for dialogs
   /// </summary>
-  public abstract class Dialog
+  public abstract class Dialog(string title)
   {
-    public string Title { get; init; }
+    public string Title { get; init; } = title;
     public string PrimaryButtonText { get; init; } = "Yes";
     public string SecondaryButtonText { get; init; } = "No";
     public string CloseButtonText { get; init; } = "Cancel";
-
-    public Dialog(string title) => Title = title;
 
     /// <summary>
     /// Creates the <see cref="ContentDialog"/>
@@ -106,9 +102,8 @@ public static partial class DialogService
   /// Base class for dialogs that returns a value.
   /// Returned value is <typeparamref name="T"/>
   /// </summary>
-  public abstract class Dialog<T> : Dialog
+  public abstract class Dialog<T>(string title) : Dialog(title)
   {
-    public Dialog(string title) : base(title) { }
 
     /// <summary>
     /// Returns a value depending on the <paramref name="result"/>
@@ -131,11 +126,9 @@ public static partial class DialogService
   /// <summary>
   /// Dialog that asks confirmation from the user.
   /// </summary>
-  public class ConfirmationDialog : Dialog<bool?>
+  public class ConfirmationDialog(string title = "") : Dialog<bool?>(title)
   {
     public string Message { get; set; }
-
-    public ConfirmationDialog(string title = "") : base(title) { }
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -159,11 +152,9 @@ public static partial class DialogService
   /// Dialog that shows a message to the used.
   /// Dialog has only close button
   /// </summary>
-  public class MessageDialog : Dialog<bool?>
+  public class MessageDialog(string title = "") : Dialog<bool?>(title)
   {
     public string Message { get; set; }
-
-    public MessageDialog(string title = "") : base(title) { }
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -181,7 +172,7 @@ public static partial class DialogService
   /// <summary>
   /// Dialog with a checkbox
   /// </summary>
-  public class CheckBoxDialog : Dialog<(bool? answer, bool? isChecked)>
+  public class CheckBoxDialog(string title = "") : Dialog<(bool? answer, bool? isChecked)>(title)
   {
     protected CheckBox checkBox;
     protected TextBlock textBlock;
@@ -190,8 +181,6 @@ public static partial class DialogService
     public string InputText { get; set; }
     public bool? IsChecked { get; set; }
     public bool InputDefaultValue { get; set; }
-
-    public CheckBoxDialog(string title = "") : base(title) { }
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -234,7 +223,7 @@ public static partial class DialogService
   /// <summary>
   /// Dialog with a textbox input
   /// </summary>
-  public class TextBoxDialog : Dialog<string>
+  public class TextBoxDialog(string title = "") : Dialog<string>(title)
   {
     protected TextBox textBox;
 
@@ -243,8 +232,6 @@ public static partial class DialogService
     public string InputPlaceholderText { get; set; } = "";
     public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
     public bool IsSpellCheckEnabled { get; set; }
-
-    public TextBoxDialog(string title = "") : base(title) { }
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -293,7 +280,7 @@ public static partial class DialogService
   /// <summary>
   /// Dialog with a text area input
   /// </summary>
-  public class TextAreaDialog : Dialog<string>
+  public class TextAreaDialog(string title = "") : Dialog<string>(title)
   {
     protected TextBox textBox;
 
@@ -302,8 +289,6 @@ public static partial class DialogService
     public string InputPlaceholderText { get; set; } = "";
     public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
     public bool IsSpellCheckEnabled { get; set; }
-
-    public TextAreaDialog(string title = "") : base(title) { }
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -355,15 +340,13 @@ public static partial class DialogService
   /// <summary>
   /// Dialog with a combobox input
   /// </summary>
-  public class ComboBoxDialog : Dialog<string>
+  public class ComboBoxDialog(string title = "") : Dialog<string>(title)
   {
     protected ComboBox comboBox;
 
     public string Selection { get; set; }
     public string InputHeader { get; set; }
     public string[] Items { get; set; }
-
-    public ComboBoxDialog(string title = "") : base(title) { }
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -393,20 +376,14 @@ public static partial class DialogService
   /// <summary>
   /// Dialog with a gridview input
   /// </summary>
-  public class GridViewDialog<T> : Dialog<object>
+  public class GridViewDialog<T>(string title = "", string itemTemplate = "", string gridStyle = "") : Dialog<object>(title)
   {
     protected GridView gridView;
 
     public T Selection { get; set; }
     public T[] Items { get; set; }
-    public object GridStyle { get; }
-    public object GridItemTemplate { get; }
-
-    public GridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title)
-    {
-      GridStyle = gridStyle;
-      GridItemTemplate = itemTemplate;
-    }
+    public object GridStyle { get; } = gridStyle;
+    public object GridItemTemplate { get; } = itemTemplate;
 
     public override ContentDialog GetDialog(XamlRoot root)
     {
@@ -465,12 +442,8 @@ public static partial class DialogService
   /// Dragging will close the dialog automaticly.
   /// </summary>
   /// <typeparam name="T">Items type</typeparam>
-  public class DraggableGridViewDialog<T> : GridViewDialog<T>
+  public class DraggableGridViewDialog<T>(string title = "", string itemTemplate = "", string gridStyle = "") : GridViewDialog<T>(title, itemTemplate, gridStyle)
   {
-    public DraggableGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : base(title, itemTemplate, gridStyle)
-    {
-    }
-
     public override ContentDialog GetDialog(XamlRoot root)
     {
       var dialog = base.GetDialog(root);

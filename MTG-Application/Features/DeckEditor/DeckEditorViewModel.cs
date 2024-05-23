@@ -23,7 +23,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     CardAPI = cardAPI;
     Notifier = notifier ?? new();
-    DeckEditorConfirmers = confirmers ?? new();
+    Confirmers = confirmers ?? new();
 
     DeckCardList = CreateCardListViewModel(Deck.DeckCards, () =>
     {
@@ -71,7 +71,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private ReversibleCommandStack UndoStack { get; } = new();
   private ICardAPI<MTGCard> CardAPI { get; }
 
-  public DeckEditorConfirmers DeckEditorConfirmers { get; }
+  public DeckEditorConfirmers Confirmers { get; }
   public Notifier Notifier { get; }
   public CardListViewModel DeckCardList { get; }
   public CardListViewModel MaybeCardList { get; }
@@ -94,7 +94,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (!HasUnsavedChanges) return true;
 
-    switch (await DeckEditorConfirmers.SaveUnsavedChangesConfirmer
+    switch (await Confirmers.SaveUnsavedChangesConfirmer
       .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(DeckName)))
     {
       case ConfirmationResult.Yes: await SaveDeck(); return !HasUnsavedChanges;
@@ -116,7 +116,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     if (!OpenDeckCommand.CanExecute(loadName) || !await ConfirmUnsavedChanges())
       return;
 
-    loadName ??= await DeckEditorConfirmers.LoadDeckConfirmer
+    loadName ??= await Confirmers.LoadDeckConfirmer
       .Confirm(DeckEditorConfirmers.GetLoadDeckConfirmation(await ((IWorker)this).DoWork(new GetDeckNames(Repository).Execute())));
 
     if (string.IsNullOrEmpty(loadName))
@@ -138,7 +138,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
     var oldName = DeckName;
     var overrideOld = false;
-    var saveName = await DeckEditorConfirmers.SaveDeckConfirmer.Confirm(
+    var saveName = await Confirmers.SaveDeckConfirmer.Confirm(
       DeckEditorConfirmers.GetSaveDeckConfirmation(DeckName));
 
     if (string.IsNullOrEmpty(saveName))
@@ -147,7 +147,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     // Override confirmation
     if (saveName != oldName && await new DeckExists(Repository).Execute(saveName))
     {
-      switch (await DeckEditorConfirmers.OverrideDeckConfirmer.Confirm(DeckEditorConfirmers.GetOverrideDeckConfirmation(saveName)))
+      switch (await Confirmers.OverrideDeckConfirmer.Confirm(DeckEditorConfirmers.GetOverrideDeckConfirmation(saveName)))
       {
         case ConfirmationResult.Yes: overrideOld = true; break;
         case ConfirmationResult.Cancel:
@@ -172,7 +172,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     if (!DeleteDeckCommand.CanExecute(null))
       return;
 
-    var deleteConfirmationResult = await DeckEditorConfirmers.DeleteDeckConfirmer.Confirm(
+    var deleteConfirmationResult = await Confirmers.DeleteDeckConfirmer.Confirm(
       DeckEditorConfirmers.GetDeleteDeckConfirmation(DeckName));
 
     switch (deleteConfirmationResult)
@@ -221,7 +221,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       OnChange = onChange,
       UndoStack = UndoStack,
       Worker = this,
-      Confirmers = DeckEditorConfirmers.CardListConfirmers,
+      Confirmers = Confirmers.CardListConfirmers,
       Notifier = Notifier
     };
   }
@@ -232,6 +232,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     {
       UndoStack = UndoStack,
       Notifier = Notifier,
+      Confirmers = Confirmers.CommanderConfirmers,
+      OnCardPropertyChange = () => { HasUnsavedChanges = true; },
       Worker = this,
     };
 

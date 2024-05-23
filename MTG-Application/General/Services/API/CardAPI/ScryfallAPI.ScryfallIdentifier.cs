@@ -37,7 +37,7 @@ public partial class ScryfallAPI
     /// <summary>
     /// Returns true, if the identifier applies to the given <paramref name="info"/>
     /// </summary>
-    public bool Compare(MTGCardInfo? info)
+    public bool Compare(MTGCardInfo info)
     {
       if (ScryfallId != Guid.Empty) { return info?.ScryfallId == ScryfallId; }
       else if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(SetCode)) { return string.Equals(info?.FrontFace.Name, Name, StringComparison.OrdinalIgnoreCase) && string.Equals(info?.SetCode, SetCode); }

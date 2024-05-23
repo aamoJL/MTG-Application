@@ -1,0 +1,27 @@
+<ResourceDictionary
+  x:Class="MTGApplication.General.Views.Styles.Templates.MTGPrintGridViewItemTemplate"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:converters="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:card="using:MTGApplication.General.Models.Card"
+  mc:Ignorable="d">
+
+  <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
+
+  <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="card:MTGCard">
+    <StackPanel Orientation="Vertical" Padding="5" ToolTipService.ToolTip="{Binding Info.SetName}">
+      <controls:ImageEx Source="{Binding Info.FrontFace.ImageUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
+      <Grid HorizontalAlignment="Stretch" ColumnSpacing="20">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="{Binding Info.SetName}" HorizontalAlignment="Left" FontSize="15" TextTrimming="CharacterEllipsis"/>
+        <TextBlock Grid.Column="1" Text="{Binding Info.Price, Converter={StaticResource FloatToEuroStringConverter}}" HorizontalAlignment="Right" FontSize="15"/>
+      </Grid>
+    </StackPanel>
+  </DataTemplate>
+</ResourceDictionary>

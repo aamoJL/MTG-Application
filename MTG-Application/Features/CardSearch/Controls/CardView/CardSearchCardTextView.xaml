@@ -16,7 +16,7 @@
         <CommandBarFlyout.SecondaryCommands>
           <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip"/>
           <AppBarSeparator />
-          <!--<MenuFlyoutItem Command="{x:Bind ShowPrintsDialogCommand, Mode=OneTime}" CommandParameter="{x:Bind Model, Mode=OneTime}" Icon="BrowsePhotos" Text="Show prints..."/>-->
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind ShowPrintsCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
           <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.APIName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}"/>
           <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
         </CommandBarFlyout.SecondaryCommands>

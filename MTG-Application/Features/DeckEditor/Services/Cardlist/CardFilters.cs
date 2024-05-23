@@ -51,7 +51,7 @@ public partial class CardFilters : ObservableObject
     if (card.Info.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
       && card.Info.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)
       && (card.Info.FrontFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)
-      || (card.Info.BackFace != null && card.Info.BackFace.Value.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)))
+      || (card.Info.BackFace != null && card.Info.BackFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)))
       && (White || !card.Info.Colors.Contains(ColorTypes.W))
       && (Blue || !card.Info.Colors.Contains(ColorTypes.U))
       && (Black || !card.Info.Colors.Contains(ColorTypes.B))

@@ -4,6 +4,8 @@ namespace MTGApplication.General.ViewModels;
 
 public interface IWorker
 {
+  public static IWorker Default => new DefaultWorker();
+  
   public bool IsBusy { get; set; }
 
   /// <summary>

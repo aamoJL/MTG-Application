@@ -39,7 +39,7 @@ public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0)
   public async Task<CardImportResult> FetchFromString(string importText)
     => await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
 
-  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false)
+  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
     return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length, ImportSource.External));

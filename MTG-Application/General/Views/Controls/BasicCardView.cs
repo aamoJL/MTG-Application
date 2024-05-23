@@ -86,16 +86,27 @@ public partial class BasicCardView : UserControl
 
   protected bool CanExecuteOpenCardmarketWebsite() => Model != null;
 
-  protected virtual void OnModelChanging(MTGCard oldValue) { }
+  protected virtual void OnModelChanging(MTGCard oldValue)
+  {
+    if (oldValue != null) oldValue.PropertyChanged -= Model_PropertyChanged;
+  }
 
   protected virtual void OnModelChanged(MTGCard newValue)
   {
     SelectedFaceUri = newValue?.Info.FrontFace.ImageUri ?? string.Empty;
 
+    if (newValue != null) newValue.PropertyChanged += Model_PropertyChanged;
+
     OnPropertyChanged(nameof(CardName));
     SwitchFaceImageCommand.NotifyCanExecuteChanged();
     OpenAPIWebsiteCommand.NotifyCanExecuteChanged();
     OpenCardmarketWebsiteCommand.NotifyCanExecuteChanged();
+  }
+
+  protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(MTGCard.Info))
+      SelectedFaceUri = Model?.Info.FrontFace.ImageUri;
   }
 
   protected void AppSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

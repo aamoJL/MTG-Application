@@ -52,6 +52,7 @@
     <None Remove="Features\CardSearch\Controls\ScryfallCardSearchInputControl.xaml" />
     <None Remove="General\Views\Controls\LinedHeader.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
+    <None Remove="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml" />
     <None Remove="README.md" />
     <None Remove="General\Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
     <None Remove="General\Views\Styles\CustomListViewStyle.xaml" />
@@ -187,6 +188,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardSearch\Controls\CardView\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckEditor\Controls\CommanderTextView.xaml">

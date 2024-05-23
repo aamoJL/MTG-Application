@@ -29,16 +29,10 @@ public static class MTGCardModelMocker
       string cardMarketUri = "https://www.cardmarket.com/en/Magic/Products/Search?referrer=scryfall&searchString=Befriending+the+Moths&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
       CardToken[]? tokens = default)
   {
-    producedMana ??= [];
-    scryfallId ??= Guid.NewGuid();
-    oracleId ??= Guid.NewGuid();
-    frontFace ??= CreateCardFace();
-    tokens ??= [];
-
     // NOTE: Remember to also update FromDTO method !
     return new MTGCard(new(
-      scryfallId: scryfallId.Value,
-      frontFace: frontFace.Value,
+      scryfallId: scryfallId ?? Guid.NewGuid(),
+      frontFace: frontFace ?? CreateCardFace(),
       backFace: backFace,
       cmc: cmc,
       name: name,
@@ -50,11 +44,11 @@ public static class MTGCardModelMocker
       collectorNumber: collectionNumber,
       apiWebsiteUri: apiWebsiteUri,
       setIconUri: setIconUri,
-      producedMana: producedMana,
+      producedMana: producedMana ?? [],
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
-      tokens: tokens,
-      oracleId: oracleId.Value), count);
+      tokens: tokens ?? [],
+      oracleId: oracleId ?? Guid.NewGuid()), count);
   }
 
   /// <summary>

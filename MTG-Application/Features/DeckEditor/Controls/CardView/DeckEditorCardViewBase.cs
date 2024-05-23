@@ -13,6 +13,10 @@ public partial class DeckEditorCardViewBase : BasicCardView
       DependencyProperty.Register(nameof(CountChangeCommand), typeof(ICommand), typeof(DeckEditorCardViewBase),
         new PropertyMetadata(default(ICommand)));
 
+  public static readonly DependencyProperty ChangePrintCommandProperty =
+      DependencyProperty.Register(nameof(ChangePrintCommand), typeof(ICommand), typeof(DeckEditorCardViewBase),
+        new PropertyMetadata(default(ICommand)));
+
   public ICommand DeleteButtonClick
   {
     get => (ICommand)GetValue(DeleteButtonClickProperty);
@@ -22,5 +26,10 @@ public partial class DeckEditorCardViewBase : BasicCardView
   {
     get => (ICommand)GetValue(CountChangeCommandProperty);
     set => SetValue(CountChangeCommandProperty, value);
+  }
+  public ICommand ChangePrintCommand
+  {
+    get => (ICommand)GetValue(ChangePrintCommandProperty);
+    set => SetValue(ChangePrintCommandProperty, value);
   }
 }

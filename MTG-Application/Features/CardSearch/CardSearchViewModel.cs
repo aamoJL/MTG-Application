@@ -21,6 +21,8 @@ public partial class CardSearchViewModel : ViewModelBase, IWorker
   public ICardAPI<MTGCard> CardAPI { get; }
   public IncrementalLoadingCardCollection Cards { get; }
 
+  public CardSearchConfirmers Confirmers { get; init; } = new();
+
   [ObservableProperty] private bool isBusy;
 
   [RelayCommand]
@@ -29,5 +31,16 @@ public partial class CardSearchViewModel : ViewModelBase, IWorker
     var searchResult = await ((IWorker)this).DoWork(new FetchCards(CardAPI).Execute(query));
 
     Cards.SetCollection(searchResult.Found.ToList(), searchResult.NextPageUri, searchResult.TotalCount);
+  }
+
+  [RelayCommand]
+  private async Task ShowCardPrints(MTGCard card)
+  {
+    if (card == null)
+      return;
+
+    var prints = (await ((IWorker)this).DoWork(CardAPI.FetchFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+
+    await Confirmers.ShowCardPrintsConfirmer.Confirm(CardSearchConfirmers.GetShowCardPrintsConfirmation(prints));
   }
 }

@@ -99,6 +99,7 @@
                 Model="{x:Bind ViewModel.CommanderViewModel.Card, Mode=OneWay}"
                 EdhrecButtonClick="{x:Bind ViewModel.OpenEDHRECWebsiteCommandCommand, Mode=OneTime}"
                 DeleteButtonClick="{x:Bind ViewModel.CommanderViewModel.RemoveCommand, Mode=OneTime}"
+                ChangePrintCommand="{x:Bind ViewModel.CommanderViewModel.ChangeCardPrintCommand, Mode=OneTime}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Commander"
@@ -115,6 +116,7 @@
                 Model="{x:Bind ViewModel.PartnerViewModel.Card, Mode=OneWay}"
                 EdhrecButtonClick="{x:Bind ViewModel.OpenEDHRECWebsiteCommandCommand, Mode=OneTime}"
                 DeleteButtonClick="{x:Bind ViewModel.PartnerViewModel.RemoveCommand, Mode=OneTime}"
+                ChangePrintCommand="{x:Bind ViewModel.CommanderViewModel.ChangeCardPrintCommand, Mode=OneTime}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Partner"
@@ -171,12 +173,15 @@
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
-                    Model="{Binding Mode=OneWay}"
+                    d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                    DataContext="{Binding ElementName=MaybeCardsListView, Path=DataContext, Mode=OneTime}"
+                    Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    DeleteButtonClick="{Binding ElementName=MaybeCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                    CountChangeCommand="{Binding ElementName=MaybeCardsListView, Path=DataContext.ChangeCardCountCommand, Mode=OneTime}"
-                    HoverPreviewEnabled="True"/>
+                    HoverPreviewEnabled="True"
+                    DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                    CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                    ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -223,12 +228,15 @@
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
-                    Model="{Binding Mode=OneWay}" 
+                    d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                    DataContext="{Binding ElementName=WishCardsListView, Path=DataContext, Mode=OneTime}"
+                    Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    DeleteButtonClick="{Binding ElementName=WishCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                    CountChangeCommand="{Binding ElementName=WishCardsListView, Path=DataContext.ChangeCardCountCommand, Mode=OneTime}"
-                    HoverPreviewEnabled="True"/>
+                    HoverPreviewEnabled="True"
+                    DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                    CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                    ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -275,12 +283,15 @@
               <local:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:MTGCard">
                   <local:DeckEditorCardTextView
-                    Model="{Binding Mode=OneWay}"
+                    d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                    DataContext="{Binding ElementName=RemoveCardsListView, Path=DataContext, Mode=OneTime}"
+                    Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
-                    DeleteButtonClick="{Binding ElementName=RemoveCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                    CountChangeCommand="{Binding ElementName=RemoveCardsListView, Path=DataContext.ChangeCardCountCommand, Mode=OneTime}"
-                    HoverPreviewEnabled="True"/>
+                    HoverPreviewEnabled="True"
+                    DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                    CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                    ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                 </DataTemplate>
               </local:AdvancedCardListView.ItemTemplate>
             </local:AdvancedCardListView>
@@ -478,9 +489,12 @@
           <local:AdvancedAdaptiveCardGridView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardImageView
-                Model="{Binding Mode=OneWay}" 
-                DeleteButtonClick="{Binding ElementName=DeckCardsGridView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                CountChangeCommand="{Binding ElementName=DeckCardsGridView, Path=DataContext.ChangeCardCountCommand, Mode=OneTime}"/>
+                d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                DataContext="{Binding ElementName=DeckCardsGridView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneTime}"
+                DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedAdaptiveCardGridView.ItemTemplate>
         </local:AdvancedAdaptiveCardGridView>
@@ -510,10 +524,13 @@
           <local:AdvancedCardListView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <local:DeckEditorCardTextView
-                Model="{Binding Mode=OneWay}" 
-                DeleteButtonClick="{Binding ElementName=DeckCardsListView, Path=DataContext.RemoveCardCommand, Mode=OneTime}"
-                CountChangeCommand="{Binding ElementName=DeckCardsListView, Path=DataContext.ChangeCardCountCommand, Mode=OneTime}"
-                HoverPreviewEnabled="True"/>
+                d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneTime}" 
+                HoverPreviewEnabled="True"
+                DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
             </DataTemplate>
           </local:AdvancedCardListView.ItemTemplate>
         </local:AdvancedCardListView>

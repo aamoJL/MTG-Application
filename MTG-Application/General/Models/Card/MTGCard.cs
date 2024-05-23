@@ -55,7 +55,7 @@ public partial class MTGCard : ObservableObject
   }
 
   [Serializable]
-  public readonly struct CardToken
+  public record CardToken
   {
     public Guid ScryfallId { get; }
 
@@ -64,7 +64,7 @@ public partial class MTGCard : ObservableObject
   }
 
   [Serializable]
-  public readonly struct CardFace
+  public record CardFace
   {
     public ColorTypes[] Colors { get; }
     public string Name { get; }
@@ -84,35 +84,35 @@ public partial class MTGCard : ObservableObject
   }
 
   [Serializable]
-  public readonly struct MTGCardInfo
+  public record MTGCardInfo
   {
-    public Guid ScryfallId { get; }
-    public Guid OracleId { get; }
-    public string Name { get; }
-    public int CMC { get; }
-    public string TypeLine { get; }
-    public string SetCode { get; }
-    public string SetName { get; }
-    public float Price { get; }
-    public string CollectorNumber { get; }
-    public string APIWebsiteUri { get; }
-    public string SetIconUri { get; }
-    public CardFace FrontFace { get; }
-    public CardFace? BackFace { get; }
-    public string PrintSearchUri { get; }
-    public CardToken[] Tokens { get; }
-    public RarityTypes RarityType { get; }
-    public ColorTypes[] Colors { get; }
-    public SpellType[] SpellTypes { get; }
-    public string CardMarketUri { get; }
-    public ColorTypes[] ProducedMana { get; }
-    public string APIName { get; }
+    public Guid ScryfallId { get; init; }
+    public Guid OracleId { get; init; }
+    public string Name { get; init; }
+    public int CMC { get; init; }
+    public string TypeLine { get; init; }
+    public string SetCode { get; init; }
+    public string SetName { get; init; }
+    public float Price { get; init; }
+    public string CollectorNumber { get; init; }
+    public string APIWebsiteUri { get; init; }
+    public string SetIconUri { get; init; }
+    public CardFace FrontFace { get; init; }
+    public CardFace BackFace { get; init; }
+    public string PrintSearchUri { get; init; }
+    public CardToken[] Tokens { get; init; }
+    public RarityTypes RarityType { get; init; }
+    public ColorTypes[] Colors { get; init; }
+    public SpellType[] SpellTypes { get; init; }
+    public string CardMarketUri { get; init; }
+    public ColorTypes[] ProducedMana { get; init; }
+    public string APIName { get; init; }
 
     /// <summary>
     /// Constructor for JSON deserialization
     /// </summary>
     [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-    public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string apiName, Guid oracleId)
+    public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string apiName, Guid oracleId)
     {
       ScryfallId = scryfallId;
       OracleId = oracleId;
@@ -136,7 +136,7 @@ public partial class MTGCard : ObservableObject
       Tokens = tokens;
       APIName = apiName;
     }
-    public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string apiName = "")
+    public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string apiName = "")
     {
       ScryfallId = scryfallId;
       OracleId = oracleId;
@@ -165,7 +165,7 @@ public partial class MTGCard : ObservableObject
   /// <summary>
   /// Returns all the <see cref="ColorTypes"/> that the given faces have
   /// </summary>
-  private static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
+  private static ColorTypes[] GetColors(CardFace frontFace, CardFace backFace)
   {
     var colors = new List<ColorTypes>();
 

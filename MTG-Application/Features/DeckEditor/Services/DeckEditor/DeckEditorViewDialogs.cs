@@ -1,6 +1,8 @@
-﻿using MTGApplication.General.Services.ConfirmationService;
+﻿using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.Dialogs;
 using System;
+using System.Linq;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -47,5 +49,19 @@ public class DeckEditorViewDialogs
       CloseButtonText = "No",
       PrimaryButtonText = "Yes"
     }.ShowAsync(getWrapper.Invoke())).ToConfirmationResult();
+    confirmer.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
+      => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      {
+        Items = msg.Data.ToArray(),
+        SecondaryButtonText = string.Empty
+      }.ShowAsync(getWrapper.Invoke())) as MTGCard;
+
+    confirmer.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
+      => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      {
+        Items = msg.Data.ToArray(),
+        PrimaryButtonText = "Change",
+        SecondaryButtonText = string.Empty,
+      }.ShowAsync(getWrapper.Invoke())) as MTGCard;
   }
 }

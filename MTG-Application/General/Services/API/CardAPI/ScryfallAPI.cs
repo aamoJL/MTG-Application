@@ -37,26 +37,42 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     return await FetchFromUri(GetSearchUri(searchParams));
   }
 
-  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false)
+  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
-    if (await NetworkService.TryFetchStringFromUrlGetAsync(pageUri) is not string data)
-      return CardImportResult.Empty();
+    var pageResults = new List<CardImportResult>();
+    var currentPage = pageUri;
 
-    if (!JsonService.TryParseJson(data, out var rootNode))
-      return CardImportResult.Empty();
+    do
+    {
+      if (await NetworkService.TryFetchStringFromUrlGetAsync(currentPage) is not string data)
+        break;
 
-    List<MTGCard> found = new();
+      if (!JsonService.TryParseJson(data, out var rootNode))
+        break;
 
-    found.AddRange(await GetCardsFromJsonObject(rootNode, paperOnly));
-    var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
-    var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
+      List<MTGCard> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
+      var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
+      var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
+      pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
 
-    return new CardImportResult(found.ToArray(), 0, totalCount, CardImportResult.ImportSource.External, nextPage);
+      currentPage = nextPage;
+    } while (fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
+
+    return pageResults.Count switch
+    {
+      0 => CardImportResult.Empty(),
+      1 => pageResults.First(),
+      _ => new(
+        Found: pageResults.SelectMany(x => x.Found).ToArray(),
+        NotFoundCount: pageResults.Sum(x => x.NotFoundCount),
+        TotalCount: pageResults.First().TotalCount,
+        Source: CardImportResult.ImportSource.External)
+    };
   }
 
   public async Task<CardImportResult> FetchFromString(string importText)
   {
-    if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty();
+    if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty(CardImportResult.ImportSource.External);
 
     var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -127,7 +143,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
   /// <summary>
   /// Converts Scryfall API Json object to <see cref="MTGCardInfo"/> object
   /// </summary>
-  private MTGCardInfo? GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
+  private MTGCardInfo GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
   {
     /// <summary>
     /// Converts the <paramref name="colorArray"/> to <see cref="ColorTypes"/> array
@@ -165,7 +181,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     var cardMarketUri = json["purchase_uris"]?["cardmarket"]?.GetValue<string>();
 
     CardFace frontFace;
-    CardFace? backFace;
+    CardFace backFace;
 
     frontFace = new CardFace(
       colors: json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray())

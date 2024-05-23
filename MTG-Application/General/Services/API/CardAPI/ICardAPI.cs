@@ -29,7 +29,7 @@ public partial interface ICardAPI<T>
   /// Fetches cards from the given <paramref name="pageUri"/>
   /// </summary>
   /// <param name="paperOnly">Fetches only cards that are printed on paper</param>
-  public Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false);
+  public Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
 
   /// <summary>
   /// Fetch cards from the API using formatted text.
