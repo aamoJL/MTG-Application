@@ -225,13 +225,13 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   [RelayCommand]
   private async Task OpenEdhrecSearchWindow()
   {
-
+    // TODO: open EDHREC search window use case
   }
 
   [RelayCommand]
   private async Task OpenPlaytestWindow()
   {
-
+    // TODO: open testing window use case
   }
 
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
@@ -274,7 +274,11 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       UndoStack = UndoStack,
       Notifier = Notifier,
       Confirmers = Confirmers.CommanderConfirmers,
-      OnCardPropertyChange = () => { HasUnsavedChanges = true; },
+      OnCardPropertyChange = () => 
+      { 
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckPrice));
+      },
       Worker = this,
     };
 
