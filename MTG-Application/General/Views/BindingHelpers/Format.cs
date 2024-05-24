@@ -14,11 +14,14 @@ public static class Format
   /// </summary>
   public static string EuroToString(float value) => value.ToString("c2", new CultureInfo("fi-FI"));
 
-  /// <summary>
-  /// Returns the <paramref name="value"/> as a euro currency formatted <see cref="string"/>.
-  /// The string format will be "0,00 €"
-  /// </summary>
+  /// <inheritdoc cref="EuroToString(float)"/>
+  public static string EuroToString(double value) => value.ToString("c2", new CultureInfo("fi-FI"));
+
+  /// <inheritdoc cref="EuroToString(float)"/>
   public static string EuroToString(float value, int digits) => ((float)Math.Round(value, digits)).ToString("c2", new CultureInfo("fi-FI"));
+
+  /// <inheritdoc cref="EuroToString(float)"/>
+  public static string EuroToString(double value, int digits) => Math.Round(value, digits).ToString("c2", new CultureInfo("fi-FI"));
 
   /// <summary>
   /// Converts <paramref name="text"/> to uppercase

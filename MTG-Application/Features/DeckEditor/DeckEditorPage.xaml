@@ -11,11 +11,19 @@
   xmlns:models="using:MTGApplication.General.Models.Card"
   xmlns:generalControls="using:MTGApplication.General.Views.Controls"
   xmlns:sys="using:System" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
 
+  <Page.Resources>
+    <!-- Setting button style on App.xaml did not work so it has to be done here -->
+    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
+    </Style>
+  </Page.Resources>
+  
   <!--#region Keyboard Accelerators -->
   <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened--> 
   <Page.KeyboardAccelerators>
@@ -303,9 +311,27 @@
         </TabViewItem>
         <TabViewItem Header="Info" IsClosable="False">
 
-          <!--#region Charts -->
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <!--#region Side Buttons -->
+            <StackPanel Margin="0 5 0 0" Orientation="Vertical" Spacing="5">
+              <TextBlock>
+                <Run Text="Price:" />
+                <Run Text="{x:Bind helpers:Format.EuroToString(ViewModel.DeckPrice, 0), Mode=OneWay}" />
+              </TextBlock>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Content="Tokens" Command="{x:Bind ViewModel.ShowDeckTokensCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+                <Button Content="EDHREC" Command="{x:Bind ViewModel.OpenEdhrecSearchWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+                <Button Content="Playtest" Command="{x:Bind ViewModel.OpenPlaytestWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+              </StackPanel>
+            </StackPanel>
+            <!--#endregion-->
+            
+            <!--#region Charts -->
 
-          <!--#endregion Charts-->
+            <!--#endregion Charts-->
+          </ScrollViewer>
+
+
 
         </TabViewItem>
       </TabView>

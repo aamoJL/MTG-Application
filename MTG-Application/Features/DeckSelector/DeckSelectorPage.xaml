@@ -11,6 +11,13 @@
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+  <Page.Resources>
+    <!-- Setting button style on App.xaml did not work so it has to be done here -->
+    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
+    </Style>
+  </Page.Resources>
+
   <Grid Padding="10 10 10 10">
     <Grid>
       <Grid.RowDefinitions>
@@ -25,7 +32,7 @@
         FontWeight="SemiBold"
         FontSize="24"
         Content="+ Add new deck"
-        Style="{ThemeResource AccentButtonStyle}"
+        Style="{StaticResource PrimaryButtonStyle}"
         Command="{x:Bind SelectDeckCommand, Mode=OneTime}" CommandParameter="{x:Null}"/>
       <GridView 
         Grid.Row="1"

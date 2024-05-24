@@ -6,28 +6,32 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests;
 
-public abstract class DeckEditorViewModelTestsBase
+public partial class DeckEditorViewModelTests
 {
-  protected readonly DeckRepositoryDependencies _dependencies = new();
-  protected readonly MTGCardDeck _savedDeck = MTGCardDeckMocker.Mock("Saved Deck");
-
-  public DeckEditorViewModelTestsBase()
-    => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
-
-  protected DeckEditorViewModel MockVM(
-    DeckEditorConfirmers? confirmers = null,
-    bool hasUnsavedChanges = false,
-    MTGCardDeck? deck = null,
-    Notifier? notifier = null)
+  public abstract class DeckEditorViewModelTestsBase
   {
-    return new DeckEditorViewModel(
-      cardAPI: _dependencies.CardAPI,
-      deck: deck,
-      notifier: notifier,
-      confirmers)
+    protected readonly DeckRepositoryDependencies _dependencies = new();
+    protected readonly MTGCardDeck _savedDeck = MTGCardDeckMocker.Mock("Saved Deck");
+
+    public DeckEditorViewModelTestsBase()
+      => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
+
+    protected DeckEditorViewModel MockVM(
+      DeckEditorConfirmers? confirmers = null,
+      bool hasUnsavedChanges = false,
+      MTGCardDeck? deck = null,
+      Notifier? notifier = null)
     {
-      Repository = _dependencies.Repository,
-      HasUnsavedChanges = hasUnsavedChanges
-    };
+      return new DeckEditorViewModel(
+        cardAPI: _dependencies.CardAPI,
+        deck: deck,
+        notifier: notifier,
+        confirmers)
+      {
+        Repository = _dependencies.Repository,
+        HasUnsavedChanges = hasUnsavedChanges
+      };
+    }
   }
 }
+

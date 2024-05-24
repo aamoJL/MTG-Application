@@ -16,6 +16,14 @@ public class DeckEditorViewDialogs
     confirmer.SaveDeckConfirmer.OnConfirm = async msg => await new ShowSaveDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
     confirmer.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmer.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
+    confirmer.ShowTokensConfirmer.OnConfirm = async (msg)
+      => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      {
+        Items = msg.Data.ToArray(),
+        PrimaryButtonText = string.Empty,
+        SecondaryButtonText = string.Empty,
+        CloseButtonText = "Close"
+      }.ShowAsync(getWrapper.Invoke())) as MTGCard;
 
     confirmer.CardListConfirmers.ExportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
     {
@@ -55,7 +63,6 @@ public class DeckEditorViewDialogs
         Items = msg.Data.ToArray(),
         SecondaryButtonText = string.Empty
       }.ShowAsync(getWrapper.Invoke())) as MTGCard;
-
     confirmer.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
       => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
       {

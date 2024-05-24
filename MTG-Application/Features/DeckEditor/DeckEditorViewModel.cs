@@ -11,6 +11,8 @@ using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
@@ -25,14 +27,10 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     Notifier = notifier ?? new();
     Confirmers = confirmers ?? new();
 
-    DeckCardList = CreateCardListViewModel(Deck.DeckCards, () =>
-    {
-      HasUnsavedChanges = true;
-      OnPropertyChanged(nameof(DeckSize));
-    });
-    MaybeCardList = CreateCardListViewModel(Deck.Maybelist, () => { HasUnsavedChanges = true; });
-    WishCardList = CreateCardListViewModel(Deck.Wishlist, () => { HasUnsavedChanges = true; });
-    RemoveCardList = CreateCardListViewModel(Deck.Removelist, () => { HasUnsavedChanges = true; });
+    DeckCardList = CreateCardListViewModel(Deck.DeckCards);
+    MaybeCardList = CreateCardListViewModel(Deck.Maybelist);
+    WishCardList = CreateCardListViewModel(Deck.Wishlist);
+    RemoveCardList = CreateCardListViewModel(Deck.Removelist);
 
     CommanderViewModel = CreateCommanderViewModel(modelChangeAction: (card) => { Deck.Commander = card; });
     PartnerViewModel = CreateCommanderViewModel(modelChangeAction: (card) => { Deck.CommanderPartner = card; });
@@ -60,12 +58,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       UndoStack.Clear();
       HasUnsavedChanges = false;
 
-      OnPropertyChanged(nameof(DeckSize));
       // Can't invoke changed event for the name if the name was already empty because visual state binding would break.
       if (DeckName != oldName) OnPropertyChanged(nameof(DeckName));
+      OnPropertyChanged(nameof(DeckSize));
+      OnPropertyChanged(nameof(DeckPrice));
       SaveDeckCommand.NotifyCanExecuteChanged();
       DeleteDeckCommand.NotifyCanExecuteChanged();
       OpenEDHRECWebsiteCommandCommand.NotifyCanExecuteChanged();
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
     }
   }
   private ReversibleCommandStack UndoStack { get; } = new();
@@ -89,6 +89,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   public string DeckName => Deck.Name;
   public int DeckSize => Deck.DeckSize;
+  public double DeckPrice => Deck.DeckPrice;
 
   public async Task<bool> ConfirmUnsavedChanges()
   {
@@ -201,6 +202,38 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private async Task OpenEDHRECWebsiteCommand()
     => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(Deck.Commander, Deck.CommanderPartner));
 
+  [RelayCommand(CanExecute = nameof(CanExecuteShowDeckTokensCommand))]
+  private async Task ShowDeckTokens()
+  {
+    var stringBuilder = new StringBuilder();
+
+    stringBuilder.AppendJoin(Environment.NewLine, DeckCardList.Cards.Where(c => c.Info.Tokens.Length > 0).Select(
+      c => string.Join(Environment.NewLine, c.Info.Tokens.Select(t => string.Join(Environment.NewLine, t.ScryfallId.ToString())))));
+
+    if (Deck.Commander != null)
+      stringBuilder.AppendJoin(Environment.NewLine, Deck.Commander.Info.Tokens.Select(t => t.ScryfallId.ToString()));
+
+    if (Deck.CommanderPartner != null)
+      stringBuilder.AppendJoin(Environment.NewLine, Deck.CommanderPartner.Info.Tokens.Select(t => t.ScryfallId.ToString()));
+
+    var tokens = (await ((IWorker)this).DoWork(CardAPI.FetchFromString(stringBuilder.ToString()))).Found
+      .DistinctBy(t => t.Info.OracleId); // Filter duplicates out using OracleId
+
+    await Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens));
+  }
+
+  [RelayCommand]
+  private async Task OpenEdhrecSearchWindow()
+  {
+
+  }
+
+  [RelayCommand]
+  private async Task OpenPlaytestWindow()
+  {
+
+  }
+
   private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
 
   private bool CanExecuteDeleteDeckCommand() => !string.IsNullOrEmpty(Deck.Name);
@@ -213,12 +246,20 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private bool CanExecuteOpenEDHRECWebsiteCommand() => Deck.Commander != null;
 
-  private CardListViewModel CreateCardListViewModel(ObservableCollection<MTGCard> cards, Action onChange)
+  private bool CanExecuteShowDeckTokensCommand() => Deck.Commander != null || Deck.DeckCards.Count != 0;
+
+  private CardListViewModel CreateCardListViewModel(ObservableCollection<MTGCard> cards)
   {
     return new(CardAPI)
     {
       Cards = cards,
-      OnChange = onChange,
+      OnChange = () =>
+      {
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(DeckSize));
+        OnPropertyChanged(nameof(DeckPrice));
+        ShowDeckTokensCommand.NotifyCanExecuteChanged();
+      },
       UndoStack = UndoStack,
       Worker = this,
       Confirmers = Confirmers.CardListConfirmers,
@@ -237,19 +278,21 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       Worker = this,
     };
 
-    var action = (MTGCard card) =>
+    var changeAction = (MTGCard card) =>
     {
       modelChangeAction?.Invoke(card);
       vm.Card = card;
       HasUnsavedChanges = true;
       OnPropertyChanged(nameof(DeckSize));
+      OnPropertyChanged(nameof(DeckPrice));
       OpenEDHRECWebsiteCommandCommand.NotifyCanExecuteChanged();
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
     };
 
     vm.ReversibleChange = new ReversibleAction<MTGCard>()
     {
-      Action = action,
-      ReverseAction = action,
+      Action = changeAction,
+      ReverseAction = changeAction,
     };
 
     return vm;
