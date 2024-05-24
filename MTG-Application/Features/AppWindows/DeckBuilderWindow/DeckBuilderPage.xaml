@@ -42,7 +42,6 @@
         <Grid>
 
           <!--#region Deck View Tabs -->
-          <!--NOTE: CanReorderTabs needs to be 'false', otherwise the app crashes when trying to reorder-->
           <TabView
             TabItemsSource="{x:Bind TabViewItems, Mode=OneWay}"
             IsAddTabButtonVisible="True" 
@@ -51,7 +50,7 @@
             CloseButtonOverlayMode="Auto"
             AddTabButtonClick="TabView_AddTabButtonClick"
             TabCloseRequested="TabView_TabCloseRequested"
-            CanReorderTabs="False" />
+            CanReorderTabs="True"/>
           <!--#endregion-->
 
           <!--#region Corner Buttons -->

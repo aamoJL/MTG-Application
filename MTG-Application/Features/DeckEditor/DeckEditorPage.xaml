@@ -85,6 +85,16 @@
         AllowDropTabs="False"
         CanDragTabs="False"
         CanReorderTabs="False">
+        <TabView.Resources>
+          <!-- NOTE: Disables entrance transitions -->
+          <Style TargetType="TabViewListView">
+            <Setter Property="ItemContainerTransitions">
+              <Setter.Value>
+                <TransitionCollection/>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </TabView.Resources>
         <TabViewItem Header="Side lists" IsClosable="False">
 
           <!--#region Side Lists -->
@@ -310,8 +320,8 @@
 
         </TabViewItem>
         <TabViewItem Header="Info" IsClosable="False">
-
           <ScrollViewer VerticalScrollBarVisibility="Auto">
+            
             <!--#region Side Buttons -->
             <StackPanel Margin="0 5 0 0" Orientation="Vertical" Spacing="5">
               <TextBlock>
