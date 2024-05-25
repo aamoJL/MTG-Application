@@ -42,6 +42,7 @@
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
+    <None Remove="Features\DeckEditor\Controls\Charts\ManaCurveChart.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
     <None Remove="Features\DeckEditor\Controls\CommanderTextView.xaml" />
     <None Remove="Features\DeckEditor\Controls\DeckEditorCardImageView.xaml" />
@@ -188,6 +189,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardSearch\Controls\CardView\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckEditor\Controls\Charts\ManaCurveChart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
