@@ -333,16 +333,22 @@
                 <Button Content="EDHREC" Command="{x:Bind ViewModel.OpenEdhrecSearchWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
                 <Button Content="Playtest" Command="{x:Bind ViewModel.OpenPlaytestWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
               </StackPanel>
-            <!--#endregion-->
+              <!--#endregion-->
             
-            <!--#region Charts -->
-            <customControls:LinedHeader>
-              <customControls:LinedHeader.Header>
-                <TextBlock Text="Mana Curve"/>
-              </customControls:LinedHeader.Header>
+              <!--#region Charts -->
+              <customControls:LinedHeader>
+                <customControls:LinedHeader.Header>
+                  <TextBlock Text="Mana Curve"/>
+                </customControls:LinedHeader.Header>
+              </customControls:LinedHeader>
               <local:ManaCurveChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
-            </customControls:LinedHeader>
-            <!--#endregion Charts-->
+              <customControls:LinedHeader>
+                <customControls:LinedHeader.Header>
+                  <TextBlock Text="Type Distribution"/>
+                </customControls:LinedHeader.Header>
+              </customControls:LinedHeader>
+              <local:CardTypeDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <!--#endregion Charts-->
             
             </StackPanel>
           </ScrollViewer>
