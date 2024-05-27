@@ -1,25 +1,38 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.API.CardAPI;
+using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
-
-// TODO: integration tests
-
 [TestClass]
 public class DTOToDeckConversionTests
 {
-  //[TestMethod]
-  //public async Task Execute()
-  //{
-  //  var deck = new MTGCardDeck()
-  //  {
-  //    Name = "First",
-  //    DeckCards = new([
-  //      MTGCardModelMocker.CreateMTGCardModel(name: "first"),
-  //      MTGCardModelMocker.CreateMTGCardModel(name: "second"),
-  //      MTGCardModelMocker.CreateMTGCardModel(name: "third")])
-  //  };
-  //  var dto = new MTGCardDeckDTO(deck);
+  [TestMethod]
+  public async Task Execute_DTOConvertedToDeck()
+  {
+    var cards = new MTGCard[]
+    {
+        MTGCardModelMocker.CreateMTGCardModel(name: "first"),
+        MTGCardModelMocker.CreateMTGCardModel(name: "second"),
+        MTGCardModelMocker.CreateMTGCardModel(name: "third"),
+    };
+    var deck = new MTGCardDeck()
+    {
+      Name = "First",
+      DeckCards = new(cards),
+    };
 
-  //  //var result = new DTOToDeckConversion()
-  //}
+    var result = await new DTOToDeckConversion(new TestCardAPI()
+    {
+      ExpectedCards = cards
+    }).Execute(new(deck));
+
+    Assert.IsNotNull(result);
+    Assert.AreEqual(3, result.DeckCards.Count);
+    CollectionAssert.AreEquivalent(
+      deck.DeckCards.Select(x => x.Info).ToArray(),
+      result.DeckCards.Select(x => x.Info).ToArray());
+  }
 }

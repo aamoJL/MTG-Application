@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.API.CardAPI;
 
-public class DTOToDeckConversion : UseCase<MTGCardDeckDTO, Task<MTGCardDeck>>
+public class DTOToDeckConversion(ICardAPI<MTGCard> cardAPI) : UseCase<MTGCardDeckDTO, Task<MTGCardDeck>>
 {
-  public DTOToDeckConversion(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
-
-  public ICardAPI<MTGCard> CardAPI { get; }
+  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
 
   public override async Task<MTGCardDeck> Execute(MTGCardDeckDTO dto)
   {
