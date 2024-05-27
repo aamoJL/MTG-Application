@@ -104,7 +104,6 @@ public static partial class DialogService
   /// </summary>
   public abstract class Dialog<T>(string title) : Dialog(title)
   {
-
     /// <summary>
     /// Returns a value depending on the <paramref name="result"/>
     /// </summary>

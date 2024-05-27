@@ -5,18 +5,14 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Models.Card;
 
-// TODO: integration tests
-
-public class CardImporter
+public class CardImporter(ICardAPI<MTGCard> cardAPI)
 {
-  public CardImporter(ICardAPI<MTGCard> cardAPI) => CardAPI = cardAPI;
-
-  public ICardAPI<MTGCard> CardAPI { get; }
+  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
 
   public async Task<CardImportResult> Import(string data)
   {
     if (JsonService.TryDeserializeJson<MTGCard>(data, out var card))
-      return new(new MTGCard[] { card }, 0, 1, CardImportResult.ImportSource.Internal); // Imported from the app
+      return new([card], 0, 1, CardImportResult.ImportSource.Internal); // Imported from the app
 
     if (EdhrecAPI.TryParseCardNameFromEdhrecUri(data, out var name))
       return await CardAPI.FetchFromString(name); // Imported from EDHREC.com
