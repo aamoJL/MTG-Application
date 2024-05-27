@@ -43,6 +43,7 @@
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\DeckEditor\Controls\Charts\CardTypeDistributionChart\CardTypeDistributionChart.xaml" />
+    <None Remove="Features\DeckEditor\Controls\Charts\ColorDistributionChart\ColorDistributionChart.xaml" />
     <None Remove="Features\DeckEditor\Controls\Charts\ManaCurveChart.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
     <None Remove="Features\DeckEditor\Controls\CommanderTextView.xaml" />
@@ -148,6 +149,9 @@
     <Page Update="Features\CardSearch\Controls\CardSearchCardTextView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Features\DeckEditor\Controls\Charts\ColorDistributionChart\ColorDistributionChart.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="General\Views\Controls\LinedHeader.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

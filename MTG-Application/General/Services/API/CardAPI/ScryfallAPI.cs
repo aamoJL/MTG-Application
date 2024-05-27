@@ -196,7 +196,7 @@ public partial class ScryfallAPI : ICardAPI<MTGCard>
     {
       backFace = new CardFace(
         colors: json["card_faces"]!.AsArray()[1]["colors"] != null ? GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray())
-          : Array.Empty<ColorTypes>(),
+          : [],
         name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>() ?? string.Empty,
         imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>() ?? null,
         illustrationId: json["card_faces"]?.AsArray()[1]["illustration_id"]?.GetValue<Guid?>() ?? null,

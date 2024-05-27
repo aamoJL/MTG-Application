@@ -46,13 +46,10 @@ public sealed partial class CardTypeDistributionChart : MTGCardChart
 
     foreach (var spellType in spellTypes)
     {
-      // Find series
-      if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is not ISeries series)
-        return;
-
       // Find value item
-      if (series.Values is ObservableCollection<MTGCardChartSeriesItem> seriesValues &&
-        seriesValues.FirstOrDefault() is MTGCardChartSeriesItem valueItem && valueItem.Cards.Contains(card))
+      if (Series.FirstOrDefault(x => x.Name == spellType.ToString()) is ISeries series
+        && series.Values is ObservableCollection<MTGCardChartSeriesItem> seriesValues
+        && seriesValues.FirstOrDefault() is MTGCardChartSeriesItem valueItem)
       {
         // Remove card from the value item
         valueItem.Cards.Remove(card);

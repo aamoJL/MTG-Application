@@ -36,11 +36,11 @@ public sealed partial class ManaCurveChart : MTGCardChart
 
   protected override void AddToSeries(MTGCard card)
   {
-    // Validation: Exclude lands
+    // Validation: Exclude cards that are only Lands
     if (card.Info.SpellTypes.All(x => x == SpellType.Land))
       return;
 
-    // Combine cards with multiple colors into a one Multicolored item
+    // Cards with multiple colors will be shown as a Multicolored
     var color = card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0];
 
     // Find series or create a new one
@@ -64,13 +64,10 @@ public sealed partial class ManaCurveChart : MTGCardChart
 
   protected override void RemoveFromSeries(MTGCard card)
   {
-    // Find series
-    if (Series.FirstOrDefault(x => x.Name == card.ColorType.GetFullName()) is not ISeries series)
-      return;
-
     // Find value item
-    if (series.Values is ObservableCollection<MTGCardCMCSeriesItem> seriesValues &&
-      seriesValues.FirstOrDefault(x => x.Cards.Contains(card)) is MTGCardCMCSeriesItem valueItem)
+    if (Series.FirstOrDefault(x => x.Name == card.ColorType.GetFullName()) is ISeries series 
+      && series.Values is ObservableCollection<MTGCardCMCSeriesItem> seriesValues 
+      && seriesValues.FirstOrDefault(x => x.Cards.Contains(card)) is MTGCardCMCSeriesItem valueItem)
     {
       // Remove card from the value item
       valueItem.Cards.Remove(card);

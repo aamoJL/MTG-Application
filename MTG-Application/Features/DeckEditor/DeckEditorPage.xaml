@@ -348,6 +348,12 @@
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
               <local:CardTypeDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <customControls:LinedHeader>
+                <customControls:LinedHeader.Header>
+                  <TextBlock Text="Color Distribution"/>
+                </customControls:LinedHeader.Header>
+              </customControls:LinedHeader>
+              <local:ColorDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
               <!--#endregion Charts-->
             
             </StackPanel>

@@ -75,6 +75,8 @@ public partial class MTGCard : ObservableObject
     [JsonConstructor]
     public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId, string oracleText)
     {
+      if (colors.Length == 0) colors = [ColorTypes.C];
+
       Colors = colors;
       Name = name;
       ImageUri = imageUri;
@@ -177,9 +179,6 @@ public partial class MTGCard : ObservableObject
       foreach (var color in backFace?.Colors)
         if (!colors.Contains(color)) { colors.Add(color); }
     }
-
-    // Card is colorless if it has no other colors
-    if (colors.Count == 0) colors.Add(ColorTypes.C);
 
     return colors.ToArray();
   }

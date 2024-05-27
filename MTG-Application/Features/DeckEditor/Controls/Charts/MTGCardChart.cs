@@ -32,6 +32,8 @@ public abstract class MTGCardChart : UserControl
 
   protected abstract ISeries AddNewSeries(object property);
 
+  protected virtual void ResetSeries() => Series.Clear();
+
   protected virtual void UpdateTheme() { }
 
   protected void OnCardsChanged(ObservableCollection<MTGCard> oldValue)
@@ -39,7 +41,7 @@ public abstract class MTGCardChart : UserControl
     if (oldValue != null) oldValue.CollectionChanged -= Cards_CollectionChanged;
     if (Cards != null) Cards.CollectionChanged += Cards_CollectionChanged;
 
-    Series.Clear();
+    ResetSeries();
 
     foreach (var card in Cards)
       AddToSeries(card);
