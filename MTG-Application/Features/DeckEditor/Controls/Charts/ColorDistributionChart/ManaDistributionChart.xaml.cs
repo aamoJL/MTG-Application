@@ -9,13 +9,13 @@ using System.Linq;
 using static MTGApplication.General.Models.Card.MTGCard;
 
 namespace MTGApplication.Features.DeckEditor;
-public sealed partial class ColorDistributionChart : MTGCardChart
+public sealed partial class ManaDistributionChart : MTGCardChart
 {
   private static readonly ColorTypes[] _colorRange = [ColorTypes.W, ColorTypes.U, ColorTypes.B, ColorTypes.R, ColorTypes.G];
   private static readonly string _costSeriesName = "Costs";
   private static readonly string _productionSeriesName = "Producers";
 
-  public ColorDistributionChart() : base()
+  public ManaDistributionChart() : base()
   {
     InitializeComponent();
 
