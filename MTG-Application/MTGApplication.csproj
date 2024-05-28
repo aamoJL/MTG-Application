@@ -40,7 +40,7 @@
     <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
-    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckEditorTabViewItem.xaml" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectorAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\DeckEditor\Controls\Charts\CardTypeDistributionChart\CardTypeDistributionChart.xaml" />
     <None Remove="Features\DeckEditor\Controls\Charts\ColorDistributionChart\ManaDistributionChart.xaml" />
@@ -216,7 +216,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckEditorTabViewItem.xaml">
+    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectorAndEditorTabViewItem.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.ConfirmationService;
 
-// TODO: clean
 // TODO: dialogs to views?
 
 /// <summary>

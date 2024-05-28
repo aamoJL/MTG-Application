@@ -6,7 +6,6 @@ using MTGApplication.Features.AppWindows.DeckBuilderWindow;
 using MTGApplication.General.Databases;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication;
 
@@ -37,10 +36,7 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    var mainWindow = new ThemedWindow() { Title = "Deck Builder" };
-
-    mainWindow.Navigate(typeof(DeckBuilderPage));
-    mainWindow.Activate();
+    new DeckBuilderWindow().Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
   }

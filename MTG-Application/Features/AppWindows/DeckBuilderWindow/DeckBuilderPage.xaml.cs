@@ -9,14 +9,9 @@ namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 [ObservableObject]
 public sealed partial class DeckBuilderPage : Page
 {
-  public DeckBuilderPage()
-  {
-    InitializeComponent();
+  public DeckBuilderPage() => InitializeComponent();
 
-    TabViewItems.Add(new CreateNewDeckViewTabItem().Execute());
-  }
-
-  public ObservableCollection<DeckEditorTabViewItem> TabViewItems { get; } = new();
+  public ObservableCollection<DeckSelectorAndEditorTabViewItem> TabViewItems { get; } = [new CreateNewDeckViewTabItem().Execute()];
 
   [ObservableProperty] private bool isSearchPaneOpen = false;
 
@@ -31,25 +26,24 @@ public sealed partial class DeckBuilderPage : Page
       ? ElementTheme.Light : ElementTheme.Dark).Execute();
   }
 
-  private void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
+  private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
   {
-    if (args.Item is not DeckEditorTabViewItem tabItem) return;
+    if (!await (args.Item as DeckSelectorAndEditorTabViewItem).RequestClosure())
+      return;
 
-    // TODO: save unsaved changes
-    TabViewItems.Remove(tabItem);
+    TabViewItems.Remove(args.Item as DeckSelectorAndEditorTabViewItem);
 
+    // Create new tab if there are no tabs
     if (TabViewItems.Count == 0)
-    {
-      var newTab = new CreateNewDeckViewTabItem().Execute();
-      TabViewItems.Add(newTab);
-      sender.SelectedItem = newTab;
-    }
+      AddNewTab(sender);
   }
 
-  private void TabView_AddTabButtonClick(TabView sender, object args)
+  private void TabView_AddTabButtonClick(TabView sender, object args) => AddNewTab(sender);
+
+  private void AddNewTab(TabView tabView)
   {
     var newTab = new CreateNewDeckViewTabItem().Execute();
     TabViewItems.Add(newTab);
-    sender.SelectedItem = newTab;
+    tabView.SelectedItem = newTab;
   }
 }

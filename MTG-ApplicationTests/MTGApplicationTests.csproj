@@ -35,6 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GeneralTests\Services\IOServiceTests\" />
+    <Folder Include="GeneralTests\ServiceTests\IOServiceTests\" />
   </ItemGroup>
 </Project>

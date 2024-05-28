@@ -2,7 +2,6 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.General.Services.NotificationService;
-using MTGApplication.General.ViewModels;
 using System;
 using Windows.UI;
 
@@ -11,11 +10,11 @@ namespace MTGApplication.General.Views.AppWindows;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class ThemedWindow : Window
+public partial class ThemedWindow : Window
 {
   private static readonly string DEFAULT_ICON_URI = "Assets/Icon.ico";
 
-  private bool _close = false; // Temp variable for window closing
+  private bool CanClose { get; set; } = false;
 
   public ThemedWindow() : base()
   {
@@ -77,30 +76,22 @@ public sealed partial class ThemedWindow : Window
       element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
-  private async void ThemedWindow_Closed(object sender, WindowEventArgs args)
+  private async void ThemedWindow_Closed(object sender, WindowEventArgs e)
   {
-    // The Window will close if the close variable has been set to true.
+    // The Window will close if the CanClose variable has been set to true.
     // Otherwise the user will be asked to save unsaved changes.
     // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
-    if (_close) { return; }
+    if (CanClose) { return; }
 
-    var canceled = false;
+    e.Handled = true;
+    CanClose = await new WindowClosing(Content.XamlRoot).Close();
 
-    if (Content is ISavable savableContent)
+    if (CanClose)
     {
-      args.Handled = savableContent.HasUnsavedChanges;
-      canceled = !await savableContent.ConfirmUnsavedChanges();
-    }
-
-    if (!canceled)
-    {
-      _close = true;
-      args.Handled = false;
-
+      e.Handled = false;
       AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
       NotificationService.OnShow -= NotificationService_OnShow;
       Closed -= ThemedWindow_Closed;
-
       Content = null;
       Close();
     }
