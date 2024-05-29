@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.API.CardAPI;
 
-public class DTOToDeckConversion(ICardAPI<MTGCard> cardAPI) : UseCase<MTGCardDeckDTO, Task<MTGCardDeck>>
+public class DTOToDeckConverter(ICardAPI<MTGCard> cardAPI) : UseCase<MTGCardDeckDTO, Task<MTGCardDeck>>
 {
   public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
 
@@ -15,8 +15,8 @@ public class DTOToDeckConversion(ICardAPI<MTGCard> cardAPI) : UseCase<MTGCardDec
     return new MTGCardDeck()
     {
       Name = dto.Name,
-      Commander = dto.Commander != null ? (await CardAPI.FetchFromDTOs(new CardDTO[] { dto.Commander })).Found.FirstOrDefault() : null,
-      CommanderPartner = dto.CommanderPartner != null ? (await CardAPI.FetchFromDTOs(new CardDTO[] { dto.CommanderPartner })).Found.FirstOrDefault() : null,
+      Commander = dto.Commander != null ? (await CardAPI.FetchFromDTOs([dto.Commander])).Found.FirstOrDefault() : null,
+      CommanderPartner = dto.CommanderPartner != null ? (await CardAPI.FetchFromDTOs([dto.CommanderPartner])).Found.FirstOrDefault() : null,
       DeckCards = new((await CardAPI.FetchFromDTOs(dto.DeckCards.ToArray())).Found),
       Wishlist = new((await CardAPI.FetchFromDTOs(dto.WishlistCards.ToArray())).Found),
       Maybelist = new((await CardAPI.FetchFromDTOs(dto.MaybelistCards.ToArray())).Found),

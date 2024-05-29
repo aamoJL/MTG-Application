@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.ViewModels;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardSearch;
@@ -30,7 +29,7 @@ public partial class CardSearchViewModel : ViewModelBase, IWorker
   {
     var searchResult = await ((IWorker)this).DoWork(new FetchCards(CardAPI).Execute(query));
 
-    Cards.SetCollection(searchResult.Found.ToList(), searchResult.NextPageUri, searchResult.TotalCount);
+    Cards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
   }
 
   [RelayCommand]

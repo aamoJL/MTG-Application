@@ -9,11 +9,9 @@ namespace MTGApplication.General.Models.CardCollection;
 /// </summary>
 public partial class MTGCardCollection : ObservableObject
 {
-  public MTGCardCollection() { }
-
   [ObservableProperty] private string name = string.Empty;
 
-  public ObservableCollection<MTGCardCollectionList> CollectionLists { get; set; } = new();
+  public ObservableCollection<MTGCardCollectionList> CollectionLists { get; set; } = [];
 
   /// <summary>
   /// Returns the collection as a data transfer object

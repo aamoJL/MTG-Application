@@ -24,7 +24,7 @@ public class DTOToDeckConversionTests
       DeckCards = new(cards),
     };
 
-    var result = await new DTOToDeckConversion(new TestCardAPI()
+    var result = await new DTOToDeckConverter(new TestCardAPI()
     {
       ExpectedCards = cards
     }).Execute(new(deck));

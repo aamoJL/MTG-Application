@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public class IncrementalCardSource : IIncrementalSource<MTGCard>
+public class IncrementalCardSource(ICardAPI<MTGCard> cardAPI) : object(), IIncrementalSource<MTGCard>
 {
-  public IncrementalCardSource(ICardAPI<MTGCard> cardAPI) : base() => CardAPI = cardAPI;
-
-  public List<MTGCard> Cards { get; set; } = new();
-  public ICardAPI<MTGCard> CardAPI { get; init; }
+  public List<MTGCard> Cards { get; set; } = [];
+  public ICardAPI<MTGCard> CardAPI { get; init; } = cardAPI;
   public string NextPage { get; set; }
 
   public async Task<IEnumerable<MTGCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)

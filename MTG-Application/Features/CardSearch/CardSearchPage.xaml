@@ -55,7 +55,7 @@
       <Grid controls:DockPanel.Dock="Top">
         <controls:AdaptiveGridView
           x:Name="SearcCardsImageView"
-          DataContext="{x:Bind ViewModel}"
+          DataContext="{x:Bind ViewModel, Mode=OneTime}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
           Visibility="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
           DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"

@@ -1,9 +1,6 @@
-﻿using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MTGApplication.General.Models.CardCollection;
 
@@ -22,25 +19,5 @@ public class MTGCardCollectionDTO
   [Key] public int Id { get; init; }
   public string Name { get; init; }
 
-  public List<MTGCardCollectionListDTO> CollectionLists { get; init; } = new();
-
-  /// <summary>
-  /// Converts the DTO to a <see cref="MTGCardCollection"/> object using the given <paramref name="api"/>
-  /// </summary>
-  public async Task<MTGCardCollection> AsMTGCardCollection(ICardAPI<MTGCard> api)
-  {
-    return new MTGCardCollection()
-    {
-      Name = Name,
-      CollectionLists = new(await Task.WhenAll(CollectionLists.Select(async x =>
-      {
-        return new MTGCardCollectionList()
-        {
-          Name = x.Name,
-          SearchQuery = x.SearchQuery,
-          Cards = new((await api.FetchFromDTOs(x.Cards.ToArray())).Found),
-        };
-      })))
-    };
-  }
+  public List<MTGCardCollectionListDTO> CollectionLists { get; init; } = [];
 }

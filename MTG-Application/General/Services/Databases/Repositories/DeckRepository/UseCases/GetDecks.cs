@@ -23,7 +23,7 @@ public class GetDecks : UseCase<Task<IEnumerable<MTGCardDeck>>>
 
   public async override Task<IEnumerable<MTGCardDeck>> Execute()
   {
-    var converter = new DTOToDeckConversion(CardAPI);
+    var converter = new DTOToDeckConverter(CardAPI);
     return await Task.WhenAll((await Repository.Get(Includes)).Select(x => converter.Execute(x)));
   }
 }

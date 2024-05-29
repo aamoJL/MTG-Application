@@ -9,12 +9,9 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Databases.Repositories.DeckRepository;
 
-public class DeckDTORepository : IRepository<MTGCardDeckDTO>
+public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : IRepository<MTGCardDeckDTO>
 {
-  public DeckDTORepository(CardDbContextFactory dbContextFactory = null)
-    => DbContextFactory = dbContextFactory ?? new();
-
-  public CardDbContextFactory DbContextFactory { get; }
+  public CardDbContextFactory DbContextFactory { get; } = dbContextFactory ?? new();
 
   public virtual async Task<bool> Add(MTGCardDeckDTO item)
   {

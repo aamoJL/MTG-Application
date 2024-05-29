@@ -80,9 +80,9 @@ public sealed partial class DeckSelectorAndEditorTabViewItem : TabViewItem
     if (Frame?.Content is DeckEditorPage deckEditorPage)
       deckEditorPage.ViewModel.PropertyChanged -= DeckEditorPageViewModel_PropertyChanged;
 
-    Frame.Navigated -= Frame_Navigated;
     WindowClosing.Closing -= WindowClosing_Closing;
     WindowClosing.Closed -= WindowClosing_Closed;
+    Frame.Navigated -= Frame_Navigated;
   }
 }
 

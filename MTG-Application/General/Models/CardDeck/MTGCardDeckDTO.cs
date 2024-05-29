@@ -12,15 +12,15 @@ namespace MTGApplication.General.Models.CardDeck;
 /// </summary>
 public record MTGCardDeckDTO
 {
-  public static Expression<Func<MTGCardDeckDTO, object>>[] DefaultIncludes => new Expression<Func<MTGCardDeckDTO, object>>[]
-  {
+  public static Expression<Func<MTGCardDeckDTO, object>>[] DefaultIncludes
+  => [
     x => x.DeckCards,
     x => x.WishlistCards,
     x => x.MaybelistCards,
     x => x.RemovelistCards,
     x => x.Commander,
     x => x.CommanderPartner,
-  };
+  ];
 
   private MTGCardDeckDTO() { }
 

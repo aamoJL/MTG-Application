@@ -39,7 +39,7 @@ public interface IRepository<T>
   /// <summary>
   /// Returns all the items from the database.
   /// </summary>
-  public Task<IEnumerable<T>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null);
+  public Task<IEnumerable<T>> Get(Expression<Func<T, object>>[] Includes = null);
 
   /// <summary>
   /// Returns an item with the given <paramref name="name"/> from the database.
