@@ -14,17 +14,15 @@ public static partial class DbSetExtensions
     includes ??= MTGCardDeckDTO.DefaultIncludes;
 
     foreach (var include in includes)
-    {
       value.Include(include).Load();
-    }
 
     return value;
   }
 
-  public static DbSet<MTGCardCollectionDTO> SetDefaultIncludesOrEmpty(this DbSet<MTGCardCollectionDTO> value, bool setDefault)
+  public static IQueryable<MTGCardCollectionDTO> SetDefaultIncludesOrEmpty(this IQueryable<MTGCardCollectionDTO> value, bool setDefault)
   {
-    if(setDefault)
-      value.Include(x => x.CollectionLists).ThenInclude(x => x.Cards);
+    if (setDefault)
+      value.Include(x => x.CollectionLists).ThenInclude(x => x.Cards).Load();
 
     return value;
   }

@@ -12,11 +12,11 @@
 
   <StackPanel x:Name="GridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
     <Grid>
-      <!--<controls:ImageEx 
+      <controls:ImageEx 
         x:Name="GridViewItemImage" 
         Style="{StaticResource PlaceholderImageStyle}" 
         Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-        Opacity="{x:Bind OwnedToOpacity(IsOwned), Mode=OneWay}" 
+        Opacity="{x:Bind OwnedToOpacity(Model.IsOwned), Mode=OneWay}" 
         DoubleTapped="GridViewItemImage_DoubleTapped" 
         Tapped="GridViewItemImage_Tapped">
         <controls:ImageEx.ContextFlyout>
@@ -30,7 +30,7 @@
             </CommandBarFlyout.SecondaryCommands>
           </CommandBarFlyout>
         </controls:ImageEx.ContextFlyout>
-      </controls:ImageEx>-->
+      </controls:ImageEx>
     </Grid>
   </StackPanel>
 </local:CardCollectionCardViewBase>

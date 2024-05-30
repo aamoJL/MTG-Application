@@ -11,14 +11,14 @@ using System.Windows.Input;
 namespace MTGApplication.General.Views;
 
 [ObservableObject]
-public partial class BasicCardView : UserControl
+public abstract partial class BasicCardView<TCard> : UserControl where TCard : MTGCard
 {
   public static readonly DependencyProperty ModelProperty =
-      DependencyProperty.Register(nameof(Model), typeof(MTGCard), typeof(BasicCardView),
-        new PropertyMetadata(default(MTGCard), OnModelPropertyChangedCallback));
+      DependencyProperty.Register(nameof(Model), typeof(TCard), typeof(BasicCardView<TCard>),
+        new PropertyMetadata(default(TCard), OnModelPropertyChangedCallback));
 
   public static readonly DependencyProperty HoverPreviewEnabledProperty =
-      DependencyProperty.Register(nameof(HoverPreviewEnabled), typeof(bool), typeof(BasicCardView), new PropertyMetadata(false));
+      DependencyProperty.Register(nameof(HoverPreviewEnabled), typeof(bool), typeof(BasicCardView<TCard>), new PropertyMetadata(false));
 
   public BasicCardView()
   {
@@ -33,9 +33,9 @@ public partial class BasicCardView : UserControl
     Unloaded += (_, _) => { AppConfig.LocalSettings.PropertyChanged -= AppSettings_PropertyChanged; };
   }
 
-  public MTGCard Model
+  public TCard Model
   {
-    get => (MTGCard)GetValue(ModelProperty);
+    get => (TCard)GetValue(ModelProperty);
     set => SetValue(ModelProperty, value);
   }
   public bool HoverPreviewEnabled
@@ -86,12 +86,12 @@ public partial class BasicCardView : UserControl
 
   protected bool CanExecuteOpenCardmarketWebsite() => Model != null;
 
-  protected virtual void OnModelChanging(MTGCard oldValue)
+  protected virtual void OnModelChanging(TCard oldValue)
   {
     if (oldValue != null) oldValue.PropertyChanged -= Model_PropertyChanged;
   }
 
-  protected virtual void OnModelChanged(MTGCard newValue)
+  protected virtual void OnModelChanged(TCard newValue)
   {
     SelectedFaceUri = newValue?.Info.FrontFace.ImageUri ?? string.Empty;
 
@@ -140,12 +140,12 @@ public partial class BasicCardView : UserControl
 
   protected static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
-    var view = (sender as BasicCardView);
+    var view = (sender as BasicCardView<TCard>);
 
     if (e.Property.Equals(ModelProperty))
     {
-      view.OnModelChanging((MTGCard)e.OldValue);
-      view.OnModelChanged((MTGCard)e.NewValue);
+      view.OnModelChanging((TCard)e.OldValue);
+      view.OnModelChanged((TCard)e.NewValue);
     }
   }
 }

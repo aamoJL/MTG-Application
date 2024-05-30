@@ -13,27 +13,27 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
 {
   public CardDbContextFactory DbContextFactory { get; } = dbContextFactory ?? new();
 
-  public Task<bool> Add(MTGCardCollectionDTO item)
+  public virtual async Task<bool> Add(MTGCardCollectionDTO item)
   {
     throw new NotImplementedException();
   }
 
-  public Task<bool> AddOrUpdate(MTGCardCollectionDTO item)
+  public virtual async Task<bool> AddOrUpdate(MTGCardCollectionDTO item)
   {
     throw new NotImplementedException();
   }
 
-  public Task<bool> Delete(MTGCardCollectionDTO item)
+  public virtual async Task<bool> Delete(MTGCardCollectionDTO item)
   {
     throw new NotImplementedException();
   }
 
-  public Task<bool> Exists(string name)
+  public virtual async Task<bool> Exists(string name)
   {
     throw new NotImplementedException();
   }
 
-  public async Task<IEnumerable<MTGCardCollectionDTO>> Get(Expression<Func<MTGCardCollectionDTO, object>>[] includes = null)
+  public virtual async Task<IEnumerable<MTGCardCollectionDTO>> Get(Expression<Func<MTGCardCollectionDTO, object>>[] includes = null)
     => await Get((items) => items.SetDefaultIncludesOrEmpty(includes.Length != 0));
 
   // TODO: test if this works and replace the expression version with this
@@ -50,18 +50,17 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
     return await Task.FromResult(items.ToList());
   }
 
-  public async Task<MTGCardCollectionDTO> Get(string name, Expression<Func<MTGCardCollectionDTO, object>>[] includes = null)
+  public virtual async Task<MTGCardCollectionDTO> Get(string name, Expression<Func<MTGCardCollectionDTO, object>>[] includes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
-    var item = db.MTGCardCollections.SetDefaultIncludesOrEmpty(includes.Length != 0)
-      .Where(x => x.Name == name).FirstOrDefault();
+    var item = db.MTGCardCollections.Where(x => x.Name == name).SetDefaultIncludesOrEmpty(includes?.Length != 0).FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
     return await Task.FromResult(item);
   }
 
-  public Task<bool> Update(MTGCardCollectionDTO item)
+  public virtual async Task<bool> Update(MTGCardCollectionDTO item)
   {
     throw new NotImplementedException();
   }

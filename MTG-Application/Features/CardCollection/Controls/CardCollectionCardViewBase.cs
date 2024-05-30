@@ -3,7 +3,7 @@ using MTGApplication.General.Views;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.CardCollection.Controls;
-public partial class CardCollectionCardViewBase : BasicCardView
+public partial class CardCollectionCardViewBase : BasicCardView<CardCollectionMTGCard>
 {
   public static readonly DependencyProperty ShowPrintsCommandProperty =
       DependencyProperty.Register(nameof(ShowPrintsCommand), typeof(ICommand), typeof(CardCollectionCardViewBase),

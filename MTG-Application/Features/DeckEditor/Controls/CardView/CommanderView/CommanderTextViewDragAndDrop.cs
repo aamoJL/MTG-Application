@@ -11,7 +11,7 @@ public class CommanderTextViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : Dr
 {
   public void DragStarting(UIElement sender, DragStartingEventArgs e)
   {
-    OnDragStarting((sender as BasicCardView)?.Model, out var requestedOperation);
+    OnDragStarting((sender as BasicCardView<MTGCard>)?.Model, out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }

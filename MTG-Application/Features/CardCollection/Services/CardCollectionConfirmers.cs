@@ -5,7 +5,15 @@ namespace MTGApplication.Features.CardCollection;
 
 public class CardCollectionConfirmers
 {
+  public Confirmer<ConfirmationResult> SaveUnsavedChangesConfirmer { get; init; } = new();
   public Confirmer<string, IEnumerable<string>> LoadCollectionConfirmer { get; init; } = new();
+
+  public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
+  {
+    return new(
+      Title: "Save unsaved changes?",
+      Message: $"{(string.IsNullOrEmpty(collectionName) ? "Unnamed collection" : $"'{collectionName}'")} has unsaved changes. Would you like to save the collection?");
+  }
 
   public static Confirmation<IEnumerable<string>> GetLoadCollectionConfirmation(IEnumerable<string> data)
   {

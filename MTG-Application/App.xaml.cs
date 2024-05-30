@@ -2,6 +2,7 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
+using MTGApplication.Features.AppWindows.CardCollectionWindow;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow;
 using MTGApplication.General.Databases;
 using MTGApplication.General.Models.Card;
@@ -36,7 +37,8 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    new DeckBuilderWindow().Activate();
+    //new DeckBuilderWindow().Activate();
+    new CardCollectionWindow().Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
   }

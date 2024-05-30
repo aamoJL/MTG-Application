@@ -22,9 +22,7 @@ public abstract class IncrementalCardSource<TCard>(ICardAPI<MTGCard> cardAPI) : 
       // Load next page
       var result = await CardAPI.FetchFromUri(NextPage);
       NextPage = result.NextPageUri;
-
-      foreach (var card in result.Found)
-        Cards.Add(card);
+      Cards.AddRange(result.Found);
     }
 
     return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize).Select(ConvertToCardType);
