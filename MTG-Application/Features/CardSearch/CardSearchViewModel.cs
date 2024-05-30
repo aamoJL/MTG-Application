@@ -9,16 +9,10 @@ namespace MTGApplication.Features.CardSearch;
 /// <summary>
 /// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>
-public partial class CardSearchViewModel : ViewModelBase, IWorker
+public partial class CardSearchViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBase, IWorker
 {
-  public CardSearchViewModel(ICardAPI<MTGCard> cardAPI)
-  {
-    CardAPI = cardAPI;
-    Cards = new(CardAPI);
-  }
-
-  public ICardAPI<MTGCard> CardAPI { get; }
-  public IncrementalLoadingCardCollection Cards { get; }
+  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
+  public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new DefaultIncrementalCardSource(cardAPI));
 
   public CardSearchConfirmers Confirmers { get; init; } = new();
 

@@ -22,13 +22,7 @@ public partial class MTGCard : ObservableObject
   {
     Info = info;
     Count = count;
-
-    ColorType = Info.Colors.Length > 1 ? ColorTypes.M : Info.Colors[0];
-    PrimarySpellType = Info.SpellTypes[0];
   }
-
-  public ColorTypes ColorType { get; }
-  public SpellType PrimarySpellType { get; }
 
   [ObservableProperty] private MTGCardInfo info;
 

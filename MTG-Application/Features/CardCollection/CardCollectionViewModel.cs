@@ -4,11 +4,9 @@ using MTGApplication.General.Databases.Repositories;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardCollection;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 using MTGApplication.General.ViewModels;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,7 +21,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
 
-  public IncrementalLoadingCardCollection AllListCards { get; } = new(cardAPI);
+  public IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; } = new(new CardCollectionIncrementalCardSource(cardAPI));
   public CardCollectionConfirmers Confirmers { get; init; }
   public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
 
@@ -110,18 +108,5 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   {
     // TODO:
     return Task.FromResult(HasUnsavedChanges);
-  }
-}
-
-public class CardCollectionConfirmers
-{
-  public Confirmer<string, IEnumerable<string>> LoadCollectionConfirmer { get; init; } = new();
-
-  public static Confirmation<IEnumerable<string>> GetLoadCollectionConfirmation(IEnumerable<string> data)
-  {
-    return new(
-      Title: "Open collection",
-      Message: "Name",
-      Data: data);
   }
 }

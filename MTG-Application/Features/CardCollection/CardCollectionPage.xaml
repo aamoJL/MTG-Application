@@ -119,6 +119,7 @@
         x:Name="ListCardImageView"
         controls:DockPanel.Dock="Top" 
         DataContext="{x:Bind ViewModel, Mode=OneTime}"
+        ItemsSource="{x:Bind ViewModel.QueryCards.Collection, Mode=OneWay}"
         Style="{StaticResource MTGAdaptiveGridViewStyle}"
         SelectionMode="None"
         DesiredWidth="250">

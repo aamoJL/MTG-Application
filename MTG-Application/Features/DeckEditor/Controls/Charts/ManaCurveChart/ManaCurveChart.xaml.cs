@@ -64,9 +64,12 @@ public sealed partial class ManaCurveChart : MTGCardChart
 
   protected override void RemoveFromSeries(MTGCard card)
   {
+    // Cards with multiple colors will be shown as a Multicolored
+    var color = card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0];
+
     // Find value item
-    if (Series.FirstOrDefault(x => x.Name == card.ColorType.GetFullName()) is ISeries series 
-      && series.Values is ObservableCollection<MTGCardCMCSeriesItem> seriesValues 
+    if (Series.FirstOrDefault(x => x.Name == color.GetFullName()) is ISeries series
+      && series.Values is ObservableCollection<MTGCardCMCSeriesItem> seriesValues
       && seriesValues.FirstOrDefault(x => x.Cards.Contains(card)) is MTGCardCMCSeriesItem valueItem)
     {
       // Remove card from the value item

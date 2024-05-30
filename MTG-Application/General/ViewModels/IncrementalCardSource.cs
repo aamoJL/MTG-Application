@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public class IncrementalCardSource(ICardAPI<MTGCard> cardAPI) : object(), IIncrementalSource<MTGCard>
+public abstract class IncrementalCardSource<TCard>(ICardAPI<MTGCard> cardAPI) : object(), IIncrementalSource<TCard> where TCard : MTGCard
 {
   public List<MTGCard> Cards { get; set; } = [];
-  public ICardAPI<MTGCard> CardAPI { get; init; } = cardAPI;
   public string NextPage { get; set; }
+  
+  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
 
-  public async Task<IEnumerable<MTGCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+  public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
   {
     if (!string.IsNullOrEmpty(NextPage))
     {
@@ -26,6 +27,8 @@ public class IncrementalCardSource(ICardAPI<MTGCard> cardAPI) : object(), IIncre
         Cards.Add(card);
     }
 
-    return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize).Select(x => x);
+    return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize).Select(ConvertToCardType);
   }
+
+  protected abstract TCard ConvertToCardType(MTGCard card);
 }
