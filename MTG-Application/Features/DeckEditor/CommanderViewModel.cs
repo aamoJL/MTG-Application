@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -70,7 +71,7 @@ public partial class CommanderViewModel : ViewModelBase
   {
     var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
 
-    if (!result.Found.Any())
+    if (result.Found.Length == 0)
     {
       new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportError);
     }

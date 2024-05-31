@@ -51,7 +51,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
         await new GetCardCollectionNames(Repository).Execute())) is not string loadName)
       return;
 
-    if (await ((IWorker)this).DoWork(new GetCardCollection(Repository, CardAPI).Execute(loadName)) is MTGCardCollection loadedCollection)
+    if (await ((IWorker)this).DoWork(new LoadCardCollection(Repository, CardAPI).Execute(loadName)) is MTGCardCollection loadedCollection)
     {
       HasUnsavedChanges = false;
       Collection = loadedCollection;
@@ -68,46 +68,76 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     }
   }
 
-  [RelayCommand]
+  [RelayCommand(CanExecute = nameof(CanExecuteSaveCollectionCommand))]
   private async Task SaveCollection()
   {
-    // TODO:
+    if (!SaveCollectionCommand.CanExecute(null)) return;
+
+    var oldName = Collection.Name;
+    var overrideOld = false;
+    var saveName = await Confirmers.SaveCollectionConfirmer.Confirm(
+      CardCollectionConfirmers.GetSaveCollectionConfirmation(oldName));
+
+    if (string.IsNullOrEmpty(saveName))
+      return;
+
+    // Override confirmation
+    if (saveName != oldName && await new CardCollectionExists(Repository).Execute(saveName))
+    {
+      switch (await Confirmers.OverrideCollectionConfirmer.Confirm(CardCollectionConfirmers.GetOverrideCollectionConfirmation(saveName)))
+      {
+        case ConfirmationResult.Yes: overrideOld = true; break;
+        case ConfirmationResult.No:
+        default: return; // Cancel
+      }
+    }
+
+    switch (await ((IWorker)this).DoWork(new SaveCardCollection(Repository).Execute(new(Collection, saveName, overrideOld))))
+    {
+      case true:
+        //TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveSuccessNotification);
+        HasUnsavedChanges = false;
+        break;
+      case false:
+        //TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveErrorNotification); 
+        break;
+    }
   }
 
   [RelayCommand]
   private async Task DeleteCollection()
   {
-    // TODO:
+    // TODO: DeleteCollection
   }
 
   [RelayCommand]
   private async Task NewList()
   {
-    // TODO:
+    // TODO: NewList
   }
 
   [RelayCommand]
   private async Task EditList()
   {
-    // TODO:
+    // TODO: EditList
   }
 
   [RelayCommand]
   private async Task ImportCards()
   {
-    // TODO:
+    // TODO: ImportCards
   }
 
   [RelayCommand]
   private async Task ExportCards()
   {
-    // TODO:
+    // TODO: ExportCards
   }
 
   [RelayCommand]
   private async Task DeleteList()
   {
-    // TODO:
+    // TODO: DeleteList
   }
 
   public async Task<bool> ConfirmUnsavedChanges()
@@ -122,4 +152,6 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       default: return false;
     };
   }
+
+  private bool CanExecuteSaveCollectionCommand() => Collection.CollectionLists.Any();
 }

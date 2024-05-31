@@ -7,6 +7,7 @@ using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.IOService;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -140,7 +141,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     var oldName = DeckName;
     var overrideOld = false;
     var saveName = await Confirmers.SaveDeckConfirmer.Confirm(
-      DeckEditorConfirmers.GetSaveDeckConfirmation(DeckName));
+      DeckEditorConfirmers.GetSaveDeckConfirmation(oldName));
 
     if (string.IsNullOrEmpty(saveName))
       return;
@@ -274,8 +275,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       UndoStack = UndoStack,
       Notifier = Notifier,
       Confirmers = Confirmers.CommanderConfirmers,
-      OnCardPropertyChange = () => 
-      { 
+      OnCardPropertyChange = () =>
+      {
         HasUnsavedChanges = true;
         OnPropertyChanged(nameof(DeckPrice));
       },

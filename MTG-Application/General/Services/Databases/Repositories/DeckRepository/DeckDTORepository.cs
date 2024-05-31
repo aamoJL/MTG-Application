@@ -66,19 +66,18 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
-    if (db.MTGDecks
-      .Where(x => x.Name == item.Name)
-      .SetIncludesOrDefault()
-      .FirstOrDefault() is MTGCardDeckDTO existingDeck)
-    {
-      db.ChangeTracker.AutoDetectChangesEnabled = true;
-      // Remove unused cards from the database
-      List<MTGCardDTO> missingDeckCards = new();
-      List<MTGCardDTO> missingWishlistCards = new();
-      List<MTGCardDTO> missingMaybelistCards = new();
-      List<MTGCardDTO> missingRemovelistCards = new();
 
-      var missingCardsTasks = new List<Task>()
+    if (await Get(item.Name) is not MTGCardDeckDTO existingDeck)
+      return false;
+
+    db.ChangeTracker.AutoDetectChangesEnabled = true;
+    // Remove unused cards from the database
+    List<MTGCardDTO> missingDeckCards = [];
+    List<MTGCardDTO> missingWishlistCards = [];
+    List<MTGCardDTO> missingMaybelistCards = [];
+    List<MTGCardDTO> missingRemovelistCards = [];
+
+    var missingCardsTasks = new List<Task>()
       {
         Task.Run(() => missingDeckCards.AddRange(existingDeck.DeckCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
         Task.Run(() => missingWishlistCards.AddRange(existingDeck.WishlistCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
@@ -86,15 +85,15 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
         Task.Run(() => missingRemovelistCards.AddRange(existingDeck.RemovelistCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
       };
 
-      await Task.WhenAll(missingCardsTasks);
+    await Task.WhenAll(missingCardsTasks);
 
-      db.RemoveRange(missingDeckCards);
-      db.RemoveRange(missingWishlistCards);
-      db.RemoveRange(missingMaybelistCards);
-      db.RemoveRange(missingRemovelistCards);
+    db.RemoveRange(missingDeckCards);
+    db.RemoveRange(missingWishlistCards);
+    db.RemoveRange(missingMaybelistCards);
+    db.RemoveRange(missingRemovelistCards);
 
-      // Add new cards to the deckDTO
-      var updateCardsTasks = new List<Task>()
+    // Add new cards to the deckDTO
+    var updateCardsTasks = new List<Task>()
       {
         Task.Run(() =>
         {
@@ -130,27 +129,26 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
         })
       };
 
-      await Task.WhenAll(updateCardsTasks);
+    await Task.WhenAll(updateCardsTasks);
 
-      // Remove old commander and add new one if the commander changed
-      if ((existingDeck.Commander != null || item.Commander != null) && existingDeck.Commander?.Compare(item?.Commander) is not true)
-      {
-        if (existingDeck.Commander != null)
-          db.Remove(existingDeck.Commander);
+    // Remove old commander and add new one if the commander changed
+    if ((existingDeck.Commander != null || item.Commander != null) && existingDeck.Commander?.Compare(item?.Commander) is not true)
+    {
+      if (existingDeck.Commander != null)
+        db.Remove(existingDeck.Commander);
 
-        existingDeck.Commander = item.Commander ?? null;
-      }
-
-      if ((existingDeck.CommanderPartner != null || item.CommanderPartner != null) && existingDeck.CommanderPartner?.Compare(item?.CommanderPartner) is not true)
-      {
-        if (existingDeck.CommanderPartner != null)
-          db.Remove(existingDeck.CommanderPartner);
-
-        existingDeck.CommanderPartner = item.CommanderPartner ?? null;
-      }
-
-      db.Update(existingDeck);
+      existingDeck.Commander = item.Commander ?? null;
     }
+
+    if ((existingDeck.CommanderPartner != null || item.CommanderPartner != null) && existingDeck.CommanderPartner?.Compare(item?.CommanderPartner) is not true)
+    {
+      if (existingDeck.CommanderPartner != null)
+        db.Remove(existingDeck.CommanderPartner);
+
+      existingDeck.CommanderPartner = item.CommanderPartner ?? null;
+    }
+
+    db.Update(existingDeck);
 
     return await db.SaveChangesAsync() > 0;
   }

@@ -4,14 +4,10 @@ using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Databases.Repositories.DeckRepository;
-public class DeleteDeck : UseCase<MTGCardDeck, Task<bool>>
+public class DeleteDeck(IRepository<MTGCardDeckDTO> repository) : UseCase<MTGCardDeck, Task<bool>>
 {
-  public DeleteDeck(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
-
-  public IRepository<MTGCardDeckDTO> Repository { get; }
-
-  public override async Task<bool> Execute(MTGCardDeck deck) => await Repository.Delete(new(deck));
+  public override async Task<bool> Execute(MTGCardDeck deck) => await repository.Delete(new(deck));
 
   public async Task<bool> Execute(string deckName)
-    => await Repository.Delete(await Repository.Get(deckName, ExpressionExtensions.EmptyArray<MTGCardDeckDTO>()));
+    => await repository.Delete(await repository.Get(deckName, []));
 }

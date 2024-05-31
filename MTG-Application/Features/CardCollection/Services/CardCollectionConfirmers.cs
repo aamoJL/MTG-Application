@@ -7,6 +7,8 @@ public class CardCollectionConfirmers
 {
   public Confirmer<ConfirmationResult> SaveUnsavedChangesConfirmer { get; init; } = new();
   public Confirmer<string, IEnumerable<string>> LoadCollectionConfirmer { get; init; } = new();
+  public Confirmer<string, string> SaveCollectionConfirmer { get; init; } = new();
+  public Confirmer<ConfirmationResult> OverrideCollectionConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -21,5 +23,20 @@ public class CardCollectionConfirmers
       Title: "Open collection",
       Message: "Name",
       Data: data);
+  }
+
+  public static Confirmation<string> GetSaveCollectionConfirmation(string oldName)
+  {
+    return new(
+      Title: "Save your collection?",
+      Message: string.Empty,
+      Data: oldName);
+  }
+
+  public static Confirmation GetOverrideCollectionConfirmation(string saveName)
+  {
+    return new(
+      Title: "Override existing collection?",
+      Message: $"Collection '{saveName}' already exist. Would you like to override the collection?");
   }
 }

@@ -4,6 +4,7 @@ using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.IOService;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -110,7 +111,7 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     }
 
     // Add cards
-    if (addedCards.Any())
+    if (addedCards.Count != 0)
     {
       UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(addedCards, CardCopier)
       {
@@ -121,10 +122,10 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     // Notifications
     if (result.Source == CardImportResult.ImportSource.External)
     {
-      if (result.Found.Any() && result.NotFoundCount == 0) // All found
+      if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
         new SendNotification(Notifier).Execute(new(NotificationType.Success,
           $"{addedCards.Count} cards imported successfully." + ((result.Found.Length - addedCards.Count) > 0 ? $" ({(result.Found.Length - addedCards.Count)} cards skipped) " : "")));
-      else if (result.Found.Any() && result.NotFoundCount > 0) // Some found
+      else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
         new SendNotification(Notifier).Execute(new(NotificationType.Warning,
           $"{result.Found.Length} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + ((result.Found.Length - addedCards.Count) > 0 ? $" ({(result.Found.Length - addedCards.Count)} cards skipped) " : "")));
       else if (result.NotFoundCount > 0) // None found

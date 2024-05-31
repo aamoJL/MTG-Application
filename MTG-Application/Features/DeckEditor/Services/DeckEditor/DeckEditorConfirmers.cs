@@ -31,12 +31,12 @@ public class DeckEditorConfirmers
       Data: data);
   }
 
-  public static Confirmation<string> GetSaveDeckConfirmation(string deckName)
+  public static Confirmation<string> GetSaveDeckConfirmation(string oldName)
   {
     return new(
       Title: "Save your deck?",
       Message: string.Empty,
-      Data: deckName);
+      Data: oldName);
   }
 
   public static Confirmation GetOverrideDeckConfirmation(string saveName)
@@ -46,11 +46,11 @@ public class DeckEditorConfirmers
       Message: $"Deck '{saveName}' already exist. Would you like to override the deck?");
   }
 
-  public static Confirmation GetDeleteDeckConfirmation(string deckName)
+  public static Confirmation GetDeleteDeckConfirmation(string name)
   {
     return new(
       Title: "Delete deck?",
-      Message: $"Are you sure you want to delete '{deckName}'?");
+      Message: $"Are you sure you want to delete '{name}'?");
   }
 
   public static Confirmation<IEnumerable<MTGCard>> GetShowTokensConfirmation(IEnumerable<MTGCard> data)

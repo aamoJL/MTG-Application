@@ -23,9 +23,9 @@ public partial class CardCollectionViewModelTests
         ]
     };
 
-    public CardCollectionViewModelTestsBase()
-      => _dependencies.ContextFactory.Populate(new MTGCardCollectionDTO(_savedCollection));
+    public CardCollectionViewModelTestsBase() => _dependencies.ContextFactory.Populate(new MTGCardCollectionDTO(_savedCollection));
 
+    [Obsolete("Use Mocker instead")]
     public CardCollectionViewModel MockVM(
       CardCollectionConfirmers? confirmers = null,
       bool hasUnsavedChanges = false,
@@ -38,6 +38,24 @@ public partial class CardCollectionViewModelTests
         HasUnsavedChanges = hasUnsavedChanges,
         Collection = collection ?? new()
       };
+    }
+
+    public class Mocker(CollectionRepositoryDependencies dependencies)
+    {
+      public bool HasUnsavedChanges { get; set; } = false;
+      public CardCollectionConfirmers Confirmers { get; set; } = new();
+      public MTGCardCollection Collection { get; set; } = new();
+
+      public CardCollectionViewModel MockVM()
+      {
+        return new(dependencies.CardAPI)
+        {
+          Repository = dependencies.Repository,
+          Confirmers = Confirmers,
+          HasUnsavedChanges = HasUnsavedChanges,
+          Collection = Collection
+        };
+      }
     }
   }
 }

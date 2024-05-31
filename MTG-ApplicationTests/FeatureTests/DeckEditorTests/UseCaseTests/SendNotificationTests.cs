@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor;
+using MTGApplication.General.Services.NotificationService;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.UseCaseTests;
