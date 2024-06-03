@@ -15,75 +15,83 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Unsaved changes confirmation should be shown when setting new deck if there are unsaved changes")]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
-      var vm = MockVM(
-        hasUnsavedChanges: true,
-        deck: MTGCardDeckMocker.Mock("Deck"),
-        confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = MTGCardDeckMocker.Mock("Deck"),
+        HasUnsavedChanges = true,
+        Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
-        });
+        }
+      }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.NewDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Cancel_HasUnsavedChanges()
     {
-      var vm = MockVM(
-        hasUnsavedChanges: true,
-        deck: MTGCardDeckMocker.Mock("Deck"),
-        confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = MTGCardDeckMocker.Mock("Deck"),
+        HasUnsavedChanges = true,
+        Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) }
-        });
+        }
+      }.MockVM();
 
-      await vm.NewDeckCommand.ExecuteAsync(null);
+      await viewmodel.NewDeckCommand.ExecuteAsync(null);
 
-      Assert.IsTrue(vm.HasUnsavedChanges);
+      Assert.IsTrue(viewmodel.HasUnsavedChanges);
     }
 
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Decline_NoUnsavedChanges()
     {
-      var vm = MockVM(
-        hasUnsavedChanges: true,
-        deck: MTGCardDeckMocker.Mock("Deck"),
-        confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = MTGCardDeckMocker.Mock("Deck"),
+        HasUnsavedChanges = true,
+        Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) }
-        });
+        }
+      }.MockVM();
 
-      await vm.NewDeckCommand.ExecuteAsync(null);
+      await viewmodel.NewDeckCommand.ExecuteAsync(null);
 
-      Assert.IsFalse(vm.HasUnsavedChanges);
+      Assert.IsFalse(viewmodel.HasUnsavedChanges);
     }
 
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
     {
-      var vm = MockVM(
-        hasUnsavedChanges: true,
-        deck: MTGCardDeckMocker.Mock("Deck"),
-        confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = MTGCardDeckMocker.Mock("Deck"),
+        HasUnsavedChanges = true,
+        Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
           SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
-        });
+        }
+      }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.NewDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
     public async Task Execute_Reset()
     {
-      var vm = MockVM(deck: MTGCardDeckMocker.Mock("Deck"));
+      var viewmodel = new Mocker(_dependencies) { Deck = MTGCardDeckMocker.Mock("Deck") }.MockVM();
 
-      await vm.NewDeckCommand.ExecuteAsync(null);
+      await viewmodel.NewDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(string.Empty, vm.DeckName);
-      Assert.AreEqual(null, vm.CommanderViewModel.Card);
-      Assert.AreEqual(null, vm.PartnerViewModel.Card);
-      Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
+      Assert.AreEqual(string.Empty, viewmodel.DeckName);
+      Assert.AreEqual(null, viewmodel.CommanderViewModel.Card);
+      Assert.AreEqual(null, viewmodel.PartnerViewModel.Card);
+      Assert.AreEqual(0, viewmodel.DeckCardList.Cards.Count);
     }
   }
 }

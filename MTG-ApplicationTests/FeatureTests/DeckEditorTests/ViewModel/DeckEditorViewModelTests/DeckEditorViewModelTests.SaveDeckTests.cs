@@ -15,40 +15,49 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Should be able to execute if the deck has cards")]
     public void ValidState_CanExecute()
     {
-      var vm = MockVM(deck: _savedDeck);
+      var viewmodel = new Mocker(_dependencies) { Deck = _savedDeck }.MockVM();
 
-      Assert.IsTrue(vm.SaveDeckCommand.CanExecute(null));
+      Assert.IsTrue(viewmodel.SaveDeckCommand.CanExecute(null));
     }
 
     [TestMethod("Should not be able to execute if the deck has no cards")]
     public void InvalidState_CanNotExecute()
     {
-      var vm = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
-      Assert.IsFalse(vm.SaveDeckCommand.CanExecute(null));
+      Assert.IsFalse(viewmodel.SaveDeckCommand.CanExecute(null));
     }
 
     [TestMethod("Should show save confirmation when saving the deck")]
     public async Task Save_SaveConfirmationShown()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
 
-      await ConfirmationAssert.ConfirmationShown(() => vm.SaveDeckCommand.ExecuteAsync(null));
+        }
+      }.MockVM();
+
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.SaveDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod("Should not save if the confirmation was canceled")]
     public async Task Save_Cancel_NotSaved()
     {
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
-      var vm = MockVM(deck: newDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string?>(null) }
-      });
+        Deck = newDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string?>(null) }
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       Assert.IsFalse(await _dependencies.Repository.Exists(newDeck.Name));
       Assert.IsFalse(await _dependencies.Repository.Exists(string.Empty));
@@ -58,12 +67,16 @@ public partial class DeckEditorViewModelTests
     public async Task Save_WithEmptyName_NotSaved()
     {
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
-      var vm = MockVM(deck: newDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(string.Empty) }
-      });
+        Deck = newDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(string.Empty) }
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       Assert.IsFalse(await _dependencies.Repository.Exists(newDeck.Name));
       Assert.IsFalse(await _dependencies.Repository.Exists(string.Empty));
@@ -73,12 +86,16 @@ public partial class DeckEditorViewModelTests
     public async Task Save_NewName_Saved()
     {
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
-      var vm = MockVM(deck: newDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(newDeck.Name) }
-      });
+        Deck = newDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(newDeck.Name) }
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       Assert.IsTrue(await _dependencies.Repository.Exists(newDeck.Name));
     }
@@ -86,26 +103,34 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Should not show override confirmation if saving with the same name")]
     public async Task Save_SameName_NoOverrideConfirmationShown()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
-        OverrideDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() },
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
+          OverrideDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() },
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
     }
 
     [TestMethod("Should show override confirmation when trying to save over an existing deck")]
     public async Task Save_Override_OverrideConfirmationShown()
     {
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
-      var vm = MockVM(deck: newDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
-        OverrideDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() },
-      });
+        Deck = newDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
+          OverrideDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() },
+        }
+      }.MockVM();
 
-      await Assert.ThrowsExceptionAsync<ConfirmationException>(() => vm.SaveDeckCommand.ExecuteAsync(null));
+      await Assert.ThrowsExceptionAsync<ConfirmationException>(() => viewmodel.SaveDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod("Saving should be canceled if overriding was canceled")]
@@ -114,13 +139,17 @@ public partial class DeckEditorViewModelTests
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
       newDeck.Commander = MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
 
-      var vm = MockVM(deck: newDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
-        OverrideDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) },
-      });
+        Deck = newDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
+          OverrideDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) },
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       var dbDeck = await _dependencies.Repository.Get(_savedDeck.Name);
       Assert.AreEqual(_savedDeck.Commander?.Info.Name, dbDeck?.Commander?.Name);
@@ -132,13 +161,17 @@ public partial class DeckEditorViewModelTests
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
       newDeck.Commander = MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
 
-      var vm = MockVM(deck: newDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
-        OverrideDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
-      });
+        Deck = newDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
+          OverrideDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       var dbDeck = await _dependencies.Repository.Get(_savedDeck.Name);
       Assert.AreEqual(newDeck.Commander.Info.Name, dbDeck?.Commander?.Name);
@@ -149,12 +182,16 @@ public partial class DeckEditorViewModelTests
     {
       var newName = "New Name";
       var oldName = _savedDeck.Name;
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(newName) }
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(newName) }
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       Assert.IsNull(await _dependencies.Repository.Get(oldName));
     }
@@ -163,42 +200,57 @@ public partial class DeckEditorViewModelTests
     public async Task Save_Renamed_NameChanged()
     {
       var newName = "New Name";
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(newName) }
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(newName) }
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(newName, vm.DeckName);
+      Assert.AreEqual(newName, viewmodel.DeckName);
     }
 
     [TestMethod("Should have no unsaved changes if the deck was saved")]
     public async Task Save_Success_NoUnsavedChanges()
     {
-      var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
-      });
+        Deck = _savedDeck,
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+        }
+      }.MockVM();
 
-      await vm.SaveDeckCommand.ExecuteAsync(null);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
-      Assert.IsFalse(vm.HasUnsavedChanges);
+      Assert.IsFalse(viewmodel.HasUnsavedChanges);
     }
 
     [TestMethod("Success notification should be sent when the deck was saved")]
     public async Task Save_Success_SuccessNotificationSent()
     {
-      var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
-      }, notifier: new()
-      {
-        OnNotify = (arg) => throw new NotificationException(arg)
-      });
+        Deck = _savedDeck,
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+        },
+        Notifier =
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
+      }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => vm.SaveDeckCommand.ExecuteAsync(null));
+        () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod("Error notification should be sent when there are failure on saving")]
@@ -206,27 +258,38 @@ public partial class DeckEditorViewModelTests
     {
       _dependencies.Repository.UpdateFailure = true;
 
-      var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
-      }, notifier: new()
-      {
-        OnNotify = (arg) => throw new NotificationException(arg)
-      });
+        Deck = _savedDeck,
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+        },
+        Notifier =
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
+      }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => vm.SaveDeckCommand.ExecuteAsync(null));
+        () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod("ViewModel should be busy when saving the deck")]
     public async Task Execute_IsBusy()
     {
-      var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
-      });
+        Deck = _savedDeck,
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
+        }
+      }.MockVM();
 
-      await WorkerAssert.IsBusy(vm, () => vm.SaveDeckCommand.ExecuteAsync(null));
+      await WorkerAssert.IsBusy(viewmodel, () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
     }
   }
 }

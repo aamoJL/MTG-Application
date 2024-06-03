@@ -13,28 +13,32 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Should be able to execute if the deck has a name")]
     public void DeleteDeck_HasName_CanExecute()
     {
-      var vm = MockVM(deck: new() { Name = "New Deck" });
+      var viewmodel = new Mocker(_dependencies) { Deck = new() { Name = "New Deck" } }.MockVM();
 
-      Assert.IsTrue(vm.DeleteDeckCommand.CanExecute(null));
+      Assert.IsTrue(viewmodel.DeleteDeckCommand.CanExecute(null));
     }
 
     [TestMethod("Should not be able to execute if the deck has no name")]
     public void DeleteDeck_NoName_CanNotExecute()
     {
-      var vm = MockVM(deck: new());
+      var viewmodel = new Mocker(_dependencies) { Deck = new() }.MockVM();
 
-      Assert.IsFalse(vm.DeleteDeckCommand.CanExecute(null));
+      Assert.IsFalse(viewmodel.DeleteDeckCommand.CanExecute(null));
     }
 
     [TestMethod("Deck should be deleted if the deletion was confirmed")]
     public async Task DeleteDeck_Accept_DeckDeleted()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        }
+      }.MockVM();
 
-      await vm.DeleteDeckCommand.ExecuteAsync(null);
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
 
       Assert.IsFalse(await _dependencies.Repository.Exists(_savedDeck.Name));
     }
@@ -42,14 +46,18 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Deck should reset when the deck has been deleted")]
     public async Task DeleteDeck_Accept_DeckReset()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        }
+      }.MockVM();
 
-      await vm.DeleteDeckCommand.ExecuteAsync(null);
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(string.Empty, vm.DeckName);
+      Assert.AreEqual(string.Empty, viewmodel.DeckName);
     }
 
     [TestMethod("Deck should not reset if there are a failure when deleting the deck")]
@@ -57,25 +65,33 @@ public partial class DeckEditorViewModelTests
     {
       _dependencies.Repository.DeleteFailure = true;
 
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        }
+      }.MockVM();
 
-      await vm.DeleteDeckCommand.ExecuteAsync(null);
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedDeck.Name, vm.DeckName);
+      Assert.AreEqual(_savedDeck.Name, viewmodel.DeckName);
     }
 
     [TestMethod("Deck should not be deleted if the deletion was canceled")]
     public async Task DeleteDeck_Cancel_DeckNotDeleted()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
+        }
+      }.MockVM();
 
-      await vm.DeleteDeckCommand.ExecuteAsync(null);
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
 
       Assert.IsTrue(await _dependencies.Repository.Exists(_savedDeck.Name));
     }
@@ -83,29 +99,39 @@ public partial class DeckEditorViewModelTests
     [TestMethod("ViewModel should have no unsaved changes if the deck was deleted")]
     public async Task DeleteDeck_Deleted_NoUnsavedChanges()
     {
-      var vm = MockVM(deck: _savedDeck, hasUnsavedChanges: true, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-      });
+        Deck = _savedDeck,
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        }
+      }.MockVM();
 
-      await vm.DeleteDeckCommand.ExecuteAsync(null);
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
 
-      Assert.IsFalse(vm.HasUnsavedChanges);
+      Assert.IsFalse(viewmodel.HasUnsavedChanges);
     }
 
     [TestMethod("Success notification should be sent when the deck was deleted")]
     public async Task DeleteDeck_Deleted_SuccessNotificationSent()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-      }, notifier: new()
-      {
-        OnNotify = (arg) => throw new NotificationException(arg)
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        },
+        Notifier = new()
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
+      }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => vm.DeleteDeckCommand.ExecuteAsync(null));
+        () => viewmodel.DeleteDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod("Error notification should be sent when there are failure on deletion")]
@@ -113,27 +139,36 @@ public partial class DeckEditorViewModelTests
     {
       _dependencies.Repository.DeleteFailure = true;
 
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-      }, notifier: new()
-      {
-        OnNotify = (arg) => throw new NotificationException(arg)
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        },
+        Notifier = new()
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
+      }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => vm.DeleteDeckCommand.ExecuteAsync(null));
+        () => viewmodel.DeleteDeckCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
     public async Task DeleteDeck_ConfirmationShown()
     {
-      var vm = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeleteDeckConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          DeleteDeckConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+        }
+      }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => vm.DeleteDeckCommand.ExecuteAsync(null));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.DeleteDeckCommand.ExecuteAsync(null));
     }
   }
 }

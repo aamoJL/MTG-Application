@@ -11,7 +11,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void Undo_NoCommands_CanNotExecute()
     {
-      var viewmodel = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       Assert.IsFalse(viewmodel.UndoCommand.CanExecute(null));
     }
@@ -19,7 +19,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void Undo_HasCommand_CanExecute()
     {
-      var viewmodel = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
@@ -29,7 +29,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void Undo_Execute_ReverseActionInvoked()
     {
-      var viewmodel = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 

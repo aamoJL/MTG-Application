@@ -14,10 +14,13 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void ShowTokens_HasOnlyCommander_CanExecute()
     {
-      var viewmodel = MockVM(deck: new MTGCardDeck()
+      var viewmodel = new Mocker(_dependencies)
       {
-        Commander = MTGCardModelMocker.CreateMTGCardModel()
-      });
+        Deck = new MTGCardDeck()
+        {
+          Commander = MTGCardModelMocker.CreateMTGCardModel()
+        },
+      }.MockVM();
 
       Assert.IsTrue(viewmodel.ShowDeckTokensCommand.CanExecute(null));
     }
@@ -25,7 +28,8 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void ShowTokens_HasNoCards_CanNotExecute()
     {
-      var viewmodel = MockVM();
+
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       Assert.IsFalse(viewmodel.ShowDeckTokensCommand.CanExecute(null));
     }
@@ -33,10 +37,13 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void ShowTokens_HasCards_CanExecute()
     {
-      var viewmodel = MockVM(deck: new MTGCardDeck()
+      var viewmodel = new Mocker(_dependencies)
       {
-        DeckCards = [MTGCardModelMocker.CreateMTGCardModel()]
-      });
+        Deck = new MTGCardDeck()
+        {
+          DeckCards = [MTGCardModelMocker.CreateMTGCardModel()]
+        },
+      }.MockVM();
 
       Assert.IsTrue(viewmodel.ShowDeckTokensCommand.CanExecute(null));
     }
@@ -44,10 +51,14 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task ShowTokens_ConfirmationShown()
     {
-      var viewmodel = MockVM(deck: _savedDeck, confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        ShowTokensConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>(),
-      });
+        Deck = _savedDeck,
+        Confirmers = new()
+        {
+          ShowTokensConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>(),
+        }
+      }.MockVM();
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ShowDeckTokensCommand.ExecuteAsync(null));
     }

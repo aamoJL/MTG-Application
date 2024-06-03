@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -13,10 +14,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task NoUnsavedChanges_ReturnTrue()
     {
-      var viewmodel = new Mocker(_dependencies)
-      {
-        HasUnsavedChanges = false,
-      }.MockVM();
+      var viewmodel = new Mocker(_dependencies) { HasUnsavedChanges = false }.MockVM();
 
       Assert.IsTrue(await viewmodel.ConfirmUnsavedChanges());
     }

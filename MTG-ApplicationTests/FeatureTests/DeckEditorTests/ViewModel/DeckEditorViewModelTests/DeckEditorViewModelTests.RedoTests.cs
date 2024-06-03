@@ -11,7 +11,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void Redo_NoCommands_CanNotExecute()
     {
-      var viewmodel = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       Assert.IsFalse(viewmodel.RedoCommand.CanExecute(null));
     }
@@ -19,7 +19,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void Redo_HasCommand_CanExecute()
     {
-      var viewmodel = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
       viewmodel.UndoCommand.Execute(null);
@@ -30,7 +30,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void Redo_Execute_ActionInvokedAgain()
     {
-      var viewmodel = MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
 
@@ -45,5 +45,4 @@ public partial class DeckEditorViewModelTests
       Assert.AreEqual(1, viewmodel.DeckCardList.Cards.Count);
     }
   }
-
 }
