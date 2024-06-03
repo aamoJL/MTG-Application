@@ -3,58 +3,108 @@ using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
+using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
 public partial class CardCollectionViewModelTests
 {
   [TestClass]
-  public class OpenCollectionTests : CardCollectionViewModelTestsBase
+  public class OpenCollectionTests : CardCollectionViewModelTestsBase,
+    IUnsavedChangesCheckTests, IOpenCommandTests
   {
     [TestMethod]
-    public async Task OpenCollection_HasUnsavedChanges_UnsavedChangesConfirmationShown()
+    public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
-      var viewmodel = MockVM(
-        confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Collection = new() { CollectionLists = [new()] },
+        Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
         },
-        hasUnsavedChanges: true);
+        HasUnsavedChanges = true
+      }.MockVM();
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
-    public async Task OpenCollection_HasUnsavedChanges_NoSave_OpenConfirmationShown()
+    public async Task Execute_HasUnsavedChanges_Cancel_HasUnsavedChanges()
     {
-      var viewmodel = MockVM(
-        confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
+        {
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) },
+        },
+        HasUnsavedChanges = true
+      }.MockVM();
+
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      Assert.IsTrue(viewmodel.HasUnsavedChanges);
+    }
+
+    [TestMethod]
+    public async Task Execute_HasUnsavedChanges_Decline_NoUnsavedChanges()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(_savedCollection.Name) }
+        },
+        HasUnsavedChanges = true
+      }.MockVM();
+
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      Assert.IsFalse(viewmodel.HasUnsavedChanges);
+    }
+
+    [TestMethod]
+    public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Collection = new() { CollectionLists = [new()] },
+        Confirmers = new()
+        {
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
+          SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>()
+        },
+        HasUnsavedChanges = true
+      }.MockVM();
+
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task Open_OpenConfirmationShown()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
+        {
           LoadCollectionConfirmer = new TestExceptionConfirmer<string, IEnumerable<string>>()
         },
-        hasUnsavedChanges: true);
+      }.MockVM();
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
-    public async Task OpenCollection_OpenConfirmationShown()
+    public async Task Open_Cancel_NoChanges()
     {
-      var viewmodel = MockVM(confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        LoadCollectionConfirmer = new TestExceptionConfirmer<string, IEnumerable<string>>()
-      });
-
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
-    }
-
-    [TestMethod]
-    public async Task OpenCollection_Cancel_CollectionIsSame()
-    {
-      var viewmodel = MockVM(collection: _savedCollection, confirmers: new()
-      {
-        LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) }
-      });
+        Collection = _savedCollection,
+        Confirmers = new()
+        {
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) }
+        },
+      }.MockVM();
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
 
@@ -62,12 +112,15 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task OpenCollection_CollectionChanged()
+    public async Task Open_Success_Changed()
     {
-      var viewmodel = MockVM(confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
-      });
+        Confirmers = new()
+        {
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+        },
+      }.MockVM();
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
 
@@ -79,21 +132,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task OpenCollection_HasUnsavedChanges_NoSave_NoUnsavedChanges()
-    {
-      var viewmodel = MockVM(hasUnsavedChanges: true, confirmers: new()
-      {
-        SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
-        LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(_savedCollection.Name) }
-      });
-
-      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
-
-      Assert.IsFalse(viewmodel.HasUnsavedChanges);
-    }
-
-    [TestMethod]
-    public async Task OpenCollection_QueryCardsUpdated()
+    public async Task Open_Valid_QueryCardsUpdated()
     {
       var expectedCards = new MTGCard[]
       {
@@ -101,10 +140,13 @@ public partial class CardCollectionViewModelTests
         MTGCardModelMocker.CreateMTGCardModel(name: "2"),
         MTGCardModelMocker.CreateMTGCardModel(name: "3"),
       };
-      var viewmodel = MockVM(confirmers: new()
+      var viewmodel = new Mocker(_dependencies)
       {
-        LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(_savedCollection.Name) }
-      });
+        Confirmers = new()
+        {
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+        },
+      }.MockVM();
 
       _dependencies.CardAPI.ExpectedCards = expectedCards;
 
@@ -114,6 +156,18 @@ public partial class CardCollectionViewModelTests
       CollectionAssert.AreEquivalent(
         expectedCards.Select(c => c.Info.Name).ToList(),
         viewmodel.QueryCards.Collection.Select(c => c.Info.Name).ToList());
+    }
+
+    [TestMethod]
+    public Task Open_Success_SuccessNotificationSent()
+    {
+      throw new NotImplementedException();
+    }
+
+    [TestMethod]
+    public Task Open_Error_ErrorNotificationSent()
+    {
+      throw new NotImplementedException();
     }
   }
 }

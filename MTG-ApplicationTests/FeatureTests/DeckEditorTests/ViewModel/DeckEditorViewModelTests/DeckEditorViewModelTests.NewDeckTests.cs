@@ -2,41 +2,18 @@
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
+using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests;
 
 public partial class DeckEditorViewModelTests
 {
   [TestClass]
-  public class NewDeckTests : DeckEditorViewModelTestsBase
+  public class NewDeckTests : DeckEditorViewModelTestsBase,
+    IUnsavedChangesCheckTests, INewCommandTests
   {
-    [TestMethod("Should be able to execute with null")]
-    public void NewDeck_CanExecute()
-    {
-      var vm = MockVM();
-      Assert.IsTrue(vm.NewDeckCommand.CanExecute(null));
-    }
-
-    [TestMethod("Deck should be new when setting a new deck if there are no unsaved changes")]
-    public async Task NewDeck_NoUnsavedChanges_DeckIsEmpty()
-    {
-      var vm = MockVM(
-        deck: MTGCardDeckMocker.Mock("Deck"),
-        confirmers: new()
-        {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() }
-        });
-
-      await vm.NewDeckCommand.ExecuteAsync(null);
-
-      Assert.AreEqual(string.Empty, vm.DeckName);
-      Assert.AreEqual(null, vm.CommanderViewModel.Card);
-      Assert.AreEqual(null, vm.PartnerViewModel.Card);
-      Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
-    }
-
     [TestMethod("Unsaved changes confirmation should be shown when setting new deck if there are unsaved changes")]
-    public async Task NewDeck_UnsavedChanges_UnsavedConfirmationShown()
+    public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
       var vm = MockVM(
         hasUnsavedChanges: true,
@@ -49,34 +26,31 @@ public partial class DeckEditorViewModelTests
       await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));
     }
 
-    [TestMethod("Deck should be new when setting a new deck if unsaved changes will not be saved")]
-    public async Task NewDeck_DontSaveUnsaved_DeckIsEmpty()
+    [TestMethod]
+    public async Task Execute_HasUnsavedChanges_Cancel_HasUnsavedChanges()
     {
       var vm = MockVM(
         hasUnsavedChanges: true,
         deck: MTGCardDeckMocker.Mock("Deck"),
         confirmers: new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) }
         });
 
       await vm.NewDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(string.Empty, vm.DeckName);
-      Assert.AreEqual(null, vm.CommanderViewModel.Card);
-      Assert.AreEqual(null, vm.PartnerViewModel.Card);
-      Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
+      Assert.IsTrue(vm.HasUnsavedChanges);
     }
 
-    [TestMethod("ViewModel should not have unsaved changes if the deck was reset")]
-    public async Task NewDeck_DontSaveUnsaved_NoUnsavedChanges()
+    [TestMethod]
+    public async Task Execute_HasUnsavedChanges_Decline_NoUnsavedChanges()
     {
       var vm = MockVM(
         hasUnsavedChanges: true,
         deck: MTGCardDeckMocker.Mock("Deck"),
         confirmers: new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) }
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) }
         });
 
       await vm.NewDeckCommand.ExecuteAsync(null);
@@ -84,21 +58,32 @@ public partial class DeckEditorViewModelTests
       Assert.IsFalse(vm.HasUnsavedChanges);
     }
 
-    [TestMethod("Deck should be the same when canceling the unsaved changes confirmation when setting a new deck")]
-    public async Task NewDeck_CancelSaveUnsaved_DeckIsSame()
+    [TestMethod]
+    public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
     {
-      var deck = MTGCardDeckMocker.Mock("Deck");
       var vm = MockVM(
         hasUnsavedChanges: true,
-        deck: deck,
+        deck: MTGCardDeckMocker.Mock("Deck"),
         confirmers: new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
+          SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
         });
+
+      await ConfirmationAssert.ConfirmationShown(() => vm.NewDeckCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task Execute_Reset()
+    {
+      var vm = MockVM(deck: MTGCardDeckMocker.Mock("Deck"));
 
       await vm.NewDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(deck.Name, vm.DeckName);
+      Assert.AreEqual(string.Empty, vm.DeckName);
+      Assert.AreEqual(null, vm.CommanderViewModel.Card);
+      Assert.AreEqual(null, vm.PartnerViewModel.Card);
+      Assert.AreEqual(0, vm.DeckCardList.Cards.Count);
     }
   }
 }

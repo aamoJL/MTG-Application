@@ -94,7 +94,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   public async Task<bool> ConfirmUnsavedChanges()
   {
-    if (!HasUnsavedChanges) return true;
+    if (!HasUnsavedChanges || !SaveDeckCommand.CanExecute(null)) return true;
 
     switch (await Confirmers.SaveUnsavedChangesConfirmer
       .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(DeckName)))

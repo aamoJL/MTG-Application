@@ -142,7 +142,8 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   public async Task<bool> ConfirmUnsavedChanges()
   {
-    if (!HasUnsavedChanges) return true;
+    if (!HasUnsavedChanges || !SaveCollectionCommand.CanExecute(null))
+      return true;
 
     switch (await Confirmers.SaveUnsavedChangesConfirmer
       .Confirm(CardCollectionConfirmers.GetSaveUnsavedChangesConfirmation(Collection.Name)))

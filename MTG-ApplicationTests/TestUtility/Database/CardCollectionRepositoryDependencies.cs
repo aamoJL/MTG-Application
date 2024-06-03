@@ -2,9 +2,9 @@
 
 namespace MTGApplicationTests.TestUtility.Database;
 
-public class CollectionRepositoryDependencies
+public class CardCollectionRepositoryDependencies
 {
-  public CollectionRepositoryDependencies()
+  public CardCollectionRepositoryDependencies()
   {
     ContextFactory = new();
     Repository = new TestCardCollectionDTORepository(ContextFactory);

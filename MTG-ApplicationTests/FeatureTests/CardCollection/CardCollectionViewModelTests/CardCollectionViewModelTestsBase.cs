@@ -8,7 +8,7 @@ public partial class CardCollectionViewModelTests
 {
   public class CardCollectionViewModelTestsBase
   {
-    protected readonly CollectionRepositoryDependencies _dependencies = new();
+    protected readonly CardCollectionRepositoryDependencies _dependencies = new();
     protected readonly MTGCardCollection _savedCollection = new()
     {
       Name = "Saved Collection",
@@ -40,7 +40,7 @@ public partial class CardCollectionViewModelTests
       };
     }
 
-    public class Mocker(CollectionRepositoryDependencies dependencies)
+    public class Mocker(CardCollectionRepositoryDependencies dependencies)
     {
       public bool HasUnsavedChanges { get; set; } = false;
       public CardCollectionConfirmers Confirmers { get; set; } = new();
