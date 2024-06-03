@@ -104,10 +104,31 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     }
   }
 
-  [RelayCommand]
+  [RelayCommand(CanExecute = nameof(CanExecuteDeleteCollectionCommand))]
   private async Task DeleteCollection()
   {
-    // TODO: DeleteCollection
+    if (!DeleteCollectionCommand.CanExecute(null))
+      return;
+
+    var deleteConfirmationResult = await Confirmers.DeleteCollectionConfirmer.Confirm(
+      CardCollectionConfirmers.GetDeleteCollectionConfirmation(Collection.Name));
+
+    switch (deleteConfirmationResult)
+    {
+      case ConfirmationResult.Yes: break;
+      default: return; // Cancel
+    }
+
+    switch (await ((IWorker)this).DoWork(new DeleteCardCollection(Repository).Execute(Collection)))
+    {
+      case true:
+        Collection = new();
+        // TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteSuccessNotification);
+        break;
+      case false:
+        // TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteErrorNotification); 
+        break;
+    }
   }
 
   [RelayCommand]
@@ -155,4 +176,6 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   }
 
   private bool CanExecuteSaveCollectionCommand() => Collection.CollectionLists.Any();
+
+  private bool CanExecuteDeleteCollectionCommand() => !string.IsNullOrEmpty(Collection.Name);
 }

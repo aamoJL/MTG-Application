@@ -49,7 +49,7 @@ public class DeckEditorConfirmers
   public static Confirmation GetDeleteDeckConfirmation(string name)
   {
     return new(
-      Title: "Delete deck?",
+      Title: "Delete the deck?",
       Message: $"Are you sure you want to delete '{name}'?");
   }
 

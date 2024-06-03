@@ -9,6 +9,7 @@ public class CardCollectionConfirmers
   public Confirmer<string, IEnumerable<string>> LoadCollectionConfirmer { get; init; } = new();
   public Confirmer<string, string> SaveCollectionConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> OverrideCollectionConfirmer { get; init; } = new();
+  public Confirmer<ConfirmationResult> DeleteCollectionConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -38,5 +39,12 @@ public class CardCollectionConfirmers
     return new(
       Title: "Override existing collection?",
       Message: $"Collection '{saveName}' already exist. Would you like to override the collection?");
+  }
+
+  public static Confirmation GetDeleteCollectionConfirmation(string name)
+  {
+    return new(
+      Title: "Delete the collection?",
+      Message: $"Are you sure you want to delete '{name}'?");
   }
 }
