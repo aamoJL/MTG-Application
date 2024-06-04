@@ -11,6 +11,8 @@ public class CardCollectionConfirmers
   public Confirmer<ConfirmationResult> OverrideCollectionConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteCollectionConfirmer { get; init; } = new();
 
+  public Confirmer<(string Name, string Query)?> NewCollectionListConfirmer { get; init; } = new();
+
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
     return new(
@@ -46,5 +48,12 @@ public class CardCollectionConfirmers
     return new(
       Title: "Delete the collection?",
       Message: $"Are you sure you want to delete '{name}'?");
+  }
+
+  public static Confirmation GetNewCollectionListConfirmation()
+  {
+    return new(
+      Title: "Add new list",
+      Message: string.Empty);
   }
 }

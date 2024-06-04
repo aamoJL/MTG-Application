@@ -127,7 +127,23 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   [RelayCommand]
   private async Task NewList()
   {
-    // TODO: NewList
+    if (await Confirmers.NewCollectionListConfirmer.Confirm(CardCollectionConfirmers.GetNewCollectionListConfirmation())
+      is not (string name, string query))
+      return;
+
+    if (string.IsNullOrEmpty(name)) { }
+    // TODO: RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Name can't be empty.");
+    else if (string.IsNullOrEmpty(query)) { }
+    // TODO: RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Search query can't be empty.");
+    else if (Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null) { }
+    // TODO: else RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection.");
+    else
+    {
+      Collection.CollectionLists.Add(new MTGCardCollectionList() { Name = name, SearchQuery = query });
+      HasUnsavedChanges = true;
+      await SelectList(name);
+      // TODO: RaiseInAppNotification(NotificationService.NotificationType.Success, "List added to the collection successfully.");
+    }
   }
 
   [RelayCommand]
@@ -155,9 +171,9 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   }
 
   [RelayCommand]
-  private async Task SelectList(MTGCardCollectionList list)
+  private async Task SelectList(string name)
   {
-    SelectedList = list;
+    SelectedList = Collection.CollectionLists.FirstOrDefault(x => x.Name == name);
 
     var searchResult = await ((IWorker)this).DoWork(new GetMTGCardsBySearchQuery(CardAPI).Execute(SelectedList?.SearchQuery ?? string.Empty));
     QueryCards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
@@ -186,6 +202,6 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     Collection = collection;
     HasUnsavedChanges = false;
 
-    await SelectList(Collection.CollectionLists.FirstOrDefault());
+    await SelectList(Collection.CollectionLists.FirstOrDefault()?.Name);
   }
 }

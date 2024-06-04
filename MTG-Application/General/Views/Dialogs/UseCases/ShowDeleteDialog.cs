@@ -4,10 +4,8 @@ using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.General.Views.Dialogs;
 
-public class ShowDeleteDialog : ShowDialogUseCase<ConfirmationResult>
+public class ShowDeleteDialog(DialogWrapper dialogWrapper) : ShowDialogUseCase<ConfirmationResult>(dialogWrapper)
 {
-  public ShowDeleteDialog(DialogWrapper dialogWrapper) : base(dialogWrapper) { }
-
   protected override async Task<ConfirmationResult> ShowDialog(string title, string message) => (await new ConfirmationDialog(title)
   {
     Message = message,

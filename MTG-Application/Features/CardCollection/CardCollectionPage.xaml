@@ -58,7 +58,7 @@
             </AppBarButton.Icon>
             <AppBarButton.Flyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                <MenuFlyoutItem Text="New" Command="{x:Bind ViewModel.NewListCommand, Mode=OneTime}"/>
+                <MenuFlyoutItem Text="New..." Command="{x:Bind ViewModel.NewListCommand, Mode=OneTime}"/>
                 <MenuFlyoutItem Text="Edit..." Command="{x:Bind ViewModel.EditListCommand, Mode=OneTime}"/>
                 <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Import..." Command="{x:Bind ViewModel.ImportCardsCommand, Mode=OneTime}" />

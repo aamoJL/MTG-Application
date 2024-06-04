@@ -5,7 +5,7 @@ using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardCollection;
 
-public class CardCollectionViewDialogs : IViewDialogs<CardCollectionConfirmers>
+public partial class CardCollectionViewDialogs : IViewDialogs<CardCollectionConfirmers>
 {
   public static void RegisterConfirmDialogs(CardCollectionConfirmers confirmers, Func<DialogWrapper> getWrapper)
   {
@@ -14,5 +14,7 @@ public class CardCollectionViewDialogs : IViewDialogs<CardCollectionConfirmers>
     confirmers.SaveCollectionConfirmer.OnConfirm = async msg => await new ShowSaveDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
     confirmers.OverrideCollectionConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmers.DeleteCollectionConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
+
+    confirmers.NewCollectionListConfirmer.OnConfirm = async msg => await new ShowCollectionListContentDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
   }
 }
