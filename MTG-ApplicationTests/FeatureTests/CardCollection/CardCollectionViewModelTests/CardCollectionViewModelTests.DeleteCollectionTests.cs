@@ -119,10 +119,10 @@ public partial class CardCollectionViewModelTests
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
         },
-        //Notifier = new()
-        //{
-        //  OnNotify = (arg) => throw new NotificationException(arg)
-        //}
+        Notifier = new()
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
       }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
@@ -141,10 +141,10 @@ public partial class CardCollectionViewModelTests
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
         },
-        //Notifier = new()
-        //{
-        //  OnNotify = (arg) => throw new NotificationException(arg)
-        //}
+        Notifier = new()
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
       }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Error,

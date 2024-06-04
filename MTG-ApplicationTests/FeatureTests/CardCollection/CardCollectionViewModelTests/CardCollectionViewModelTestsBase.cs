@@ -2,6 +2,7 @@
 using MTGApplication.General.Models.CardCollection;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
 public partial class CardCollectionViewModelTests
@@ -45,6 +46,7 @@ public partial class CardCollectionViewModelTests
       public bool HasUnsavedChanges { get; set; } = false;
       public CardCollectionConfirmers Confirmers { get; set; } = new();
       public MTGCardCollection Collection { get; set; } = new();
+      public Notifier Notifier { get; set; } = new();
 
       public CardCollectionViewModel MockVM()
       {
@@ -53,7 +55,8 @@ public partial class CardCollectionViewModelTests
           Repository = dependencies.Repository,
           Confirmers = Confirmers,
           HasUnsavedChanges = HasUnsavedChanges,
-          Collection = Collection
+          Collection = Collection,
+          Notifier = Notifier,
         };
       }
     }

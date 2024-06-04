@@ -73,7 +73,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private ICardAPI<MTGCard> CardAPI { get; }
 
   public DeckEditorConfirmers Confirmers { get; }
-  public Notifier Notifier { get; }
+  public Notifier Notifier { get; } = new();
   public CardListViewModel DeckCardList { get; }
   public CardListViewModel MaybeCardList { get; }
   public CardListViewModel WishCardList { get; }

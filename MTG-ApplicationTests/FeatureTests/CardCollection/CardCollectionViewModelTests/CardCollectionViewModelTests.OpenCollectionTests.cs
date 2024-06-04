@@ -4,6 +4,7 @@ using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
 public partial class CardCollectionViewModelTests
@@ -159,15 +160,41 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public Task Open_Success_SuccessNotificationSent()
+    public async Task Open_Success_SuccessNotificationSent()
     {
-      throw new NotImplementedException();
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
+        {
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+        },
+        Notifier = new()
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
+      }.MockVM();
+
+      await NotificationAssert.NotificationSent(NotificationType.Success, () => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
-    public Task Open_Error_ErrorNotificationSent()
+    public async Task Open_Error_ErrorNotificationSent()
     {
-      throw new NotImplementedException();
+      _dependencies.Repository.GetFailure = true;
+
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
+        {
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+        },
+        Notifier = new()
+        {
+          OnNotify = (arg) => throw new NotificationException(arg)
+        }
+      }.MockVM();
+
+      await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
     }
   }
 }

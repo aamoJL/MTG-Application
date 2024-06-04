@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
+using MTGApplication.General.Services.NotificationService;
 using System;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -16,7 +17,7 @@ public sealed partial class DeckEditorPage : Page
     InitializeComponent();
 
     DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, () => new(XamlRoot));
-    DeckEditorViewNotifications.RegisterNotifications(ViewModel.Notifier, this);
+    NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 
   public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardAPI);

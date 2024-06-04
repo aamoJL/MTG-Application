@@ -7,9 +7,11 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardCollection;
 
@@ -24,6 +26,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   public IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; } = new(new CardCollectionIncrementalCardSource(cardAPI));
   public CardCollectionConfirmers Confirmers { get; init; } = new();
+  public Notifier Notifier { get; init; } = new();
   public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
 
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
@@ -53,12 +56,9 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     if (await ((IWorker)this).DoWork(new LoadCardCollection(Repository, CardAPI).Execute(loadName)) is MTGCardCollection loadedCollection)
     {
       await SetCollection(loadedCollection);
-      // TODO: RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was loaded successfully.");
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
     }
-    else
-    {
-      // TODO: RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Could not load the collection.")
-    }
+    else new SendNotification(Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveCollectionCommand))]
@@ -88,11 +88,11 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     switch (await ((IWorker)this).DoWork(new SaveCardCollection(Repository).Execute(new(Collection, saveName, overrideOld))))
     {
       case true:
-        //TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveSuccessNotification);
+        new SendNotification(Notifier).Execute(CardCollectionNotifications.SaveCollectionSuccess);
         HasUnsavedChanges = false;
         break;
       case false:
-        //TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveErrorNotification); 
+        new SendNotification(Notifier).Execute(CardCollectionNotifications.SaveCollectionError);
         break;
     }
   }
@@ -116,10 +116,10 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     {
       case true:
         await SetCollection(new());
-        // TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteSuccessNotification);
+        new SendNotification(Notifier).Execute(CardCollectionNotifications.DeleteCollectionSuccess);
         break;
       case false:
-        // TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteErrorNotification); 
+        new SendNotification(Notifier).Execute(CardCollectionNotifications.DeletecollectionError);
         break;
     }
   }
@@ -131,18 +131,20 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       is not (string name, string query))
       return;
 
-    if (string.IsNullOrEmpty(name)) { }
-    // TODO: RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Name can't be empty.");
-    else if (string.IsNullOrEmpty(query)) { }
-    // TODO: RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. Search query can't be empty.");
-    else if (Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null) { }
-    // TODO: else RaiseInAppNotification(NotificationService.NotificationType.Error, "Error. List already exists in the collection.");
+    if (string.IsNullOrEmpty(name))
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.NewListNameError);
+    else if (string.IsNullOrEmpty(query))
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.NewListQueryError);
+    else if (Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null)
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.NewListExistsError);
     else
     {
       Collection.CollectionLists.Add(new MTGCardCollectionList() { Name = name, SearchQuery = query });
       HasUnsavedChanges = true;
+
       await SelectList(name);
-      // TODO: RaiseInAppNotification(NotificationService.NotificationType.Success, "List added to the collection successfully.");
+
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.NewListSuccess);
     }
   }
 

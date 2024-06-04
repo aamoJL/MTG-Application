@@ -15,6 +15,9 @@ public static class NotificationService
   /// </summary>
   public static int NotificationDuration => 5000;
 
+  public static void RegisterNotifications(Notifier notifier, object sender)
+    => notifier.OnNotify = (arg) => { RaiseNotification(sender, arg); };
+  
   public static void RaiseNotification(object sender, Notification notification) 
     => OnShow?.Invoke(sender, notification);
 
@@ -25,4 +28,5 @@ public static class NotificationService
     public void Notify(Notification notification)
       => OnNotify?.Invoke(notification);
   }
+
 }
