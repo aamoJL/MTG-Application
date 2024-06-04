@@ -93,7 +93,7 @@
             <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind ViewModel.Collection.Name, Mode=OneWay}" FontWeight="Bold"/>
             <TextBlock>
               <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.SelectedListCardCount), Mode=OneWay}"/>
-              <!--<Run Text="{x:Bind sys:String.Format('{0} cards collected', ViewModel.AllListCards.Collection.Count), Mode=OneWay}"/>-->
+              <Run Text="{x:Bind sys:String.Format('{0} cards collected', ViewModel.QueryCards.Collection.Count), Mode=OneWay}"/>
             </TextBlock>
           </StackPanel>
           <!--#endregion-->
@@ -105,8 +105,8 @@
         <Grid HorizontalAlignment="Right" Padding="0 0 10 0">
           <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 5 0 0"/>
           <TextBlock VerticalAlignment="Bottom">
-            <!--<Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.CardSearchViewModel.Cards.Collection.Count), Mode=OneWay}"/>-->
-            <!--<Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.CardSearchViewModel.Cards.TotalCardCount), Mode=OneWay}"/>-->
+            <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.QueryCards.Collection.Count), Mode=OneWay}"/>
+            <Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.QueryCards.TotalCardCount), Mode=OneWay}"/>
           </TextBlock>
         </Grid>
         <!--#endregion-->
