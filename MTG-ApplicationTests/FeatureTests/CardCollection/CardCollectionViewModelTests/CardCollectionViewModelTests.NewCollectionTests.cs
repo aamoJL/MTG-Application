@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollection;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
@@ -81,7 +83,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod("Collection should be changed to a new collection when executed successfully")]
-    public async Task Execute_Reset()
+    public async Task New_Success_Reset()
     {
       var viewmodel = new CardCollectionViewModel(new TestCardAPI())
       {
@@ -99,6 +101,32 @@ public partial class CardCollectionViewModelTests
 
       Assert.AreEqual(string.Empty, viewmodel.Collection.Name);
       Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
+    }
+
+    [TestMethod]
+    public async Task New_Success_QueryCardsReset()
+    {
+      var expectedCards = new MTGCard[]
+      {
+        MTGCardModelMocker.CreateMTGCardModel(name: "1"),
+        MTGCardModelMocker.CreateMTGCardModel(name: "2"),
+        MTGCardModelMocker.CreateMTGCardModel(name: "3"),
+        MTGCardModelMocker.CreateMTGCardModel(name: "4"),
+      };
+      var viewmodel = new CardCollectionViewModel(new TestCardAPI() { ExpectedCards = expectedCards })
+      {
+        Collection = new()
+        {
+          CollectionLists = [new() { Name = "List", Cards = [.. expectedCards], SearchQuery = "asd" }]
+        }
+      };
+
+      await viewmodel.SelectListCommand.ExecuteAsync(viewmodel.Collection.CollectionLists[0]);
+      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
+
+      CollectionAssert.AreEquivalent(
+        expectedCards.Select(x => x.Info.Name).ToList(),
+        viewmodel.QueryCards.Collection.Select(x => x.Info.Name).ToList());
     }
   }
 }

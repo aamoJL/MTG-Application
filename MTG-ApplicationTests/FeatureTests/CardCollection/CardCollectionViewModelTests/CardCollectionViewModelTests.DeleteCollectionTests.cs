@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -91,6 +93,20 @@ public partial class CardCollectionViewModelTests
 
       Assert.AreEqual(string.Empty, viewmodel.Collection.Name);
       Assert.IsFalse(viewmodel.HasUnsavedChanges);
+    }
+
+    [TestMethod]
+    public async Task Delete_Success_QueryCardsReset()
+    {
+      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      {
+        Collection = _savedCollection
+      };
+
+      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
+      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync(10);
+
+      Assert.AreEqual(0, viewmodel.QueryCards.TotalCardCount);
     }
 
     [TestMethod("Success notification should be sent when the collection was deleted")]

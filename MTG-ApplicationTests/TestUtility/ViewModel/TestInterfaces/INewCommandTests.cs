@@ -2,5 +2,5 @@
 
 internal interface INewCommandTests
 {
-  Task Execute_Reset();
+  Task New_Success_Reset();
 }

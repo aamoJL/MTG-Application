@@ -82,7 +82,7 @@ public partial class DeckEditorViewModelTests
     }
 
     [TestMethod]
-    public async Task Execute_Reset()
+    public async Task New_Success_Reset()
     {
       var viewmodel = new Mocker(_dependencies) { Deck = MTGCardDeckMocker.Mock("Deck") }.MockVM();
 

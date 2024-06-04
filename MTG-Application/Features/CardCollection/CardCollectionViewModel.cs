@@ -36,8 +36,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     if (!await ConfirmUnsavedChanges())
       return;
 
-    Collection = new();
-    HasUnsavedChanges = false;
+    await SetCollection(new());
   }
 
   [RelayCommand]
@@ -53,13 +52,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
     if (await ((IWorker)this).DoWork(new LoadCardCollection(Repository, CardAPI).Execute(loadName)) is MTGCardCollection loadedCollection)
     {
-      HasUnsavedChanges = false;
-      Collection = loadedCollection;
-      SelectedList = Collection.CollectionLists.FirstOrDefault();
-
-      var searchResult = await ((IWorker)this).DoWork(new GetMTGCardsBySearchQuery(CardAPI).Execute(SelectedList?.SearchQuery ?? string.Empty));
-      QueryCards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
-
+      await SetCollection(loadedCollection);
       // TODO: RaiseInAppNotification(NotificationService.NotificationType.Success, "The collection was loaded successfully.");
     }
     else
@@ -122,7 +115,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     switch (await ((IWorker)this).DoWork(new DeleteCardCollection(Repository).Execute(Collection)))
     {
       case true:
-        Collection = new();
+        await SetCollection(new());
         // TODO: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteSuccessNotification);
         break;
       case false:
@@ -161,6 +154,15 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     // TODO: DeleteList
   }
 
+  [RelayCommand]
+  private async Task SelectList(MTGCardCollectionList list)
+  {
+    SelectedList = list;
+
+    var searchResult = await ((IWorker)this).DoWork(new GetMTGCardsBySearchQuery(CardAPI).Execute(SelectedList?.SearchQuery ?? string.Empty));
+    QueryCards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
+  }
+
   public async Task<bool> ConfirmUnsavedChanges()
   {
     if (!HasUnsavedChanges || !SaveCollectionCommand.CanExecute(null))
@@ -178,4 +180,12 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   private bool CanExecuteSaveCollectionCommand() => Collection.CollectionLists.Any();
 
   private bool CanExecuteDeleteCollectionCommand() => !string.IsNullOrEmpty(Collection.Name);
+
+  private async Task SetCollection(MTGCardCollection collection)
+  {
+    Collection = collection;
+    HasUnsavedChanges = false;
+
+    await SelectList(Collection.CollectionLists.FirstOrDefault());
+  }
 }
