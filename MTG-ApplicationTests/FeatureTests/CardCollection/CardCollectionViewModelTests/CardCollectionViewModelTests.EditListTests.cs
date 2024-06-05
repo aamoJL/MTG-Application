@@ -33,7 +33,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_EditConfirmationShown()
+    public async Task EditList_EditConfirmationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -50,7 +50,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_Cancel_NoChanges()
+    public async Task EditList_Cancel_NoChanges()
     {
       var searchQuery = _savedCollection.CollectionLists.First().SearchQuery;
       var viewmodel = new Mocker(_dependencies)
@@ -73,7 +73,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_Success_NameChanged()
+    public async Task EditList_Success_NameChanged()
     {
       var name = "New Name";
       var query = "New Query";
@@ -97,7 +97,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_Success_QueryChanged()
+    public async Task EditList_Success_QueryChanged()
     {
       var name = "New Name";
       var query = "New Query";
@@ -121,7 +121,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_Success_QueryCardsUpdated()
+    public async Task EditList_Success_QueryCardsUpdated()
     {
       var name = "New Name";
       var query = "New Query";
@@ -151,7 +151,30 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_NoName_ErrorNotificationShown()
+    public async Task EditList_Success_HasUnsavedChanges()
+    {
+      var name = "New Name";
+      var query = "New Query";
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Collection = _savedCollection,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, query))
+          }
+        }
+      }.MockVM();
+
+      await viewmodel.SelectListCommand.ExecuteAsync(_savedCollection.CollectionLists.First().Name);
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.IsTrue(viewmodel.HasUnsavedChanges);
+    }
+
+    [TestMethod]
+    public async Task EditList_NoName_ErrorNotificationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -173,7 +196,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_NoQuery_ErrorNotificationShown()
+    public async Task EditList_NoQuery_ErrorNotificationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -195,7 +218,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_Exists_ErrorNotificationShown()
+    public async Task EditList_Exists_ErrorNotificationShown()
     {
       var collection = new MTGCardCollection()
       {
@@ -225,7 +248,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_SameName_NoErrorNotificationShown()
+    public async Task EditList_SameName_NoErrorNotificationShown()
     {
       var name = _savedCollection.CollectionLists.First().Name;
       var viewmodel = new Mocker(_dependencies)
@@ -254,7 +277,7 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
-    public async Task Edit_Success_SuccessNotificationShown()
+    public async Task EditList_Success_SuccessNotificationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {

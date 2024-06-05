@@ -106,6 +106,22 @@ public partial class CardCollectionViewModelTests
     }
 
     [TestMethod]
+    public async Task NewList_Success_HasUnsavedChanges()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
+        {
+          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+        }
+      }.MockVM();
+
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      Assert.IsTrue(viewmodel.HasUnsavedChanges);
+    }
+
+    [TestMethod]
     public async Task NewList_NoName_ErrorNotificationSent()
     {
       var viewmodel = new Mocker(_dependencies)

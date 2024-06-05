@@ -148,7 +148,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     }
   }
 
-  [RelayCommand(CanExecute = nameof(CanExecuteEditCollectionCommand))]
+  [RelayCommand(CanExecute = nameof(CanExecuteEditListCommand))]
   private async Task EditList()
   {
     if (!EditListCommand.CanExecute(null)) return;
@@ -176,6 +176,28 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     }
   }
 
+  [RelayCommand(CanExecute = nameof(CanExecuteDeleteListCommand))]
+  private async Task DeleteList()
+  {
+    if (!DeleteListCommand.CanExecute(null)) return;
+
+    if (await Confirmers.DeleteCollectionListConfirmer.Confirm(
+      CardCollectionConfirmers.GetDeleteCollectionListConfirmation(SelectedList.Name))
+      is not ConfirmationResult.Yes)
+      return;
+
+    if (Collection.CollectionLists.Remove(SelectedList))
+    {
+      HasUnsavedChanges = true;
+
+      await SelectList(Collection.CollectionLists.FirstOrDefault()?.Name);
+
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.DeleteListSuccess);
+    }
+    else
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.DeleteListError);
+  }
+
   [RelayCommand]
   private async Task ImportCards()
   {
@@ -186,12 +208,6 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   private async Task ExportCards()
   {
     // TODO: ExportCards
-  }
-
-  [RelayCommand]
-  private async Task DeleteList()
-  {
-    // TODO: DeleteList
   }
 
   [RelayCommand]
@@ -220,7 +236,9 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   private bool CanExecuteDeleteCollectionCommand() => !string.IsNullOrEmpty(Collection.Name);
 
-  private bool CanExecuteEditCollectionCommand() => SelectedList != null;
+  private bool CanExecuteEditListCommand() => SelectedList != null;
+
+  private bool CanExecuteDeleteListCommand() => SelectedList != null;
 
   private async Task SetCollection(MTGCardCollection collection)
   {

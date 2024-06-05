@@ -14,10 +14,4 @@ public partial class CardCollectionViewModelTests
   {
 
   }
-
-  [TestClass]
-  public class DeleteListTests : CardCollectionViewModelTestsBase
-  {
-
-  }
 }
