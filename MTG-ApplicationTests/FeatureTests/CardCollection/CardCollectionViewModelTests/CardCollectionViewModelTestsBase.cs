@@ -20,7 +20,12 @@ public partial class CardCollectionViewModelTests
           Cards = [
             MTGCardModelMocker.CreateMTGCardModel(name: "First"),
             MTGCardModelMocker.CreateMTGCardModel(name: "Second"),
-            MTGCardModelMocker.CreateMTGCardModel(name: "Third")]}
+            MTGCardModelMocker.CreateMTGCardModel(name: "Third")]},
+        new(){
+          Name = "Saved List 2",
+          SearchQuery = "Search Query 2",
+          Cards = [
+            MTGCardModelMocker.CreateMTGCardModel(name: "First")]}
         ]
     };
 
