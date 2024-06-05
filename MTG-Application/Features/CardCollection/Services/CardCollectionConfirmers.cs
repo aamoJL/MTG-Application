@@ -12,6 +12,7 @@ public class CardCollectionConfirmers
   public Confirmer<ConfirmationResult> DeleteCollectionConfirmer { get; init; } = new();
 
   public Confirmer<(string Name, string Query)?> NewCollectionListConfirmer { get; init; } = new();
+  public Confirmer<(string Name, string Query)?, (string Name, string Query)> EditCollectionListConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -55,5 +56,13 @@ public class CardCollectionConfirmers
     return new(
       Title: "Add new list",
       Message: string.Empty);
+  }
+
+  public static Confirmation<(string Name, string Query)> GetEditCollectionListConfirmation((string Name, string Query) args)
+  {
+    return new(
+      Title: "Edit list",
+      Message: string.Empty,
+      Data: args);
   }
 }

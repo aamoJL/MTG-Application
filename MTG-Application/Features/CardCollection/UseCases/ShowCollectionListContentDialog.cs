@@ -10,12 +10,15 @@ namespace MTGApplication.Features.CardCollection;
 
 public partial class CardCollectionViewDialogs
 {
-  public class ShowCollectionListContentDialog(DialogWrapper dialogWrapper) : ShowDialogUseCase<(string Name, string Query)?>(dialogWrapper)
+  public class ShowCollectionListContentDialog(DialogWrapper dialogWrapper) : ShowDialogUseCase<(string Name, string Query)?, (string Name, string Query)?>(dialogWrapper)
   {
-    protected override async Task<(string Name, string Query)?> ShowDialog(string title, string message) => await new CollectionListContentDialog(title)
-    {
-      PrimaryButtonText = "Add",
-    }.ShowAsync(DialogWrapper);
+    protected override async Task<(string Name, string Query)?> ShowDialog(string title, string message, (string Name, string Query)? data)
+      => await new CollectionListContentDialog(title)
+      {
+        PrimaryButtonText = data != null ? "Edit" : "Add",
+        NameInputText = data?.Name ?? string.Empty,
+        QueryInputText = data?.Query ?? string.Empty,
+      }.ShowAsync(DialogWrapper);
 
     private class CollectionListContentDialog(string title = "") : Dialog<(string Name, string Query)?>(title)
     {

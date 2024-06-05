@@ -15,6 +15,7 @@ public partial class CardCollectionViewDialogs : IViewDialogs<CardCollectionConf
     confirmers.OverrideCollectionConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmers.DeleteCollectionConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
 
-    confirmers.NewCollectionListConfirmer.OnConfirm = async msg => await new ShowCollectionListContentDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
+    confirmers.NewCollectionListConfirmer.OnConfirm = async msg => await new ShowCollectionListContentDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, null));
+    confirmers.EditCollectionListConfirmer.OnConfirm = async msg => await new ShowCollectionListContentDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
   }
 }

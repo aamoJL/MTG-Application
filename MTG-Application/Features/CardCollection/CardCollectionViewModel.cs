@@ -148,10 +148,32 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     }
   }
 
-  [RelayCommand]
+  [RelayCommand(CanExecute = nameof(CanExecuteEditCollectionCommand))]
   private async Task EditList()
   {
-    // TODO: EditList
+    if (!EditListCommand.CanExecute(null)) return;
+
+    if (await Confirmers.EditCollectionListConfirmer.Confirm(
+      CardCollectionConfirmers.GetEditCollectionListConfirmation((SelectedList.Name, SelectedList.SearchQuery)))
+      is not (string name, string query) args)
+      return;
+
+    if (string.IsNullOrEmpty(name))
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.EditListNameError);
+    else if (string.IsNullOrEmpty(query))
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.EditListQueryError);
+    else if (SelectedList.Name != name && Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null)
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.EditListExistsError);
+    else
+    {
+      SelectedList.Name = name;
+      SelectedList.SearchQuery = query;
+      HasUnsavedChanges = true;
+
+      await UpdateQueryCards();
+
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.EditListSuccess);
+    }
   }
 
   [RelayCommand]
@@ -177,8 +199,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   {
     SelectedList = Collection.CollectionLists.FirstOrDefault(x => x.Name == name);
 
-    var searchResult = await ((IWorker)this).DoWork(new GetMTGCardsBySearchQuery(CardAPI).Execute(SelectedList?.SearchQuery ?? string.Empty));
-    QueryCards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
+    await UpdateQueryCards();
   }
 
   public async Task<bool> ConfirmUnsavedChanges()
@@ -199,11 +220,19 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   private bool CanExecuteDeleteCollectionCommand() => !string.IsNullOrEmpty(Collection.Name);
 
+  private bool CanExecuteEditCollectionCommand() => SelectedList != null;
+
   private async Task SetCollection(MTGCardCollection collection)
   {
     Collection = collection;
     HasUnsavedChanges = false;
 
     await SelectList(Collection.CollectionLists.FirstOrDefault()?.Name);
+  }
+
+  private async Task UpdateQueryCards()
+  {
+    var searchResult = await ((IWorker)this).DoWork(new GetMTGCardsBySearchQuery(CardAPI).Execute(SelectedList?.SearchQuery ?? string.Empty));
+    QueryCards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
   }
 }
