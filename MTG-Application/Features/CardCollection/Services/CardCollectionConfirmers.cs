@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Services.ConfirmationService;
+﻿using MTGApplication.General.Models.Card;
+using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
 namespace MTGApplication.Features.CardCollection;
@@ -16,6 +17,8 @@ public class CardCollectionConfirmers
   public Confirmer<ConfirmationResult> DeleteCollectionListConfirmer { get; init; } = new();
   public Confirmer<string, string> ExportCardsConfirmer { get; init; } = new();
   public Confirmer<string> ImportCardsConfirmer { get; init; } = new();
+  
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -89,5 +92,13 @@ public class CardCollectionConfirmers
     return new(
       Title: "Import cards with Scryfall IDs",
       Message: string.Empty);
+  }
+
+  public static Confirmation<IEnumerable<MTGCard>> GetShowCardPrintsConfirmation(IEnumerable<MTGCard> data)
+  {
+    return new(
+      Title: "Card prints",
+      Message: string.Empty,
+      Data: data);
   }
 }

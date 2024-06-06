@@ -125,7 +125,11 @@
         DesiredWidth="250">
         <controls:AdaptiveGridView.ItemTemplate>
           <DataTemplate x:DataType="local:CardCollectionMTGCard">
-            <localControls:CardCollectionCardImageView Model="{Binding Mode=OneTime}"/>
+            <localControls:CardCollectionCardImageView 
+              d:DataContext="{d:DesignInstance Type=local:CardCollectionViewModel}"
+              DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
+              Model="{x:Bind Mode=OneTime}"
+              ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
           </DataTemplate>
         </controls:AdaptiveGridView.ItemTemplate>
       </controls:AdaptiveGridView>

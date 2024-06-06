@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Views.Dialogs;
+﻿using MTGApplication.General.Models.Card;
+using MTGApplication.General.Views.Dialogs;
 using System;
 using System.Linq;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
@@ -30,5 +31,11 @@ public partial class CardCollectionViewDialogs : IViewDialogs<CardCollectionConf
       PrimaryButtonText = "Copy to Clipboard",
       SecondaryButtonText = string.Empty
     }.ShowAsync(getWrapper.Invoke());
+    confirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg)
+      => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      {
+        Items = msg.Data.ToArray(),
+        SecondaryButtonText = string.Empty
+      }.ShowAsync(getWrapper.Invoke())) as MTGCard;
   }
 }

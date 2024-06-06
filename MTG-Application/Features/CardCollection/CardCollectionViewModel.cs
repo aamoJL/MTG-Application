@@ -235,7 +235,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     if (!ExportCardsCommand.CanExecute(null)) return;
 
     if (await Confirmers.ExportCardsConfirmer.Confirm(
-      CardCollectionConfirmers.GetExportCardsConfirmation(string.Join(Environment.NewLine, SelectedList.Cards.Select(x => x.Info.ScryfallId))))
+      CardCollectionConfirmers.GetExportCardsConfirmation(new ExportCardsById().Execute(SelectedList.Cards)))
       is not string response || string.IsNullOrEmpty(response))
       return;
 
@@ -249,6 +249,14 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     SelectedList = Collection.CollectionLists.FirstOrDefault(x => x.Name == name);
 
     await UpdateQueryCards();
+  }
+
+  [RelayCommand]
+  private async Task ShowCardPrints(MTGCard card)
+  {
+    var prints = (await ((IWorker)this).DoWork(CardAPI.FetchFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+
+    await Confirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionConfirmers.GetShowCardPrintsConfirmation(prints));
   }
 
   public async Task<bool> ConfirmUnsavedChanges()
