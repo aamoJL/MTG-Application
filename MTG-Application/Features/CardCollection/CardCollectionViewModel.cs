@@ -7,6 +7,7 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
+using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -28,6 +29,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   public IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; } = new(new CardCollectionIncrementalCardSource(cardAPI));
   public CardCollectionConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
+  public ClipboardService ClipboardService { get; init; } = new();
   public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
 
   private ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
@@ -231,7 +233,14 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   private async Task ExportCards()
   {
     if (!ExportCardsCommand.CanExecute(null)) return;
-    // TODO: ExportCards
+
+    if (await Confirmers.ExportCardsConfirmer.Confirm(
+      CardCollectionConfirmers.GetExportCardsConfirmation(string.Join(Environment.NewLine, SelectedList.Cards.Select(x => x.Info.ScryfallId))))
+      is not string response || string.IsNullOrEmpty(response))
+      return;
+
+    ClipboardService.CopyToClipboard(response);
+    new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
   }
 
   [RelayCommand]

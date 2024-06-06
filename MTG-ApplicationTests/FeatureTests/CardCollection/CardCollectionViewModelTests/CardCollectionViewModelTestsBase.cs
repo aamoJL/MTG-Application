@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Models.CardCollection;
+using MTGApplication.General.Services.IOService;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -52,6 +53,7 @@ public partial class CardCollectionViewModelTests
       public CardCollectionConfirmers Confirmers { get; set; } = new();
       public MTGCardCollection Collection { get; set; } = new();
       public Notifier Notifier { get; set; } = new();
+      public ClipboardService ClipboardService { get; set; } = new();
 
       public CardCollectionViewModel MockVM()
       {
@@ -62,6 +64,7 @@ public partial class CardCollectionViewModelTests
           HasUnsavedChanges = HasUnsavedChanges,
           Collection = Collection,
           Notifier = Notifier,
+          ClipboardService = ClipboardService
         };
       }
     }

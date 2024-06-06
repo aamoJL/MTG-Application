@@ -4,6 +4,7 @@ using MTGApplication.General.Models.Card;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
+using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
@@ -11,26 +12,19 @@ namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListVie
 public partial class CardListViewModelTests
 {
   [TestClass]
-  public class ExportCardTests
+  public class ExportCardTests : ICanExecuteWithParameterCommandTests
   {
-    [TestMethod]
-    public void ByName_CanExecute()
+    [TestMethod("Should be able to execute with Name or Id parameters")]
+    public void ValidParameter_CanExecute()
     {
       var viewmodel = new CardListViewModel(new TestCardAPI());
 
       Assert.IsTrue(viewmodel.ExportCommand.CanExecute("Name"));
-    }
-
-    [TestMethod]
-    public void ById_CanExecute()
-    {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-
       Assert.IsTrue(viewmodel.ExportCommand.CanExecute("Id"));
     }
 
-    [TestMethod]
-    public void ByInvalidProperty_CanExecute()
+    [TestMethod("Should not be able to execute if parameter is not Name or Id")]
+    public void InvalidParameter_CanNotExecute()
     {
       var viewmodel = new CardListViewModel(new TestCardAPI());
 

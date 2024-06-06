@@ -143,11 +143,11 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     var exportString = new ExportCards().Execute(new(Cards, byProperty));
 
     if (await Confirmers.ExportConfirmer.Confirm(CardListConfirmers.GetExportConfirmation(exportString))
-      is string response && !string.IsNullOrEmpty(response))
-    {
-      ClipboardService.CopyToClipboard(response);
-      new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
-    }
+      is not string response || string.IsNullOrEmpty(response))
+      return;
+
+    ClipboardService.CopyToClipboard(response);
+    new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteChangeCardCount))]
