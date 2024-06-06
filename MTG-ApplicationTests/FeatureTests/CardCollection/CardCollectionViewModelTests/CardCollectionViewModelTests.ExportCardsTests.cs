@@ -118,5 +118,29 @@ public partial class CardCollectionViewModelTests
         exportData,
         string.Join(Environment.NewLine, viewmodel.SelectedList.Cards.Select(x => x.Info.ScryfallId)));
     }
+
+    [TestMethod]
+    public async Task ExportCards_Success_InfoNotificationShown()
+    {
+      var exportText = "Export";
+      var clipboard = new TestClipboardService();
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Collection = _savedCollection,
+        Confirmers = new()
+        {
+          ExportCardsConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult<string?>(exportText),
+          }
+        },
+        ClipboardService = clipboard,
+        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+      }.MockVM();
+      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
+
+      await NotificationAssert.NotificationSent(MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Info,
+        () => viewmodel.ExportCardsCommand.ExecuteAsync(null));
+    }
   }
 }
