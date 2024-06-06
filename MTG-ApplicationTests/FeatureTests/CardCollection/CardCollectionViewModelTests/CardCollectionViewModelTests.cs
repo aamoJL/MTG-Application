@@ -4,12 +4,6 @@ namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewMode
 public partial class CardCollectionViewModelTests
 {
   [TestClass]
-  public class ImportCardsTests : CardCollectionViewModelTestsBase
-  {
-
-  }
-
-  [TestClass]
   public class ExportCardsTests : CardCollectionViewModelTestsBase
   {
 

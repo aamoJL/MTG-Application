@@ -14,6 +14,8 @@ public class CardCollectionConfirmers
   public Confirmer<(string Name, string Query)?> NewCollectionListConfirmer { get; init; } = new();
   public Confirmer<(string Name, string Query)?, (string Name, string Query)> EditCollectionListConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteCollectionListConfirmer { get; init; } = new();
+  public Confirmer<string, string> ExportCardsConfirmer { get; init; } = new();
+  public Confirmer<string> ImportCardsConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -72,5 +74,20 @@ public class CardCollectionConfirmers
     return new(
       Title: "Delete the list?",
       Message: $"Are you sure you want to delete '{name}'?");
+  }
+
+  public static Confirmation<string> GetExportCardsConfirmation(string data)
+  {
+    return new(
+      Title: "Export cards",
+      Message: string.Empty,
+      Data: data);
+  }
+
+  public static Confirmation GetImportCardsConfirmation()
+  {
+    return new(
+      Title: "Import cards with Scryfall IDs",
+      Message: string.Empty);
   }
 }

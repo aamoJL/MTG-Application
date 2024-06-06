@@ -119,15 +119,17 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
       });
     }
 
+    var skippedCount = result.Found.Length - addedCards.Count;
+
     // Notifications
     if (result.Source == CardImportResult.ImportSource.External)
     {
       if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
         new SendNotification(Notifier).Execute(new(NotificationType.Success,
-          $"{addedCards.Count} cards imported successfully." + ((result.Found.Length - addedCards.Count) > 0 ? $" ({(result.Found.Length - addedCards.Count)} cards skipped) " : "")));
+          $"{addedCards.Count} cards imported successfully." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
       else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
         new SendNotification(Notifier).Execute(new(NotificationType.Warning,
-          $"{result.Found.Length} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + ((result.Found.Length - addedCards.Count) > 0 ? $" ({(result.Found.Length - addedCards.Count)} cards skipped) " : "")));
+          $"{addedCards.Count} / {result.NotFoundCount + addedCards.Count} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
       else if (result.NotFoundCount > 0) // None found
         new SendNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
     }

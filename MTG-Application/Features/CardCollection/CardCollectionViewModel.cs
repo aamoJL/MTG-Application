@@ -9,6 +9,7 @@ using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepos
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -29,9 +30,9 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   public Notifier Notifier { get; init; } = new();
   public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
 
-  public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
-
   private ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
+
+  public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
 
   [RelayCommand]
   private async Task NewCollection()
@@ -198,15 +199,38 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       new SendNotification(Notifier).Execute(CardCollectionNotifications.DeleteListError);
   }
 
-  [RelayCommand]
+  [RelayCommand(CanExecute = nameof(CanExecuteImportCardsCommand))]
   private async Task ImportCards()
   {
-    // TODO: ImportCards
+    if (!ImportCardsCommand.CanExecute(null)) return;
+
+    if (await Confirmers.ImportCardsConfirmer.Confirm(
+      CardCollectionConfirmers.GetImportCardsConfirmation())
+      is not string importText || string.IsNullOrEmpty(importText))
+      return;
+
+    var result = await ((IWorker)this).DoWork(new ImportCards(CardAPI).Execute(importText));
+    var addedCards = result.Found.Where(found => !SelectedList.Cards.Any(old => old.Info.ScryfallId == found.Info.ScryfallId))
+      .DistinctBy(x => x.Info.ScryfallId).ToList();
+
+    foreach (var card in addedCards)
+      SelectedList.Cards.Add(card);
+
+    HasUnsavedChanges = true;
+
+    if (result.Found.Length == 0)
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.ImportCardsError);
+    else
+      new SendNotification(Notifier).Execute(CardCollectionNotifications.ImportCardsSuccessOrWarning(
+        added: addedCards.Count,
+        skipped: result.Found.Length - addedCards.Count,
+        notFound: result.NotFoundCount));
   }
 
-  [RelayCommand]
+  [RelayCommand(CanExecute = nameof(CanExecuteExportCardsCommand))]
   private async Task ExportCards()
   {
+    if (!ExportCardsCommand.CanExecute(null)) return;
     // TODO: ExportCards
   }
 
@@ -239,6 +263,10 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   private bool CanExecuteEditListCommand() => SelectedList != null;
 
   private bool CanExecuteDeleteListCommand() => SelectedList != null;
+
+  private bool CanExecuteImportCardsCommand() => SelectedList != null;
+
+  private bool CanExecuteExportCardsCommand() => SelectedList != null;
 
   private async Task SetCollection(MTGCardCollection collection)
   {
