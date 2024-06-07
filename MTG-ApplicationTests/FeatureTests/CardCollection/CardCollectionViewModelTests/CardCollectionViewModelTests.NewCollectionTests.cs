@@ -121,7 +121,7 @@ public partial class CardCollectionViewModelTests
         }
       };
 
-      await viewmodel.SelectListCommand.ExecuteAsync(viewmodel.Collection.CollectionLists[0].Name);
+      await viewmodel.SelectListCommand.ExecuteAsync(viewmodel.Collection.CollectionLists.First());
       await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
 
       CollectionAssert.AreEquivalent(

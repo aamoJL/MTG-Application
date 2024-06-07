@@ -140,10 +140,11 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       new SendNotification(Notifier).Execute(CardCollectionNotifications.NewListExistsError);
     else
     {
-      Collection.CollectionLists.Add(new MTGCardCollectionList() { Name = name, SearchQuery = query });
+      var newList = new MTGCardCollectionList() { Name = name, SearchQuery = query };
+      Collection.CollectionLists.Add(newList);
       HasUnsavedChanges = true;
 
-      await SelectList(name);
+      await SelectList(newList);
 
       new SendNotification(Notifier).Execute(CardCollectionNotifications.NewListSuccess);
     }
@@ -191,7 +192,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     {
       HasUnsavedChanges = true;
 
-      await SelectList(Collection.CollectionLists.FirstOrDefault()?.Name);
+      await SelectList(Collection.CollectionLists.FirstOrDefault());
 
       new SendNotification(Notifier).Execute(CardCollectionNotifications.DeleteListSuccess);
     }
@@ -241,10 +242,12 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
   }
 
-  [RelayCommand]
-  private async Task SelectList(string name)
+  [RelayCommand(CanExecute = nameof(CanExecuteSelectListCommand))]
+  private async Task SelectList(MTGCardCollectionList list)
   {
-    SelectedList = Collection.CollectionLists.FirstOrDefault(x => x.Name == name);
+    if (!SelectListCommand.CanExecute(list)) return;
+
+    SelectedList = list;
     QueryCardsViewModel.OwnedCards = SelectedList?.Cards ?? [];
 
     OnPropertyChanged(nameof(SelectedListCardCount));
@@ -302,11 +305,13 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   private bool CanExecuteSwitchCardOwnershipCommand(MTGCard card) => card != null && SelectedList != null;
 
+  private bool CanExecuteSelectListCommand(MTGCardCollectionList list) => list == null || (Collection.CollectionLists.Contains(list) && SelectedList != list);
+
   private async Task SetCollection(MTGCardCollection collection)
   {
     Collection = collection;
     HasUnsavedChanges = false;
 
-    await SelectList(Collection.CollectionLists.FirstOrDefault()?.Name);
+    await SelectList(Collection.CollectionLists.FirstOrDefault());
   }
 }

@@ -9,14 +9,24 @@
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
   xmlns:sys="using:System" 
-  xmlns:localControls="using:MTGApplication.Features.CardCollection.Controls"
+  xmlns:localControls="using:MTGApplication.Features.CardCollection.Controls" xmlns:customControls="using:MTGApplication.General.Views.Controls"
   mc:Ignorable="d"
-  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+  KeyboardAcceleratorPlacementMode="Hidden">
 
   <Page.Resources>
     <localControls:BoolToSelectionModeConverter x:Key="BoolToSelectionModeConverter"/>
   </Page.Resources>
-  
+
+  <!--#region Keyboard Accelerators -->
+  <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened-->
+  <Page.KeyboardAccelerators>
+    <KeyboardAccelerator Modifiers="Control" Key="N" Invoked="NewCollectionKeyboardAccelerator_Invoked" />
+    <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="SaveCollectionKeyboardAccelerator_Invoked" />
+    <KeyboardAccelerator Modifiers="Control" Key="O" Invoked="OpenCollectionKeyboardAccelerator_Invoked" />
+  </Page.KeyboardAccelerators>
+  <!--#endregion-->
+
   <Grid>
     <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
 
@@ -31,21 +41,9 @@
             </AppBarButton.Icon>
             <AppBarButton.Flyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                <MenuFlyoutItem Text="New" Command="{x:Bind ViewModel.NewCollectionCommand, Mode=OneTime}">
-                  <MenuFlyoutItem.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="N" Modifiers="Control"/>
-                  </MenuFlyoutItem.KeyboardAccelerators>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Open..." Command="{x:Bind ViewModel.OpenCollectionCommand, Mode=OneTime}">
-                  <MenuFlyoutItem.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="O" Modifiers="Control"/>
-                  </MenuFlyoutItem.KeyboardAccelerators>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem x:Name="SaveButton" Text="Save..." Command="{x:Bind ViewModel.SaveCollectionCommand, Mode=OneTime}">
-                  <MenuFlyoutItem.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="S" Modifiers="Control"/>
-                  </MenuFlyoutItem.KeyboardAccelerators>
-                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="New" Command="{x:Bind ViewModel.NewCollectionCommand, Mode=OneTime}" KeyboardAcceleratorTextOverride="Ctrl+N"/>
+                <MenuFlyoutItem Text="Open..." Command="{x:Bind ViewModel.OpenCollectionCommand, Mode=OneTime}" KeyboardAcceleratorTextOverride="Ctrl+O"/>
+                <MenuFlyoutItem x:Name="SaveButton" Text="Save..." Command="{x:Bind ViewModel.SaveCollectionCommand, Mode=OneTime}" KeyboardAcceleratorTextOverride="Ctrl+S"/>
                 <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Delete Collection" Command="{x:Bind ViewModel.DeleteCollectionCommand, Mode=OneTime}" Background="IndianRed"/>
               </MenuFlyout>
@@ -75,10 +73,10 @@
           <!--#endregion-->
 
           <!--#region List Selector -->
-          <ComboBox 
+          <customControls:ComboBoxWithCommands 
             ItemsSource="{x:Bind ViewModel.Collection.CollectionLists, Mode=OneWay}" 
             SelectedItem="{x:Bind ViewModel.SelectedList, Mode=OneWay}"
-            SelectionChanged="CollectionListComboBox_SelectionChanged"
+            SelectionChangedCommand="{x:Bind ViewModel.SelectListCommand, Mode=OneTime}"
             VerticalAlignment="Center" 
             Width="200"
             Margin="0 0 5 0"
@@ -88,7 +86,7 @@
                 <TextBlock Text="{Binding Name, Mode=OneTime}"/>
               </DataTemplate>
             </ComboBox.ItemTemplate>
-          </ComboBox>
+          </customControls:ComboBoxWithCommands>
           <!--#endregion-->
           
           <AppBarSeparator/>

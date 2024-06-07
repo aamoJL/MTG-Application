@@ -167,7 +167,7 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(_savedCollection.CollectionLists.First().Name);
+      await viewmodel.SelectListCommand.ExecuteAsync(_savedCollection.CollectionLists.First());
       await viewmodel.EditListCommand.ExecuteAsync(null);
 
       Assert.IsTrue(viewmodel.HasUnsavedChanges);

@@ -50,39 +50,51 @@ public sealed partial class DeckEditorPage : Page
     }
   }
 
-  private void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private async void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.SaveDeckCommand.CanExecute(null)) ViewModel.SaveDeckCommand.Execute(null);
     args.Handled = true;
+    
+    if (ViewModel.SaveDeckCommand.CanExecute(null))
+      await ViewModel.SaveDeckCommand.ExecuteAsync(null);
   }
 
-  private void OpenDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private async void OpenDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.OpenDeckCommand.CanExecute(null)) ViewModel.OpenDeckCommand.Execute(null);
     args.Handled = true;
+    
+    if (ViewModel.OpenDeckCommand.CanExecute(null))
+      await ViewModel.OpenDeckCommand.ExecuteAsync(null);
   }
 
-  private void NewDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private async void NewDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.NewDeckCommand.CanExecute(null)) ViewModel.NewDeckCommand.Execute(null);
     args.Handled = true;
+    
+    if (ViewModel.NewDeckCommand.CanExecute(null))
+      await ViewModel.NewDeckCommand.ExecuteAsync(null);
   }
 
   private void ResetFiltersKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.CardFilters.ResetCommand.CanExecute(null)) ViewModel.CardFilters.ResetCommand.Execute(null);
+    if (ViewModel.CardFilters.ResetCommand.CanExecute(null))
+      ViewModel.CardFilters.ResetCommand.Execute(null);
+
     args.Handled = true;
   }
 
   private void UndoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.UndoCommand.CanExecute(null)) ViewModel.UndoCommand.Execute(null);
+    if (ViewModel.UndoCommand.CanExecute(null))
+      ViewModel.UndoCommand.Execute(null);
+
     args.Handled = true;
   }
 
   private void RedoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.RedoCommand.CanExecute(null)) ViewModel.RedoCommand.Execute(null);
+    if (ViewModel.RedoCommand.CanExecute(null))
+      ViewModel.RedoCommand.Execute(null);
+
     args.Handled = true;
   }
 
@@ -112,12 +124,8 @@ public sealed partial class DeckEditorPage : Page
     // Deselect list selection if the list loses focus so
     // the delete keyboard accelerator does not delete item in the list
     if (sender is ListViewBase listview)
-    {
       if (args.NewFocusedElement is not ListViewItem item || !listview.Items.Contains(item.Content))
-      {
         listview.DeselectAll();
-      }
-    }
 
     args.Handled = true;
   }
