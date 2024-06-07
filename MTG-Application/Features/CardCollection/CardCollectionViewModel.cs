@@ -20,21 +20,19 @@ namespace MTGApplication.Features.CardCollection;
 public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBase, IWorker, ISavable
 {
   [ObservableProperty] private MTGCardCollection collection = new();
-  [ObservableProperty,
-    NotifyPropertyChangedFor(nameof(SelectedListCardCount))]
-  private MTGCardCollectionList selectedList;
+  [ObservableProperty] private MTGCardCollectionList selectedList;
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
 
-  public IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; } = new(new CardCollectionIncrementalCardSource(cardAPI));
+  public QueryCardsViewModel QueryCardsViewModel { get; } = new(cardAPI);
   public CardCollectionConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
 
-  private ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
-
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
+
+  private ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
 
   [RelayCommand]
   private async Task NewCollection()
@@ -52,8 +50,8 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       return;
 
     if (await Confirmers.LoadCollectionConfirmer.Confirm(
-      CardCollectionConfirmers.GetLoadCollectionConfirmation(
-        await new GetCardCollectionNames(Repository).Execute())) is not string loadName)
+      CardCollectionConfirmers.GetLoadCollectionConfirmation(await new GetCardCollectionNames(Repository).Execute()))
+      is not string loadName)
       return;
 
     if (await ((IWorker)this).DoWork(new LoadCardCollection(Repository, CardAPI).Execute(loadName)) is MTGCardCollection loadedCollection)
@@ -173,7 +171,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       SelectedList.SearchQuery = query;
       HasUnsavedChanges = true;
 
-      await UpdateQueryCards();
+      await ((IWorker)this).DoWork(QueryCardsViewModel.UpdateQueryCards(SelectedList?.SearchQuery ?? string.Empty));
 
       new SendNotification(Notifier).Execute(CardCollectionNotifications.EditListSuccess);
     }
@@ -247,8 +245,10 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   private async Task SelectList(string name)
   {
     SelectedList = Collection.CollectionLists.FirstOrDefault(x => x.Name == name);
+    QueryCardsViewModel.OwnedCards = SelectedList?.Cards ?? [];
 
-    await UpdateQueryCards();
+    OnPropertyChanged(nameof(SelectedListCardCount));
+    await ((IWorker)this).DoWork(QueryCardsViewModel.UpdateQueryCards(SelectedList?.SearchQuery ?? string.Empty));
   }
 
   [RelayCommand]
@@ -257,6 +257,21 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
     var prints = (await ((IWorker)this).DoWork(CardAPI.FetchFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
     await Confirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionConfirmers.GetShowCardPrintsConfirmation(prints));
+  }
+
+  [RelayCommand(CanExecute = nameof(CanExecuteSwitchCardOwnershipCommand))]
+  private void SwitchCardOwnership(MTGCard card)
+  {
+    if (!SwitchCardOwnershipCommand.CanExecute(card)) return;
+
+    if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is MTGCard existingCard)
+      SelectedList.Cards.Remove(existingCard);
+    else
+      SelectedList.Cards.Add(card);
+
+    HasUnsavedChanges = true;
+
+    OnPropertyChanged(nameof(SelectedListCardCount));
   }
 
   public async Task<bool> ConfirmUnsavedChanges()
@@ -285,17 +300,13 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   private bool CanExecuteExportCardsCommand() => SelectedList != null;
 
+  private bool CanExecuteSwitchCardOwnershipCommand(MTGCard card) => card != null && SelectedList != null;
+
   private async Task SetCollection(MTGCardCollection collection)
   {
     Collection = collection;
     HasUnsavedChanges = false;
 
     await SelectList(Collection.CollectionLists.FirstOrDefault()?.Name);
-  }
-
-  private async Task UpdateQueryCards()
-  {
-    var searchResult = await ((IWorker)this).DoWork(new GetMTGCardsBySearchQuery(CardAPI).Execute(SelectedList?.SearchQuery ?? string.Empty));
-    QueryCards.SetCollection([.. searchResult.Found], searchResult.NextPageUri, searchResult.TotalCount);
   }
 }

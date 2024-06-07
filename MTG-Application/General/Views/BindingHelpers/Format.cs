@@ -29,8 +29,8 @@ public static class Format
   public static string ToUpper(string text) => text.ToUpper();
 
   /// <summary>
-  /// Retruns given default text, if the value is empty or null
+  /// Returns given default text, if the value is empty or null
   /// </summary>
-  public static string ValueOrDefault(string value, string defaultText)
-    => string.IsNullOrEmpty(value) ? defaultText : value;
+  public static string ValueOrDefault(object value, string defaultText)
+    => string.IsNullOrEmpty(value?.ToString()) ? defaultText : value.ToString();
 }

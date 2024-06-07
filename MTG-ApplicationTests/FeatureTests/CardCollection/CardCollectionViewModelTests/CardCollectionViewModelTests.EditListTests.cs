@@ -138,16 +138,16 @@ public partial class CardCollectionViewModelTests
       }.MockVM();
 
       viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync(10);
+      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);
 
-      Assert.AreEqual(0, viewmodel.QueryCards.Collection.Count);
+      Assert.AreEqual(0, viewmodel.QueryCardsViewModel.Collection.Count);
 
       _dependencies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: "Card")];
 
       await viewmodel.EditListCommand.ExecuteAsync(null);
-      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync(10);
+      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);
 
-      Assert.AreEqual(1, viewmodel.QueryCards.Collection.Count);
+      Assert.AreEqual(1, viewmodel.QueryCardsViewModel.Collection.Count);
     }
 
     [TestMethod]

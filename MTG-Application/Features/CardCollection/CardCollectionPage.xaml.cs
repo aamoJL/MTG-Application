@@ -7,7 +7,7 @@ public sealed partial class CardCollectionPage : Page
   public CardCollectionPage()
   {
     InitializeComponent();
-    
+
     CardCollectionViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, () => new(XamlRoot));
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }

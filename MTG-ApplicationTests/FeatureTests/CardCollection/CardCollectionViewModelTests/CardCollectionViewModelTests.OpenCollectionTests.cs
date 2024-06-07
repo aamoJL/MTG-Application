@@ -152,11 +152,11 @@ public partial class CardCollectionViewModelTests
       _dependencies.CardAPI.ExpectedCards = expectedCards;
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
-      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
+      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
 
       CollectionAssert.AreEquivalent(
         expectedCards.Select(c => c.Info.Name).ToList(),
-        viewmodel.QueryCards.Collection.Select(c => c.Info.Name).ToList());
+        viewmodel.QueryCardsViewModel.Collection.Select(c => c.Info.Name).ToList());
     }
 
     [TestMethod]

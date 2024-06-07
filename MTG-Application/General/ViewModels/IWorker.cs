@@ -18,6 +18,16 @@ public interface IWorker
     IsBusy = false;
     return result;
   }
+
+  /// <summary>
+  /// Sets the <see cref="IsBusy"/> property to <see langword="true"/> for the duration of the <paramref name="task"/>
+  /// </summary>
+  public async Task DoWork(Task task)
+  {
+    IsBusy = true;
+    await task;
+    IsBusy = false;
+  }
 }
 
 public class DefaultWorker : IWorker

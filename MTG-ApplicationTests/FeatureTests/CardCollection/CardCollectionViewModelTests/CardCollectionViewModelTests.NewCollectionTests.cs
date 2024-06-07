@@ -122,11 +122,11 @@ public partial class CardCollectionViewModelTests
       };
 
       await viewmodel.SelectListCommand.ExecuteAsync(viewmodel.Collection.CollectionLists[0].Name);
-      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
+      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
 
       CollectionAssert.AreEquivalent(
         expectedCards.Select(x => x.Info.Name).ToList(),
-        viewmodel.QueryCards.Collection.Select(x => x.Info.Name).ToList());
+        viewmodel.QueryCardsViewModel.Collection.Select(x => x.Info.Name).ToList());
     }
   }
 }

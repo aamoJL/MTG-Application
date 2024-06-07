@@ -104,9 +104,9 @@ public partial class CardCollectionViewModelTests
       };
 
       await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
-      await viewmodel.QueryCards.Collection.LoadMoreItemsAsync(10);
+      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);
 
-      Assert.AreEqual(0, viewmodel.QueryCards.TotalCardCount);
+      Assert.AreEqual(0, viewmodel.QueryCardsViewModel.TotalCardCount);
     }
 
     [TestMethod("Success notification should be sent when the collection was deleted")]

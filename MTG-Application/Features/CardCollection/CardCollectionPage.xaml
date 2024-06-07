@@ -13,6 +13,10 @@
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+  <Page.Resources>
+    <localControls:BoolToSelectionModeConverter x:Key="BoolToSelectionModeConverter"/>
+  </Page.Resources>
+  
   <Grid>
     <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
 
@@ -93,7 +97,7 @@
             <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind ViewModel.Collection.Name, Mode=OneWay}" FontWeight="Bold"/>
             <TextBlock>
               <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.SelectedListCardCount), Mode=OneWay}"/>
-              <Run Text="{x:Bind sys:String.Format('{0} cards collected', ViewModel.QueryCards.Collection.Count), Mode=OneWay}"/>
+              <Run Text="{x:Bind sys:String.Format('{0} cards collected', ViewModel.QueryCardsViewModel.TotalCardCount), Mode=OneWay}"/>
             </TextBlock>
           </StackPanel>
           <!--#endregion-->
@@ -105,8 +109,8 @@
         <Grid HorizontalAlignment="Right" Padding="0 0 10 0">
           <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 5 0 0"/>
           <TextBlock VerticalAlignment="Bottom">
-            <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.QueryCards.Collection.Count), Mode=OneWay}"/>
-            <Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.QueryCards.TotalCardCount), Mode=OneWay}"/>
+            <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.QueryCardsViewModel.Collection.Count), Mode=OneWay}"/>
+            <Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.QueryCardsViewModel.TotalCardCount), Mode=OneWay}"/>
           </TextBlock>
         </Grid>
         <!--#endregion-->
@@ -119,7 +123,7 @@
         x:Name="ListCardImageView"
         controls:DockPanel.Dock="Top" 
         DataContext="{x:Bind ViewModel, Mode=OneTime}"
-        ItemsSource="{x:Bind ViewModel.QueryCards.Collection, Mode=OneWay}"
+        ItemsSource="{x:Bind ViewModel.QueryCardsViewModel.Collection, Mode=OneWay}"
         Style="{StaticResource MTGAdaptiveGridViewStyle}"
         SelectionMode="None"
         DesiredWidth="250">
@@ -129,7 +133,9 @@
               d:DataContext="{d:DesignInstance Type=local:CardCollectionViewModel}"
               DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
               Model="{x:Bind Mode=OneTime}"
-              ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+              ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
+              SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
+              OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
           </DataTemplate>
         </controls:AdaptiveGridView.ItemTemplate>
       </controls:AdaptiveGridView>
