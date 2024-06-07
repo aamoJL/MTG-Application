@@ -47,7 +47,7 @@
                   </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Delete" Command="{x:Bind ViewModel.DeleteCollectionCommand, Mode=OneTime}" Background="IndianRed"/>
+                <MenuFlyoutItem Text="Delete Collection" Command="{x:Bind ViewModel.DeleteCollectionCommand, Mode=OneTime}" Background="IndianRed"/>
               </MenuFlyout>
             </AppBarButton.Flyout>
           </AppBarButton>
@@ -68,7 +68,7 @@
                 <MenuFlyoutItem Text="Import..." Command="{x:Bind ViewModel.ImportCardsCommand, Mode=OneTime}" />
                 <MenuFlyoutItem Text="Export..." Command="{x:Bind ViewModel.ExportCardsCommand, Mode=OneTime}" />
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Delete" Command="{x:Bind ViewModel.DeleteListCommand, Mode=OneTime}" Background="IndianRed"/>
+                <MenuFlyoutItem Text="Delete List" Command="{x:Bind ViewModel.DeleteListCommand, Mode=OneTime}" Background="IndianRed"/>
               </MenuFlyout>
             </AppBarButton.Flyout>
           </AppBarButton>
@@ -77,7 +77,8 @@
           <!--#region List Selector -->
           <ComboBox 
             ItemsSource="{x:Bind ViewModel.Collection.CollectionLists, Mode=OneWay}" 
-            SelectedItem="{x:Bind ViewModel.SelectedList, Mode=TwoWay}"
+            SelectedItem="{x:Bind ViewModel.SelectedList, Mode=OneWay}"
+            SelectionChanged="CollectionListComboBox_SelectionChanged"
             VerticalAlignment="Center" 
             Width="200"
             Margin="0 0 5 0"
