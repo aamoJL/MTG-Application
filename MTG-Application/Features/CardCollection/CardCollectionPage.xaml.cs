@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Services.NotificationService;
+using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication.Features.CardCollection;
 public sealed partial class CardCollectionPage : Page
@@ -10,6 +11,8 @@ public sealed partial class CardCollectionPage : Page
 
     CardCollectionViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, () => new(XamlRoot));
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
+    WindowClosing.Closing += WindowClosing_Closing;
+    WindowClosing.Closed += WindowClosing_Closed;
   }
 
   public CardCollectionViewModel ViewModel { get; } = new(App.MTGCardAPI);
@@ -36,5 +39,20 @@ public sealed partial class CardCollectionPage : Page
 
     if (ViewModel.OpenCollectionCommand.CanExecute(null))
       await ViewModel.OpenCollectionCommand.ExecuteAsync(null);
+  }
+
+  private void WindowClosing_Closing(object sender, WindowClosing.ClosingEventArgs e)
+  {
+    if (e.Root != XamlRoot) return;
+
+    e.Tasks.Add(ViewModel.ConfirmUnsavedChanges);
+  }
+
+  private void WindowClosing_Closed(object sender, WindowClosing.ClosedEventArgs e)
+  {
+    if (e.Root != XamlRoot) return;
+
+    WindowClosing.Closing -= WindowClosing_Closing;
+    WindowClosing.Closed -= WindowClosing_Closed;
   }
 }
