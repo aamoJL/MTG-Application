@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.UseCases;
 
 public class ExportCards : UseCase<ExportCards.Args, string>
 {
-  public record Args(IEnumerable<MTGCard> Cards, string ByProperty);
+  public record Args(IEnumerable<DeckEditorMTGCard> Cards, string ByProperty);
 
   public override string Execute(Args args)
   {

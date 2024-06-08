@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.General.Databases.Repositories;
+using MTGApplication.Features.CardCollection.Services;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Models.CardCollection;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.NotificationService;
@@ -17,7 +18,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.CardCollection;
 
-public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBase, IWorker, ISavable
+public partial class CardCollectionViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : ViewModelBase, IWorker, ISavable
 {
   [ObservableProperty] private MTGCardCollection collection = new();
   [ObservableProperty] private MTGCardCollectionList selectedList;
@@ -32,7 +33,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
 
-  private ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
+  private ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
 
   [RelayCommand]
   private async Task NewCollection()
@@ -76,7 +77,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       return;
 
     // Override confirmation
-    if (saveName != oldName && await new CardCollectionExists(Repository).Execute(saveName))
+    if (saveName != oldName && await new CardCollectionDTOExists(Repository).Execute(saveName))
     {
       switch (await Confirmers.OverrideCollectionConfirmer.Confirm(CardCollectionConfirmers.GetOverrideCollectionConfirmation(saveName)))
       {
@@ -113,7 +114,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
       default: return; // Cancel
     }
 
-    switch (await ((IWorker)this).DoWork(new DeleteCardCollection(Repository).Execute(Collection)))
+    switch (await ((IWorker)this).DoWork(new DeleteCardCollectionDTO(Repository).Execute(Collection)))
     {
       case true:
         await SetCollection(new());
@@ -255,7 +256,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   }
 
   [RelayCommand]
-  private async Task ShowCardPrints(MTGCard card)
+  private async Task ShowCardPrints(DeckEditorMTGCard card)
   {
     var prints = (await ((IWorker)this).DoWork(CardAPI.FetchFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
@@ -263,11 +264,11 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
   }
 
   [RelayCommand(CanExecute = nameof(CanExecuteSwitchCardOwnershipCommand))]
-  private void SwitchCardOwnership(MTGCard card)
+  private void SwitchCardOwnership(DeckEditorMTGCard card)
   {
     if (!SwitchCardOwnershipCommand.CanExecute(card)) return;
 
-    if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is MTGCard existingCard)
+    if (SelectedList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) is DeckEditorMTGCard existingCard)
       SelectedList.Cards.Remove(existingCard);
     else
       SelectedList.Cards.Add(card);
@@ -303,7 +304,7 @@ public partial class CardCollectionViewModel(ICardAPI<MTGCard> cardAPI) : ViewMo
 
   private bool CanExecuteExportCardsCommand() => SelectedList != null;
 
-  private bool CanExecuteSwitchCardOwnershipCommand(MTGCard card) => card != null && SelectedList != null;
+  private bool CanExecuteSwitchCardOwnershipCommand(DeckEditorMTGCard card) => card != null && SelectedList != null;
 
   private bool CanExecuteSelectListCommand(MTGCardCollectionList list) => list == null || (Collection.CollectionLists.Contains(list) && SelectedList != list);
 

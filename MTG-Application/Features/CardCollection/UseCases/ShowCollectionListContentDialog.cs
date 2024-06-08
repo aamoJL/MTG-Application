@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using MTGApplication.General.Views.Dialogs;
+using MTGApplication.General.Views.Dialogs.UseCases;
 using System;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;

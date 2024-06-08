@@ -7,7 +7,7 @@ public class ReversibleCollectionCommand<T> : IReversibleCommand<IEnumerable<T>>
   public ReversibleCollectionCommand(T item, IClassCopier<T> copier)
   {
     Copier = copier;
-    Items = new List<T>(Copier.Copy(new T[] { item }));
+    Items = new List<T>(Copier.Copy([item]));
   }
 
   public ReversibleCollectionCommand(IEnumerable<T> items, IClassCopier<T> copier)

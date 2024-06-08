@@ -2,7 +2,7 @@
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.IOService;
 using MTGApplicationTests.TestUtility.Mocker;
-using static MTGApplication.General.Models.Card.MTGCard;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplicationTests.GeneralTests.ModelTests.CardTests;
 
@@ -55,7 +55,7 @@ public class MTGCardTests
     var card = MTGCardModelMocker.CreateMTGCardModel();
 
     JsonService.TrySerializeObject(card, out var serialized);
-    JsonService.TryDeserializeJson(serialized, out MTGCard deserialized);
+    JsonService.TryDeserializeJson(serialized, out DeckEditorMTGCard deserialized);
 
     Assert.IsNotNull(deserialized);
     Assert.AreEqual(card.Info.Name, deserialized.Info.Name);

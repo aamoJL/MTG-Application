@@ -3,7 +3,7 @@ using MTGApplication.General.Models.Card;
 
 namespace MTGApplication.Features.CardCollection;
 
-public partial class CardCollectionMTGCard(MTGCard.MTGCardInfo info) : MTGCard(info)
+public partial class CardCollectionMTGCard(DeckEditorMTGCard.MTGCardInfo info) : DeckEditorMTGCard(info)
 {
   [ObservableProperty] private bool isOwned;
 }

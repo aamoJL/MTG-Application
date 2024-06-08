@@ -1,5 +1,4 @@
 ﻿using MTGApplication.General.Models.Card;
-using System;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.API.CardAPI;
@@ -8,7 +7,7 @@ namespace MTGApplication.General.Services.API.CardAPI;
 /// Generic card API
 /// </summary>
 /// <typeparam name="T">Card type</typeparam>
-public partial interface ICardAPI<T>
+public partial interface ICardAPI<TModel>
 {
   /// <summary>
   /// Name of the API
@@ -36,9 +35,4 @@ public partial interface ICardAPI<T>
   /// The text formatting depends on the API implementation
   /// </summary>
   public Task<CardImportResult> FetchFromString(string importText);
-
-  /// <summary>
-  /// Fetch cards from the API using <see cref="CardDTO"/> array
-  /// </summary>
-  public Task<CardImportResult> FetchFromDTOs(CardDTO[] dtoArray);
 }

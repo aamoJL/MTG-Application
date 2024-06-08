@@ -1,11 +1,11 @@
-﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Models.CardCollection;
+﻿using MTGApplication.General.Services.Databases.Repositories;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollection.UseCases;
 public class GetCardCollectionNames(IRepository<MTGCardCollectionDTO> repository) : UseCase<Task<IEnumerable<string>>>
 {
   public IRepository<MTGCardCollectionDTO> Repository { get; } = repository;

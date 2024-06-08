@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Data;
 using System;
 
-namespace MTGApplication.General.Views.BindingHelpers;
+namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
 /// <summary>
 /// Converts <see cref="double"/> to <see cref="int"/>

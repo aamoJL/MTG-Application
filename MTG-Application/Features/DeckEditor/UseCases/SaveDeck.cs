@@ -1,11 +1,12 @@
-﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.DeckRepository;
+﻿using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.Databases.Repositories;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
-using static MTGApplication.Features.DeckEditor.SaveDeck;
+using static MTGApplication.Features.DeckEditor.UseCases.SaveDeck;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.UseCases;
 public class SaveDeck(IRepository<MTGCardDeckDTO> repository) : UseCase<SaveArgs, Task<bool>>
 {
   public record SaveArgs(MTGCardDeck Deck, string SaveName, bool OverrideOld = false);

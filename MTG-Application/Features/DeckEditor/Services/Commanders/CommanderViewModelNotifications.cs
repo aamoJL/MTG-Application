@@ -1,6 +1,6 @@
 ﻿using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Services.Commanders;
 
 public static class CommanderViewModelNotifications
 {

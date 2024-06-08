@@ -135,7 +135,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Open_Valid_QueryCardsUpdated()
     {
-      var expectedCards = new MTGCard[]
+      var expectedCards = new DeckEditorMTGCard[]
       {
         MTGCardModelMocker.CreateMTGCardModel(name: "1"),
         MTGCardModelMocker.CreateMTGCardModel(name: "2"),

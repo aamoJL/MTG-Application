@@ -1,14 +1,15 @@
-﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.DeckRepository;
+﻿using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Databases.Repositories;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.UseCases;
 
-public class LoadDeck(IRepository<MTGCardDeckDTO> repository, ICardAPI<MTGCard> cardAPI) : UseCase<string, Task<MTGCardDeck>>
+public class LoadDeck(IRepository<MTGCardDeckDTO> repository, ICardAPI<DeckEditorMTGCard> cardAPI) : UseCase<string, Task<MTGCardDeck>>
 {
   public override async Task<MTGCardDeck> Execute(string loadName)
   {

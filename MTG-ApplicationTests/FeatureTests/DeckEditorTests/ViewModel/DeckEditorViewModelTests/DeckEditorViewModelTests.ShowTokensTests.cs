@@ -56,7 +56,7 @@ public partial class DeckEditorViewModelTests
         Deck = _savedDeck,
         Confirmers = new()
         {
-          ShowTokensConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>(),
+          ShowTokensConfirmer = new TestExceptionConfirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>>(),
         }
       }.MockVM();
 

@@ -1,12 +1,13 @@
 ﻿using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Models.Card.CardImportResult;
 
 namespace MTGApplicationTests.TestUtility.API;
-public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0) : ICardAPI<MTGCard>
+public class TestCardAPI(DeckEditorMTGCard[]? expectedCards = null, int notFoundCount = 0) : ICardAPI<DeckEditorMTGCard>
 {
-  public MTGCard[]? ExpectedCards { get; set; } = expectedCards;
+  public DeckEditorMTGCard[]? ExpectedCards { get; set; } = expectedCards;
   public int NotFoundCount { get; set; } = notFoundCount;
 
   public int PageSize => 40;
@@ -25,7 +26,7 @@ public class TestCardAPI(MTGCard[]? expectedCards = null, int notFoundCount = 0)
     if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length, ImportSource.External)); }
     else
     {
-      var found = ExpectedCards!.Where(ex => cards.FirstOrDefault(x => x.Info.ScryfallId == ex.Info.ScryfallId) != null)?.ToList() ?? new List<MTGCard>();
+      var found = ExpectedCards!.Where(ex => cards.FirstOrDefault(x => x.Info.ScryfallId == ex.Info.ScryfallId) != null)?.ToList() ?? new List<DeckEditorMTGCard>();
       var notFoundCount = ExpectedCards!.Length - found.Count;
 
       return await Task.Run(() => new CardImportResult([.. found], notFoundCount, found.Count, ImportSource.External));

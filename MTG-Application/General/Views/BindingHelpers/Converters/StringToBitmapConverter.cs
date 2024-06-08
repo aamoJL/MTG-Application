@@ -2,7 +2,7 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 
-namespace MTGApplication.General.Views.BindingHelpers;
+namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
 /// <summary>
 /// Converts <see cref="string"/> uri to <see cref="BitmapImage"/>

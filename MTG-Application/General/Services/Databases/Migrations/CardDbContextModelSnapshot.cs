@@ -3,12 +3,13 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MTGApplication.General.Services.Databases;
 
 #nullable disable
 
 namespace MTGApplication.General.Databases
 {
-    [DbContext(typeof(CardDbContext))]
+  [DbContext(typeof(CardDbContext))]
     partial class CardDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

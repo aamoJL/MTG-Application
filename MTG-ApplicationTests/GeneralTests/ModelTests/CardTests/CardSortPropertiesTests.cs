@@ -13,13 +13,13 @@ public class CardSortPropertiesTests
     public void Compare()
     {
       var card1 = MTGCardModelMocker.CreateMTGCardModel(
-        name: "A", cmc: 1, rarity: MTGCard.RarityTypes.Common,
-        setCode: "aaa", count: 1, price: 1, typeLine: MTGCard.SpellType.Land.ToString(),
-        frontFace: MTGCardModelMocker.CreateCardFace(colors: [MTGCard.ColorTypes.W]));
+        name: "A", cmc: 1, rarity: DeckEditorMTGCard.RarityTypes.Common,
+        setCode: "aaa", count: 1, price: 1, typeLine: DeckEditorMTGCard.SpellType.Land.ToString(),
+        frontFace: MTGCardModelMocker.CreateCardFace(colors: [DeckEditorMTGCard.ColorTypes.W]));
       var card2 = MTGCardModelMocker.CreateMTGCardModel(
-        name: "B", cmc: 2, rarity: MTGCard.RarityTypes.Rare,
-        setCode: "bbb", count: 2, price: 2, typeLine: MTGCard.SpellType.Creature.ToString(),
-        frontFace: MTGCardModelMocker.CreateCardFace(colors: [MTGCard.ColorTypes.U]));
+        name: "B", cmc: 2, rarity: DeckEditorMTGCard.RarityTypes.Rare,
+        setCode: "bbb", count: 2, price: 2, typeLine: DeckEditorMTGCard.SpellType.Creature.ToString(),
+        frontFace: MTGCardModelMocker.CreateCardFace(colors: [DeckEditorMTGCard.ColorTypes.U]));
 
       foreach (var property in Enum.GetNames(typeof(MTGSortProperty)))
       {

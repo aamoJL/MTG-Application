@@ -20,7 +20,7 @@ public partial class CardSearchViewModelTests
       {
         Confirmers = new()
         {
-          ShowCardPrintsConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
+          ShowCardPrintsConfirmer = new TestExceptionConfirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>>()
         }
       };
 

@@ -9,7 +9,7 @@ public class TestScryfallAPI() : ScryfallAPI
 {
   private readonly string _apiSamplePath = Path.Join(FileService.GetAssetDirectoryPath(), "ScryfallAPIDeckSample.json");
 
-  public async Task<MTGCard[]> GetCardsFromSampleJSON()
+  public async Task<DeckEditorMTGCard[]> GetCardsFromSampleJSON()
   {
     FileService.TryReadTextFromFile(_apiSamplePath, out var data);
 

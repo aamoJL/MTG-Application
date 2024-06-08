@@ -1,12 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.General.Databases;
-using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Models.CardCollection;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
@@ -43,29 +40,34 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
     return await Task.FromResult(db.MTGCardCollections.FirstOrDefault(x => x.Name == name) != null);
   }
 
-  public virtual async Task<IEnumerable<MTGCardCollectionDTO>> Get(Expression<Func<MTGCardCollectionDTO, object>>[] includes = null)
-    => await Get((items) => items.SetDefaultIncludesOrEmpty(includes.Length != 0));
-
-  // TODO: test if this works and replace the expression version with this
   public async Task<IEnumerable<MTGCardCollectionDTO>> Get(Action<DbSet<MTGCardCollectionDTO>> setIncludes)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
 
-    setIncludes?.Invoke(db.MTGCardCollections);
+    var set = db.MTGCardCollections;
 
-    var items = db.MTGCardCollections;
+    if (setIncludes != null) setIncludes.Invoke(set);
+    else SetDefaultIncludes(set);
+
+    var items = set.ToList();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
-    return await Task.FromResult(items.ToList());
+    return await Task.FromResult(items);
   }
 
-  public virtual async Task<MTGCardCollectionDTO> Get(string name, Expression<Func<MTGCardCollectionDTO, object>>[] includes = null)
+  public async Task<MTGCardCollectionDTO> Get(string name, Action<DbSet<MTGCardCollectionDTO>> setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
-    var item = db.MTGCardCollections.Where(x => x.Name == name).SetDefaultIncludesOrEmpty(includes?.Length != 0).FirstOrDefault();
+
+    var set = db.MTGCardCollections;
+
+    if (setIncludes != null) setIncludes.Invoke(set);
+    else SetDefaultIncludes(set);
+
+    var item = set.Where(x => x.Name == name).FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
     return await Task.FromResult(item);
   }
@@ -119,6 +121,6 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
     return await db.SaveChangesAsync() > 0;
   }
 
-  public static void SetDefaultIncludes(DbSet<MTGCardCollectionDTO> items)
-    => items.Include(x => x.CollectionLists).ThenInclude(x => x.Cards);
+  protected static void SetDefaultIncludes(DbSet<MTGCardCollectionDTO> db)
+    => db.Include(x => x.CollectionLists).ThenInclude(x => x.Cards).Load();
 }

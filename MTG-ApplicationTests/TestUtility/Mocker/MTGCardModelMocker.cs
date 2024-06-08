@@ -1,14 +1,15 @@
 ﻿using MTGApplication.General.Models.Card;
-using static MTGApplication.General.Models.Card.MTGCard;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplicationTests.TestUtility.Mocker;
 
 public static class MTGCardModelMocker
 {
   /// <summary>
-  /// Returns a mock <see cref="MTGCard"/> object
+  /// Returns a mock <see cref="DeckEditorMTGCard"/> object
   /// </summary>
-  public static MTGCard CreateMTGCardModel(
+  public static DeckEditorMTGCard CreateMTGCardModel(
       Guid? scryfallId = null,
       Guid? oracleId = null,
       CardFace? frontFace = null,
@@ -30,7 +31,7 @@ public static class MTGCardModelMocker
       CardToken[]? tokens = default)
   {
     // NOTE: Remember to also update FromDTO method !
-    return new MTGCard(new(
+    return new DeckEditorMTGCard(new(
       scryfallId: scryfallId ?? Guid.NewGuid(),
       frontFace: frontFace ?? CreateCardFace(),
       backFace: backFace,
@@ -72,9 +73,9 @@ public static class MTGCardModelMocker
   }
 
   /// <summary>
-  /// Returns a mock <see cref="MTGCard"/> object from the given <see cref="MTGCardDTO"/> object
+  /// Returns a mock <see cref="DeckEditorMTGCard"/> object from the given <see cref="MTGCardDTO"/> object
   /// </summary>
-  public static MTGCard FromDTO(MTGCardDTO dto)
+  public static DeckEditorMTGCard FromDTO(MTGCardDTO dto)
   {
     return CreateMTGCardModel(
       name: dto.Name,

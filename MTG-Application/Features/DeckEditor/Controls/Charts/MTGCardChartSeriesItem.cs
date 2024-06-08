@@ -3,13 +3,13 @@ using MTGApplication.General.Models.Card;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Controls.Charts;
 
 public class MTGCardChartSeriesItem : ObservableObject
 {
   public MTGCardChartSeriesItem() => Cards.CollectionChanged += Cards_CollectionChanged;
 
-  public ObservableCollection<MTGCard> Cards { get; } = [];
+  public ObservableCollection<DeckEditorMTGCard> Cards { get; } = [];
 
   public int Count => Cards.Sum(x => x.Count);
 
@@ -18,9 +18,9 @@ public class MTGCardChartSeriesItem : ObservableObject
     switch (e.Action)
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-        (e.NewItems[0] as MTGCard).PropertyChanged += CardsItem_PropertyChanged; break;
+        (e.NewItems[0] as DeckEditorMTGCard).PropertyChanged += CardsItem_PropertyChanged; break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-        (e.OldItems[0] as MTGCard).PropertyChanged -= CardsItem_PropertyChanged; break;
+        (e.OldItems[0] as DeckEditorMTGCard).PropertyChanged -= CardsItem_PropertyChanged; break;
     }
 
     OnPropertyChanged(nameof(Count));
@@ -28,7 +28,7 @@ public class MTGCardChartSeriesItem : ObservableObject
 
   protected void CardsItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(MTGCard.Count))
+    if (e.PropertyName == nameof(DeckEditorMTGCard.Count))
       OnPropertyChanged(nameof(Count));
   }
 }

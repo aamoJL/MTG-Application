@@ -21,7 +21,7 @@ public partial class CardListViewModelTests
         Cards = [existingCard],
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
+          ChangeCardPrintConfirmer = new TestExceptionConfirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>>()
         }
       };
 
@@ -32,7 +32,7 @@ public partial class CardListViewModelTests
     public async Task ChangePrint_PrintChanged()
     {
       var existingCard = MTGCardModelMocker.CreateMTGCardModel(setCode: "abc");
-      var newPrint = new MTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" });
+      var newPrint = new DeckEditorMTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" });
       var viewmodel = new CardListViewModel(new TestCardAPI())
       {
         Cards = [existingCard],
@@ -51,7 +51,7 @@ public partial class CardListViewModelTests
     public async Task ChangePrint_CardDoesNotExist_NothingHappens()
     {
       var existingCard = MTGCardModelMocker.CreateMTGCardModel(name: "abc", setCode: "abc");
-      var newPrint = new MTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), Name = "zyx", SetCode = "zyx" });
+      var newPrint = new DeckEditorMTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), Name = "zyx", SetCode = "zyx" });
       var viewmodel = new CardListViewModel(new TestCardAPI())
       {
         Cards = [existingCard],
@@ -71,7 +71,7 @@ public partial class CardListViewModelTests
     public async Task ChangePrint_Undo_CardHasOldPrint()
     {
       var existingCard = MTGCardModelMocker.CreateMTGCardModel(setCode: "abc");
-      var newPrint = new MTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" });
+      var newPrint = new DeckEditorMTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" });
       var viewmodel = new CardListViewModel(new TestCardAPI())
       {
         Cards = [existingCard],
@@ -91,7 +91,7 @@ public partial class CardListViewModelTests
     public async Task ChangePrint_Redo_CardHasNewPrintAgain()
     {
       var existingCard = MTGCardModelMocker.CreateMTGCardModel(setCode: "abc");
-      var newPrint = new MTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" });
+      var newPrint = new DeckEditorMTGCard(existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" });
       var viewmodel = new CardListViewModel(new TestCardAPI())
       {
         Cards = [existingCard],

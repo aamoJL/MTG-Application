@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MTGApplication.General.Services.Databases;
 
 #nullable disable
 
 namespace MTGApplication.General.Databases
 {
-    [DbContext(typeof(CardDbContext))]
+  [DbContext(typeof(CardDbContext))]
     [Migration("20231001160142_MTG-Card-Set-001")]
     partial class MTGCardSet001
     {

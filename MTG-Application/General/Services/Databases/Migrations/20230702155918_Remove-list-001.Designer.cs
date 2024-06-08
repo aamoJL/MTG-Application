@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MTGApplication.General.Services.Databases;
 
 #nullable disable
 
 namespace MTGApplication.General.Databases
 {
-    [DbContext(typeof(CardDbContext))]
+  [DbContext(typeof(CardDbContext))]
     [Migration("20230702155918_Remove-list-001")]
     partial class Removelist001
     {

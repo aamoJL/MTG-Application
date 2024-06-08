@@ -34,7 +34,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_ByName_ConfirmationShown()
     {
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
       MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
@@ -56,7 +56,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_ById_ConfirmationShown()
     {
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
       MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
@@ -80,7 +80,7 @@ public partial class CardListViewModelTests
     {
       string? exportText = null;
 
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
       MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
@@ -106,7 +106,7 @@ public partial class CardListViewModelTests
     {
       string? exportText = null;
 
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
       MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
@@ -132,7 +132,7 @@ public partial class CardListViewModelTests
     {
       string? exportText = null;
 
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
       MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
@@ -158,7 +158,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_CopyToClipboard_InfoNotificationSent()
     {
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
       MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),

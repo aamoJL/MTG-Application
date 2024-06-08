@@ -2,13 +2,13 @@
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Services.Commanders;
 
 public class CommanderConfirmers
 {
-  public Confirmer<MTGCard, IEnumerable<MTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
+  public Confirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
 
-  public static Confirmation<IEnumerable<MTGCard>> GetChangeCardPrintConfirmation(IEnumerable<MTGCard> data)
+  public static Confirmation<IEnumerable<DeckEditorMTGCard>> GetChangeCardPrintConfirmation(IEnumerable<DeckEditorMTGCard> data)
   {
     return new(
       Title: "Card prints",

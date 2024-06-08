@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Features.DeckEditor.Controls.CardView;
 using static MTGApplication.Features.DeckEditor.CardListViewModel;
 
 namespace MTGApplication.Features.DeckEditor;

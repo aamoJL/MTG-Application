@@ -1,6 +1,6 @@
 ﻿using MTGApplication;
-using MTGApplication.General.Databases.Repositories.DeckRepository;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using System.Linq.Expressions;
 
 namespace MTGApplicationTests.TestUtility.Database;

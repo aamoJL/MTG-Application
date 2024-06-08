@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.CardSearch.Services;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.ViewModels;
@@ -9,10 +10,10 @@ namespace MTGApplication.Features.CardSearch;
 /// <summary>
 /// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>
-public partial class CardSearchViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBase, IWorker
+public partial class CardSearchViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : ViewModelBase, IWorker
 {
-  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
-  public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new DefaultIncrementalCardSource(cardAPI));
+  public ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
+  public IncrementalLoadingCardCollection<DeckEditorMTGCard> Cards { get; } = new(new DefaultIncrementalCardSource(cardAPI));
 
   public CardSearchConfirmers Confirmers { get; init; } = new();
 
@@ -27,7 +28,7 @@ public partial class CardSearchViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelB
   }
 
   [RelayCommand]
-  private async Task ShowCardPrints(MTGCard card)
+  private async Task ShowCardPrints(DeckEditorMTGCard card)
   {
     if (card == null)
       return;

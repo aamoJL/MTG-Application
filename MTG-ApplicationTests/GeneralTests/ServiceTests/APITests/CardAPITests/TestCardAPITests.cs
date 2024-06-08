@@ -27,7 +27,7 @@ public class TestCardAPITests
   public async Task FetchFromDTOsTest()
   {
     var api = new TestCardAPI();
-    var cards = new List<MTGCard>
+    var cards = new List<DeckEditorMTGCard>
     {
       MTGCardModelMocker.CreateMTGCardModel(),
       MTGCardModelMocker.CreateMTGCardModel(),
@@ -53,7 +53,7 @@ public class TestCardAPITests
   public async Task FetchFromStringTest()
   {
     var api = new TestCardAPI();
-    var cards = new List<MTGCard>
+    var cards = new List<DeckEditorMTGCard>
     {
       MTGCardModelMocker.CreateMTGCardModel(),
       MTGCardModelMocker.CreateMTGCardModel(),

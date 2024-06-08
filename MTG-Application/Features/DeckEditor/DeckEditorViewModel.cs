@@ -1,13 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Databases.Repositories.DeckRepository;
+using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Services.DeckEditor;
+using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Models.CardDeck;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Databases.Repositories;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.Services.IOService;
-using MTGApplication.General.Services.NotificationService;
+using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -22,7 +26,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
   private MTGCardDeck deck = new();
 
-  public DeckEditorViewModel(ICardAPI<MTGCard> cardAPI, MTGCardDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
+  public DeckEditorViewModel(ICardAPI<DeckEditorMTGCard> cardAPI, MTGCardDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
   {
     CardAPI = cardAPI;
     Notifier = notifier ?? new();
@@ -70,7 +74,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     }
   }
   private ReversibleCommandStack UndoStack { get; } = new();
-  private ICardAPI<MTGCard> CardAPI { get; }
+  private ICardAPI<DeckEditorMTGCard> CardAPI { get; }
 
   public DeckEditorConfirmers Confirmers { get; }
   public Notifier Notifier { get; } = new();
@@ -147,7 +151,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       return;
 
     // Override confirmation
-    if (saveName != oldName && await new DeckExists(Repository).Execute(saveName))
+    if (saveName != oldName && await new DeckDTOExists(Repository).Execute(saveName))
     {
       switch (await Confirmers.OverrideDeckConfirmer.Confirm(DeckEditorConfirmers.GetOverrideDeckConfirmation(saveName)))
       {
@@ -183,7 +187,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       default: return; // Cancel
     }
 
-    switch (await ((IWorker)this).DoWork(new DeleteDeck(Repository).Execute(Deck)))
+    switch (await ((IWorker)this).DoWork(new UseCases.DeleteDeck(Repository).Execute(Deck)))
     {
       case true:
         Deck = new();
@@ -249,7 +253,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private bool CanExecuteShowDeckTokensCommand() => Deck.Commander != null || Deck.DeckCards.Count != 0;
 
-  private CardListViewModel CreateCardListViewModel(ObservableCollection<MTGCard> cards)
+  private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
     return new(CardAPI)
     {
@@ -268,7 +272,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     };
   }
 
-  private CommanderViewModel CreateCommanderViewModel(Action<MTGCard> modelChangeAction)
+  private CommanderViewModel CreateCommanderViewModel(Action<DeckEditorMTGCard> modelChangeAction)
   {
     var vm = new CommanderViewModel(CardAPI)
     {
@@ -283,7 +287,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       Worker = this,
     };
 
-    var changeAction = (MTGCard card) =>
+    var changeAction = (DeckEditorMTGCard card) =>
     {
       modelChangeAction?.Invoke(card);
       vm.Card = card;
@@ -294,7 +298,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       ShowDeckTokensCommand.NotifyCanExecuteChanged();
     };
 
-    vm.ReversibleChange = new ReversibleAction<MTGCard>()
+    vm.ReversibleChange = new ReversibleAction<DeckEditorMTGCard>()
     {
       Action = changeAction,
       ReverseAction = changeAction,

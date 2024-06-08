@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MTGApplication.General.Services.Databases;
 
 #nullable disable
 
 namespace MTGApplication.General.Databases
 {
-    [DbContext(typeof(CardDbContext))]
+  [DbContext(typeof(CardDbContext))]
     [Migration("20230625233725_MTG-Deck-Commander-001")]
     partial class MTGDeckCommander001
     {

@@ -4,5 +4,5 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CardListViewModel
 {
-  public record CardCountChangeArgs(MTGCard Card, int NewValue);
+  public record CardCountChangeArgs(DeckEditorMTGCard Card, int NewValue);
 }

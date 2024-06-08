@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using SkiaSharp;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Controls.Charts;
 
 /// <summary>
 /// Colors for charts

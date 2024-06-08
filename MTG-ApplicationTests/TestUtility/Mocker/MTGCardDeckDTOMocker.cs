@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.Models.CardDeck;
+﻿using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 
 namespace MTGApplicationTests.TestUtility.Mocker;
 

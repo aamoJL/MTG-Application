@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace MTGApplication.General.Services.ReversibleCommandService;
 
@@ -23,5 +22,5 @@ public class CombinedReversibleCommand : IReversibleCommand
 
   public void Cancel() => Canceled = true;
 
-  public bool CanExecute() => Commands.Any() && !Canceled;
+  public bool CanExecute() => Commands.Count != 0 && !Canceled;
 }

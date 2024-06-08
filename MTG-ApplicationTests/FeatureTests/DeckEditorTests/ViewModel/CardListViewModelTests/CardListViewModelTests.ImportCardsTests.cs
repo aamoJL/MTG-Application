@@ -124,7 +124,7 @@ public partial class CardListViewModelTests
       var conflictConfirmationCount = 0;
       var skipConflicts = false;
 
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(),
       MTGCardModelMocker.CreateMTGCardModel(),
@@ -161,7 +161,7 @@ public partial class CardListViewModelTests
       var conflictConfirmationCount = 0;
       var skipConflicts = true;
 
-      var cards = new MTGCard[]
+      var cards = new DeckEditorMTGCard[]
       {
       MTGCardModelMocker.CreateMTGCardModel(),
       MTGCardModelMocker.CreateMTGCardModel(),

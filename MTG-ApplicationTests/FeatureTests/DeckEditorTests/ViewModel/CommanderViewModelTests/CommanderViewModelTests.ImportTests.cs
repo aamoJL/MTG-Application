@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
+using MTGApplication.Features.DeckEditor.Services.Commanders;
 using MTGApplication.General.Services.IOService;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;

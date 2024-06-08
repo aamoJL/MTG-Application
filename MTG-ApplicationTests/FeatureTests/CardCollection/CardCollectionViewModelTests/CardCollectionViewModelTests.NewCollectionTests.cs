@@ -106,7 +106,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task New_Success_QueryCardsReset()
     {
-      var expectedCards = new MTGCard[]
+      var expectedCards = new DeckEditorMTGCard[]
       {
         MTGCardModelMocker.CreateMTGCardModel(name: "1"),
         MTGCardModelMocker.CreateMTGCardModel(name: "2"),

@@ -3,7 +3,7 @@ using MTGApplication.General.Services.API.CardAPI;
 
 namespace MTGApplication.General.ViewModels;
 
-public class DefaultIncrementalCardSource(ICardAPI<MTGCard> cardAPI) : IncrementalCardSource<MTGCard>(cardAPI)
+public class DefaultIncrementalCardSource(ICardAPI<DeckEditorMTGCard> cardAPI) : IncrementalCardSource<DeckEditorMTGCard>(cardAPI)
 {
-  protected override MTGCard ConvertToCardType(MTGCard card) => card;
+  protected override DeckEditorMTGCard ConvertToCardType(DeckEditorMTGCard card) => card;
 }

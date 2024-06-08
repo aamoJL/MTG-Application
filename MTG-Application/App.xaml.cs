@@ -15,7 +15,7 @@ namespace MTGApplication;
 /// </summary>
 public partial class App : Application
 {
-  public static ICardAPI<MTGCard> MTGCardAPI { get; } = new ScryfallAPI();
+  public static ICardAPI<DeckEditorMTGCard> MTGCardAPI { get; } = new ScryfallAPI();
 
   /// <summary>
   /// Initializes the singleton application object.  This is the first line of authored code

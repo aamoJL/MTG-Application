@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml;
+using MTGApplication.Features.DeckEditor.Controls.CardView;
+using MTGApplication.Features.DeckEditor.Controls.CardView.CommanderView;
 using MTGApplication.General.Models.Card;
 using System.Windows.Input;
 
@@ -22,7 +24,7 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
   {
     InitializeComponent();
 
-    DragAndDrop = new(new MTGCardCopier())
+    DragAndDrop = new(new DeckEditorMTGCardCopier())
     {
       OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),

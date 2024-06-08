@@ -1,8 +1,9 @@
 ﻿using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.API.CardAPI.UseCases;
 
-namespace MTGApplication.Features.CardSearch;
+namespace MTGApplication.Features.CardSearch.UseCases;
 
-public class FetchCards(ICardAPI<MTGCard> cardAPI) : GetMTGCardsBySearchQuery(cardAPI)
+public class FetchCards(ICardAPI<DeckEditorMTGCard> cardAPI) : FetchCardsWithSearchQuery(cardAPI)
 {
 }

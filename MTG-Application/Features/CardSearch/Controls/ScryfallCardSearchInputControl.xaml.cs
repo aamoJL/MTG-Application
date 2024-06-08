@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Features.CardSearch.Enums;
 using MTGApplication.General.ViewModels;
 using System.Text;
 using System.Windows.Input;

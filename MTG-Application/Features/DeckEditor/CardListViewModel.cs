@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.Services.Cardlist;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.IOService;
-using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -16,11 +16,11 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor;
 
-public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBase
+public partial class CardListViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : ViewModelBase
 {
-  [ObservableProperty] private ObservableCollection<MTGCard> cards = [];
+  [ObservableProperty] private ObservableCollection<DeckEditorMTGCard> cards = [];
 
-  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
+  public ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public CardListConfirmers Confirmers { get; init; } = new();
@@ -30,54 +30,54 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
 
   public Action OnChange { get; init; }
 
-  private MTGCardCopier CardCopier { get; } = new();
-  private ReversibleAction<IEnumerable<MTGCard>> ReversibleAddAction => new() { Action = ReversibleAdd, ReverseAction = ReversibleRemove };
-  private ReversibleAction<IEnumerable<MTGCard>> ReversibleRemoveAction => new() { Action = ReversibleRemove, ReverseAction = ReversibleAdd };
-  private ReversibleAction<(MTGCard Card, int Value)> ReversibleCardCountChangeAction
+  private DeckEditorMTGCardCopier CardCopier { get; } = new();
+  private ReversibleAction<IEnumerable<DeckEditorMTGCard>> ReversibleAddAction => new() { Action = ReversibleAdd, ReverseAction = ReversibleRemove };
+  private ReversibleAction<IEnumerable<DeckEditorMTGCard>> ReversibleRemoveAction => new() { Action = ReversibleRemove, ReverseAction = ReversibleAdd };
+  private ReversibleAction<(DeckEditorMTGCard Card, int Value)> ReversibleCardCountChangeAction
     => new() { Action = (arg) => ReversibleCardCountChange(arg.Card, arg.Value), ReverseAction = (arg) => ReversibleCardCountChange(arg.Card, arg.Value) };
-  private ReversibleAction<(MTGCard Card, MTGCard.MTGCardInfo Info)> ReversibleCardPrintChangeAction
+  private ReversibleAction<(DeckEditorMTGCard Card, DeckEditorMTGCard.MTGCardInfo Info)> ReversibleCardPrintChangeAction
     => new() { Action = (arg) => ReversibleCardPrintChange(arg.Card, arg.Info), ReverseAction = (arg) => ReversibleCardPrintChange(arg.Card, arg.Info) };
 
   [RelayCommand]
-  private async Task AddCard(MTGCard card)
+  private async Task AddCard(DeckEditorMTGCard card)
   {
     if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
     {
       if (await Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
-        UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
+        UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
     }
     else
-      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
+      UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
   }
 
   [RelayCommand]
-  private void RemoveCard(MTGCard card) => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleRemoveAction });
+  private void RemoveCard(DeckEditorMTGCard card) => UndoStack.PushAndExecute(
+    new ReversibleCollectionCommand<DeckEditorMTGCard>(card, CardCopier) { ReversibleAction = ReversibleRemoveAction });
 
   [RelayCommand]
-  private void BeginMoveFrom(MTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
-    new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleRemoveAction });
+  private void BeginMoveFrom(DeckEditorMTGCard card) => UndoStack.ActiveCombinedCommand.Commands.Add(
+    new ReversibleCollectionCommand<DeckEditorMTGCard>(card, CardCopier) { ReversibleAction = ReversibleRemoveAction });
 
   [RelayCommand]
-  private async Task BeginMoveTo(MTGCard card)
+  private async Task BeginMoveTo(DeckEditorMTGCard card)
   {
     if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
     {
       if (await Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
-        UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
+        UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
       else
         UndoStack.ActiveCombinedCommand.Cancel();
     }
     else
-      UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<MTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
+      UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, CardCopier) { ReversibleAction = ReversibleAddAction });
   }
 
   [RelayCommand]
-  private void ExecuteMove(MTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
+  private void ExecuteMove(DeckEditorMTGCard card) => UndoStack.PushAndExecuteActiveCombinedCommand();
 
   [RelayCommand(CanExecute = nameof(CanExecuteClearCommand))]
   private void Clear() => UndoStack.PushAndExecute(
-    new ReversibleCollectionCommand<MTGCard>(Cards, CardCopier) { ReversibleAction = ReversibleRemoveAction });
+    new ReversibleCollectionCommand<DeckEditorMTGCard>(Cards, CardCopier) { ReversibleAction = ReversibleRemoveAction });
 
   [RelayCommand]
   private async Task ImportCards(string data)
@@ -86,7 +86,7 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
 
     var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
 
-    var addedCards = new List<MTGCard>();
+    var addedCards = new List<DeckEditorMTGCard>();
     var skipConflictConfirmation = false;
     var addConflictConfirmationResult = ConfirmationResult.Yes;
 
@@ -104,7 +104,7 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
 
         if (addConflictConfirmationResult == ConfirmationResult.Yes) { addedCards.Add(card); }
       }
-      else if (addedCards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard addedCard)
+      else if (addedCards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard addedCard)
         addedCard.Count += card.Count;
       else
         addedCards.Add(card);
@@ -113,7 +113,7 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     // Add cards
     if (addedCards.Count != 0)
     {
-      UndoStack.PushAndExecute(new ReversibleCollectionCommand<MTGCard>(addedCards, CardCopier)
+      UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(addedCards, CardCopier)
       {
         ReversibleAction = ReversibleAddAction,
       });
@@ -158,23 +158,23 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     var (card, newValue) = args;
 
     UndoStack.PushAndExecute(
-      new ReversiblePropertyChangeCommand<MTGCard, int>(card, card.Count, newValue, CardCopier) { ReversibleAction = ReversibleCardCountChangeAction });
+      new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(card, card.Count, newValue, CardCopier) { ReversibleAction = ReversibleCardCountChangeAction });
   }
 
   [RelayCommand]
-  private async Task ChangeCardPrint(MTGCard card)
+  private async Task ChangeCardPrint(DeckEditorMTGCard card)
   {
-    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard existingCard)
+    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
     {
       var prints = (await Worker.DoWork(CardAPI.FetchFromUri(pageUri: existingCard.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
-      if (await Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is MTGCard selection)
+      if (await Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is DeckEditorMTGCard selection)
       {
         if (selection.Info.ScryfallId == existingCard.Info.ScryfallId)
           return; // Same print
 
         UndoStack.PushAndExecute(
-          new ReversiblePropertyChangeCommand<MTGCard, MTGCard.MTGCardInfo>(existingCard, existingCard.Info, selection.Info, CardCopier)
+          new ReversiblePropertyChangeCommand<DeckEditorMTGCard, DeckEditorMTGCard.MTGCardInfo>(existingCard, existingCard.Info, selection.Info, CardCopier)
           {
             ReversibleAction = ReversibleCardPrintChangeAction
           });
@@ -189,13 +189,13 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
   private static bool CanExecuteChangeCardCount(CardCountChangeArgs args)
     => args.Card.Count != args.NewValue && args.NewValue > 0;
 
-  private void ReversibleAdd(IEnumerable<MTGCard> cards)
+  private void ReversibleAdd(IEnumerable<DeckEditorMTGCard> cards)
   {
-    var addList = new List<MTGCard>();
+    var addList = new List<DeckEditorMTGCard>();
 
     foreach (var card in cards)
     {
-      if (Cards.FirstOrDefault(x => x.Info.Name == card?.Info.Name) is MTGCard existingCard)
+      if (Cards.FirstOrDefault(x => x.Info.Name == card?.Info.Name) is DeckEditorMTGCard existingCard)
         existingCard.Count += card.Count;
       else if (card != null)
         addList.Add(card);
@@ -207,13 +207,13 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     OnChange?.Invoke();
   }
 
-  private void ReversibleRemove(IEnumerable<MTGCard> cards)
+  private void ReversibleRemove(IEnumerable<DeckEditorMTGCard> cards)
   {
-    var removeList = new List<MTGCard>();
+    var removeList = new List<DeckEditorMTGCard>();
 
     foreach (var card in cards)
     {
-      if (Cards.FirstOrDefault(x => x.Info.Name == card?.Info.Name) is MTGCard existingCard)
+      if (Cards.FirstOrDefault(x => x.Info.Name == card?.Info.Name) is DeckEditorMTGCard existingCard)
       {
         if (existingCard.Count <= card.Count) removeList.Add(existingCard);
         else existingCard.Count -= card.Count;
@@ -226,18 +226,18 @@ public partial class CardListViewModel(ICardAPI<MTGCard> cardAPI) : ViewModelBas
     OnChange?.Invoke();
   }
 
-  private void ReversibleCardCountChange(MTGCard card, int value)
+  private void ReversibleCardCountChange(DeckEditorMTGCard card, int value)
   {
-    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard existingCard)
+    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
     {
       existingCard.Count = value;
       OnChange?.Invoke();
     }
   }
 
-  private void ReversibleCardPrintChange(MTGCard card, MTGCard.MTGCardInfo info)
+  private void ReversibleCardPrintChange(DeckEditorMTGCard card, DeckEditorMTGCard.MTGCardInfo info)
   {
-    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is MTGCard existingCard)
+    if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
     {
       existingCard.Info = info with { };
       OnChange?.Invoke();

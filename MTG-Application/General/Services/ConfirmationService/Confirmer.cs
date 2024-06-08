@@ -7,13 +7,8 @@ public class Confirmer<TReturn, TArgs>
 {
   public virtual Func<Confirmation<TArgs>, Task<TReturn>> OnConfirm { protected get; set; }
 
-  public async Task<TReturn> Confirm(Confirmation<TArgs> confirmation)
-  {
-    if (OnConfirm == null || confirmation == null) return default;
-
-    var result = await OnConfirm.Invoke(confirmation);
-    return result;
-  }
+  public async Task<TReturn> Confirm(Confirmation<TArgs> confirmation) 
+    => OnConfirm == null || confirmation == null ? default : await OnConfirm.Invoke(confirmation);
 }
 
 public class Confirmer<TReturn>

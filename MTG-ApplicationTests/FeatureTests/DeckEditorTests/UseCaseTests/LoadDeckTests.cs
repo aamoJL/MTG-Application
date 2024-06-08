@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 

@@ -2,26 +2,26 @@
 using MTGApplication.General.Services;
 using MTGApplication.General.Services.ReversibleCommandService;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Services.Commanders;
 
-public class ReversibleCommanderChangeCommand : IReversibleCommand<MTGCard>
+public class ReversibleCommanderChangeCommand : IReversibleCommand<DeckEditorMTGCard>
 {
-  public ReversibleCommanderChangeCommand(MTGCard newCard, MTGCard oldCard, IClassCopier<MTGCard> copier)
+  public ReversibleCommanderChangeCommand(DeckEditorMTGCard newCard, DeckEditorMTGCard oldCard, IClassCopier<DeckEditorMTGCard> copier)
   {
     Copier = copier;
     NewCard = CopyOrDefault(newCard);
     OldCard = CopyOrDefault(oldCard);
   }
 
-  public ReversibleAction<MTGCard> ReversibleAction { get; set; }
+  public ReversibleAction<DeckEditorMTGCard> ReversibleAction { get; set; }
 
-  public MTGCard NewCard { get; }
-  public MTGCard OldCard { get; }
-  private IClassCopier<MTGCard> Copier { get; }
+  public DeckEditorMTGCard NewCard { get; }
+  public DeckEditorMTGCard OldCard { get; }
+  private IClassCopier<DeckEditorMTGCard> Copier { get; }
 
   public void Execute() => ReversibleAction?.Action?.Invoke(CopyOrDefault(NewCard));
   public void Undo() => ReversibleAction?.ReverseAction?.Invoke(CopyOrDefault(OldCard));
 
-  private MTGCard CopyOrDefault(MTGCard card) => card != null ? Copier.Copy(card) : null;
+  private DeckEditorMTGCard CopyOrDefault(DeckEditorMTGCard card) => card != null ? Copier.Copy(card) : null;
 }
 

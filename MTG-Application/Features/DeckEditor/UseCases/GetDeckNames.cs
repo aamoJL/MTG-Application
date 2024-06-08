@@ -1,11 +1,11 @@
-﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Extensions;
-using MTGApplication.General.Models.CardDeck;
+﻿using MTGApplication.General.Extensions;
+using MTGApplication.General.Services.Databases.Repositories;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.UseCases;
 
 public class GetDeckNames : UseCase<Task<string[]>>
 {

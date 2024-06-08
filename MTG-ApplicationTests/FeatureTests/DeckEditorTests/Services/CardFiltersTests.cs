@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
 using MTGApplicationTests.TestUtility.Mocker;
-using static MTGApplication.General.Models.Card.MTGCard;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.Services;
 

@@ -2,31 +2,20 @@
 
 namespace MTGApplication.General.Services.NotificationService;
 
-public static class NotificationService
+public static partial class NotificationService
 {
   public enum NotificationType { Info, Error, Warning, Success }
-
-  public record class Notification(NotificationType NotificationType, string Message);
-
-  public static event EventHandler<Notification> OnShow;
 
   /// <summary>
   /// Notification duration in milliseconds
   /// </summary>
   public static int NotificationDuration => 5000;
 
+  public static event EventHandler<Notification> OnShow;
+
   public static void RegisterNotifications(Notifier notifier, object sender)
     => notifier.OnNotify = (arg) => { RaiseNotification(sender, arg); };
-  
-  public static void RaiseNotification(object sender, Notification notification) 
+
+  public static void RaiseNotification(object sender, Notification notification)
     => OnShow?.Invoke(sender, notification);
-
-  public class Notifier
-  {
-    public Action<Notification> OnNotify { private get; set; }
-
-    public void Notify(Notification notification)
-      => OnNotify?.Invoke(notification);
-  }
-
 }

@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Views;
+using MTGApplication.General.Views.DragAndDrop;
 using System.Linq;
 
 namespace MTGApplication.Features.CardSearch;
@@ -17,9 +17,9 @@ public sealed partial class CardSearchPage : Page
         SecondaryButtonText = string.Empty,
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close"
-      }.ShowAsync(new(XamlRoot))) as MTGCard;
+      }.ShowAsync(new(XamlRoot))) as DeckEditorMTGCard;
   }
 
   public CardSearchViewModel ViewModel { get; } = new(App.MTGCardAPI);
-  public ListViewDragAndDrop CardDragAndDrop { get; } = new(new MTGCardCopier()) { AcceptMove = false };
+  public ListViewDragAndDrop CardDragAndDrop { get; } = new(new DeckEditorMTGCardCopier()) { AcceptMove = false };
 }

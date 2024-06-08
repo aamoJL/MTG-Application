@@ -1,4 +1,4 @@
-﻿namespace MTGApplication.General.Services.ConfirmationService;
+﻿namespace MTGApplication.General.Services.ConfirmationService.Extensions;
 
 public static partial class ConfirmationExtensions
 {
@@ -11,7 +11,4 @@ public static partial class ConfirmationExtensions
       _ => ConfirmationResult.Cancel,
     };
   }
-
-  public static ConfirmationResult FailureFromNull(object value)
-    => value != null ? ConfirmationResult.Yes : ConfirmationResult.Failure;
 }

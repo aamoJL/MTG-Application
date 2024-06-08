@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Features.DeckSelector.Models;
 using MTGApplication.General.Databases.Repositories.DeckRepository;
 using System.Windows.Input;
 

@@ -5,15 +5,15 @@ using MTGApplication.General.Services;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace MTGApplication.General.Views;
+namespace MTGApplication.General.Views.DragAndDrop;
 
-public class ListViewDragAndDrop : DragAndDrop<MTGCard>
+public class ListViewDragAndDrop : DragAndDrop<DeckEditorMTGCard>
 {
-  public ListViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : base(itemCopier) { }
+  public ListViewDragAndDrop(IClassCopier<DeckEditorMTGCard> itemCopier) : base(itemCopier) { }
 
   public void DragStarting(object sender, DragItemsStartingEventArgs e)
   {
-    OnDragStarting(e.Items[0] as MTGCard, out var requestedOperation);
+    OnDragStarting(e.Items[0] as DeckEditorMTGCard, out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }

@@ -3,8 +3,8 @@ using MTGApplication.General.Models.Card;
 using MTGApplication.General.Views;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.DeckEditor;
-public partial class DeckEditorCardViewBase : BasicCardView<MTGCard>
+namespace MTGApplication.Features.DeckEditor.Controls.CardView;
+public partial class DeckEditorCardViewBase : BasicCardView<DeckEditorMTGCard>
 {
   public static readonly DependencyProperty DeleteButtonClickProperty =
       DependencyProperty.Register(nameof(DeleteButtonClick), typeof(ICommand), typeof(DeckEditorCardViewBase),

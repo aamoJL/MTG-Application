@@ -1,4 +1,4 @@
-﻿namespace MTGApplication.Features.CardSearch;
+﻿namespace MTGApplication.Features.CardSearch.Enums;
 
 public enum CardUniqueness
 {

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class IncrementalCardSource<TCard>(ICardAPI<MTGCard> cardAPI) : object(), IIncrementalSource<TCard> where TCard : MTGCard
+public abstract class IncrementalCardSource<TCard>(ICardAPI<DeckEditorMTGCard> cardAPI) : object(), IIncrementalSource<TCard> where TCard : DeckEditorMTGCard
 {
-  public List<MTGCard> Cards { get; set; } = [];
+  public List<DeckEditorMTGCard> Cards { get; set; } = [];
   public string NextPage { get; set; }
-  
-  public ICardAPI<MTGCard> CardAPI { get; } = cardAPI;
+
+  public ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
 
   public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
   {
@@ -22,11 +22,11 @@ public abstract class IncrementalCardSource<TCard>(ICardAPI<MTGCard> cardAPI) : 
       // Load next page
       var result = await CardAPI.FetchFromUri(NextPage);
       NextPage = result.NextPageUri;
-      Cards.AddRange(result.Found);
+      Cards.AddRange(result.Found.Select(x => new DeckEditorMTGCard(x.Info, x.Count)));
     }
 
     return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize).Select(ConvertToCardType);
   }
 
-  protected abstract TCard ConvertToCardType(MTGCard card);
+  protected abstract TCard ConvertToCardType(DeckEditorMTGCard card);
 }

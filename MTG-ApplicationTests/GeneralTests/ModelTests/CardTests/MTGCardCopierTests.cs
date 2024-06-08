@@ -11,7 +11,7 @@ public class MTGCardCopierTests
   public void Copy_Single()
   {
     var card = MTGCardModelMocker.CreateMTGCardModel(name: "card", cmc: 2, count: 5);
-    var copier = new MTGCardCopier();
+    var copier = new DeckEditorMTGCardCopier();
 
     var result = copier.Copy(card);
 
@@ -23,13 +23,13 @@ public class MTGCardCopierTests
   [TestMethod]
   public void Copy_Multiple()
   {
-    var cards = new List<MTGCard>()
+    var cards = new List<DeckEditorMTGCard>()
     {
       MTGCardModelMocker.CreateMTGCardModel(name: "card1", cmc: 1, count: 1),
       MTGCardModelMocker.CreateMTGCardModel(name: "card2", cmc: 2, count: 2),
       MTGCardModelMocker.CreateMTGCardModel(name: "card3", cmc: 3, count: 3)
     };
-    var copier = new MTGCardCopier();
+    var copier = new DeckEditorMTGCardCopier();
 
     var result = copier.Copy(cards);
 

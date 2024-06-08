@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Databases.Repositories.DeckRepository;
+namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 
 public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : IRepository<MTGCardDeckDTO>
 {
@@ -29,22 +28,34 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
     return await Task.FromResult(db.MTGDecks.FirstOrDefault(x => x.Name == name) != null);
   }
 
-  public virtual async Task<IEnumerable<MTGCardDeckDTO>> Get(Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
+  public virtual async Task<IEnumerable<MTGCardDeckDTO>> Get(Action<DbSet<MTGCardDeckDTO>> setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
-    var decks = db.MTGDecks.SetIncludesOrDefault(Includes);
+
+    var set = db.MTGDecks;
+
+    if (setIncludes != null) setIncludes.Invoke(set);
+    else SetDefaultIncludes(set);
+
+    var items = set.ToList();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
-    return await Task.FromResult(decks.ToList());
+    return await Task.FromResult(items);
   }
 
-  public virtual async Task<MTGCardDeckDTO> Get(string name, Expression<Func<MTGCardDeckDTO, object>>[] Includes = null)
+  public virtual async Task<MTGCardDeckDTO> Get(string name, Action<DbSet<MTGCardDeckDTO>> setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
-    var deck = db.MTGDecks.Where(x => x.Name == name).SetIncludesOrDefault(Includes).FirstOrDefault();
+
+    var set = db.MTGDecks;
+
+    if (setIncludes != null) setIncludes.Invoke(set);
+    else SetDefaultIncludes(set);
+
+    var deck = set.Where(x => x.Name == name).FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
     return await Task.FromResult(deck);
   }
@@ -151,5 +162,15 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
     db.Update(existingDeck);
 
     return await db.SaveChangesAsync() > 0;
+  }
+
+  protected static void SetDefaultIncludes(DbSet<MTGCardDeckDTO> db)
+  {
+    db.Include(x => x.DeckCards).Load();
+    db.Include(x => x.WishlistCards).Load();
+    db.Include(x => x.MaybelistCards).Load();
+    db.Include(x => x.RemovelistCards).Load();
+    db.Include(x => x.Commander).Load();
+    db.Include(x => x.CommanderPartner).Load();
   }
 }

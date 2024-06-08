@@ -11,7 +11,7 @@ namespace MTGApplication.Features.CardCollection;
 
 public partial class QueryCardsViewModel : ObservableObject
 {
-  public QueryCardsViewModel(ICardAPI<MTGCard> cardAPI)
+  public QueryCardsViewModel(ICardAPI<DeckEditorMTGCard> cardAPI)
   {
     CardAPI = cardAPI;
     QueryCards = new(new CardCollectionIncrementalCardSource(cardAPI));
@@ -21,11 +21,11 @@ public partial class QueryCardsViewModel : ObservableObject
     PropertyChanged += QueryCardsViewModel_PropertyChanged;
   }
 
-  public ICardAPI<MTGCard> CardAPI { get; }
+  public ICardAPI<DeckEditorMTGCard> CardAPI { get; }
   
   private IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; }
 
-  [ObservableProperty] private ObservableCollection<MTGCard> ownedCards = [];
+  [ObservableProperty] private ObservableCollection<DeckEditorMTGCard> ownedCards = [];
   
   public IncrementalLoadingCollection<IncrementalCardSource<CardCollectionMTGCard>, CardCollectionMTGCard> Collection => QueryCards.Collection;
   public int TotalCardCount => QueryCards.TotalCardCount;
@@ -55,12 +55,12 @@ public partial class QueryCardsViewModel : ObservableObject
     switch (e.Action)
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId)
+        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.NewItems[0] as DeckEditorMTGCard).Info.ScryfallId)
           is CardCollectionMTGCard existingNew)
           existingNew.IsOwned = true;
         break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId)
+        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.OldItems[0] as DeckEditorMTGCard).Info.ScryfallId)
           is CardCollectionMTGCard existingOld)
           existingOld.IsOwned = false;
         break;

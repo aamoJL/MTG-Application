@@ -2,19 +2,20 @@ using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MTGApplication.Features.DeckEditor.Controls.Charts;
 using MTGApplication.General.Models.Card;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static MTGApplication.General.Models.Card.MTGCard;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplication.Features.DeckEditor;
 public sealed partial class CardTypeDistributionChart : MTGCardChart
 {
   public CardTypeDistributionChart() : base() => InitializeComponent();
 
-  protected override void AddToSeries(MTGCard card)
+  protected override void AddToSeries(DeckEditorMTGCard card)
   {
     var spellTypes = card.Info.SpellTypes;
 
@@ -40,7 +41,7 @@ public sealed partial class CardTypeDistributionChart : MTGCardChart
     }
   }
 
-  protected override void RemoveFromSeries(MTGCard card)
+  protected override void RemoveFromSeries(DeckEditorMTGCard card)
   {
     var spellTypes = card.Info.SpellTypes;
 

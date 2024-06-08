@@ -2,7 +2,7 @@
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Services.Cardlist;
 
 public class CardListConfirmers
 {
@@ -10,7 +10,7 @@ public class CardListConfirmers
   public Confirmer<string, string> ImportConfirmer { get; init; } = new();
   public Confirmer<(ConfirmationResult Result, bool SkipCheck)> AddMultipleConflictConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> AddSingleConflictConfirmer { get; init; } = new();
-  public Confirmer<MTGCard, IEnumerable<MTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
+  public Confirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
 
   public static Confirmation<string> GetExportConfirmation(string data)
   {
@@ -42,7 +42,7 @@ public class CardListConfirmers
       Message: $"'{cardName}' already exists in the list. Do you still want to add it?");
   }
 
-  public static Confirmation<IEnumerable<MTGCard>> GetChangeCardPrintConfirmation(IEnumerable<MTGCard> data)
+  public static Confirmation<IEnumerable<DeckEditorMTGCard>> GetChangeCardPrintConfirmation(IEnumerable<DeckEditorMTGCard> data)
   {
     return new(
       Title: "Card prints",

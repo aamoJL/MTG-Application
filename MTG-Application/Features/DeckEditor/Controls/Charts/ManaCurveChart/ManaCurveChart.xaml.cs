@@ -3,13 +3,14 @@ using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MTGApplication.Features.DeckEditor.Controls.Charts;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Models.Card;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static MTGApplication.General.Models.Card.MTGCard;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplication.Features.DeckEditor;
 public sealed partial class ManaCurveChart : MTGCardChart
@@ -34,7 +35,7 @@ public sealed partial class ManaCurveChart : MTGCardChart
     }
   };
 
-  protected override void AddToSeries(MTGCard card)
+  protected override void AddToSeries(DeckEditorMTGCard card)
   {
     // Validation: Exclude cards that are only Lands
     if (card.Info.SpellTypes.All(x => x == SpellType.Land))
@@ -62,7 +63,7 @@ public sealed partial class ManaCurveChart : MTGCardChart
     }
   }
 
-  protected override void RemoveFromSeries(MTGCard card)
+  protected override void RemoveFromSeries(DeckEditorMTGCard card)
   {
     // Cards with multiple colors will be shown as a Multicolored
     var color = card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0];

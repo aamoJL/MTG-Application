@@ -2,16 +2,17 @@
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services;
 using MTGApplication.General.Views;
+using MTGApplication.General.Views.DragAndDrop;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Controls.CardView.CommanderView;
 
-public class CommanderTextViewDragAndDrop(IClassCopier<MTGCard> itemCopier) : DragAndDrop<MTGCard>(itemCopier)
+public class CommanderTextViewDragAndDrop(IClassCopier<DeckEditorMTGCard> itemCopier) : DragAndDrop<DeckEditorMTGCard>(itemCopier)
 {
   public void DragStarting(UIElement sender, DragStartingEventArgs e)
   {
-    OnDragStarting((sender as BasicCardView<MTGCard>)?.Model, out var requestedOperation);
+    OnDragStarting((sender as BasicCardView<DeckEditorMTGCard>)?.Model, out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models.Card;
 using System;
 using System.Linq;
-using static MTGApplication.General.Models.Card.MTGCard;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplication.Features.DeckEditor;
 
@@ -46,7 +46,7 @@ public partial class CardFilters : ObservableObject
   /// <summary>
   /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
   /// </summary>
-  public bool CardValidation(MTGCard card)
+  public bool CardValidation(DeckEditorMTGCard card)
   {
     if (card.Info.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
       && card.Info.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)

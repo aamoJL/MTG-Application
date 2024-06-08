@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor;
+using MTGApplication.Features.DeckEditor.Services.DeckEditor;
 using MTGApplication.General.Models.CardDeck;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;

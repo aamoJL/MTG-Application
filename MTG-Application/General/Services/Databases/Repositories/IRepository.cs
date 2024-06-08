@@ -1,15 +1,14 @@
-﻿using MTGApplication.General.Models.CardDeck;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Databases.Repositories;
+namespace MTGApplication.General.Services.Databases.Repositories;
 
 /// <summary>
 /// Interface for database repositories
 /// </summary>
-public interface IRepository<T>
+public interface IRepository<T> where T : class
 {
   /// <summary>
   /// Returns <see langword="true"/> if an item with the given <paramref name="name"/> exists in the database.
@@ -39,10 +38,10 @@ public interface IRepository<T>
   /// <summary>
   /// Returns all the items from the database.
   /// </summary>
-  public Task<IEnumerable<T>> Get(Expression<Func<T, object>>[] Includes = null);
+  public Task<IEnumerable<T>> Get(Action<DbSet<T>> setIncludes = null);
 
   /// <summary>
   /// Returns an item with the given <paramref name="name"/> from the database.
   /// </summary>
-  public Task<T> Get(string name, Expression<Func<T, object>>[] Includes = null);
+  public Task<T> Get(string name, Action<DbSet<T>> setIncludes = null);
 }

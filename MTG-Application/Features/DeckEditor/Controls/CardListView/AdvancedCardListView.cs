@@ -3,18 +3,18 @@ using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Views;
+using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Input;
 using static MTGApplication.General.Models.Card.CardSortProperties;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Controls.CardListView;
 
 public partial class AdvancedCardListView : ListView
 {
   public new static readonly DependencyProperty ItemsSourceProperty =
-      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<MTGCard>), typeof(AdvancedCardListView), new PropertyMetadata(null, OnDependencyPropertyChanged));
+      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<DeckEditorMTGCard>), typeof(AdvancedCardListView), new PropertyMetadata(null, OnDependencyPropertyChanged));
 
   public static readonly DependencyProperty SortPropertiesProperty =
       DependencyProperty.Register(nameof(SortProperties), typeof(CardSortProperties), typeof(AdvancedCardListView), new PropertyMetadata(
@@ -26,7 +26,7 @@ public partial class AdvancedCardListView : ListView
 
   public AdvancedCardListView()
   {
-    DragAndDrop = new(new MTGCardCopier())
+    DragAndDrop = new(new DeckEditorMTGCardCopier())
     {
       OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),
@@ -44,9 +44,9 @@ public partial class AdvancedCardListView : ListView
 
   private AdvancedCollectionView filteredAndSortedCardSource = new();
 
-  public new IList<MTGCard> ItemsSource
+  public new IList<DeckEditorMTGCard> ItemsSource
   {
-    get => (IList<MTGCard>)GetValue(ItemsSourceProperty);
+    get => (IList<DeckEditorMTGCard>)GetValue(ItemsSourceProperty);
     set => SetValue(ItemsSourceProperty, value);
   }
 
@@ -110,7 +110,7 @@ public partial class AdvancedCardListView : ListView
   {
     if (FilterProperties.FiltersApplied)
     {
-      FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as MTGCard);
+      FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as DeckEditorMTGCard);
       FilteredAndSortedCardSource.RefreshFilter();
     }
     else { FilteredAndSortedCardSource.Filter = null; }

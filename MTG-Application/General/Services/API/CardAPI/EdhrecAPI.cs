@@ -26,7 +26,7 @@ public class EdhrecAPI
     return name != default;
   }
 
-  public static string GetCommanderWebsiteUri(MTGCard commander, MTGCard partner, string themeSuffix = "")
+  public static string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard partner, string themeSuffix = "")
   {
     if (commander == null) return string.Empty;
 

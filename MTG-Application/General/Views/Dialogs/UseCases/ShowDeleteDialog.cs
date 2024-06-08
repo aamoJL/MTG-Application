@@ -1,8 +1,9 @@
 ﻿using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.ConfirmationService.Extensions;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.General.Views.Dialogs;
+namespace MTGApplication.General.Views.Dialogs.UseCases;
 
 public class ShowDeleteDialog(DialogWrapper dialogWrapper) : ShowDialogUseCase<ConfirmationResult>(dialogWrapper)
 {

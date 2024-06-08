@@ -4,13 +4,13 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Models.Card;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Controls.Charts;
 
 public abstract class MTGCardChart : UserControl
 {
   public static readonly DependencyProperty CardsProperty =
-      DependencyProperty.Register(nameof(Cards), typeof(ObservableCollection<MTGCard>), typeof(MTGCardChart),
-        new PropertyMetadata(new ObservableCollection<MTGCard>(), CardsPropertyChanged));
+      DependencyProperty.Register(nameof(Cards), typeof(ObservableCollection<DeckEditorMTGCard>), typeof(MTGCardChart),
+        new PropertyMetadata(new ObservableCollection<DeckEditorMTGCard>(), CardsPropertyChanged));
 
   protected MTGCardChart()
   {
@@ -18,17 +18,17 @@ public abstract class MTGCardChart : UserControl
     Unloaded += (_, _) => { AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged; };
   }
 
-  public ObservableCollection<MTGCard> Cards
+  public ObservableCollection<DeckEditorMTGCard> Cards
   {
-    get => (ObservableCollection<MTGCard>)GetValue(CardsProperty);
+    get => (ObservableCollection<DeckEditorMTGCard>)GetValue(CardsProperty);
     set => SetValue(CardsProperty, value);
   }
 
   protected ObservableCollection<ISeries> Series { get; set; } = [];
 
-  protected abstract void RemoveFromSeries(MTGCard card);
+  protected abstract void RemoveFromSeries(DeckEditorMTGCard card);
 
-  protected abstract void AddToSeries(MTGCard card);
+  protected abstract void AddToSeries(DeckEditorMTGCard card);
 
   protected abstract ISeries AddNewSeries(object property);
 
@@ -36,7 +36,7 @@ public abstract class MTGCardChart : UserControl
 
   protected virtual void UpdateTheme() { }
 
-  protected void OnCardsChanged(ObservableCollection<MTGCard> oldValue)
+  protected void OnCardsChanged(ObservableCollection<DeckEditorMTGCard> oldValue)
   {
     if (oldValue != null) oldValue.CollectionChanged -= Cards_CollectionChanged;
     if (Cards != null) Cards.CollectionChanged += Cards_CollectionChanged;
@@ -51,8 +51,8 @@ public abstract class MTGCardChart : UserControl
   {
     switch (e.Action)
     {
-      case System.Collections.Specialized.NotifyCollectionChangedAction.Add: AddToSeries(e.NewItems[0] as MTGCard); break;
-      case System.Collections.Specialized.NotifyCollectionChangedAction.Remove: RemoveFromSeries(e.OldItems[0] as MTGCard); break;
+      case System.Collections.Specialized.NotifyCollectionChangedAction.Add: AddToSeries(e.NewItems[0] as DeckEditorMTGCard); break;
+      case System.Collections.Specialized.NotifyCollectionChangedAction.Remove: RemoveFromSeries(e.OldItems[0] as DeckEditorMTGCard); break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Reset: Series.Clear(); break;
     }
   }
@@ -64,6 +64,6 @@ public abstract class MTGCardChart : UserControl
   }
 
   protected static void CardsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-    => (sender as MTGCardChart).OnCardsChanged(e.OldValue as ObservableCollection<MTGCard>);
+    => (sender as MTGCardChart).OnCardsChanged(e.OldValue as ObservableCollection<DeckEditorMTGCard>);
 
 }

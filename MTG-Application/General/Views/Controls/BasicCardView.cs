@@ -11,7 +11,7 @@ using System.Windows.Input;
 namespace MTGApplication.General.Views;
 
 [ObservableObject]
-public abstract partial class BasicCardView<TCard> : UserControl where TCard : MTGCard
+public abstract partial class BasicCardView<TCard> : UserControl where TCard : DeckEditorMTGCard
 {
   public static readonly DependencyProperty ModelProperty =
       DependencyProperty.Register(nameof(Model), typeof(TCard), typeof(BasicCardView<TCard>),
@@ -105,7 +105,7 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
 
   protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(MTGCard.Info))
+    if (e.PropertyName == nameof(DeckEditorMTGCard.Info))
       SelectedFaceUri = Model?.Info.FrontFace.ImageUri;
   }
 

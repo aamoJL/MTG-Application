@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.ApplicationModel.DataTransfer.DragDrop;
 
-namespace MTGApplication.General.Views;
+namespace MTGApplication.General.Views.DragAndDrop;
 
 public abstract class DragAndDrop<T>
 {
@@ -43,11 +43,11 @@ public abstract class DragAndDrop<T>
   public virtual void DragOver(DragEventArgs eventArgs)
   {
     // Block dropping if the origin is the same or the item is invalid
-    if (DragOrigin == this || (!eventArgs.DataView.Contains(StandardDataFormats.Text) && Item == null))
+    if (DragOrigin == this || !eventArgs.DataView.Contains(StandardDataFormats.Text) && Item == null)
       return;
 
     // Change operation to 'Move' if the shift key is down and move is an accepted operation.
-    eventArgs.AcceptedOperation = ((eventArgs.Modifiers & DragDropModifiers.Shift) == DragDropModifiers.Shift && DragOrigin?.AcceptMove is true && Item != null)
+    eventArgs.AcceptedOperation = (eventArgs.Modifiers & DragDropModifiers.Shift) == DragDropModifiers.Shift && DragOrigin?.AcceptMove is true && Item != null
       ? DataPackageOperation.Move : DataPackageOperation.Copy;
 
     if (eventArgs.AcceptedOperation == DataPackageOperation.Move && !string.IsNullOrEmpty(MoveCaptionOverride))

@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Data;
 using System;
 
-namespace MTGApplication.General.Views.BindingHelpers;
+namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
 public class PlusCounterConverter : IValueConverter
 {

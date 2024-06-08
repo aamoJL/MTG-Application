@@ -12,7 +12,7 @@ public class DTOToDeckConversionTests
   [TestMethod]
   public async Task Execute_DTOConvertedToDeck()
   {
-    var cards = new MTGCard[]
+    var cards = new DeckEditorMTGCard[]
     {
         MTGCardModelMocker.CreateMTGCardModel(name: "first"),
         MTGCardModelMocker.CreateMTGCardModel(name: "second"),

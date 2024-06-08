@@ -3,17 +3,17 @@ using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using MTGApplication.General.Models.Card;
-using MTGApplication.General.Views;
+using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Input;
 using static MTGApplication.General.Models.Card.CardSortProperties;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Controls.CardListView;
 public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 {
   public new static readonly DependencyProperty ItemsSourceProperty =
-      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<MTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
+      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<DeckEditorMTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
 
   public static readonly DependencyProperty SortPropertiesProperty =
       DependencyProperty.Register(nameof(SortProperties), typeof(CardSortProperties), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
@@ -25,7 +25,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 
   public AdvancedAdaptiveCardGridView()
   {
-    DragAndDrop = new(new MTGCardCopier())
+    DragAndDrop = new(new DeckEditorMTGCardCopier())
     {
       OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
       OnRemove = (item) => OnDropRemove?.Execute(item),
@@ -43,9 +43,9 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 
   private AdvancedCollectionView filteredAndSortedCardSource = new();
 
-  public new IList<MTGCard> ItemsSource
+  public new IList<DeckEditorMTGCard> ItemsSource
   {
-    get => (IList<MTGCard>)GetValue(ItemsSourceProperty);
+    get => (IList<DeckEditorMTGCard>)GetValue(ItemsSourceProperty);
     set => SetValue(ItemsSourceProperty, value);
   }
 
@@ -109,7 +109,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
   {
     if (FilterProperties.FiltersApplied)
     {
-      FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as MTGCard);
+      FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as DeckEditorMTGCard);
       FilteredAndSortedCardSource.RefreshFilter();
     }
     else { FilteredAndSortedCardSource.Filter = null; }

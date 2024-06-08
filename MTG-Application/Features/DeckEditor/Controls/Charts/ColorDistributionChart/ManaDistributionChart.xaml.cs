@@ -2,11 +2,12 @@ using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MTGApplication.Features.DeckEditor.Controls.Charts;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Models.Card;
 using System.Collections.Generic;
 using System.Linq;
-using static MTGApplication.General.Models.Card.MTGCard;
+using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
 
 namespace MTGApplication.Features.DeckEditor;
 public sealed partial class ManaDistributionChart : MTGCardChart
@@ -26,13 +27,13 @@ public sealed partial class ManaDistributionChart : MTGCardChart
   public IPolarAxis[] AngleAxes { get; } = new PolarAxis[] { new() { Labels = _colorRange.Select(x => x.GetFullName()).ToList() } };
   public IPolarAxis[] RadiusAxes { get; } = new PolarAxis[] { new() { Labeler = value => value.ToString() } };
 
-  protected override void AddToSeries(MTGCard card)
+  protected override void AddToSeries(DeckEditorMTGCard card)
   {
     AddToCosts(card);
     AddToProducers(card);
   }
 
-  protected override void RemoveFromSeries(MTGCard card)
+  protected override void RemoveFromSeries(DeckEditorMTGCard card)
   {
     RemoveFromCosts(card);
     RemoveFromProducers(card);
@@ -51,7 +52,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     AddNewSeries(null);
   }
 
-  private void AddToCosts(MTGCard card)
+  private void AddToCosts(DeckEditorMTGCard card)
   {
     // Filter colorless costs
     var colors = card.Info.Colors.Where(color => color != ColorTypes.C);
@@ -67,7 +68,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     }
   }
 
-  private void AddToProducers(MTGCard card)
+  private void AddToProducers(DeckEditorMTGCard card)
   {
     // Filter colorless mana productions
     var producedMana = card.Info.ProducedMana.Where(color => color != ColorTypes.C);
@@ -83,7 +84,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     }
   }
 
-  private void RemoveFromCosts(MTGCard card)
+  private void RemoveFromCosts(DeckEditorMTGCard card)
   {
     // Find value item
     if (Series.FirstOrDefault(x => x.Name == _costSeriesName) is ISeries series
@@ -95,7 +96,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     }
   }
 
-  private void RemoveFromProducers(MTGCard card)
+  private void RemoveFromProducers(DeckEditorMTGCard card)
   {
     // Find value item
     if (Series.FirstOrDefault(x => x.Name == _productionSeriesName) is ISeries series

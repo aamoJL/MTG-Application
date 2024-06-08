@@ -1,16 +1,15 @@
-﻿using MTGApplication.General.Databases.Repositories;
-using MTGApplication.General.Models.CardDeck;
+﻿using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.General.Services.Databases.Repositories;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.UseCases;
 
-public class DeleteDeck : UseCase<MTGCardDeck, Task<bool>>
+public class DeleteDeck(IRepository<MTGCardDeckDTO> repository) : UseCase<MTGCardDeck, Task<bool>>
 {
-  public DeleteDeck(IRepository<MTGCardDeckDTO> repository) => Repository = repository;
-
-  public IRepository<MTGCardDeckDTO> Repository { get; }
+  public IRepository<MTGCardDeckDTO> Repository { get; } = repository;
 
   public override async Task<bool> Execute(MTGCardDeck deck)
-    => await new General.Databases.Repositories.DeckRepository.DeleteDeck(Repository).Execute(deck);
+    => await new DeleteDeck(Repository).Execute(deck);
 }

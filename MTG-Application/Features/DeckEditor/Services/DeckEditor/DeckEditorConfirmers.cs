@@ -1,8 +1,10 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Services.Cardlist;
+using MTGApplication.Features.DeckEditor.Services.Commanders;
+using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Services.DeckEditor;
 
 public class DeckEditorConfirmers
 {
@@ -11,7 +13,7 @@ public class DeckEditorConfirmers
   public Confirmer<string, string> SaveDeckConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> OverrideDeckConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteDeckConfirmer { get; init; } = new();
-  public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowTokensConfirmer { get; init; } = new();
+  public Confirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>> ShowTokensConfirmer { get; init; } = new();
 
   public CardListConfirmers CardListConfirmers { get; init; } = new();
   public CommanderConfirmers CommanderConfirmers { get; init; } = new();
@@ -53,7 +55,7 @@ public class DeckEditorConfirmers
       Message: $"Are you sure you want to delete '{name}'?");
   }
 
-  public static Confirmation<IEnumerable<MTGCard>> GetShowTokensConfirmation(IEnumerable<MTGCard> data)
+  public static Confirmation<IEnumerable<DeckEditorMTGCard>> GetShowTokensConfirmation(IEnumerable<DeckEditorMTGCard> data)
   {
     return new(
       Title: "Tokens",
