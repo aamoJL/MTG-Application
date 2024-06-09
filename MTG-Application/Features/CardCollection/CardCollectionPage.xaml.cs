@@ -15,7 +15,7 @@ public sealed partial class CardCollectionPage : Page
     WindowClosing.Closed += WindowClosing_Closed;
   }
 
-  public CardCollectionViewModel ViewModel { get; } = new(App.MTGCardAPI);
+  public CardCollectionViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
   private async void NewCollectionKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {
@@ -45,7 +45,7 @@ public sealed partial class CardCollectionPage : Page
   {
     if (e.Root != XamlRoot) return;
 
-    e.Tasks.Add(ViewModel.ConfirmUnsavedChanges);
+    e.Tasks.Add(ViewModel.ConfirmUnsavedChangesCommand);
   }
 
   private void WindowClosing_Closed(object sender, WindowClosing.ClosedEventArgs e)

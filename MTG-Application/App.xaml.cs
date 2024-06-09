@@ -3,10 +3,8 @@ using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.AppWindows.CardCollectionWindow;
-using MTGApplication.Features.AppWindows.DeckBuilderWindow;
-using MTGApplication.General.Databases;
-using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Databases;
 
 namespace MTGApplication;
 
@@ -15,7 +13,7 @@ namespace MTGApplication;
 /// </summary>
 public partial class App : Application
 {
-  public static ICardAPI<DeckEditorMTGCard> MTGCardAPI { get; } = new ScryfallAPI();
+  public static MTGCardImporter MTGCardImporter { get; } = new ScryfallAPI();
 
   /// <summary>
   /// Initializes the singleton application object.  This is the first line of authored code

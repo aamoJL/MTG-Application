@@ -12,15 +12,15 @@ public class TestCardAPITests
   public async Task FetchCardsTest()
   {
     var api = new TestCardAPI();
-    Assert.AreEqual(0, (await api.FetchCardsWithSearchQuery(string.Empty)).Found.Length);
-    Assert.AreEqual(0, (await api.FetchCardsWithSearchQuery("params")).Found.Length);
+    Assert.AreEqual(0, (await api.ImportCardsWithSearchQuery(string.Empty)).Found.Length);
+    Assert.AreEqual(0, (await api.ImportCardsWithSearchQuery("params")).Found.Length);
 
     api.ExpectedCards =
     [
       MTGCardModelMocker.CreateMTGCardModel(),
     ];
-    Assert.AreEqual(0, (await api.FetchCardsWithSearchQuery(string.Empty)).Found.Length);
-    Assert.AreEqual(1, (await api.FetchCardsWithSearchQuery("params")).Found.Length);
+    Assert.AreEqual(0, (await api.ImportCardsWithSearchQuery(string.Empty)).Found.Length);
+    Assert.AreEqual(1, (await api.ImportCardsWithSearchQuery("params")).Found.Length);
   }
 
   [TestMethod]
@@ -61,12 +61,12 @@ public class TestCardAPITests
     };
 
     //No expected cards
-    Assert.AreEqual(0, (await api.FetchFromString("")).Found.Length);
+    Assert.AreEqual(0, (await api.ImportFromString("")).Found.Length);
 
     // Expected cards
     api.ExpectedCards = [.. cards];
     api.NotFoundCount = 4;
-    Assert.AreEqual(3, (await api.FetchFromString("")).Found.Length);
-    Assert.AreEqual(4, (await api.FetchFromString("")).NotFoundCount);
+    Assert.AreEqual(3, (await api.ImportFromString("")).Found.Length);
+    Assert.AreEqual(4, (await api.ImportFromString("")).NotFoundCount);
   }
 }

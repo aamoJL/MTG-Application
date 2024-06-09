@@ -1,6 +1,7 @@
 ﻿using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.ConfirmationService.Extensions;
 using MTGApplication.General.Views.Dialogs;
+using MTGApplication.General.Views.Dialogs.UseCases;
 using System;
 using System.Linq;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;

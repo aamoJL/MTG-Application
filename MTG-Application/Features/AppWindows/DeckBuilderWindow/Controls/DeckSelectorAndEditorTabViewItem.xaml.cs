@@ -17,7 +17,7 @@ public sealed partial class DeckSelectorAndEditorTabViewItem : TabViewItem
     WindowClosing.Closed += WindowClosing_Closed;
     Frame.Navigated += Frame_Navigated;
 
-    Frame.Navigate(typeof(DeckSelectorPage));
+    Frame.Navigate(typeof(DeckSelectionPage));
   }
 
   public new TabHeader Header { get; set; } = new TabHeader() { Text = "New tab" };
@@ -30,7 +30,7 @@ public sealed partial class DeckSelectorAndEditorTabViewItem : TabViewItem
     {
       IsSelected = true; // Will bring this tab view to the front
 
-      if (!await deckEditorPage.ViewModel.ConfirmUnsavedChanges())
+      if (!await deckEditorPage.ViewModel.ConfirmUnsavedChangesCommand())
         return false; // Closing cancelled
     }
 
@@ -39,7 +39,7 @@ public sealed partial class DeckSelectorAndEditorTabViewItem : TabViewItem
 
   private void Frame_Navigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
   {
-    if (e.Content is DeckSelectorPage selectorPage)
+    if (e.Content is DeckSelectionPage selectorPage)
     {
       selectorPage.DeckSelectedCommand = new RelayCommand<string>((string selectedDeck) =>
       {

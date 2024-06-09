@@ -5,13 +5,10 @@ using MTGApplication.Features.DeckEditor.Services.DeckEditor;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.Services.IOService;
-using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -24,11 +21,11 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 namespace MTGApplication.Features.DeckEditor;
 public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
-  private MTGCardDeck deck = new();
+  private DeckEditorMTGDeck deck = new();
 
-  public DeckEditorViewModel(ICardAPI<DeckEditorMTGCard> cardAPI, MTGCardDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
+  public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
   {
-    CardAPI = cardAPI;
+    Importer = importer;
     Notifier = notifier ?? new();
     Confirmers = confirmers ?? new();
 
@@ -43,13 +40,33 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     Deck = deck ?? new();
   }
 
-  private MTGCardDeck Deck
+  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
+  public CardFilters CardFilters { get; init; } = new();
+  public CardSorter CardSorter { get; init; } = new();
+  public DeckEditorConfirmers Confirmers { get; }
+  public Notifier Notifier { get; } = new();
+  public CardListViewModel DeckCardList { get; }
+  public CardListViewModel MaybeCardList { get; }
+  public CardListViewModel WishCardList { get; }
+  public CardListViewModel RemoveCardList { get; }
+  public CommanderViewModel CommanderViewModel { get; }
+  public CommanderViewModel PartnerViewModel { get; }
+
+  public string DeckName => Deck.Name;
+  public int DeckSize => Deck.DeckSize;
+  public double DeckPrice => Deck.DeckPrice;
+
+  [ObservableProperty] private bool isBusy;
+  [ObservableProperty] private bool hasUnsavedChanges;
+
+  private DeckEditorMTGDeck Deck
   {
     get => deck;
     set
     {
       var oldName = deck.Name;
 
+      // TODO: change to own method
       deck = value;
 
       DeckCardList.Cards = deck.DeckCards;
@@ -74,127 +91,58 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     }
   }
   private ReversibleCommandStack UndoStack { get; } = new();
-  private ICardAPI<DeckEditorMTGCard> CardAPI { get; }
+  private MTGCardImporter Importer { get; }
 
-  public DeckEditorConfirmers Confirmers { get; }
-  public Notifier Notifier { get; } = new();
-  public CardListViewModel DeckCardList { get; }
-  public CardListViewModel MaybeCardList { get; }
-  public CardListViewModel WishCardList { get; }
-  public CardListViewModel RemoveCardList { get; }
-  public CommanderViewModel CommanderViewModel { get; }
-  public CommanderViewModel PartnerViewModel { get; }
-
-  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
-  public CardFilters CardFilters { get; init; } = new();
-  public CardSorter CardSorter { get; init; } = new();
-
-  [ObservableProperty] private bool isBusy;
-  [ObservableProperty] private bool hasUnsavedChanges;
-
-  public string DeckName => Deck.Name;
-  public int DeckSize => Deck.DeckSize;
-  public double DeckPrice => Deck.DeckPrice;
-
-  public async Task<bool> ConfirmUnsavedChanges()
-  {
-    if (!HasUnsavedChanges || !SaveDeckCommand.CanExecute(null)) return true;
-
-    switch (await Confirmers.SaveUnsavedChangesConfirmer
-      .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(DeckName)))
-    {
-      case ConfirmationResult.Yes: await SaveDeck(); return !HasUnsavedChanges;
-      case ConfirmationResult.No: return true;
-      default: return false;
-    };
-  }
+  public async Task<bool> ConfirmUnsavedChanges() => await new ConfirmUnsavedChanges(
+    saveUnsavedChangesConfirmer: Confirmers.SaveUnsavedChangesConfirmer,
+    saveCommand: SaveDeckCommand)
+    .Execute(HasUnsavedChanges, DeckName);
 
   [RelayCommand]
-  private async Task NewDeck()
-  {
-    if (await ConfirmUnsavedChanges())
-      Deck = new();
-  }
-
-  [RelayCommand(CanExecute = nameof(CanExecuteOpenDeckCommand))]
-  private async Task OpenDeck(string loadName = null)
-  {
-    if (!OpenDeckCommand.CanExecute(loadName) || !await ConfirmUnsavedChanges())
-      return;
-
-    loadName ??= await Confirmers.LoadDeckConfirmer
-      .Confirm(DeckEditorConfirmers.GetLoadDeckConfirmation(await ((IWorker)this).DoWork(new GetDeckNames(Repository).Execute())));
-
-    if (string.IsNullOrEmpty(loadName))
-      return;
-
-    if (await ((IWorker)this).DoWork(new LoadDeck(Repository, CardAPI).Execute(loadName)) is MTGCardDeck deck)
+  public async Task NewDeck() => await new NewDeck(
+    unsavedConfirmer: ConfirmUnsavedChanges,
+    onDeckChanged: (deck) =>
     {
       Deck = deck;
-      new SendNotification(Notifier).Execute(DeckEditorNotifications.LoadSuccessNotification);
-    }
-    else
-      new SendNotification(Notifier).Execute(DeckEditorNotifications.LoadErrorNotification);
-  }
+    }).Execute();
+
+  [RelayCommand(CanExecute = nameof(CanExecuteOpenDeckCommand))]
+  private async Task OpenDeck(string loadName = null) => await new OpenDeck(
+    repository: Repository,
+    importer: Importer,
+    notifier: Notifier,
+    unsavedConfirmer: ConfirmUnsavedChanges,
+    loadConfirmer: Confirmers.LoadDeckConfirmer,
+    worker: this,
+    onDeckChanged: (deck) =>
+    {
+      Deck = deck;
+    }).Execute(loadName);
 
   [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
-  private async Task SaveDeck()
-  {
-    if (!SaveDeckCommand.CanExecute(null)) return;
-
-    var oldName = DeckName;
-    var overrideOld = false;
-    var saveName = await Confirmers.SaveDeckConfirmer.Confirm(
-      DeckEditorConfirmers.GetSaveDeckConfirmation(oldName));
-
-    if (string.IsNullOrEmpty(saveName))
-      return;
-
-    // Override confirmation
-    if (saveName != oldName && await new DeckDTOExists(Repository).Execute(saveName))
+  private async Task SaveDeck() => await new SaveDeck(
+    repository: Repository,
+    notifier: Notifier,
+    saveConfirmer: Confirmers.SaveDeckConfirmer,
+    overrideConfirmer: Confirmers.OverrideDeckConfirmer,
+    worker: this,
+    onNameChanged: (name) =>
     {
-      switch (await Confirmers.OverrideDeckConfirmer.Confirm(DeckEditorConfirmers.GetOverrideDeckConfirmation(saveName)))
-      {
-        case ConfirmationResult.Yes: overrideOld = true; break;
-        case ConfirmationResult.Cancel:
-        default: return; // Cancel
-      }
-    }
-
-    switch (await ((IWorker)this).DoWork(new SaveDeck(Repository).Execute(new(Deck, saveName, overrideOld))))
-    {
-      case true:
-        new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveSuccessNotification);
-        OnPropertyChanged(nameof(DeckName));
-        HasUnsavedChanges = false;
-        break;
-      case false: new SendNotification(Notifier).Execute(DeckEditorNotifications.SaveErrorNotification); break;
-    }
-  }
+      Deck.Name = name;
+      OnPropertyChanged(nameof(DeckName));
+      HasUnsavedChanges = false;
+    }).Execute(Deck);
 
   [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckCommand))]
-  private async Task DeleteDeck()
-  {
-    if (!DeleteDeckCommand.CanExecute(null))
-      return;
-
-    var deleteConfirmationResult = await Confirmers.DeleteDeckConfirmer.Confirm(
-      DeckEditorConfirmers.GetDeleteDeckConfirmation(DeckName));
-
-    switch (deleteConfirmationResult)
+  private async Task DeleteDeck() => await new DeleteDeck(
+    repository: Repository,
+    notifier: Notifier,
+    deleteConfirmer: Confirmers.DeleteDeckConfirmer,
+    worker: this,
+    onDeckChanged: (deck) =>
     {
-      case ConfirmationResult.Yes: break;
-      default: return; // Cancel
-    }
-
-    switch (await ((IWorker)this).DoWork(new UseCases.DeleteDeck(Repository).Execute(Deck)))
-    {
-      case true:
-        Deck = new();
-        new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteSuccessNotification); break;
-      case false: new SendNotification(Notifier).Execute(DeckEditorNotifications.DeleteErrorNotification); break;
-    }
-  }
+      Deck = deck;
+    }).Execute(Deck);
 
   [RelayCommand(CanExecute = nameof(CanExecuteUndoCommand))] private void Undo() => UndoStack.Undo();
 
@@ -205,7 +153,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   /// </summary>    
   [RelayCommand(CanExecute = nameof(CanExecuteOpenEDHRECWebsiteCommand))]
   private async Task OpenEDHRECWebsiteCommand()
-    => await NetworkService.OpenUri(EdhrecAPI.GetCommanderWebsiteUri(Deck.Commander, Deck.CommanderPartner));
+    => await NetworkService.OpenUri(EdhrecImporter.GetCommanderWebsiteUri(Deck.Commander, Deck.CommanderPartner));
 
   [RelayCommand(CanExecute = nameof(CanExecuteShowDeckTokensCommand))]
   private async Task ShowDeckTokens()
@@ -221,7 +169,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     if (Deck.CommanderPartner != null)
       stringBuilder.AppendJoin(Environment.NewLine, Deck.CommanderPartner.Info.Tokens.Select(t => t.ScryfallId.ToString()));
 
-    var tokens = (await ((IWorker)this).DoWork(CardAPI.FetchFromString(stringBuilder.ToString()))).Found
+    var tokens = (await ((IWorker)this).DoWork(Importer.ImportFromString(stringBuilder.ToString()))).Found
       .DistinctBy(t => t.Info.OracleId); // Filter duplicates out using OracleId
 
     await Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens));
@@ -239,11 +187,11 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     // TODO: open testing window use case
   }
 
-  private bool CanExecuteSaveDeckCommand() => Deck.DeckCards.Count > 0;
+  private bool CanExecuteSaveDeckCommand() => UseCases.SaveDeck.CanExecute(Deck);
 
-  private bool CanExecuteDeleteDeckCommand() => !string.IsNullOrEmpty(Deck.Name);
+  private bool CanExecuteDeleteDeckCommand() => UseCases.DeleteDeck.CanExecute(Deck);
 
-  private bool CanExecuteOpenDeckCommand(string name) => name != string.Empty;
+  private bool CanExecuteOpenDeckCommand(string name) => UseCases.OpenDeck.CanExecute(name);
 
   private bool CanExecuteUndoCommand() => UndoStack.CanUndo;
 
@@ -255,7 +203,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
-    return new(CardAPI)
+    return new(Importer)
     {
       Cards = cards,
       OnChange = () =>
@@ -274,7 +222,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private CommanderViewModel CreateCommanderViewModel(Action<DeckEditorMTGCard> modelChangeAction)
   {
-    var vm = new CommanderViewModel(CardAPI)
+    var vm = new CommanderViewModel(Importer)
     {
       UndoStack = UndoStack,
       Notifier = Notifier,

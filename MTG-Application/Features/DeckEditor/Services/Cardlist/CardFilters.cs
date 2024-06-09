@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models.Card;
 using System;
 using System.Linq;
-using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
+using static MTGApplication.General.Models.Card.MTGCardInfo;
 
 namespace MTGApplication.Features.DeckEditor;
 
@@ -65,7 +65,7 @@ public partial class CardFilters : ObservableObject
     {
       return true;
     }
-    else { return false; };
+    else return false;
   }
 
   /// <summary>
@@ -94,9 +94,7 @@ public partial class CardFilters : ObservableObject
   private void ChangeColorGroup(string group)
   {
     if (Enum.TryParse(group, out ColorGroups colorGroup))
-    {
       ColorGroup = colorGroup;
-    }
   }
 
   private bool CanExecuteResetCommand() => FiltersApplied;

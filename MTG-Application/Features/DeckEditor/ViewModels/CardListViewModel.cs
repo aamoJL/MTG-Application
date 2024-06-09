@@ -16,11 +16,11 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor;
 
-public partial class CardListViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : ViewModelBase
+public partial class CardListViewModel(ICardImporter<DeckEditorMTGCard> cardAPI) : ViewModelBase
 {
   [ObservableProperty] private ObservableCollection<DeckEditorMTGCard> cards = [];
 
-  public ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
+  public ICardImporter<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public CardListConfirmers Confirmers { get; init; } = new();
@@ -166,7 +166,7 @@ public partial class CardListViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : Vi
   {
     if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
     {
-      var prints = (await Worker.DoWork(CardAPI.FetchFromUri(pageUri: existingCard.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+      var prints = (await Worker.DoWork(CardAPI.ImportFromUri(pageUri: existingCard.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
       if (await Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is DeckEditorMTGCard selection)
       {

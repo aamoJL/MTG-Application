@@ -13,7 +13,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var query = string.Empty;
 
-      var result = await api.FetchCardsWithSearchQuery(query);
+      var result = await api.ImportCardsWithSearchQuery(query);
 
       Assert.AreEqual(0, result.Found.Length);
     }
@@ -24,7 +24,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var query = "asd";
 
-      var result = await api.FetchCardsWithSearchQuery(query);
+      var result = await api.ImportCardsWithSearchQuery(query);
 
       Assert.IsTrue(result.Found.Length > 0);
       Assert.AreEqual(api.Name, result.Found[0].APIName);
@@ -36,7 +36,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var query = "is:reversible";
 
-      var result = await api.FetchCardsWithSearchQuery(query);
+      var result = await api.ImportCardsWithSearchQuery(query);
 
       Assert.IsTrue(result.Found.Length > 0);
     }

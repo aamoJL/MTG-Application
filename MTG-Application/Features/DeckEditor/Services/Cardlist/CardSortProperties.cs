@@ -2,12 +2,12 @@
 using System;
 using System.Collections;
 using static MTGApplication.General.Models.Card.CardSortProperties;
-using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
+using static MTGApplication.General.Models.Card.MTGCardInfo;
 
 namespace MTGApplication.General.Models.Card;
 
 /// <summary>
-/// Record that has properties to sort MTG card lists
+/// Class that has properties to sort MTG card lists
 /// </summary>
 public record CardSortProperties(
   MTGSortProperty PrimarySortProperty = MTGSortProperty.CMC,

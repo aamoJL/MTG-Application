@@ -16,7 +16,7 @@ public partial class DeckEditorViewModelTests
     {
       var viewmodel = new Mocker(_dependencies) { HasUnsavedChanges = false }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
     }
 
     [TestMethod]
@@ -28,7 +28,7 @@ public partial class DeckEditorViewModelTests
         HasUnsavedChanges = true,
       }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
     }
 
     [TestMethod]
@@ -44,7 +44,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(viewmodel.ConfirmUnsavedChanges);
+      await ConfirmationAssert.ConfirmationShown(viewmodel.ConfirmUnsavedChangesCommand);
     }
 
     [TestMethod]
@@ -61,7 +61,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(viewmodel.ConfirmUnsavedChanges);
+      await ConfirmationAssert.ConfirmationShown(viewmodel.ConfirmUnsavedChangesCommand);
     }
 
     [TestMethod]
@@ -77,7 +77,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
     }
 
     [TestMethod]
@@ -93,7 +93,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      Assert.IsFalse(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsFalse(await viewmodel.ConfirmUnsavedChangesCommand());
     }
 
     [TestMethod]
@@ -110,7 +110,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
     }
 
     [TestMethod]
@@ -127,7 +127,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      Assert.IsFalse(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsFalse(await viewmodel.ConfirmUnsavedChangesCommand());
     }
 
     [TestMethod]
@@ -144,7 +144,7 @@ public partial class DeckEditorViewModelTests
         },
       }.MockVM();
 
-      Assert.IsFalse(await viewmodel.ConfirmUnsavedChanges());
+      Assert.IsFalse(await viewmodel.ConfirmUnsavedChangesCommand());
     }
   }
 }

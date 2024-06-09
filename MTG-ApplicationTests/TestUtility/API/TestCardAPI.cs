@@ -5,7 +5,7 @@ using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Models.Card.CardImportResult;
 
 namespace MTGApplicationTests.TestUtility.API;
-public class TestCardAPI(DeckEditorMTGCard[]? expectedCards = null, int notFoundCount = 0) : ICardAPI<DeckEditorMTGCard>
+public class TestCardAPI(DeckEditorMTGCard[]? expectedCards = null, int notFoundCount = 0) : ICardImporter<DeckEditorMTGCard>
 {
   public DeckEditorMTGCard[]? ExpectedCards { get; set; } = expectedCards;
   public int NotFoundCount { get; set; } = notFoundCount;
@@ -13,7 +13,7 @@ public class TestCardAPI(DeckEditorMTGCard[]? expectedCards = null, int notFound
   public int PageSize => 40;
   public string Name => "Test Card API";
 
-  public async Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams)
   {
     if (string.IsNullOrEmpty(searchParams)) { return Empty(); }
     return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
@@ -33,10 +33,10 @@ public class TestCardAPI(DeckEditorMTGCard[]? expectedCards = null, int notFound
     }
   }
 
-  public async Task<CardImportResult> FetchFromString(string importText)
+  public async Task<CardImportResult> ImportFromString(string importText)
     => await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
 
-  public async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
     return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length, ImportSource.External));

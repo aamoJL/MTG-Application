@@ -16,7 +16,7 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CommanderViewModel : ViewModelBase
 {
-  public CommanderViewModel(ICardAPI<DeckEditorMTGCard> cardAPI)
+  public CommanderViewModel(ICardImporter<DeckEditorMTGCard> cardAPI)
   {
     CardAPI = cardAPI;
 
@@ -37,7 +37,7 @@ public partial class CommanderViewModel : ViewModelBase
   public IWorker Worker { get; init; } = new DefaultWorker();
   public Notifier Notifier { get; init; } = new();
 
-  private ICardAPI<DeckEditorMTGCard> CardAPI { get; }
+  private ICardImporter<DeckEditorMTGCard> CardAPI { get; }
   private DeckEditorMTGCardCopier CardCopier { get; } = new();
 
   private ReversibleAction<(DeckEditorMTGCard Card, DeckEditorMTGCard.MTGCardInfo Info)> ReversibleCardPrintChangeAction
@@ -75,18 +75,18 @@ public partial class CommanderViewModel : ViewModelBase
 
     if (result.Found.Length == 0)
     {
-      new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportError);
+      new SendNotification(Notifier).Execute(CommanderNotifications.ImportError);
     }
     else if (!result.Found[0].Info.TypeLine.Contains("Legendary", System.StringComparison.OrdinalIgnoreCase))
     {
-      new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportNotLegendaryError);
+      new SendNotification(Notifier).Execute(CommanderNotifications.ImportNotLegendaryError);
     }
     else
     {
       // Only legendary cards are allowed to be commanders
       await Change(result.Found[0]);
 
-      new SendNotification(Notifier).Execute(CommanderViewModelNotifications.ImportSuccess);
+      new SendNotification(Notifier).Execute(CommanderNotifications.ImportSuccess);
     }
   }
 
@@ -95,7 +95,7 @@ public partial class CommanderViewModel : ViewModelBase
   {
     if (Card.Info.Name != card.Info.Name) return;
 
-    var prints = (await Worker.DoWork(CardAPI.FetchFromUri(pageUri: Card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+    var prints = (await Worker.DoWork(CardAPI.ImportFromUri(pageUri: Card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
     if (await Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is DeckEditorMTGCard selection)
     {

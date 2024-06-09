@@ -13,7 +13,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var uri = string.Empty;
 
-      var result = await api.FetchFromUri(uri);
+      var result = await api.ImportFromUri(uri);
 
       Assert.AreEqual(0, result.TotalCount);
       Assert.AreEqual(0, result.Found.Length);
@@ -26,7 +26,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var uri = "https://api.scryfall.com/cards/search?dir=asc&format=json&include_extras=false&include_multilingual=false&include_variations=false&order=released&page=2&q=set%3Aneo+unique%3Acards+order%3Areleased+direction%3Aasc+format%3Aany+game%3Apaper&unique=cards";
 
-      var result = await api.FetchFromUri(uri);
+      var result = await api.ImportFromUri(uri);
 
       Assert.IsTrue(result.TotalCount > 0);
       Assert.IsTrue(result.Found.Length > 0);
@@ -38,7 +38,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var uri = "https://api.scryfall.com/cards/search?q=set:neo+order:Released+unique:Cards+direction:Asc+game:paper";
 
-      var result = await api.FetchFromUri(uri);
+      var result = await api.ImportFromUri(uri);
 
       Assert.AreEqual(api.PageSize, result.Found.Length);
       Assert.IsTrue(result.TotalCount > api.PageSize);
@@ -51,7 +51,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var uri = "https://api.scryfall.com/cards/search?q=set:neo+order:Released+unique:Cards+direction:Asc+game:paper";
 
-      var result = await api.FetchFromUri(uri, fetchAll: true);
+      var result = await api.ImportFromUri(uri, fetchAll: true);
 
       Assert.AreEqual(result.TotalCount, result.Found.Length);
       Assert.IsTrue(result.TotalCount > api.PageSize);

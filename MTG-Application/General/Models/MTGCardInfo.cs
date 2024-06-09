@@ -63,7 +63,7 @@ public record MTGCardInfo
   public SpellType[] SpellTypes { get; init; }
   public string CardMarketUri { get; init; }
   public ColorTypes[] ProducedMana { get; init; }
-  public string APIName { get; init; }
+  public string ImporterName { get; init; }
 
   /// <summary>
   /// Constructor for JSON deserialization
@@ -91,7 +91,7 @@ public record MTGCardInfo
     ProducedMana = producedMana;
     PrintSearchUri = printSearchUri;
     Tokens = tokens;
-    APIName = apiName;
+    ImporterName = apiName;
   }
   public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string apiName = "")
   {
@@ -115,7 +115,7 @@ public record MTGCardInfo
     SpellTypes = GetSpellTypes(TypeLine);
     CardMarketUri = cardMarketUri;
     ProducedMana = producedMana;
-    APIName = apiName;
+    ImporterName = apiName;
   }
 
   /// <summary>

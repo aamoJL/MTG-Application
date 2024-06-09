@@ -2,6 +2,7 @@
 using MTGApplication.General.Services.API.CardAPI.UseCases;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.IOService;
+using SkiaSharp.HarfBuzz;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,7 +17,7 @@ namespace MTGApplication.General.Services.API.CardAPI;
 /// <summary>
 /// Scryfall API calls and helper functions
 /// </summary>
-public partial class ScryfallAPI : MTGCardAPI
+public partial class ScryfallAPI : MTGCardImporter
 {
   private readonly static string API_URL = "https://api.scryfall.com";
   private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
@@ -33,13 +34,13 @@ public partial class ScryfallAPI : MTGCardAPI
   public override string Name => "Scryfall";
   public override int PageSize => 175;
 
-  public override async Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams)
+  public override async Task<CardImportResult<MTGCardInfo>> ImportCardsWithSearchQuery(string searchParams)
   {
     if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
-    return await FetchFromUri(GetSearchUri(searchParams));
+    return await ImportFromUri(GetSearchUri(searchParams));
   }
 
-  public override async Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public override async Task<CardImportResult<MTGCardInfo>> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var pageResults = new List<CardImportResult>();
     var currentPage = pageUri;
@@ -72,7 +73,7 @@ public partial class ScryfallAPI : MTGCardAPI
     };
   }
 
-  public override async Task<CardImportResult> FetchFromString(string importText)
+  public override async Task<CardImportResult<MTGCardInfo>> ImportFromString(string importText)
   {
     if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty(CardImportResult.ImportSource.External);
 
@@ -110,16 +111,16 @@ public partial class ScryfallAPI : MTGCardAPI
     return await FetchWithIdentifiers(identifiers);
   }
 
-  public async Task<CardImportResult> FetchFromDTOs(MTGCardDTO[] dtoArray)
+  public override async Task<CardImportResult<MTGCardInfo>> ImportFromDTOs(IEnumerable<MTGCardDTO> dtos)
   {
-    var identifiers = dtoArray.Select(x => new ScryfallIdentifier(x)).ToArray();
+    var identifiers = dtos.Select(x => new ScryfallIdentifier(x)).ToArray();
     return await FetchWithIdentifiers(identifiers);
   }
 
   /// <summary>
   /// Returns <see cref="CardImportResult.Card"/> array from the given <paramref name="jsonNode"/>
   /// </summary>
-  protected async Task<IEnumerable<CardImportResult.Card>> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
+  protected async Task<IEnumerable<CardImportResult<MTGCardInfo>.Card>> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
     if (jsonNode == null) { return []; }
 
@@ -237,7 +238,7 @@ public partial class ScryfallAPI : MTGCardAPI
   /// <summary>
   /// Fetches MTGCards from the API using the given identifier objects
   /// </summary>
-  private async Task<CardImportResult> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
+  private async Task<CardImportResult<MTGCardInfo>> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
     {

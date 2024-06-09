@@ -2,7 +2,7 @@
 
 namespace MTGApplication.Features.DeckEditor.Services.Commanders;
 
-public static class CommanderViewModelNotifications
+public static class CommanderNotifications
 {
   public static Notification ImportSuccess => new(NotificationType.Success, "Commander was imported successfully.");
   public static Notification ImportNotLegendaryError => new(NotificationType.Error, "Error. Commander needs to be Legendary.");

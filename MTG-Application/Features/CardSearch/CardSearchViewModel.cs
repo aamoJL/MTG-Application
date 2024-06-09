@@ -10,9 +10,9 @@ namespace MTGApplication.Features.CardSearch;
 /// <summary>
 /// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>
-public partial class CardSearchViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : ViewModelBase, IWorker
+public partial class CardSearchViewModel(ICardImporter<DeckEditorMTGCard> cardAPI) : ViewModelBase, IWorker
 {
-  public ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
+  public ICardImporter<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
   public IncrementalLoadingCardCollection<DeckEditorMTGCard> Cards { get; } = new(new DefaultIncrementalCardSource(cardAPI));
 
   public CardSearchConfirmers Confirmers { get; init; } = new();
@@ -33,7 +33,7 @@ public partial class CardSearchViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : 
     if (card == null)
       return;
 
-    var prints = (await ((IWorker)this).DoWork(CardAPI.FetchFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+    var prints = (await ((IWorker)this).DoWork(CardAPI.ImportFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
     await Confirmers.ShowCardPrintsConfirmer.Confirm(CardSearchConfirmers.GetShowCardPrintsConfirmation(prints));
   }

@@ -9,5 +9,5 @@ public class DeckEditorMTGCardCopier : IClassCopier<DeckEditorMTGCard>
   public DeckEditorMTGCard Copy(DeckEditorMTGCard item) => new(item.Info, item.Count);
 
   public IEnumerable<DeckEditorMTGCard> Copy(IEnumerable<DeckEditorMTGCard> items)
-    => items.Select(x => new DeckEditorMTGCard(x.Info with { }, x.Count));
+    => items.Select(x => new DeckEditorMTGCard(x.Info, x.Count));
 }

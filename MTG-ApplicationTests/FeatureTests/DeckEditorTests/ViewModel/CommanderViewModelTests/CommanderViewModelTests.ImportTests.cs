@@ -52,7 +52,7 @@ public partial class CommanderViewModelTests
 
       JsonService.TrySerializeObject(card, out var json);
 
-      await NotificationAssert.NotificationSent(CommanderViewModelNotifications.ImportSuccess, () => viewmodel.ImportCommand.ExecuteAsync(json));
+      await NotificationAssert.NotificationSent(CommanderNotifications.ImportSuccess, () => viewmodel.ImportCommand.ExecuteAsync(json));
     }
 
     [TestMethod("Error notification should be sent when the import fails")]
@@ -66,7 +66,7 @@ public partial class CommanderViewModelTests
         }
       };
 
-      await NotificationAssert.NotificationSent(CommanderViewModelNotifications.ImportError, () => viewmodel.ImportCommand.ExecuteAsync("Invalid json"));
+      await NotificationAssert.NotificationSent(CommanderNotifications.ImportError, () => viewmodel.ImportCommand.ExecuteAsync("Invalid json"));
     }
 
     [TestMethod("Error notification should be sent when the import fails")]
@@ -83,7 +83,7 @@ public partial class CommanderViewModelTests
 
       JsonService.TrySerializeObject(card, out var json);
 
-      await NotificationAssert.NotificationSent(CommanderViewModelNotifications.ImportNotLegendaryError, () => viewmodel.ImportCommand.ExecuteAsync(json));
+      await NotificationAssert.NotificationSent(CommanderNotifications.ImportNotLegendaryError, () => viewmodel.ImportCommand.ExecuteAsync(json));
     }
   }
 }

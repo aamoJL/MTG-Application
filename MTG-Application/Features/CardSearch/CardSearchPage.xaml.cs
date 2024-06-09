@@ -20,6 +20,6 @@ public sealed partial class CardSearchPage : Page
       }.ShowAsync(new(XamlRoot))) as DeckEditorMTGCard;
   }
 
-  public CardSearchViewModel ViewModel { get; } = new(App.MTGCardAPI);
+  public CardSearchViewModel ViewModel { get; } = new(App.MTGCardImporter);
   public ListViewDragAndDrop CardDragAndDrop { get; } = new(new DeckEditorMTGCardCopier()) { AcceptMove = false };
 }

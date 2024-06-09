@@ -21,7 +21,7 @@ public sealed partial class DeckEditorPage : Page
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 
-  public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardAPI);
+  public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
   [ObservableProperty] private bool deckImageViewVisible = true;
   [ObservableProperty] private bool deckTextViewVisible = false;

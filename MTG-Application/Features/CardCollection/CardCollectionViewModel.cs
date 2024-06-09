@@ -18,7 +18,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.CardCollection;
 
-public partial class CardCollectionViewModel(ICardAPI<DeckEditorMTGCard> cardAPI) : ViewModelBase, IWorker, ISavable
+public partial class CardCollectionViewModel(ICardImporter<DeckEditorMTGCard> cardAPI) : ViewModelBase, IWorker, ISavable
 {
   [ObservableProperty] private MTGCardCollection collection = new();
   [ObservableProperty] private MTGCardCollectionList selectedList;
@@ -33,12 +33,12 @@ public partial class CardCollectionViewModel(ICardAPI<DeckEditorMTGCard> cardAPI
 
   public int SelectedListCardCount => SelectedList?.Cards.Count ?? 0;
 
-  private ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
+  private ICardImporter<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
 
   [RelayCommand]
   private async Task NewCollection()
   {
-    if (!await ConfirmUnsavedChanges())
+    if (!await ConfirmUnsavedChangesCommand())
       return;
 
     await SetCollection(new());
@@ -47,7 +47,7 @@ public partial class CardCollectionViewModel(ICardAPI<DeckEditorMTGCard> cardAPI
   [RelayCommand]
   private async Task OpenCollection()
   {
-    if (!await ConfirmUnsavedChanges())
+    if (!await ConfirmUnsavedChangesCommand())
       return;
 
     if (await Confirmers.LoadCollectionConfirmer.Confirm(
@@ -258,7 +258,7 @@ public partial class CardCollectionViewModel(ICardAPI<DeckEditorMTGCard> cardAPI
   [RelayCommand]
   private async Task ShowCardPrints(DeckEditorMTGCard card)
   {
-    var prints = (await ((IWorker)this).DoWork(CardAPI.FetchFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+    var prints = (await ((IWorker)this).DoWork(CardAPI.ImportFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
     await Confirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionConfirmers.GetShowCardPrintsConfirmation(prints));
   }
@@ -278,7 +278,7 @@ public partial class CardCollectionViewModel(ICardAPI<DeckEditorMTGCard> cardAPI
     OnPropertyChanged(nameof(SelectedListCardCount));
   }
 
-  public async Task<bool> ConfirmUnsavedChanges()
+  public async Task<bool> ConfirmUnsavedChangesCommand()
   {
     if (!HasUnsavedChanges || !SaveCollectionCommand.CanExecute(null))
       return true;

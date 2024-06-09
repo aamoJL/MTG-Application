@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class IncrementalCardSource<TCard>(ICardAPI<DeckEditorMTGCard> cardAPI) : object(), IIncrementalSource<TCard> where TCard : DeckEditorMTGCard
+public abstract class IncrementalCardSource<TCard>(ICardImporter<DeckEditorMTGCard> cardAPI) : object(), IIncrementalSource<TCard> where TCard : DeckEditorMTGCard
 {
   public List<DeckEditorMTGCard> Cards { get; set; } = [];
   public string NextPage { get; set; }
 
-  public ICardAPI<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
+  public ICardImporter<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
 
   public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
   {
     if (!string.IsNullOrEmpty(NextPage))
     {
       // Load next page
-      var result = await CardAPI.FetchFromUri(NextPage);
+      var result = await CardAPI.ImportFromUri(NextPage);
       NextPage = result.NextPageUri;
       Cards.AddRange(result.Found.Select(x => new DeckEditorMTGCard(x.Info, x.Count)));
     }

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 
 /// <summary>
-/// Data transfer object for <see cref="MTGCardDeck"/> class
+/// Data transfer object for <see cref="DeckEditorMTGDeck"/> class
 /// </summary>
 public record MTGCardDeckDTO
 {

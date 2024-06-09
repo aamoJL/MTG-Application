@@ -44,13 +44,13 @@
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectorAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\CardCollection\Controls\CardCollectionCardImageView.xaml" />
-    <None Remove="Features\DeckEditor\Controls\Charts\CardTypeDistributionChart\CardTypeDistributionChart.xaml" />
-    <None Remove="Features\DeckEditor\Controls\Charts\ColorDistributionChart\ManaDistributionChart.xaml" />
-    <None Remove="Features\DeckEditor\Controls\Charts\ManaCurveChart.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\Charts\CardTypeDistributionChart\CardTypeDistributionChart.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\Charts\ColorDistributionChart\ManaDistributionChart.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\Charts\ManaCurveChart.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
-    <None Remove="Features\DeckEditor\Controls\CommanderTextView.xaml" />
-    <None Remove="Features\DeckEditor\Controls\DeckEditorCardImageView.xaml" />
-    <None Remove="Features\DeckEditor\Controls\DeckEditorCardTextView.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\CommanderTextView.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\DeckEditorCardImageView.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\DeckEditorCardTextView.xaml" />
     <None Remove="Features\CardSearch\CardSearchPage.xaml" />
     <None Remove="Features\CardSearch\Controls\CardSearchCardImageView.xaml" />
     <None Remove="Features\CardSearch\Controls\CardSearchCardTextView.xaml" />
@@ -155,9 +155,6 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Features\DeckEditor\Controls\Charts\ColorDistributionChart\ManaDistributionChart.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
     <Page Update="General\Views\Controls\LinedHeader.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
@@ -199,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\CardSearch\Controls\CardView\" />
+    <Folder Include="Features\DeckEditor\Views\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
@@ -206,22 +204,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\DeckEditor\Controls\Charts\CardTypeDistributionChart\CardTypeDistributionChart.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\DeckEditor\Controls\Charts\ManaCurveChart.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\DeckEditor\Controls\CommanderTextView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

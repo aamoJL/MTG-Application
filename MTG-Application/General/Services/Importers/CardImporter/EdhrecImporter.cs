@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MTGApplication.General.Services.API.CardAPI;
 
-public class EdhrecAPI
+public class EdhrecImporter
 {
   private static readonly string WEBSITE_BASE_URI = "https://edhrec.com/commanders";
 

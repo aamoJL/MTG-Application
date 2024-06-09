@@ -8,7 +8,7 @@ namespace MTGApplication.Features.DeckEditor.Models;
 /// <summary>
 /// Class for MTG card decks
 /// </summary>
-public partial class MTGCardDeck : ObservableObject
+public partial class DeckEditorMTGDeck : ObservableObject
 {
   [ObservableProperty] private string name = "";
   [ObservableProperty] private DeckEditorMTGCard commander;

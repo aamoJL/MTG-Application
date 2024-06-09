@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public class LoadCardCollection(IRepository<MTGCardCollectionDTO> repository, ICardAPI<DeckEditorMTGCard> cardAPI) : UseCase<string, Task<MTGCardCollection>>
+public class LoadCardCollection(IRepository<MTGCardCollectionDTO> repository, ICardImporter<DeckEditorMTGCard> cardAPI) : UseCase<string, Task<MTGCardCollection>>
 {
   public override async Task<MTGCardCollection> Execute(string loadName)
   {

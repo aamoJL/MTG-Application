@@ -11,7 +11,7 @@ namespace MTGApplication.Features.CardCollection;
 
 public partial class QueryCardsViewModel : ObservableObject
 {
-  public QueryCardsViewModel(ICardAPI<DeckEditorMTGCard> cardAPI)
+  public QueryCardsViewModel(ICardImporter<DeckEditorMTGCard> cardAPI)
   {
     CardAPI = cardAPI;
     QueryCards = new(new CardCollectionIncrementalCardSource(cardAPI));
@@ -21,7 +21,7 @@ public partial class QueryCardsViewModel : ObservableObject
     PropertyChanged += QueryCardsViewModel_PropertyChanged;
   }
 
-  public ICardAPI<DeckEditorMTGCard> CardAPI { get; }
+  public ICardImporter<DeckEditorMTGCard> CardAPI { get; }
   
   private IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; }
 

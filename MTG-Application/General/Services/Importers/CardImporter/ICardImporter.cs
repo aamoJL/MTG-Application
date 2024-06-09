@@ -7,7 +7,7 @@ namespace MTGApplication.General.Services.API.CardAPI;
 /// Generic card API
 /// </summary>
 /// <typeparam name="T">Card type</typeparam>
-public partial interface ICardAPI<TModel>
+public partial interface ICardImporter<TInfo>
 {
   /// <summary>
   /// Name of the API
@@ -22,17 +22,17 @@ public partial interface ICardAPI<TModel>
   /// <summary>
   /// Fetch cards from the API using API search query
   /// </summary>
-  public Task<CardImportResult> FetchCardsWithSearchQuery(string searchParams);
+  public Task<CardImportResult<TInfo>> ImportCardsWithSearchQuery(string searchParams);
 
   /// <summary>
   /// Fetches cards from the given <paramref name="pageUri"/>
   /// </summary>
   /// <param name="paperOnly">Fetches only cards that are printed on paper</param>
-  public Task<CardImportResult> FetchFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
+  public Task<CardImportResult<TInfo>> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
 
   /// <summary>
   /// Fetch cards from the API using formatted text.
   /// The text formatting depends on the API implementation
   /// </summary>
-  public Task<CardImportResult> FetchFromString(string importText);
+  public Task<CardImportResult<TInfo>> ImportFromString(string importText);
 }
