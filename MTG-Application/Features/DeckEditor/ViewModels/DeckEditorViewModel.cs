@@ -2,19 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.Services.DeckEditor;
-using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
-using MTGApplication.General.Services.IOService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
@@ -55,6 +51,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public string DeckName => Deck.Name;
   public int DeckSize => Deck.DeckSize;
   public double DeckPrice => Deck.DeckPrice;
+  public IWorker Worker => this;
 
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
@@ -86,94 +83,22 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       OnPropertyChanged(nameof(DeckPrice));
       SaveDeckCommand.NotifyCanExecuteChanged();
       DeleteDeckCommand.NotifyCanExecuteChanged();
-      OpenEDHRECWebsiteCommandCommand.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
       ShowDeckTokensCommand.NotifyCanExecuteChanged();
     }
   }
   private ReversibleCommandStack UndoStack { get; } = new();
   private MTGCardImporter Importer { get; }
 
-  public async Task<bool> ConfirmUnsavedChanges() => await new ConfirmUnsavedChanges(
-    saveUnsavedChangesConfirmer: Confirmers.SaveUnsavedChangesConfirmer,
-    saveCommand: SaveDeckCommand)
-    .Execute(HasUnsavedChanges, DeckName);
-
-  [RelayCommand]
-  public async Task NewDeck() => await new NewDeck(
-    unsavedConfirmer: ConfirmUnsavedChanges,
-    onDeckChanged: (deck) =>
-    {
-      Deck = deck;
-    }).Execute();
-
-  [RelayCommand(CanExecute = nameof(CanExecuteOpenDeckCommand))]
-  private async Task OpenDeck(string loadName = null) => await new OpenDeck(
-    repository: Repository,
-    importer: Importer,
-    notifier: Notifier,
-    unsavedConfirmer: ConfirmUnsavedChanges,
-    loadConfirmer: Confirmers.LoadDeckConfirmer,
-    worker: this,
-    onDeckChanged: (deck) =>
-    {
-      Deck = deck;
-    }).Execute(loadName);
-
-  [RelayCommand(CanExecute = nameof(CanExecuteSaveDeckCommand))]
-  private async Task SaveDeck() => await new SaveDeck(
-    repository: Repository,
-    notifier: Notifier,
-    saveConfirmer: Confirmers.SaveDeckConfirmer,
-    overrideConfirmer: Confirmers.OverrideDeckConfirmer,
-    worker: this,
-    onNameChanged: (name) =>
-    {
-      Deck.Name = name;
-      OnPropertyChanged(nameof(DeckName));
-      HasUnsavedChanges = false;
-    }).Execute(Deck);
-
-  [RelayCommand(CanExecute = nameof(CanExecuteDeleteDeckCommand))]
-  private async Task DeleteDeck() => await new DeleteDeck(
-    repository: Repository,
-    notifier: Notifier,
-    deleteConfirmer: Confirmers.DeleteDeckConfirmer,
-    worker: this,
-    onDeckChanged: (deck) =>
-    {
-      Deck = deck;
-    }).Execute(Deck);
-
-  [RelayCommand(CanExecute = nameof(CanExecuteUndoCommand))] private void Undo() => UndoStack.Undo();
-
-  [RelayCommand(CanExecute = nameof(CanExecuteRedoCommand))] private void Redo() => UndoStack.Redo();
-
-  /// <summary>
-  /// Opens card's Cardmarket page in web browser
-  /// </summary>    
-  [RelayCommand(CanExecute = nameof(CanExecuteOpenEDHRECWebsiteCommand))]
-  private async Task OpenEDHRECWebsiteCommand()
-    => await NetworkService.OpenUri(EdhrecImporter.GetCommanderWebsiteUri(Deck.Commander, Deck.CommanderPartner));
-
-  [RelayCommand(CanExecute = nameof(CanExecuteShowDeckTokensCommand))]
-  private async Task ShowDeckTokens()
-  {
-    var stringBuilder = new StringBuilder();
-
-    stringBuilder.AppendJoin(Environment.NewLine, DeckCardList.Cards.Where(c => c.Info.Tokens.Length > 0).Select(
-      c => string.Join(Environment.NewLine, c.Info.Tokens.Select(t => string.Join(Environment.NewLine, t.ScryfallId.ToString())))));
-
-    if (Deck.Commander != null)
-      stringBuilder.AppendJoin(Environment.NewLine, Deck.Commander.Info.Tokens.Select(t => t.ScryfallId.ToString()));
-
-    if (Deck.CommanderPartner != null)
-      stringBuilder.AppendJoin(Environment.NewLine, Deck.CommanderPartner.Info.Tokens.Select(t => t.ScryfallId.ToString()));
-
-    var tokens = (await ((IWorker)this).DoWork(Importer.ImportFromString(stringBuilder.ToString()))).Found
-      .DistinctBy(t => t.Info.OracleId); // Filter duplicates out using OracleId
-
-    await Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens));
-  }
+  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => new ConfirmUnsavedChanges(this).Command;
+  public IAsyncRelayCommand NewDeckCommand => new NewDeck(this).Command;
+  public IAsyncRelayCommand<string> OpenDeckCommand => new OpenDeck(this).Command;
+  public IAsyncRelayCommand SaveDeckCommand => new SaveDeck(this).Command;
+  public IAsyncRelayCommand DeleteDeckCommand => new DeleteDeck(this).Command;
+  public IRelayCommand UndoCommand => new Undo(this).Command;
+  public IRelayCommand RedoCommand => new Redo(this).Command;
+  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => new OpenEdhrecCommanderWebsite(this).Command;
+  public IAsyncRelayCommand ShowDeckTokensCommand => new ShowDeckTokens(this).Command;
 
   [RelayCommand]
   private async Task OpenEdhrecSearchWindow()
@@ -186,20 +111,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     // TODO: open testing window use case
   }
-
-  private bool CanExecuteSaveDeckCommand() => UseCases.SaveDeck.CanExecute(Deck);
-
-  private bool CanExecuteDeleteDeckCommand() => UseCases.DeleteDeck.CanExecute(Deck);
-
-  private bool CanExecuteOpenDeckCommand(string name) => UseCases.OpenDeck.CanExecute(name);
-
-  private bool CanExecuteUndoCommand() => UndoStack.CanUndo;
-
-  private bool CanExecuteRedoCommand() => UndoStack.CanRedo;
-
-  private bool CanExecuteOpenEDHRECWebsiteCommand() => Deck.Commander != null;
-
-  private bool CanExecuteShowDeckTokensCommand() => Deck.Commander != null || Deck.DeckCards.Count != 0;
 
   private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
@@ -222,7 +133,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private CommanderViewModel CreateCommanderViewModel(Action<DeckEditorMTGCard> modelChangeAction)
   {
-    var vm = new CommanderViewModel(Importer)
+    var commanderVM = new CommanderViewModel(Importer)
     {
       UndoStack = UndoStack,
       Notifier = Notifier,
@@ -235,23 +146,23 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       Worker = this,
     };
 
-    var changeAction = (DeckEditorMTGCard card) =>
+    void changeAction(DeckEditorMTGCard card)
     {
       modelChangeAction?.Invoke(card);
-      vm.Card = card;
+      commanderVM.Card = card;
       HasUnsavedChanges = true;
       OnPropertyChanged(nameof(DeckSize));
       OnPropertyChanged(nameof(DeckPrice));
-      OpenEDHRECWebsiteCommandCommand.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
       ShowDeckTokensCommand.NotifyCanExecuteChanged();
-    };
+    }
 
-    vm.ReversibleChange = new ReversibleAction<DeckEditorMTGCard>()
+    commanderVM.ReversibleChange = new ReversibleAction<DeckEditorMTGCard>()
     {
       Action = changeAction,
       ReverseAction = changeAction,
     };
 
-    return vm;
+    return commanderVM;
   }
 }

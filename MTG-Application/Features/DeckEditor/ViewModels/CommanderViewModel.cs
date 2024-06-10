@@ -4,7 +4,6 @@ using MTGApplication.Features.DeckEditor.Services.Cardlist;
 using MTGApplication.Features.DeckEditor.Services.Commanders;
 using MTGApplication.General.Models.Card;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -16,9 +15,9 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CommanderViewModel : ViewModelBase
 {
-  public CommanderViewModel(ICardImporter<DeckEditorMTGCard> cardAPI)
+  public CommanderViewModel(MTGCardImporter importer)
   {
-    CardAPI = cardAPI;
+    Importer = importer;
 
     ReversibleChange ??= new()
     {
@@ -37,7 +36,7 @@ public partial class CommanderViewModel : ViewModelBase
   public IWorker Worker { get; init; } = new DefaultWorker();
   public Notifier Notifier { get; init; } = new();
 
-  private ICardImporter<DeckEditorMTGCard> CardAPI { get; }
+  private MTGCardImporter Importer { get; }
   private DeckEditorMTGCardCopier CardCopier { get; } = new();
 
   private ReversibleAction<(DeckEditorMTGCard Card, DeckEditorMTGCard.MTGCardInfo Info)> ReversibleCardPrintChangeAction
@@ -71,7 +70,7 @@ public partial class CommanderViewModel : ViewModelBase
   [RelayCommand]
   private async Task Import(string data)
   {
-    var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
+    var result = await Worker.DoWork(new ImportCards(Importer).Execute(data));
 
     if (result.Found.Length == 0)
     {
@@ -95,7 +94,7 @@ public partial class CommanderViewModel : ViewModelBase
   {
     if (Card.Info.Name != card.Info.Name) return;
 
-    var prints = (await Worker.DoWork(CardAPI.ImportFromUri(pageUri: Card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+    var prints = (await Worker.DoWork(Importer.ImportFromUri(pageUri: Card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
     if (await Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is DeckEditorMTGCard selection)
     {

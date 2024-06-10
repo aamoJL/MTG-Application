@@ -16,11 +16,11 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor;
 
-public partial class CardListViewModel(ICardImporter<DeckEditorMTGCard> cardAPI) : ViewModelBase
+public partial class CardListViewModel(MTGCardImporter importer) : ViewModelBase
 {
   [ObservableProperty] private ObservableCollection<DeckEditorMTGCard> cards = [];
 
-  public ICardImporter<DeckEditorMTGCard> CardAPI { get; } = cardAPI;
+  public MTGCardImporter Importer { get; } = importer;
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public CardListConfirmers Confirmers { get; init; } = new();
@@ -84,7 +84,7 @@ public partial class CardListViewModel(ICardImporter<DeckEditorMTGCard> cardAPI)
   {
     data ??= await Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
 
-    var result = await Worker.DoWork(new ImportCards(CardAPI).Execute(data));
+    var result = await Worker.DoWork(new ImportCards(Importer).Execute(data));
 
     var addedCards = new List<DeckEditorMTGCard>();
     var skipConflictConfirmation = false;
@@ -166,7 +166,7 @@ public partial class CardListViewModel(ICardImporter<DeckEditorMTGCard> cardAPI)
   {
     if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
     {
-      var prints = (await Worker.DoWork(CardAPI.ImportFromUri(pageUri: existingCard.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+      var prints = (await Worker.DoWork(Importer.ImportFromUri(pageUri: existingCard.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
       if (await Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is DeckEditorMTGCard selection)
       {

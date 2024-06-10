@@ -1,10 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.Input;
 
 namespace MTGApplication.General.ViewModels;
 
 public interface ISavable
 {
-  public bool HasUnsavedChanges { get; set; }
+  public class ConfirmArgs()
+  {
+    public bool Canceled = false;
+  }
 
-  public Task<bool> ConfirmUnsavedChanges();
+  public bool HasUnsavedChanges { get; set; }
+  
+  IAsyncRelayCommand<ConfirmArgs> ConfirmUnsavedChangesCommand { get; }
 }
