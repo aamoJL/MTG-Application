@@ -38,11 +38,12 @@ public partial class ScryfallCardSearchControlViewModel : ViewModelBase
       sb.Append($"{SearchText}+");
 
       if (SearchGameFormat != GameFormat.Any)
-        sb.Append($"format:{SearchGameFormat.ToString()}+");
+        sb.AppendJoin('+', $"format:{SearchGameFormat}");
 
-      sb.Append($"order:{SearchOrderProperty.ToString()}+");
-      sb.Append($"unique:{SearchCardUniqueness.ToString()}+");
-      sb.Append($"direction:{SearchOrderDirection.ToString()}");
+      sb.AppendJoin('+', [
+        $"order:{SearchOrderProperty}",
+        $"unique:{SearchCardUniqueness}",
+        $"direction:{SearchOrderDirection}"]);
 
       return sb.ToString();
     }

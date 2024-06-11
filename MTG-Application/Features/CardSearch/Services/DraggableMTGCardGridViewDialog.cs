@@ -6,13 +6,13 @@ using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardSearch.Services;
 
-public class DraggableMTGCardGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : DraggableGridViewDialog<DeckEditorMTGCard>(title, itemTemplate, gridStyle)
+public class DraggableMTGCardGridViewDialog(string title = "", string itemTemplate = "", string gridStyle = "") : DraggableGridViewDialog<CardImportResult<MTGCardInfo>.Card>(title, itemTemplate, gridStyle)
 {
   protected override void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e)
   {
-    if (e.Items[0] is DeckEditorMTGCard item)
+    if (e.Items[0] is CardImportResult<MTGCardInfo>.Card item)
     {
-      DragAndDrop<DeckEditorMTGCard>.Item = item;
+      DragAndDrop<CardImportResult<MTGCardInfo>.Card>.Item = item;
       e.Data.RequestedOperation = DataPackageOperation.Copy;
     }
     base.DraggableGridViewDialog_DragItemsStarting(dialog, e);

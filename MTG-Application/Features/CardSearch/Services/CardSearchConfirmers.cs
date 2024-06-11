@@ -6,9 +6,9 @@ namespace MTGApplication.Features.CardSearch.Services;
 
 public class CardSearchConfirmers
 {
-  public Confirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
+  public Confirmer<MTGCardInfo, IEnumerable<MTGCardInfo>> ShowCardPrintsConfirmer { get; init; } = new();
 
-  public static Confirmation<IEnumerable<DeckEditorMTGCard>> GetShowCardPrintsConfirmation(IEnumerable<DeckEditorMTGCard> data)
+  public static Confirmation<IEnumerable<MTGCardInfo>> GetShowCardPrintsConfirmation(IEnumerable<MTGCardInfo> data)
   {
     return new(
       Title: "Card prints",

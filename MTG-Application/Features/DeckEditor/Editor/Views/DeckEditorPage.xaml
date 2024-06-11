@@ -12,7 +12,8 @@
   xmlns:customControls="using:MTGApplication.General.Views.Controls"
   xmlns:sys="using:System" 
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.Controls.CardListView"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
@@ -115,36 +116,36 @@
               <local:CommanderTextView 
                 PrefixText="Commander: "
                 Model="{x:Bind ViewModel.CommanderViewModel.Card, Mode=OneWay}"
-                EdhrecButtonClick="{x:Bind ViewModel.OpenEDHRECWebsiteCommandCommand, Mode=OneTime}"
-                DeleteButtonClick="{x:Bind ViewModel.CommanderViewModel.RemoveCommand, Mode=OneTime}"
+                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
+                DeleteButtonClick="{x:Bind ViewModel.CommanderViewModel.RemoveCommanderCommand, Mode=OneTime}"
                 ChangePrintCommand="{x:Bind ViewModel.CommanderViewModel.ChangeCardPrintCommand, Mode=OneTime}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Commander"
                 DragMoveCaptionText="Move to Commander"
-                OnDropCopy="{x:Bind ViewModel.CommanderViewModel.ChangeCommand, Mode=OneTime}"
-                OnDropRemove="{x:Bind ViewModel.CommanderViewModel.RemoveCommand, Mode=OneTime}"
+                OnDropCopy="{x:Bind ViewModel.CommanderViewModel.ChangeCommanderCommand, Mode=OneTime}"
+                OnDropRemove="{x:Bind ViewModel.CommanderViewModel.RemoveCommanderCommand, Mode=OneTime}"
                 OnDropBeginMoveFrom="{x:Bind ViewModel.CommanderViewModel.BeginMoveFromCommand, Mode=OneTime}"
                 OnDropBeginMoveTo="{x:Bind ViewModel.CommanderViewModel.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.CommanderViewModel.ExecuteMoveCommand, Mode=OneTime}"
-                OnDropImport="{x:Bind ViewModel.CommanderViewModel.ImportCommand, Mode=OneTime}"
+                OnDropImport="{x:Bind ViewModel.CommanderViewModel.ImportCommanderCommand, Mode=OneTime}"
                 HoverPreviewEnabled="True"/>
               <local:CommanderTextView 
                 PrefixText="Partner: "
                 Model="{x:Bind ViewModel.PartnerViewModel.Card, Mode=OneWay}"
-                EdhrecButtonClick="{x:Bind ViewModel.OpenEDHRECWebsiteCommandCommand, Mode=OneTime}"
-                DeleteButtonClick="{x:Bind ViewModel.PartnerViewModel.RemoveCommand, Mode=OneTime}"
+                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
+                DeleteButtonClick="{x:Bind ViewModel.PartnerViewModel.RemoveCommanderCommand, Mode=OneTime}"
                 ChangePrintCommand="{x:Bind ViewModel.CommanderViewModel.ChangeCardPrintCommand, Mode=OneTime}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Partner"
                 DragMoveCaptionText="Move to Partner"
-                OnDropCopy="{x:Bind ViewModel.PartnerViewModel.ChangeCommand, Mode=OneTime}"
-                OnDropRemove="{x:Bind ViewModel.PartnerViewModel.RemoveCommand, Mode=OneTime}"
+                OnDropCopy="{x:Bind ViewModel.PartnerViewModel.ChangeCommanderCommand, Mode=OneTime}"
+                OnDropRemove="{x:Bind ViewModel.PartnerViewModel.RemoveCommanderCommand, Mode=OneTime}"
                 OnDropBeginMoveFrom="{x:Bind ViewModel.PartnerViewModel.BeginMoveFromCommand, Mode=OneTime}"
                 OnDropBeginMoveTo="{x:Bind ViewModel.PartnerViewModel.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.PartnerViewModel.ExecuteMoveCommand, Mode=OneTime}"
-                OnDropImport="{x:Bind ViewModel.PartnerViewModel.ImportCommand, Mode=OneTime}"
+                OnDropImport="{x:Bind ViewModel.PartnerViewModel.ImportCommanderCommand, Mode=OneTime}"
                 HoverPreviewEnabled="True"/>
               <!--#endregion-->
 
@@ -158,8 +159,8 @@
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
@@ -167,7 +168,7 @@
                 </TextBlock>
               </customControls:LinedHeader.Header>
             </customControls:LinedHeader>
-            <local:AdvancedCardListView
+            <cardlistview:AdvancedCardListView
               x:Name="MaybeCardsListView"
               Grid.Row="2"
               DataContext="{x:Bind ViewModel.MaybeCardList, Mode=OneWay}"
@@ -185,11 +186,11 @@
               OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneWay}"
               OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
-              <local:AdvancedCardListView.KeyboardAccelerators>
+              <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-              </local:AdvancedCardListView.KeyboardAccelerators>
-              <local:AdvancedCardListView.ItemTemplate>
-                <DataTemplate x:DataType="models:MTGCard">
+              </cardlistview:AdvancedCardListView.KeyboardAccelerators>
+              <cardlistview:AdvancedCardListView.ItemTemplate>
+                <DataTemplate x:DataType="models:DeckEditorMTGCard">
                   <local:DeckEditorCardTextView
                     d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
                     DataContext="{Binding ElementName=MaybeCardsListView, Path=DataContext, Mode=OneTime}"
@@ -201,8 +202,8 @@
                     CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                     ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                 </DataTemplate>
-              </local:AdvancedCardListView.ItemTemplate>
-            </local:AdvancedCardListView>
+              </cardlistview:AdvancedCardListView.ItemTemplate>
+            </cardlistview:AdvancedCardListView>
             <!--#endregion-->
 
             <!--#region Wishlist -->
@@ -213,8 +214,8 @@
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
@@ -222,7 +223,7 @@
                 </TextBlock>
               </customControls:LinedHeader.Header>
             </customControls:LinedHeader>
-            <local:AdvancedCardListView
+            <cardlistview:AdvancedCardListView
               x:Name="WishCardsListView"
               Grid.Row="4"
               DataContext="{x:Bind ViewModel.WishCardList, Mode=OneWay}"
@@ -240,11 +241,11 @@
               OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneWay}"
               OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
-              <local:AdvancedCardListView.KeyboardAccelerators>
+              <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-              </local:AdvancedCardListView.KeyboardAccelerators>
-              <local:AdvancedCardListView.ItemTemplate>
-                <DataTemplate x:DataType="models:MTGCard">
+              </cardlistview:AdvancedCardListView.KeyboardAccelerators>
+              <cardlistview:AdvancedCardListView.ItemTemplate>
+                <DataTemplate x:DataType="models:DeckEditorMTGCard">
                   <local:DeckEditorCardTextView
                     d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
                     DataContext="{Binding ElementName=WishCardsListView, Path=DataContext, Mode=OneTime}"
@@ -256,8 +257,8 @@
                     CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                     ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                 </DataTemplate>
-              </local:AdvancedCardListView.ItemTemplate>
-            </local:AdvancedCardListView>
+              </cardlistview:AdvancedCardListView.ItemTemplate>
+            </cardlistview:AdvancedCardListView>
             <!--#endregion-->
 
             <!--#region Removelist -->
@@ -268,8 +269,8 @@
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                       <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
                       <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
@@ -277,7 +278,7 @@
                 </TextBlock>
               </customControls:LinedHeader.Header>
             </customControls:LinedHeader>
-            <local:AdvancedCardListView
+            <cardlistview:AdvancedCardListView
               x:Name="RemoveCardsListView"
               Grid.Row="6"
               DataContext="{x:Bind ViewModel.RemoveCardList, Mode=OneWay}"
@@ -295,11 +296,11 @@
               OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneWay}"
               OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
-              <local:AdvancedCardListView.KeyboardAccelerators>
+              <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-              </local:AdvancedCardListView.KeyboardAccelerators>
-              <local:AdvancedCardListView.ItemTemplate>
-                <DataTemplate x:DataType="models:MTGCard">
+              </cardlistview:AdvancedCardListView.KeyboardAccelerators>
+              <cardlistview:AdvancedCardListView.ItemTemplate>
+                <DataTemplate x:DataType="models:DeckEditorMTGCard">
                   <local:DeckEditorCardTextView
                     d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
                     DataContext="{Binding ElementName=RemoveCardsListView, Path=DataContext, Mode=OneTime}"
@@ -311,8 +312,8 @@
                     CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                     ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                 </DataTemplate>
-              </local:AdvancedCardListView.ItemTemplate>
-            </local:AdvancedCardListView>
+              </cardlistview:AdvancedCardListView.ItemTemplate>
+            </cardlistview:AdvancedCardListView>
             <!--#endregion-->
 
           </Grid>
@@ -497,8 +498,8 @@
             <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
               <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
               <MenuFlyoutSubItem Text="Export...">
-                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
               </MenuFlyoutSubItem>
               <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
             </MenuFlyout>
@@ -513,7 +514,7 @@
       <Grid controls:DockPanel.Dock="Top">
 
         <!--#region Grid View -->
-        <local:AdvancedAdaptiveCardGridView
+        <cardlistview:AdvancedAdaptiveCardGridView
           x:Name="DeckCardsGridView"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           ItemsSource="{Binding Cards, Mode=OneWay}"
@@ -534,11 +535,11 @@
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
           OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
           LosingFocus="ListView_LosingFocus">
-          <local:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
+          <cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
             <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-          </local:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
-          <local:AdvancedAdaptiveCardGridView.ItemTemplate>
-            <DataTemplate x:DataType="models:MTGCard">
+          </cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
+          <cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
+            <DataTemplate x:DataType="models:DeckEditorMTGCard">
               <local:DeckEditorCardImageView
                 d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
                 DataContext="{Binding ElementName=DeckCardsGridView, Path=DataContext, Mode=OneTime}"
@@ -547,12 +548,12 @@
                 CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                 ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
             </DataTemplate>
-          </local:AdvancedAdaptiveCardGridView.ItemTemplate>
-        </local:AdvancedAdaptiveCardGridView>
+          </cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
+        </cardlistview:AdvancedAdaptiveCardGridView>
         <!--#endregion-->
 
         <!--#region List View -->
-        <local:AdvancedCardListView
+        <cardlistview:AdvancedCardListView
           x:Name="DeckCardsListView"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           ItemsSource="{Binding Cards, Mode=OneWay}"
@@ -569,11 +570,11 @@
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
           OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
           LosingFocus="ListView_LosingFocus">
-          <local:AdvancedCardListView.KeyboardAccelerators>
+          <cardlistview:AdvancedCardListView.KeyboardAccelerators>
             <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-          </local:AdvancedCardListView.KeyboardAccelerators>
-          <local:AdvancedCardListView.ItemTemplate>
-            <DataTemplate x:DataType="models:MTGCard">
+          </cardlistview:AdvancedCardListView.KeyboardAccelerators>
+          <cardlistview:AdvancedCardListView.ItemTemplate>
+            <DataTemplate x:DataType="models:DeckEditorMTGCard">
               <local:DeckEditorCardTextView
                 d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
                 DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
@@ -583,8 +584,8 @@
                 CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                 ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
             </DataTemplate>
-          </local:AdvancedCardListView.ItemTemplate>
-        </local:AdvancedCardListView>
+          </cardlistview:AdvancedCardListView.ItemTemplate>
+        </cardlistview:AdvancedCardListView>
         <!--#endregion-->
 
       </Grid>

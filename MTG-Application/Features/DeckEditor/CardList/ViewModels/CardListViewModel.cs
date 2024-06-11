@@ -37,5 +37,5 @@ public partial class CardListViewModel(MTGCardImporter importer) : ViewModelBase
   public IAsyncRelayCommand<string> ImportCardsCommand => new ImportCards(this).Command;
   public IAsyncRelayCommand<string> ExportCardsCommand => new ExportCards(this).Command;
   public IRelayCommand<CardCountChangeArgs> ChangeCardCountCommand => new ChangeCardCount(this).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> CahngeCardPrintCommand => new ChangeCardPrint(this).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCardPrintCommand => new ChangeCardPrint(this).Command;
 }
