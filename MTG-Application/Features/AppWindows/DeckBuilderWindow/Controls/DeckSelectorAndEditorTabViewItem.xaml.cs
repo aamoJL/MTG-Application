@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.Features.DeckSelector;
+using MTGApplication.General.ViewModels;
 using MTGApplication.General.Views.AppWindows;
 using System.Threading.Tasks;
 
@@ -30,7 +31,11 @@ public sealed partial class DeckSelectorAndEditorTabViewItem : TabViewItem
     {
       IsSelected = true; // Will bring this tab view to the front
 
-      if (!await deckEditorPage.ViewModel.ConfirmUnsavedChangesCommand())
+      var unsavedArgs = new ISavable.ConfirmArgs();
+
+      await deckEditorPage.ViewModel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
+
+      if (unsavedArgs.Canceled)
         return false; // Closing cancelled
     }
 

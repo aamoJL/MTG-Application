@@ -5,11 +5,7 @@ namespace MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
 /// <summary>
 /// Use case to switch window theme between dark and light themes.
 /// </summary>
-public class ChangeWindowTheme : UseCase
+public class ChangeWindowTheme(ElementTheme theme) : UseCase()
 {
-  public ChangeWindowTheme(ElementTheme theme) : base() => Theme = theme;
-
-  public ElementTheme Theme { get; }
-
-  public override void Execute() => AppConfig.LocalSettings.AppTheme = Theme;
+  public override void Execute() => AppConfig.LocalSettings.AppTheme = theme;
 }

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;

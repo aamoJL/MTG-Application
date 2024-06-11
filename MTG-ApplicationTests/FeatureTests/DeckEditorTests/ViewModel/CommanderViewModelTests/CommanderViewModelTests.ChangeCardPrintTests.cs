@@ -78,7 +78,7 @@ public partial class CommanderViewModelTests
         {
           ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(newPrint) }
         },
-        OnCardPropertyChange = () => { invoked = true; }
+        OnChange = () => { invoked = true; }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);

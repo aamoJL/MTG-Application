@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
@@ -12,6 +13,17 @@ public abstract class ViewModelCommand<TViewModel>(TViewModel viewmodel)
   protected virtual bool CanExecute() => true;
 
   protected abstract void Execute();
+}
+
+public abstract class ViewModelCommand<TViewModel, TParam>(TViewModel viewmodel)
+{
+  public RelayCommand<TParam> Command => new(execute: Execute, canExecute: CanExecute);
+
+  protected TViewModel Viewmodel { get; } = viewmodel;
+
+  protected virtual bool CanExecute(TParam param) => true;
+
+  protected abstract void Execute(TParam param);
 }
 
 public abstract class ViewModelAsyncCommand<TViewModel>(TViewModel viewmodel)
@@ -35,4 +47,3 @@ public abstract class ViewModelAsyncCommand<TViewModel, TParam>(TViewModel viewm
 
   protected abstract Task Execute(TParam param);
 }
-
