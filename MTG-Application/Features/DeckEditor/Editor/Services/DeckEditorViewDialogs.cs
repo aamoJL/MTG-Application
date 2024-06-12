@@ -18,13 +18,13 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
     confirmers.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmers.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmers.ShowTokensConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCardInfo>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
       {
         Items = msg.Data.ToArray(),
         PrimaryButtonText = string.Empty,
         SecondaryButtonText = string.Empty,
         CloseButtonText = "Close"
-      }.ShowAsync(getWrapper.Invoke()) as MTGCardInfo;
+      }.ShowAsync(getWrapper.Invoke()) as MTGCard;
 
     confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
     {
@@ -59,17 +59,17 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       PrimaryButtonText = "Yes"
     }.ShowAsync(getWrapper.Invoke())).ToConfirmationResult();
     confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCardInfo>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
       {
         Items = msg.Data.ToArray(),
         SecondaryButtonText = string.Empty
-      }.ShowAsync(getWrapper.Invoke()) as MTGCardInfo;
+      }.ShowAsync(getWrapper.Invoke()) as MTGCard;
     confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCardInfo>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
       {
         Items = msg.Data.ToArray(),
         PrimaryButtonText = "Change",
         SecondaryButtonText = string.Empty,
-      }.ShowAsync(getWrapper.Invoke()) as MTGCardInfo;
+      }.ShowAsync(getWrapper.Invoke()) as MTGCard;
   }
 }

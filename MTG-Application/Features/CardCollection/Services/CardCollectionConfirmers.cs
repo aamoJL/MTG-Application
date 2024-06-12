@@ -11,14 +11,12 @@ public class CardCollectionConfirmers
   public Confirmer<string, string> SaveCollectionConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> OverrideCollectionConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteCollectionConfirmer { get; init; } = new();
-
   public Confirmer<(string Name, string Query)?> NewCollectionListConfirmer { get; init; } = new();
   public Confirmer<(string Name, string Query)?, (string Name, string Query)> EditCollectionListConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteCollectionListConfirmer { get; init; } = new();
   public Confirmer<string, string> ExportCardsConfirmer { get; init; } = new();
   public Confirmer<string> ImportCardsConfirmer { get; init; } = new();
-
-  public Confirmer<MTGCardInfo, IEnumerable<MTGCardInfo>> ShowCardPrintsConfirmer { get; init; } = new();
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -94,7 +92,7 @@ public class CardCollectionConfirmers
       Message: string.Empty);
   }
 
-  public static Confirmation<IEnumerable<MTGCardInfo>> GetShowCardPrintsConfirmation(IEnumerable<MTGCardInfo> data)
+  public static Confirmation<IEnumerable<MTGCard>> GetShowCardPrintsConfirmation(IEnumerable<MTGCard> data)
   {
     return new(
       Title: "Card prints",

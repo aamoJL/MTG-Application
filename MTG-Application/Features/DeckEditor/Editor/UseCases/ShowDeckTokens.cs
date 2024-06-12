@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Linq;
@@ -29,7 +30,7 @@ public partial class DeckEditorViewModelCommands
       var tokens = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(stringBuilder.ToString()))).Found
         .DistinctBy(t => t.Info.OracleId).Select(x => x.Info); // Filter duplicates out using OracleId
 
-      await Viewmodel.Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens));
+      await Viewmodel.Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens.Select(x => new MTGCard(x))));
     }
   }
 }

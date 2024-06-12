@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : object(), IIncrementalSource<TCard> where TCard : IMTGCard
+public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : object(), IIncrementalSource<TCard> where TCard : MTGCard
 {
   public List<TCard> Cards { get; set; } = [];
   public string NextPage { get; set; }
@@ -27,5 +27,5 @@ public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : o
     return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize);
   }
 
-  protected abstract TCard ConvertToCardType(CardImportResult<MTGCardInfo>.Card card);
+  protected abstract TCard ConvertToCardType(CardImportResult.Card card);
 }

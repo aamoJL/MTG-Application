@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl
-  x:Class="MTGApplication.Features.CardSearch.Controls.ScryfallCardSearchInputControl"
+  x:Class="MTGApplication.Features.CardSearch.Views.Controls.ScryfallCardSearchInputControl"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
-  xmlns:enums="using:MTGApplication.Features.CardSearch"
   xmlns:api="using:MTGApplication.General.Services.API.CardAPI"
+  xmlns:local="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl"
   mc:Ignorable="d">
 
   <Grid ColumnSpacing="0" VerticalAlignment="Top">
@@ -46,7 +46,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="85"
-        ItemsSource="{ui:EnumValues Type=enums:GameFormat}"
+        ItemsSource="{ui:EnumValues Type=local:GameFormat}"
         SelectedItem="{x:Bind ViewModel.SearchGameFormat, Mode=TwoWay}"/>
       <ComboBox 
         Header="Unique"
@@ -55,7 +55,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="85"
-        ItemsSource="{ui:EnumValues Type=enums:CardUniqueness}"
+        ItemsSource="{ui:EnumValues Type=local:CardUniqueness}"
         SelectedItem="{x:Bind ViewModel.SearchCardUniqueness, Mode=TwoWay}"/>
       <ComboBox 
         Header="Order" 
@@ -64,7 +64,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="105"
-        ItemsSource="{ui:EnumValues Type=enums:SearchOrderProperty}"
+        ItemsSource="{ui:EnumValues Type=local:SearchOrderProperty}"
         SelectedItem="{x:Bind ViewModel.SearchOrderProperty, Mode=TwoWay}" />
       <ComboBox 
         Header="Direction" 
@@ -73,7 +73,7 @@
         CornerRadius="0" 
         BorderThickness="0 1 1 1" 
         Width="80"
-        ItemsSource="{ui:EnumValues Type=enums:SearchOrderDirection}"
+        ItemsSource="{ui:EnumValues Type=local:SearchOrderDirection}"
         SelectedItem="{x:Bind ViewModel.SearchOrderDirection, Mode=TwoWay}" />
     </StackPanel>
     <Button 

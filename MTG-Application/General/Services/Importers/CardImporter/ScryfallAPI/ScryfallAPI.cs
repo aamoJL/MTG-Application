@@ -34,15 +34,15 @@ public partial class ScryfallAPI : MTGCardImporter
   public override string Name => "Scryfall";
   public override int PageSize => 175;
 
-  public override async Task<CardImportResult<MTGCardInfo>> ImportCardsWithSearchQuery(string searchParams)
+  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams)
   {
-    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult<MTGCardInfo>.Empty(); }
+    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
     return await ImportFromUri(GetSearchUri(searchParams));
   }
 
-  public override async Task<CardImportResult<MTGCardInfo>> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
-    var pageResults = new List<CardImportResult<MTGCardInfo>>();
+    var pageResults = new List<CardImportResult>();
     var currentPage = pageUri;
 
     do
@@ -53,17 +53,17 @@ public partial class ScryfallAPI : MTGCardImporter
       if (!JsonService.TryParseJson(data, out var rootNode))
         break;
 
-      List<CardImportResult<MTGCardInfo>.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
+      List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
       var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
       var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
-      pageResults.Add(new CardImportResult<MTGCardInfo>([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
+      pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
 
       currentPage = nextPage;
     } while (fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
 
     return pageResults.Count switch
     {
-      0 => CardImportResult<MTGCardInfo>.Empty(),
+      0 => CardImportResult.Empty(),
       1 => pageResults.First(),
       _ => new(
         Found: pageResults.SelectMany(x => x.Found).ToArray(),
@@ -73,9 +73,9 @@ public partial class ScryfallAPI : MTGCardImporter
     };
   }
 
-  public override async Task<CardImportResult<MTGCardInfo>> ImportFromString(string importText)
+  public override async Task<CardImportResult> ImportFromString(string importText)
   {
-    if (string.IsNullOrEmpty(importText)) return CardImportResult<MTGCardInfo>.Empty(CardImportResult.ImportSource.External);
+    if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty(CardImportResult.ImportSource.External);
 
     var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -111,7 +111,7 @@ public partial class ScryfallAPI : MTGCardImporter
     return await FetchWithIdentifiers(identifiers);
   }
 
-  public override async Task<CardImportResult<MTGCardInfo>> ImportFromDTOs(IEnumerable<MTGCardDTO> dtos)
+  public override async Task<CardImportResult> ImportFromDTOs(IEnumerable<MTGCardDTO> dtos)
   {
     var identifiers = dtos.Select(x => new ScryfallIdentifier(x)).ToArray();
     return await FetchWithIdentifiers(identifiers);
@@ -120,11 +120,11 @@ public partial class ScryfallAPI : MTGCardImporter
   /// <summary>
   /// Returns <see cref="CardImportResult.Card"/> array from the given <paramref name="jsonNode"/>
   /// </summary>
-  protected async Task<IEnumerable<CardImportResult<MTGCardInfo>.Card>> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
+  protected async Task<IEnumerable<CardImportResult.Card>> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
     if (jsonNode == null) { return []; }
 
-    var cards = new List<CardImportResult<MTGCardInfo>.Card>();
+    var cards = new List<CardImportResult.Card>();
 
     if (jsonNode?["data"] is JsonNode dataNode)
       foreach (var itemInfo in await Task.WhenAll(dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x, paperOnly)))))
@@ -238,13 +238,13 @@ public partial class ScryfallAPI : MTGCardImporter
   /// <summary>
   /// Fetches MTGCards from the API using the given identifier objects
   /// </summary>
-  private async Task<CardImportResult<MTGCardInfo>> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
+  private async Task<CardImportResult> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
     {
       var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(chunk);
 
-      var fetchedCards = new List<CardImportResult<MTGCardInfo>.Card>();
+      var fetchedCards = new List<CardImportResult.Card>();
       var notFoundCount = 0;
 
       // Fetch and covert the JSON to card objects

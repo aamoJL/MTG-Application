@@ -16,7 +16,7 @@ public partial class CardImporterTests
     public async Task Import_Serialized_CardFound()
     {
       var importer = new DeckEditorCardImporter(new ScryfallAPI());
-      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(), Count: 5);
+      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(), Count: 5);
 
       JsonService.TrySerializeObject(card, out var json);
 

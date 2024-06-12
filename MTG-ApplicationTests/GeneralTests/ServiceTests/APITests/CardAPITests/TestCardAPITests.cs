@@ -19,7 +19,7 @@ public class TestCardAPITests
 
     api.ExpectedCards =
     [
-      new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo()),
+      new CardImportResult.Card(MTGCardInfoMocker.MockInfo()),
     ];
     Assert.AreEqual(0, (await api.ImportCardsWithSearchQuery(string.Empty)).Found.Length);
     Assert.AreEqual(1, (await api.ImportCardsWithSearchQuery("params")).Found.Length);
@@ -29,7 +29,7 @@ public class TestCardAPITests
   public async Task FetchFromDTOsTest()
   {
     var api = new TestMTGCardImporter();
-    var expectedCards = new List<CardImportResult<MTGCardInfo>.Card>
+    var expectedCards = new List<CardImportResult.Card>
     {
       new(MTGCardInfoMocker.MockInfo()),
       new(MTGCardInfoMocker.MockInfo()),
@@ -55,7 +55,7 @@ public class TestCardAPITests
   public async Task FetchFromStringTest()
   {
     var api = new TestMTGCardImporter();
-    var cards = new List<CardImportResult<MTGCardInfo>.Card>
+    var cards = new List<CardImportResult.Card>
     {
       new(MTGCardInfoMocker.MockInfo()),
       new(MTGCardInfoMocker.MockInfo()),

@@ -18,7 +18,7 @@ public partial class CardSearchViewModelTests
     public async Task SearchCards_WithValidQuery_CardsFound()
     {
       var query = "Black Lotus";
-      _dependensies.Importer.ExpectedCards = [new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(name: query))];
+      _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
 
       var search = new CardSearchViewModel(_dependensies.Importer);
 
@@ -31,7 +31,7 @@ public partial class CardSearchViewModelTests
     public async Task SearchCards_WithEmptyQuery_CardsNotFound()
     {
       var query = string.Empty;
-      _dependensies.Importer.ExpectedCards = [new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(name: query))];
+      _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
       var search = new CardSearchViewModel(_dependensies.Importer);
 
       await search.SubmitSearchCommand.ExecuteAsync(query);
@@ -43,7 +43,7 @@ public partial class CardSearchViewModelTests
     public async Task SearchCards_WithValidQuery_CardsAreLoaded()
     {
       var query = "Black Lotus";
-      _dependensies.Importer.ExpectedCards = [new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(name: query))];
+      _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
       var search = new CardSearchViewModel(_dependensies.Importer);
 
       await search.SubmitSearchCommand.ExecuteAsync(query);

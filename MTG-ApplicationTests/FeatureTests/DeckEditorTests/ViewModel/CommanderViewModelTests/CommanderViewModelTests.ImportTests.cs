@@ -17,7 +17,7 @@ public partial class CommanderViewModelTests
     [TestMethod("Card should not change if the imported card is not legendary")]
     public async Task Import_NotLegendary_CardIsNull()
     {
-      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
+      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
       var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
 
       JsonService.TrySerializeObject(card, out var json);
@@ -30,7 +30,7 @@ public partial class CommanderViewModelTests
     [TestMethod("Card should change if the imported card is legendary")]
     public async Task Import_Legendary_CardIsCard()
     {
-      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
+      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
       var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
 
       JsonService.TrySerializeObject(card, out var json);
@@ -43,7 +43,7 @@ public partial class CommanderViewModelTests
     [TestMethod("Success notifications should be sent when the import was successfull")]
     public async Task Import_Success_SuccessNotificationSent()
     {
-      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
+      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
       var viewmodel = new CommanderViewModel(new TestMTGCardImporter())
       {
         Notifier = new()
@@ -74,7 +74,7 @@ public partial class CommanderViewModelTests
     [TestMethod("Error notification should be sent when the import fails")]
     public async Task Import_NotLegendary_LegendaryErrorNotificationSent()
     {
-      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
+      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
       var viewmodel = new CommanderViewModel(new TestMTGCardImporter())
       {
         Notifier = new()

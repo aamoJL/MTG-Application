@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.General.Services;
+using MTGApplication.General.Models;
 using MTGApplication.General.Views;
 using MTGApplication.General.Views.DragAndDrop;
 using System;
@@ -8,18 +8,21 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
 
-public class CommanderTextViewDragAndDrop(IClassCopier<DeckEditorMTGCard> itemCopier) : DragAndDrop<DeckEditorMTGCard>(itemCopier)
+public class CommanderTextViewDragAndDrop() : DragAndDrop<CardMoveArgs>()
 {
   public void DragStarting(UIElement sender, DragStartingEventArgs e)
   {
-    OnDragStarting((sender as BasicCardView<DeckEditorMTGCard>)?.Model, out var requestedOperation);
+    if ((sender as BasicCardView<DeckEditorMTGCard>)?.Model is not DeckEditorMTGCard item)
+      return;
+
+    OnDragStarting(new(item, item.Count), out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }
 
-  public void DragOver(object sender, DragEventArgs e) => DragOver(e);
+  public void DragOver(object _, DragEventArgs e) => DragOver(e);
 
-  public async void Drop(object sender, DragEventArgs e)
+  public async void Drop(object _, DragEventArgs e)
   {
     var def = e.GetDeferral();
 
@@ -28,13 +31,13 @@ public class CommanderTextViewDragAndDrop(IClassCopier<DeckEditorMTGCard> itemCo
     def.Complete();
   }
 
-  public void DropCompleted(UIElement sender, DropCompletedEventArgs args) => DropCompleted();
+  public void DropCompleted(UIElement _, DropCompletedEventArgs args) => DropCompleted();
 
   public override void DragOver(DragEventArgs eventArgs)
   {
     base.DragOver(eventArgs);
 
-    if (Item?.Info.TypeLine.Contains("Legendary", StringComparison.OrdinalIgnoreCase) is false)
+    if (Item?.Card.Info.TypeLine.Contains("Legendary", StringComparison.OrdinalIgnoreCase) is false)
     {
       eventArgs.AcceptedOperation = DataPackageOperation.None;
       eventArgs.DragUIOverride.Caption = "Invalid card";

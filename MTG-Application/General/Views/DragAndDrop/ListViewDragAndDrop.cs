@@ -1,28 +1,23 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.General.Services;
+using MTGApplication.General.Models;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.General.Views.DragAndDrop;
 
-// TODO: Change to ImportResult.Card
-
-public class ListViewDragAndDrop : DragAndDrop<DeckEditorMTGCard>
+public class ListViewDragAndDrop<TItem>(Func<TItem, CardMoveArgs> itemToArgsConverter) : DragAndDrop<CardMoveArgs>
 {
-  public ListViewDragAndDrop(IClassCopier<DeckEditorMTGCard> itemCopier) : base(itemCopier) { }
-
-  public void DragStarting(object sender, DragItemsStartingEventArgs e)
+  public void DragStarting(object _, DragItemsStartingEventArgs e)
   {
-    OnDragStarting(e.Items[0] as DeckEditorMTGCard, out var requestedOperation);
+    OnDragStarting(itemToArgsConverter((TItem)e.Items[0]), out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }
 
-  public void DragOver(object sender, DragEventArgs e) => DragOver(e);
+  public void DragOver(object _, DragEventArgs e) => DragOver(e);
 
-  public async void Drop(object sender, DragEventArgs e)
+  public async void Drop(object _, DragEventArgs e)
   {
     var def = e.GetDeferral();
 
@@ -31,5 +26,5 @@ public class ListViewDragAndDrop : DragAndDrop<DeckEditorMTGCard>
     def.Complete();
   }
 
-  public void DragCompleted(ListViewBase sender, DragItemsCompletedEventArgs e) => DropCompleted();
+  public void DragCompleted(ListViewBase _, DragItemsCompletedEventArgs e) => DropCompleted();
 }

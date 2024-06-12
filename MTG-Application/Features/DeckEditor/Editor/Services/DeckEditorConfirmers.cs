@@ -13,7 +13,7 @@ public class DeckEditorConfirmers
   public Confirmer<string, string> SaveDeckConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> OverrideDeckConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteDeckConfirmer { get; init; } = new();
-  public Confirmer<MTGCardInfo, IEnumerable<MTGCardInfo>> ShowTokensConfirmer { get; init; } = new();
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowTokensConfirmer { get; init; } = new();
 
   public CardListConfirmers CardListConfirmers { get; init; } = new();
   public CommanderConfirmers CommanderConfirmers { get; init; } = new();
@@ -55,7 +55,7 @@ public class DeckEditorConfirmers
       Message: $"Are you sure you want to delete '{name}'?");
   }
 
-  public static Confirmation<IEnumerable<MTGCardInfo>> GetShowTokensConfirmation(IEnumerable<MTGCardInfo> data)
+  public static Confirmation<IEnumerable<MTGCard>> GetShowTokensConfirmation(IEnumerable<MTGCard> data)
   {
     return new(
       Title: "Tokens",

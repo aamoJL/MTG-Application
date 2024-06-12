@@ -21,9 +21,9 @@ public partial class DeckSelectorViewModelCommands
       // TODO: save image to database so it does not need to be fetched here
       var commanders = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromDTOs(deckDTOs.Where(x => x.Commander != null).Select(x => x.Commander)))).Found;
 
-      var decks = deckDTOs.Select(d => new DeckSelectionDeck(
-        Title: d.Name,
-        ImageUri: commanders.FirstOrDefault(c => c.Info.ScryfallId == d.Commander.ScryfallId)?.Info.FrontFace.ImageUri ?? string.Empty));
+      var decks = deckDTOs.Select(dto => new DeckSelectionDeck(
+        Title: dto.Name,
+        ImageUri: commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.FrontFace.ImageUri ?? string.Empty));
 
       Viewmodel.DeckItems.Clear();
 

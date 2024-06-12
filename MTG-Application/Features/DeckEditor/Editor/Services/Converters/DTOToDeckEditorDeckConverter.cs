@@ -15,12 +15,12 @@ public class DTOToDeckEditorDeckConverter(MTGCardImporter importer)
   {
     if (dto == null) return null;
 
-    CardImportResult<MTGCardInfo>.Card commander = null;
-    CardImportResult<MTGCardInfo>.Card partner = null;
-    var deckCards = new List<CardImportResult<MTGCardInfo>.Card>();
-    var wishCards = new List<CardImportResult<MTGCardInfo>.Card>();
-    var maybeCards = new List<CardImportResult<MTGCardInfo>.Card>();
-    var removeCards = new List<CardImportResult<MTGCardInfo>.Card>();
+    CardImportResult.Card commander = null;
+    CardImportResult.Card partner = null;
+    var deckCards = new List<CardImportResult.Card>();
+    var wishCards = new List<CardImportResult.Card>();
+    var maybeCards = new List<CardImportResult.Card>();
+    var removeCards = new List<CardImportResult.Card>();
 
     await Task.WhenAll(
     [

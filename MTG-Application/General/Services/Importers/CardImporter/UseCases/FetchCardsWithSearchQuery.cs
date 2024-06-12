@@ -3,8 +3,8 @@ using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
-public class FetchCardsWithSearchQuery(MTGCardImporter importer) : UseCase<string, Task<CardImportResult<MTGCardInfo>>>
+public class FetchCardsWithSearchQuery(MTGCardImporter importer) : UseCase<string, Task<CardImportResult>>
 {
-  public async override Task<CardImportResult<MTGCardInfo>> Execute(string query)
+  public async override Task<CardImportResult> Execute(string query)
     => await importer.ImportCardsWithSearchQuery(query);
 }

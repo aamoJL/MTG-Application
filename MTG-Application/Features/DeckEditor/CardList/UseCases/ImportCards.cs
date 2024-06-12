@@ -25,7 +25,7 @@ public partial class CardListViewModelCommands
 
       var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
 
-      var addedCards = new List<CardImportResult<MTGCardInfo>.Card>();
+      var addedCards = new List<CardImportResult.Card>();
       var skipConflictConfirmation = false;
       var addConflictConfirmationResult = ConfirmationResult.Yes;
 

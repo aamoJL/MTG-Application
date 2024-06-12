@@ -1,6 +1,3 @@
 ﻿namespace MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl;
 
-public enum SearchOrderDirection
-{
-  Asc, Desc
-}
+public enum SearchOrderDirection { Asc, Desc }

@@ -4,7 +4,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,14 +27,14 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 
   public AdvancedAdaptiveCardGridView()
   {
-    DragAndDrop = new(new DeckEditorMTGCardCopier())
+    DragAndDrop = new(itemToArgsConverter: (item) => { return new CardMoveArgs(item, item.Count); })
     {
-      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
-      OnRemove = (item) => OnDropRemove?.Execute(item),
+      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnRemove = (item) => OnDropRemove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
-      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
-      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
-      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item)
+      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count))
     };
 
     DragItemsStarting += DragAndDrop.DragStarting;
@@ -63,7 +63,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     set => SetValue(FilterPropertiesProperty, value);
   }
 
-  private ListViewDragAndDrop DragAndDrop { get; }
+  private ListViewDragAndDrop<DeckEditorMTGCard> DragAndDrop { get; }
   private AdvancedCollectionView FilteredAndSortedCardSource
   {
     get => filteredAndSortedCardSource;

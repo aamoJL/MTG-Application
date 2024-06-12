@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using MTGApplication.Features.CardCollection.Services;
-using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
@@ -57,12 +57,12 @@ public partial class QueryCardsViewModel : ObservableObject
     switch (e.Action)
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.NewItems[0] as DeckEditorMTGCard).Info.ScryfallId)
+        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId)
           is CardCollectionMTGCard existingNew)
           existingNew.IsOwned = true;
         break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.OldItems[0] as DeckEditorMTGCard).Info.ScryfallId)
+        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId)
           is CardCollectionMTGCard existingOld)
           existingOld.IsOwned = false;
         break;

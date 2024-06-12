@@ -18,7 +18,7 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          ShowCardPrintsConfirmer = new TestExceptionConfirmer<MTGCardInfo, IEnumerable<MTGCardInfo>>()
+          ShowCardPrintsConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
         }
       }.MockVM();
 

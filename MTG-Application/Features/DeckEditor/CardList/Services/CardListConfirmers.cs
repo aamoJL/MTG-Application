@@ -10,7 +10,7 @@ public class CardListConfirmers
   public Confirmer<string, string> ImportConfirmer { get; init; } = new();
   public Confirmer<(ConfirmationResult Result, bool SkipCheck)> AddMultipleConflictConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> AddSingleConflictConfirmer { get; init; } = new();
-  public Confirmer<MTGCardInfo, IEnumerable<MTGCardInfo>> ChangeCardPrintConfirmer { get; init; } = new();
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
 
   public static Confirmation<string> GetExportConfirmation(string data)
   {
@@ -42,7 +42,7 @@ public class CardListConfirmers
       Message: $"'{cardName}' already exists in the list. Do you still want to add it?");
   }
 
-  public static Confirmation<IEnumerable<MTGCardInfo>> GetChangeCardPrintConfirmation(IEnumerable<MTGCardInfo> data)
+  public static Confirmation<IEnumerable<MTGCard>> GetChangeCardPrintConfirmation(IEnumerable<MTGCard> data)
   {
     return new(
       Title: "Card prints",

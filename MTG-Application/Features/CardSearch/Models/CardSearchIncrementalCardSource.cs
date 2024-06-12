@@ -6,6 +6,6 @@ namespace MTGApplication.Features.CardSearch.Models;
 
 public class CardSearchIncrementalCardSource(MTGCardImporter importer) : IncrementalCardSource<MTGCard>(importer)
 {
-  protected override MTGCard ConvertToCardType(CardImportResult<MTGCardInfo>.Card card)
+  protected override MTGCard ConvertToCardType(CardImportResult.Card card)
     => new(card.Info);
 }

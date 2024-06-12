@@ -34,10 +34,10 @@ public partial class CardCollectionViewDialogs : IViewDialogs<CardCollectionConf
       SecondaryButtonText = string.Empty
     }.ShowAsync(getWrapper.Invoke());
     confirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg)
-      => (await new GridViewDialog<MTGCardInfo>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
       {
         Items = msg.Data.ToArray(),
         SecondaryButtonText = string.Empty
-      }.ShowAsync(getWrapper.Invoke())) as MTGCardInfo;
+      }.ShowAsync(getWrapper.Invoke())) as MTGCard;
   }
 }

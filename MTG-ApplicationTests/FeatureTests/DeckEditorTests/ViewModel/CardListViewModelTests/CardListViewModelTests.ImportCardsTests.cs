@@ -21,7 +21,7 @@ public partial class CardListViewModelTests
     public async Task ImportCards_SerializedCardData_CardAdded()
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter());
-      JsonService.TrySerializeObject(new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo()), out var json);
+      JsonService.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
 
@@ -32,7 +32,7 @@ public partial class CardListViewModelTests
     public async Task ImportCards_SerializedCardData_Undo_CardRemoved()
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter());
-      JsonService.TrySerializeObject(new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo()), out var json);
+      JsonService.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
       viewmodel.UndoStack.Undo();
@@ -44,7 +44,7 @@ public partial class CardListViewModelTests
     public async Task ImportCards_SerializedCardData_Redo_CardAddedAgain()
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter());
-      JsonService.TrySerializeObject(new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo()), out var json);
+      JsonService.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
       viewmodel.UndoStack.Undo();
@@ -134,7 +134,7 @@ public partial class CardListViewModelTests
       };
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
-        ExpectedCards = [.. cards.Select(x => new CardImportResult<MTGCardInfo>.Card(x.Info, x.Count))]
+        ExpectedCards = [.. cards.Select(x => new CardImportResult.Card(x.Info, x.Count))]
       })
       {
         Cards = new([.. cards]),
@@ -171,7 +171,7 @@ public partial class CardListViewModelTests
       };
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
-        ExpectedCards = [.. cards.Select(x => new CardImportResult<MTGCardInfo>.Card(x.Info, x.Count))]
+        ExpectedCards = [.. cards.Select(x => new CardImportResult.Card(x.Info, x.Count))]
       })
       {
         Cards = new([.. cards]),

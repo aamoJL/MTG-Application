@@ -10,7 +10,8 @@
   xmlns:sys="using:System"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
   xmlns:cardsearch="using:MTGApplication.Features.CardSearch" 
-  xmlns:models="using:MTGApplication.General.Models"
+  xmlns:models="using:MTGApplication.General.Models" 
+  xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -18,7 +19,7 @@
     <controls:DockPanel Grid.Column="0" LastChildFill="True" Background="Transparent">
 
       <!--#region Search Input -->
-      <customControls:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" Submit="{x:Bind ViewModel.SubmitSearchCommand}" />
+      <searchinputcontrol:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" Submit="{x:Bind ViewModel.SubmitSearchCommand}" />
       <!--#endregion-->
 
       <!--#region Commandbar -->

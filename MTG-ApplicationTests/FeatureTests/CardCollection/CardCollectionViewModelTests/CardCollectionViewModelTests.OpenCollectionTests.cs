@@ -136,7 +136,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Open_Valid_QueryCardsUpdated()
     {
-      var expectedCards = new CardImportResult<MTGCardInfo>.Card[]
+      var expectedCards = new CardImportResult.Card[]
       {
         new (MTGCardInfoMocker.MockInfo(name: "1")),
         new (MTGCardInfoMocker.MockInfo(name: "2")),

@@ -44,7 +44,7 @@ public class MTGCardTests
   [TestMethod]
   public void Serialize()
   {
-    var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
+    var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo());
 
     JsonService.TrySerializeObject(card, out var serialized);
 
@@ -54,7 +54,7 @@ public class MTGCardTests
   [TestMethod]
   public void Deserialize()
   {
-    var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
+    var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo());
 
     JsonService.TrySerializeObject(card, out var serialized);
     JsonService.TryDeserializeJson(serialized, out DeckEditorMTGCard deserialized);

@@ -18,13 +18,13 @@ public partial class CardListViewModelCommands
       {
         var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: existingCard.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
-        if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints)) is MTGCardInfo selection)
+        if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CardListConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
         {
-          if (selection.ScryfallId == existingCard.Info.ScryfallId)
+          if (selection.Info.ScryfallId == existingCard.Info.ScryfallId)
             return; // Same print
 
           Viewmodel.UndoStack.PushAndExecute(
-            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(existingCard, existingCard.Info, selection, Viewmodel.CardCopier)
+            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(existingCard, existingCard.Info, selection.Info, Viewmodel.CardCopier)
             {
               ReversibleAction = new CardListViewModelReversibleActions.ReversibleCardPrintChangeAction(Viewmodel)
             });

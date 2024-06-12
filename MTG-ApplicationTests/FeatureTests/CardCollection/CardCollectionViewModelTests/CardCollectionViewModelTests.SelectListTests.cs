@@ -62,7 +62,7 @@ public partial class CardCollectionViewModelTests
 
       Assert.AreEqual(0, viewmodel.QueryCardsViewModel.Collection.Count);
 
-      _dependencies.CardAPI.ExpectedCards = [.. _savedCollection.CollectionLists[1].Cards.Select(x => new CardImportResult<MTGCardInfo>.Card(x.Info))];
+      _dependencies.CardAPI.ExpectedCards = [.. _savedCollection.CollectionLists[1].Cards.Select(x => new CardImportResult.Card(x.Info))];
 
       await viewmodel.SelectListCommand.ExecuteAsync(viewmodel.Collection.CollectionLists[1]);
       await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);

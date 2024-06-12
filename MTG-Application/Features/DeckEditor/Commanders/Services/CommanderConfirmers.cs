@@ -6,9 +6,9 @@ namespace MTGApplication.Features.DeckEditor.Commanders.Services;
 
 public class CommanderConfirmers
 {
-  public Confirmer<MTGCardInfo, IEnumerable<MTGCardInfo>> ChangeCardPrintConfirmer { get; init; } = new();
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
 
-  public static Confirmation<IEnumerable<MTGCardInfo>> GetChangeCardPrintConfirmation(IEnumerable<MTGCardInfo> data)
+  public static Confirmation<IEnumerable<MTGCard>> GetChangeCardPrintConfirmation(IEnumerable<MTGCard> data)
   {
     return new(
       Title: "Card prints",

@@ -1,5 +1,4 @@
 ﻿using Microsoft.UI.Xaml;
-using MTGApplication.General.Services;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -7,12 +6,11 @@ using Windows.ApplicationModel.DataTransfer.DragDrop;
 
 namespace MTGApplication.General.Views.DragAndDrop;
 
-public abstract class DragAndDrop<T>(IClassCopier<T> itemCopier)
+public abstract class DragAndDrop<T>()
 {
   public static DragAndDrop<T> DragOrigin { get; set; }
   public static T Item { get; set; }
 
-  public IClassCopier<T> ItemCopier { get; } = itemCopier;
   public bool AcceptMove { get; set; } = true;
   public string CopyCaptionOverride { get; set; } = string.Empty;
   public string MoveCaptionOverride { get; set; } = string.Empty;

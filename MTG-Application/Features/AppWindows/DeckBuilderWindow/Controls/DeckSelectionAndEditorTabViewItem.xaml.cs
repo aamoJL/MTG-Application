@@ -27,22 +27,12 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
   /// <returns><see langword="true"/> if the tab can be closed; otherwise <see langword="false"/></returns>
   public async Task RequestClosure(ISavable.ConfirmArgs args)
   {
-    if (Frame?.Content is DeckEditorPage deckEditorPage && deckEditorPage.ViewModel.HasUnsavedChanges)
-    {
-      IsSelected = true; // Will bring this tab view to the front
+    await ConfirmClosure(args);
 
-      var unsavedArgs = new ISavable.ConfirmArgs();
+    if (args.Cancelled)
+      return;
 
-      await deckEditorPage.ViewModel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
-
-      if (unsavedArgs.Cancelled)
-      {
-        args.Cancelled = true; // Closing cancelled
-        return;
-      }
-    }
-
-    args.Cancelled = false;
+    Close();
   }
 
   private void Frame_Navigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -78,13 +68,30 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
   {
     if (e.Root != XamlRoot) return;
 
-    e.Tasks.Add(RequestClosure);
+    e.Tasks.Add(ConfirmClosure);
   }
 
   private void WindowClosing_Closed(object sender, WindowClosing.ClosedEventArgs e)
   {
     if (e.Root != XamlRoot) return;
 
+    Close();
+  }
+
+  private async Task ConfirmClosure(ISavable.ConfirmArgs args)
+  {
+    if (args.Cancelled) return;
+
+    if (Frame?.Content is DeckEditorPage deckEditorPage && deckEditorPage.ViewModel.HasUnsavedChanges)
+    {
+      IsSelected = true; // Will bring this tab view to the front
+
+      await deckEditorPage.ViewModel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+    }
+  }
+
+  private void Close()
+  {
     if (Frame?.Content is DeckEditorPage deckEditorPage)
       deckEditorPage.ViewModel.PropertyChanged -= DeckEditorPageViewModel_PropertyChanged;
 

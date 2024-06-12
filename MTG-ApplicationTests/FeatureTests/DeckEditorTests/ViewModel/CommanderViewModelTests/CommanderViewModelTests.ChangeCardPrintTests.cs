@@ -39,7 +39,7 @@ public partial class CommanderViewModelTests
         Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCardInfo, IEnumerable<MTGCardInfo>>()
+          ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
         }
       };
 
@@ -56,7 +56,7 @@ public partial class CommanderViewModelTests
         Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(newPrint) }
+          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
         }
       };
 
@@ -76,7 +76,7 @@ public partial class CommanderViewModelTests
         Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(newPrint) }
+          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
         },
         OnChange = (card) => { invoked = true; }
       };
@@ -96,7 +96,7 @@ public partial class CommanderViewModelTests
         Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(newPrint) }
+          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
         }
       };
 
@@ -115,7 +115,7 @@ public partial class CommanderViewModelTests
         Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(newPrint) }
+          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
         }
       };
 
@@ -135,7 +135,7 @@ public partial class CommanderViewModelTests
         Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(newPrint) }
+          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
         }
       };
 

@@ -1,21 +1,20 @@
-﻿namespace MTGApplication.General.Services.Importers.CardImporter;
+﻿using MTGApplication.General.Models;
 
-public abstract record CardImportResult
-{
-  public enum ImportSource { Internal, External }
-}
+namespace MTGApplication.General.Services.Importers.CardImporter;
 
-public record CardImportResult<TInfo>(
-  CardImportResult<TInfo>.Card[] Found,
+public record CardImportResult(
+  CardImportResult.Card[] Found,
   int NotFoundCount,
   int TotalCount,
   CardImportResult.ImportSource Source,
-  string NextPageUri = "") : CardImportResult
+  string NextPageUri = "")
 {
-  public record Card(TInfo Info, int Count = 1);
+  public enum ImportSource { Internal, External }
+
+  public record Card(MTGCardInfo Info, int Count = 1);
 
   /// <summary>
   /// Returns empty result object
   /// </summary>
-  public static CardImportResult<TInfo> Empty(ImportSource source = ImportSource.External) => new([], 0, 0, source);
+  public static CardImportResult Empty(ImportSource source = ImportSource.External) => new([], 0, 0, source);
 }

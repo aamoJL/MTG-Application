@@ -5,7 +5,8 @@ using MTGApplication.General.ViewModels;
 using System.Text;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.CardSearch.Controls;
+namespace MTGApplication.Features.CardSearch.Views.Controls;
+
 [ObservableObject]
 public sealed partial class ScryfallCardSearchInputControl : UserControl
 {

@@ -30,14 +30,16 @@ public sealed partial class DeckBuilderPage : Page
 
   private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
   {
+    if (args.Item is not DeckSelectionAndEditorTabViewItem item) return;
+
     var unsavedArgs = new ISavable.ConfirmArgs();
 
-    await (args.Item as DeckSelectionAndEditorTabViewItem).RequestClosure(unsavedArgs);
+    await item.RequestClosure(unsavedArgs);
 
     if (unsavedArgs.Cancelled)
       return;
 
-    TabViewItems.Remove(args.Item as DeckSelectionAndEditorTabViewItem);
+    TabViewItems.Remove(item);
 
     // Create new tab if there are no tabs
     if (TabViewItems.Count == 0)

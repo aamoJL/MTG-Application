@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 using MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
-using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -24,14 +24,14 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
   {
     InitializeComponent();
 
-    DragAndDrop = new(new DeckEditorMTGCardCopier())
+    DragAndDrop = new()
     {
-      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(item),
-      OnRemove = (item) => OnDropRemove?.Execute(item),
+      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnRemove = (item) => OnDropRemove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
-      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(item),
-      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item),
-      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(item),
+      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnExecuteMove = (item) => OnDropExecuteMove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       IsDropContentVisible = false,
     };
 
