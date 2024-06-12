@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.CardCollection;
+using MTGApplication.Features.CardCollection;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
@@ -60,7 +62,7 @@ public partial class CardCollectionViewModelTests
 
       Assert.AreEqual(0, viewmodel.QueryCardsViewModel.Collection.Count);
 
-      _dependencies.CardAPI.ExpectedCards = [.. _savedCollection.CollectionLists[1].Cards];
+      _dependencies.CardAPI.ExpectedCards = [.. _savedCollection.CollectionLists[1].Cards.Select(x => new CardImportResult<MTGCardInfo>.Card(x.Info))];
 
       await viewmodel.SelectListCommand.ExecuteAsync(viewmodel.Collection.CollectionLists[1]);
       await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);

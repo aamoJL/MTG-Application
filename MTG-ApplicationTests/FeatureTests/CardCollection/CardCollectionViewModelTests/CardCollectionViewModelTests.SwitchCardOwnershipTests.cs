@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Features.CardCollection;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
@@ -11,7 +12,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Should be able to execute if a list is selected")]
     public void ValidState_CanExecute()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Collection = new() { CollectionLists = [new() { Cards = [] }] }
@@ -24,7 +25,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Should not be able to execute if a list is not selected")]
     public void InvalidState_CanNotExecute()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Collection = new() { CollectionLists = [new() { Cards = [] }] }
@@ -36,7 +37,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Should be able to execute if the given card is not null")]
     public void ValidParameter_CanExecute()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Collection = _savedCollection
@@ -75,7 +76,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public void SwitchOwnership_New_CardAdded()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Collection = new() { CollectionLists = [new() { Cards = [] }] }
@@ -90,7 +91,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public void SwitchOwnership_Existing_CardRemoved()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Collection = new() { CollectionLists = [new() { Cards = [card] }] }
@@ -119,7 +120,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public void SwitchOwnership_Success_HasUnsavedChanges()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Collection = new() { CollectionLists = [new() { Cards = [card] }] }

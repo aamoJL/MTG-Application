@@ -1,12 +1,12 @@
 ﻿using Microsoft.UI.Xaml;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services;
 using MTGApplication.General.Views;
 using MTGApplication.General.Views.DragAndDrop;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace MTGApplication.Features.DeckEditor.Controls.CardView.CommanderView;
+namespace MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
 
 public class CommanderTextViewDragAndDrop(IClassCopier<DeckEditorMTGCard> itemCopier) : DragAndDrop<DeckEditorMTGCard>(itemCopier)
 {

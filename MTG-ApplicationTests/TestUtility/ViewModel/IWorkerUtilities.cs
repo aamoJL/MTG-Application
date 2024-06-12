@@ -13,6 +13,8 @@ public partial class TestExceptionWorker : ObservableObject, IWorker
 
   public TestExceptionWorker() => PropertyChanged += TestExceptionWorker_PropertyChanged;
 
+  public IWorker Worker => this;
+
   private void TestExceptionWorker_PropertyChanged(object? sender, PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(IsBusy)) { throw new IsBusyException(); }

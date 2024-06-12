@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplicationTests.IntegrationTests.CardImporterTests;
 public partial class CardImporterTests
@@ -11,7 +12,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithValidUri_CardFound()
     {
-      var importer = new CardImporter(new ScryfallAPI());
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
       var uri = "https://edhrec.com/cards/sol-ring";
 
       var result = await importer.Import(uri);
@@ -23,7 +24,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithInvalidUri_NoCardFound()
     {
-      var importer = new CardImporter(new ScryfallAPI());
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
       var uri = "https://edhrec.com/cards/xxxxx";
 
       var result = await importer.Import(uri);

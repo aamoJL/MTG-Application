@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,34 +11,34 @@ public class WindowClosing(XamlRoot root)
   public class ClosingEventArgs(XamlRoot root) : EventArgs
   {
     public XamlRoot Root { get; } = root;
-    public List<Func<Task<bool>>> Tasks { get; } = [];
+    public List<Func<ISavable.ConfirmArgs, Task>> Tasks { get; } = [];
   };
   public class ClosedEventArgs(XamlRoot root) : EventArgs { public XamlRoot Root { get; } = root; }
 
   public static event EventHandler<ClosingEventArgs> Closing;
   public static event EventHandler<ClosedEventArgs> Closed;
-  
+
   public XamlRoot Root { get; } = root;
 
   public async Task<bool> Close()
   {
-    var cancelled = false;
     var closingArgs = new ClosingEventArgs(Root);
-    
+
     Closing?.Invoke(null, closingArgs);
+
+    var savableConfirmArgs = new ISavable.ConfirmArgs();
 
     foreach (var task in closingArgs.Tasks)
     {
-      if (!await task.Invoke())
-      {
-        cancelled = true; 
+      await task.Invoke(savableConfirmArgs);
+
+      if (savableConfirmArgs.Cancelled)
         break;
-      }
     }
 
-    if(!cancelled)
+    if (!savableConfirmArgs.Cancelled)
       Closed?.Invoke(null, new(Root));
 
-    return !cancelled;
+    return !savableConfirmArgs.Cancelled;
   }
 }

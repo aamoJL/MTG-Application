@@ -1,11 +1,13 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.General.Views.DragAndDrop;
+
+// TODO: Change to ImportResult.Card
 
 public class ListViewDragAndDrop : DragAndDrop<DeckEditorMTGCard>
 {

@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using System;
 using System.Linq;
-using static MTGApplication.General.Models.Card.MTGCardInfo;
+using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplication.Features.DeckEditor;
 

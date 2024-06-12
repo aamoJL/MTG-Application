@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.Features.DeckEditor.Models;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.GeneralTests.ModelTests.CardDeckTests;
@@ -9,11 +9,11 @@ public class CardDeckTests
   [TestMethod]
   public void DeckPrice_HasCards_PriceIsCardPriceMultipliedByCount()
   {
-    var deck = new MTGCardDeck()
+    var deck = new DeckEditorMTGDeck()
     {
       DeckCards = [
-        MTGCardModelMocker.CreateMTGCardModel(count: 1, price: 1),
-        MTGCardModelMocker.CreateMTGCardModel(count: 2, price: 2),
+        DeckEditorMTGCardMocker.CreateMTGCardModel(count: 1, price: 1),
+        DeckEditorMTGCardMocker.CreateMTGCardModel(count: 2, price: 2),
         ],
     };
 
@@ -23,9 +23,9 @@ public class CardDeckTests
   [TestMethod]
   public void DeckPrice_HasCommander_PriceIsCommanderPrice()
   {
-    var deck = new MTGCardDeck()
+    var deck = new DeckEditorMTGDeck()
     {
-      Commander = MTGCardModelMocker.CreateMTGCardModel(count: 2, price: 8),
+      Commander = DeckEditorMTGCardMocker.CreateMTGCardModel(count: 2, price: 8),
     };
 
     Assert.AreEqual(deck.Commander.Info.Price, deck.DeckPrice);
@@ -34,9 +34,9 @@ public class CardDeckTests
   [TestMethod]
   public void DeckPrice_HasPartner_PriceIsPartnerPrice()
   {
-    var deck = new MTGCardDeck()
+    var deck = new DeckEditorMTGDeck()
     {
-      CommanderPartner = MTGCardModelMocker.CreateMTGCardModel(count: 2, price: 8),
+      CommanderPartner = DeckEditorMTGCardMocker.CreateMTGCardModel(count: 2, price: 8),
     };
 
     Assert.AreEqual(deck.CommanderPartner.Info.Price, deck.DeckPrice);

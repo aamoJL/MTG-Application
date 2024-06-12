@@ -1,5 +1,6 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Commanders;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Commanders.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ public partial class CommanderViewModelCommands
       else
       {
         // Only legendary cards are allowed to be commanders
-        await Viewmodel.ChangeCommanderCommand.ExecuteAsync(result.Found[0]);
+        await Viewmodel.ChangeCommanderCommand.ExecuteAsync(new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count));
 
         new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
       }

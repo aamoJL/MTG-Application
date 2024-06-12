@@ -12,8 +12,8 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public async Task BeginMoveTo_CommandAddedToCombinedCommand()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
-      var viewmodel = new CommanderViewModel(new TestCardAPI());
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
 
       await viewmodel.BeginMoveToCommand.ExecuteAsync(card);
 

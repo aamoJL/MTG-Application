@@ -12,8 +12,8 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public void BeginMoveFrom_CommandAddedToCombinedCommand()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
-      var viewmodel = new CommanderViewModel(new TestCardAPI());
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
 
       viewmodel.BeginMoveFromCommand.Execute(card);
 

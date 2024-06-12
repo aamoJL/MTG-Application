@@ -1,9 +1,9 @@
-﻿using MTGApplication.General.Extensions;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Extensions;
 using System;
 using System.Text;
 
-namespace MTGApplication.General.Services.API.CardAPI;
+namespace MTGApplication.General.Services.Importers.CardImporter;
 
 public class EdhrecImporter
 {
@@ -32,7 +32,7 @@ public class EdhrecImporter
 
     var stringBuilder = new StringBuilder($"{WEBSITE_BASE_URI}/{commander.Info.Name.ToKebabCase().ToLower()}");
 
-    if(partner != null)
+    if (partner != null)
       stringBuilder.Append($"-{partner.Info.Name.ToKebabCase().ToLower()}");
 
     if (!string.IsNullOrEmpty(themeSuffix))

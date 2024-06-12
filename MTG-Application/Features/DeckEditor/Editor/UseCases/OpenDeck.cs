@@ -1,6 +1,6 @@
-﻿using MTGApplication.Features.DeckEditor.Models;
-using MTGApplication.Features.DeckEditor.Services.DeckEditor;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
+using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
@@ -24,7 +24,7 @@ public partial class DeckEditorViewModelCommands
 
       await new ConfirmUnsavedChanges(Viewmodel).Command.ExecuteAsync(unsavedArgs);
 
-      if (unsavedArgs.Canceled)
+      if (unsavedArgs.Cancelled)
         return;
 
       loadName ??= await Viewmodel.Confirmers.LoadDeckConfirmer

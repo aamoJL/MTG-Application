@@ -1,8 +1,8 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services;
 using MTGApplication.General.Services.ReversibleCommandService;
 
-namespace MTGApplication.Features.DeckEditor.Services.Commanders;
+namespace MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleCommands;
 
 public class ReversibleCommanderChangeCommand : IReversibleCommand<DeckEditorMTGCard>
 {

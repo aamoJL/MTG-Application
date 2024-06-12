@@ -6,7 +6,7 @@ public interface ISavable
 {
   public class ConfirmArgs()
   {
-    public bool Canceled = false;
+    public bool Cancelled = false;
   }
 
   public bool HasUnsavedChanges { get; set; }

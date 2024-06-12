@@ -12,10 +12,10 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public async Task Change_ToCard_CardIsCard()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
-      var viewmodel = new CommanderViewModel(new TestCardAPI());
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
 
-      await viewmodel.ChangeCommand.ExecuteAsync(card);
+      await viewmodel.ChangeCommanderCommand.ExecuteAsync(card);
 
       Assert.AreEqual(card.Info.Name, viewmodel.Card.Info.Name);
     }
@@ -23,12 +23,12 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public async Task Change_ToNull_CardIsNull()
     {
-      var viewmodel = new CommanderViewModel(new TestCardAPI())
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter())
       {
-        Card = MTGCardModelMocker.CreateMTGCardModel()
+        Card = DeckEditorMTGCardMocker.CreateMTGCardModel()
       };
 
-      await viewmodel.ChangeCommand.ExecuteAsync(null);
+      await viewmodel.ChangeCommanderCommand.ExecuteAsync(null);
 
       Assert.IsNull(viewmodel.Card);
     }

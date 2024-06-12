@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService.Extensions;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.UseCases;
@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.Features.DeckEditor.Services.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
 {

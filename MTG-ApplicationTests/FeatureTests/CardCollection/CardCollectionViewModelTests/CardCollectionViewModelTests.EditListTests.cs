@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.CardCollection;
+using MTGApplication.Features.CardCollection;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -142,7 +142,7 @@ public partial class CardCollectionViewModelTests
 
       Assert.AreEqual(0, viewmodel.QueryCardsViewModel.Collection.Count);
 
-      _dependencies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel(name: "Card")];
+      _dependencies.CardAPI.ExpectedCards = [new(MTGCardInfoMocker.MockInfo(name: "Card"))];
 
       await viewmodel.EditListCommand.ExecuteAsync(null);
       await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);

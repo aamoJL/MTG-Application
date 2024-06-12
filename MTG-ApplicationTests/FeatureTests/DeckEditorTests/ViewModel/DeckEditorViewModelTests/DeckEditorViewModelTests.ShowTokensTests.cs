@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.General.Models;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 
@@ -16,9 +16,9 @@ public partial class DeckEditorViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Deck = new MTGCardDeck()
+        Deck = new DeckEditorMTGDeck()
         {
-          Commander = MTGCardModelMocker.CreateMTGCardModel()
+          Commander = DeckEditorMTGCardMocker.CreateMTGCardModel()
         },
       }.MockVM();
 
@@ -39,9 +39,9 @@ public partial class DeckEditorViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Deck = new MTGCardDeck()
+        Deck = new DeckEditorMTGDeck()
         {
-          DeckCards = [MTGCardModelMocker.CreateMTGCardModel()]
+          DeckCards = [DeckEditorMTGCardMocker.CreateMTGCardModel()]
         },
       }.MockVM();
 
@@ -56,7 +56,7 @@ public partial class DeckEditorViewModelTests
         Deck = _savedDeck,
         Confirmers = new()
         {
-          ShowTokensConfirmer = new TestExceptionConfirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>>(),
+          ShowTokensConfirmer = new TestExceptionConfirmer<MTGCardInfo, IEnumerable<MTGCardInfo>>(),
         }
       }.MockVM();
 

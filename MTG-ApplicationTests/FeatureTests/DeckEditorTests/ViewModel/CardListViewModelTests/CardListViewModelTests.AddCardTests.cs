@@ -15,9 +15,9 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void AddCard_CardAdded()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
 
-      viewmodel.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
+      viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.AreEqual(1, viewmodel.Cards.Count);
     }
@@ -25,9 +25,9 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void AddCard_Undo_CardRemoved()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
 
-      viewmodel.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
+      viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.AreEqual(1, viewmodel.Cards.Count);
 
@@ -39,9 +39,9 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void AddCard_Redo_CardAddedAgain()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
 
-      viewmodel.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
+      viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.AreEqual(1, viewmodel.Cards.Count);
 
@@ -57,8 +57,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task AddCard_Existing_ConflictConfirmationShown()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = [card],
         Confirmers = new()

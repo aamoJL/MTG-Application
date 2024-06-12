@@ -1,9 +1,9 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Services.API.CardAPI;
+namespace MTGApplication.General.Services.Importers.CardImporter;
 
 public abstract class MTGCardImporter : ICardImporter<MTGCardInfo>
 {

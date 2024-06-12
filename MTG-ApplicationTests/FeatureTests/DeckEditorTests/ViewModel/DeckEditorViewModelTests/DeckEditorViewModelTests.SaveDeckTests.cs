@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -10,24 +11,8 @@ namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorV
 public partial class DeckEditorViewModelTests
 {
   [TestClass]
-  public class SaveDeckTests : DeckEditorViewModelTestsBase, ICanExecuteCommandTests, ISaveCommandTests, IWorkerTests
+  public class SaveDeckTests : DeckEditorViewModelTestsBase, ISaveCommandTests, IWorkerTests
   {
-    [TestMethod("Should be able to execute if the deck has cards")]
-    public void ValidState_CanExecute()
-    {
-      var viewmodel = new Mocker(_dependencies) { Deck = _savedDeck }.MockVM();
-
-      Assert.IsTrue(viewmodel.SaveDeckCommand.CanExecute(null));
-    }
-
-    [TestMethod("Should not be able to execute if the deck has no cards")]
-    public void InvalidState_CanNotExecute()
-    {
-      var viewmodel = new Mocker(_dependencies).MockVM();
-
-      Assert.IsFalse(viewmodel.SaveDeckCommand.CanExecute(null));
-    }
-
     [TestMethod("Should show save confirmation when saving the deck")]
     public async Task Save_SaveConfirmationShown()
     {
@@ -137,7 +122,7 @@ public partial class DeckEditorViewModelTests
     public async Task Save_Override_Cancel_NotSaved()
     {
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
-      newDeck.Commander = MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
+      newDeck.Commander = DeckEditorMTGCardMocker.CreateMTGCardModel(name: "New Commander");
 
       var viewmodel = new Mocker(_dependencies)
       {
@@ -159,7 +144,7 @@ public partial class DeckEditorViewModelTests
     public async Task Save_Override_Accept_Overridden()
     {
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
-      newDeck.Commander = MTGCardModelMocker.CreateMTGCardModel(name: "New Commander");
+      newDeck.Commander = DeckEditorMTGCardMocker.CreateMTGCardModel(name: "New Commander");
 
       var viewmodel = new Mocker(_dependencies)
       {
@@ -290,6 +275,26 @@ public partial class DeckEditorViewModelTests
       }.MockVM();
 
       await WorkerAssert.IsBusy(viewmodel, () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task Save_SaveEmpty_Success()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = new() { DeckCards = [] },
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
+          SaveDeckConfirmer = new() { OnConfirm = async msg => await Task.FromResult("New") },
+        },
+      }.MockVM();
+
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsFalse(args.Cancelled);
     }
   }
 }

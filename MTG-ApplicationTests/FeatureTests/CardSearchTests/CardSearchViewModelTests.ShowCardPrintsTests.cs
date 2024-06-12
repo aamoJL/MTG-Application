@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardSearch;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
@@ -15,12 +15,12 @@ public partial class CardSearchViewModelTests
     [TestMethod]
     public async Task ChangePrint_ConfirmationShown()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel(setCode: "abc");
-      var viewmodel = new CardSearchViewModel(new TestCardAPI())
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
+      var viewmodel = new CardSearchViewModel(new TestMTGCardImporter())
       {
         Confirmers = new()
         {
-          ShowCardPrintsConfirmer = new TestExceptionConfirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>>()
+          ShowCardPrintsConfirmer = new TestExceptionConfirmer<MTGCardInfo, IEnumerable<MTGCardInfo>>()
         }
       };
 

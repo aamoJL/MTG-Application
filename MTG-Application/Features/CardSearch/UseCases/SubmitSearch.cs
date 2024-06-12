@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.CardSearch.Models;
-using MTGApplication.General.Services.API.CardAPI.UseCases;
+﻿using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +15,7 @@ public partial class CardSearchViewModelCommands
       var searchResult = await Viewmodel.Worker.DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query));
 
       Viewmodel.Cards.SetCollection(
-        cards: [.. searchResult.Found.Select(x => new CardSearchMTGCard(x.Info))],
+        cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],
         nextPageUri: searchResult.NextPageUri,
         totalCount: searchResult.TotalCount);
     }

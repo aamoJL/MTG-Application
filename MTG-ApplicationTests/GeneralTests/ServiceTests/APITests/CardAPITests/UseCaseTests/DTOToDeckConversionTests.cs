@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Models.CardDeck;
-using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
+using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
 
@@ -14,20 +16,20 @@ public class DTOToDeckConversionTests
   {
     var cards = new DeckEditorMTGCard[]
     {
-        MTGCardModelMocker.CreateMTGCardModel(name: "first"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "second"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "third"),
+        DeckEditorMTGCardMocker.CreateMTGCardModel(name: "first"),
+        DeckEditorMTGCardMocker.CreateMTGCardModel(name: "second"),
+        DeckEditorMTGCardMocker.CreateMTGCardModel(name: "third"),
     };
-    var deck = new MTGCardDeck()
+    var deck = new DeckEditorMTGDeck()
     {
       Name = "First",
       DeckCards = new(cards),
     };
 
-    var result = await new DTOToDeckConverter(new TestCardAPI()
+    var result = await new DTOToDeckEditorDeckConverter(new TestMTGCardImporter()
     {
-      ExpectedCards = cards
-    }).Execute(new(deck));
+      ExpectedCards = cards.Select(x => new CardImportResult<MTGCardInfo>.Card(x.Info, x.Count)).ToArray()
+    }).Convert(DeckEditorMTGDeckToDTOConverter.Convert(deck));
 
     Assert.IsNotNull(result);
     Assert.AreEqual(3, result.DeckCards.Count);

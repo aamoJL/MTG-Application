@@ -13,7 +13,7 @@ public partial class DeckEditorViewModelCommands
 
       await new ConfirmUnsavedChanges(Viewmodel).Command.ExecuteAsync(unsavedArgs);
 
-      if (unsavedArgs.Canceled)
+      if (unsavedArgs.Cancelled)
         return;
 
       Viewmodel.Deck = new();

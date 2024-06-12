@@ -1,8 +1,8 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.DeckEditor.Services.Cardlist;
+namespace MTGApplication.Features.DeckEditor.CardList.Services;
 
 public class CardListConfirmers
 {

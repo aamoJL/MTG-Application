@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 

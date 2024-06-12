@@ -1,7 +1,7 @@
-﻿using MTGApplication;
+﻿using Microsoft.EntityFrameworkCore;
+using MTGApplication;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
-using System.Linq.Expressions;
 
 namespace MTGApplicationTests.TestUtility.Database;
 public class TestDeckDTORepository : DeckDTORepository, IDisposable
@@ -23,9 +23,9 @@ public class TestDeckDTORepository : DeckDTORepository, IDisposable
 
   public override Task<bool> Exists(string name) => ExistsFailure ? Task.FromResult(false) : base.Exists(name);
 
-  public override async Task<IEnumerable<MTGCardDeckDTO>> Get(Expression<Func<MTGCardDeckDTO, object>>[]? Includes = null) => GetFailure ? await Task.FromResult(new List<MTGCardDeckDTO>()) : await base.Get(Includes);
+  public override async Task<IEnumerable<MTGCardDeckDTO>> Get(Action<DbSet<MTGCardDeckDTO>>? setIncludes = null) => GetFailure ? await Task.FromResult(new List<MTGCardDeckDTO>()) : await base.Get(setIncludes);
 
-  public override Task<MTGCardDeckDTO?> Get(string name, Expression<Func<MTGCardDeckDTO, object>>[]? Includes = null) => GetFailure ? Task.FromResult(default(MTGCardDeckDTO)) : base.Get(name, Includes);
+  public override Task<MTGCardDeckDTO?> Get(string name, Action<DbSet<MTGCardDeckDTO>>? setIncludes = null) => GetFailure ? Task.FromResult(default(MTGCardDeckDTO)) : base.Get(name, setIncludes);
 
   public override Task<bool> Delete(MTGCardDeckDTO item) => DeleteFailure ? Task.FromResult(false) : base.Delete(item);
 

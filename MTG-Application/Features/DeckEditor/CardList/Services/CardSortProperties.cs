@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.WinUI.UI;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using System;
 using System.Collections;
-using static MTGApplication.General.Models.Card.CardSortProperties;
-using static MTGApplication.General.Models.Card.MTGCardInfo;
+using static MTGApplication.Features.DeckEditor.CardList.Services.CardSortProperties;
+using static MTGApplication.General.Models.MTGCardInfo;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.CardList.Services;
 
 /// <summary>
 /// Class that has properties to sort MTG card lists

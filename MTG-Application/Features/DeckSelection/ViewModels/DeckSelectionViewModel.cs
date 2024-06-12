@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckSelector.Models;
-using MTGApplication.Features.DeckSelector.UseCases;
-using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.Features.DeckSelection.Models;
+using MTGApplication.Features.DeckSelection.UseCases;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.Features.DeckSelector;
+namespace MTGApplication.Features.DeckSelection;
 public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, MTGCardImporter importer) : ViewModelBase, IWorker
 {
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];

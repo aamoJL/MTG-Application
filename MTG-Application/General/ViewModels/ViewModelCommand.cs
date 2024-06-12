@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;

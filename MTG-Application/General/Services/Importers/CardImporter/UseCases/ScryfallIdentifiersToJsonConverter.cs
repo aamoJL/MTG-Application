@@ -5,7 +5,7 @@ using System.Text.Json;
 using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
 using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI.ScryfallIdentifier;
 
-namespace MTGApplication.General.Services.API.CardAPI.UseCases;
+namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
 
 public class ScryfallIdentifiersToJsonConverter : UseCase<ScryfallIdentifier[], string>
 {

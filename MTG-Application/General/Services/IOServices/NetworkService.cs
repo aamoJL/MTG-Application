@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.System;
 
-namespace MTGApplication.General.Services.IOService;
+namespace MTGApplication.General.Services.IOServices;
 
 public static class NetworkService
 {

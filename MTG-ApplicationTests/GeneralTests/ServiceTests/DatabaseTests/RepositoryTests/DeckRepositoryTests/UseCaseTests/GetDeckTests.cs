@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 
@@ -16,7 +16,7 @@ public class GetDeckTests
   [TestMethod("Should return saved deck with the given name")]
   public async Task Execute_Found_ReturnDeck()
   {
-    var result = await new GetDeck(_dependencies.Repository, _dependencies.CardAPI).Execute(_savedDeck.Name);
+    var result = await new GetDeckDTO(_dependencies.Repository).Execute(_savedDeck.Name);
 
     Assert.AreEqual(result.Name, _savedDeck.Name);
   }
@@ -24,7 +24,7 @@ public class GetDeckTests
   [TestMethod("Should return null if the deck was not found")]
   public async Task Execute_NotFound_ReturnNull()
   {
-    var result = await new GetDeck(_dependencies.Repository, _dependencies.CardAPI).Execute("Unsaved Deck");
+    var result = await new GetDeckDTO(_dependencies.Repository).Execute("Unsaved Deck");
 
     Assert.IsNull(result);
   }

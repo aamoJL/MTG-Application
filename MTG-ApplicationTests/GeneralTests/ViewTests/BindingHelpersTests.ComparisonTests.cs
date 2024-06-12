@@ -10,10 +10,10 @@ public partial class BindingHelpersTests
   {
     [TestMethod]
     public void MoreThanTest() => Assert.IsTrue(Comparison.MoreThan(3, 1));
-  
+
     [TestMethod]
     public void NotNullTest() => Assert.IsFalse(Comparison.NotNull(null));
-  
+
     [TestMethod]
     public void NotNullOrEmptyTest() => Assert.IsFalse(Comparison.NotNullOrEmpty(string.Empty));
 

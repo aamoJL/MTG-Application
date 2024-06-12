@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace MTGApplication.Features.DeckEditor.Controls.Charts;
+namespace MTGApplication.Features.DeckEditor.Charts.Models;
 
 public class MTGCardChartSeriesItem : ObservableObject
 {

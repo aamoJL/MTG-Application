@@ -1,7 +1,7 @@
 ﻿using MTGApplication.Features.CardCollection;
 using MTGApplication.Features.CardCollection.Services;
-using MTGApplication.General.Models.CardCollection;
-using MTGApplication.General.Services.IOService;
+using MTGApplication.Features.CardCollection.Services.Converters;
+using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -20,18 +20,18 @@ public partial class CardCollectionViewModelTests
           Name = "Saved List",
           SearchQuery = "Search Query",
           Cards = [
-            MTGCardModelMocker.CreateMTGCardModel(name: "First"),
-            MTGCardModelMocker.CreateMTGCardModel(name: "Second"),
-            MTGCardModelMocker.CreateMTGCardModel(name: "Third")]},
+            new(MTGCardInfoMocker.MockInfo(name: "First")),
+            new(MTGCardInfoMocker.MockInfo(name: "Second")),
+            new(MTGCardInfoMocker.MockInfo(name: "Third"))]},
         new(){
           Name = "Saved List 2",
           SearchQuery = "Search Query 2",
           Cards = [
-            MTGCardModelMocker.CreateMTGCardModel(name: "First")]}
+            new(MTGCardInfoMocker.MockInfo(name: "First"))]}
         ]
     };
 
-    public CardCollectionViewModelTestsBase() => _dependencies.ContextFactory.Populate(new MTGCardCollectionDTO(_savedCollection));
+    public CardCollectionViewModelTestsBase() => _dependencies.ContextFactory.Populate(CardCollectionToDTOConverter.Convert(_savedCollection));
 
     [Obsolete("Use Mocker instead")]
     public CardCollectionViewModel MockVM(

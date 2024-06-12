@@ -2,7 +2,7 @@
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using System.Linq;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 
 public class DeckEditorMTGDeckToDTOConverter
 {

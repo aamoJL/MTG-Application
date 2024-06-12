@@ -1,6 +1,6 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Cardlist;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.IOService;
+﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;

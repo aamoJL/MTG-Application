@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
@@ -18,7 +18,7 @@ public class CardCollectionConfirmers
   public Confirmer<string, string> ExportCardsConfirmer { get; init; } = new();
   public Confirmer<string> ImportCardsConfirmer { get; init; } = new();
 
-  public Confirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
+  public Confirmer<MTGCardInfo, IEnumerable<MTGCardInfo>> ShowCardPrintsConfirmer { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string collectionName)
   {
@@ -94,7 +94,7 @@ public class CardCollectionConfirmers
       Message: string.Empty);
   }
 
-  public static Confirmation<IEnumerable<DeckEditorMTGCard>> GetShowCardPrintsConfirmation(IEnumerable<DeckEditorMTGCard> data)
+  public static Confirmation<IEnumerable<MTGCardInfo>> GetShowCardPrintsConfirmation(IEnumerable<MTGCardInfo> data)
   {
     return new(
       Title: "Card prints",

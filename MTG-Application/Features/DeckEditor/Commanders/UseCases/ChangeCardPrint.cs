@@ -1,5 +1,6 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Commanders;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Commanders.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Linq;
@@ -9,14 +10,13 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CommanderViewModelCommands
 {
-  public class ChangeCardPrint(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+  public class ChangeCardPrint(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel>(viewmodel)
   {
-    protected override bool CanExecute(DeckEditorMTGCard card)
-      => Viewmodel.Card != null && Viewmodel.Card.Info.Name != card.Info.Name;
+    protected override bool CanExecute() => Viewmodel.Card != null;
 
-    protected override async Task Execute(DeckEditorMTGCard card)
+    protected override async Task Execute()
     {
-      if (!CanExecute(card)) return;
+      if (!CanExecute()) return;
 
       var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: Viewmodel.Card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 

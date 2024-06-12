@@ -1,14 +1,15 @@
-﻿using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Services.IOService;
+﻿using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public class DeckEditorCardImporter(MTGCardImporter importer)
 {
   public async Task<CardImportResult<MTGCardInfo>> Import(string data)
   {
-    if (JsonService.TryDeserializeJson<DeckEditorMTGCard>(data, out var card))
+    if (JsonService.TryDeserializeJson<CardImportResult<MTGCardInfo>.Card>(data, out var card))
       return new([new CardImportResult<MTGCardInfo>.Card(card.Info, card.Count)], 0, 1, CardImportResult.ImportSource.Internal); // Imported from the app
 
     if (EdhrecImporter.TryParseCardNameFromEdhrecUri(data, out var name))

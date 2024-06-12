@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Services.DeckEditor;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.Services.NotificationService.UseCases;

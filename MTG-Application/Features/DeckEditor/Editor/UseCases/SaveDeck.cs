@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Services.DeckEditor;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
@@ -14,12 +14,8 @@ public partial class DeckEditorViewModelCommands
 {
   public class SaveDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
-    protected override bool CanExecute() => Viewmodel.Deck.DeckCards.Count > 0;
-
     protected override async Task Execute()
     {
-      if (!CanExecute()) return;
-
       var oldName = Viewmodel.Deck.Name;
       var overrideOld = false;
       var saveName = await Viewmodel.Confirmers.SaveDeckConfirmer.Confirm(DeckEditorConfirmers.GetSaveDeckConfirmation(oldName));
@@ -41,7 +37,9 @@ public partial class DeckEditorViewModelCommands
       if (await Viewmodel.Worker.DoWork(SaveDTO(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck), saveName, overrideOld)) is true)
       {
         Viewmodel.Deck.Name = saveName;
-        Viewmodel.OnPropertyChanged(nameof(DeckName));
+
+        // TODO: move to viemodel
+        //Viewmodel.OnPropertyChanged(nameof(DeckName));
         Viewmodel.HasUnsavedChanges = false;
 
         new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.SaveSuccess);

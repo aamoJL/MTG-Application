@@ -41,9 +41,9 @@
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
-    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectorAndEditorTabViewItem.xaml" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
-    <None Remove="Features\CardCollection\Controls\CardCollectionCardImageView.xaml" />
+    <None Remove="Features\CardCollection\Views\Controls\CardCollectionCardImageView.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
     <None Remove="Features\CardSearch\CardSearchPage.xaml" />
@@ -143,9 +143,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\CardCollection\Controls\CardCollectionCardImageView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
     <Page Update="General\Views\Controls\LinedHeader.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
@@ -202,7 +199,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectorAndEditorTabViewItem.xaml">
+    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

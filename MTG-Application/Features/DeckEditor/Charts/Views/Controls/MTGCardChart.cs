@@ -1,10 +1,10 @@
 ﻿using LiveChartsCore;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.Features.DeckEditor.Controls.Charts;
+namespace MTGApplication.Features.DeckEditor.Charts.Views.Controls;
 
 public abstract class MTGCardChart : UserControl
 {

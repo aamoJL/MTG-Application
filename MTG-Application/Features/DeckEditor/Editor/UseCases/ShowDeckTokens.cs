@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Services.DeckEditor;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Linq;

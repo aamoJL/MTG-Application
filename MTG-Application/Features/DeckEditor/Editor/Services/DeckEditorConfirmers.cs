@@ -1,10 +1,10 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Cardlist;
-using MTGApplication.Features.DeckEditor.Services.Commanders;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Commanders.Services;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.DeckEditor.Services.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public class DeckEditorConfirmers
 {

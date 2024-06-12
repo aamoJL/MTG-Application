@@ -1,4 +1,4 @@
-﻿namespace MTGApplication.General.Models.Card;
+﻿namespace MTGApplication.General.Services.Importers.CardImporter;
 
 public abstract record CardImportResult
 {

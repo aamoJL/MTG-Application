@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Services.IOService;
+namespace MTGApplication.General.Services.IOServices;
 
 public static class FileService
 {
@@ -25,7 +25,7 @@ public static class FileService
   /// <summary>
   /// Retruns path to the application's Asset directory
   /// </summary>
-  public static string GetAssetDirectoryPath() 
+  public static string GetAssetDirectoryPath()
     => Path.Join(AppDomain.CurrentDomain.BaseDirectory, "Assets");
 
   /// <summary>

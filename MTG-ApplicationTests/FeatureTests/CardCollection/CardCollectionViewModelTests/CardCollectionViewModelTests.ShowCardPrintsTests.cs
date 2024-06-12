@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.CardCollection;
+using MTGApplication.General.Models;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 
@@ -12,12 +13,12 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ShowPrints_PrintConfirmationShown()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          ShowCardPrintsConfirmer = new TestExceptionConfirmer<DeckEditorMTGCard, IEnumerable<DeckEditorMTGCard>>()
+          ShowCardPrintsConfirmer = new TestExceptionConfirmer<MTGCardInfo, IEnumerable<MTGCardInfo>>()
         }
       }.MockVM();
 

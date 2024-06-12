@@ -13,7 +13,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void Clear_Empty_CanNotExecute()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
 
       Assert.IsFalse(viewmodel.ClearCommand.CanExecute(null));
     }
@@ -21,8 +21,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void Clear_HasCards_CanExecute()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.IsTrue(viewmodel.ClearCommand.CanExecute(null));
     }
@@ -30,8 +30,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void Clear_Execute_HasNoCards()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.IsTrue(viewmodel.Cards.Any());
 
@@ -43,8 +43,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void Clear_Undo_HasCards()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       viewmodel.ClearCommand.Execute(null);
       viewmodel.UndoStack.Undo();
@@ -55,8 +55,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void Clear_Redo_HasNoCardsAgain()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      viewmodel.Cards.Add(MTGCardModelMocker.CreateMTGCardModel());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       viewmodel.ClearCommand.Execute(null);
       viewmodel.UndoStack.Undo();

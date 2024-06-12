@@ -2,14 +2,16 @@
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Input;
-using static MTGApplication.General.Models.Card.CardSortProperties;
+using static MTGApplication.Features.DeckEditor.CardList.Services.CardSortProperties;
 
-namespace MTGApplication.Features.DeckEditor.Controls.CardListView;
+namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
 
 public partial class AdvancedCardListView : ListView
 {

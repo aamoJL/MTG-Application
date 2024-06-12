@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Services.DeckEditor;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
@@ -9,26 +9,21 @@ public partial class DeckEditorViewModelCommands
 {
   public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, ISavable.ConfirmArgs>(viewmodel)
   {
-    protected override bool CanExecute(ISavable.ConfirmArgs param) => !param.Canceled;
+    protected override bool CanExecute(ISavable.ConfirmArgs param) => !param.Cancelled && Viewmodel.HasUnsavedChanges;
 
     protected override async Task Execute(ISavable.ConfirmArgs param)
     {
       if (!CanExecute(param)) return;
-      if (!Viewmodel.HasUnsavedChanges || !Viewmodel.SaveDeckCommand?.CanExecute(null) is true)
-      {
-        param.Canceled = true;
-        return;
-      }
 
       switch (await Viewmodel.Confirmers.SaveUnsavedChangesConfirmer
         .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.DeckName)))
       {
         case ConfirmationResult.Yes:
           await Viewmodel.SaveDeckCommand.ExecuteAsync(null);
-          param.Canceled = Viewmodel.HasUnsavedChanges;
+          param.Cancelled = Viewmodel.HasUnsavedChanges;
           return;
         case ConfirmationResult.Cancel:
-          param.Canceled = true;
+          param.Cancelled = true;
           return;
       };
     }

@@ -1,10 +1,11 @@
-﻿using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.CardCollection.Services;
 
-public class CardCollectionIncrementalCardSource(ICardImporter<DeckEditorMTGCard> cardAPI) : IncrementalCardSource<CardCollectionMTGCard>(cardAPI)
+public class CardCollectionIncrementalCardSource(MTGCardImporter importer) : IncrementalCardSource<CardCollectionMTGCard>(importer)
 {
-  protected override CardCollectionMTGCard ConvertToCardType(DeckEditorMTGCard card) => new(card.Info);
+  protected override CardCollectionMTGCard ConvertToCardType(CardImportResult<MTGCardInfo>.Card card)
+    => new(card.Info);
 }

@@ -1,11 +1,13 @@
-﻿using MTGApplication.Features.DeckEditor.Models;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 
 public class DTOToDeckEditorDeckConverter(MTGCardImporter importer)
 {

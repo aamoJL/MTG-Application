@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.General.Models;
 
 [Serializable]
 public record MTGCardInfo
@@ -43,33 +43,11 @@ public record MTGCardInfo
     }
   }
 
-  public Guid ScryfallId { get; init; }
-  public Guid OracleId { get; init; }
-  public string Name { get; init; }
-  public int CMC { get; init; }
-  public string TypeLine { get; init; }
-  public string SetCode { get; init; }
-  public string SetName { get; init; }
-  public float Price { get; init; }
-  public string CollectorNumber { get; init; }
-  public string APIWebsiteUri { get; init; }
-  public string SetIconUri { get; init; }
-  public CardFace FrontFace { get; init; }
-  public CardFace BackFace { get; init; }
-  public string PrintSearchUri { get; init; }
-  public CardToken[] Tokens { get; init; }
-  public RarityTypes RarityType { get; init; }
-  public ColorTypes[] Colors { get; init; }
-  public SpellType[] SpellTypes { get; init; }
-  public string CardMarketUri { get; init; }
-  public ColorTypes[] ProducedMana { get; init; }
-  public string ImporterName { get; init; }
-
   /// <summary>
   /// Constructor for JSON deserialization
   /// </summary>
   [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-  public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string apiName, Guid oracleId)
+  public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace backFace, RarityTypes rarityType, ColorTypes[] colors, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string importerName, Guid oracleId)
   {
     ScryfallId = scryfallId;
     OracleId = oracleId;
@@ -91,9 +69,9 @@ public record MTGCardInfo
     ProducedMana = producedMana;
     PrintSearchUri = printSearchUri;
     Tokens = tokens;
-    ImporterName = apiName;
+    ImporterName = importerName;
   }
-  public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string apiName = "")
+  public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string importerName = "")
   {
     ScryfallId = scryfallId;
     OracleId = oracleId;
@@ -115,8 +93,30 @@ public record MTGCardInfo
     SpellTypes = GetSpellTypes(TypeLine);
     CardMarketUri = cardMarketUri;
     ProducedMana = producedMana;
-    ImporterName = apiName;
+    ImporterName = importerName;
   }
+  
+  public Guid ScryfallId { get; init; }
+  public Guid OracleId { get; init; }
+  public string Name { get; init; }
+  public int CMC { get; init; }
+  public string TypeLine { get; init; }
+  public string SetCode { get; init; }
+  public string SetName { get; init; }
+  public float Price { get; init; }
+  public string CollectorNumber { get; init; }
+  public string APIWebsiteUri { get; init; }
+  public string SetIconUri { get; init; }
+  public CardFace FrontFace { get; init; }
+  public CardFace BackFace { get; init; }
+  public string PrintSearchUri { get; init; }
+  public CardToken[] Tokens { get; init; }
+  public RarityTypes RarityType { get; init; }
+  public ColorTypes[] Colors { get; init; }
+  public SpellType[] SpellTypes { get; init; }
+  public string CardMarketUri { get; init; }
+  public ColorTypes[] ProducedMana { get; init; }
+  public string ImporterName { get; init; }
 
   /// <summary>
   /// Returns all the <see cref="ColorTypes"/> that the given faces have

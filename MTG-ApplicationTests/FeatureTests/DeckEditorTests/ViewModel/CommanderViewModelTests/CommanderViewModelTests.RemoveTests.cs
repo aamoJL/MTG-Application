@@ -12,12 +12,12 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public async Task Remove_CardIsNull()
     {
-      var viewmodel = new CommanderViewModel(new TestCardAPI())
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter())
       {
-        Card = MTGCardModelMocker.CreateMTGCardModel()
+        Card = DeckEditorMTGCardMocker.CreateMTGCardModel()
       };
 
-      await viewmodel.ChangeCommand.ExecuteAsync(null);
+      await viewmodel.ChangeCommanderCommand.ExecuteAsync(null);
 
       Assert.IsNull(viewmodel.Card);
     }

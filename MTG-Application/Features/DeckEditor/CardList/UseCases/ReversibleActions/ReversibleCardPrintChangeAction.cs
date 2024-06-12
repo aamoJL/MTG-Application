@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 

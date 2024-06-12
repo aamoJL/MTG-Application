@@ -1,7 +1,6 @@
-﻿using MTGApplication.General.Models.Card;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace MTGApplication.General.Services.API.CardAPI;
+namespace MTGApplication.General.Services.Importers.CardImporter;
 
 /// <summary>
 /// Generic card API

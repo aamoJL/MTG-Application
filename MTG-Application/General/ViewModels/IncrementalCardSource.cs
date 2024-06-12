@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Common.Collections;
 using MTGApplication.General.Models;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Importers.CardImporter;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

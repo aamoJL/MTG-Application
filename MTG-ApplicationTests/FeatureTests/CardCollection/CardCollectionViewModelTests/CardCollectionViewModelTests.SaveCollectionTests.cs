@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.CardCollection;
+using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -9,28 +10,8 @@ namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewMode
 public partial class CardCollectionViewModelTests
 {
   [TestClass]
-  public class SaveCollectionTests : CardCollectionViewModelTestsBase,
-    ICanExecuteCommandTests, ISaveCommandTests
+  public class SaveCollectionTests : CardCollectionViewModelTestsBase, ISaveCommandTests
   {
-    [TestMethod("Should not be able to execute if collection has no lists")]
-    public void InvalidState_CanNotExecute()
-    {
-      var viewmodel = new Mocker(_dependencies).MockVM();
-
-      Assert.IsFalse(viewmodel.SaveCollectionCommand.CanExecute(null));
-    }
-
-    [TestMethod("Should be able to execute if collection has lists")]
-    public void ValidState_CanExecute()
-    {
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Collection = _savedCollection
-      }.MockVM();
-
-      Assert.IsTrue(viewmodel.SaveCollectionCommand.CanExecute(null));
-    }
-
     [TestMethod]
     public async Task Save_SaveConfirmationShown()
     {
@@ -264,6 +245,26 @@ public partial class CardCollectionViewModelTests
       }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.SaveCollectionCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task Save_SaveEmpty_Success()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Collection = new() { CollectionLists = [] },
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
+          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult("Name") }
+        },
+      }.MockVM();
+
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsFalse(args.Cancelled);
     }
   }
 }

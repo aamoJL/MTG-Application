@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
+using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
@@ -12,7 +13,7 @@ public sealed partial class DeckBuilderPage : Page
 {
   public DeckBuilderPage() => InitializeComponent();
 
-  public ObservableCollection<DeckSelectorAndEditorTabViewItem> TabViewItems { get; } = [new CreateNewDeckViewTabItem().Execute()];
+  public ObservableCollection<DeckSelectionAndEditorTabViewItem> TabViewItems { get; } = [new CreateNewDeckViewTabItem().Execute()];
 
   [ObservableProperty] private bool isSearchPaneOpen = false;
 
@@ -29,10 +30,14 @@ public sealed partial class DeckBuilderPage : Page
 
   private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
   {
-    if (!await (args.Item as DeckSelectorAndEditorTabViewItem).RequestClosure())
+    var unsavedArgs = new ISavable.ConfirmArgs();
+
+    await (args.Item as DeckSelectionAndEditorTabViewItem).RequestClosure(unsavedArgs);
+
+    if (unsavedArgs.Cancelled)
       return;
 
-    TabViewItems.Remove(args.Item as DeckSelectorAndEditorTabViewItem);
+    TabViewItems.Remove(args.Item as DeckSelectionAndEditorTabViewItem);
 
     // Create new tab if there are no tabs
     if (TabViewItems.Count == 0)

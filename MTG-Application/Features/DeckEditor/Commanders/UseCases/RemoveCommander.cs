@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Commanders;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleCommands;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.DeckEditor;

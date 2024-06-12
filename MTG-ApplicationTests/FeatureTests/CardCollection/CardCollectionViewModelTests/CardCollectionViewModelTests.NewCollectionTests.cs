@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollection;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
@@ -16,7 +18,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
       {
         HasUnsavedChanges = true,
         Collection = new() { CollectionLists = [new()] },
@@ -32,7 +34,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Cancel_HasUnsavedChanges()
     {
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
       {
         HasUnsavedChanges = true,
         Collection = new() { CollectionLists = [new()] },
@@ -50,7 +52,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Should not have unsaved changes if the collection has been changed to a new collection")]
     public async Task Execute_HasUnsavedChanges_Decline_NoUnsavedChanges()
     {
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
       {
         HasUnsavedChanges = true,
         Collection = new() { CollectionLists = [new()] },
@@ -68,7 +70,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
     {
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
       {
         HasUnsavedChanges = true,
         Collection = new() { CollectionLists = [new()] },
@@ -85,7 +87,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Collection should be changed to a new collection when executed successfully")]
     public async Task New_Success_Reset()
     {
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
       {
         Collection = new()
         {
@@ -106,18 +108,18 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task New_Success_QueryCardsReset()
     {
-      var expectedCards = new DeckEditorMTGCard[]
+      var expectedCards = new CardImportResult<MTGCardInfo>.Card[]
       {
-        MTGCardModelMocker.CreateMTGCardModel(name: "1"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "2"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "3"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "4"),
+        new(MTGCardInfoMocker.MockInfo(name: "1")),
+        new(MTGCardInfoMocker.MockInfo(name: "2")),
+        new(MTGCardInfoMocker.MockInfo(name: "3")),
+        new(MTGCardInfoMocker.MockInfo(name: "4")),
       };
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI() { ExpectedCards = expectedCards })
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter() { ExpectedCards = expectedCards })
       {
         Collection = new()
         {
-          CollectionLists = [new() { Name = "List", Cards = [.. expectedCards], SearchQuery = "asd" }]
+          CollectionLists = [new() { Name = "List", Cards = [.. expectedCards.Select(x => new CardCollectionMTGCard(x.Info))], SearchQuery = "asd" }]
         }
       };
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Views.DragAndDrop;
 using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;

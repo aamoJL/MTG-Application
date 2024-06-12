@@ -1,6 +1,9 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Cardlist;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -39,8 +42,8 @@ public partial class CardListViewModelCommands
           if (addConflictConfirmationResult == ConfirmationResult.Yes)
             addedCards.Add(card);
         }
-        else if (addedCards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is CardImportResult<MTGCardInfo>.Card addedCard)
-          addedCard = addedCard with { Count = addedCard.Count + card.Count };
+        else if (addedCards.FindIndex(x => x.Info.Name == card.Info.Name) is int index && index >= 0)
+          addedCards[index] = addedCards[index] with { Count = addedCards[index].Count + card.Count };
         else
           addedCards.Add(card);
       }

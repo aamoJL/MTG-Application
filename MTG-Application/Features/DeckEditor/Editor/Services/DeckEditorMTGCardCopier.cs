@@ -1,8 +1,9 @@
-﻿using MTGApplication.General.Services;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Services;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public class DeckEditorMTGCardCopier : IClassCopier<DeckEditorMTGCard>
 {

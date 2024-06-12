@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.UI.Xaml;
-using MTGApplication.General.Services.IOService;
+using MTGApplication.General.Services.IOServices;
 using System;
 using System.IO;
 using System.Linq;

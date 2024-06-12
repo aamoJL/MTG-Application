@@ -1,4 +1,4 @@
-﻿namespace MTGApplication.Features.CardSearch.Enums;
+﻿namespace MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl;
 
 public enum GameFormat
 {

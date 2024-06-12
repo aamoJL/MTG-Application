@@ -5,13 +5,13 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-  xmlns:converters="using:MTGApplication.General.Views.BindingHelpers" 
-  xmlns:card="using:MTGApplication.General.Models.Card"
+  xmlns:converters="using:MTGApplication.General.Views.BindingHelpers.Converters" 
+  xmlns:models="using:MTGApplication.General.Models"
   mc:Ignorable="d">
 
   <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
 
-  <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="card:MTGCard">
+  <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="models:MTGCard">
     <StackPanel Orientation="Vertical" Padding="5" ToolTipService.ToolTip="{Binding Info.SetName}">
       <controls:ImageEx Source="{Binding Info.FrontFace.ImageUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
       <Grid HorizontalAlignment="Stretch" ColumnSpacing="20">

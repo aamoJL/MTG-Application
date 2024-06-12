@@ -1,10 +1,10 @@
 ﻿using Microsoft.UI.Xaml;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models;
 using MTGApplication.General.Views;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.CardSearch.Controls.CardView;
-public partial class CardSearchCardViewBase : BasicCardView<DeckEditorMTGCard>
+namespace MTGApplication.Features.CardSearch.Views.Controls.CardView;
+public partial class CardSearchCardViewBase : BasicCardView<MTGCard>
 {
   public static readonly DependencyProperty ShowPrintsCommandProperty =
       DependencyProperty.Register(nameof(ShowPrintsCommand), typeof(ICommand), typeof(CardSearchCardViewBase),

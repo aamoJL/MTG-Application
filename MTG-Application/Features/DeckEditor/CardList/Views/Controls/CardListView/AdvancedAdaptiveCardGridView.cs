@@ -2,14 +2,16 @@
 using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Input;
-using static MTGApplication.General.Models.Card.CardSortProperties;
+using static MTGApplication.Features.DeckEditor.CardList.Services.CardSortProperties;
 
-namespace MTGApplication.Features.DeckEditor.Controls.CardListView;
+namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
 public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 {
   public new static readonly DependencyProperty ItemsSourceProperty =
@@ -41,7 +43,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     Drop += DragAndDrop.Drop;
   }
 
-  private AdvancedCollectionView filteredAndSortedCardSource = new();
+  private AdvancedCollectionView filteredAndSortedCardSource = [];
 
   public new IList<DeckEditorMTGCard> ItemsSource
   {

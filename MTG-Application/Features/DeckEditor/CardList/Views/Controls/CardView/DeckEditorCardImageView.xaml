@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<local:DeckEditorCardViewBase
+<cardview:DeckEditorCardViewBase
+  xmlns:cardview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView"  
   x:Class="MTGApplication.Features.DeckEditor.DeckEditorCardImageView"
-  xmlns:local="using:MTGApplication.Features.DeckEditor"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,7 +19,7 @@
             <CommandBarFlyout.PrimaryCommands>
               <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
               <AppBarSeparator />
-              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.APIName, Mode=OneWay}" IsCompact="True"/>
+              <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}" IsCompact="True"/>
               <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
               <AppBarButton Command="{x:Bind DeleteButtonClick, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
             </CommandBarFlyout.PrimaryCommands>
@@ -44,4 +44,4 @@
       </StackPanel>
     </Grid>
   </StackPanel>
-</local:DeckEditorCardViewBase>
+</cardview:DeckEditorCardViewBase>

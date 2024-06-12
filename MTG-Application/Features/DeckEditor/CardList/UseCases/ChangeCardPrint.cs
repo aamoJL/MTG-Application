@@ -1,5 +1,6 @@
-﻿using MTGApplication.Features.DeckEditor.Services.Cardlist;
-using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Linq;

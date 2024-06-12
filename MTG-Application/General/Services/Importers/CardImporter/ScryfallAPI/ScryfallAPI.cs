@@ -1,8 +1,8 @@
-﻿using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI.UseCases;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
-using MTGApplication.General.Services.IOService;
-using SkiaSharp.HarfBuzz;
+using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
+using MTGApplication.General.Services.IOServices;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static MTGApplication.General.Models.Card.MTGCardInfo;
+using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplication.General.Services.API.CardAPI;
 
@@ -36,13 +36,13 @@ public partial class ScryfallAPI : MTGCardImporter
 
   public override async Task<CardImportResult<MTGCardInfo>> ImportCardsWithSearchQuery(string searchParams)
   {
-    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
+    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult<MTGCardInfo>.Empty(); }
     return await ImportFromUri(GetSearchUri(searchParams));
   }
 
   public override async Task<CardImportResult<MTGCardInfo>> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
-    var pageResults = new List<CardImportResult>();
+    var pageResults = new List<CardImportResult<MTGCardInfo>>();
     var currentPage = pageUri;
 
     do
@@ -53,17 +53,17 @@ public partial class ScryfallAPI : MTGCardImporter
       if (!JsonService.TryParseJson(data, out var rootNode))
         break;
 
-      List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
+      List<CardImportResult<MTGCardInfo>.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
       var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
       var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
-      pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
+      pageResults.Add(new CardImportResult<MTGCardInfo>([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
 
       currentPage = nextPage;
     } while (fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
 
     return pageResults.Count switch
     {
-      0 => CardImportResult.Empty(),
+      0 => CardImportResult<MTGCardInfo>.Empty(),
       1 => pageResults.First(),
       _ => new(
         Found: pageResults.SelectMany(x => x.Found).ToArray(),
@@ -75,7 +75,7 @@ public partial class ScryfallAPI : MTGCardImporter
 
   public override async Task<CardImportResult<MTGCardInfo>> ImportFromString(string importText)
   {
-    if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty(CardImportResult.ImportSource.External);
+    if (string.IsNullOrEmpty(importText)) return CardImportResult<MTGCardInfo>.Empty(CardImportResult.ImportSource.External);
 
     var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -124,7 +124,7 @@ public partial class ScryfallAPI : MTGCardImporter
   {
     if (jsonNode == null) { return []; }
 
-    var cards = new List<CardImportResult.Card>();
+    var cards = new List<CardImportResult<MTGCardInfo>.Card>();
 
     if (jsonNode?["data"] is JsonNode dataNode)
       foreach (var itemInfo in await Task.WhenAll(dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x, paperOnly)))))
@@ -231,7 +231,7 @@ public partial class ScryfallAPI : MTGCardImporter
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
       tokens: tokens ?? Array.Empty<CardToken>(),
-      apiName: Name,
+      importerName: Name,
       oracleId: oracle);
   }
 
@@ -244,7 +244,7 @@ public partial class ScryfallAPI : MTGCardImporter
     {
       var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(chunk);
 
-      var fetchedCards = new List<CardImportResult.Card>();
+      var fetchedCards = new List<CardImportResult<MTGCardInfo>.Card>();
       var notFoundCount = 0;
 
       // Fetch and covert the JSON to card objects

@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace MTGApplication.General.Services.IOService;
+namespace MTGApplication.General.Services.IOServices;
 
 public static class JsonService
 {

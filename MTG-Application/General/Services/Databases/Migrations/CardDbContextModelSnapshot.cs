@@ -3,7 +3,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MTGApplication.General.Services.Databases;
+using MTGApplication.General.Services.Databases.Context;
+
 
 #nullable disable
 

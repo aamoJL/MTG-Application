@@ -1,6 +1,7 @@
-﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 
 public class DeckEditorMTGCardToDTOConverter
 {

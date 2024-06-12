@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System;
@@ -40,7 +41,7 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
     return await Task.FromResult(db.MTGCardCollections.FirstOrDefault(x => x.Name == name) != null);
   }
 
-  public async Task<IEnumerable<MTGCardCollectionDTO>> Get(Action<DbSet<MTGCardCollectionDTO>> setIncludes)
+  public virtual async Task<IEnumerable<MTGCardCollectionDTO>> Get(Action<DbSet<MTGCardCollectionDTO>> setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -56,7 +57,7 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
     return await Task.FromResult(items);
   }
 
-  public async Task<MTGCardCollectionDTO> Get(string name, Action<DbSet<MTGCardCollectionDTO>> setIncludes = null)
+  public virtual async Task<MTGCardCollectionDTO> Get(string name, Action<DbSet<MTGCardCollectionDTO>> setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;

@@ -1,8 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.Services.Commanders;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.Features.DeckEditor.Commanders.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
@@ -30,6 +31,6 @@ public partial class CommanderViewModel(MTGCardImporter importer) : ViewModelBas
   public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => new MoveCard.BeginMoveTo(this).Command;
   public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => new MoveCard.ExecuteMove(this).Command;
   public IAsyncRelayCommand<string> ImportCommanderCommand => new ImportCommander(this).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCardPrintCommand => new ChangeCardPrint(this).Command;
+  public IAsyncRelayCommand ChangeCardPrintCommand => new ChangeCardPrint(this).Command;
 }
 

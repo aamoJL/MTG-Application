@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -63,7 +63,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Deck should be the same when executing with an empty name parameter")]
     public async Task Execute_WithInvalidParameter_Canceled()
     {
-      var unsavedDeck = new MTGCardDeck() { Name = "Unsaved Deck" };
+      var unsavedDeck = new DeckEditorMTGDeck() { Name = "Unsaved Deck" };
       var viewmodel = new Mocker(_dependencies) { Deck = unsavedDeck }.MockVM();
 
       await viewmodel.OpenDeckCommand.ExecuteAsync(string.Empty);
@@ -90,7 +90,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Cancel_HasUnsavedChanges()
     {
-      var unsavedDeck = new MTGCardDeck() { Name = "Unsaved Deck" };
+      var unsavedDeck = new DeckEditorMTGDeck() { Name = "Unsaved Deck" };
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = unsavedDeck,
@@ -158,7 +158,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Deck should be the same if the loading was canceled when loading a deck")]
     public async Task Open_Cancel_NoChanges()
     {
-      var unsavedDeck = new MTGCardDeck() { Name = "Unsaved Deck" };
+      var unsavedDeck = new DeckEditorMTGDeck() { Name = "Unsaved Deck" };
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = unsavedDeck,

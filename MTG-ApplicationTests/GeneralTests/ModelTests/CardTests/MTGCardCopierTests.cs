@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.GeneralTests.ModelTests.CardTests;
@@ -10,7 +11,7 @@ public class MTGCardCopierTests
   [TestMethod]
   public void Copy_Single()
   {
-    var card = MTGCardModelMocker.CreateMTGCardModel(name: "card", cmc: 2, count: 5);
+    var card = DeckEditorMTGCardMocker.CreateMTGCardModel(name: "card", cmc: 2, count: 5);
     var copier = new DeckEditorMTGCardCopier();
 
     var result = copier.Copy(card);
@@ -25,9 +26,9 @@ public class MTGCardCopierTests
   {
     var cards = new List<DeckEditorMTGCard>()
     {
-      MTGCardModelMocker.CreateMTGCardModel(name: "card1", cmc: 1, count: 1),
-      MTGCardModelMocker.CreateMTGCardModel(name: "card2", cmc: 2, count: 2),
-      MTGCardModelMocker.CreateMTGCardModel(name: "card3", cmc: 3, count: 3)
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "card1", cmc: 1, count: 1),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "card2", cmc: 2, count: 2),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "card3", cmc: 3, count: 3)
     };
     var copier = new DeckEditorMTGCardCopier();
 

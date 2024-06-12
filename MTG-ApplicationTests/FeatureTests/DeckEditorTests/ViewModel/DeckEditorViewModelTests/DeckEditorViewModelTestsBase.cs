@@ -1,6 +1,7 @@
 ﻿using MTGApplication.Features.DeckEditor;
-using MTGApplication.Features.DeckEditor.Services.DeckEditor;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
+using MTGApplication.Features.DeckEditor.Models;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -12,22 +13,22 @@ public partial class DeckEditorViewModelTests
   public abstract class DeckEditorViewModelTestsBase
   {
     protected readonly DeckRepositoryDependencies _dependencies = new();
-    protected readonly MTGCardDeck _savedDeck = MTGCardDeckMocker.Mock("Saved Deck");
+    protected readonly DeckEditorMTGDeck _savedDeck = MTGCardDeckMocker.Mock("Saved Deck");
 
     public DeckEditorViewModelTestsBase()
-      => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
+      => _dependencies.ContextFactory.Populate(DeckEditorMTGDeckToDTOConverter.Convert(_savedDeck));
 
     public class Mocker(DeckRepositoryDependencies dependencies)
     {
       public bool HasUnsavedChanges { get; set; } = false;
       public DeckEditorConfirmers Confirmers { get; set; } = new();
-      public MTGCardDeck Deck { get; set; } = new();
+      public DeckEditorMTGDeck Deck { get; set; } = new();
       public Notifier Notifier { get; set; } = new();
 
       public DeckEditorViewModel MockVM()
       {
         return new(
-          dependencies.CardAPI,
+          dependencies.Importer,
           deck: Deck,
           confirmers: Confirmers,
           notifier: Notifier)

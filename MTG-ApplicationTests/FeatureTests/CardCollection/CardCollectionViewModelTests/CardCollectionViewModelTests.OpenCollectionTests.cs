@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -135,11 +136,11 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Open_Valid_QueryCardsUpdated()
     {
-      var expectedCards = new DeckEditorMTGCard[]
+      var expectedCards = new CardImportResult<MTGCardInfo>.Card[]
       {
-        MTGCardModelMocker.CreateMTGCardModel(name: "1"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "2"),
-        MTGCardModelMocker.CreateMTGCardModel(name: "3"),
+        new (MTGCardInfoMocker.MockInfo(name: "1")),
+        new (MTGCardInfoMocker.MockInfo(name: "2")),
+        new (MTGCardInfoMocker.MockInfo(name: "3")),
       };
       var viewmodel = new Mocker(_dependencies)
       {

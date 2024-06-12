@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.IOService;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Mocker;
-using static MTGApplication.General.Models.Card.DeckEditorMTGCard;
+using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplicationTests.GeneralTests.ModelTests.CardTests;
 
@@ -14,7 +16,7 @@ public class MTGCardTests
   {
     var allTypeLine = string.Join(' ', Enum.GetNames(typeof(SpellType)));
 
-    var card = MTGCardModelMocker.CreateMTGCardModel(typeLine: allTypeLine);
+    var card = DeckEditorMTGCardMocker.CreateMTGCardModel(typeLine: allTypeLine);
 
     CollectionAssert.AreEquivalent(Enum.GetValues<SpellType>().ToArray(), card.Info.SpellTypes);
   }
@@ -22,9 +24,9 @@ public class MTGCardTests
   [TestMethod]
   public void ColorTypes_TwoFaces_AllColors()
   {
-    var frontFace = MTGCardModelMocker.CreateCardFace(colors: [ColorTypes.W, ColorTypes.U, ColorTypes.B]);
-    var backFace = MTGCardModelMocker.CreateCardFace(colors: [ColorTypes.R, ColorTypes.G]);
-    var card = MTGCardModelMocker.CreateMTGCardModel(frontFace: frontFace, backFace: backFace);
+    var frontFace = DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.W, ColorTypes.U, ColorTypes.B]);
+    var backFace = DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.R, ColorTypes.G]);
+    var card = DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace: frontFace, backFace: backFace);
 
     CollectionAssert.AreEquivalent(
       new ColorTypes[] { ColorTypes.W, ColorTypes.U, ColorTypes.B, ColorTypes.R, ColorTypes.G }, card.Info.Colors);
@@ -33,8 +35,8 @@ public class MTGCardTests
   [TestMethod]
   public void ColorTypes_NoColors_Colorless()
   {
-    var frontFace = MTGCardModelMocker.CreateCardFace(colors: []);
-    var card = MTGCardModelMocker.CreateMTGCardModel(frontFace: frontFace);
+    var frontFace = DeckEditorMTGCardMocker.CreateCardFace(colors: []);
+    var card = DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace: frontFace);
 
     CollectionAssert.AreEquivalent(new ColorTypes[] { ColorTypes.C }, card.Info.Colors);
   }
@@ -42,7 +44,7 @@ public class MTGCardTests
   [TestMethod]
   public void Serialize()
   {
-    var card = MTGCardModelMocker.CreateMTGCardModel();
+    var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
 
     JsonService.TrySerializeObject(card, out var serialized);
 
@@ -52,7 +54,7 @@ public class MTGCardTests
   [TestMethod]
   public void Deserialize()
   {
-    var card = MTGCardModelMocker.CreateMTGCardModel();
+    var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
 
     JsonService.TrySerializeObject(card, out var serialized);
     JsonService.TryDeserializeJson(serialized, out DeckEditorMTGCard deserialized);
@@ -65,7 +67,7 @@ public class MTGCardTests
   [TestMethod("Card cound should be the given value if the value is more than one")]
   public void Count_MoreThanOne_IsValue()
   {
-    var card = MTGCardModelMocker.CreateMTGCardModel();
+    var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
     var countValue = 10;
 
     card.Count = countValue;
@@ -76,7 +78,7 @@ public class MTGCardTests
   [TestMethod("Card cound should be the one if the value is less than one")]
   public void Count_LessThanOne_IsOne()
   {
-    var card = MTGCardModelMocker.CreateMTGCardModel();
+    var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
     var countValue = -10;
 
     card.Count = countValue;

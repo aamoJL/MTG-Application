@@ -21,7 +21,7 @@ public partial class DeckEditorViewModelTests
     {
       var viewmodel = new Mocker(_dependencies).MockVM();
 
-      viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
+      viewmodel.DeckCardList.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.IsTrue(viewmodel.UndoCommand.CanExecute(null));
     }
@@ -31,7 +31,7 @@ public partial class DeckEditorViewModelTests
     {
       var viewmodel = new Mocker(_dependencies).MockVM();
 
-      viewmodel.DeckCardList.AddCardCommand.Execute(MTGCardModelMocker.CreateMTGCardModel());
+      viewmodel.DeckCardList.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
       Assert.AreEqual(1, viewmodel.DeckCardList.Cards.Count);
 

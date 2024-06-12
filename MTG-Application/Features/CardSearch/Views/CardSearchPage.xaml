@@ -10,7 +10,7 @@
   xmlns:sys="using:System"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
   xmlns:cardsearch="using:MTGApplication.Features.CardSearch" 
-  xmlns:models="using:MTGApplication.Features.CardSearch.Models"
+  xmlns:models="using:MTGApplication.General.Models"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -66,7 +66,7 @@
           DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
           DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
           <controls:AdaptiveGridView.ItemTemplate>
-            <DataTemplate x:DataType="models:CardSearchMTGCard">
+            <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardImageView
                 d:DataContext="{d:DesignInstance Type=cardsearch:CardSearchViewModel}"
                 DataContext="{Binding ElementName=SearcCardsImageView, Path=DataContext, Mode=OneTime}"
@@ -86,7 +86,7 @@
           DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
           DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
           <ListView.ItemTemplate>
-            <DataTemplate x:DataType="models:CardSearchMTGCard">
+            <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardTextView 
                 d:DataContext="{d:DesignInstance Type=cardsearch:CardSearchViewModel}"
                 DataContext="{Binding ElementName=SearcCardsTextView, Path=DataContext, Mode=OneTime}"

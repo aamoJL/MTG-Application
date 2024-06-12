@@ -15,4 +15,5 @@ internal interface ISaveCommandTests
   Task Save_Success_NoUnsavedChanges();
   Task Save_Success_SuccessNotificationSent();
   Task Save_Error_ErrorNotificationSent();
+  Task Save_SaveEmpty_Success();
 }

@@ -1,6 +1,6 @@
 ﻿using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.DeckEditor.Services.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public static class DeckEditorNotifications
 {

@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.DeckEditor;
@@ -18,7 +19,7 @@ public partial class CommanderViewModelReversibleActions
       if (Viewmodel.Card.Info.Name != print.Name) return;
 
       Viewmodel.Card.Info = print;
-      Viewmodel.OnChange?.Invoke();
+      Viewmodel.OnChange?.Invoke(Viewmodel.Card);
     }
   }
 }

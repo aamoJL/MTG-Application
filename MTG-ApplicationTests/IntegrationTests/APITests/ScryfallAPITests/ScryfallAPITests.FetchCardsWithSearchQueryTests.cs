@@ -27,7 +27,7 @@ public partial class ScryfallAPITests
       var result = await api.ImportCardsWithSearchQuery(query);
 
       Assert.IsTrue(result.Found.Length > 0);
-      Assert.AreEqual(api.Name, result.Found[0].APIName);
+      Assert.AreEqual(api.Name, result.Found[0].Info.ImporterName);
     }
 
     [TestMethod]

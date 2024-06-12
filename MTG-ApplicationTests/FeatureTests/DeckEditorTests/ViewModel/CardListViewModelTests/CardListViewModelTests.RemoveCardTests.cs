@@ -13,8 +13,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void RemoveCard_CardRemoved()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
       viewmodel.AddCardCommand.Execute(card);
       viewmodel.RemoveCardCommand.Execute(card);
@@ -25,8 +25,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void RemoveCard_Undo_CardAdded()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
       viewmodel.AddCardCommand.Execute(card);
       viewmodel.RemoveCardCommand.Execute(card);
@@ -38,8 +38,8 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void RemoveCard_Redo_CardRemovedAgain()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
       viewmodel.AddCardCommand.Execute(card);
       viewmodel.RemoveCardCommand.Execute(card);

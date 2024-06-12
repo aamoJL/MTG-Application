@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
-using MTGApplication.Features.DeckEditor.Controls.CardView;
-using MTGApplication.Features.DeckEditor.Controls.CardView.CommanderView;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
+using MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor;

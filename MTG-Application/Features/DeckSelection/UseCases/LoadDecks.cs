@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.Features.DeckSelector.Models;
+using MTGApplication.Features.DeckSelection.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.DeckSelector.UseCases;
+namespace MTGApplication.Features.DeckSelection.UseCases;
 
 public partial class DeckSelectorViewModelCommands
 {
@@ -15,7 +15,7 @@ public partial class DeckSelectorViewModelCommands
     {
       var deckDTOs = await Viewmodel.Worker.DoWork(new GetDeckDTOs(Viewmodel.Repository)
       {
-        SetIncludes = (set) => { set.Include(x => x.Commander); },
+        SetIncludes = (set) => { set.Include(x => x.Commander).Load(); },
       }.Execute());
 
       // TODO: save image to database so it does not need to be fetched here

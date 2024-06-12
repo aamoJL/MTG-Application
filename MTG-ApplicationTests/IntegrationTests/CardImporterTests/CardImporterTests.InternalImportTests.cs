@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.API.CardAPI;
-using MTGApplication.General.Services.IOService;
+using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.IntegrationTests.CardImporterTests;
@@ -13,8 +15,8 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_Serialized_CardFound()
     {
-      var importer = new CardImporter(new ScryfallAPI());
-      var card = MTGCardModelMocker.CreateMTGCardModel(count: 5);
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo(), Count: 5);
 
       JsonService.TrySerializeObject(card, out var json);
 

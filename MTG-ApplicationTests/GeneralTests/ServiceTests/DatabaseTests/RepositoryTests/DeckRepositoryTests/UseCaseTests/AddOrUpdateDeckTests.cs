@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Databases.Repositories.DeckRepository;
-using MTGApplication.General.Models.CardDeck;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
+using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplicationTests.TestUtility.Database;
 
 namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTests.DeckRepositoryTests.UseCaseTests;
@@ -9,15 +11,15 @@ namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTest
 public class AddOrUpdateDeckTests
 {
   private readonly DeckRepositoryDependencies _dependencies = new();
-  private readonly MTGCardDeck _savedDeck = new() { Name = "Saved Deck" };
+  private readonly DeckEditorMTGDeck _savedDeck = new() { Name = "Saved Deck" };
 
-  public AddOrUpdateDeckTests() => _dependencies.ContextFactory.Populate(new MTGCardDeckDTO(_savedDeck));
+  public AddOrUpdateDeckTests() => _dependencies.ContextFactory.Populate(DeckEditorMTGDeckToDTOConverter.Convert(_savedDeck));
 
   [TestMethod("Should return true if the deck was added to the reposiotry")]
   public async Task Execute_Added_ReturnTrue()
   {
-    var newDeck = new MTGCardDeck() { Name = "New Deck" };
-    var result = await new AddOrUpdateDeck(_dependencies.Repository).Execute((newDeck, "Save Name"));
+    var newDeck = new MTGCardDeckDTO(name: "New Deck");
+    var result = await new AddOrUpdateDeckDTO(_dependencies.Repository).Execute((newDeck, "Save Name"));
 
     Assert.IsTrue(result, "Should have returned true");
   }
@@ -27,8 +29,8 @@ public class AddOrUpdateDeckTests
   {
     _dependencies.Repository.AddFailure = true;
 
-    var newDeck = new MTGCardDeck() { Name = "New Deck" };
-    var result = await new AddOrUpdateDeck(_dependencies.Repository).Execute((newDeck, "Save Name"));
+    var newDeck = new MTGCardDeckDTO(name: "New Deck");
+    var result = await new AddOrUpdateDeckDTO(_dependencies.Repository).Execute((newDeck, "Save Name"));
 
     Assert.IsFalse(result, "Should have returned false");
   }
@@ -36,7 +38,8 @@ public class AddOrUpdateDeckTests
   [TestMethod("Should return true if an existing deck was updated")]
   public async Task Execute_Update_ReturnTrue()
   {
-    var result = await new AddOrUpdateDeck(_dependencies.Repository).Execute((_savedDeck, _savedDeck.Name));
+    var dto = DeckEditorMTGDeckToDTOConverter.Convert(_savedDeck);
+    var result = await new AddOrUpdateDeckDTO(_dependencies.Repository).Execute((dto, dto.Name));
 
     Assert.IsTrue(result, "Should have returned true");
   }
@@ -45,7 +48,9 @@ public class AddOrUpdateDeckTests
   public async Task Execute_UpdateFailure_ReturnFalse()
   {
     _dependencies.Repository.UpdateFailure = true;
-    var result = await new AddOrUpdateDeck(_dependencies.Repository).Execute((_savedDeck, _savedDeck.Name));
+
+    var dto = DeckEditorMTGDeckToDTOConverter.Convert(_savedDeck);
+    var result = await new AddOrUpdateDeckDTO(_dependencies.Repository).Execute((dto, dto.Name));
 
     Assert.IsFalse(result, "Should have returned false");
   }

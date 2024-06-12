@@ -98,7 +98,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Delete_Success_QueryCardsReset()
     {
-      var viewmodel = new CardCollectionViewModel(new TestCardAPI())
+      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
       {
         Collection = _savedCollection
       };

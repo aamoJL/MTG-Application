@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using static MTGApplication.General.Models.Card.MTGCardInfo;
+using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplication.General.Extensions;
 

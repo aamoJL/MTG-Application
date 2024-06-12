@@ -14,13 +14,13 @@ public partial class CommanderViewModelTests
     public async Task ExecuteMove_CardMovedBetweenViewModels()
     {
       var undoStack = new ReversibleCommandStack();
-      var card = MTGCardModelMocker.CreateMTGCardModel();
-      var origin = new CommanderViewModel(new TestCardAPI())
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
+      var origin = new CommanderViewModel(new TestMTGCardImporter())
       {
         Card = card,
         UndoStack = undoStack,
       };
-      var target = new CommanderViewModel(new TestCardAPI())
+      var target = new CommanderViewModel(new TestMTGCardImporter())
       {
         UndoStack = undoStack,
       };

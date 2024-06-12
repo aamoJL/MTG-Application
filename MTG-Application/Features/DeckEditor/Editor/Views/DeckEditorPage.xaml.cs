@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
-using MTGApplication.Features.DeckEditor.Services.DeckEditor;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService;
 using System;
 

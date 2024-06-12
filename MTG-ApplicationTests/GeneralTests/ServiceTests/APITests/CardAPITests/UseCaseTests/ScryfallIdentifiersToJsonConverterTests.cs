@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using System.Text.Json;
 using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
 

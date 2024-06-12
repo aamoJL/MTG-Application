@@ -2,8 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.IOService;
+using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Views.Controls;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -11,7 +12,7 @@ using System.Windows.Input;
 namespace MTGApplication.General.Views;
 
 [ObservableObject]
-public abstract partial class BasicCardView<TCard> : UserControl where TCard : DeckEditorMTGCard
+public abstract partial class BasicCardView<TCard> : UserControl where TCard : MTGCard
 {
   public static readonly DependencyProperty ModelProperty =
       DependencyProperty.Register(nameof(Model), typeof(TCard), typeof(BasicCardView<TCard>),

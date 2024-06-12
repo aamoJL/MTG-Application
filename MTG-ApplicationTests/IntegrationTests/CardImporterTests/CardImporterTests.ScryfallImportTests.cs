@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplicationTests.IntegrationTests.CardImporterTests;
 public partial class CardImporterTests
@@ -11,7 +12,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithValidIds_CardsFound()
     {
-      var importer = new CardImporter(new ScryfallAPI());
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
       var idListString = string.Join(Environment.NewLine,
       [
         "d9b1ed43-ee6c-43a2-ba94-5bf71c63e070",
@@ -30,7 +31,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithInvalidIds_NoCardsFound()
     {
-      var importer = new CardImporter(new ScryfallAPI());
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
       var idListString = string.Join(Environment.NewLine,
       [
         "xxxxxxx-ee6c-43a2-ba94-5bf71c63e070",

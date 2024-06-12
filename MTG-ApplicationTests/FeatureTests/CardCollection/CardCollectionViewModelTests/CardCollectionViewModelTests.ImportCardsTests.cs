@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -113,7 +115,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ImportCards_Found_CardsAdded()
     {
-      _dependencies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel()];
+      _dependencies.CardAPI.ExpectedCards = [new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo())];
 
       var viewmodel = new Mocker(_dependencies)
       {
@@ -136,12 +138,13 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ImportCards_Exists_CardNotAdded()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
+
       _dependencies.CardAPI.ExpectedCards = [card];
 
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new() { Cards = [card] }] },
+        Collection = new() { CollectionLists = [new() { Cards = [new(card.Info)] }] },
         Confirmers = new()
         {
           ImportCardsConfirmer = new()
@@ -160,7 +163,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ImportCards_AllFound_SuccessNotificationSent()
     {
-      _dependencies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel()];
+      _dependencies.CardAPI.ExpectedCards = [new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo())];
 
       var viewmodel = new Mocker(_dependencies)
       {
@@ -183,7 +186,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ImportCards_PartialFound_WarningNotificationSent()
     {
-      _dependencies.CardAPI.ExpectedCards = [MTGCardModelMocker.CreateMTGCardModel()];
+      _dependencies.CardAPI.ExpectedCards = [new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo())];
       _dependencies.CardAPI.NotFoundCount = 1;
 
       var viewmodel = new Mocker(_dependencies)
@@ -207,12 +210,12 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ImportCards_AllSkipped_SuccessNotificationSent()
     {
-      var card = MTGCardModelMocker.CreateMTGCardModel();
+      var card = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
       _dependencies.CardAPI.ExpectedCards = [card];
 
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new() { Cards = [card] }] },
+        Collection = new() { CollectionLists = [new() { Cards = [new(card.Info)] }] },
         Confirmers = new()
         {
           ImportCardsConfirmer = new()
@@ -231,16 +234,16 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ImportCards_SomeSkipped_SuccessNotificationSent()
     {
-      var existingCard = MTGCardModelMocker.CreateMTGCardModel();
+      var existingCard = new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo());
 
       _dependencies.CardAPI.ExpectedCards = [
         existingCard,
-        MTGCardModelMocker.CreateMTGCardModel()
+        new CardImportResult<MTGCardInfo>.Card(MTGCardInfoMocker.MockInfo())
       ];
 
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new() { Cards = [existingCard] }] },
+        Collection = new() { CollectionLists = [new() { Cards = [new(existingCard.Info)] }] },
         Confirmers = new()
         {
           ImportCardsConfirmer = new()

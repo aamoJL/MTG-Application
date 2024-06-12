@@ -2,13 +2,12 @@
 
 internal interface IConfirmUnsavedChangesTests
 {
-  Task NoUnsavedChanges_ReturnTrue();
-  Task SaveCommandCanNotExecute_ReturnTrue();
-  Task CanSave_UnsavedChangesConfirmationShown();
-  Task CanSave_AcceptUnsavedSave_SaveConfirmationShown();
-  Task CanSave_DeclineUnsavedSave_ReturnTrue();
-  Task CanSave_CancelUnsavedSave_ReturnFalse();
-  Task CanSave_AcceptUnsavedSave_CancelSave_ReturnFalse();
-  Task CanSave_AcceptUnsavedSave_DeclineSave_ReturnFalse();
-  Task CanSave_AcceptUnsavedSave_Save_ReturnTrue();
+  Task NoUnsavedChanges_Success();
+  Task ConfirmUnsavedChanges_UnsavedChangesConfirmationShown();
+  Task ConfirmUnsavedChanges_Accept_SaveConfirmationShown();
+  Task ConfirmUnsavedChanges_Decline_Success();
+  Task ConfirmUnsavedChanges_Cancel_Canceled();
+  Task ConfirmUnsavedChanges_Accept_CancelSave_Canceled();
+  Task ConfirmUnsavedChanges_Accept_DeclineSave_Canceled();
+  Task ConfirmUnsavedChanges_Accept_Save_Success();
 }

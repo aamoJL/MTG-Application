@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,6 +19,15 @@ public record MTGCardDTO
     OracleId = oracleId;
     SetCode = setCode;
     CollectorNumber = collectorNumber;
+  }
+  public MTGCardDTO(MTGCardInfo info, int count = 1)
+  {
+    Name = info.Name;
+    Count = count;
+    ScryfallId = info.ScryfallId;
+    OracleId = info.OracleId;
+    SetCode = info.SetCode;
+    CollectorNumber = info.CollectorNumber;
   }
 
   [Key] public int Id { get; init; }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<local:MTGCardChart
+<controls:MTGCardChart
   x:Class="MTGApplication.Features.DeckEditor.ManaDistributionChart"
-  xmlns:local="using:MTGApplication.Features.DeckEditor"
+  xmlns:controls="using:MTGApplication.Features.DeckEditor.Charts.Views.Controls"  
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,4 +16,4 @@
       AngleAxes="{x:Bind AngleAxes, Mode=OneTime}"
       RadiusAxes="{x:Bind RadiusAxes, Mode=OneTime}"/>
   </Grid>
-</local:MTGCardChart>
+</controls:MTGCardChart>

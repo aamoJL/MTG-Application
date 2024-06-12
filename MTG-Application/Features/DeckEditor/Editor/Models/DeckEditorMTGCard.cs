@@ -1,15 +1,14 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using MTGApplication.General.Models;
 using System;
 
-namespace MTGApplication.General.Models.Card;
+namespace MTGApplication.Features.DeckEditor.Editor.Models;
 
 /// <summary>
 /// MTG card model
 /// </summary>
-public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : ObservableObject
+public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCard(info)
 {
-  protected int count = Math.Max(1, count);
-  [ObservableProperty] private MTGCardInfo info = info;
+  protected int count = LimitCount(count);
 
   /// <summary>
   /// Name of the API, that was used to fetch this card
@@ -24,7 +23,7 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : Observ
     get => count;
     set
     {
-      value = Math.Max(1, value);
+      value = LimitCount(value);
       if (count != value)
       {
         count = value;
@@ -32,4 +31,6 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : Observ
       }
     }
   }
+
+  private static int LimitCount(int value) => Math.Max(1, value);
 }

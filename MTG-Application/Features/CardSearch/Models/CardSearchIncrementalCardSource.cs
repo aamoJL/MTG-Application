@@ -1,11 +1,11 @@
-﻿using MTGApplication.General.Models.Card;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.CardSearch.Models;
 
-public class CardSearchIncrementalCardSource(MTGCardImporter importer) : IncrementalCardSource<CardSearchMTGCard>(importer)
+public class CardSearchIncrementalCardSource(MTGCardImporter importer) : IncrementalCardSource<MTGCard>(importer)
 {
-  protected override CardSearchMTGCard ConvertToCardType(CardImportResult<MTGCardInfo>.Card card) 
+  protected override MTGCard ConvertToCardType(CardImportResult<MTGCardInfo>.Card card)
     => new(card.Info);
 }

@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.Models.Card;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.ReversibleCommandService;
 using System.Collections.Generic;
 using System.Linq;

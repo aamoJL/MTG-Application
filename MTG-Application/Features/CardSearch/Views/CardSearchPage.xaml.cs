@@ -1,6 +1,8 @@
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardSearch.Services;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Linq;
 

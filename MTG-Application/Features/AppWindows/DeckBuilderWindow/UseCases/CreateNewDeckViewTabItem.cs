@@ -2,7 +2,7 @@
 using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
-public class CreateNewDeckViewTabItem : UseCase<DeckSelectorAndEditorTabViewItem>
+public class CreateNewDeckViewTabItem : UseCase<DeckSelectionAndEditorTabViewItem>
 {
-  public override DeckSelectorAndEditorTabViewItem Execute() => new();
+  public override DeckSelectionAndEditorTabViewItem Execute() => new();
 }

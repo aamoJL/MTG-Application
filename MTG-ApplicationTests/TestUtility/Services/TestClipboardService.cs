@@ -1,4 +1,4 @@
-﻿using MTGApplication.General.Services.IOService;
+﻿using MTGApplication.General.Services.IOServices;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplicationTests.TestUtility.Services;

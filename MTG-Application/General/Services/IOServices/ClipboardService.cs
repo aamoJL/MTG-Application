@@ -1,7 +1,7 @@
 ﻿using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.General.Services.IOService;
+namespace MTGApplication.General.Services.IOServices;
 
 /// <summary>
 /// Service that handles clipboard actions

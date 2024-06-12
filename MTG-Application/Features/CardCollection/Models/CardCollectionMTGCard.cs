@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.General.Models.Card;
+using MTGApplication.General.Models;
 
 namespace MTGApplication.Features.CardCollection;
 
-public partial class CardCollectionMTGCard(DeckEditorMTGCard.MTGCardInfo info) : DeckEditorMTGCard(info)
+public partial class CardCollectionMTGCard(MTGCardInfo info) : MTGCard(info)
 {
   [ObservableProperty] private bool isOwned;
 }

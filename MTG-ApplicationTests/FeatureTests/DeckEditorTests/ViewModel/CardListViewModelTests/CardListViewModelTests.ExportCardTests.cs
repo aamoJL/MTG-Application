@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
-using MTGApplication.General.Models.Card;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
@@ -17,18 +17,18 @@ public partial class CardListViewModelTests
     [TestMethod("Should be able to execute with Name or Id parameters")]
     public void ValidParameter_CanExecute()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
 
-      Assert.IsTrue(viewmodel.ExportCommand.CanExecute("Name"));
-      Assert.IsTrue(viewmodel.ExportCommand.CanExecute("Id"));
+      Assert.IsTrue(viewmodel.ExportCardsCommand.CanExecute("Name"));
+      Assert.IsTrue(viewmodel.ExportCardsCommand.CanExecute("Id"));
     }
 
     [TestMethod("Should not be able to execute if parameter is not Name or Id")]
     public void InvalidParameter_CanNotExecute()
     {
-      var viewmodel = new CardListViewModel(new TestCardAPI());
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
 
-      Assert.IsFalse(viewmodel.ExportCommand.CanExecute("Invalid property name"));
+      Assert.IsFalse(viewmodel.ExportCardsCommand.CanExecute("Invalid property name"));
     }
 
     [TestMethod]
@@ -36,12 +36,12 @@ public partial class CardListViewModelTests
     {
       var cards = new DeckEditorMTGCard[]
       {
-      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = new(cards),
         Confirmers = new()
@@ -50,7 +50,7 @@ public partial class CardListViewModelTests
         }
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCommand.ExecuteAsync("Name"));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync("Name"));
     }
 
     [TestMethod]
@@ -58,12 +58,12 @@ public partial class CardListViewModelTests
     {
       var cards = new DeckEditorMTGCard[]
       {
-      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = new(cards),
         Confirmers = new()
@@ -72,7 +72,7 @@ public partial class CardListViewModelTests
         }
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCommand.ExecuteAsync("Id"));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync("Id"));
     }
 
     [TestMethod]
@@ -82,12 +82,12 @@ public partial class CardListViewModelTests
 
       var cards = new DeckEditorMTGCard[]
       {
-      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = new(cards),
         Confirmers = new()
@@ -96,7 +96,7 @@ public partial class CardListViewModelTests
         }
       };
 
-      await viewmodel.ExportCommand.ExecuteAsync("Name");
+      await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
 
       Assert.AreEqual(string.Join(Environment.NewLine, cards.Select(x => x.Info.Name)), exportText);
     }
@@ -108,12 +108,12 @@ public partial class CardListViewModelTests
 
       var cards = new DeckEditorMTGCard[]
       {
-      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = new(cards),
         Confirmers = new()
@@ -122,7 +122,7 @@ public partial class CardListViewModelTests
         }
       };
 
-      await viewmodel.ExportCommand.ExecuteAsync("Id");
+      await viewmodel.ExportCardsCommand.ExecuteAsync("Id");
 
       Assert.AreEqual(string.Join(Environment.NewLine, cards.Select(x => x.Info.ScryfallId)), exportText);
     }
@@ -134,13 +134,13 @@ public partial class CardListViewModelTests
 
       var cards = new DeckEditorMTGCard[]
       {
-      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
       var clipboard = new TestClipboardService();
 
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = new(cards),
         Confirmers = new()
@@ -150,7 +150,7 @@ public partial class CardListViewModelTests
         ClipboardService = clipboard
       };
 
-      await viewmodel.ExportCommand.ExecuteAsync("Name");
+      await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
 
       Assert.AreEqual(string.Join(Environment.NewLine, cards.Select(x => x.Info.Name)), clipboard.Content);
     }
@@ -160,13 +160,13 @@ public partial class CardListViewModelTests
     {
       var cards = new DeckEditorMTGCard[]
       {
-      MTGCardModelMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
-      MTGCardModelMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Second", scryfallId: Guid.NewGuid()),
+      DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
       var clipboard = new TestClipboardService();
 
-      var viewmodel = new CardListViewModel(new TestCardAPI())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
       {
         Cards = new(cards),
         Confirmers = new()
@@ -177,7 +177,7 @@ public partial class CardListViewModelTests
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };
 
-      await NotificationAssert.NotificationSent(NotificationType.Info, () => viewmodel.ExportCommand.ExecuteAsync("Name"));
+      await NotificationAssert.NotificationSent(NotificationType.Info, () => viewmodel.ExportCardsCommand.ExecuteAsync("Name"));
     }
   }
 }

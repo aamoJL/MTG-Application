@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Controls.Charts;
+﻿using MTGApplication.Features.DeckEditor.Charts.Models;
 
 namespace MTGApplication.Features.DeckEditor;
 public sealed partial class ManaCurveChart

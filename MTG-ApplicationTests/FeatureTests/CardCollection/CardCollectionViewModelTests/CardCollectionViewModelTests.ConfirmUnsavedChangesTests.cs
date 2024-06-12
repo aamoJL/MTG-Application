@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
@@ -10,30 +11,21 @@ public partial class CardCollectionViewModelTests
   public class ConfirmUnsavedChangesTests : CardCollectionViewModelTestsBase, IConfirmUnsavedChangesTests
   {
     [TestMethod]
-    public async Task NoUnsavedChanges_ReturnTrue()
+    public async Task NoUnsavedChanges_Success()
     {
       var viewmodel = new Mocker(_dependencies)
       {
         HasUnsavedChanges = false,
       }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsFalse(args.Cancelled);
     }
 
     [TestMethod]
-    public async Task SaveCommandCanNotExecute_ReturnTrue()
-    {
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Collection = new() { CollectionLists = [] },
-        HasUnsavedChanges = true,
-      }.MockVM();
-
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
-    }
-
-    [TestMethod]
-    public async Task CanSave_UnsavedChangesConfirmationShown()
+    public async Task ConfirmUnsavedChanges_UnsavedChangesConfirmationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -45,11 +37,13 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(viewmodel.ConfirmUnsavedChangesCommand);
+      var args = new ISavable.ConfirmArgs();
+
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));
     }
 
     [TestMethod]
-    public async Task CanSave_AcceptUnsavedSave_SaveConfirmationShown()
+    public async Task ConfirmUnsavedChanges_Accept_SaveConfirmationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -62,11 +56,13 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(viewmodel.ConfirmUnsavedChangesCommand);
+      var args = new ISavable.ConfirmArgs();
+
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));
     }
 
     [TestMethod]
-    public async Task CanSave_DeclineUnsavedSave_ReturnTrue()
+    public async Task ConfirmUnsavedChanges_Decline_Success()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -78,11 +74,14 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsFalse(args.Cancelled);
     }
 
     [TestMethod]
-    public async Task CanSave_CancelUnsavedSave_ReturnFalse()
+    public async Task ConfirmUnsavedChanges_Cancel_Canceled()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -94,11 +93,14 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      Assert.IsFalse(await viewmodel.ConfirmUnsavedChangesCommand());
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsTrue(args.Cancelled);
     }
 
     [TestMethod]
-    public async Task CanSave_AcceptUnsavedSave_Save_ReturnTrue()
+    public async Task ConfirmUnsavedChanges_Accept_Save_Success()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -111,11 +113,14 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      Assert.IsTrue(await viewmodel.ConfirmUnsavedChangesCommand());
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsFalse(args.Cancelled);
     }
 
     [TestMethod]
-    public async Task CanSave_AcceptUnsavedSave_DeclineSave_ReturnFalse()
+    public async Task ConfirmUnsavedChanges_Accept_DeclineSave_Canceled()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -128,11 +133,14 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      Assert.IsFalse(await viewmodel.ConfirmUnsavedChangesCommand());
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsTrue(args.Cancelled);
     }
 
     [TestMethod]
-    public async Task CanSave_AcceptUnsavedSave_CancelSave_ReturnFalse()
+    public async Task ConfirmUnsavedChanges_Accept_CancelSave_Canceled()
     {
       var viewmodel = new Mocker(_dependencies)
       {
@@ -145,7 +153,10 @@ public partial class CardCollectionViewModelTests
         },
       }.MockVM();
 
-      Assert.IsFalse(await viewmodel.ConfirmUnsavedChangesCommand());
+      var args = new ISavable.ConfirmArgs();
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      Assert.IsTrue(args.Cancelled);
     }
   }
 }
