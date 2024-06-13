@@ -16,7 +16,7 @@ public partial class DeckEditorViewModelCommands
       if (!CanExecute(param)) return;
 
       switch (await Viewmodel.Confirmers.SaveUnsavedChangesConfirmer
-        .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.DeckName)))
+        .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.Name)))
       {
         case ConfirmationResult.Yes:
           await Viewmodel.SaveDeckCommand.ExecuteAsync(null);

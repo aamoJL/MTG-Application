@@ -6,7 +6,6 @@ using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepos
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;

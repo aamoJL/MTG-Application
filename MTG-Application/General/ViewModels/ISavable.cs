@@ -10,6 +10,6 @@ public interface ISavable
   }
 
   public bool HasUnsavedChanges { get; set; }
-  
+
   IAsyncRelayCommand<ConfirmArgs> ConfirmUnsavedChangesCommand { get; }
 }

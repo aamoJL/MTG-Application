@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MTGApplication.General.Services.Databases.Context;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 

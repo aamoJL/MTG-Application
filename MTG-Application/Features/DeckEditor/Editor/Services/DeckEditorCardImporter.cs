@@ -1,5 +1,4 @@
-﻿using MTGApplication.General.Models;
-using MTGApplication.General.Services.Importers.CardImporter;
+﻿using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
 using System.Threading.Tasks;
 

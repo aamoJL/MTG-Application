@@ -46,7 +46,7 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
     }
     else if (e.Content is DeckEditorPage deckEditor)
     {
-      Header.Text = !string.IsNullOrEmpty(deckEditor.ViewModel.DeckName) ? deckEditor.ViewModel.DeckName : "New deck";
+      Header.Text = !string.IsNullOrEmpty(deckEditor.ViewModel.Name) ? deckEditor.ViewModel.Name : "New deck";
 
       deckEditor.ViewModel.PropertyChanged += DeckEditorPageViewModel_PropertyChanged;
     }
@@ -56,8 +56,8 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
   {
     if (sender is DeckEditorViewModel deckEditorViewModel)
     {
-      if (e.PropertyName == nameof(deckEditorViewModel.DeckName))
-        Header.Text = !string.IsNullOrEmpty(deckEditorViewModel.DeckName) ? deckEditorViewModel.DeckName : "New deck";
+      if (e.PropertyName == nameof(deckEditorViewModel.Name))
+        Header.Text = !string.IsNullOrEmpty(deckEditorViewModel.Name) ? deckEditorViewModel.Name : "New deck";
 
       if (e.PropertyName == nameof(deckEditorViewModel.HasUnsavedChanges))
         Header.UnsavedIndicator = deckEditorViewModel.HasUnsavedChanges;

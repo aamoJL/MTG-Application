@@ -16,7 +16,7 @@ public partial class DeckEditorViewModelCommands
       if (unsavedArgs.Cancelled)
         return;
 
-      Viewmodel.Deck = new();
+      Viewmodel.SetDeck(new());
     }
   }
 }

@@ -38,7 +38,7 @@ public partial class DeckEditorViewModelCommands
         dto: await new GetDeckDTO(Viewmodel.Repository).Execute(loadName)))
         is DeckEditorMTGDeck deck)
       {
-        Viewmodel.Deck = deck;
+        Viewmodel.SetDeck(deck);
 
         new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.LoadSuccess);
       }

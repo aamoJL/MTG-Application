@@ -25,12 +25,20 @@ public partial class CommanderViewModel(MTGCardImporter importer) : ViewModelBas
 
   public Action<DeckEditorMTGCard> OnChange { get; init; }
 
-  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCommanderCommand => new ChangeCommander(this).Command;
-  public IRelayCommand<DeckEditorMTGCard> RemoveCommanderCommand => new RemoveCommander(this).Command;
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => new MoveCard.BeginMoveFrom(this).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => new MoveCard.BeginMoveTo(this).Command;
-  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => new MoveCard.ExecuteMove(this).Command;
-  public IAsyncRelayCommand<string> ImportCommanderCommand => new ImportCommander(this).Command;
-  public IAsyncRelayCommand ChangeCardPrintCommand => new ChangeCardPrint(this).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCommanderCommand => changeCommander?.Command ?? (changeCommander = new ChangeCommander(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> RemoveCommanderCommand => removeCommander?.Command ?? (removeCommander = new RemoveCommander(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => beginMoveFrom?.Command ?? (beginMoveFrom = new MoveCard.BeginMoveFrom(this)).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => beginMoveTo?.Command ?? (beginMoveTo = new MoveCard.BeginMoveTo(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => executeMove?.Command ?? (executeMove = new MoveCard.ExecuteMove(this)).Command;
+  public IAsyncRelayCommand<string> ImportCommanderCommand => importCommander?.Command ?? (importCommander = new ImportCommander(this)).Command;
+  public IAsyncRelayCommand ChangeCardPrintCommand => changeCardPrint?.Command ?? (changeCardPrint = new ChangeCardPrint(this)).Command;
+
+  private ChangeCommander changeCommander;
+  private RemoveCommander removeCommander;
+  private MoveCard.BeginMoveFrom beginMoveFrom;
+  private MoveCard.BeginMoveTo beginMoveTo;
+  private MoveCard.ExecuteMove executeMove;
+  private ImportCommander importCommander;
+  private ChangeCardPrint changeCardPrint;
 }
 

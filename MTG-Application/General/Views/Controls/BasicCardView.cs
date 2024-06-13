@@ -106,7 +106,7 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
 
   protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(DeckEditorMTGCard.Info))
+    if (e.PropertyName == nameof(MTGCard.Info))
       SelectedFaceUri = Model?.Info.FrontFace.ImageUri;
   }
 

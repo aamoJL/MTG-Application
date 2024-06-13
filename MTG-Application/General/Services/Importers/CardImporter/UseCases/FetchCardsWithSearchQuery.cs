@@ -1,5 +1,4 @@
-﻿using MTGApplication.General.Models;
-using MTGApplication.General.ViewModels;
+﻿using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;

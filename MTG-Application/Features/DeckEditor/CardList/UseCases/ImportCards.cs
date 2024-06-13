@@ -1,7 +1,6 @@
 ﻿using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService.UseCases;

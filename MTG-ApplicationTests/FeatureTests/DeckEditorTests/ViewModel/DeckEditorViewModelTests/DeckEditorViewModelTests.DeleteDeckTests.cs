@@ -90,7 +90,7 @@ public partial class DeckEditorViewModelTests
 
       await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(string.Empty, viewmodel.DeckName);
+      Assert.AreEqual(string.Empty, viewmodel.Name);
       Assert.IsFalse(viewmodel.HasUnsavedChanges);
     }
 

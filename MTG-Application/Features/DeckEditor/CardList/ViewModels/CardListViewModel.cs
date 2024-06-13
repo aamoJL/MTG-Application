@@ -26,17 +26,30 @@ public partial class CardListViewModel(MTGCardImporter importer) : ViewModelBase
   public Notifier Notifier { get; init; } = new();
   public IWorker Worker { get; init; } = IWorker.Default;
   public DeckEditorMTGCardCopier CardCopier { get; } = new();
+  public CardFilters CardFilters { get; init; } = new();
+  public CardSorter CardSorter { get; init; } = new();
 
   public Action OnChange { get; init; }
 
-  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardCommand => new AddCard(this).Command;
-  public IRelayCommand<DeckEditorMTGCard> RemoveCardCommand => new RemoveCard(this).Command;
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => new MoveCard.BeginMoveFrom(this).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => new MoveCard.BeginMoveTo(this).Command;
-  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => new MoveCard.ExecuteMove(this).Command;
-  public IRelayCommand ClearCommand => new Clear(this).Command;
-  public IAsyncRelayCommand<string> ImportCardsCommand => new ImportCards(this).Command;
-  public IAsyncRelayCommand<string> ExportCardsCommand => new ExportCards(this).Command;
-  public IRelayCommand<CardCountChangeArgs> ChangeCardCountCommand => new ChangeCardCount(this).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCardPrintCommand => new ChangeCardPrint(this).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardCommand => addCard?.Command ?? (addCard = new AddCard(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> RemoveCardCommand => removeCard?.Command ?? (removeCard = new RemoveCard(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => beginMoveFrom?.Command ?? (beginMoveFrom = new MoveCard.BeginMoveFrom(this)).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => beginMoveTo?.Command ?? (beginMoveTo = new MoveCard.BeginMoveTo(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => executeMove?.Command ?? (executeMove = new MoveCard.ExecuteMove(this)).Command;
+  public IRelayCommand ClearCommand => clear?.Command ?? (clear = new Clear(this)).Command;
+  public IAsyncRelayCommand<string> ImportCardsCommand => importCards?.Command ?? (importCards = new ImportCards(this)).Command;
+  public IAsyncRelayCommand<string> ExportCardsCommand => exportCards?.Command ?? (exportCards = new ExportCards(this)).Command;
+  public IRelayCommand<CardCountChangeArgs> ChangeCardCountCommand => changeCardCount?.Command ?? (changeCardCount = new ChangeCardCount(this)).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCardPrintCommand => changeCardPrint?.Command ?? (changeCardPrint = new ChangeCardPrint(this)).Command;
+
+  private AddCard addCard;
+  private RemoveCard removeCard;
+  private MoveCard.BeginMoveFrom beginMoveFrom;
+  private MoveCard.BeginMoveTo beginMoveTo;
+  private MoveCard.ExecuteMove executeMove;
+  private Clear clear;
+  private ImportCards importCards;
+  private ExportCards exportCards;
+  private ChangeCardCount changeCardCount;
+  private ChangeCardPrint changeCardPrint;
 }

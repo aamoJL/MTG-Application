@@ -3,44 +3,68 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class ViewModelCommand<TViewModel>(TViewModel viewmodel)
+public abstract class ViewModelCommand<TViewModel>
 {
-  public RelayCommand Command => new(execute: Execute, canExecute: CanExecute);
+  protected ViewModelCommand(TViewModel viewmodel)
+  {
+    Command = new(execute: Execute, canExecute: CanExecute);
+    Viewmodel = viewmodel;
+  }
 
-  protected TViewModel Viewmodel { get; } = viewmodel;
+  public RelayCommand Command { get; }
+
+  protected TViewModel Viewmodel { get; }
 
   protected virtual bool CanExecute() => true;
 
   protected abstract void Execute();
 }
 
-public abstract class ViewModelCommand<TViewModel, TParam>(TViewModel viewmodel)
+public abstract class ViewModelCommand<TViewModel, TParam>
 {
-  public RelayCommand<TParam> Command => new(execute: Execute, canExecute: CanExecute);
+  protected ViewModelCommand(TViewModel viewmodel)
+  {
+    Command = new(execute: Execute, canExecute: CanExecute);
+    Viewmodel = viewmodel;
+  }
 
-  protected TViewModel Viewmodel { get; } = viewmodel;
+  public RelayCommand<TParam> Command { get; }
+
+  protected TViewModel Viewmodel { get; }
 
   protected virtual bool CanExecute(TParam param) => true;
 
   protected abstract void Execute(TParam param);
 }
 
-public abstract class ViewModelAsyncCommand<TViewModel>(TViewModel viewmodel)
+public abstract class ViewModelAsyncCommand<TViewModel>
 {
-  public AsyncRelayCommand Command => new(execute: Execute, canExecute: CanExecute);
+  protected ViewModelAsyncCommand(TViewModel viewmodel)
+  {
+    Command = new(execute: Execute, canExecute: CanExecute);
+    Viewmodel = viewmodel;
+  }
 
-  protected TViewModel Viewmodel { get; } = viewmodel;
+  public AsyncRelayCommand Command { get; }
+
+  protected TViewModel Viewmodel { get; }
 
   protected virtual bool CanExecute() => true;
 
   protected abstract Task Execute();
 }
 
-public abstract class ViewModelAsyncCommand<TViewModel, TParam>(TViewModel viewmodel)
+public abstract class ViewModelAsyncCommand<TViewModel, TParam>
 {
-  public AsyncRelayCommand<TParam> Command => new(execute: Execute, canExecute: CanExecute);
+  protected ViewModelAsyncCommand(TViewModel viewmodel)
+  {
+    Command = new(execute: Execute, canExecute: CanExecute);
+    Viewmodel = viewmodel;
+  }
 
-  protected TViewModel Viewmodel { get; } = viewmodel;
+  public AsyncRelayCommand<TParam> Command { get; }
+
+  protected TViewModel Viewmodel { get; }
 
   protected virtual bool CanExecute(TParam param) => true;
 

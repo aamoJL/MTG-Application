@@ -196,7 +196,7 @@ public partial class DeckEditorViewModelTests
 
       await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(newName, viewmodel.DeckName);
+      Assert.AreEqual(newName, viewmodel.Name);
     }
 
     [TestMethod("Should have no unsaved changes if the deck was saved")]

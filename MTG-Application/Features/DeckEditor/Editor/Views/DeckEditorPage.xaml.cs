@@ -54,7 +54,7 @@ public sealed partial class DeckEditorPage : Page
   private async void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
-    
+
     if (ViewModel.SaveDeckCommand.CanExecute(null))
       await ViewModel.SaveDeckCommand.ExecuteAsync(null);
   }
@@ -62,7 +62,7 @@ public sealed partial class DeckEditorPage : Page
   private async void OpenDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
-    
+
     if (ViewModel.OpenDeckCommand.CanExecute(null))
       await ViewModel.OpenDeckCommand.ExecuteAsync(null);
   }
@@ -70,15 +70,15 @@ public sealed partial class DeckEditorPage : Page
   private async void NewDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
-    
+
     if (ViewModel.NewDeckCommand.CanExecute(null))
       await ViewModel.NewDeckCommand.ExecuteAsync(null);
   }
 
   private void ResetFiltersKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (ViewModel.CardFilters.ResetCommand.CanExecute(null))
-      ViewModel.CardFilters.ResetCommand.Execute(null);
+    if (ViewModel.DeckCardList.CardFilters.ResetCommand.CanExecute(null))
+      ViewModel.DeckCardList.CardFilters.ResetCommand.Execute(null);
 
     args.Handled = true;
   }

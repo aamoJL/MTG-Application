@@ -43,7 +43,7 @@ public partial class DeckEditorViewModelTests
 
       await viewmodel.OpenDeckCommand.ExecuteAsync(_savedDeck.Name);
 
-      Assert.AreEqual(_savedDeck.Name, viewmodel.DeckName);
+      Assert.AreEqual(_savedDeck.Name, viewmodel.Name);
     }
 
     [TestMethod("Load confirmation should not be shown when executing with a name parameter")]
@@ -68,7 +68,7 @@ public partial class DeckEditorViewModelTests
 
       await viewmodel.OpenDeckCommand.ExecuteAsync(string.Empty);
 
-      Assert.AreEqual(unsavedDeck.Name, viewmodel.DeckName);
+      Assert.AreEqual(unsavedDeck.Name, viewmodel.Name);
     }
 
     [TestMethod]
@@ -170,7 +170,7 @@ public partial class DeckEditorViewModelTests
 
       await viewmodel.OpenDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(unsavedDeck.Name, viewmodel.DeckName);
+      Assert.AreEqual(unsavedDeck.Name, viewmodel.Name);
     }
 
     [TestMethod("Deck should be the loaded deck if the loading was successful")]
@@ -186,7 +186,7 @@ public partial class DeckEditorViewModelTests
 
       await viewmodel.OpenDeckCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedDeck.Name, viewmodel.DeckName);
+      Assert.AreEqual(_savedDeck.Name, viewmodel.Name);
     }
 
     [TestMethod("Success notification should be sent when deck has been loaded")]

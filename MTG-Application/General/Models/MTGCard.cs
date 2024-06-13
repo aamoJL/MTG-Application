@@ -2,7 +2,7 @@
 
 namespace MTGApplication.General.Models;
 
-public class MTGCard(MTGCardInfo info) : ObservableObject
+public partial class MTGCard(MTGCardInfo info) : ObservableObject
 {
-  public MTGCardInfo Info { get; set; } = info;
+  [ObservableProperty] private MTGCardInfo info = info;
 }

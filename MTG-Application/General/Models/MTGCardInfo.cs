@@ -95,7 +95,7 @@ public record MTGCardInfo
     ProducedMana = producedMana;
     ImporterName = importerName;
   }
-  
+
   public Guid ScryfallId { get; init; }
   public Guid OracleId { get; init; }
   public string Name { get; init; }

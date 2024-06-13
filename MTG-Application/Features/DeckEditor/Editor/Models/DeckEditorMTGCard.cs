@@ -11,11 +11,6 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCar
   protected int count = LimitCount(count);
 
   /// <summary>
-  /// Name of the API, that was used to fetch this card
-  /// </summary>
-  public string ImporterName => Info.ImporterName;
-
-  /// <summary>
   /// Card count. Minimum is 1
   /// </summary>
   public int Count

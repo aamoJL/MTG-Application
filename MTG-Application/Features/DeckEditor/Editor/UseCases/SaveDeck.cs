@@ -16,7 +16,7 @@ public partial class DeckEditorViewModelCommands
   {
     protected override async Task Execute()
     {
-      var oldName = Viewmodel.Deck.Name;
+      var oldName = Viewmodel.Name;
       var overrideOld = false;
       var saveName = await Viewmodel.Confirmers.SaveDeckConfirmer.Confirm(DeckEditorConfirmers.GetSaveDeckConfirmation(oldName));
 
@@ -34,12 +34,9 @@ public partial class DeckEditorViewModelCommands
         }
       }
 
-      if (await Viewmodel.Worker.DoWork(SaveDTO(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck), saveName, overrideOld)) is true)
+      if (await Viewmodel.Worker.DoWork(SaveDTO(Viewmodel.DTO, saveName, overrideOld)) is true)
       {
-        Viewmodel.Deck.Name = saveName;
-
-        // TODO: move to viemodel
-        //Viewmodel.OnPropertyChanged(nameof(DeckName));
+        Viewmodel.Name = saveName;
         Viewmodel.HasUnsavedChanges = false;
 
         new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.SaveSuccess);

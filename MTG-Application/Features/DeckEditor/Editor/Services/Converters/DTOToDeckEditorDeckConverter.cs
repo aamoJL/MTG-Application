@@ -1,6 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Models;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using System.Collections.Generic;

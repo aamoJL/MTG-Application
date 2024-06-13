@@ -9,10 +9,10 @@ public partial class DeckEditorViewModelCommands
 {
   public class OpenEdhrecCommanderWebsite(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
-    protected override bool CanExecute() => Viewmodel.Deck.Commander != null;
+    protected override bool CanExecute() => Viewmodel.Commander != null;
 
     protected override async Task Execute()
       => await NetworkService.OpenUri(
-        EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Deck.Commander, Viewmodel.Deck.CommanderPartner));
+        EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Commander, Viewmodel.Partner));
   }
 }
