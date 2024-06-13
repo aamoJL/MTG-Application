@@ -11,8 +11,6 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Features.DeckEditor.DeckEditorViewModelCommands;
@@ -26,18 +24,19 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     Importer = importer;
     Notifier = notifier ?? new();
     Confirmers = confirmers ?? new();
-    Deck = deck ?? new();
 
     var cardFilters = new CardFilters();
     var cardSorter = new CardSorter();
 
-    DeckCardList = CreateCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
-    MaybeCardList = CreateCardListViewModel(Deck.Maybelist, cardFilters, cardSorter);
-    WishCardList = CreateCardListViewModel(Deck.Wishlist, cardFilters, cardSorter);
-    RemoveCardList = CreateCardListViewModel(Deck.Removelist, cardFilters, cardSorter);
+    DeckCardList = CreateCardListViewModel(cardFilters, cardSorter);
+    MaybeCardList = CreateCardListViewModel(cardFilters, cardSorter);
+    WishCardList = CreateCardListViewModel(cardFilters, cardSorter);
+    RemoveCardList = CreateCardListViewModel(cardFilters, cardSorter);
 
-    CommanderViewModel = CreateCommanderViewModel(modelChangeAction: (card) => { Deck.Commander = card; });
-    PartnerViewModel = CreateCommanderViewModel(modelChangeAction: (card) => { Deck.CommanderPartner = card; });
+    CommanderCommands = CreateCommanderViewModel(() => { return Commander; }, modelChangeAction: OnCommanderChanged);
+    PartnerCommands = CreateCommanderViewModel(() => { return Partner; }, modelChangeAction: OnPartnerChanged);
+
+    Deck = deck ?? new();
   }
 
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
@@ -49,8 +48,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public CardListViewModel MaybeCardList { get; }
   public CardListViewModel WishCardList { get; }
   public CardListViewModel RemoveCardList { get; }
-  public CommanderViewModel CommanderViewModel { get; }
-  public CommanderViewModel PartnerViewModel { get; }
+  public CommanderViewModel CommanderCommands { get; }
+  public CommanderViewModel PartnerCommands { get; }
 
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
@@ -58,9 +57,32 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public string Name { get => Deck.Name; set { Deck.Name = value; OnPropertyChanged(nameof(Name)); } }
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
   public double Price => Deck.DeckCards.Sum(x => x.Info.Price * x.Count) + (Deck.Commander?.Info.Price ?? 0) + (Deck.CommanderPartner?.Info.Price ?? 0);
-  public DeckEditorMTGCard Commander => Deck.Commander;
-  public DeckEditorMTGCard Partner => Deck.CommanderPartner;
-  public ReadOnlyCollection<DeckEditorMTGCard> DeckCards => Deck.DeckCards.AsReadOnly();
+  public DeckEditorMTGCard Commander
+  {
+    get => Deck.Commander;
+    set
+    {
+      Deck.Commander = value;
+      OnPropertyChanged(nameof(Commander));
+      OnPropertyChanged(nameof(Size));
+      OnPropertyChanged(nameof(Price));
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+    }
+  }
+  public DeckEditorMTGCard Partner
+  {
+    get => Deck.CommanderPartner;
+    set
+    {
+      Deck.CommanderPartner = value;
+      OnPropertyChanged(nameof(Partner));
+      OnPropertyChanged(nameof(Size));
+      OnPropertyChanged(nameof(Price));
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+    }
+  }
 
   public MTGCardDeckDTO DTO => DeckEditorMTGDeckToDTOConverter.Convert(Deck);
   public IWorker Worker => this;
@@ -75,7 +97,37 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => openEdhrecCommanderWebsite?.Command ?? (openEdhrecCommanderWebsite = new OpenEdhrecCommanderWebsite(this)).Command;
   public IAsyncRelayCommand ShowDeckTokensCommand => showDeckTokens?.Command ?? (showDeckTokens = new ShowDeckTokens(this)).Command;
 
-  private DeckEditorMTGDeck Deck { get; set; }
+  private DeckEditorMTGDeck deck;
+  private DeckEditorMTGDeck Deck
+  {
+    get => deck;
+    set
+    {
+      if (deck == value) return;
+
+      var oldName = deck != null ? Name : string.Empty;
+
+      deck = value;
+
+      DeckCardList.Cards = deck.DeckCards;
+      MaybeCardList.Cards = deck.Maybelist;
+      WishCardList.Cards = deck.Wishlist;
+      RemoveCardList.Cards = deck.Removelist;
+
+      // Can't invoke changed event for the name if the name was already empty because visual state binding would break.
+      if (Name != oldName) OnPropertyChanged(nameof(Name));
+      OnPropertyChanged(nameof(Deck));
+      OnPropertyChanged(nameof(Size));
+      OnPropertyChanged(nameof(Price));
+      OnPropertyChanged(nameof(Commander));
+      OnPropertyChanged(nameof(Partner));
+
+      SaveDeckCommand.NotifyCanExecuteChanged();
+      DeleteDeckCommand.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+    }
+  }
   private ConfirmUnsavedChanges confirmUnsavedChanges;
   private NewDeck newDeck;
   private OpenDeck openDeck;
@@ -102,37 +154,38 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (deck == Deck) return;
 
-    var oldName = Name;
-
     Deck = deck;
-
-    DeckCardList.Cards = deck.DeckCards;
-    MaybeCardList.Cards = deck.Maybelist;
-    WishCardList.Cards = deck.Wishlist;
-    RemoveCardList.Cards = deck.Removelist;
-
-    CommanderViewModel.Card = deck.Commander;
-    PartnerViewModel.Card = deck.CommanderPartner;
 
     UndoStack.Clear();
     HasUnsavedChanges = false;
-
-    OnPropertyChanged(nameof(Deck));
-    // Can't invoke changed event for the name if the name was already empty because visual state binding would break.
-    if (Name != oldName) OnPropertyChanged(nameof(Name));
-    OnPropertyChanged(nameof(Size));
-    OnPropertyChanged(nameof(Price));
-    SaveDeckCommand.NotifyCanExecuteChanged();
-    DeleteDeckCommand.NotifyCanExecuteChanged();
-    OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-    ShowDeckTokensCommand.NotifyCanExecuteChanged();
   }
 
-  private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
+  private void OnCommanderChanged(DeckEditorMTGCard card)
+  {
+    if (Commander == card) return;
+
+    if (card == null) Commander = null;
+    else if (Commander?.Info.Name == card.Info.Name) Commander.Info = card.Info;
+    else Commander = card;
+
+    HasUnsavedChanges = true;
+  }
+
+  private void OnPartnerChanged(DeckEditorMTGCard card)
+  {
+    if (Partner == card) return;
+
+    if (card == null) Partner = null;
+    else if (Partner?.Info.Name == card.Info.Name) Partner.Info = card.Info;
+    else Partner = card;
+
+    HasUnsavedChanges = true;
+  }
+
+  private CardListViewModel CreateCardListViewModel(CardFilters filters, CardSorter sorter)
   {
     return new(Importer)
     {
-      Cards = cards,
       OnChange = () =>
       {
         HasUnsavedChanges = true;
@@ -149,25 +202,15 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     };
   }
 
-  private CommanderViewModel CreateCommanderViewModel(Action<DeckEditorMTGCard> modelChangeAction)
+  private CommanderViewModel CreateCommanderViewModel(Func<DeckEditorMTGCard> getModelAction, Action<DeckEditorMTGCard> modelChangeAction)
   {
-    var commanderVM = new CommanderViewModel(Importer)
+    return new(Importer, getModelAction)
     {
       UndoStack = UndoStack,
       Notifier = Notifier,
       Confirmers = Confirmers.CommanderConfirmers,
-      OnChange = (card) =>
-      {
-        modelChangeAction?.Invoke(card);
-        HasUnsavedChanges = true;
-        OnPropertyChanged(nameof(Size));
-        OnPropertyChanged(nameof(Price));
-        OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-        ShowDeckTokensCommand.NotifyCanExecuteChanged();
-      },
+      OnChange = (card) => modelChangeAction?.Invoke(card),
       Worker = this,
     };
-
-    return commanderVM;
   }
 }

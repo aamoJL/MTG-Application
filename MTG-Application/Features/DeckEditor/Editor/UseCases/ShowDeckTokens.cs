@@ -12,7 +12,7 @@ public partial class DeckEditorViewModelCommands
 {
   public class ShowDeckTokens(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
-    protected override bool CanExecute() => Viewmodel.Commander != null || Viewmodel.DeckCards.Count != 0;
+    protected override bool CanExecute() => Viewmodel.Commander != null || Viewmodel.DeckCardList.Cards.Count != 0;
 
     protected override async Task Execute()
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplicationTests.TestUtility.API;
-using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
 public partial class CommanderViewModelTests
@@ -10,16 +10,18 @@ public partial class CommanderViewModelTests
   public class RemoveTests
   {
     [TestMethod]
-    public async Task Remove_CardIsNull()
+    public async Task Remove_InvokedWithNull()
     {
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter())
+      DeckEditorMTGCard? result = null;
+
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => null)
       {
-        Card = DeckEditorMTGCardMocker.CreateMTGCardModel()
+        OnChange = (card) => { result = card; }
       };
 
       await viewmodel.ChangeCommanderCommand.ExecuteAsync(null);
 
-      Assert.IsNull(viewmodel.Card);
+      Assert.IsNull(result);
     }
   }
 }

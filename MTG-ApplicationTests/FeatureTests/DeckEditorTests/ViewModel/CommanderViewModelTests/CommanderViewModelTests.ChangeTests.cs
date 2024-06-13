@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
 
@@ -10,27 +11,32 @@ public partial class CommanderViewModelTests
   public class ChangeTests
   {
     [TestMethod]
-    public async Task Change_ToCard_CardIsCard()
+    public async Task Change_ToCard_InvokedWithCard()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
+      DeckEditorMTGCard? result = null;
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => null)
+      {
+        OnChange = (card) => { result = card; }
+      };
 
       await viewmodel.ChangeCommanderCommand.ExecuteAsync(card);
 
-      Assert.AreEqual(card.Info.Name, viewmodel.Card.Info.Name);
+      Assert.AreEqual(card.Info.Name, result?.Info.Name);
     }
 
     [TestMethod]
-    public async Task Change_ToNull_CardIsNull()
+    public async Task Change_ToNull_InvokedWithNull()
     {
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter())
+      DeckEditorMTGCard? result = null;
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => null)
       {
-        Card = DeckEditorMTGCardMocker.CreateMTGCardModel()
+        OnChange = (card) => { result = card; }
       };
 
       await viewmodel.ChangeCommanderCommand.ExecuteAsync(null);
 
-      Assert.IsNull(viewmodel.Card);
+      Assert.IsNull(result);
     }
   }
 }

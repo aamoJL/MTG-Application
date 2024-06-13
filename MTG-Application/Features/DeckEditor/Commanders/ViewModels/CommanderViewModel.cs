@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Commanders.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
@@ -12,7 +11,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor;
 
-public partial class CommanderViewModel(MTGCardImporter importer) : ViewModelBase
+public partial class CommanderViewModel(MTGCardImporter importer, Func<DeckEditorMTGCard> getModelAction)
 {
   public MTGCardImporter Importer { get; } = importer;
   public DeckEditorMTGCardCopier CardCopier { get; } = new();
@@ -20,8 +19,7 @@ public partial class CommanderViewModel(MTGCardImporter importer) : ViewModelBas
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public IWorker Worker { get; init; } = new DefaultWorker();
   public Notifier Notifier { get; init; } = new();
-
-  [ObservableProperty] private DeckEditorMTGCard card;
+  public Func<DeckEditorMTGCard> GetModelAction { get; } = getModelAction;
 
   public Action<DeckEditorMTGCard> OnChange { get; init; }
 

@@ -13,10 +13,7 @@ public partial class CommanderViewModelReversibleActions
     protected override void ReverseActionMethod(DeckEditorMTGCard card)
       => ChangeCommander(card);
 
-    private void ChangeCommander(DeckEditorMTGCard card)
-    {
-      Viewmodel.Card = card;
-      Viewmodel.OnChange?.Invoke(card);
-    }
+    private void ChangeCommander(DeckEditorMTGCard card) 
+      => Viewmodel.OnChange?.Invoke(card);
   }
 }

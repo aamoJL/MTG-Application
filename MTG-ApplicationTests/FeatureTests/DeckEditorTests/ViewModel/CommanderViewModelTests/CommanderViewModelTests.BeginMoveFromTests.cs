@@ -13,7 +13,7 @@ public partial class CommanderViewModelTests
     public void BeginMoveFrom_CommandAddedToCombinedCommand()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter());
+      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => null);
 
       viewmodel.BeginMoveFromCommand.Execute(card);
 

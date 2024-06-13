@@ -16,10 +16,9 @@ public partial class CommanderViewModelReversibleActions
 
     private void ChangePrint(MTGCardInfo print)
     {
-      if (Viewmodel.Card.Info.Name != print.Name) return;
+      if (Viewmodel.GetModelAction?.Invoke().Info.Name != print.Name) return;
 
-      Viewmodel.Card.Info = print;
-      Viewmodel.OnChange?.Invoke(Viewmodel.Card);
+      Viewmodel.OnChange?.Invoke(new DeckEditorMTGCard(print, Viewmodel.GetModelAction?.Invoke().Count ?? 1));
     }
   }
 }

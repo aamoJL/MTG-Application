@@ -89,8 +89,8 @@ public partial class DeckEditorViewModelTests
       await viewmodel.NewDeckCommand.ExecuteAsync(null);
 
       Assert.AreEqual(string.Empty, viewmodel.Name);
-      Assert.AreEqual(null, viewmodel.CommanderViewModel.Card);
-      Assert.AreEqual(null, viewmodel.PartnerViewModel.Card);
+      Assert.AreEqual(null, viewmodel.Commander);
+      Assert.AreEqual(null, viewmodel.Partner);
       Assert.AreEqual(0, viewmodel.DeckCardList.Cards.Count);
     }
   }
