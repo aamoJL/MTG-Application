@@ -1,4 +1,4 @@
-﻿namespace MTGApplicationTests.GeneralTests.Services.APITests;
+﻿namespace MTGApplicationTests.GeneralTests.ServiceTests.APITests;
 
 // TODO: Edhrec commander api tests
 

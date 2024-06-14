@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;

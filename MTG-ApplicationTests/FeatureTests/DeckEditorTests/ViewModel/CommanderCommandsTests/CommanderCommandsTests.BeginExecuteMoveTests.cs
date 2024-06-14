@@ -2,14 +2,14 @@
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.ReversibleCommandService;
-using MTGApplicationTests.TestUtility.API;
 using MTGApplicationTests.TestUtility.Mocker;
+using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
-public partial class CommanderViewModelTests
+public partial class CommanderCommandsTests
 {
   [TestClass]
-  public class BeginExecuteMoveTests
+  public class BeginExecuteMoveTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
     public async Task ExecuteMove_OnChangesInvoked()
@@ -19,12 +19,12 @@ public partial class CommanderViewModelTests
 
       var undoStack = new ReversibleCommandStack();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var origin = new CommanderViewModel(new TestMTGCardImporter(), () => card)
+      var origin = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
         UndoStack = undoStack,
         OnChange = (card) => { originResult = card; }
       };
-      var target = new CommanderViewModel(new TestMTGCardImporter(), () => null)
+      var target = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Partner)
       {
         UndoStack = undoStack,
         OnChange = (card) => { targetResult = card; }

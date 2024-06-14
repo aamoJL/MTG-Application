@@ -3,7 +3,7 @@ using MTGApplication.Features.DeckSelection;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.FeatureTests.DeckSelectorTests;
+namespace MTGApplicationTests.FeatureTests.DeckSelectionTests;
 [TestClass]
 public class DeckSelectionViewModelTests
 {
@@ -37,7 +37,7 @@ public class DeckSelectionViewModelTests
   public async Task LoadDecks_DeckItemsHasImageUris()
   {
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
-    
+
     var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
 
     await vm.LoadDecksCommand.ExecuteAsync(null);

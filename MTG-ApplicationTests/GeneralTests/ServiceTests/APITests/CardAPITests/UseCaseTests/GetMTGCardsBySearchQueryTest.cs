@@ -3,7 +3,7 @@ using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.APITests.CardAPITests.UseCaseTests;
 [TestClass]
 public partial class GetMTGCardsBySearchQueryTest
 {

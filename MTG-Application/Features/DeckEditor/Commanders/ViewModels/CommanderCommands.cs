@@ -11,15 +11,16 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor;
 
-public partial class CommanderViewModel(MTGCardImporter importer, Func<DeckEditorMTGCard> getModelAction)
+public partial class CommanderCommands(DeckEditorViewModel viewmodel, CommanderCommands.CommanderType commanderType)
 {
-  public MTGCardImporter Importer { get; } = importer;
+  public enum CommanderType { Commander, Partner }
+
+  public MTGCardImporter Importer { get; } = viewmodel.Importer;
   public DeckEditorMTGCardCopier CardCopier { get; } = new();
-  public CommanderConfirmers Confirmers { get; init; } = new();
-  public ReversibleCommandStack UndoStack { get; init; } = new();
-  public IWorker Worker { get; init; } = new DefaultWorker();
-  public Notifier Notifier { get; init; } = new();
-  public Func<DeckEditorMTGCard> GetModelAction { get; } = getModelAction;
+  public CommanderConfirmers Confirmers { get; init; } = viewmodel.Confirmers.CommanderConfirmers;
+  public ReversibleCommandStack UndoStack { get; init; } = viewmodel.UndoStack;
+  public IWorker Worker { get; init; } = viewmodel;
+  public Notifier Notifier { get; init; } = viewmodel.Notifier;
 
   public Action<DeckEditorMTGCard> OnChange { get; init; }
 
@@ -38,5 +39,7 @@ public partial class CommanderViewModel(MTGCardImporter importer, Func<DeckEdito
   private MoveCard.ExecuteMove executeMove;
   private ImportCommander importCommander;
   private ChangeCardPrint changeCardPrint;
+
+  public DeckEditorMTGCard GetCommander() => commanderType == CommanderType.Commander ? viewmodel.Commander : viewmodel.Partner;
 }
 

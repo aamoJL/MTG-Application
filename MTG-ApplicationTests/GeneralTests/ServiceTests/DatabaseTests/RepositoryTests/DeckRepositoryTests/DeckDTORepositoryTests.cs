@@ -2,7 +2,7 @@
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
-namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTests.DeckRepositoryTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.DatabaseTests.RepositoryTests.DeckRepositoryTests;
 
 [TestClass]
 public class DeckDTORepositoryTests

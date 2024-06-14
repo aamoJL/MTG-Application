@@ -2,20 +2,19 @@
 using MTGApplication.Features.DeckEditor;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
-using MTGApplicationTests.TestUtility.API;
-using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
+using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
-public partial class CommanderViewModelTests
+public partial class CommanderCommandsTests
 {
   [TestClass]
-  public class ChangeCardPrintTests
+  public class ChangeCardPrintTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
     public void ChangePrint_HasCard_CanExecute()
     {
-      var commands = new CommanderViewModel(new TestMTGCardImporter(), () => DeckEditorMTGCardMocker.CreateMTGCardModel());
+      var commands = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander);
 
       Assert.IsTrue(commands.ChangeCardPrintCommand.CanExecute(null));
     }
@@ -23,7 +22,7 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public void ChangePrint_HasNoCard_CanExecute()
     {
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => null);
+      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander);
 
       Assert.IsFalse(viewmodel.ChangeCardPrintCommand.CanExecute(null));
     }
@@ -31,8 +30,8 @@ public partial class CommanderViewModelTests
     [TestMethod]
     public async Task ChangePrint_ConfirmationShown()
     {
-      var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => existingCard)
+      var existingCard = _savedDeck.Commander;
+      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
       {
         Confirmers = new()
         {
@@ -47,9 +46,9 @@ public partial class CommanderViewModelTests
     public async Task ChangePrint_InvokedWithPrint()
     {
       DeckEditorMTGCard? result = null;
-      var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
+      var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => existingCard)
+      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
       {
         Confirmers = new()
         {
@@ -67,9 +66,9 @@ public partial class CommanderViewModelTests
     public async Task ChangePrint_Undo_InvokedWithOldPrint()
     {
       DeckEditorMTGCard? result = null;
-      var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
+      var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => existingCard)
+      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
       {
         Confirmers = new()
         {
@@ -88,9 +87,9 @@ public partial class CommanderViewModelTests
     public async Task ChangePrint_Redo_InvokedWithNewPrint()
     {
       DeckEditorMTGCard? result = null;
-      var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
+      var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderViewModel(new TestMTGCardImporter(), () => existingCard)
+      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
       {
         Confirmers = new()
         {

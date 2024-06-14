@@ -10,7 +10,6 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Mode
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Features.DeckEditor.DeckEditorViewModelCommands;
@@ -28,13 +27,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     var cardFilters = new CardFilters();
     var cardSorter = new CardSorter();
 
+    // Cardlists use same sorter and filters
     DeckCardList = CreateCardListViewModel(cardFilters, cardSorter);
     MaybeCardList = CreateCardListViewModel(cardFilters, cardSorter);
     WishCardList = CreateCardListViewModel(cardFilters, cardSorter);
     RemoveCardList = CreateCardListViewModel(cardFilters, cardSorter);
 
-    CommanderCommands = CreateCommanderViewModel(() => { return Commander; }, modelChangeAction: OnCommanderChanged);
-    PartnerCommands = CreateCommanderViewModel(() => { return Partner; }, modelChangeAction: OnPartnerChanged);
+    CommanderCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Commander);
+    PartnerCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Partner);
 
     Deck = deck ?? new();
   }
@@ -48,11 +48,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public CardListViewModel MaybeCardList { get; }
   public CardListViewModel WishCardList { get; }
   public CardListViewModel RemoveCardList { get; }
-  public CommanderViewModel CommanderCommands { get; }
-  public CommanderViewModel PartnerCommands { get; }
+  public CommanderCommands CommanderCommands { get; }
+  public CommanderCommands PartnerCommands { get; }
 
   [ObservableProperty] private bool isBusy;
   [ObservableProperty] private bool hasUnsavedChanges;
+
+  public MTGCardDeckDTO DTO => DeckEditorMTGDeckToDTOConverter.Convert(Deck);
+  public IWorker Worker => this;
 
   public string Name { get => Deck.Name; set { Deck.Name = value; OnPropertyChanged(nameof(Name)); } }
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
@@ -84,20 +87,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     }
   }
 
-  public MTGCardDeckDTO DTO => DeckEditorMTGDeckToDTOConverter.Convert(Deck);
-  public IWorker Worker => this;
-
-  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => confirmUnsavedChanges?.Command ?? (confirmUnsavedChanges = new ConfirmUnsavedChanges(this)).Command;
-  public IAsyncRelayCommand NewDeckCommand => newDeck?.Command ?? (newDeck = new NewDeck(this)).Command;
-  public IAsyncRelayCommand<string> OpenDeckCommand => openDeck?.Command ?? (openDeck = new OpenDeck(this)).Command;
-  public IAsyncRelayCommand SaveDeckCommand => saveDeck?.Command ?? (saveDeck = new SaveDeck(this)).Command;
-  public IAsyncRelayCommand DeleteDeckCommand => deleteDeck?.Command ?? (deleteDeck = new DeleteDeck(this)).Command;
-  public IRelayCommand UndoCommand => undo?.Command ?? (undo = new Undo(this)).Command;
-  public IRelayCommand RedoCommand => redo?.Command ?? (redo = new Redo(this)).Command;
-  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => openEdhrecCommanderWebsite?.Command ?? (openEdhrecCommanderWebsite = new OpenEdhrecCommanderWebsite(this)).Command;
-  public IAsyncRelayCommand ShowDeckTokensCommand => showDeckTokens?.Command ?? (showDeckTokens = new ShowDeckTokens(this)).Command;
-
-  private DeckEditorMTGDeck deck;
   private DeckEditorMTGDeck Deck
   {
     get => deck;
@@ -128,6 +117,18 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       ShowDeckTokensCommand.NotifyCanExecuteChanged();
     }
   }
+
+  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => confirmUnsavedChanges?.Command ?? (confirmUnsavedChanges = new ConfirmUnsavedChanges(this)).Command;
+  public IAsyncRelayCommand NewDeckCommand => newDeck?.Command ?? (newDeck = new NewDeck(this)).Command;
+  public IAsyncRelayCommand<string> OpenDeckCommand => openDeck?.Command ?? (openDeck = new OpenDeck(this)).Command;
+  public IAsyncRelayCommand SaveDeckCommand => saveDeck?.Command ?? (saveDeck = new SaveDeck(this)).Command;
+  public IAsyncRelayCommand DeleteDeckCommand => deleteDeck?.Command ?? (deleteDeck = new DeleteDeck(this)).Command;
+  public IRelayCommand UndoCommand => undo?.Command ?? (undo = new Undo(this)).Command;
+  public IRelayCommand RedoCommand => redo?.Command ?? (redo = new Redo(this)).Command;
+  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => openEdhrecCommanderWebsite?.Command ?? (openEdhrecCommanderWebsite = new OpenEdhrecCommanderWebsite(this)).Command;
+  public IAsyncRelayCommand ShowDeckTokensCommand => showDeckTokens?.Command ?? (showDeckTokens = new ShowDeckTokens(this)).Command;
+
+  private DeckEditorMTGDeck deck;
   private ConfirmUnsavedChanges confirmUnsavedChanges;
   private NewDeck newDeck;
   private OpenDeck openDeck;
@@ -164,10 +165,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (Commander == card) return;
 
-    if (card == null) Commander = null;
-    else if (Commander?.Info.Name == card.Info.Name) Commander.Info = card.Info;
-    else Commander = card;
-
+    Commander = card;
     HasUnsavedChanges = true;
   }
 
@@ -175,10 +173,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     if (Partner == card) return;
 
-    if (card == null) Partner = null;
-    else if (Partner?.Info.Name == card.Info.Name) Partner.Info = card.Info;
-    else Partner = card;
-
+    Partner = card;
     HasUnsavedChanges = true;
   }
 
@@ -202,14 +197,14 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     };
   }
 
-  private CommanderViewModel CreateCommanderViewModel(Func<DeckEditorMTGCard> getModelAction, Action<DeckEditorMTGCard> modelChangeAction)
+  private CommanderCommands CreateCommanderCommands(CommanderCommands.CommanderType commanderType)
   {
-    return new(Importer, getModelAction)
+    return new(this, commanderType)
     {
       UndoStack = UndoStack,
       Notifier = Notifier,
       Confirmers = Confirmers.CommanderConfirmers,
-      OnChange = (card) => modelChangeAction?.Invoke(card),
+      OnChange = commanderType == CommanderCommands.CommanderType.Commander ? OnCommanderChanged : OnPartnerChanged,
       Worker = this,
     };
   }

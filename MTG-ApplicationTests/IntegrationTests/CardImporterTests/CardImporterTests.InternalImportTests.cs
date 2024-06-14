@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Editor.Services;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;

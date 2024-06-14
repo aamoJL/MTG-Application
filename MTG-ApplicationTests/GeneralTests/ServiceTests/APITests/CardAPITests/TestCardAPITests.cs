@@ -1,11 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.APITests.CardAPITests;
 
 [TestClass]
 public class TestCardAPITests

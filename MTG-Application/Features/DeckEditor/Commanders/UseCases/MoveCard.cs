@@ -9,23 +9,23 @@ public partial class CommanderViewModelCommands
 {
   public class MoveCard
   {
-    public class BeginMoveFrom(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+    public class BeginMoveFrom(CommanderCommands viewmodel) : ViewModelCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
     {
       protected override void Execute(DeckEditorMTGCard _)
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
-          new ReversibleCommanderChangeCommand(null, Viewmodel.GetModelAction?.Invoke(), Viewmodel.CardCopier)
+          new ReversibleCommanderChangeCommand(null, Viewmodel.GetCommander(), Viewmodel.CardCopier)
           {
             ReversibleAction = new CommanderViewModelReversibleActions.ReversibleChangeCommanderAction(Viewmodel)
           });
       }
     }
 
-    public class BeginMoveTo(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+    public class BeginMoveTo(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
     {
       protected override async Task Execute(DeckEditorMTGCard card)
       {
-        Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCommanderChangeCommand(card, Viewmodel.GetModelAction?.Invoke(), Viewmodel.CardCopier)
+        Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCommanderChangeCommand(card, Viewmodel.GetCommander(), Viewmodel.CardCopier)
         {
           ReversibleAction = new CommanderViewModelReversibleActions.ReversibleChangeCommanderAction(Viewmodel)
         });
@@ -33,7 +33,7 @@ public partial class CommanderViewModelCommands
       }
     }
 
-    public class ExecuteMove(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+    public class ExecuteMove(CommanderCommands viewmodel) : ViewModelCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
     {
       protected override void Execute(DeckEditorMTGCard _)
         => Viewmodel.UndoStack.PushAndExecuteActiveCombinedCommand();

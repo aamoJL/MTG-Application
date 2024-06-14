@@ -53,7 +53,7 @@ public partial class DeckEditorViewModelTests
           SaveDeckConfirmer = new TestExceptionConfirmer<string, string>(),
         },
       }.MockVM();
-      
+
       var args = new ISavable.ConfirmArgs();
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));

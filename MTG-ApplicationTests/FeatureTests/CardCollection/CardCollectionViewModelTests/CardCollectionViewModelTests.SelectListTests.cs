@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollection;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 

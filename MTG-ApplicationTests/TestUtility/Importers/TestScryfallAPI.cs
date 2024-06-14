@@ -1,10 +1,9 @@
-﻿using MTGApplication.General.Models;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
 using System.Text.Json.Nodes;
 
-namespace MTGApplicationTests.TestUtility.API;
+namespace MTGApplicationTests.TestUtility.Importers;
 
 public class TestScryfallAPI() : ScryfallAPI
 {

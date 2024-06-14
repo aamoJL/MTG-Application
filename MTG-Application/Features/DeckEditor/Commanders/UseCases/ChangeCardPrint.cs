@@ -10,23 +10,23 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CommanderViewModelCommands
 {
-  public class ChangeCardPrint(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel>(viewmodel)
+  public class ChangeCardPrint(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands>(viewmodel)
   {
-    protected override bool CanExecute() => Viewmodel.GetModelAction?.Invoke() != null;
+    protected override bool CanExecute() => Viewmodel.GetCommander() != null;
 
     protected override async Task Execute()
     {
       if (!CanExecute()) return;
 
-      var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: Viewmodel.GetModelAction?.Invoke().Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
+      var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: Viewmodel.GetCommander().Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
       if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CommanderConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
       {
-        if (selection.Info.ScryfallId == Viewmodel.GetModelAction?.Invoke().Info.ScryfallId)
+        if (selection.Info.ScryfallId == Viewmodel.GetCommander().Info.ScryfallId)
           return; // Same print
 
         Viewmodel.UndoStack.PushAndExecute(
-          new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(Viewmodel.GetModelAction?.Invoke(), Viewmodel.GetModelAction?.Invoke().Info, selection.Info, Viewmodel.CardCopier)
+          new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(Viewmodel.GetCommander(), Viewmodel.GetCommander().Info, selection.Info, Viewmodel.CardCopier)
           {
             ReversibleAction = new CommanderViewModelReversibleActions.ReversibleCardPrintChangeAction(Viewmodel)
           });

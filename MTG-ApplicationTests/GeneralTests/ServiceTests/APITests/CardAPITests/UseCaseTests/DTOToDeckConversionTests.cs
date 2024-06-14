@@ -2,12 +2,11 @@
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.Features.DeckEditor.Models;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.APITests.CardAPITests.UseCaseTests;
 [TestClass]
 public class DTOToDeckConversionTests
 {

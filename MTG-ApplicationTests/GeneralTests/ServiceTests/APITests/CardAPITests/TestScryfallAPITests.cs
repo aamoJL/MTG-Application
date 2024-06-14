@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Importers;
 
-namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.APITests.CardAPITests;
 [TestClass]
 public class TestScryfallAPITests
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ReversibleCommandService;
 
-namespace MTGApplicationTests.GeneralTests.Services.ReversibleCommandServiceTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.ReversibleCommandServiceTests;
 [TestClass]
 public class ReversibleCommandStackTests
 {

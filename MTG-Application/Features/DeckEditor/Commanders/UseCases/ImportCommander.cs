@@ -8,7 +8,7 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CommanderViewModelCommands
 {
-  public class ImportCommander(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, string>(viewmodel)
+  public class ImportCommander(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands, string>(viewmodel)
   {
     protected override async Task Execute(string data)
     {

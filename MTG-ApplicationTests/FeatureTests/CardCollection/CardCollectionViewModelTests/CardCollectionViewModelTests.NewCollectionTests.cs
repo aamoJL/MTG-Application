@@ -1,10 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollection;
-using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplicationTests.TestUtility.API;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;

@@ -7,11 +7,11 @@ namespace MTGApplication.Features.DeckEditor;
 
 public partial class CommanderViewModelCommands
 {
-  public class ChangeCommander(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+  public class ChangeCommander(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
   {
     protected override async Task Execute(DeckEditorMTGCard card)
     {
-      Viewmodel.UndoStack.PushAndExecute(new ReversibleCommanderChangeCommand(card, Viewmodel.GetModelAction?.Invoke(), Viewmodel.CardCopier)
+      Viewmodel.UndoStack.PushAndExecute(new ReversibleCommanderChangeCommand(card, Viewmodel.GetCommander(), Viewmodel.CardCopier)
       {
         ReversibleAction = new CommanderViewModelReversibleActions.ReversibleChangeCommanderAction(Viewmodel)
       });

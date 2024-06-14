@@ -3,7 +3,7 @@ using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using System.Text.Json;
 using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI;
 
-namespace MTGApplicationTests.GeneralTests.Services.APITests.CardAPITests.UseCaseTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.APITests.CardAPITests.UseCaseTests;
 
 [TestClass]
 public class ScryfallIdentifiersToJsonConverterTests

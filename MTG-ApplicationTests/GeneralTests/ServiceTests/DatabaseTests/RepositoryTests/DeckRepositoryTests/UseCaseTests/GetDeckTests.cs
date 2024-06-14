@@ -4,7 +4,7 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseC
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 
-namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTests.DeckRepositoryTests.UseCaseTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.DatabaseTests.RepositoryTests.DeckRepositoryTests.UseCaseTests;
 [TestClass]
 public class GetDeckTests
 {

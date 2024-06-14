@@ -5,7 +5,7 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Mode
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplicationTests.TestUtility.Database;
 
-namespace MTGApplicationTests.GeneralTests.Services.DatabaseTests.RepositoryTests.DeckRepositoryTests.UseCaseTests;
+namespace MTGApplicationTests.GeneralTests.ServiceTests.DatabaseTests.RepositoryTests.DeckRepositoryTests.UseCaseTests;
 
 [TestClass]
 public class AddOrUpdateDeckTests
