@@ -85,7 +85,7 @@
             IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.Collection.CollectionLists.Count, 0), Mode=OneWay}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding Name, Mode=OneTime}"/>
+                <TextBlock Text="{Binding Name, Mode=OneWay}"/>
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </customControls:ComboBoxWithCommands>

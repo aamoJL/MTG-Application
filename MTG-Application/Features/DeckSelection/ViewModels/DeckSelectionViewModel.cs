@@ -18,7 +18,7 @@ public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> reposito
 
   [ObservableProperty] private bool isBusy;
 
-  public IAsyncRelayCommand LoadDecksCommand => loadDecks?.Command ?? (loadDecks = new DeckSelectorViewModelCommands.LoadDecks(this)).Command;
+  public IAsyncRelayCommand LoadDecksCommand => (loadDecks ??= (loadDecks = new DeckSelectorViewModelCommands.LoadDecks(this))).Command;
 
   private DeckSelectorViewModelCommands.LoadDecks loadDecks;
 }

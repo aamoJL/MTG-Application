@@ -24,13 +24,13 @@ public partial class CommanderCommands(DeckEditorViewModel viewmodel, CommanderC
 
   public Action<DeckEditorMTGCard> OnChange { get; init; }
 
-  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCommanderCommand => changeCommander?.Command ?? (changeCommander = new ChangeCommander(this)).Command;
-  public IRelayCommand<DeckEditorMTGCard> RemoveCommanderCommand => removeCommander?.Command ?? (removeCommander = new RemoveCommander(this)).Command;
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => beginMoveFrom?.Command ?? (beginMoveFrom = new MoveCard.BeginMoveFrom(this)).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => beginMoveTo?.Command ?? (beginMoveTo = new MoveCard.BeginMoveTo(this)).Command;
-  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => executeMove?.Command ?? (executeMove = new MoveCard.ExecuteMove(this)).Command;
-  public IAsyncRelayCommand<string> ImportCommanderCommand => importCommander?.Command ?? (importCommander = new ImportCommander(this)).Command;
-  public IAsyncRelayCommand ChangeCardPrintCommand => changeCardPrint?.Command ?? (changeCardPrint = new ChangeCardPrint(this)).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCommanderCommand => (changeCommander ??= new ChangeCommander(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> RemoveCommanderCommand => (removeCommander ??= new RemoveCommander(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => (beginMoveFrom ??= new MoveCard.BeginMoveFrom(this)).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => (beginMoveTo ??= new MoveCard.BeginMoveTo(this)).Command;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => (executeMove ??= new MoveCard.ExecuteMove(this)).Command;
+  public IAsyncRelayCommand<string> ImportCommanderCommand => (importCommander ??= new ImportCommander(this)).Command;
+  public IAsyncRelayCommand ChangeCardPrintCommand => (changeCardPrint ??= new ChangeCardPrint(this)).Command;
 
   private ChangeCommander changeCommander;
   private RemoveCommander removeCommander;

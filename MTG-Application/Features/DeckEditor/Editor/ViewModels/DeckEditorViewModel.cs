@@ -118,15 +118,15 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     }
   }
 
-  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => confirmUnsavedChanges?.Command ?? (confirmUnsavedChanges = new ConfirmUnsavedChanges(this)).Command;
-  public IAsyncRelayCommand NewDeckCommand => newDeck?.Command ?? (newDeck = new NewDeck(this)).Command;
-  public IAsyncRelayCommand<string> OpenDeckCommand => openDeck?.Command ?? (openDeck = new OpenDeck(this)).Command;
-  public IAsyncRelayCommand SaveDeckCommand => saveDeck?.Command ?? (saveDeck = new SaveDeck(this)).Command;
-  public IAsyncRelayCommand DeleteDeckCommand => deleteDeck?.Command ?? (deleteDeck = new DeleteDeck(this)).Command;
-  public IRelayCommand UndoCommand => undo?.Command ?? (undo = new Undo(this)).Command;
-  public IRelayCommand RedoCommand => redo?.Command ?? (redo = new Redo(this)).Command;
-  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => openEdhrecCommanderWebsite?.Command ?? (openEdhrecCommanderWebsite = new OpenEdhrecCommanderWebsite(this)).Command;
-  public IAsyncRelayCommand ShowDeckTokensCommand => showDeckTokens?.Command ?? (showDeckTokens = new ShowDeckTokens(this)).Command;
+  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => (confirmUnsavedChanges ??= new ConfirmUnsavedChanges(this)).Command;
+  public IAsyncRelayCommand NewDeckCommand => (newDeck ??= new NewDeck(this)).Command;
+  public IAsyncRelayCommand<string> OpenDeckCommand => (openDeck ??= new OpenDeck(this)).Command;
+  public IAsyncRelayCommand SaveDeckCommand => (saveDeck ??= new SaveDeck(this)).Command;
+  public IAsyncRelayCommand DeleteDeckCommand => (deleteDeck ??= new DeleteDeck(this)).Command;
+  public IRelayCommand UndoCommand => (undo ??= new Undo(this)).Command;
+  public IRelayCommand RedoCommand => (redo ??= new Redo(this)).Command;
+  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => (openEdhrecCommanderWebsite ??= new OpenEdhrecCommanderWebsite(this)).Command;
+  public IAsyncRelayCommand ShowDeckTokensCommand => (showDeckTokens ??= new ShowDeckTokens(this)).Command;
 
   private DeckEditorMTGDeck deck;
   private ConfirmUnsavedChanges confirmUnsavedChanges;
