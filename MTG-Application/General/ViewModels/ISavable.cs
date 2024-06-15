@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-
-namespace MTGApplication.General.ViewModels;
+﻿namespace MTGApplication.General.ViewModels;
 
 public interface ISavable
 {
@@ -10,6 +8,4 @@ public interface ISavable
   }
 
   public bool HasUnsavedChanges { get; set; }
-
-  IAsyncRelayCommand<ConfirmArgs> ConfirmUnsavedChangesCommand { get; }
 }

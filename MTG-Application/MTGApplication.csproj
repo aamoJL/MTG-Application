@@ -183,6 +183,8 @@
     <PRIResource Remove="Windows\**" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\CardCollection\CardCollection\" />
+    <Folder Include="Features\CardCollection\Page\Views\" />
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
     <Folder Include="Features\DeckEditor\CardList\Views\Controls\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
