@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class EditList(CardCollectionListViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionListViewModel>(viewmodel)
   {
@@ -25,13 +25,14 @@ public partial class CardCollectionPageViewModelCommands
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListNameError);
       else if (string.IsNullOrEmpty(query))
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListQueryError);
-      else if (Viewmodel.Name != name && Viewmodel.NameValidation.Invoke(name))
+      else if (Viewmodel.Name != name && Viewmodel.ExistsValidation.Invoke(name))
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListExistsError);
       else
       {
         Viewmodel.Name = name;
-        Viewmodel.Query = query;
         Viewmodel.HasUnsavedChanges = true;
+
+        await Viewmodel.UpdateQuery(query);
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListSuccess);
       }

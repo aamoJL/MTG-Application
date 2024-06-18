@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmUnsavedChanges(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, ISavable.ConfirmArgs>(viewmodel)
   {
@@ -16,11 +16,12 @@ public partial class CardCollectionPageViewModelCommands
       if (!CanExecute(param)) return;
 
       switch (await Viewmodel.Confirmers.SaveUnsavedChangesConfirmer
-        .Confirm(CardCollectionEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.SelectedCardCollection.Name)))
+        .Confirm(CardCollectionEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.CardCollectionViewModel.Name)))
       {
         case ConfirmationResult.Yes:
           await Viewmodel.CardCollectionViewModel.SaveCollectionCommand.ExecuteAsync(null);
-          param.Cancelled = Viewmodel.HasUnsavedChanges;
+
+          param.Cancelled = Viewmodel.HasUnsavedChanges = Viewmodel.CardCollectionViewModel.HasUnsavedChanges;
           return;
         case ConfirmationResult.Cancel:
           param.Cancelled = true;

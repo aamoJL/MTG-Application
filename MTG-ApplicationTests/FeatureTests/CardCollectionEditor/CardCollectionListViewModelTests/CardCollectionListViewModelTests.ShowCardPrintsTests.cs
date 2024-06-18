@@ -5,16 +5,16 @@ using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionViewModelTests
+public partial class CardCollectionListViewModelTests
 {
   [TestClass]
-  public class ShowCardPrintsTests : CardCollectionViewModelTestsBase
+  public class ShowCardPrintsTests : CardCollectionListViewModelTestsBase
   {
     [TestMethod]
     public async Task ShowPrints_PrintConfirmationShown()
     {
       var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
         Confirmers = new()
         {

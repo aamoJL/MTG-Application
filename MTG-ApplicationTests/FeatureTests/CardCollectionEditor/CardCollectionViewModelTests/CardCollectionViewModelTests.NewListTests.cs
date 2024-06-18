@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Features.CardCollection;
 using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
@@ -35,7 +36,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
+      Assert.AreEqual(0, viewmodel.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -51,7 +52,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
+      Assert.AreEqual(0, viewmodel.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -67,7 +68,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
+      Assert.AreEqual(0, viewmodel.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -77,7 +78,7 @@ public partial class CardCollectionViewModelTests
       var newQuery = "New Query";
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, newQuery)) },
@@ -86,7 +87,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.IsNull(viewmodel.Collection.CollectionLists.FirstOrDefault(x => x.SearchQuery == newQuery));
+      Assert.IsNull(viewmodel.CollectionLists.FirstOrDefault(x => x.SearchQuery == newQuery));
     }
 
     [TestMethod]
@@ -102,7 +103,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(1, viewmodel.Collection.CollectionLists.Count);
+      Assert.AreEqual(1, viewmodel.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -181,7 +182,7 @@ public partial class CardCollectionViewModelTests
       var list = _savedCollection.CollectionLists[0];
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, "New Query")) },
@@ -211,6 +212,24 @@ public partial class CardCollectionViewModelTests
       }.MockVM();
 
       await NotificationAssert.NotificationSent(NotificationType.Success, () => viewmodel.NewListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task NewList_Success_OnListAddedInvoked()
+    {
+      MTGCardCollectionList? invoked = null;
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Confirmers = new()
+        {
+          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+        },
+        OnListAdded = async (list) => { invoked = list; await Task.Yield(); }
+      }.MockVM();
+
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      Assert.IsNotNull(invoked);
     }
   }
 }

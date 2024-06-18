@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmNewList(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel>(viewmodel)
   {

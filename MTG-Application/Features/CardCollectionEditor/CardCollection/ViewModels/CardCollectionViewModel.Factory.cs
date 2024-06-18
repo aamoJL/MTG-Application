@@ -4,6 +4,7 @@ using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepos
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using System;
+using System.Threading.Tasks;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardCollection;
@@ -15,9 +16,9 @@ public partial class CardCollectionViewModel
     public CardCollectionConfirmers Confirmers { get; init; } = new();
     public Notifier Notifier { get; init; } = new();
     public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
-    public Action OnDeleted { get; init; }
-    public Action<MTGCardCollectionList> OnListAdded { get; init; }
-    public Action<MTGCardCollectionList> OnListRemoved { get; init; }
+    public Func<Task> OnDeleted { get; init; }
+    public Func<MTGCardCollectionList, Task> OnListAdded { get; init; }
+    public Func<MTGCardCollectionList, Task> OnListRemoved { get; init; }
 
     public CardCollectionViewModel Build(MTGCardCollection model, MTGCardImporter importer)
     {

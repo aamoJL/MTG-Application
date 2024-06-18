@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmNewCollection(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
   {
@@ -13,10 +13,10 @@ public partial class CardCollectionPageViewModelCommands
 
       await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
 
-      if (unsavedArgs.Cancelled) 
+      if (unsavedArgs.Cancelled)
         return;
 
-      Viewmodel.SelectedCardCollection = new();
+      await Viewmodel.ChangeCollection(new());
       Viewmodel.HasUnsavedChanges = false;
     }
   }

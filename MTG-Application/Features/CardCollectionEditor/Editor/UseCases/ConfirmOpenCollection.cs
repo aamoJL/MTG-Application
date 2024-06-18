@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmOpenCollection(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
   {
@@ -28,7 +28,7 @@ public partial class CardCollectionPageViewModelCommands
 
       if (await Viewmodel.Worker.DoWork(LoadCollection(loadName)) is MTGCardCollection loadedCollection)
       {
-        Viewmodel.SelectedCardCollection = loadedCollection;
+        await Viewmodel.ChangeCollection(loadedCollection);
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
       }

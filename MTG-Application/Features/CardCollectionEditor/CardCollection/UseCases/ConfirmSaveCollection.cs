@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmSaveCollection(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel>(viewmodel)
   {
@@ -36,9 +36,9 @@ public partial class CardCollectionPageViewModelCommands
       if (await Viewmodel.Worker.DoWork(SaveCollectionDTO(Viewmodel.AsDTO(), saveName, overrideOld)))
       {
         Viewmodel.Name = saveName;
+        Viewmodel.HasUnsavedChanges = false;
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionSuccess);
-        Viewmodel.HasUnsavedChanges = false;
       }
       else
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionError);

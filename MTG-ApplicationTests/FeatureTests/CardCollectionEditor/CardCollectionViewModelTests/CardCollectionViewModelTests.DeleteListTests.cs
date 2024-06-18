@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -8,24 +9,23 @@ namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewMode
 public partial class CardCollectionViewModelTests
 {
   [TestClass]
-  public class DeleteListTests : CardCollectionViewModelTestsBase, ICanExecuteCommandTests
+  public class DeleteListTests : CardCollectionViewModelTestsBase, ICanExecuteWithParameterCommandTests
   {
-    [TestMethod("Should not be able to execute if a list is not selected")]
-    public void InvalidState_CanNotExecute()
+    [TestMethod("Should be able to execute if the given list is in the collection")]
+    public void ValidParameter_CanExecute()
     {
-      var viewmodel = new Mocker(_dependencies).MockVM();
+      var viewmodel = new Mocker(_dependencies) { Model = _savedCollection }.MockVM();
 
-      Assert.IsFalse(viewmodel.DeleteListCommand.CanExecute(null));
+      Assert.IsTrue(viewmodel.DeleteListCommand.CanExecute(_savedCollection.CollectionLists.First()));
     }
 
-    [TestMethod("Should be able to execute if a list is selected")]
-    public void ValidState_CanExecute()
+    [TestMethod("Should not be able to execute if the given list is not in the collection")]
+    public void InvalidParameter_CanNotExecute()
     {
-      var viewmodel = new Mocker(_dependencies) { Collection = _savedCollection }.MockVM();
+      var viewmodel = new Mocker(_dependencies) { Model = _savedCollection }.MockVM();
 
-      viewmodel.SelectListCommand.Execute(_savedCollection.CollectionLists.First());
-
-      Assert.IsTrue(viewmodel.DeleteListCommand.CanExecute(null));
+      Assert.IsFalse(viewmodel.DeleteListCommand.CanExecute(null));
+      Assert.IsFalse(viewmodel.DeleteListCommand.CanExecute(new MTGCardCollectionList()));
     }
 
     [TestMethod]
@@ -33,24 +33,23 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionListConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
         }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(_savedCollection.CollectionLists.First());
-
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.DeleteListCommand.ExecuteAsync(null));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.DeleteListCommand.ExecuteAsync(_savedCollection.CollectionLists.First()));
     }
 
     [TestMethod]
     public async Task DeleteList_Cancel_NoChanges()
     {
+      var list = _savedCollection.CollectionLists.First();
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionListConfirmer = new()
@@ -60,10 +59,9 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(_savedCollection.CollectionLists.First());
-      await viewmodel.DeleteListCommand.ExecuteAsync(null);
+      await viewmodel.DeleteListCommand.ExecuteAsync(list);
 
-      Assert.AreEqual(viewmodel.SelectedList, _savedCollection.CollectionLists.First());
+      Assert.IsTrue(viewmodel.CollectionLists.Contains(list));
     }
 
     [TestMethod]
@@ -72,7 +70,7 @@ public partial class CardCollectionViewModelTests
       var list = _savedCollection.CollectionLists.First();
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionListConfirmer = new()
@@ -82,10 +80,9 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(list);
-      await viewmodel.DeleteListCommand.ExecuteAsync(null);
+      await viewmodel.DeleteListCommand.ExecuteAsync(list);
 
-      Assert.IsNull(viewmodel.Collection.CollectionLists.FirstOrDefault(x => x.Name == list.Name));
+      Assert.IsFalse(viewmodel.CollectionLists.Contains(list));
     }
 
     [TestMethod]
@@ -94,7 +91,7 @@ public partial class CardCollectionViewModelTests
       var list = _savedCollection.CollectionLists.First();
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionListConfirmer = new()
@@ -104,33 +101,9 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(list);
-      await viewmodel.DeleteListCommand.ExecuteAsync(null);
+      await viewmodel.DeleteListCommand.ExecuteAsync(list);
 
       Assert.IsTrue(viewmodel.HasUnsavedChanges);
-    }
-
-    [TestMethod]
-    public async Task DeleteList_Success_SelectedListChanged()
-    {
-      var list = _savedCollection.CollectionLists.First();
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Collection = _savedCollection,
-        Confirmers = new()
-        {
-          DeleteCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
-          }
-        }
-      }.MockVM();
-
-      await viewmodel.SelectListCommand.ExecuteAsync(list);
-      await viewmodel.DeleteListCommand.ExecuteAsync(null);
-
-      Assert.IsNotNull(viewmodel.SelectedList);
-      Assert.AreNotEqual(list.Name, viewmodel.SelectedList?.Name);
     }
 
     [TestMethod]
@@ -139,7 +112,7 @@ public partial class CardCollectionViewModelTests
       var list = _savedCollection.CollectionLists.First();
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionListConfirmer = new()
@@ -150,10 +123,8 @@ public partial class CardCollectionViewModelTests
         Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(list);
-
       await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.DeleteListCommand.ExecuteAsync(null));
+        () => viewmodel.DeleteListCommand.ExecuteAsync(list));
     }
 
     [TestMethod]
@@ -162,7 +133,7 @@ public partial class CardCollectionViewModelTests
       var list = _savedCollection.CollectionLists.First();
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionListConfirmer = new()
@@ -173,13 +144,35 @@ public partial class CardCollectionViewModelTests
         Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(list);
-
       // Remove list manually, so the command will fail to remove it
-      viewmodel.Collection.CollectionLists.Remove(viewmodel.SelectedList);
+      viewmodel.CollectionLists.Remove(list);
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.DeleteListCommand.ExecuteAsync(null));
+        () => viewmodel.DeleteListCommand.ExecuteAsync(list));
+    }
+
+    [TestMethod]
+    public async Task DeleteList_Success_OnListRemovedInvoked()
+    {
+      MTGCardCollectionList? invoked = null;
+      var list = _savedCollection.CollectionLists.First();
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Model = _savedCollection,
+        Confirmers = new()
+        {
+          DeleteCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
+          }
+        },
+        OnListRemoved = async (list) => { invoked = list; await Task.Yield(); }
+      }.MockVM();
+
+      await viewmodel.DeleteListCommand.ExecuteAsync(list);
+
+      Assert.IsNotNull(invoked);
+      Assert.AreEqual(list, invoked);
     }
   }
 }

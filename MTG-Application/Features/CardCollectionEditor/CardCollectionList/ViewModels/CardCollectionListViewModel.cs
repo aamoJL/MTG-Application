@@ -7,33 +7,28 @@ using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using static MTGApplication.Features.CardCollection.UseCases.CardCollectionPageViewModelCommands;
+using static MTGApplication.Features.CardCollection.UseCases.CardCollectionEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardCollection;
 
 public partial class CardCollectionListViewModel : ObservableObject, ISavable, IWorker
 {
-  public CardCollectionListViewModel(MTGCardCollectionList model, MTGCardImporter importer, Func<string, bool> nameValidation = null)
+  public CardCollectionListViewModel(MTGCardCollectionList model, MTGCardImporter importer, Func<string, bool> existsValidation = null)
   {
-    Model = model;
+    Model = model ?? new();
 
     Importer = importer;
-    NameValidation = nameValidation;
+    ExistsValidation = existsValidation;
 
-    QueryCardsViewModel = new(importer)
-    {
-      OwnedCards = OwnedCards,
-    };
-
-    PropertyChanged += CardCollectionListViewModel_PropertyChanged;
+    QueryCardsViewModel = new(OwnedCards, importer);
   }
 
   public MTGCardImporter Importer { get; }
   public QueryCardsViewModel QueryCardsViewModel { get; }
-  public CardCollectionListConfirmers Confirmers { get; init; } = new();
-  public Notifier Notifier { get; init; } = new();
-  public ClipboardService ClipboardService { get; init; } = new();
+  public CardCollectionListConfirmers Confirmers { get; set; } = new();
+  public Notifier Notifier { get; set; } = new();
+  public ClipboardService ClipboardService { get; set; } = new();
   public IWorker Worker => this;
 
   public string Name
@@ -50,7 +45,7 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
   public string Query
   {
     get => Model.SearchQuery;
-    set
+    private set
     {
       if (Model.SearchQuery == value) return;
 
@@ -63,7 +58,7 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
   [ObservableProperty] private bool hasUnsavedChanges;
   [ObservableProperty] private bool isBusy;
 
-  public Func<string, bool> NameValidation { get; }
+  public Func<string, bool> ExistsValidation { get; }
 
   private MTGCardCollectionList Model { get; }
 
@@ -81,11 +76,12 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
 
   public async Task UpdateQueryCards() => await Worker.DoWork(QueryCardsViewModel.UpdateQueryCards(Model.SearchQuery));
 
-  private async void CardCollectionListViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  public async Task UpdateQuery(string query)
   {
-    switch (e.PropertyName)
-    {
-      case nameof(Query): await UpdateQueryCards(); break;
-    }
+    if (Query == query) return;
+
+    Query = query;
+
+    await UpdateQueryCards();
   }
 }

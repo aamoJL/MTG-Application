@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -17,7 +16,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>()
@@ -32,7 +31,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { Name = "New", CollectionLists = [new()] },
+        Model = new() { Name = "New", CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) },
@@ -41,7 +40,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
 
-      Assert.IsFalse(await _dependencies.Repository.Exists(viewmodel.Collection.Name));
+      Assert.IsFalse(await _dependencies.Repository.Exists(viewmodel.Name));
     }
 
     [TestMethod]
@@ -49,7 +48,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(string.Empty) },
@@ -58,7 +57,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedCollection.Name, viewmodel.Collection.Name);
+      Assert.AreEqual(_savedCollection.Name, viewmodel.Name);
     }
 
     [TestMethod]
@@ -67,7 +66,7 @@ public partial class CardCollectionViewModelTests
       var collection = new MTGCardCollection() { Name = "New", CollectionLists = [new()] };
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = collection,
+        Model = collection,
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(collection.Name) },
@@ -85,7 +84,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
@@ -101,7 +100,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
+        Model = new() { CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
@@ -118,7 +117,7 @@ public partial class CardCollectionViewModelTests
       var collection = new MTGCardCollection() { Name = "New", CollectionLists = [new()] };
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = collection,
+        Model = collection,
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
@@ -136,7 +135,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
+        Model = new() { CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
@@ -156,7 +155,7 @@ public partial class CardCollectionViewModelTests
       var newName = "New";
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { Name = _savedCollection.Name, CollectionLists = [new()] },
+        Model = new() { Name = _savedCollection.Name, CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(newName) },
@@ -175,7 +174,7 @@ public partial class CardCollectionViewModelTests
       var newName = "New";
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { Name = _savedCollection.Name, CollectionLists = [new()] },
+        Model = new() { Name = _savedCollection.Name, CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(newName) },
@@ -184,7 +183,7 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(newName, viewmodel.Collection.Name);
+      Assert.AreEqual(newName, viewmodel.Name);
     }
 
     [TestMethod]
@@ -192,7 +191,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         HasUnsavedChanges = true,
         Confirmers = new()
         {
@@ -210,7 +209,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         HasUnsavedChanges = true,
         Confirmers = new()
         {
@@ -232,7 +231,7 @@ public partial class CardCollectionViewModelTests
 
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         HasUnsavedChanges = true,
         Confirmers = new()
         {
@@ -250,21 +249,20 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Save_SaveEmpty_Success()
     {
+      var newName = "Name";
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [] },
+        Model = new() { CollectionLists = [] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult("Name") }
+          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(newName) }
         },
       }.MockVM();
 
-      var args = new ISavable.ConfirmArgs();
-      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+      await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
 
-      Assert.IsFalse(args.Cancelled);
+      Assert.AreEqual(viewmodel.Name, newName);
     }
   }
 }

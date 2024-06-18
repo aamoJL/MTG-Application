@@ -1,33 +1,30 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.CardCollection;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionViewModelTests
+public partial class CardCollectionListViewModelTests
 {
   [TestClass]
-  public class EditListTests : CardCollectionViewModelTestsBase, ICanExecuteCommandTests
+  public class EditListTests : CardCollectionListViewModelTestsBase, ICanExecuteCommandAsyncTests
   {
-    [TestMethod("Should not be able to execute if the selected list is null")]
-    public void InvalidState_CanNotExecute()
+    [TestMethod("Should not be able to execute if the list does not have a name")]
+    public async Task InvalidState_CanNotExecute()
     {
-      var viewmodel = new Mocker(_dependencies).MockVM();
+      var viewmodel = await new Mocker(_dependencies).MockVM();
 
       Assert.IsFalse(viewmodel.EditListCommand.CanExecute(null));
     }
 
-    [TestMethod("Should be able to execute if the selected list is not null")]
-    public void ValidState_CanExecute()
+    [TestMethod("Should be able to execute if the list has a name")]
+    public async Task ValidState_CanExecute()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
       }.MockVM();
-
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       Assert.IsTrue(viewmodel.EditListCommand.CanExecute(null));
     }
@@ -35,16 +32,14 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task EditList_EditConfirmationShown()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new TestExceptionConfirmer<(string, string)?, (string, string)>(),
         }
       }.MockVM();
-
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.EditListCommand.ExecuteAsync(null));
     }
@@ -52,10 +47,10 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task EditList_Cancel_NoChanges()
     {
-      var searchQuery = _savedCollection.CollectionLists.First().SearchQuery;
-      var viewmodel = new Mocker(_dependencies)
+      var searchQuery = _savedList.SearchQuery;
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -65,11 +60,9 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-
       await viewmodel.EditListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(searchQuery, viewmodel.Collection.CollectionLists.First().SearchQuery);
+      Assert.AreEqual(searchQuery, viewmodel.Query);
     }
 
     [TestMethod]
@@ -77,9 +70,9 @@ public partial class CardCollectionViewModelTests
     {
       var name = "New Name";
       var query = "New Query";
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -89,11 +82,9 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-
       await viewmodel.EditListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(name, viewmodel.SelectedList.Name);
+      Assert.AreEqual(name, viewmodel.Name);
     }
 
     [TestMethod]
@@ -101,9 +92,9 @@ public partial class CardCollectionViewModelTests
     {
       var name = "New Name";
       var query = "New Query";
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -113,11 +104,9 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-
       await viewmodel.EditListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(query, viewmodel.SelectedList.SearchQuery);
+      Assert.AreEqual(query, viewmodel.Query);
     }
 
     [TestMethod]
@@ -125,9 +114,9 @@ public partial class CardCollectionViewModelTests
     {
       var name = "New Name";
       var query = "New Query";
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -137,17 +126,13 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);
+      Assert.AreEqual(0, viewmodel.QueryCardsViewModel.TotalCardCount);
 
-      Assert.AreEqual(0, viewmodel.QueryCardsViewModel.Collection.Count);
-
-      _dependencies.CardAPI.ExpectedCards = [new(MTGCardInfoMocker.MockInfo(name: "Card"))];
+      _dependencies.Importer.ExpectedCards = [new(MTGCardInfoMocker.MockInfo(name: "Card"))];
 
       await viewmodel.EditListCommand.ExecuteAsync(null);
-      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);
 
-      Assert.AreEqual(1, viewmodel.QueryCardsViewModel.Collection.Count);
+      Assert.AreEqual(1, viewmodel.QueryCardsViewModel.TotalCardCount);
     }
 
     [TestMethod]
@@ -155,9 +140,9 @@ public partial class CardCollectionViewModelTests
     {
       var name = "New Name";
       var query = "New Query";
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -167,7 +152,6 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      await viewmodel.SelectListCommand.ExecuteAsync(_savedCollection.CollectionLists.First());
       await viewmodel.EditListCommand.ExecuteAsync(null);
 
       Assert.IsTrue(viewmodel.HasUnsavedChanges);
@@ -176,9 +160,9 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task EditList_NoName_ErrorNotificationShown()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -189,8 +173,6 @@ public partial class CardCollectionViewModelTests
         Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-
       await NotificationAssert.NotificationSent(NotificationType.Error,
         () => viewmodel.EditListCommand.ExecuteAsync(null));
     }
@@ -198,9 +180,9 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task EditList_NoQuery_ErrorNotificationShown()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -211,8 +193,6 @@ public partial class CardCollectionViewModelTests
         Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-
       await NotificationAssert.NotificationSent(NotificationType.Error,
         () => viewmodel.EditListCommand.ExecuteAsync(null));
     }
@@ -220,28 +200,19 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task EditList_Exists_ErrorNotificationShown()
     {
-      var collection = new MTGCardCollection()
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Name = "Collection",
-        CollectionLists = [
-            new() { Name = "List" },
-            new() { Name = "List 2" },
-          ]
-      };
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Collection = collection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult((collection.CollectionLists[1].Name, "New Query"))
+            OnConfirm = async msg => await Task.FromResult(("Name", "New Query"))
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) },
+        ExistsValidator = (name) => true
       }.MockVM();
-
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
         () => viewmodel.EditListCommand.ExecuteAsync(null));
@@ -250,10 +221,10 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task EditList_SameName_NoErrorNotificationShown()
     {
-      var name = _savedCollection.CollectionLists.First().Name;
-      var viewmodel = new Mocker(_dependencies)
+      var name = _savedList.Name;
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -271,17 +242,15 @@ public partial class CardCollectionViewModelTests
         }
       }.MockVM();
 
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
-
       await viewmodel.EditListCommand.ExecuteAsync(null);
     }
 
     [TestMethod]
     public async Task EditList_Success_SuccessNotificationShown()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           EditCollectionListConfirmer = new()
@@ -291,8 +260,6 @@ public partial class CardCollectionViewModelTests
         },
         Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
       }.MockVM();
-
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
         () => viewmodel.EditListCommand.ExecuteAsync(null));

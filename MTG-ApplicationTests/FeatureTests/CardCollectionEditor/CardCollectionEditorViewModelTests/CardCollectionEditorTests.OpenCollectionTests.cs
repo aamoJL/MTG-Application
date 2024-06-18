@@ -1,24 +1,21 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionViewModelTests
+namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
+
+public partial class CardCollectionEditorTests
 {
   [TestClass]
-  public class OpenCollectionTests : CardCollectionViewModelTestsBase,
-    IUnsavedChangesCheckTests, IOpenCommandTests
+  public class OpenCollectionTests : CardCollectionEditorViewModelTestsBase, IUnsavedChangesCheckTests, IOpenCommandTests
   {
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
@@ -69,11 +66,13 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>()
+          CardCollectionConfirmers = new()
+          {
+            SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>()
+          }
         },
         HasUnsavedChanges = true
       }.MockVM();
@@ -98,18 +97,17 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Open_Cancel_NoChanges()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
         Confirmers = new()
         {
           LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) }
         },
-      }.MockVM();
+      }.MockVM(_savedCollection);
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedCollection, viewmodel.Collection);
+      Assert.AreEqual(_savedCollection.Name, viewmodel.CardCollectionViewModel.Name);
     }
 
     [TestMethod]
@@ -125,38 +123,11 @@ public partial class CardCollectionViewModelTests
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedCollection.Name, viewmodel.Collection.Name);
-      Assert.AreEqual(_savedCollection.CollectionLists.Count, viewmodel.Collection.CollectionLists.Count);
+      Assert.AreEqual(_savedCollection.Name, viewmodel.CardCollectionViewModel.Name);
+      Assert.AreEqual(_savedCollection.CollectionLists.Count, viewmodel.CardCollectionViewModel.CollectionLists.Count);
       CollectionAssert.AreEquivalent(
         _savedCollection.CollectionLists.SelectMany(l => l.Cards.Select(c => c.Info.Name)).ToList(),
-        viewmodel.Collection.CollectionLists.SelectMany(l => l.Cards.Select(c => c.Info.Name)).ToList());
-    }
-
-    [TestMethod]
-    public async Task Open_Valid_QueryCardsUpdated()
-    {
-      var expectedCards = new CardImportResult.Card[]
-      {
-        new (MTGCardInfoMocker.MockInfo(name: "1")),
-        new (MTGCardInfoMocker.MockInfo(name: "2")),
-        new (MTGCardInfoMocker.MockInfo(name: "3")),
-      };
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Confirmers = new()
-        {
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
-        },
-      }.MockVM();
-
-      _dependencies.CardAPI.ExpectedCards = expectedCards;
-
-      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
-      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync((uint)expectedCards.Length);
-
-      CollectionAssert.AreEquivalent(
-        expectedCards.Select(c => c.Info.Name).ToList(),
-        viewmodel.QueryCardsViewModel.Collection.Select(c => c.Info.Name).ToList());
+        viewmodel.CardCollectionViewModel.CollectionLists.SelectMany(l => l.Cards.Select(c => c.Info.Name)).ToList());
     }
 
     [TestMethod]

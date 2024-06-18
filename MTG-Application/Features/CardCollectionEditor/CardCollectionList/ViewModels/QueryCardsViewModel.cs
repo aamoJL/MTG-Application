@@ -13,21 +13,21 @@ namespace MTGApplication.Features.CardCollection;
 
 public partial class QueryCardsViewModel : ObservableObject
 {
-  public QueryCardsViewModel(MTGCardImporter importer)
+  public QueryCardsViewModel(ObservableCollection<CardCollectionMTGCard> ownedCards, MTGCardImporter importer)
   {
     Importer = importer;
+    OwnedCards = ownedCards;
     QueryCards = new(new CardCollectionIncrementalCardSource(importer));
 
     QueryCards.Collection.CollectionChanged += QueryCardsCollection_CollectionChanged;
-    PropertyChanging += QueryCardsViewModel_PropertyChanging;
-    PropertyChanged += QueryCardsViewModel_PropertyChanged;
+    OwnedCards.CollectionChanged += OwnedCards_CollectionChanged;
   }
 
   public MTGCardImporter Importer { get; }
 
   private IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; }
 
-  [ObservableProperty] private ObservableCollection<CardCollectionMTGCard> ownedCards = [];
+  private ObservableCollection<CardCollectionMTGCard> OwnedCards { get; }
 
   public IncrementalLoadingCollection<IncrementalCardSource<CardCollectionMTGCard>, CardCollectionMTGCard> Collection => QueryCards.Collection;
   public int TotalCardCount => QueryCards.TotalCardCount;
@@ -38,18 +38,6 @@ public partial class QueryCardsViewModel : ObservableObject
     QueryCards.SetCollection([.. searchResult.Found.Select(x => new CardCollectionMTGCard(x.Info))], searchResult.NextPageUri, searchResult.TotalCount);
 
     OnPropertyChanged(nameof(TotalCardCount));
-  }
-
-  private void QueryCardsViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
-  {
-    if (e.PropertyName == nameof(OwnedCards))
-      OwnedCards.CollectionChanged -= OwnedCards_CollectionChanged;
-  }
-
-  private void QueryCardsViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(OwnedCards))
-      OwnedCards.CollectionChanged += OwnedCards_CollectionChanged;
   }
 
   private void OwnedCards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

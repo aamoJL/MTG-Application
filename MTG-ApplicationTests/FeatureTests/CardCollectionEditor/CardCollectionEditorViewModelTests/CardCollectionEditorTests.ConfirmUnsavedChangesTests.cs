@@ -4,11 +4,12 @@ using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
-namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionViewModelTests
+namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
+
+public partial class CardCollectionEditorTests
 {
   [TestClass]
-  public class ConfirmUnsavedChangesTests : CardCollectionViewModelTestsBase, IConfirmUnsavedChangesTests
+  public class ConfirmUnsavedChangesTests : CardCollectionEditorViewModelTestsBase, IConfirmUnsavedChangesTests
   {
     [TestMethod]
     public async Task NoUnsavedChanges_Success()
@@ -29,7 +30,6 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
@@ -47,12 +47,14 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>(),
+          CardCollectionConfirmers = new()
+          {
+            SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>(),
+          }
         },
       }.MockVM();
 
@@ -66,7 +68,6 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
@@ -85,7 +86,6 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
@@ -104,12 +104,14 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult("New") },
+          CardCollectionConfirmers = new()
+          {
+            SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult("New") },
+          }
         },
       }.MockVM();
 
@@ -124,12 +126,14 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(string.Empty) },
+          CardCollectionConfirmers = new()
+          {
+            SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(string.Empty) },
+          }
         },
       }.MockVM();
 
@@ -144,12 +148,14 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = new() { CollectionLists = [new()] },
         HasUnsavedChanges = true,
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) },
+          CardCollectionConfirmers = new()
+          {
+            SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) },
+          }
         },
       }.MockVM();
 

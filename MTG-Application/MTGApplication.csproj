@@ -18,12 +18,16 @@
     <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Features\CardCollection\**" />
     <Compile Remove="General\Views\Styles\Template\**" />
     <Compile Remove="Windows\**" />
+    <EmbeddedResource Remove="Features\CardCollection\**" />
     <EmbeddedResource Remove="General\Views\Styles\Template\**" />
     <EmbeddedResource Remove="Windows\**" />
+    <None Remove="Features\CardCollection\**" />
     <None Remove="General\Views\Styles\Template\**" />
     <None Remove="Windows\**" />
+    <Page Remove="Features\CardCollection\**" />
     <Page Remove="General\Views\Styles\Template\**" />
     <Page Remove="Windows\**" />
   </ItemGroup>
@@ -43,7 +47,6 @@
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
-    <None Remove="Features\CardCollection\Views\Controls\CardCollectionCardImageView.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
     <None Remove="Features\CardSearch\CardSearchPage.xaml" />
@@ -183,8 +186,6 @@
     <PRIResource Remove="Windows\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\CardCollection\CardCollection\" />
-    <Folder Include="Features\CardCollection\Page\Views\" />
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
     <Folder Include="Features\DeckEditor\CardList\Views\Controls\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
@@ -209,5 +210,8 @@
     <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Features\CardCollection\**" />
   </ItemGroup>
 </Project>

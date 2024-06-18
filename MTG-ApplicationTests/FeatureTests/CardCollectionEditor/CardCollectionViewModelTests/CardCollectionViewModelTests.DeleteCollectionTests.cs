@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.CardCollection;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -15,7 +13,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Should be able to execute if the collection has a name")]
     public void ValidState_CanExecute()
     {
-      var viewmodel = new Mocker(_dependencies) { Collection = new() { Name = "Collection" } }.MockVM();
+      var viewmodel = new Mocker(_dependencies) { Model = new() { Name = "Collection" } }.MockVM();
 
       Assert.IsTrue(viewmodel.DeleteCollectionCommand.CanExecute(null));
     }
@@ -23,7 +21,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Should not be able to execute if the collection has no name")]
     public void InvalidState_CanNotExecute()
     {
-      var viewmodel = new Mocker(_dependencies) { Collection = new() { Name = string.Empty } }.MockVM();
+      var viewmodel = new Mocker(_dependencies) { Model = new() { Name = string.Empty } }.MockVM();
 
       Assert.IsFalse(viewmodel.DeleteCollectionCommand.CanExecute(null));
     }
@@ -33,7 +31,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
@@ -48,7 +46,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Cancel) }
@@ -65,7 +63,7 @@ public partial class CardCollectionViewModelTests
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
@@ -77,44 +75,12 @@ public partial class CardCollectionViewModelTests
       Assert.IsFalse(await _dependencies.Repository.Exists(_savedCollection.Name));
     }
 
-    [TestMethod("Collection should reset when the collection has been deleted")]
-    public async Task Delete_Success_Reset()
-    {
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Collection = _savedCollection,
-        Confirmers = new()
-        {
-          DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
-        }
-      }.MockVM();
-
-      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
-
-      Assert.AreEqual(string.Empty, viewmodel.Collection.Name);
-      Assert.IsFalse(viewmodel.HasUnsavedChanges);
-    }
-
-    [TestMethod]
-    public async Task Delete_Success_QueryCardsReset()
-    {
-      var viewmodel = new CardCollectionViewModel(new TestMTGCardImporter())
-      {
-        Collection = _savedCollection
-      };
-
-      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
-      await viewmodel.QueryCardsViewModel.Collection.LoadMoreItemsAsync(10);
-
-      Assert.AreEqual(0, viewmodel.QueryCardsViewModel.TotalCardCount);
-    }
-
     [TestMethod("Success notification should be sent when the collection was deleted")]
     public async Task Delete_Success_SuccessNotificationSent()
     {
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
@@ -136,7 +102,7 @@ public partial class CardCollectionViewModelTests
 
       var viewmodel = new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedCollection,
         Confirmers = new()
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
@@ -149,6 +115,25 @@ public partial class CardCollectionViewModelTests
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
         () => viewmodel.DeleteCollectionCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task Delete_Success_OnDeletedInvoked()
+    {
+      var invoked = false;
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Model = _savedCollection,
+        Confirmers = new()
+        {
+          DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
+        },
+        OnDeleted = async () => { invoked = true; await Task.Yield(); }
+      }.MockVM();
+
+      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
+
+      Assert.IsTrue(invoked);
     }
   }
 }

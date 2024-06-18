@@ -9,7 +9,8 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
-using static MTGApplication.Features.CardCollection.UseCases.CardCollectionPageViewModelCommands;
+using System.Threading.Tasks;
+using static MTGApplication.Features.CardCollection.UseCases.CardCollectionEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardCollection;
@@ -17,9 +18,9 @@ namespace MTGApplication.Features.CardCollection;
 public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImporter importer) : ViewModelBase, IWorker, ISavable
 {
   public MTGCardImporter Importer { get; } = importer;
-  public CardCollectionConfirmers Confirmers { get; init; } = new();
-  public Notifier Notifier { get; init; } = new();
-  public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
+  public CardCollectionConfirmers Confirmers { get; set; } = new();
+  public Notifier Notifier { get; set; } = new();
+  public IRepository<MTGCardCollectionDTO> Repository { get; set; } = new CardCollectionDTORepository();
   public IWorker Worker => this;
 
   public string Name
@@ -40,10 +41,10 @@ public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImp
 
   private MTGCardCollection Model { get; } = model;
 
-  public Action OnDelete { get; init; }
+  public Func<Task> OnDelete { get; init; }
   // List change actions are used to update selected list on CardCollectionPage, because Combobox does not work with collection change events
-  public Action<MTGCardCollectionList> OnListAdded { get; init; }
-  public Action<MTGCardCollectionList> OnListRemoved { get; init; }
+  public Func<MTGCardCollectionList, Task> OnListAdded { get; init; }
+  public Func<MTGCardCollectionList, Task> OnListRemoved { get; init; }
 
   public IAsyncRelayCommand SaveCollectionCommand => (saveCollection ??= new ConfirmSaveCollection(this)).Command;
   public IAsyncRelayCommand DeleteCollectionCommand => (deleteCollection ??= new ConfirmDeleteCollection(this)).Command;

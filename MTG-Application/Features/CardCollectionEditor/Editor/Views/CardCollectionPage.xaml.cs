@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.AppWindows;
 
@@ -17,7 +18,7 @@ public sealed partial class CardCollectionPage : Page
     WindowClosing.Closed += WindowClosing_Closed;
   }
 
-  public CardCollectionEditorViewModel ViewModel { get; } = new(new ScryfallAPI());
+  public CardCollectionEditorViewModel ViewModel { get; } = new(new ScryfallAPI(), new(), new(), new CardCollectionDTORepository(), new());
 
   private async void NewCollectionKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {

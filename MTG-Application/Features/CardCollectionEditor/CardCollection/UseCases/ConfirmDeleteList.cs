@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmDeleteList(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel, MTGCardCollectionList>(viewmodel)
   {
@@ -15,7 +15,11 @@ public partial class CardCollectionPageViewModelCommands
 
     protected override async Task Execute(MTGCardCollectionList list)
     {
-      if (!CanExecute(list)) return;
+      if (!CanExecute(list))
+      {
+        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListNotFoundError);
+        return;
+      }
 
       if (await Viewmodel.Confirmers.DeleteCollectionListConfirmer.Confirm(
         CardCollectionConfirmers.GetDeleteCollectionListConfirmation(Viewmodel.Name))
@@ -26,10 +30,11 @@ public partial class CardCollectionPageViewModelCommands
       {
         Viewmodel.HasUnsavedChanges = true;
 
+        Viewmodel.OnListRemoved?.Invoke(list);
+
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListSuccess);
       }
-      else
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListError);
+      else new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListError);
     }
   }
 }

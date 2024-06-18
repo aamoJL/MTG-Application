@@ -1,27 +1,29 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionViewModelTests
+public partial class CardCollectionListViewModelTests
 {
   [TestClass]
-  public class ExportCardsTests : CardCollectionViewModelTestsBase, ICanExecuteCommandTests
+  public class ExportCardsTests : CardCollectionListViewModelTestsBase, ICanExecuteCommandAsyncTests
   {
-    [TestMethod("Should not be able to execute if a list is not selected")]
-    public void InvalidState_CanNotExecute()
+    [TestMethod("Should not be able to execute if the list has no name")]
+    public async Task InvalidState_CanNotExecute()
     {
-      var viewmodel = new Mocker(_dependencies).MockVM();
+      var viewmodel = await new Mocker(_dependencies).MockVM();
 
       Assert.IsFalse(viewmodel.ExportCardsCommand.CanExecute(null));
     }
 
-    [TestMethod("Should be able to execute if a list is selected")]
-    public void ValidState_CanExecute()
+    [TestMethod("Should be able to execute if the list has a name")]
+    public async Task ValidState_CanExecute()
     {
-      var viewmodel = new Mocker(_dependencies) { Collection = _savedCollection }.MockVM();
-
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList
+      }.MockVM();
 
       Assert.IsTrue(viewmodel.ExportCardsCommand.CanExecute(null));
     }
@@ -29,15 +31,14 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task ExportCards_ExportConfirmationShown()
     {
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           ExportCardsConfirmer = new TestExceptionConfirmer<string, string>()
         }
       }.MockVM();
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync(null));
     }
@@ -46,9 +47,9 @@ public partial class CardCollectionViewModelTests
     public async Task ExportCards_Cancel_NoCopy()
     {
       var clipboard = new TestClipboardService();
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           ExportCardsConfirmer = new()
@@ -58,7 +59,6 @@ public partial class CardCollectionViewModelTests
         },
         ClipboardService = clipboard
       }.MockVM();
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await viewmodel.ExportCardsCommand.ExecuteAsync(null);
 
@@ -70,9 +70,9 @@ public partial class CardCollectionViewModelTests
     {
       var exportText = "Export";
       var clipboard = new TestClipboardService();
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           ExportCardsConfirmer = new()
@@ -82,7 +82,6 @@ public partial class CardCollectionViewModelTests
         },
         ClipboardService = clipboard
       }.MockVM();
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await viewmodel.ExportCardsCommand.ExecuteAsync(null);
 
@@ -94,9 +93,9 @@ public partial class CardCollectionViewModelTests
     {
       var exportData = string.Empty;
       var clipboard = new TestClipboardService();
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           ExportCardsConfirmer = new()
@@ -110,13 +109,12 @@ public partial class CardCollectionViewModelTests
         },
         ClipboardService = clipboard
       }.MockVM();
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
       await viewmodel.ExportCardsCommand.ExecuteAsync(null);
 
       Assert.AreEqual(
         exportData,
-        string.Join(Environment.NewLine, viewmodel.SelectedList.Cards.Select(x => x.Info.ScryfallId)));
+        string.Join(Environment.NewLine, viewmodel.OwnedCards.Select(x => x.Info.ScryfallId)));
     }
 
     [TestMethod]
@@ -124,9 +122,9 @@ public partial class CardCollectionViewModelTests
     {
       var exportText = "Export";
       var clipboard = new TestClipboardService();
-      var viewmodel = new Mocker(_dependencies)
+      var viewmodel = await new Mocker(_dependencies)
       {
-        Collection = _savedCollection,
+        Model = _savedList,
         Confirmers = new()
         {
           ExportCardsConfirmer = new()
@@ -137,9 +135,8 @@ public partial class CardCollectionViewModelTests
         ClipboardService = clipboard,
         Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
       }.MockVM();
-      viewmodel.SelectedList = viewmodel.Collection.CollectionLists.First();
 
-      await NotificationAssert.NotificationSent(MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Info,
+      await NotificationAssert.NotificationSent(NotificationType.Info,
         () => viewmodel.ExportCardsCommand.ExecuteAsync(null));
     }
   }

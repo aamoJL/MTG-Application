@@ -26,6 +26,7 @@ public class CardCollectionNotifications
   public static Notification EditListExistsError => new(NotificationType.Error, "Error. List already exists in the collection.");
 
   public static Notification DeleteListSuccess => new(NotificationType.Success, "The list was deleted successfully.");
+  public static Notification DeleteListNotFoundError => new(NotificationType.Error, "Error. Could not find the list.");
   public static Notification DeleteListError => new(NotificationType.Error, "Error. Could not delete list.");
 
   public static Notification ImportCardsSuccessOrWarning(int added, int skipped, int notFound)

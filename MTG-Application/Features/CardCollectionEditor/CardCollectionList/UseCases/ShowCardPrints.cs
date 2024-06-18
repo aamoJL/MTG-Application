@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class ShowCardPrints(CardCollectionListViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionListViewModel, CardCollectionMTGCard>(viewmodel)
   {

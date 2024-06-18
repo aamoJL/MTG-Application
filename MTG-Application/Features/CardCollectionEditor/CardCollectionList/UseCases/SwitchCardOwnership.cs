@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MTGApplication.Features.CardCollection.UseCases;
 
-public partial class CardCollectionPageViewModelCommands
+public partial class CardCollectionEditorViewModelCommands
 {
   public class SwitchCardOwnership(CardCollectionListViewModel viewmodel) : ViewModelCommand<CardCollectionListViewModel, CardCollectionMTGCard>(viewmodel)
   {
