@@ -90,9 +90,9 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
 
   public async Task ChangeCollectionList(MTGCardCollectionList list)
   {
-    if (SelectedCardCollectionList == list) return;
+    if (!ChangeListCommand.CanExecute(list)) return;
 
-    SelectedCardCollectionList = list;
+    SelectedCardCollectionList = list ?? new();
     CardCollectionListViewModel = CreateCardCollectionListViewModel(list);
 
     await CardCollectionListViewModel.UpdateQueryCards();

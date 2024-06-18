@@ -4,6 +4,7 @@ using MTGApplication.Features.CardCollection.Services.Converters;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
+using static MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests.CardCollectionViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
 
