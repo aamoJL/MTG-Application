@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
@@ -12,10 +14,10 @@ using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
-using static MTGApplication.Features.DeckEditor.DeckEditorViewModelCommands;
+using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.ViewModels;
 public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
   public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)

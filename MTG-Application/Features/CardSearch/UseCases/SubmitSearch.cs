@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models;
+﻿using MTGApplication.Features.CardSearch.ViewModels;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Linq;

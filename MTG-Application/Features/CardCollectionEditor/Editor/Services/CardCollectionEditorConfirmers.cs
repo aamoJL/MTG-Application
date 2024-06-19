@@ -1,7 +1,9 @@
-﻿using MTGApplication.General.Services.ConfirmationService;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
+using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.CardCollection.Services;
+namespace MTGApplication.Features.CardCollectionEditor.Editor.Services;
 
 public class CardCollectionEditorConfirmers
 {

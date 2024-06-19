@@ -1,8 +1,9 @@
-﻿using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System.Linq;
 
-namespace MTGApplication.Features.CardCollection.Services.Converters;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollection.Services.Converters;
 
 public class CollectionListToDTOConverter
 {

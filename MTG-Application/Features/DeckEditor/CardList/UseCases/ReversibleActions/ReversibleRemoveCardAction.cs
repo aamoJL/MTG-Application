@@ -1,9 +1,10 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ReversibleCommandService;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions;
 
 public partial class CardListViewModelReversibleActions
 {

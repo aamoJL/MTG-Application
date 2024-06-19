@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <controls:MTGCardChart
-  x:Class="MTGApplication.Features.DeckEditor.ManaDistributionChart"
+  x:Class="MTGApplication.Features.DeckEditor.Charts.Views.Controls.ColorDistributionChart.ManaDistributionChart"
   xmlns:controls="using:MTGApplication.Features.DeckEditor.Charts.Views.Controls"  
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

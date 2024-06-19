@@ -1,7 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 
 /// <summary>
 /// <see cref="MTGCardCollection"/>'s list class

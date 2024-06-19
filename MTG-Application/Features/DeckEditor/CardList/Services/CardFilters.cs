@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using static MTGApplication.General.Models.MTGCardInfo;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.CardList.Services;
 
 /// <summary>
 /// Class that has properties to filter MTG card lists

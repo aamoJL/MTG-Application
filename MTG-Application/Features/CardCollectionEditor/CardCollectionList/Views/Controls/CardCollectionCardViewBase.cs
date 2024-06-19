@@ -1,8 +1,9 @@
 ﻿using Microsoft.UI.Xaml;
-using MTGApplication.General.Views;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.General.Views.Controls;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.CardCollection.Views.Controls;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls;
 public partial class CardCollectionCardViewBase : BasicCardView<CardCollectionMTGCard>
 {
   public static readonly DependencyProperty ShowPrintsCommandProperty =

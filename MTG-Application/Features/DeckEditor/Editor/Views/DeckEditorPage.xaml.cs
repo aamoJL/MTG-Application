@@ -6,10 +6,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.NotificationService;
 using System;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Views;
 [ObservableObject]
 public sealed partial class DeckEditorPage : Page
 {

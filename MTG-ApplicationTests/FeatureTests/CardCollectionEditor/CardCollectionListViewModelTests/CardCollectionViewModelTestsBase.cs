@@ -1,5 +1,6 @@
-﻿using MTGApplication.Features.CardCollection;
-using MTGApplication.Features.CardCollection.Services;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
 using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;

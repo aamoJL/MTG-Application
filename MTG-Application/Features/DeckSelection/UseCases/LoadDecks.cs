@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MTGApplication.Features.DeckSelection.Models;
+using MTGApplication.Features.DeckSelection.ViewModels;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Linq;

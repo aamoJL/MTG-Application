@@ -8,7 +8,7 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 
-namespace MTGApplication.Features.DeckSelection;
+namespace MTGApplication.Features.DeckSelection.ViewModels;
 public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, MTGCardImporter importer) : ViewModelBase, IWorker
 {
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];

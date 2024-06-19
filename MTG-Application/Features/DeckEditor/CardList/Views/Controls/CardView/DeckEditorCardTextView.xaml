@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cardview:DeckEditorCardViewBase
-  x:Class="MTGApplication.Features.DeckEditor.DeckEditorCardTextView"
+  x:Class="MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView.DeckEditorCardTextView"
   xmlns:cardview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView"  
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

@@ -1,11 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl;
 using MTGApplication.General.ViewModels;
 using System.Text;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.CardSearch.Views.Controls;
+namespace MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl;
 
 [ObservableObject]
 public sealed partial class ScryfallCardSearchInputControl : UserControl

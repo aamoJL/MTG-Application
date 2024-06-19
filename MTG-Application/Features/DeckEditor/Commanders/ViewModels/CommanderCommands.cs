@@ -2,14 +2,15 @@
 using MTGApplication.Features.DeckEditor.Commanders.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
-using static MTGApplication.Features.DeckEditor.CommanderViewModelCommands;
+using static MTGApplication.Features.DeckEditor.Commanders.UseCases.CommanderViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 
 public partial class CommanderCommands(DeckEditorViewModel viewmodel, CommanderCommands.CommanderType commanderType)
 {

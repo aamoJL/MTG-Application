@@ -1,16 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.CardCollection.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using static MTGApplication.Features.CardCollection.UseCases.CardCollectionEditorViewModelCommands;
+using static MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCases.CardCollectionEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
 
 public partial class CardCollectionListViewModel : ObservableObject, ISavable, IWorker
 {

@@ -1,12 +1,13 @@
-﻿using MTGApplication.Features.CardCollection.Services;
+﻿using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.UseCases;
 using System;
 using System.Linq;
+using static MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.CardCollectionEditorViewDialogs;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollection.Editor.Services;
 
 public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollectionEditorConfirmers>
 {
@@ -14,7 +15,7 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
   {
     confirmers.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmers.LoadCollectionConfirmer.OnConfirm = async msg => await new ShowOpenDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data.ToArray()));
-    
+
     confirmers.CardCollectionConfirmers.SaveCollectionConfirmer.OnConfirm = async msg => await new ShowSaveDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
     confirmers.CardCollectionConfirmers.OverrideCollectionConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
     confirmers.CardCollectionConfirmers.DeleteCollectionConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));

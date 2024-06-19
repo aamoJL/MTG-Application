@@ -2,12 +2,13 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.CardSearch.Models;
 using MTGApplication.Features.CardSearch.Services;
+using MTGApplication.Features.CardSearch.Views;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using static MTGApplication.Features.CardSearch.UseCases.CardSearchViewModelCommands;
 
-namespace MTGApplication.Features.CardSearch;
+namespace MTGApplication.Features.CardSearch.ViewModels;
 /// <summary>
 /// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>

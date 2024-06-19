@@ -1,8 +1,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
-using MTGApplication.Features.DeckEditor;
-using MTGApplication.Features.DeckSelection;
+using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.Features.DeckEditor.Views;
+using MTGApplication.Features.DeckSelection.Views;
 using MTGApplication.General.ViewModels;
 using MTGApplication.General.Views.AppWindows;
 using System.Threading.Tasks;

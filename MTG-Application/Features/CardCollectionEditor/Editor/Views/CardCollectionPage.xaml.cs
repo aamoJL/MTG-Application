@@ -1,10 +1,12 @@
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Features.CardCollection.Editor.Services;
+using MTGApplication.Features.CardCollection.Editor.ViewModels;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.AppWindows;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.Editor.Views;
 
 public sealed partial class CardCollectionPage : Page
 {

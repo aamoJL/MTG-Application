@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.CardSearch.Services;
+using MTGApplication.Features.CardSearch.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
 using System.Linq;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
-using static MTGApplication.Features.DeckEditor.CardListViewModelCommands.ChangeCardCount;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands.ChangeCardCount;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CardListViewModelTests;
 

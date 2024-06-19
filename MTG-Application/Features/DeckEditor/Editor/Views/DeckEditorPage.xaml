@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-  x:Class="MTGApplication.Features.DeckEditor.DeckEditorPage"
+  x:Class="MTGApplication.Features.DeckEditor.Views.DeckEditorPage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-  xmlns:local="using:MTGApplication.Features.DeckEditor"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
-  xmlns:customControls="using:MTGApplication.General.Views.Controls"
-  xmlns:sys="using:System" 
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:sys="using:System" 
+  xmlns:commanderview="using:MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView" 
+  xmlns:customControls="using:MTGApplication.General.Views.Controls" 
   xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView" 
-  xmlns:models="using:MTGApplication.Features.DeckEditor.Editor.Models"
+  xmlns:cardview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView" 
+  xmlns:models="using:MTGApplication.Features.DeckEditor.Editor.Models" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:deckeditor="using:MTGApplication.Features.DeckEditor" 
+  xmlns:cardtypedistributionchart="using:MTGApplication.Features.DeckEditor.Charts.Views.Controls.CardTypeDistributionChart" 
+  xmlns:colordistributionchart="using:MTGApplication.Features.DeckEditor.Charts.Views.Controls.ColorDistributionChart" 
+  xmlns:viewmodels="using:MTGApplication.Features.DeckEditor.ViewModels"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
@@ -24,12 +29,12 @@
       <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
     </Style>
   </Page.Resources>
-  
+
   <!--#region Keyboard Accelerators -->
-  <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened--> 
+  <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened-->
   <Page.KeyboardAccelerators>
-    <KeyboardAccelerator Key="Z" Modifiers="Control" Invoked="UndoKeyboardAccelerator_Invoked"/>
-    <KeyboardAccelerator Key="Y" Modifiers="Control" Invoked="RedoKeyboardAccelerator_Invoked"/>
+    <KeyboardAccelerator Key="Z" Modifiers="Control" Invoked="UndoKeyboardAccelerator_Invoked" />
+    <KeyboardAccelerator Key="Y" Modifiers="Control" Invoked="RedoKeyboardAccelerator_Invoked" />
     <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="SaveDeckKeyboardAccelerator_Invoked" />
     <KeyboardAccelerator Modifiers="Control" Key="O" Invoked="OpenDeckKeyboardAccelerator_Invoked" />
     <KeyboardAccelerator Modifiers="Control" Key="N" Invoked="NewDeckKeyboardAccelerator_Invoked" />
@@ -38,48 +43,48 @@
   <!--#endregion-->
 
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    
+
     <!--#region Visual State Manager -->
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="DeckNameTitleSaveState">
         <!--NOTE: Changes deck name text to "Unsaved", if the deck has no name-->
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.Name, Mode=OneWay}" To="{x:Bind sys:String.Empty}"/>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.Name, Mode=OneWay}" To="{x:Bind sys:String.Empty}" />
           </VisualState.StateTriggers>
           <VisualState.Setters>
-            <Setter Target="SelectedDeckNameTitle.Text" Value="Unsaved"/>
-            <Setter Target="SelectedDeckNameTitle.FontStyle" Value="Italic"/>
-            <Setter Target="SelectedDeckNameTitle.Foreground" Value="LightGray"/>
+            <Setter Target="SelectedDeckNameTitle.Text" Value="Unsaved" />
+            <Setter Target="SelectedDeckNameTitle.FontStyle" Value="Italic" />
+            <Setter Target="SelectedDeckNameTitle.Foreground" Value="LightGray" />
           </VisualState.Setters>
         </VisualState>
 
         <!--NOTE: Changes deck name text to different color to show that the deck has unsaved changes-->
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True" />
           </VisualState.StateTriggers>
           <VisualState.Setters>
-            <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}"/>
+            <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}" />
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
     </VisualStateManager.VisualStateGroups>
     <!--#endregion-->
 
-    <controls:DockPanel 
-      LastChildFill="True" 
-      Padding="0 0 10 10" 
+    <controls:DockPanel
+      LastChildFill="True"
+      Padding="0 0 10 10"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
       <!--#region Sidebar -->
-      <TabView 
+      <TabView
         x:Name="SidebarTabs"
         controls:DockPanel.Dock="Right"
-        IsAddTabButtonVisible="False" 
-        Width="250" 
-        Margin="10 7 0 0" 
-        HorizontalAlignment="Stretch" 
+        IsAddTabButtonVisible="False"
+        Width="250"
+        Margin="10 7 0 0"
+        HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         BorderThickness="0 2 0 0"
         BorderBrush="{ThemeResource RegionColor}"
@@ -91,7 +96,7 @@
           <Style TargetType="TabViewListView">
             <Setter Property="ItemContainerTransitions">
               <Setter.Value>
-                <TransitionCollection/>
+                <TransitionCollection />
               </Setter.Value>
             </Setter>
           </Style>
@@ -101,19 +106,19 @@
           <!--#region Side Lists -->
           <Grid RowSpacing="5" Margin="0 5 0 0">
             <Grid.RowDefinitions>
-              <RowDefinition Height="auto"/>
-              <RowDefinition Height="auto"/>
-              <RowDefinition Height="*"/>
-              <RowDefinition Height="auto"/>
-              <RowDefinition Height="*"/>
-              <RowDefinition Height="auto"/>
-              <RowDefinition Height="*"/>
+              <RowDefinition Height="auto" />
+              <RowDefinition Height="auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="auto" />
+              <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
 
               <!--#region Commander / Partner -->
-              <local:CommanderTextView 
+              <commanderview:CommanderTextView
                 PrefixText="Commander: "
                 Model="{x:Bind ViewModel.Commander, Mode=OneWay}"
                 EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
@@ -129,8 +134,8 @@
                 OnDropBeginMoveTo="{x:Bind ViewModel.CommanderCommands.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.CommanderCommands.ExecuteMoveCommand, Mode=OneTime}"
                 OnDropImport="{x:Bind ViewModel.CommanderCommands.ImportCommanderCommand, Mode=OneTime}"
-                HoverPreviewEnabled="True"/>
-              <local:CommanderTextView 
+                HoverPreviewEnabled="True" />
+              <commanderview:CommanderTextView
                 PrefixText="Partner: "
                 Model="{x:Bind ViewModel.Partner, Mode=OneWay}"
                 EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
@@ -146,7 +151,7 @@
                 OnDropBeginMoveTo="{x:Bind ViewModel.PartnerCommands.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.PartnerCommands.ExecuteMoveCommand, Mode=OneTime}"
                 OnDropImport="{x:Bind ViewModel.PartnerCommands.ImportCommanderCommand, Mode=OneTime}"
-                HoverPreviewEnabled="True"/>
+                HoverPreviewEnabled="True" />
               <!--#endregion-->
 
             </StackPanel>
@@ -157,12 +162,12 @@
                 <TextBlock Text="Maybe">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..." />
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id" />
                       </MenuFlyoutSubItem>
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed" />
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -187,12 +192,12 @@
               OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
-                <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+                <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked" />
               </cardlistview:AdvancedCardListView.KeyboardAccelerators>
               <cardlistview:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                  <local:DeckEditorCardTextView
-                    d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                  <cardview:DeckEditorCardTextView
+                    d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                     DataContext="{Binding ElementName=MaybeCardsListView, Path=DataContext, Mode=OneTime}"
                     Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
@@ -246,8 +251,8 @@
               </cardlistview:AdvancedCardListView.KeyboardAccelerators>
               <cardlistview:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                  <local:DeckEditorCardTextView
-                    d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                  <cardview:DeckEditorCardTextView
+                    d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                     DataContext="{Binding ElementName=WishCardsListView, Path=DataContext, Mode=OneTime}"
                     Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
@@ -301,8 +306,8 @@
               </cardlistview:AdvancedCardListView.KeyboardAccelerators>
               <cardlistview:AdvancedCardListView.ItemTemplate>
                 <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                  <local:DeckEditorCardTextView
-                    d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+                  <cardview:DeckEditorCardTextView
+                    d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                     DataContext="{Binding ElementName=RemoveCardsListView, Path=DataContext, Mode=OneTime}"
                     Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
@@ -342,19 +347,19 @@
                   <TextBlock Text="Mana Curve"/>
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
-              <local:ManaCurveChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <deckeditor:ManaCurveChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
               <customControls:LinedHeader>
                 <customControls:LinedHeader.Header>
                   <TextBlock Text="Type Distribution"/>
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
-              <local:CardTypeDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <cardtypedistributionchart:CardTypeDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
               <customControls:LinedHeader>
                 <customControls:LinedHeader.Header>
                   <TextBlock Text="Mana Distribution"/>
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
-              <local:ManaDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <colordistributionchart:ManaDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
               <!--#endregion Charts-->
 
             </StackPanel>
@@ -540,8 +545,8 @@
           </cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
           <cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
             <DataTemplate x:DataType="models:DeckEditorMTGCard">
-              <local:DeckEditorCardImageView
-                d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+              <cardview:DeckEditorCardImageView
+                d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                 DataContext="{Binding ElementName=DeckCardsGridView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneTime}"
                 DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
@@ -575,8 +580,8 @@
           </cardlistview:AdvancedCardListView.KeyboardAccelerators>
           <cardlistview:AdvancedCardListView.ItemTemplate>
             <DataTemplate x:DataType="models:DeckEditorMTGCard">
-              <local:DeckEditorCardTextView
-                d:DataContext="{d:DesignInstance Type=local:CardListViewModel}"
+              <cardview:DeckEditorCardTextView
+                d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                 DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneTime}" 
                 HoverPreviewEnabled="True"

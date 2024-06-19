@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.CardCollection;
+﻿using MTGApplication.Features.CardCollectionEditor.Editor.Views;
 using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication.Features.AppWindows.CardCollectionWindow;

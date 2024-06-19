@@ -1,10 +1,12 @@
-﻿using MTGApplication.Features.CardCollection.Services;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.CardCollection.UseCases;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {

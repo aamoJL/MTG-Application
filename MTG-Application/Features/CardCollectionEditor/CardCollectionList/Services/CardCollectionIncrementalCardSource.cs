@@ -1,7 +1,8 @@
-﻿using MTGApplication.General.Services.Importers.CardImporter;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.Features.CardCollection.Services;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 
 public class CardCollectionIncrementalCardSource(MTGCardImporter importer) : IncrementalCardSource<CardCollectionMTGCard>(importer)
 {

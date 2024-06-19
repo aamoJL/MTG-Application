@@ -1,6 +1,7 @@
-﻿using MTGApplication.General.ViewModels;
+﻿using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {

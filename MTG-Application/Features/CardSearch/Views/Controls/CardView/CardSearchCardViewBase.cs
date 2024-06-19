@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.General.Models;
-using MTGApplication.General.Views;
+using MTGApplication.General.Views.Controls;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.CardSearch.Views.Controls.CardView;

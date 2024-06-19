@@ -1,10 +1,10 @@
-﻿using MTGApplication.Features.CardCollection;
-using MTGApplication.Features.CardCollection.Services;
-using MTGApplication.Features.CardCollection.Services.Converters;
+﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services.Converters;
+using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
-using static MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests.CardCollectionViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
 

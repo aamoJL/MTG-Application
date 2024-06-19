@@ -9,11 +9,11 @@ using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
-using static MTGApplication.Features.DeckEditor.CardListViewModelCommands;
-using static MTGApplication.Features.DeckEditor.CardListViewModelCommands.ChangeCardCount;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands.ChangeCardCount;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.ViewModels;
 
 public partial class CardListViewModel(MTGCardImporter importer) : ViewModelBase
 {

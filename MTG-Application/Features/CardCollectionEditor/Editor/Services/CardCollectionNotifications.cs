@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.CardCollection.Services;
+namespace MTGApplication.Features.CardCollectionEditor.Editor.Services;
 
 public class CardCollectionNotifications
 {

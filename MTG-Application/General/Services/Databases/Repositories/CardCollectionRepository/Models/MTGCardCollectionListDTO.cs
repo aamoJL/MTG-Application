@@ -1,5 +1,4 @@
-﻿using MTGApplication.Features.CardCollection;
-using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

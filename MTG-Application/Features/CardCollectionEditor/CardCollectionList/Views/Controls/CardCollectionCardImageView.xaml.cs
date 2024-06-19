@@ -1,6 +1,4 @@
-using MTGApplication.Features.CardCollection.Views.Controls;
-
-namespace MTGApplication.Features.CardCollection.Controls;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls;
 public sealed partial class CardCollectionCardImageView : CardCollectionCardViewBase
 {
   public double OwnedToOpacity(bool owned) => owned ? 1 : .5f;

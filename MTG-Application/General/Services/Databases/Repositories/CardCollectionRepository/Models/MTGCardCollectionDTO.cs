@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.CardCollection;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

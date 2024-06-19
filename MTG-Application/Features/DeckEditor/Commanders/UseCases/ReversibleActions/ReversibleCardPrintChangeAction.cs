@@ -1,8 +1,9 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActions;
 
 public partial class CommanderViewModelReversibleActions
 {

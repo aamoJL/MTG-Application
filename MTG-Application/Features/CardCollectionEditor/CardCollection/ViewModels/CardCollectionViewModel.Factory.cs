@@ -1,4 +1,6 @@
-﻿using MTGApplication.Features.CardCollection.Services;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
@@ -7,7 +9,7 @@ using System;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
 
 public partial class CardCollectionViewModel
 {

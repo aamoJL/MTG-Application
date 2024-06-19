@@ -2,10 +2,11 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckSelection.Models;
+using MTGApplication.Features.DeckSelection.ViewModels;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.DeckSelection;
+namespace MTGApplication.Features.DeckSelection.Views;
 public sealed partial class DeckSelectionPage : Page
 {
   public static readonly DependencyProperty DeckSelectedCommandProperty =

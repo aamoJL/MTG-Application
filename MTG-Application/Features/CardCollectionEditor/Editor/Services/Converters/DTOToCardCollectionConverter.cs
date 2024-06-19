@@ -1,9 +1,11 @@
-﻿using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.CardCollection.Services.Converters;
+namespace MTGApplication.Features.CardCollectionEditor.Editor.Services.Converters;
 
 public class DTOToCardCollectionConverter(MTGCardImporter importer)
 {

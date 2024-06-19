@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.CardCollection.Services;
-using MTGApplication.Features.CardCollection.Services.Converters;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services.Converters;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
@@ -10,10 +12,10 @@ using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using static MTGApplication.Features.CardCollection.UseCases.CardCollectionEditorViewModelCommands;
+using static MTGApplication.Features.CardCollectionEditor.CardCollection.UseCases.CardCollectionEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
 
 public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImporter importer) : ViewModelBase, IWorker, ISavable
 {

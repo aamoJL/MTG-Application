@@ -1,8 +1,10 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
@@ -21,7 +23,7 @@ public partial class CardListViewModelCommands
       Viewmodel.UndoStack.PushAndExecute(
         new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(card, card.Count, newValue, Viewmodel.CardCopier)
         {
-          ReversibleAction = new CardListViewModelReversibleActions.ReversibleCardCountChangeAction(Viewmodel)
+          ReversibleAction = new ReversibleCardCountChangeAction(Viewmodel)
         });
     }
   }

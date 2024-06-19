@@ -1,10 +1,9 @@
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
-using MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using System.Windows.Input;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
 public sealed partial class CommanderTextView : DeckEditorCardViewBase
 {
   public static readonly DependencyProperty PrefixTextProperty =

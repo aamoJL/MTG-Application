@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
-using MTGApplication.General.Views;
+using MTGApplication.General.Views.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using System;
 using Windows.ApplicationModel.DataTransfer;

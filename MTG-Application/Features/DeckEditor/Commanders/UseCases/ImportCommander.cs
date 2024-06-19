@@ -1,10 +1,12 @@
 ﻿using MTGApplication.Features.DeckEditor.Commanders.Services;
+using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
-namespace MTGApplication.Features.DeckEditor;
+
+namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {

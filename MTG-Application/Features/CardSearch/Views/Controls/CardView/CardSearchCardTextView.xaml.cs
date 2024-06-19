@@ -1,6 +1,4 @@
-using MTGApplication.Features.CardSearch.Views.Controls.CardView;
-
-namespace MTGApplication.Features.CardSearch.Controls;
+namespace MTGApplication.Features.CardSearch.Views.Controls.CardView;
 public sealed partial class CardSearchCardTextView : CardSearchCardViewBase
 {
   public CardSearchCardTextView() => InitializeComponent();

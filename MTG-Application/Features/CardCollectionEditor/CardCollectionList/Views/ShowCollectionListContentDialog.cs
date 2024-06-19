@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views;
 
 public partial class CardCollectionEditorViewDialogs
 {

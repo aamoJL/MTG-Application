@@ -1,7 +1,8 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.ViewModels;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActions;
 
 public partial class CommanderViewModelReversibleActions
 {
@@ -13,7 +14,7 @@ public partial class CommanderViewModelReversibleActions
     protected override void ReverseActionMethod(DeckEditorMTGCard card)
       => ChangeCommander(card);
 
-    private void ChangeCommander(DeckEditorMTGCard card) 
+    private void ChangeCommander(DeckEditorMTGCard card)
       => Viewmodel.OnChange?.Invoke(card);
   }
 }

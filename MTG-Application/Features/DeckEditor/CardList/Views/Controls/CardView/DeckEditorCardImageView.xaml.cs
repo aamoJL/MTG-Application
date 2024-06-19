@@ -1,8 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
-using static MTGApplication.Features.DeckEditor.CardListViewModelCommands.ChangeCardCount;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands.ChangeCardCount;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 public sealed partial class DeckEditorCardImageView : DeckEditorCardViewBase
 {
   public DeckEditorCardImageView() => InitializeComponent();

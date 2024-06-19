@@ -1,10 +1,11 @@
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardSearch.Services;
+using MTGApplication.Features.CardSearch.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Linq;
 
-namespace MTGApplication.Features.CardSearch;
+namespace MTGApplication.Features.CardSearch.Views;
 public sealed partial class CardSearchPage : Page
 {
   public CardSearchPage()
@@ -12,13 +13,13 @@ public sealed partial class CardSearchPage : Page
     InitializeComponent();
 
     ViewModel.Confirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg)
-      => (await new DraggableMTGCardGridViewDialog($"{msg.Title} (Prints can be dragged)", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      => await new DraggableMTGCardGridViewDialog($"{msg.Title} (Prints can be dragged)", "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
       {
         Items = msg.Data.ToArray(),
         SecondaryButtonText = string.Empty,
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close"
-      }.ShowAsync(new(XamlRoot)) as MTGCard);
+      }.ShowAsync(new(XamlRoot)) as MTGCard;
   }
 
   public CardSearchViewModel ViewModel { get; } = new(App.MTGCardImporter);

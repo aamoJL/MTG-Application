@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Data;
 using System;
 
-namespace MTGApplication.Features.CardCollection.Views.Controls.Converters;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls.Converters;
 
 public class BoolToSelectionModeConverter : IValueConverter
 {

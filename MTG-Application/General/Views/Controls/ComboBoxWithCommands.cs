@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.CardCollection;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using System.Linq;
 using System.Windows.Input;
 

@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using System.Collections.ObjectModel;
 
-namespace MTGApplication.Features.CardCollection;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
 
 public class MTGCardCollection
 {

@@ -1,9 +1,10 @@
-﻿using MTGApplication.General.Services.Importers.CardImporter;
+﻿using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {

@@ -2,7 +2,7 @@
 using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
-namespace MTGApplication.Features.CardCollection.Services;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 
 public class CardCollectionListConfirmers
 {

@@ -6,8 +6,8 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:cardsearch="using:MTGApplication.Features.CardSearch"
-  xmlns:deckeditor="using:MTGApplication.General.Views.Controls"
+  xmlns:deckeditor="using:MTGApplication.General.Views.Controls" 
+  xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 

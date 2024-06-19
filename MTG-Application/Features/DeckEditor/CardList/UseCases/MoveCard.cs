@@ -1,12 +1,14 @@
 ﻿using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
@@ -21,7 +23,7 @@ public partial class CardListViewModelCommands
           if (await Viewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
             Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
             {
-              ReversibleAction = new CardListViewModelReversibleActions.ReversibleAddCardAction(Viewmodel)
+              ReversibleAction = new ReversibleAddCardAction(Viewmodel)
             });
           else
             Viewmodel.UndoStack.ActiveCombinedCommand.Cancel();
@@ -29,7 +31,7 @@ public partial class CardListViewModelCommands
         else
           Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
           {
-            ReversibleAction = new CardListViewModelReversibleActions.ReversibleAddCardAction(Viewmodel)
+            ReversibleAction = new ReversibleAddCardAction(Viewmodel)
           });
       }
     }
@@ -40,7 +42,7 @@ public partial class CardListViewModelCommands
         => Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
           new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
           {
-            ReversibleAction = new CardListViewModelReversibleActions.ReversibleRemoveCardAction(Viewmodel)
+            ReversibleAction = new ReversibleRemoveCardAction(Viewmodel)
           });
     }
 

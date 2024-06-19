@@ -1,9 +1,11 @@
 ﻿using MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleCommands;
+using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
+using static MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActions.CommanderViewModelReversibleActions;
 
-namespace MTGApplication.Features.DeckEditor;
+namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {
@@ -16,7 +18,7 @@ public partial class CommanderViewModelCommands
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
           new ReversibleCommanderChangeCommand(null, Viewmodel.GetCommander(), Viewmodel.CardCopier)
           {
-            ReversibleAction = new CommanderViewModelReversibleActions.ReversibleChangeCommanderAction(Viewmodel)
+            ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
           });
       }
     }
@@ -27,7 +29,7 @@ public partial class CommanderViewModelCommands
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCommanderChangeCommand(card, Viewmodel.GetCommander(), Viewmodel.CardCopier)
         {
-          ReversibleAction = new CommanderViewModelReversibleActions.ReversibleChangeCommanderAction(Viewmodel)
+          ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
         });
         await Task.Yield();
       }

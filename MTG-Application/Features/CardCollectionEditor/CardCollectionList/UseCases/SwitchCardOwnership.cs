@@ -1,7 +1,9 @@
-﻿using MTGApplication.General.ViewModels;
+﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
+using MTGApplication.General.ViewModels;
 using System.Linq;
 
-namespace MTGApplication.Features.CardCollection.UseCases;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {

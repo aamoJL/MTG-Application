@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-  x:Class="MTGApplication.Features.CardSearch.CardSearchPage"
+  x:Class="MTGApplication.Features.CardSearch.Views.CardSearchPage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:customControls="using:MTGApplication.Features.CardSearch.Controls" 
   xmlns:sys="using:System"
   xmlns:ui="using:CommunityToolkit.WinUI.UI"
-  xmlns:cardsearch="using:MTGApplication.Features.CardSearch" 
   xmlns:models="using:MTGApplication.General.Models" 
-  xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls"
+  xmlns:customControls="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
+  xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl" 
+  xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -69,7 +69,7 @@
           <controls:AdaptiveGridView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardImageView
-                d:DataContext="{d:DesignInstance Type=cardsearch:CardSearchViewModel}"
+                d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
                 DataContext="{Binding ElementName=SearcCardsImageView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneWay}"
                 ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
@@ -89,7 +89,7 @@
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardTextView 
-                d:DataContext="{d:DesignInstance Type=cardsearch:CardSearchViewModel}"
+                d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
                 DataContext="{Binding ElementName=SearcCardsTextView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneWay}"
                 ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"

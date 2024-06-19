@@ -1,6 +1,6 @@
 ﻿using MTGApplication.General.Services.ConfirmationService;
 
-namespace MTGApplication.Features.CardCollection.Services;
+namespace MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 
 public class CardCollectionConfirmers
 {
