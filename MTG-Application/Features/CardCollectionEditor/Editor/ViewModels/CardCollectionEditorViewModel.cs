@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.CardCollection.Services;
 using MTGApplication.General.Services.Databases.Repositories;
-using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
@@ -24,6 +23,8 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
     Repository = repository;
     ClipboardService = clipboardService;
 
+    PropertyChanged += CardCollectionEditorViewModel_PropertyChanged;
+
     CardCollectionViewModel = CreateCardCollectionViewModel(new());
     CardCollectionListViewModel = CreateCardCollectionListViewModel(new());
   }
@@ -31,10 +32,10 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
   public MTGCardImporter Importer { get; }
   public CardCollectionEditorConfirmers Confirmers { get; }
   public Notifier Notifier { get; }
-  public IRepository<MTGCardCollectionDTO> Repository { get; } = new CardCollectionDTORepository();
+  public IRepository<MTGCardCollectionDTO> Repository { get; }
   public ClipboardService ClipboardService { get; }
-  public IWorker Worker => this;
 
+  public IWorker Worker => this;
   public CardCollectionViewModel CardCollectionViewModel
   {
     get => cardCollectionViewModel;
@@ -59,15 +60,12 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
   public bool IsBusy
   {
     get => isBusy || CardCollectionViewModel.IsBusy || CardCollectionListViewModel.IsBusy;
-    set
-    {
-      if (isBusy != value)
-        isBusy = value;
-
-      OnPropertyChanged(nameof(IsBusy));
-    }
+    set => SetProperty(ref isBusy, value);
   }
+
   [ObservableProperty] private MTGCardCollectionList selectedCardCollectionList = new();
+  // Used to bind collection name to visual state trigger, so it does not update when CardCollectionViewModel changes with the same name
+  [ObservableProperty] private string collectionName;
 
   public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => (confirmUnsavedChanges ??= new ConfirmUnsavedChanges(this)).Command;
   public IAsyncRelayCommand NewCollectionCommand => (newCollection ??= new ConfirmNewCollection(this)).Command;
@@ -114,14 +112,8 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
     {
       switch (e.PropertyName)
       {
-        case nameof(ISavable.HasUnsavedChanges):
-          if (!viewmodel.HasUnsavedChanges)
-          {
-            IsBusy = false;
-            cardCollectionListViewModel.HasUnsavedChanges = false;
-          }
-          OnPropertyChanged(nameof(HasUnsavedChanges));
-          break;
+        case nameof(CardCollectionViewModel.Name): CollectionName = CardCollectionViewModel.Name; break;
+        case nameof(ISavable.HasUnsavedChanges): HasUnsavedChanges = viewmodel.HasUnsavedChanges; break;
         case nameof(IWorker.IsBusy): OnPropertyChanged(nameof(IsBusy)); break;
       }
     };
@@ -145,11 +137,19 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
     {
       switch (e.PropertyName)
       {
-        case nameof(ISavable.HasUnsavedChanges): OnPropertyChanged(nameof(HasUnsavedChanges)); break;
+        case nameof(ISavable.HasUnsavedChanges): HasUnsavedChanges = viewmodel.HasUnsavedChanges; break;
         case nameof(IWorker.IsBusy): OnPropertyChanged(nameof(IsBusy)); break;
       }
     };
 
     return viewmodel;
+  }
+
+  private void CardCollectionEditorViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(CardCollectionViewModel): CollectionName = CardCollectionViewModel.Name; break;
+    }
   }
 }

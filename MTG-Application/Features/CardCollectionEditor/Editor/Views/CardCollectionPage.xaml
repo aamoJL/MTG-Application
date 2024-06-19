@@ -11,12 +11,18 @@
   xmlns:sys="using:System" 
   xmlns:localControls="using:MTGApplication.Features.CardCollection.Controls" 
   xmlns:customControls="using:MTGApplication.General.Views.Controls" 
-  xmlns:converters="using:MTGApplication.Features.CardCollection.Views.Controls.Converters"
+  xmlns:converters="using:MTGApplication.Features.CardCollection.Views.Controls.Converters" 
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
 
   <Page.Resources>
+    <!-- Setting button style on App.xaml did not work so it has to be done here -->
+    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
+    </Style>
+
     <converters:BoolToSelectionModeConverter x:Key="BoolToSelectionModeConverter"/>
   </Page.Resources>
 
@@ -30,6 +36,35 @@
   <!--#endregion-->
 
   <Grid>
+
+    <!--#region Visual State Manager -->
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="CollectionNameTitleSaveState">
+        <!--NOTE: Changes name text to "Unsaved" if the collection has no name-->
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.CollectionName, Mode=OneWay}" To="{x:Bind sys:String.Empty}"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedCollectionNameTitle.Text" Value="Unsaved"/>
+            <Setter Target="SelectedCollectionNameTitle.FontStyle" Value="Italic"/>
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="LightGray"/>
+          </VisualState.Setters>
+        </VisualState>
+
+        <!--NOTE: Changes name text to different color to show that the collection has unsaved changes-->
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    <!--#endregion-->
+
     <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
 
       <!--#region Command bar -->
@@ -95,7 +130,7 @@
 
           <!--#region Collection Info -->
           <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10 0 0 0">
-            <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind ViewModel.CardCollectionViewModel.Name, Mode=OneWay}" FontWeight="Bold"/>
+            <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind ViewModel.CollectionName, Mode=OneWay}" FontWeight="Bold"/>
             <TextBlock>
               <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.CardCollectionListViewModel.OwnedCards.Count), Mode=OneWay}"/>
               <Run Text="{x:Bind sys:String.Format('{0} cards collected', ViewModel.CardCollectionListViewModel.QueryCardsViewModel.TotalCardCount), Mode=OneWay}"/>
