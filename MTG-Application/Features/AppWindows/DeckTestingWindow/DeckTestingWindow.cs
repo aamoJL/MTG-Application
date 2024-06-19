@@ -3,9 +3,9 @@ using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication.Features.AppWindows.DeckTestingWindow;
 
-public class CardTestingWindow : ThemedWindow
+public class DeckTestingWindow : ThemedWindow
 {
-  public CardTestingWindow()
+  public DeckTestingWindow()
   {
     Title = "MTG Deck Testing";
 

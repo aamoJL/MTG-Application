@@ -29,6 +29,7 @@ public static partial class DialogService
     {
       var contentDialog = dialog.GetDialog(XamlRoot);
 
+      // TODO: opening multiple dialogs still crashes the app
       // Only one dialog can be open at once on the window
       if (force && CurrentDialog != null) { CurrentDialog.Hide(); CurrentDialog = null; }
       if (CurrentDialog != null) { return ContentDialogResult.None; }

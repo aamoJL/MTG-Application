@@ -337,7 +337,7 @@
               <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button Content="Tokens" Command="{x:Bind ViewModel.ShowDeckTokensCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
                 <Button Content="EDHREC" Command="{x:Bind ViewModel.OpenEdhrecSearchWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
-                <Button Content="Playtest" Command="{x:Bind ViewModel.OpenPlaytestWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+                <Button Content="Playtest" Command="{x:Bind ViewModel.OpenDeckTestingWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
               </StackPanel>
               <!--#endregion-->
 

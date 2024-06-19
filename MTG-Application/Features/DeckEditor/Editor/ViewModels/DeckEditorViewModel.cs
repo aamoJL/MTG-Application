@@ -5,6 +5,7 @@ using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
+using MTGApplication.Features.DeckEditor.Editor.UseCases;
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
@@ -20,6 +21,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
+  // TODO: DeckViewModel like CardCollectionPage's CardCollectionViewModel
   public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
   {
     Importer = importer;
@@ -39,6 +41,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     PartnerCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Partner);
 
     Deck = deck ?? new();
+
+    PropertyChanged += DeckEditorViewModel_PropertyChanged;
   }
 
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
@@ -59,7 +63,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public MTGCardDeckDTO DTO => DeckEditorMTGDeckToDTOConverter.Convert(Deck);
   public IWorker Worker => this;
 
-  public string Name { get => Deck.Name; set { Deck.Name = value; OnPropertyChanged(nameof(Name)); } }
+  public string Name { get => Deck.Name; set { if (deckName != value) { deckName = value; Deck.Name = value; OnPropertyChanged(nameof(Name)); } } }
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
   public double Price => Deck.DeckCards.Sum(x => x.Info.Price * x.Count) + (Deck.Commander?.Info.Price ?? 0) + (Deck.CommanderPartner?.Info.Price ?? 0);
   public DeckEditorMTGCard Commander
@@ -69,10 +73,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     {
       Deck.Commander = value;
       OnPropertyChanged(nameof(Commander));
-      OnPropertyChanged(nameof(Size));
-      OnPropertyChanged(nameof(Price));
-      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+
     }
   }
   public DeckEditorMTGCard Partner
@@ -82,42 +83,13 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     {
       Deck.CommanderPartner = value;
       OnPropertyChanged(nameof(Partner));
-      OnPropertyChanged(nameof(Size));
-      OnPropertyChanged(nameof(Price));
-      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-      ShowDeckTokensCommand.NotifyCanExecuteChanged();
     }
   }
 
   private DeckEditorMTGDeck Deck
   {
     get => deck;
-    set
-    {
-      if (deck == value) return;
-
-      var oldName = deck != null ? Name : string.Empty;
-
-      deck = value;
-
-      DeckCardList.Cards = deck.DeckCards;
-      MaybeCardList.Cards = deck.Maybelist;
-      WishCardList.Cards = deck.Wishlist;
-      RemoveCardList.Cards = deck.Removelist;
-
-      // Can't invoke changed event for the name if the name was already empty because visual state binding would break.
-      if (Name != oldName) OnPropertyChanged(nameof(Name));
-      OnPropertyChanged(nameof(Deck));
-      OnPropertyChanged(nameof(Size));
-      OnPropertyChanged(nameof(Price));
-      OnPropertyChanged(nameof(Commander));
-      OnPropertyChanged(nameof(Partner));
-
-      SaveDeckCommand.NotifyCanExecuteChanged();
-      DeleteDeckCommand.NotifyCanExecuteChanged();
-      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-      ShowDeckTokensCommand.NotifyCanExecuteChanged();
-    }
+    set => SetProperty(ref deck, value);
   }
 
   public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => (confirmUnsavedChanges ??= new ConfirmUnsavedChanges(this)).Command;
@@ -129,7 +101,9 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public IRelayCommand RedoCommand => (redo ??= new Redo(this)).Command;
   public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => (openEdhrecCommanderWebsite ??= new OpenEdhrecCommanderWebsite(this)).Command;
   public IAsyncRelayCommand ShowDeckTokensCommand => (showDeckTokens ??= new ShowDeckTokens(this)).Command;
+  public IRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
 
+  private string deckName = string.Empty;
   private DeckEditorMTGDeck deck;
   private ConfirmUnsavedChanges confirmUnsavedChanges;
   private NewDeck newDeck;
@@ -140,17 +114,12 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private Redo redo;
   private OpenEdhrecCommanderWebsite openEdhrecCommanderWebsite;
   private ShowDeckTokens showDeckTokens;
+  private OpenDeckTestingWindow openDeckTestingWindow;
 
   [RelayCommand]
   private async Task OpenEdhrecSearchWindow()
   {
     // TODO: open EDHREC search window use case
-  }
-
-  [RelayCommand]
-  private async Task OpenPlaytestWindow()
-  {
-    // TODO: open testing window use case
   }
 
   public void SetDeck(DeckEditorMTGDeck deck)
@@ -209,5 +178,35 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       OnChange = commanderType == CommanderCommands.CommanderType.Commander ? OnCommanderChanged : OnPartnerChanged,
       Worker = this,
     };
+  }
+
+  private void DeckEditorViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(Deck):
+        Name = Deck.Name;
+
+        DeckCardList.Cards = deck.DeckCards;
+        MaybeCardList.Cards = deck.Maybelist;
+        WishCardList.Cards = deck.Wishlist;
+        RemoveCardList.Cards = deck.Removelist;
+
+        OnPropertyChanged(nameof(Size));
+        OnPropertyChanged(nameof(Price));
+        OnPropertyChanged(nameof(Commander));
+        OnPropertyChanged(nameof(Partner));
+        SaveDeckCommand.NotifyCanExecuteChanged();
+        DeleteDeckCommand.NotifyCanExecuteChanged();
+        break;
+      case nameof(Size):
+        ShowDeckTokensCommand.NotifyCanExecuteChanged();
+        OpenDeckTestingWindowCommand.NotifyCanExecuteChanged(); break;
+      case nameof(Commander):
+      case nameof(Partner):
+        OnPropertyChanged(nameof(Size));
+        OnPropertyChanged(nameof(Price));
+        OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged(); break;
+    }
   }
 }
