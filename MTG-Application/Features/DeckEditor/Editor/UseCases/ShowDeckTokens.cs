@@ -1,6 +1,7 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Linq;
@@ -28,7 +29,7 @@ public partial class DeckEditorViewModelCommands
       if (Viewmodel.Partner != null)
         stringBuilder.AppendJoin(Environment.NewLine, Viewmodel.Partner.Info.Tokens.Select(t => t.ScryfallId.ToString()));
 
-      var tokens = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(stringBuilder.ToString()))).Found
+      var tokens = (await Viewmodel.Worker.DoWork(new FetchCardsWithImportString(Viewmodel.Importer).Execute(stringBuilder.ToString()))).Found
         .DistinctBy(t => t.Info.OracleId).Select(x => x.Info); // Filter duplicates out using OracleId
 
       await Viewmodel.Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens.Select(x => new MTGCard(x))));

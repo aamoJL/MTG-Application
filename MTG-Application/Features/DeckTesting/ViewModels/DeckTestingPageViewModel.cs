@@ -1,48 +1,42 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.General.Models;
+using MTGApplication.Features.DeckTesting.Models;
+using MTGApplication.Features.DeckTesting.UseCases;
 using System;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.DeckTesting.ViewModels;
-public partial class DeckTestingPageViewModel : ObservableObject
+public partial class DeckTestingPageViewModel(DeckTestingDeck deck) : ObservableObject
 {
+  public DeckTestingDeck Deck { get; } = deck;
+
+  public ObservableCollection<DeckTestingMTGCard> Library { get; } = [];
+  public ObservableCollection<DeckTestingMTGCard> Graveyard { get; } = [];
+  public ObservableCollection<DeckTestingMTGCard> Exile { get; } = [];
+  public ObservableCollection<DeckTestingMTGCard> Hand { get; } = [];
+  public ObservableCollection<DeckTestingMTGCard> CommandZone { get; } = [];
+
   [ObservableProperty] private int playerHP = 40;
   [ObservableProperty] private int enemyHP = 40;
   [ObservableProperty] private int turnCount = 0;
 
-  public ObservableCollection<MTGCard> Library { get; } = [];
-  public ObservableCollection<MTGCard> Graveyard { get; } = [];
-  public ObservableCollection<MTGCard> Exile { get; } = [];
-  public ObservableCollection<MTGCard> Hand { get; } = [];
-  public ObservableCollection<MTGCard> CommandZone { get; } = [];
-  public ObservableCollection<MTGCard> Tokens { get; } = [];
-
   public event Action NewGameStarted;
   public event Action NewTurnStarted;
 
-  [RelayCommand]
-  private void NewGame()
-  {
+  public IRelayCommand StartNewGameCommand => (startNewGame ??= new StartNewGame(this)).Command;
+  public IRelayCommand DrawCardCommand => (drawCard ??= new DrawCard(this)).Command;
+  public IRelayCommand StartNewTurnCommand => (startNewTurn ??= new StartNewTurn(this)).Command;
+  public IRelayCommand ShuffleDeckCommand => (shuffleDeck ??= new ShuffleDeck(this)).Command;
 
-  }
+  private StartNewGame startNewGame;
+  private DrawCard drawCard;
+  private StartNewTurn startNewTurn;
+  private ShuffleDeck shuffleDeck;
 
-  [RelayCommand]
-  private void Draw()
-  {
+  public void StartNewGame() => NewGameStarted?.Invoke();
 
-  }
+  public void StartNewTurn() => NewTurnStarted?.Invoke();
 
-  [RelayCommand]
-  private void NewTurn()
-  {
-
-  }
-
-  [RelayCommand]
-  private void Shuffle()
-  {
-
-  }
+  // TODO: fetch tokens here so the window can open immediately
 }
 

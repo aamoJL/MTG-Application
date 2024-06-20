@@ -35,7 +35,7 @@
       <!--#region File -->
       <MenuBar controls:DockPanel.Dock="Top">
         <MenuBarItem Title="File">
-          <MenuFlyoutItem Text="New Game" Command="{x:Bind ViewModel.NewGameCommand, Mode=OneTime}"/>
+          <MenuFlyoutItem Text="New Game" Command="{x:Bind ViewModel.StartNewGameCommand, Mode=OneTime}"/>
         </MenuBarItem>
       </MenuBar>
       <!--#endregion-->
@@ -67,7 +67,7 @@
             </Grid.RowDefinitions>
             <Button 
           Grid.Row="0" 
-          Command="{x:Bind ViewModel.DrawCommand, Mode=OneTime}" 
+          Command="{x:Bind ViewModel.DrawCardCommand, Mode=OneTime}" 
           Content="Draw a Card"
           FontSize="24"
           FontWeight="Bold"
@@ -76,7 +76,7 @@
           Margin="0 5 0 0"/>
             <Button 
           Grid.Row="1" 
-          Command="{x:Bind ViewModel.NewTurnCommand, Mode=OneTime}" 
+          Command="{x:Bind ViewModel.StartNewTurnCommand, Mode=OneTime}" 
           Content="New Turn"
           FontSize="24"
           FontWeight="Bold"
@@ -202,7 +202,7 @@
           </customcontrols:LinedHeader>
           <ListView 
           Grid.Row="1"
-          ItemsSource="{x:Bind ViewModel.Tokens, Mode=OneTime}"
+          ItemsSource="{x:Bind ViewModel.Deck.Tokens, Mode=OneWay}"
           SelectionMode="None"
           BorderBrush="{ThemeResource RegionBrush}"
           BorderThickness="1 0 0 0"
@@ -297,7 +297,7 @@
 
             <!--#region Library Buttons -->
             <StackPanel Grid.Row="1" Margin="10 0" Spacing="10">
-              <Button HorizontalAlignment="Stretch" Content="Shuffle" Command="{x:Bind ViewModel.ShuffleCommand, Mode=OneTime}"/>
+              <Button HorizontalAlignment="Stretch" Content="Shuffle" Command="{x:Bind ViewModel.ShuffleDeckCommand, Mode=OneTime}"/>
               <Button  x:Name="LibraryVisibilitySwitchButton"  HorizontalAlignment="Stretch" Command="{x:Bind LibraryVisibilitySwitchCommand, Mode=OneTime}"  Content="Show library"/>
             </StackPanel>
             <!--#endregion-->

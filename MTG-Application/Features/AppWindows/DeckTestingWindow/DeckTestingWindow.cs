@@ -1,14 +1,15 @@
-﻿using MTGApplication.Features.DeckTesting.Views;
+﻿using MTGApplication.Features.DeckTesting.Models;
+using MTGApplication.Features.DeckTesting.Views;
 using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication.Features.AppWindows.DeckTestingWindow;
 
 public class DeckTestingWindow : ThemedWindow
 {
-  public DeckTestingWindow()
+  public DeckTestingWindow(DeckTestingDeck deck)
   {
     Title = "MTG Deck Testing";
 
-    Navigate(typeof(DeckTestingPage));
+    Navigate(typeof(DeckTestingPage), deck);
   }
 }

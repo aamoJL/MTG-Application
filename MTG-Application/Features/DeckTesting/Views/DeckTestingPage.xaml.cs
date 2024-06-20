@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.ViewModels;
 
@@ -9,23 +10,20 @@ namespace MTGApplication.Features.DeckTesting.Views;
 [ObservableObject]
 public sealed partial class DeckTestingPage : Page
 {
-  public DeckTestingPage()
-  {
-    InitializeComponent();
+  public DeckTestingPage() => InitializeComponent();
 
-    Loaded += DeckTestingPage_Loaded;
-  }
-
-  private void DeckTestingPage_Loaded(object sender, RoutedEventArgs e)
+  protected override void OnNavigatedTo(NavigationEventArgs e)
   {
-    Loaded -= DeckTestingPage_Loaded;
+    base.OnNavigatedTo(e);
+
+    ViewModel = new(e.Parameter as DeckTestingDeck);
 
     ViewModel.NewGameStarted += OnNewGameStarted;
     ViewModel.NewTurnStarted += OnNewTurnStarted;
-    ViewModel.NewGameCommand.Execute(null);
+    ViewModel.StartNewGameCommand.Execute(null);
   }
 
-  public DeckTestingPageViewModel ViewModel { get; } = new();
+  public DeckTestingPageViewModel ViewModel { get; set; }
 
   [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
 

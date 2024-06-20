@@ -101,7 +101,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public IRelayCommand RedoCommand => (redo ??= new Redo(this)).Command;
   public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => (openEdhrecCommanderWebsite ??= new OpenEdhrecCommanderWebsite(this)).Command;
   public IAsyncRelayCommand ShowDeckTokensCommand => (showDeckTokens ??= new ShowDeckTokens(this)).Command;
-  public IRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
+  public IAsyncRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
 
   private string deckName = string.Empty;
   private DeckEditorMTGDeck deck;
