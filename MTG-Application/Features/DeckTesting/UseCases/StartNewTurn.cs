@@ -1,6 +1,5 @@
 ﻿using MTGApplication.Features.DeckTesting.ViewModels;
 using MTGApplication.General.ViewModels;
-using System;
 
 namespace MTGApplication.Features.DeckTesting.UseCases;
 
@@ -8,6 +7,8 @@ public class StartNewTurn(DeckTestingPageViewModel viewmodel) : ViewModelCommand
 {
   protected override void Execute()
   {
-    throw new NotImplementedException();
+    Viewmodel.TurnCount++;
+    Viewmodel.DrawCardCommand.Execute(null);
+    Viewmodel.RaiseNewTurnStarted();
   }
 }

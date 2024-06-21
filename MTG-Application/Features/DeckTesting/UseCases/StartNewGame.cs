@@ -29,6 +29,6 @@ public class StartNewGame(DeckTestingPageViewModel viewmodel) : ViewModelCommand
     for (var i = 0; i < 7; i++)
       Viewmodel.DrawCardCommand.Execute(null); // Draw 7 cards from library to hand
 
-    Viewmodel.StartNewGame();
+    Viewmodel.RaiseNewGameStarted();
   }
 }

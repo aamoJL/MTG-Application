@@ -33,9 +33,9 @@ public partial class DeckTestingPageViewModel(DeckTestingDeck deck) : Observable
   private StartNewTurn startNewTurn;
   private ShuffleDeck shuffleDeck;
 
-  public void StartNewGame() => NewGameStarted?.Invoke();
+  public void RaiseNewGameStarted() => NewGameStarted?.Invoke();
 
-  public void StartNewTurn() => NewTurnStarted?.Invoke();
+  public void RaiseNewTurnStarted() => NewTurnStarted?.Invoke();
 
   // TODO: fetch tokens here so the window can open immediately
 }
