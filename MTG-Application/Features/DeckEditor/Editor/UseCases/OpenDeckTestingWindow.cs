@@ -28,7 +28,7 @@ public class OpenDeckTestingWindow(DeckEditorViewModel viewmodel) : ViewModelAsy
     var tokens = await Viewmodel.Worker.DoWork(GetTokens(cardsWithTokens));
 
     var testingDeck = new DeckTestingDeck(
-      DeckCards: Viewmodel.DeckCardList.Cards.SelectMany(c => Enumerable.Repeat(c as MTGCard, c.Count)).ToList(),
+      DeckCards: Viewmodel.DeckCardList.Cards.SelectMany(c => Enumerable.Range(1, c.Count).Select(i => c as MTGCard)).ToList(),
       Commander: Viewmodel.Commander,
       Partner: Viewmodel.Partner,
       Tokens: tokens);
