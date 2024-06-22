@@ -16,7 +16,8 @@ public sealed partial class DeckTestingPage : Page
   {
     base.OnNavigatedTo(e);
 
-    ViewModel = new(e.Parameter as DeckTestingDeck);
+    ViewModel = new DeckTestingPageViewModel.Factory(App.MTGCardImporter)
+      .Build(e.Parameter as DeckTestingDeck);
 
     ViewModel.NewGameStarted += OnNewGameStarted;
     ViewModel.NewTurnStarted += OnNewTurnStarted;

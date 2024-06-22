@@ -18,6 +18,8 @@ public partial class DeckEditorViewModelCommands
 
     protected override async Task Execute()
     {
+      if (!CanExecute()) return;
+
       var stringBuilder = new StringBuilder();
 
       stringBuilder.AppendJoin(Environment.NewLine, Viewmodel.DeckCardList.Cards.Where(c => c.Info.Tokens.Length > 0).Select(

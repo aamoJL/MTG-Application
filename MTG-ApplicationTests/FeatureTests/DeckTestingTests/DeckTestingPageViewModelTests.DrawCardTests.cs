@@ -16,8 +16,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Library.Clear();
@@ -31,8 +30,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
@@ -46,8 +44,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
@@ -65,8 +62,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));

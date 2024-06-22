@@ -7,9 +7,11 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
   xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
-  xmlns:sys="using:System" xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:sys="using:System" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
   xmlns:models="using:MTGApplication.Features.DeckTesting.Models" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:cardview="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -66,23 +68,23 @@
               <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Button 
-          Grid.Row="0" 
-          Command="{x:Bind ViewModel.DrawCardCommand, Mode=OneTime}" 
-          Content="Draw a Card"
-          FontSize="24"
-          FontWeight="Bold"
-          HorizontalAlignment="Stretch" 
-          VerticalAlignment="Stretch"
-          Margin="0 5 0 0"/>
+              Grid.Row="0" 
+              Command="{x:Bind ViewModel.DrawCardCommand, Mode=OneTime}" 
+              Content="Draw a Card"
+              FontSize="24"
+              FontWeight="Bold"
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch"
+              Margin="0 5 0 0"/>
             <Button 
-          Grid.Row="1" 
-          Command="{x:Bind ViewModel.StartNewTurnCommand, Mode=OneTime}" 
-          Content="New Turn"
-          FontSize="24"
-          FontWeight="Bold"
-          HorizontalAlignment="Stretch" 
-          VerticalAlignment="Stretch"
-          Margin="0 5"/>
+              Grid.Row="1" 
+              Command="{x:Bind ViewModel.StartNewTurnCommand, Mode=OneTime}" 
+              Content="New Turn"
+              FontSize="24"
+              FontWeight="Bold"
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch"
+              Margin="0 5"/>
           </Grid>
           <!--#endregion-->
 
@@ -100,14 +102,14 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView 
-          Grid.Row="1"
-          ItemsSource="{x:Bind ViewModel.Hand, Mode=OneTime}"
-          ScrollViewer.HorizontalScrollMode="Enabled"
-          ScrollViewer.HorizontalScrollBarVisibility="Visible"
-          ScrollViewer.IsHorizontalRailEnabled="True"
-          ScrollViewer.VerticalScrollMode="Disabled"
-          ScrollViewer.VerticalScrollBarVisibility="Disabled"
-          Padding="0 0 0 10">
+            Grid.Row="1"
+            ItemsSource="{x:Bind ViewModel.Hand, Mode=OneTime}"
+            ScrollViewer.HorizontalScrollMode="Enabled"
+            ScrollViewer.HorizontalScrollBarVisibility="Visible"
+            ScrollViewer.IsHorizontalRailEnabled="True"
+            ScrollViewer.VerticalScrollMode="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            Padding="0 0 0 10">
             <ListView.ItemsPanel>
               <ItemsPanelTemplate>
                 <ItemsStackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -149,17 +151,17 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView 
-          Grid.Row="1"
-          ItemsSource="{x:Bind ViewModel.CommandZone, Mode=OneTime}"
-          MaxWidth="300"
-          ScrollViewer.HorizontalScrollMode="Enabled"
-          ScrollViewer.HorizontalScrollBarVisibility="Visible"
-          ScrollViewer.IsHorizontalRailEnabled="True"
-          ScrollViewer.VerticalScrollMode="Disabled"
-          ScrollViewer.VerticalScrollBarVisibility="Disabled"
-          BorderBrush="{ThemeResource RegionBrush}"
-          BorderThickness="1 0 0 0"
-          Margin="0 0 0 10">
+            Grid.Row="1"
+            ItemsSource="{x:Bind ViewModel.CommandZone, Mode=OneTime}"
+            MaxWidth="300"
+            ScrollViewer.HorizontalScrollMode="Enabled"
+            ScrollViewer.HorizontalScrollBarVisibility="Visible"
+            ScrollViewer.IsHorizontalRailEnabled="True"
+            ScrollViewer.VerticalScrollMode="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            BorderBrush="{ThemeResource RegionBrush}"
+            BorderThickness="1 0 0 0"
+            Margin="0 0 0 10">
             <ListView.ItemsPanel>
               <ItemsPanelTemplate>
                 <ItemsStackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -201,24 +203,17 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView 
-          Grid.Row="1"
-          ItemsSource="{x:Bind ViewModel.Deck.Tokens, Mode=OneWay}"
-          SelectionMode="None"
-          BorderBrush="{ThemeResource RegionBrush}"
-          BorderThickness="1 0 0 0"
-          Margin="0 0 0 10">
-            <!--<ListView.ItemTemplate>
-            <DataTemplate x:DataType="MTGCardViewModel">
-              <StackPanel Style="{StaticResource MTGListViewItemStyle}">
-                <StackPanel.ContextFlyout>
-                  <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                    <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-                  </MenuFlyout>
-                </StackPanel.ContextFlyout>
-                <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
-              </StackPanel>
-            </DataTemplate>
-          </ListView.ItemTemplate>-->
+            Grid.Row="1"
+            ItemsSource="{x:Bind ViewModel.Tokens, Mode=OneWay}"
+            SelectionMode="None"
+            BorderBrush="{ThemeResource RegionBrush}"
+            BorderThickness="1 0 0 0"
+            Margin="0 0 0 10">
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="models:DeckTestingMTGCard">
+                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+              </DataTemplate>
+            </ListView.ItemTemplate>
           </ListView>
         </Grid>
         <!--#endregion-->
@@ -251,49 +246,45 @@
               <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <ListView 
-            Grid.Row="0"
-            ItemsSource="{x:Bind ViewModel.Library, Mode=OneTime}"
-            SelectionMode="None"
-            Visibility="{x:Bind LibraryVisibility, Mode=OneWay}">
-              <!--<ListView.ItemTemplate>
-              <DataTemplate x:DataType="MTGCardViewModel">
-                <StackPanel Style="{StaticResource MTGListViewItemStyle}">
-                  <StackPanel.ContextFlyout>
-                    <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                      <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-                    </MenuFlyout>
-                  </StackPanel.ContextFlyout>
-                  <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
-                </StackPanel>
-              </DataTemplate>
-            </ListView.ItemTemplate>-->
+              Grid.Row="0"
+              ItemsSource="{x:Bind ViewModel.Library, Mode=OneTime}"
+              SelectionMode="None"
+              Visibility="{x:Bind LibraryVisibility, Mode=OneWay}">
+              <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:DeckTestingMTGCard">
+                  <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+                </DataTemplate>
+              </ListView.ItemTemplate>
             </ListView>
+
+            <!--#region Library Drop Zones -->
             <Grid Grid.Row="0" Visibility="{x:Bind helpers:VisibilityHelpers.VisibilityInversion(LibraryVisibility), Mode=OneWay}">
               <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
               </Grid.RowDefinitions>
-              <Grid 
-              Grid.Row="0"
-              Background="Transparent"
-              HorizontalAlignment="Stretch" 
-              VerticalAlignment="Stretch" 
-              Margin="10 5" 
-              BorderBrush="{ThemeResource RegionBrush}" 
-              BorderThickness="1">
+              <Grid
+                Grid.Row="0"
+                Background="Transparent"
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                Margin="10 5" 
+                BorderBrush="{ThemeResource RegionBrush}" 
+                BorderThickness="1">
                 <TextBlock Text="Top" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource RegionBrush}"/>
               </Grid>
               <Grid 
-            Grid.Row="1" 
-            Background="Transparent"
-            HorizontalAlignment="Stretch" 
-            VerticalAlignment="Stretch" 
-            Margin="10 5" 
-            BorderBrush="{ThemeResource RegionBrush}"
-            BorderThickness="1">
+                Grid.Row="1" 
+                Background="Transparent"
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                Margin="10 5" 
+                BorderBrush="{ThemeResource RegionBrush}"
+                BorderThickness="1">
                 <TextBlock Text="Bottom" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource RegionBrush}"/>
               </Grid>
             </Grid>
+            <!--#endregion-->
 
             <!--#region Library Buttons -->
             <StackPanel Grid.Row="1" Margin="10 0" Spacing="10">
@@ -318,21 +309,14 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView 
-          Grid.Row="1"
-          ItemsSource="{x:Bind ViewModel.Graveyard, Mode=OneTime}"
-          SelectionMode="None">
-            <!--<ListView.ItemTemplate>
-            <DataTemplate x:DataType="MTGCardViewModel">
-              <StackPanel Style="{StaticResource MTGListViewItemStyle}">
-                <StackPanel.ContextFlyout>
-                  <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                    <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-                  </MenuFlyout>
-                </StackPanel.ContextFlyout>
-                <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
-              </StackPanel>
-            </DataTemplate>
-          </ListView.ItemTemplate>-->
+            Grid.Row="1"
+            ItemsSource="{x:Bind ViewModel.Graveyard, Mode=OneTime}"
+            SelectionMode="None">
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="models:DeckTestingMTGCard">
+                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+              </DataTemplate>
+            </ListView.ItemTemplate>
           </ListView>
         </Grid>
         <!--#endregion-->
@@ -349,21 +333,14 @@
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
           <ListView 
-          Grid.Row="1"
-          ItemsSource="{x:Bind ViewModel.Exile, Mode=OneTime}"
-          SelectionMode="None">
-            <!--<ListView.ItemTemplate>
-            <DataTemplate x:DataType="MTGCardViewModel">
-              <StackPanel Style="{StaticResource MTGListViewItemStyle}">
-                <StackPanel.ContextFlyout>
-                  <MenuFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
-                    <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-                  </MenuFlyout>
-                </StackPanel.ContextFlyout>
-                <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneTime}" Width="200"/>
-              </StackPanel>
-            </DataTemplate>
-          </ListView.ItemTemplate>-->
+            Grid.Row="1"
+            ItemsSource="{x:Bind ViewModel.Exile, Mode=OneTime}"
+            SelectionMode="None">
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="models:DeckTestingMTGCard">
+                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+              </DataTemplate>
+            </ListView.ItemTemplate>
           </ListView>
         </Grid>
         <!--#endregion-->

@@ -15,8 +15,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 100)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       foreach (var item in deck.DeckCards)

@@ -13,6 +13,7 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Mode
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewModelCommands;
@@ -27,20 +28,19 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     Importer = importer;
     Notifier = notifier ?? new();
     Confirmers = confirmers ?? new();
+    Deck = deck ?? new();
 
     var cardFilters = new CardFilters();
     var cardSorter = new CardSorter();
 
     // Cardlists use same sorter and filters
-    DeckCardList = CreateCardListViewModel(cardFilters, cardSorter);
-    MaybeCardList = CreateCardListViewModel(cardFilters, cardSorter);
-    WishCardList = CreateCardListViewModel(cardFilters, cardSorter);
-    RemoveCardList = CreateCardListViewModel(cardFilters, cardSorter);
+    DeckCardList = CreateCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
+    MaybeCardList = CreateCardListViewModel(Deck.Maybelist, cardFilters, cardSorter);
+    WishCardList = CreateCardListViewModel(Deck.Wishlist, cardFilters, cardSorter);
+    RemoveCardList = CreateCardListViewModel(Deck.Removelist, cardFilters, cardSorter);
 
     CommanderCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Commander);
     PartnerCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Partner);
-
-    Deck = deck ?? new();
 
     PropertyChanged += DeckEditorViewModel_PropertyChanged;
   }
@@ -101,7 +101,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public IRelayCommand RedoCommand => (redo ??= new Redo(this)).Command;
   public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => (openEdhrecCommanderWebsite ??= new OpenEdhrecCommanderWebsite(this)).Command;
   public IAsyncRelayCommand ShowDeckTokensCommand => (showDeckTokens ??= new ShowDeckTokens(this)).Command;
-  public IAsyncRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
+  public IRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
 
   private string deckName = string.Empty;
   private DeckEditorMTGDeck deck;
@@ -148,10 +148,11 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     HasUnsavedChanges = true;
   }
 
-  private CardListViewModel CreateCardListViewModel(CardFilters filters, CardSorter sorter)
+  private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
   {
     return new(Importer)
     {
+      Cards = cards,
       OnChange = () =>
       {
         HasUnsavedChanges = true;

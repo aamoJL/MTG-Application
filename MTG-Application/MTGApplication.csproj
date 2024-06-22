@@ -49,6 +49,7 @@
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\DeckTestingCardTextView.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
     <None Remove="Features\CardSearch\CardSearchPage.xaml" />
     <None Remove="Features\CardSearch\Views\Controls\CardSearchCardImageView.xaml" />
@@ -191,7 +192,7 @@
     <Folder Include="Features\DeckEditor\CardList\Views\Controls\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
     <Folder Include="Features\DeckEditor\Editor\Views\" />
-    <Folder Include="Features\DeckTesting\Views\" />
+    <Folder Include="Features\DeckTesting\Views\Controls\CardView\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
@@ -215,6 +216,11 @@
   </ItemGroup>
   <ItemGroup>
     <PRIResource Remove="Features\CardCollection\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckTesting\Views\Controls\DeckTestingCardTextView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckTesting\DeckTestingPage.xaml">

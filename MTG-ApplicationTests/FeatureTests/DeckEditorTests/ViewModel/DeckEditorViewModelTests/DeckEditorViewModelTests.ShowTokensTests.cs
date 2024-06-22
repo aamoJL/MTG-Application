@@ -28,7 +28,6 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public void ShowTokens_HasNoCards_CanNotExecute()
     {
-
       var viewmodel = new Mocker(_dependencies).MockVM();
 
       Assert.IsFalse(viewmodel.ShowDeckTokensCommand.CanExecute(null));

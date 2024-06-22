@@ -15,8 +15,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Library.Add(new(MTGCardInfoMocker.MockInfo()));
@@ -34,8 +33,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Graveyard.Add(new(MTGCardInfoMocker.MockInfo()));
@@ -53,8 +51,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Exile.Add(new(MTGCardInfoMocker.MockInfo()));
@@ -72,8 +69,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.Hand.Add(new(MTGCardInfoMocker.MockInfo()));
@@ -91,8 +87,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: MTGCardMocker.Mock(),
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       Assert.AreEqual(0, viewmodel.CommandZone.Count);
@@ -108,8 +103,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: MTGCardMocker.Mock(),
-        Tokens: []);
+        Partner: MTGCardMocker.Mock());
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       Assert.AreEqual(0, viewmodel.CommandZone.Count);
@@ -125,8 +119,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck)
       {
         PlayerHP = 10,
@@ -148,8 +141,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck)
       {
         TurnCount = 2
@@ -169,8 +161,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.NewGameStarted += () =>
@@ -189,8 +180,7 @@ public partial class DeckTestingPageViewModelTests
       var deck = new DeckTestingDeck(
         DeckCards: [.. MTGCardMocker.Mock(count: 100)],
         Commander: null,
-        Partner: null,
-        Tokens: []);
+        Partner: null);
       var viewmodel = new DeckTestingPageViewModel(deck);
 
       viewmodel.StartNewGameCommand.Execute(null);

@@ -15,6 +15,7 @@ public partial class DeckTestingPageViewModel(DeckTestingDeck deck) : Observable
   public ObservableCollection<DeckTestingMTGCard> Exile { get; } = [];
   public ObservableCollection<DeckTestingMTGCard> Hand { get; } = [];
   public ObservableCollection<DeckTestingMTGCard> CommandZone { get; } = [];
+  public ObservableCollection<DeckTestingMTGCard> Tokens { get; } = [];
 
   [ObservableProperty] private int playerHP = 40;
   [ObservableProperty] private int enemyHP = 40;
