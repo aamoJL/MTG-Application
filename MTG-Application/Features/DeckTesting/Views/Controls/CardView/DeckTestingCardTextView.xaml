@@ -9,7 +9,12 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d">
 
-  <Grid>
+  <Grid Height="25">
+    <Grid.ContextFlyout>
+      <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+        <MenuFlyoutItem Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
+      </MenuFlyout>
+    </Grid.ContextFlyout>
     <TextBlock Text="{x:Bind Model.Info.Name, Mode=OneWay}"/>
   </Grid>
 </local:DeckTestingCardViewBase>

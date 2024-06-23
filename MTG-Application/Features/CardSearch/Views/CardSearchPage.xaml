@@ -77,11 +77,12 @@
           </controls:AdaptiveGridView.ItemTemplate>
         </controls:AdaptiveGridView>
         <ListView
-          x:Name="SearcCardsTextView"
+          x:Name="SearchCardsTextView"
           DataContext="{x:Bind ViewModel}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
           Visibility="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
-          Style="{StaticResource MTGListViewStyle}"
+          Style="{ThemeResource MTGListViewStyle}"
+          ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"
           DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
@@ -90,7 +91,7 @@
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardTextView 
                 d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
-                DataContext="{Binding ElementName=SearcCardsTextView, Path=DataContext, Mode=OneTime}"
+                DataContext="{Binding ElementName=SearchCardsTextView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneWay}"
                 ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
                 HoverPreviewEnabled="True"/>

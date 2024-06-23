@@ -6,8 +6,8 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:deckeditor="using:MTGApplication.General.Views.Controls" 
-  xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views"
+  xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views" 
+  xmlns:customcontrols="using:MTGApplication.General.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -67,7 +67,7 @@
     </controls:DockPanel>
 
     <!--#region Card Preview -->
-    <deckeditor:CardPreview/>
+    <customcontrols:CardPreview/>
     <!--#endregion-->
     
   </Grid>

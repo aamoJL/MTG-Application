@@ -11,13 +11,6 @@
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-  <Page.Resources>
-    <!-- Setting button style on App.xaml did not work so it has to be done here -->
-    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
-      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
-    </Style>
-  </Page.Resources>
-
   <Grid Padding="10 10 10 10">
     <Grid>
       <Grid.RowDefinitions>

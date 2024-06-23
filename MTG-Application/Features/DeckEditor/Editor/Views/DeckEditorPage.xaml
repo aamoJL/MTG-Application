@@ -23,13 +23,6 @@
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
 
-  <Page.Resources>
-    <!-- Setting button style on App.xaml did not work so it has to be done here -->
-    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
-      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
-    </Style>
-  </Page.Resources>
-
   <!--#region Keyboard Accelerators -->
   <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened-->
   <Page.KeyboardAccelerators>
@@ -180,7 +173,8 @@
               ItemsSource="{Binding Cards, Mode=OneWay}"
               SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{Binding CardFilters, Mode=OneWay}"
-              Style="{StaticResource MTGListViewStyle}"
+              Style="{ThemeResource MTGListViewStyle}"
+              ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
@@ -235,7 +229,8 @@
               ItemsSource="{Binding Cards, Mode=OneWay}"
               SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{Binding CardFilters, Mode=OneWay}"
-              Style="{StaticResource MTGListViewStyle}"
+              Style="{ThemeResource MTGListViewStyle}"
+              ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
@@ -290,7 +285,8 @@
               ItemsSource="{Binding Cards, Mode=OneWay}"
               SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
               FilterProperties="{Binding CardFilters, Mode=OneWay}"
-              Style="{StaticResource MTGListViewStyle}"
+              Style="{ThemeResource MTGListViewStyle}"
+              ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
@@ -565,6 +561,7 @@
           SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{Binding CardFilters, Mode=OneWay}"
           Visibility="{x:Bind DeckTextViewVisible, Mode=OneWay}"
+          ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"
           AllowDrop="True"

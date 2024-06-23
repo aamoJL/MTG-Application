@@ -205,13 +205,16 @@
           <ListView 
             Grid.Row="1"
             ItemsSource="{x:Bind ViewModel.Tokens, Mode=OneWay}"
+            ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
             SelectionMode="None"
             BorderBrush="{ThemeResource RegionBrush}"
             BorderThickness="1 0 0 0"
             Margin="0 0 0 10">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+                <cardview:DeckTestingCardTextView 
+                  Model="{x:Bind Mode=OneTime}"
+                  HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -248,11 +251,14 @@
             <ListView 
               Grid.Row="0"
               ItemsSource="{x:Bind ViewModel.Library, Mode=OneTime}"
+              ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="None"
               Visibility="{x:Bind LibraryVisibility, Mode=OneWay}">
               <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                  <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+                  <cardview:DeckTestingCardTextView 
+                    Model="{x:Bind Mode=OneTime}"
+                    HoverPreviewEnabled="True"/>
                 </DataTemplate>
               </ListView.ItemTemplate>
             </ListView>
@@ -311,10 +317,13 @@
           <ListView 
             Grid.Row="1"
             ItemsSource="{x:Bind ViewModel.Graveyard, Mode=OneTime}"
+            ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
             SelectionMode="None">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+                <cardview:DeckTestingCardTextView 
+                  Model="{x:Bind Mode=OneTime}"
+                  HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -335,10 +344,13 @@
           <ListView 
             Grid.Row="1"
             ItemsSource="{x:Bind ViewModel.Exile, Mode=OneTime}"
+            ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
             SelectionMode="None">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}"/>
+                <cardview:DeckTestingCardTextView 
+                  Model="{x:Bind Mode=OneTime}"
+                  HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -367,5 +379,12 @@
       <!--#endregion-->
 
     </controls:DockPanel>
+  
+    <!--#region Card Preview -->
+    <customcontrols:CardPreview/>
+    <!--#endregion-->
+    
   </Grid>
+
+
 </Page>

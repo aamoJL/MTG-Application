@@ -10,10 +10,12 @@
         <!--Theme-->
         <ResourceDictionary Source="/General/Views/Styles/Themes/VioletTheme.xaml"/>
         <!--Styles-->
+        <!--NOTE: Style files need to have more than one items, otherwise the app will crash-->
         <ResourceDictionary Source="/General/Views/Styles/CustomPlaceholderImageStyle.xaml"/>
         <ResourceDictionary Source="/General/Views/Styles/PreviewImagePlaceholderImageStyle.xaml"/>
         <ResourceDictionary Source="/General/Views/Styles/CustomListViewStyle.xaml"/>
         <ResourceDictionary Source="/General/Views/Styles/CustomAdaptiveGridViewStyle.xaml"/>
+        <ResourceDictionary Source="/General/Views/Styles/CustomButtonStyles.xaml"/>
         <!--Templates-->
         <ResourceDictionary Source="/General/Views/Styles/Templates/MTGPrintGridViewItemTemplate.xaml"/>
       </ResourceDictionary.MergedDictionaries>

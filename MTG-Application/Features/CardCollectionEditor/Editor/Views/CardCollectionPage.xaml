@@ -20,11 +20,6 @@
   KeyboardAcceleratorPlacementMode="Hidden">
 
   <Page.Resources>
-    <!-- Setting button style on App.xaml did not work so it has to be done here -->
-    <Style TargetType="Button" x:Key="PrimaryButtonStyle">
-      <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
-    </Style>
-
     <converters:BoolToSelectionModeConverter x:Key="BoolToSelectionModeConverter" />
   </Page.Resources>
 

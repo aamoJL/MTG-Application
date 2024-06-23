@@ -37,7 +37,5 @@ public partial class DeckTestingPageViewModel(DeckTestingDeck deck) : Observable
   public void RaiseNewGameStarted() => NewGameStarted?.Invoke();
 
   public void RaiseNewTurnStarted() => NewTurnStarted?.Invoke();
-
-  // TODO: fetch tokens here so the window can open immediately
 }
 
