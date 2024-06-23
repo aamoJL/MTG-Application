@@ -121,13 +121,7 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
   {
     if (!HoverPreviewEnabled) return;
 
-    var point = e.GetCurrentPoint(null).Position;
-
-    CardPreview.Change(this, new(XamlRoot)
-    {
-      Uri = SelectedFaceUri,
-      Coordinates = new((float)point.X, (float)point.Y)
-    });
+    HoverPreviewUpdate(sender as FrameworkElement, e);
   }
 
   protected void BasicCardView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -146,5 +140,16 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
       view.OnModelChanging((TCard)e.OldValue);
       view.OnModelChanged((TCard)e.NewValue);
     }
+  }
+
+  protected virtual void HoverPreviewUpdate(FrameworkElement sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    var point = e.GetCurrentPoint(null).Position;
+
+    CardPreview.Change(this, new(XamlRoot)
+    {
+      Uri = SelectedFaceUri,
+      Coordinates = new((float)point.X, (float)point.Y)
+    });
   }
 }

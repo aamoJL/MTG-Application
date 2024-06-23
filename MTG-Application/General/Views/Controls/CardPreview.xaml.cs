@@ -10,14 +10,18 @@ namespace MTGApplication.General.Views.Controls;
 [ObservableObject]
 public sealed partial class CardPreview : UserControl
 {
-  public class CardPreviewEventArgs : EventArgs
+  public class CardPreviewEventArgs(XamlRoot root) : EventArgs
   {
-    public CardPreviewEventArgs(XamlRoot root) => Root = root;
-
-    public XamlRoot Root { get; }
+    public XamlRoot Root { get; } = root;
+    
     public string Uri { get; init; } = string.Empty;
     public Vector2 Coordinates { get; init; } = Vector2.Zero;
+    public Vector2 OffsetOverride { get; init; } = ImageOffset;
   }
+
+  public static double ImageX { get; } = 251;
+  public static double ImageY { get; } = 350;
+  public static Vector2 ImageOffset { get; } = new(175, 100);
 
   public static event EventHandler<CardPreviewEventArgs> OnChange;
 
@@ -35,9 +39,8 @@ public sealed partial class CardPreview : UserControl
   [ObservableProperty] private BitmapImage imageSource = null;
   [ObservableProperty] private BitmapImage placeholderSource = null;
 
-  private double ImageWidth { get; } = 251;
-  private double ImageHeight { get; } = 350;
-  private Vector2 ImageOffset { get; } = new(175, 100);
+  public double ImageWidth { get; } = ImageX;
+  public double ImageHeight { get; } = ImageY;
 
   private void CardPreview_OnChange(object sender, CardPreviewEventArgs e)
   {
@@ -55,7 +58,7 @@ public sealed partial class CardPreview : UserControl
       if (ImageSource?.UriSource.OriginalString != e.Uri)
         ImageSource = new BitmapImage(new Uri(e.Uri));
 
-      var imagePosition = GetPreviewPosition(e.Coordinates, ImageOffset);
+      var imagePosition = GetPreviewPosition(e.Coordinates, e.OffsetOverride);
       Left = imagePosition.X;
       Top = imagePosition.Y;
     }

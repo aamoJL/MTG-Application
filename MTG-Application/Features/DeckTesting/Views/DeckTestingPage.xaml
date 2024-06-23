@@ -121,20 +121,13 @@
                 <Setter Property="Margin" Value="5 0 5 0"/>
               </Style>
             </ListView.ItemContainerStyle>
-            <!--<ListView.ItemTemplate>
-            <DataTemplate x:DataType="models:DeckTestingMTGCard">
-              <controls:ImageEx 
-                Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-                Style="{StaticResource PlaceholderImageStyle}"
-                CornerRadius="7">
-                <controls:ImageEx.ContextFlyout>
-                  <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                    <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-                  </MenuFlyout>
-                </controls:ImageEx.ContextFlyout>
-              </controls:ImageEx>
-            </DataTemplate>
-          </ListView.ItemTemplate>-->
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="models:DeckTestingMTGCard">
+                <cardview:DeckTestingCardImageView
+                  Model="{x:Bind Mode=OneTime}"
+                  HoverPreviewEnabled="True"/>
+              </DataTemplate>
+            </ListView.ItemTemplate>
           </ListView>
         </Grid>
         <!--#endregion-->
@@ -173,20 +166,13 @@
                 <Setter Property="Margin" Value="5 0 5 0"/>
               </Style>
             </ListView.ItemContainerStyle>
-            <!--<ListView.ItemTemplate>
-            <DataTemplate x:DataType="MTGCardViewModel">
-              <controls:ImageEx 
-                Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-                Style="{StaticResource PlaceholderImageStyle}"
-                CornerRadius="7">
-                <controls:ImageEx.ContextFlyout>
-                  <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                    <MenuFlyoutItem Command="{x:Bind FlipCardCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
-                  </MenuFlyout>
-                </controls:ImageEx.ContextFlyout>
-              </controls:ImageEx>
-            </DataTemplate>
-          </ListView.ItemTemplate>-->
+            <ListView.ItemTemplate>
+              <DataTemplate x:DataType="models:DeckTestingMTGCard">
+                <cardview:DeckTestingCardImageView
+                  Model="{x:Bind Mode=OneTime}"
+                  HoverPreviewEnabled="True"/>
+              </DataTemplate>
+            </ListView.ItemTemplate>
           </ListView>
         </Grid>
         <!--#endregion-->
