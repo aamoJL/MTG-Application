@@ -77,13 +77,9 @@ public sealed partial class CardPreview : UserControl
 
     // Mirror offset if the image is over the boundaries
     if (maxX > windowBounds.X || minX < 0)
-    {
       position.X += (offset.X * -2); // Flip X offset
-    }
     if (maxY > windowBounds.Y || minY < 0)
-    {
       position.Y += (offset.Y * -2); // Flip Y offset
-    }
 
     // Clamp to window bounds
     return new(

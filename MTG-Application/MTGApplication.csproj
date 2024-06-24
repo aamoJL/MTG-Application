@@ -51,6 +51,7 @@
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\DeckTestingCardTextView.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\DragCardPreview.xaml" />
     <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
     <None Remove="Features\CardSearch\CardSearchPage.xaml" />
     <None Remove="Features\CardSearch\Views\Controls\CardSearchCardImageView.xaml" />
@@ -232,6 +233,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Styles\CustomButtonStyles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckTesting\Views\Controls\DragCardPreview.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml">

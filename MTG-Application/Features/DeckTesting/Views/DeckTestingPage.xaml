@@ -11,11 +11,12 @@
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
   xmlns:models="using:MTGApplication.Features.DeckTesting.Models" 
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-  xmlns:cardview="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView"
+  xmlns:cardview="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView" 
+  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-  <Grid Background="Transparent">
+  <Grid>
 
     <!--#region Visual State Groups -->
     <VisualStateManager.VisualStateGroups>
@@ -50,13 +51,13 @@
           <ColumnDefinition Width="auto"/>
           <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
+
+        <!--#region Turn Buttons -->
         <Grid Grid.Column="0" Padding="10 0 0 10">
           <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
-
-          <!--#region Turn Buttons -->
           <customcontrols:LinedHeader Grid.Row="0" Margin="0 0 10 0">
             <customcontrols:LinedHeader.Header>
               <TextBlock Text="{x:Bind sys:String.Format('Turn {0}', ViewModel.TurnCount), Mode=OneWay}"/>
@@ -86,9 +87,8 @@
               VerticalAlignment="Stretch"
               Margin="0 5"/>
           </Grid>
-          <!--#endregion-->
-
         </Grid>
+        <!--#endregion-->
 
         <!--#region Hand Cards -->
         <Grid Grid.Column="1">
@@ -365,12 +365,12 @@
       <!--#endregion-->
 
     </controls:DockPanel>
-  
-    <!--#region Card Preview -->
+
+    <!--#region Card Previews -->
     <customcontrols:CardPreview/>
+    <localcontrols:DragCardPreview/>
     <!--#endregion-->
-    
+
   </Grid>
-
-
+  
 </Page>
