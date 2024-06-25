@@ -6,19 +6,12 @@ using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.Services;
 using MTGApplication.Features.DeckTesting.ViewModels;
-using MTGApplication.Features.DeckTesting.Views.Controls;
 
 namespace MTGApplication.Features.DeckTesting.Views;
 [ObservableObject]
 public sealed partial class DeckTestingPage : Page
 {
-  public DeckTestingPage()
-  {
-    InitializeComponent();
-
-    Loaded += DeckTestingPage_Loaded;
-    Unloaded += DeckTestingPage_Unloaded;
-  }
+  public DeckTestingPage() => InitializeComponent();
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
@@ -33,6 +26,7 @@ public sealed partial class DeckTestingPage : Page
   }
 
   public DeckTestingPageViewModel ViewModel { get; set; }
+  public DeckTestingPointerEvents PointerEvents { get; } = new();
 
   [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
 
@@ -46,57 +40,4 @@ public sealed partial class DeckTestingPage : Page
   }
 
   private void OnNewGameStarted() => BattlefieldCanvas.Children.Clear();
-
-  private void DeckTestingPage_Loaded(object sender, RoutedEventArgs e)
-  {
-    if (XamlRoot.Content is UIElement root)
-    {
-      root.PointerMoved += Root_PointerMoved;
-      root.PointerReleased += Root_PointerReleased;
-    }
-
-    CardDragArgs.Ended += CardDragArgs_Ended;
-  }
-
-  private void DeckTestingPage_Unloaded(object sender, RoutedEventArgs e)
-  {
-    if (XamlRoot.Content is UIElement root)
-    {
-      root.PointerMoved -= Root_PointerMoved;
-      root.PointerReleased -= Root_PointerReleased;
-    }
-
-    CardDragArgs.Ended -= CardDragArgs_Ended;
-  }
-
-  private void Root_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-  {
-    if (CardDragArgs.IsDragging) CardDragArgs.Cancel();
-  }
-
-  private void Root_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-  {
-    if (CardDragArgs.IsDragging)
-    {
-      if (e.GetCurrentPoint(null).Properties.IsRightButtonPressed || !e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
-        CardDragArgs.Cancel();
-      else
-      {
-        var pointerPosition = e.GetCurrentPoint(null).Position;
-
-        DragCardPreview.Change(this, new(XamlRoot)
-        {
-          Coordinates = new((float)pointerPosition.X, (float)pointerPosition.Y),
-        });
-      }
-    }
-  }
-
-  private void CardDragArgs_Ended()
-  {
-    DragCardPreview.Change(this, new(XamlRoot)
-    {
-      Uri = null,
-    });
-  }
 }

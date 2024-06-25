@@ -2,11 +2,8 @@
 using System;
 
 namespace MTGApplication.Features.DeckTesting.Services;
-public static class CardDragArgs
+public static class DeckTestingCardDrag
 {
-  public static float UndroppableOpacity { get; } = .3f;
-  public static float DroppableOpacity { get; } = .8f;
-
   public static DeckTestingMTGCard Item { get; private set; }
   public static bool IsDragging { get; private set; } = false;
 

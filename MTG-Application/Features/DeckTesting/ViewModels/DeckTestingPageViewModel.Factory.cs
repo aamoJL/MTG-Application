@@ -43,7 +43,7 @@ public partial class DeckTestingPageViewModel
         cards.SelectMany(c => c.Info.Tokens.Select(t => t.ScryfallId.ToString())));
 
       return (await new FetchCardsWithImportString(importer).Execute(ids)).Found
-        .Select(x => new DeckTestingMTGCard(x.Info))
+        .Select(x => new DeckTestingMTGCard(x.Info) { IsToken = true })
         .DistinctBy(x => x.Info.OracleId)
         .ToList(); // Filter duplicates out using oracleId
     }

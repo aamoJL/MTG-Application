@@ -40,6 +40,6 @@ public static class DependencyObjectExtensions
   public static T FindParentByType<T>(this DependencyObject child) where T : DependencyObject
   {
     var parent = VisualTreeHelper.GetParent(child);
-    return parent is not null and not T ? ((FrameworkElement)parent).FindParentByType<T>() : (T)parent;
+    return parent is not null and not T ? (parent as FrameworkElement)?.FindParentByType<T>() : (T)parent;
   }
 }

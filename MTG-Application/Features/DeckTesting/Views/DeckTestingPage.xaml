@@ -16,7 +16,7 @@
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-  <Grid>
+  <Grid Background="Transparent">
 
     <!--#region Visual State Groups -->
     <VisualStateManager.VisualStateGroups>
@@ -101,7 +101,7 @@
               <TextBlock Text="{x:Bind sys:String.Format('Hand ({0})', ViewModel.Hand.Count), Mode=OneWay}"/>
             </customcontrols:LinedHeader.Header>
           </customcontrols:LinedHeader>
-          <ListView 
+          <ListView
             Grid.Row="1"
             ItemsSource="{x:Bind ViewModel.Hand, Mode=OneTime}"
             ScrollViewer.HorizontalScrollMode="Enabled"
@@ -109,7 +109,10 @@
             ScrollViewer.IsHorizontalRailEnabled="True"
             ScrollViewer.VerticalScrollMode="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Disabled"
-            Padding="0 0 0 10">
+            Padding="0 0 0 10"
+            PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+            PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+            PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
             <ListView.ItemsPanel>
               <ItemsPanelTemplate>
                 <ItemsStackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -123,9 +126,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardImageView
-                  Model="{x:Bind Mode=OneTime}"
-                  HoverPreviewEnabled="True"/>
+                <cardview:DeckTestingCardImageView Model="{x:Bind Mode=OneTime}" HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -154,7 +155,10 @@
             ScrollViewer.VerticalScrollBarVisibility="Disabled"
             BorderBrush="{ThemeResource RegionBrush}"
             BorderThickness="1 0 0 0"
-            Margin="0 0 0 10">
+            Margin="0 0 0 10"
+            PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+            PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+            PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
             <ListView.ItemsPanel>
               <ItemsPanelTemplate>
                 <ItemsStackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -168,9 +172,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardImageView
-                  Model="{x:Bind Mode=OneTime}"
-                  HoverPreviewEnabled="True"/>
+                <cardview:DeckTestingCardImageView Model="{x:Bind Mode=OneTime}" HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -198,9 +200,7 @@
             Margin="0 0 0 10">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardTextView 
-                  Model="{x:Bind Mode=OneTime}"
-                  HoverPreviewEnabled="True"/>
+                <cardview:DeckTestingCardTextView  Model="{x:Bind Mode=OneTime}" HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -239,12 +239,13 @@
               ItemsSource="{x:Bind ViewModel.Library, Mode=OneTime}"
               ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="None"
-              Visibility="{x:Bind LibraryVisibility, Mode=OneWay}">
+              Visibility="{x:Bind LibraryVisibility, Mode=OneWay}"
+              PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+              PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+              PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
               <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                  <cardview:DeckTestingCardTextView 
-                    Model="{x:Bind Mode=OneTime}"
-                    HoverPreviewEnabled="True"/>
+                  <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}" HoverPreviewEnabled="True"/>
                 </DataTemplate>
               </ListView.ItemTemplate>
             </ListView>
@@ -256,23 +257,31 @@
                 <RowDefinition Height="*"/>
               </Grid.RowDefinitions>
               <Grid
+                DataContext="{x:Bind ViewModel.Library, Mode=OneTime}"
                 Grid.Row="0"
                 Background="Transparent"
                 HorizontalAlignment="Stretch" 
                 VerticalAlignment="Stretch" 
                 Margin="10 5" 
                 BorderBrush="{ThemeResource RegionBrush}" 
-                BorderThickness="1">
+                BorderThickness="1"
+                PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+                PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+                PointerReleased="{x:Bind PointerEvents.LibraryTop_PointerReleased, Mode=OneTime}">
                 <TextBlock Text="Top" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource RegionBrush}"/>
               </Grid>
-              <Grid 
+              <Grid
+                DataContext="{x:Bind ViewModel.Library, Mode=OneTime}"
                 Grid.Row="1" 
                 Background="Transparent"
                 HorizontalAlignment="Stretch" 
                 VerticalAlignment="Stretch" 
                 Margin="10 5" 
                 BorderBrush="{ThemeResource RegionBrush}"
-                BorderThickness="1">
+                BorderThickness="1"
+                PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+                PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+                PointerReleased="{x:Bind PointerEvents.LibraryBottom_PointerReleased, Mode=OneTime}">
                 <TextBlock Text="Bottom" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource RegionBrush}"/>
               </Grid>
             </Grid>
@@ -281,7 +290,7 @@
             <!--#region Library Buttons -->
             <StackPanel Grid.Row="1" Margin="10 0" Spacing="10">
               <Button HorizontalAlignment="Stretch" Content="Shuffle" Command="{x:Bind ViewModel.ShuffleDeckCommand, Mode=OneTime}"/>
-              <Button  x:Name="LibraryVisibilitySwitchButton"  HorizontalAlignment="Stretch" Command="{x:Bind LibraryVisibilitySwitchCommand, Mode=OneTime}"  Content="Show library"/>
+              <Button x:Name="LibraryVisibilitySwitchButton"  HorizontalAlignment="Stretch" Command="{x:Bind LibraryVisibilitySwitchCommand, Mode=OneTime}"  Content="Show library"/>
             </StackPanel>
             <!--#endregion-->
 
@@ -304,12 +313,13 @@
             Grid.Row="1"
             ItemsSource="{x:Bind ViewModel.Graveyard, Mode=OneTime}"
             ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
-            SelectionMode="None">
+            SelectionMode="None"
+            PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+            PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+            PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardTextView 
-                  Model="{x:Bind Mode=OneTime}"
-                  HoverPreviewEnabled="True"/>
+                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}" HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -331,12 +341,13 @@
             Grid.Row="1"
             ItemsSource="{x:Bind ViewModel.Exile, Mode=OneTime}"
             ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
-            SelectionMode="None">
+            SelectionMode="None"
+            PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
+            PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
+            PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
             <ListView.ItemTemplate>
               <DataTemplate x:DataType="models:DeckTestingMTGCard">
-                <cardview:DeckTestingCardTextView 
-                  Model="{x:Bind Mode=OneTime}"
-                  HoverPreviewEnabled="True"/>
+                <cardview:DeckTestingCardTextView Model="{x:Bind Mode=OneTime}" HoverPreviewEnabled="True"/>
               </DataTemplate>
             </ListView.ItemTemplate>
           </ListView>
@@ -349,10 +360,12 @@
       <!--#region Battlefield -->
       <Grid controls:DockPanel.Dock="Top">
         <Canvas 
-        x:Name="BattlefieldCanvas"
-        Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
-        xmlns:ui="using:CommunityToolkit.WinUI.UI"
-        ui:UIElementExtensions.ClipToBounds="True"/>
+          x:Name="BattlefieldCanvas"
+          Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
+          xmlns:ui="using:CommunityToolkit.WinUI.UI"
+          ui:UIElementExtensions.ClipToBounds="True"
+          PointerEntered="{x:Bind PointerEvents.BattlefieldCanvas_PointerEntered, Mode=OneTime}"
+          PointerReleased="{x:Bind PointerEvents.BattlefieldCanvas_PointerReleased, Mode=OneTime}"/>
 
         <!--#region Player Information -->
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" Background="{ThemeResource AppBarBackgroundThemeBrush}">

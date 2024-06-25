@@ -11,7 +11,19 @@ namespace MTGApplication.Features.DeckTesting.Views.Controls.CardView;
 
 public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
 {
-  public DeckTestingCardViewBase() => PointerPressed += DeckTestingCardViewBase_PointerPressed;
+  public DeckTestingCardViewBase()
+  {
+    PointerPressed += DeckTestingCardViewBase_PointerPressed;
+    PointerReleased += OnPointerReleased;
+    PointerMoved += OnPointerMoved;
+  }
+
+  protected override void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
+  {
+    if (DeckTestingCardDrag.IsDragging) return; // Disable card preview if card is being dragged
+
+    base.HoverPreviewUpdate(sender, e);
+  }
 
   private void DeckTestingCardViewBase_PointerPressed(object sender, PointerRoutedEventArgs e)
   {
@@ -19,35 +31,63 @@ public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
     {
       var pointerPosition = e.GetCurrentPoint(null).Position;
 
-      CardDragArgs.Completed += OnDragCompleted;
-      CardDragArgs.Ended += OnDragEnded;
+      //Can't use pointer capturing because it will prevent other elements to fire pointer events...
+      //CapturePointer(e.Pointer);
+
+      //... Instead use the window content's pointer events
+      XamlRoot.Content.PointerMoved += OnPointerMoved;
+      XamlRoot.Content.PointerReleased += OnPointerReleased;
+
+      CardPreview.Change(this, new(XamlRoot) { Uri = null });
 
       DragCardPreview.Change(this, new(XamlRoot)
       {
         Uri = SelectedFaceUri,
+        Coordinates = new((float)pointerPosition.X, (float)pointerPosition.Y),
       });
 
-      CardDragArgs.Start(Model);
+      DeckTestingCardDrag.Completed += OnDragCompleted;
+      DeckTestingCardDrag.Ended += OnDragEnded;
+
+      DeckTestingCardDrag.Start(Model);
     }
   }
 
-  protected override void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
+  private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
   {
-    if (CardDragArgs.IsDragging)
-    {
-      CardPreview.Change(this, new(XamlRoot) { Uri = null });
-      return; // Disable card preview if card is being dragged
-    }
+    // Cancel drag if dropped on the dragged item
+    if (DeckTestingCardDrag.IsDragging && DeckTestingCardDrag.Item == Model)
+      DeckTestingCardDrag.Cancel();
+  }
 
-    base.HoverPreviewUpdate(sender, e);
+  private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
+  {
+    if (!DeckTestingCardDrag.IsDragging) return;
+
+    if (e.GetCurrentPoint(null).Properties.IsRightButtonPressed || !e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
+      DeckTestingCardDrag.Cancel();
+    else
+    {
+      var pointerPosition = e.GetCurrentPoint(null).Position;
+
+      DragCardPreview.Change(this, new(XamlRoot)
+      {
+        Coordinates = new((float)pointerPosition.X, (float)pointerPosition.Y),
+      });
+    }
   }
 
   private void OnDragCompleted(DeckTestingMTGCard item)
-    => (this.FindParentByType<ListViewBase>()?.ItemsSource as ObservableCollection<DeckTestingMTGCard>).Remove(item);
+  {
+    if (!item.IsToken)
+      (this.FindParentByType<ListViewBase>()?.ItemsSource as ObservableCollection<DeckTestingMTGCard>)?.Remove(item);
+  }
 
   private void OnDragEnded()
   {
-    CardDragArgs.Completed -= OnDragCompleted;
-    CardDragArgs.Ended -= OnDragEnded;
+    XamlRoot.Content.PointerMoved -= OnPointerMoved;
+    XamlRoot.Content.PointerReleased -= OnPointerReleased;
+    DeckTestingCardDrag.Completed -= OnDragCompleted;
+    DeckTestingCardDrag.Ended -= OnDragEnded;
   }
 }
