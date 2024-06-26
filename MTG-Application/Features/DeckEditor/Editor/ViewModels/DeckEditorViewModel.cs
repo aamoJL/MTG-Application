@@ -102,6 +102,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => (openEdhrecCommanderWebsite ??= new OpenEdhrecCommanderWebsite(this)).Command;
   public IAsyncRelayCommand ShowDeckTokensCommand => (showDeckTokens ??= new ShowDeckTokens(this)).Command;
   public IRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
+  public IRelayCommand OpenEdhrecSearchWindowCommand => (openEdhrecSearchWindow ??= new OpenEdhrecSearchWindow(this)).Command;
 
   private string deckName = string.Empty;
   private DeckEditorMTGDeck deck;
@@ -115,12 +116,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private OpenEdhrecCommanderWebsite openEdhrecCommanderWebsite;
   private ShowDeckTokens showDeckTokens;
   private OpenDeckTestingWindow openDeckTestingWindow;
-
-  [RelayCommand]
-  private async Task OpenEdhrecSearchWindow()
-  {
-    // TODO: open EDHREC search window use case
-  }
+  private OpenEdhrecSearchWindow openEdhrecSearchWindow;
 
   public void SetDeck(DeckEditorMTGDeck deck)
   {
@@ -198,8 +194,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
         OnPropertyChanged(nameof(Commander));
         OnPropertyChanged(nameof(Partner));
         SaveDeckCommand.NotifyCanExecuteChanged();
-        DeleteDeckCommand.NotifyCanExecuteChanged();
-        break;
+        DeleteDeckCommand.NotifyCanExecuteChanged(); break;
       case nameof(Size):
         ShowDeckTokensCommand.NotifyCanExecuteChanged();
         OpenDeckTestingWindowCommand.NotifyCanExecuteChanged(); break;
@@ -207,7 +202,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       case nameof(Partner):
         OnPropertyChanged(nameof(Size));
         OnPropertyChanged(nameof(Price));
-        OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged(); break;
+        OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+        OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged(); break;
     }
   }
 }
