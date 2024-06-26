@@ -49,6 +49,7 @@
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\DeckTestingCardTextView.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\DragCardPreview.xaml" />
@@ -233,6 +234,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Styles\CustomButtonStyles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckTesting\Views\Controls\DragCardPreview.xaml">

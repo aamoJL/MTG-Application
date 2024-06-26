@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.IOServices;
 using System.Threading.Tasks;
@@ -21,9 +22,6 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
 
   public BasicCardView()
   {
-    PointerExited += BasicCardView_PointerExited;
-    PointerMoved += BasicCardView_PointerMoved;
-
     Loaded += (_, _) =>
     {
       RequestedTheme = AppConfig.LocalSettings.AppTheme;
@@ -102,6 +100,24 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
     OpenCardmarketWebsiteCommand.NotifyCanExecuteChanged();
   }
 
+  protected override void OnPointerMoved(PointerRoutedEventArgs e)
+  {
+    base.OnPointerMoved(e);
+
+    if (!HoverPreviewEnabled) return;
+
+    HoverPreviewUpdate(this, e);
+  }
+
+  protected override void OnPointerExited(PointerRoutedEventArgs e)
+  {
+    base.OnPointerExited(e);
+
+    if (!HoverPreviewEnabled) return;
+
+    CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
+  }
+
   protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(MTGCard.Info))
@@ -117,20 +133,6 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
       RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
-  protected void BasicCardView_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-  {
-    if (!HoverPreviewEnabled) return;
-
-    HoverPreviewUpdate(sender as FrameworkElement, e);
-  }
-
-  protected void BasicCardView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-  {
-    if (!HoverPreviewEnabled) return;
-
-    CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
-  }
-
   protected static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
     var view = (sender as BasicCardView<TCard>);
@@ -142,7 +144,7 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
     }
   }
 
-  protected virtual void HoverPreviewUpdate(FrameworkElement sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  protected virtual void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
   {
     var point = e.GetCurrentPoint(null).Position;
 

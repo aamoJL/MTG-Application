@@ -13,7 +13,7 @@ public sealed partial class CardPreview : UserControl
   public class CardPreviewEventArgs(XamlRoot root) : EventArgs
   {
     public XamlRoot Root { get; } = root;
-    
+
     public string Uri { get; init; } = string.Empty;
     public Vector2 Coordinates { get; init; } = Vector2.Zero;
     public Vector2 OffsetOverride { get; init; } = ImageOffset;

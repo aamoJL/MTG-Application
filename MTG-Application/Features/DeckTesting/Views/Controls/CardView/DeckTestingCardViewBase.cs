@@ -11,21 +11,14 @@ namespace MTGApplication.Features.DeckTesting.Views.Controls.CardView;
 
 public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
 {
-  public DeckTestingCardViewBase()
+  protected override void OnPointerEntered(PointerRoutedEventArgs e)
   {
-    PointerPressed += DeckTestingCardViewBase_PointerPressed;
-    PointerReleased += OnPointerReleased;
-    PointerMoved += OnPointerMoved;
+    // Changing preview image on pointer enter will prevent flickering
+    if (!DeckTestingCardDrag.IsDragging)
+      DragCardPreview.Change(this, new(XamlRoot) { Uri = SelectedFaceUri });
   }
 
-  protected override void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
-  {
-    if (DeckTestingCardDrag.IsDragging) return; // Disable card preview if card is being dragged
-
-    base.HoverPreviewUpdate(sender, e);
-  }
-
-  private void DeckTestingCardViewBase_PointerPressed(object sender, PointerRoutedEventArgs e)
+  protected override void OnPointerPressed(PointerRoutedEventArgs e)
   {
     if (e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
     {
@@ -35,15 +28,17 @@ public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
       //CapturePointer(e.Pointer);
 
       //... Instead use the window content's pointer events
-      XamlRoot.Content.PointerMoved += OnPointerMoved;
-      XamlRoot.Content.PointerReleased += OnPointerReleased;
+      XamlRoot.Content.PointerMoved += Root_PointerMoved;
+      XamlRoot.Content.PointerReleased += Root_PointerReleased;
 
-      CardPreview.Change(this, new(XamlRoot) { Uri = null });
+      CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
 
       DragCardPreview.Change(this, new(XamlRoot)
       {
         Uri = SelectedFaceUri,
         Coordinates = new((float)pointerPosition.X, (float)pointerPosition.Y),
+        Offset = DragCardPreview.DefaultOffset,
+        Opacity = DragCardPreview.DroppableOpacity,
       });
 
       DeckTestingCardDrag.Completed += OnDragCompleted;
@@ -53,28 +48,35 @@ public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
     }
   }
 
-  private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
+  protected override void OnPointerReleased(PointerRoutedEventArgs e)
   {
     // Cancel drag if dropped on the dragged item
     if (DeckTestingCardDrag.IsDragging && DeckTestingCardDrag.Item == Model)
       DeckTestingCardDrag.Cancel();
   }
 
-  private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
+  protected override void OnPointerMoved(PointerRoutedEventArgs e)
   {
-    if (!DeckTestingCardDrag.IsDragging) return;
+    // Disable Hover preview if card is being dragged
+    if (!DeckTestingCardDrag.IsDragging)
+      base.OnPointerMoved(e); // Updates hover preview
+  }
 
-    if (e.GetCurrentPoint(null).Properties.IsRightButtonPressed || !e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
+  protected override void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
+  {
+    if (DeckTestingCardDrag.IsDragging) return; // Disable card preview if card is being dragged
+
+    base.HoverPreviewUpdate(sender, e);
+  }
+
+  protected virtual void Root_PointerReleased(object sender, PointerRoutedEventArgs e) => OnPointerReleased(e);
+
+  protected virtual void Root_PointerMoved(object sender, PointerRoutedEventArgs e)
+  {
+    if (DeckTestingCardDrag.IsDragging
+      && (e.GetCurrentPoint(null).Properties.IsRightButtonPressed
+      || !e.GetCurrentPoint(null).Properties.IsLeftButtonPressed))
       DeckTestingCardDrag.Cancel();
-    else
-    {
-      var pointerPosition = e.GetCurrentPoint(null).Position;
-
-      DragCardPreview.Change(this, new(XamlRoot)
-      {
-        Coordinates = new((float)pointerPosition.X, (float)pointerPosition.Y),
-      });
-    }
   }
 
   private void OnDragCompleted(DeckTestingMTGCard item)
@@ -85,8 +87,8 @@ public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
 
   private void OnDragEnded()
   {
-    XamlRoot.Content.PointerMoved -= OnPointerMoved;
-    XamlRoot.Content.PointerReleased -= OnPointerReleased;
+    XamlRoot.Content.PointerMoved -= Root_PointerMoved;
+    XamlRoot.Content.PointerReleased -= Root_PointerReleased;
     DeckTestingCardDrag.Completed -= OnDragCompleted;
     DeckTestingCardDrag.Ended -= OnDragEnded;
   }

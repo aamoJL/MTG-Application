@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.Services;
 using MTGApplication.Features.DeckTesting.ViewModels;
+using MTGApplication.Features.DeckTesting.Views.Controls.CardView;
 
 namespace MTGApplication.Features.DeckTesting.Views;
 [ObservableObject]
@@ -34,9 +35,10 @@ public sealed partial class DeckTestingPage : Page
 
   private void OnNewTurnStarted()
   {
+    // Untap battlefield cards
     foreach (var child in BattlefieldCanvas.Children)
-      if ((child as FrameworkElement).DataContext is DeckTestingMTGCard card)
-        card.IsTapped = false;
+      if (child is DeckTestingBattlefieldCardView cardView)
+        cardView.IsTapped = false;
   }
 
   private void OnNewGameStarted() => BattlefieldCanvas.Children.Clear();

@@ -79,55 +79,34 @@ public class DeckTestingPointerEvents
       var pos = e.GetCurrentPoint(canvas).Position;
       var item = DeckTestingCardDrag.Item;
 
-      if (canvas.Children.FirstOrDefault(x => ((FrameworkElement)x).DataContext == item) is UIElement existingElement)
+      if (canvas.Children.FirstOrDefault(x => (x as DeckTestingBattlefieldCardView)?.Model == item) is UIElement existingElement)
       {
         // Card is already on the canvas, so move it to the dragged position
         // TODO: z-index (check if card are under the pointer)
-        //Canvas.SetLeft(existingElement, pos.X + DeckTestingCardDrag.DragOffset.X);
-        //Canvas.SetTop(existingElement, pos.Y + DeckTestingCardDrag.DragOffset.Y);
-        Canvas.SetLeft(existingElement, pos.X);
-        Canvas.SetTop(existingElement, pos.Y);
+        Canvas.SetLeft(existingElement, pos.X + DragCardPreview.CurrentOffset.X);
+        Canvas.SetTop(existingElement, pos.Y + DragCardPreview.CurrentOffset.Y);
         DeckTestingCardDrag.Cancel();
       }
       else
       {
         // Add card to the canvas
-        var cardImg = new DeckTestingCardImageView()
+        var cardElement = new DeckTestingBattlefieldCardView()
         {
-          Model = item,
+          Model = new(item.Info),
           Height = DragCardPreview.ImageY,
           Width = DragCardPreview.ImageX,
-          //DataContext = new DeckTestingMTGCardViewModel(new(card.Model.Info))
-          //{
-          //  SelectedFaceSide = card.SelectedFaceSide,
-          //  IsToken = card.IsToken,
-          //},
-          //CardHeight = BattlefieldCardSize.Y,
-          //CardWidth = BattlefieldCardSize.X,
         };
 
-        //cardImg.PointerEntered += BattlefieldCard_PointerEntered;
-        //cardImg.PointerPressed += BattlefieldCard_PointerPressed;
+        if (item.IsToken)
+          cardElement.CountCounterVisibility = Visibility.Visible;
 
         // TODO: Item repeater for canvas items?
         // CanvasView: https://dev.azure.com/dotnet/CommunityToolkit/_artifacts/feed/CommunityToolkit-Labs/NuGet/CommunityToolkit.Labs.WinUI.CanvasView/overview/0.1.230830
-        // Events needs to be unsubscribed on unload so the Page could be destroyerd on GC
-        //canvas.Unloaded += (s, e) =>
-        //{
-        //  if (cardImg != null)
-        //  {
-        //    cardImg.PointerEntered -= BattlefieldCard_PointerEntered;
-        //    cardImg.PointerPressed -= BattlefieldCard_PointerPressed;
-        //  }
-        //};
 
-        //Canvas.SetLeft(cardImg, pos.X + DragArgs.DragOffset.X);
-        //Canvas.SetTop(cardImg, pos.Y + DragArgs.DragOffset.Y);
+        Canvas.SetLeft(cardElement, pos.X + DragCardPreview.CurrentOffset.X);
+        Canvas.SetTop(cardElement, pos.Y + DragCardPreview.CurrentOffset.Y);
 
-        Canvas.SetLeft(cardImg, pos.X);
-        Canvas.SetTop(cardImg, pos.Y);
-
-        canvas.Children.Add(cardImg);
+        canvas.Children.Add(cardElement);
 
         DeckTestingCardDrag.Complete();
       }
