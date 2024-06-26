@@ -15,7 +15,6 @@ using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 

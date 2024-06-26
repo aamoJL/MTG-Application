@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using System.Linq;
 using System.Windows.Input;
 
@@ -21,8 +20,8 @@ public class ComboBoxWithCommands : ComboBox
 
   private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
   {
-    if (e.AddedItems.FirstOrDefault() is MTGCardCollectionList list)
-      if (SelectionChangedCommand?.CanExecute(list) is true)
-        SelectionChangedCommand.Execute(list);
+    if (e.AddedItems.FirstOrDefault() is object item)
+      if (SelectionChangedCommand?.CanExecute(item) is true)
+        SelectionChangedCommand.Execute(item);
   }
 }

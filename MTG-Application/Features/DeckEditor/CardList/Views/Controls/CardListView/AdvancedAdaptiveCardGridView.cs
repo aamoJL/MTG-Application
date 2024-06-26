@@ -39,8 +39,6 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 
     DragItemsStarting += DragAndDrop.DragStarting;
     DragItemsCompleted += DragAndDrop.DragCompleted;
-    DragOver += DragAndDrop.DragOver;
-    Drop += DragAndDrop.Drop;
   }
 
   private AdvancedCollectionView filteredAndSortedCardSource = [];
@@ -130,4 +128,8 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     if (e.Property == FilterPropertiesProperty)
       view.OnFilterPropertiesDependencyPropertyChanged(e.NewValue as CardFilters);
   }
+
+  protected override void OnDrop(DragEventArgs e) => DragAndDrop.Drop(e);
+
+  protected override void OnDragOver(DragEventArgs e) => DragAndDrop.DragOver(e);
 }

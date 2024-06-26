@@ -1,18 +1,22 @@
 ﻿using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
+using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
-public class OpenEdhrecSearchWindow(DeckEditorViewModel viewmodel) : ViewModelCommand<DeckEditorViewModel>(viewmodel)
+public class OpenEdhrecSearchWindow(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
 {
   protected override bool CanExecute() => Viewmodel.Commander != null;
 
-  protected override void Execute()
+  protected override async Task Execute()
   {
-    // TODO: commander themes
-    // var themes = await CommanderAPI.GetThemes(new Models.Structs.Commanders(
-    //  deck.Commander?.Info.Name ?? string.Empty, deck.CommanderPartner?.Info.Name ?? string.Empty));
+    if (!CanExecute()) return;
 
-    new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow().Activate();
+    var themes = await EdhrecImporter.GetThemes(
+      commander: Viewmodel.Commander.Info.Name,
+      partner: Viewmodel.Partner?.Info.Name);
+
+    new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow(themes).Activate();
   }
 }

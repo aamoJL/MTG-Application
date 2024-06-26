@@ -40,11 +40,9 @@ public partial class AdvancedCardListView : ListView
 
     DragItemsStarting += DragAndDrop.DragStarting;
     DragItemsCompleted += DragAndDrop.DragCompleted;
-    DragOver += DragAndDrop.DragOver;
-    Drop += DragAndDrop.Drop;
   }
 
-  private AdvancedCollectionView filteredAndSortedCardSource = new();
+  private AdvancedCollectionView filteredAndSortedCardSource = [];
 
   public new IList<DeckEditorMTGCard> ItemsSource
   {
@@ -131,4 +129,8 @@ public partial class AdvancedCardListView : ListView
     if (e.Property == FilterPropertiesProperty)
       view.OnFilterPropertiesDependencyPropertyChanged(e.NewValue as CardFilters);
   }
+
+  protected override void OnDragOver(DragEventArgs e) => DragAndDrop.DragOver(e);
+
+  protected override void OnDrop(DragEventArgs e) => DragAndDrop.Drop(e);
 }

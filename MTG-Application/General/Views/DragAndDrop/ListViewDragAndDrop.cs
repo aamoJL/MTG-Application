@@ -15,9 +15,7 @@ public class ListViewDragAndDrop<TItem>(Func<TItem, CardMoveArgs> itemToArgsConv
     e.Data.RequestedOperation = requestedOperation;
   }
 
-  public void DragOver(object _, DragEventArgs e) => DragOver(e);
-
-  public async void Drop(object _, DragEventArgs e)
+  public async void Drop(DragEventArgs e)
   {
     var def = e.GetDeferral();
 

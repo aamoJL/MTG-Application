@@ -10,7 +10,8 @@
   xmlns:cardview="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
   xmlns:models="using:MTGApplication.General.Models"
   xmlns:viewmodels="using:MTGApplication.Features.EdhrecSearch.ViewModels" 
-  xmlns:sys="using:System"
+  xmlns:sys="using:System" 
+  xmlns:customcontrols="using:MTGApplication.General.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -26,9 +27,10 @@
         <StackPanel Orientation="Horizontal">
           <CommandBar IsOpen="False" DefaultLabelPosition="Right" HorizontalAlignment="Left">
             <AppBarElementContainer VerticalAlignment="Center">
-              <ComboBox 
-                ItemsSource="{x:Bind ViewModel.CommanderThemes, Mode=OneTime}" 
-                PlaceholderText="Select Theme..." 
+              <customcontrols:ComboBoxWithCommands 
+                ItemsSource="{x:Bind ViewModel.CommanderThemes, Mode=OneWay}" 
+                SelectionChangedCommand="{x:Bind ViewModel.ChangeCommanderThemeCommand, Mode=OneTime}"
+                PlaceholderText="Select Theme..."
                 Width="200"
                 SelectedItem="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -36,7 +38,7 @@
                     <TextBlock Text="{Binding Name, Mode=OneTime}"/>
                   </DataTemplate>
                 </ComboBox.ItemTemplate>
-              </ComboBox>
+              </customcontrols:ComboBoxWithCommands>
             </AppBarElementContainer>
             <AppBarSeparator Margin="5 0 0 0"/>
             <AppBarButton Icon="ZoomIn" Label="Zoom">
