@@ -5,11 +5,84 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:local="using:MTGApplication.Features.EdhrecSearch.Views"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:cardview="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
+  xmlns:models="using:MTGApplication.General.Models"
+  xmlns:viewmodels="using:MTGApplication.Features.EdhrecSearch.ViewModels" 
+  xmlns:sys="using:System"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid>
+    <controls:DockPanel 
+      Grid.Column="0" 
+      LastChildFill="True" 
+      Padding="10 0 10 10"
+      Background="Transparent">
 
+      <!--#region Commands -->
+      <Grid controls:DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal">
+          <CommandBar IsOpen="False" DefaultLabelPosition="Right" HorizontalAlignment="Left">
+            <AppBarElementContainer VerticalAlignment="Center">
+              <ComboBox 
+                ItemsSource="{x:Bind ViewModel.CommanderThemes, Mode=OneTime}" 
+                PlaceholderText="Select Theme..." 
+                Width="200"
+                SelectedItem="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding Name, Mode=OneTime}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </AppBarElementContainer>
+            <AppBarSeparator Margin="5 0 0 0"/>
+            <AppBarButton Icon="ZoomIn" Label="Zoom">
+              <AppBarButton.Flyout>
+                <Flyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                  <Slider x:Name="CardImageSizeSlider" Header="Card size" Value="250" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside"/>
+                </Flyout>
+              </AppBarButton.Flyout>
+            </AppBarButton>
+          </CommandBar>
+          <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}"/>
+        </StackPanel>
+        <TextBlock 
+          HorizontalAlignment="Right"
+          VerticalAlignment="Bottom"
+          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1} cards', ViewModel.Cards.Collection.Count, ViewModel.Cards.TotalCardCount), Mode=OneWay}">
+        </TextBlock>
+      </Grid>
+      <!--#endregion-->
+
+      <!--#region Card View -->
+      <Grid controls:DockPanel.Dock="Top">
+        <controls:AdaptiveGridView 
+          x:Name="SearchCardsImageView"
+          DataContext="{x:Bind ViewModel, Mode=OneTime}"
+          ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
+          DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
+          Style="{StaticResource MTGAdaptiveGridViewStyle}"
+          BorderBrush="{ThemeResource RegionColor}"
+          SelectionMode="None"
+          CanDragItems="True"
+          DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
+          DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
+          <controls:AdaptiveGridView.ItemTemplate>
+            <DataTemplate x:DataType="models:MTGCard">
+              <cardview:CardSearchCardImageView
+                d:DataContext="{d:DesignInstance Type=viewmodels:EdhrecSearchPageViewModel}"
+                DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneWay}"
+                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+            </DataTemplate>
+          </controls:AdaptiveGridView.ItemTemplate>
+        </controls:AdaptiveGridView>
+      </Grid>
+      <!--#endregion-->
+      
+    </controls:DockPanel>
   </Grid>
 </Page>

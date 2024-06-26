@@ -55,7 +55,7 @@
       <!--#region Card View -->
       <Grid controls:DockPanel.Dock="Top">
         <controls:AdaptiveGridView
-          x:Name="SearcCardsImageView"
+          x:Name="SearchCardsImageView"
           DataContext="{x:Bind ViewModel, Mode=OneTime}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
           Visibility="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
@@ -70,7 +70,7 @@
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardImageView
                 d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
-                DataContext="{Binding ElementName=SearcCardsImageView, Path=DataContext, Mode=OneTime}"
+                DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneWay}"
                 ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
             </DataTemplate>
