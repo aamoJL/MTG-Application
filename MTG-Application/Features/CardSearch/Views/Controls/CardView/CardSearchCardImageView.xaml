@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cardview:CardSearchCardViewBase
+  xmlns:cardview="using:MTGApplication.Features.CardSearch.Views.Controls.CardView"
+  x:Class="MTGApplication.Features.CardSearch.Views.Controls.CardView.CardSearchCardImageView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
+  mc:Ignorable="d">
+
+  <Grid Background="Transparent">
+    <Grid.ContextFlyout>
+      <CommandBarFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
+        <CommandBarFlyout.SecondaryCommands>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip"/>
+          <AppBarSeparator />
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind ShowPrintsCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.Info.ImporterName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}"/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+        </CommandBarFlyout.SecondaryCommands>
+      </CommandBarFlyout>
+    </Grid.ContextFlyout>
+    <StackPanel Orientation="Vertical">
+      <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
+      <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
+    </StackPanel>
+  </Grid>
+</cardview:CardSearchCardViewBase>

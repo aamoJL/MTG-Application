@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cardview:DeckEditorCardViewBase
+  x:Class="MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView.DeckEditorCardTextView"
+  xmlns:cardview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView"  
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:converters="using:MTGApplication.General.Views.BindingHelpers.Converters"
+  mc:Ignorable="d">
+
+  <cardview:DeckEditorCardViewBase.Resources>
+    <converters:BooleanToStarOrAutoConverter x:Key="BooleanToStarOrAutoConverter"/>
+  </cardview:DeckEditorCardViewBase.Resources>
+
+  <Grid Background="Transparent">
+    <Grid.ContextFlyout>
+      <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+        <CommandBarFlyout.PrimaryCommands>
+          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
+          <AppBarSeparator />
+          <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind DeleteButtonClick, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
+        </CommandBarFlyout.PrimaryCommands>
+        <CommandBarFlyout.SecondaryCommands>
+          <AppBarButton Command="{x:Bind ChangePrintCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+          <AppBarSeparator/>
+          <AppBarElementContainer AllowFocusOnInteraction="True" RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="Count" Margin="10, 5" VerticalAlignment="Center"/>
+              <NumberBox Value="{x:Bind Model.Count, Mode=OneWay}" VerticalAlignment="Center" Minimum="1" ValueChanged="NumberBox_ValueChanged"/>
+            </StackPanel>
+          </AppBarElementContainer>
+        </CommandBarFlyout.SecondaryCommands>
+      </CommandBarFlyout>
+    </Grid.ContextFlyout>
+    <Grid.ColumnDefinitions>
+      <!--Hack to make the grid aligned to left while being limited to maxwidth and having the column definitions working-->
+      <ColumnDefinition Width="1000*" MaxWidth="700"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Grid Grid.Column="0" Height="25" ColumnSpacing="5">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Grid Grid.Column="0">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+          <TextBlock Width="16" TextAlignment="Right" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
+          <Image Width="20" Margin="5 0 5 0" Visibility="{x:Bind SetIconVisible, Mode=OneWay}" Grid.Column="1" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
+        </StackPanel>
+      </Grid>
+      <Grid Grid.Column="1" ColumnSpacing="5">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="{x:Bind TypeLineVisible, Converter={StaticResource BooleanToStarOrAutoConverter}, Mode=OneWay}"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+          <TextBlock VerticalAlignment="Center" Text="{x:Bind Model.Info.Name, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+        </Grid>
+        <Grid Grid.Column="1" ColumnSpacing="5">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Visibility="{x:Bind TypeLineVisible, Mode=OneWay}" VerticalAlignment="Center" Text="{x:Bind Model.Info.TypeLine, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+          <TextBlock Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}"/>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Grid>
+</cardview:DeckEditorCardViewBase>

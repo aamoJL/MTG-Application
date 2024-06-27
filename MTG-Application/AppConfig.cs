@@ -1,13 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.UI.Xaml;
-using MTGApplication.Services;
+using MTGApplication.General.Services.IOServices;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace MTGApplication;
 
@@ -24,9 +22,6 @@ public static partial class AppConfig
   /// </summary>
   public static void Initialize()
   {
-    if (!File.Exists("appsettings.json"))
-    { throw new Exception("Error: App settings file not found. Look at 'appsettings - Template.json' file for more information"); }
-
     GlobalSettings.Load();
     LocalSettings.Load();
   }
@@ -46,6 +41,9 @@ public static partial class AppConfig
     /// </summary>
     public void Load()
     {
+      if (!File.Exists(fileName))
+        throw new Exception("Error: App settings file not found. Look at 'appsettings - Template.json' file for more information");
+
       var builder = new ConfigurationBuilder().AddJsonFile(fileName, optional: false);
       configurationRoot = builder.Build();
 
@@ -59,44 +57,37 @@ public static partial class AppConfig
   /// </summary>
   public partial class LocalAppSettings : ObservableObject
   {
+    // Application theme can only set on start, so the themeing needs to be done with ElementThemes
     [ObservableProperty] private ElementTheme appTheme = ElementTheme.Default;
 
     private readonly static string fileName = "settings.json";
-    private readonly static string filePath = Path.Join(IOService.GetAppDataPath(), fileName);
+    private readonly static string filePath = Path.Join(FileService.GetAppDataPath(), fileName);
 
     public LocalAppSettings() => PropertyChanged += (s, e) => Save();
 
     /// <summary>
     /// Saves local settings to json file
     /// </summary>
-    private void Save()
-    {
-      var json = JsonSerializer.Serialize(new
-      {
-        AppTheme,
-      });
-
-      IOService.WriteTextToFile(filePath, json);
-    }
+    private bool Save() => FileService.TryWriteTextToFile(filePath, JsonSerializer.Serialize(new { AppTheme = AppTheme }));
 
     /// <summary>
     /// Loads local settings from json file
     /// </summary>
     public void Load()
     {
-      if (!File.Exists(filePath)) return;
-      try
+      if (FileService.TryReadTextFromFile(filePath, out var data))
       {
-        var json = JsonNode.Parse(IOService.ReadTextFromFile(filePath));
-        var appTheme = json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default;
-        AppTheme = appTheme switch
+        if (JsonService.TryParseJson(data, out var json))
         {
-          1 => ElementTheme.Light,
-          2 => ElementTheme.Dark,
-          _ => ElementTheme.Default,
-        };
+          var appTheme = json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default;
+          AppTheme = appTheme switch
+          {
+            1 => ElementTheme.Light,
+            2 => ElementTheme.Dark,
+            _ => ElementTheme.Default,
+          };
+        }
       }
-      catch (Exception e) { Debug.WriteLine(e.Message); }
     }
   }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>MTGApplication</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -18,10 +18,18 @@
     <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Views\Styles\Template\**" />
-    <EmbeddedResource Remove="Views\Styles\Template\**" />
-    <None Remove="Views\Styles\Template\**" />
-    <Page Remove="Views\Styles\Template\**" />
+    <Compile Remove="Features\CardCollection\**" />
+    <Compile Remove="General\Views\Styles\Template\**" />
+    <Compile Remove="Windows\**" />
+    <EmbeddedResource Remove="Features\CardCollection\**" />
+    <EmbeddedResource Remove="General\Views\Styles\Template\**" />
+    <EmbeddedResource Remove="Windows\**" />
+    <None Remove="Features\CardCollection\**" />
+    <None Remove="General\Views\Styles\Template\**" />
+    <None Remove="Windows\**" />
+    <Page Remove="Features\CardCollection\**" />
+    <Page Remove="General\Views\Styles\Template\**" />
+    <Page Remove="Windows\**" />
   </ItemGroup>
   
   <ItemGroup>
@@ -36,27 +44,31 @@
     <None Remove="Assets\EDHREC.png" />
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
-    <None Remove="Views\Controls\CardAPISearchControl.xaml" />
-    <None Remove="Views\Controls\DeckBuilderTabHeaderControl.xaml" />
-    <None Remove="Views\Controls\DeckTestingBattlefieldCardControl.xaml" />
-    <None Remove="Views\Controls\LinedHeader.xaml" />
-    <None Remove="Views\Controls\MTGCardPreviewControl.xaml" />
-    <None Remove="Views\Controls\ScryfallSearchBarControl.xaml" />
+    <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
+    <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
+    <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\DeckTestingCardTextView.xaml" />
+    <None Remove="Features\DeckTesting\Views\Controls\DragCardPreview.xaml" />
+    <None Remove="Features\EdhrecSearch\Views\EdhrecSearchPage.xaml" />
+    <None Remove="General\Views\Controls\CardPreview\CardPreview.xaml" />
+    <None Remove="Features\CardSearch\CardSearchPage.xaml" />
+    <None Remove="Features\CardSearch\Views\Controls\CardSearchCardImageView.xaml" />
+    <None Remove="Features\CardSearch\Views\Controls\CardSearchCardTextView.xaml" />
+    <None Remove="Features\CardSearch\Views\Controls\ScryfallCardSearchInputControl.xaml" />
+    <None Remove="General\Views\Controls\LinedHeader.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
-    <None Remove="Views\DeckBuilderView.xaml" />
-    <None Remove="Views\Pages\DeckTestingPage.xaml" />
-    <None Remove="Views\Pages\EDHRECSearchPage.xaml" />
+    <None Remove="General\Views\Styles\CustomButtonStyles.xaml" />
+    <None Remove="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml" />
     <None Remove="README.md" />
-    <None Remove="Views\Pages\MTGCardCollectionPage.xaml" />
-    <None Remove="Views\Pages\MTGDeckBuildingPage.xaml" />
-    <None Remove="Views\Pages\Tabs\DeckBuilderDeckDisplayTabView.xaml" />
-    <None Remove="Views\Pages\Tabs\DeckBuilderTabFrame.xaml" />
-    <None Remove="Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
-    <None Remove="Views\Styles\CustomListViewStyle.xaml" />
-    <None Remove="Views\Styles\MTGPrintGridViewItemTemplate.xaml" />
-    <None Remove="Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
-    <None Remove="Views\Styles\Themes\VioletTheme.xaml" />
-    <None Remove="Views\Windows\ThemedWindow.xaml" />
+    <None Remove="General\Views\Styles\CustomAdaptiveGridViewStyle.xaml" />
+    <None Remove="General\Views\Styles\CustomListViewStyle.xaml" />
+    <None Remove="General\Views\Styles\MTGPrintGridViewItemTemplate.xaml" />
+    <None Remove="General\Views\Styles\PreviewImagePlaceholderImageStyle.xaml" />
+    <None Remove="General\Views\Styles\Themes\VioletTheme.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,15 +92,15 @@
     <PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-rc2.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.16" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.16">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.240211001" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -141,46 +153,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Styles\MTGPrintGridViewItemTemplate.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Pages\Tabs\DeckBuilderTabView.xaml">
+    <Page Update="General\Views\Controls\LinedHeader.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Styles\CustomListViewStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\DeckBuilderView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Controls\ScryfallSearchBarControl.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Styles\CustomPlaceholderImageStyle.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Styles\PreviewImagePlaceholderImageStyle.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Styles\CustomAdaptiveGridViewStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
 
@@ -193,70 +167,92 @@
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
   <ItemGroup>
-    <PRIResource Remove="Views\Styles\Template\**" />
+    <PRIResource Remove="General\Views\Styles\Template\**" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\Tabs\DeckBuilderTabFrame.xaml">
+    <Page Update="Features\CardSearch\CardSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\Tabs\DeckBuilderDeckDisplayTabView.xaml">
+    <Page Update="Features\MTGCardSearch\Controls\ScryfallCardSearchInputControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\DeckBuilderTabHeaderControl.xaml">
+    <Page Update="Features\MTGDeckBuilder\MTGDeckBuilderPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\MTGCardPreviewControl.xaml">
+    <Page Update="Features\MTGDeckView\MTGDeckView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\MTGDeckBuildingPage.xaml">
+    <PRIResource Remove="Windows\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
+    <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
+    <Folder Include="Features\DeckEditor\Editor\Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Windows\ThemedWindow.xaml">
+    <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\MTGCardCollectionPage.xaml">
+    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\CardAPISearchControl.xaml">
+    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\EDHRECSearchPage.xaml">
+    <PRIResource Remove="Features\CardCollection\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckTesting\Views\Controls\DeckTestingCardTextView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\DeckTestingBattlefieldCardControl.xaml">
+    <Page Update="Features\DeckTesting\DeckTestingPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Pages\DeckTestingPage.xaml">
+    <CustomAdditionalCompileInputs Remove="General\Views\Styles\CustomButtonStyles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="General\Views\Styles\CustomButtonStyles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\EdhrecSearch\Views\EdhrecSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Controls\LinedHeader.xaml">
+    <Page Update="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Styles\Themes\VioletTheme.xaml">
+    <Page Update="Features\DeckTesting\Views\Controls\DragCardPreview.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

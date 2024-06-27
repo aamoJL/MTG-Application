@@ -2,12 +2,10 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
-using MTGApplication.API;
-using MTGApplication.Database;
-using MTGApplication.Interfaces;
-using MTGApplication.Models;
-using MTGApplication.Views.Pages;
-using MTGApplication.Views.Windows;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow;
+using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Databases.Context;
+using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplication;
 
@@ -16,7 +14,7 @@ namespace MTGApplication;
 /// </summary>
 public partial class App : Application
 {
-  public static ICardAPI<MTGCard> MTGCardAPI { get; } = new ScryfallAPI();
+  public static MTGCardImporter MTGCardImporter { get; } = new ScryfallAPI();
 
   /// <summary>
   /// Initializes the singleton application object.  This is the first line of authored code
@@ -38,11 +36,7 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    new ThemedWindow
-    {
-      Title = "Deck Builder",
-      Content = new MTGDeckBuildingPage(),
-    }.Activate();
+    new DeckBuilderWindow().Activate();
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
   }

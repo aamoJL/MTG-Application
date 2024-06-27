@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+  x:Class="MTGApplication.Features.AppWindows.DeckBuilderWindow.DeckBuilderPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views" 
+  xmlns:customcontrols="using:MTGApplication.General.Views.Controls"
+  mc:Ignorable="d"
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+  <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <controls:DockPanel LastChildFill="True">
+
+      <!--#region Side Panel Buttons -->
+      <StackPanel controls:DockPanel.Dock="Left" Orientation="Vertical" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+        <AppBarButton Command="{x:Bind SwitchSearchPanelCommand, Mode=OneTime}" Label="Search" Width="50">
+          <AppBarButton.Icon>
+            <FontIcon Glyph="&#xE721;"/>
+          </AppBarButton.Icon>
+        </AppBarButton>
+      </StackPanel>
+      <!--#endregion-->
+
+      <SplitView
+        controls:DockPanel.Dock="Left"
+        PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" 
+        IsPaneOpen="{x:Bind IsSearchPaneOpen, Mode=OneWay}"
+        OpenPaneLength="780" 
+        CompactPaneLength="0"
+        DisplayMode="CompactInline" 
+        BorderThickness="0">
+        <SplitView.Pane>
+          
+          <!--#region Search Panel -->
+          <cardsearch:CardSearchPage Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"/>
+          <!--#endregion-->
+          
+        </SplitView.Pane>
+        <Grid>
+
+          <!--#region Deck View Tabs -->
+          <TabView
+            TabItemsSource="{x:Bind TabViewItems, Mode=OneWay}"
+            IsAddTabButtonVisible="True" 
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch" 
+            CloseButtonOverlayMode="Auto"
+            AddTabButtonClick="TabView_AddTabButtonClick"
+            TabCloseRequested="TabView_TabCloseRequested"
+            CanReorderTabs="True"/>
+          <!--#endregion-->
+
+          <!--#region Corner Buttons -->
+          <StackPanel Height="40" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Margin="0 0 5 0">
+            <Button MinWidth="40" Height="30" Content="Collections" Command="{x:Bind OpenCardCollectionWindowCommand, Mode=OneTime}"/>
+            <Button MinWidth="40" Height="30" Command="{x:Bind SwitchWindowThemeCommand, Mode=OneTime}">
+              <FontIcon Glyph="&#xE793;"/>
+            </Button>
+          </StackPanel>
+          <!--#endregion-->
+          
+        </Grid>
+      </SplitView>
+    </controls:DockPanel>
+
+    <!--#region Card Preview -->
+    <customcontrols:CardPreview/>
+    <!--#endregion-->
+    
+  </Grid>
+</Page>

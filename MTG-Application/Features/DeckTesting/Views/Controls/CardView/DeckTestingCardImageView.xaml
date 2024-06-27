@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:DeckTestingCardViewBase
+  x:Class="MTGApplication.Features.DeckTesting.Views.Controls.CardView.DeckTestingCardImageView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  mc:Ignorable="d">
+
+  <Grid>
+    <controls:ImageEx 
+      Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
+      Style="{StaticResource PlaceholderImageStyle}"
+      CornerRadius="7">
+      <controls:ImageEx.ContextFlyout>
+        <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+          <MenuFlyoutItem Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Text="Flip"/>
+        </MenuFlyout>
+      </controls:ImageEx.ContextFlyout>
+    </controls:ImageEx>
+  </Grid>
+</local:DeckTestingCardViewBase>

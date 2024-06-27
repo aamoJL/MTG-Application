@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+  x:Class="MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl.ScryfallCardSearchInputControl"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:CommunityToolkit.WinUI.UI"
+  xmlns:api="using:MTGApplication.General.Services.API.CardAPI"
+  xmlns:local="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl"
+  mc:Ignorable="d">
+
+  <Grid ColumnSpacing="0" VerticalAlignment="Top">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="auto"/>
+      <ColumnDefinition Width="auto"/>
+    </Grid.ColumnDefinitions>
+    <TextBox 
+      x:Name="SearchTextBox"
+      Grid.Column="0"
+      PlaceholderText="Search..." 
+      IsSpellCheckEnabled="False" 
+      CornerRadius="4 0 0 4"
+      BorderThickness="1"
+      Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+      <TextBox.Header>
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Scryfall search"/>
+          <TextBlock Margin="10 0 0 0">
+            <Hyperlink
+              Foreground="{ThemeResource SystemAccentColorLight1}"
+              NavigateUri="{x:Bind api:ScryfallAPI.API_REFERENCE_URL, Mode=OneTime}"
+              ToolTipService.ToolTip="{x:Bind api:ScryfallAPI.API_REFERENCE_URL, Mode=OneTime}">
+              <Run Text="syntax?"/>
+            </Hyperlink>
+          </TextBlock>
+        </StackPanel>
+      </TextBox.Header>
+    </TextBox>
+    <StackPanel Grid.Column="1" Orientation="Horizontal">
+      <ComboBox 
+        Header="Format"
+        VerticalAlignment="Bottom" 
+        HorizontalAlignment="Stretch"
+        CornerRadius="0" 
+        BorderThickness="0 1 1 1" 
+        Width="85"
+        ItemsSource="{ui:EnumValues Type=local:GameFormat}"
+        SelectedItem="{x:Bind ViewModel.SearchGameFormat, Mode=TwoWay}"/>
+      <ComboBox 
+        Header="Unique"
+        VerticalAlignment="Bottom" 
+        HorizontalAlignment="Stretch"
+        CornerRadius="0" 
+        BorderThickness="0 1 1 1" 
+        Width="85"
+        ItemsSource="{ui:EnumValues Type=local:CardUniqueness}"
+        SelectedItem="{x:Bind ViewModel.SearchCardUniqueness, Mode=TwoWay}"/>
+      <ComboBox 
+        Header="Order" 
+        VerticalAlignment="Bottom" 
+        HorizontalAlignment="Stretch"
+        CornerRadius="0" 
+        BorderThickness="0 1 1 1" 
+        Width="105"
+        ItemsSource="{ui:EnumValues Type=local:SearchOrderProperty}"
+        SelectedItem="{x:Bind ViewModel.SearchOrderProperty, Mode=TwoWay}" />
+      <ComboBox 
+        Header="Direction" 
+        VerticalAlignment="Bottom" 
+        HorizontalAlignment="Stretch"
+        CornerRadius="0" 
+        BorderThickness="0 1 1 1" 
+        Width="80"
+        ItemsSource="{ui:EnumValues Type=local:SearchOrderDirection}"
+        SelectedItem="{x:Bind ViewModel.SearchOrderDirection, Mode=TwoWay}" />
+    </StackPanel>
+    <Button 
+      Grid.Column="2" 
+      VerticalAlignment="Bottom"
+      HorizontalAlignment="Stretch"
+      CornerRadius="0 4 4 0" 
+      BorderThickness="0 1 1 1" 
+      Height="32"
+      Click="SubmitButton_Click"
+      Command="{x:Bind Submit, Mode=OneTime}"
+      CommandParameter="{x:Bind ViewModel.SearchQuery, Mode=OneWay}">
+      <Button.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SearchTextBox, Mode=OneTime}"/>
+      </Button.KeyboardAccelerators>
+      <SymbolIcon Symbol="Find"/>
+    </Button>
+  </Grid>
+</UserControl>

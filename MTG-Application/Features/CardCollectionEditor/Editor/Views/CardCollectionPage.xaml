@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+  x:Class="MTGApplication.Features.CardCollectionEditor.Editor.Views.CardCollectionPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:sys="using:System"
+  xmlns:customControls="using:MTGApplication.General.Views.Controls"
+  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:converters="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls.Converters" 
+  xmlns:localControls="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls" 
+  xmlns:models="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models" 
+  xmlns:viewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels" 
+  xmlns:listViewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels"
+  mc:Ignorable="d"
+  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+  KeyboardAcceleratorPlacementMode="Hidden">
+
+  <Page.Resources>
+    <converters:BoolToSelectionModeConverter x:Key="BoolToSelectionModeConverter" />
+  </Page.Resources>
+
+  <!--#region Keyboard Accelerators -->
+  <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened-->
+  <Page.KeyboardAccelerators>
+    <KeyboardAccelerator Modifiers="Control" Key="N" Invoked="NewCollectionKeyboardAccelerator_Invoked" />
+    <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="SaveCollectionKeyboardAccelerator_Invoked" />
+    <KeyboardAccelerator Modifiers="Control" Key="O" Invoked="OpenCollectionKeyboardAccelerator_Invoked" />
+  </Page.KeyboardAccelerators>
+  <!--#endregion-->
+
+  <Grid>
+
+    <!--#region Visual State Manager -->
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="CollectionNameTitleSaveState">
+        <!--NOTE: Changes name text to "Unsaved" if the collection has no name-->
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.CollectionName, Mode=OneWay}" To="{x:Bind sys:String.Empty}" />
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedCollectionNameTitle.Text" Value="Unsaved" />
+            <Setter Target="SelectedCollectionNameTitle.FontStyle" Value="Italic" />
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="LightGray" />
+          </VisualState.Setters>
+        </VisualState>
+
+        <!--NOTE: Changes name text to different color to show that the collection has unsaved changes-->
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True" />
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="SelectedCollectionNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}" />
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    <!--#endregion-->
+
+    <controls:DockPanel LastChildFill="True" Padding="0 0 0 10">
+
+      <!--#region Command bar -->
+      <Grid controls:DockPanel.Dock="Top" BorderThickness="0 0 0 1" BorderBrush="{ThemeResource RegionColor}">
+        <StackPanel Orientation="Horizontal">
+
+          <!--#region File: Collection -->
+          <AppBarButton Label="Collection">
+            <AppBarButton.Icon>
+              <FontIcon Glyph="&#xE8E5;" />
+            </AppBarButton.Icon>
+            <AppBarButton.Flyout>
+              <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                <MenuFlyoutItem Text="New" Command="{x:Bind ViewModel.NewCollectionCommand, Mode=OneWay}" KeyboardAcceleratorTextOverride="Ctrl+N" />
+                <MenuFlyoutItem Text="Open..." Command="{x:Bind ViewModel.OpenCollectionCommand, Mode=OneWay}" KeyboardAcceleratorTextOverride="Ctrl+O" />
+                <MenuFlyoutItem x:Name="SaveButton" Text="Save..." Command="{x:Bind ViewModel.CardCollectionViewModel.SaveCollectionCommand, Mode=OneWay}" KeyboardAcceleratorTextOverride="Ctrl+S" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Delete Collection" Command="{x:Bind ViewModel.CardCollectionViewModel.DeleteCollectionCommand, Mode=OneWay}" Background="IndianRed" />
+              </MenuFlyout>
+            </AppBarButton.Flyout>
+          </AppBarButton>
+          <!--#endregion-->
+
+          <AppBarSeparator />
+
+          <!--#region File: List -->
+          <AppBarButton Label="List">
+            <AppBarButton.Icon>
+              <FontIcon Glyph="&#xE8E5;" />
+            </AppBarButton.Icon>
+            <AppBarButton.Flyout>
+              <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                <MenuFlyoutItem Text="New..." Command="{x:Bind ViewModel.CardCollectionViewModel.NewListCommand, Mode=OneWay}" />
+                <MenuFlyoutItem Text="Edit..." Command="{x:Bind ViewModel.CardCollectionListViewModel.EditListCommand, Mode=OneWay}" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Import..." Command="{x:Bind ViewModel.CardCollectionListViewModel.ImportCardsCommand, Mode=OneWay}" />
+                <MenuFlyoutItem Text="Export..." Command="{x:Bind ViewModel.CardCollectionListViewModel.ExportCardsCommand, Mode=OneWay}" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Delete List" Command="{x:Bind ViewModel.CardCollectionViewModel.DeleteListCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.SelectedCardCollectionList, Mode=OneWay}" Background="IndianRed" />
+              </MenuFlyout>
+            </AppBarButton.Flyout>
+          </AppBarButton>
+          <!--#endregion-->
+
+          <!--#region List Selector-->
+          <customControls:ComboBoxWithCommands
+            ItemsSource="{x:Bind ViewModel.CardCollectionViewModel.CollectionLists, Mode=OneWay}"
+            SelectedItem="{x:Bind ViewModel.SelectedCardCollectionList, Mode=TwoWay}"
+            SelectionChangedCommand="{x:Bind ViewModel.ChangeListCommand, Mode=OneTime}"
+            VerticalAlignment="Center"
+            Width="200"
+            Margin="5 0 5 0"
+            IsEnabled="{x:Bind helpers:Comparison.MoreThan(ViewModel.CardCollectionViewModel.CollectionLists.Count, 0), Mode=OneWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="models:MTGCardCollectionList">
+                <TextBlock Text="{Binding Name, Mode=OneWay}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </customControls:ComboBoxWithCommands>
+          <!--#endregion-->
+
+          <AppBarSeparator />
+
+          <!--#region Collection Info -->
+          <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10 0 0 0">
+            <TextBlock x:Name="SelectedCollectionNameTitle" Text="{x:Bind ViewModel.CollectionName, Mode=OneWay}" FontWeight="Bold" />
+            <TextBlock>
+              <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.CardCollectionListViewModel.OwnedCards.Count), Mode=OneWay}" />
+              <Run Text="{x:Bind sys:String.Format('{0} cards collected', ViewModel.CardCollectionListViewModel.QueryCardsViewModel.TotalCardCount), Mode=OneWay}" />
+            </TextBlock>
+          </StackPanel>
+          <!--#endregion-->
+
+          <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0" />
+        </StackPanel>
+
+        <!--#region Card View Information -->
+        <Grid HorizontalAlignment="Right" Padding="0 0 10 0">
+          <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 5 0 0" />
+          <TextBlock VerticalAlignment="Bottom">
+            <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.CardCollectionListViewModel.QueryCardsViewModel.Collection.Count), Mode=OneWay}" />
+            <Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.CardCollectionListViewModel.QueryCardsViewModel.TotalCardCount), Mode=OneWay}" />
+          </TextBlock>
+        </Grid>
+        <!--#endregion-->
+
+      </Grid>
+      <!--#endregion-->
+
+      <!--#region Card View -->
+      <controls:AdaptiveGridView
+        x:Name="ListCardImageView"
+        controls:DockPanel.Dock="Top"
+        DataContext="{x:Bind ViewModel.CardCollectionListViewModel, Mode=OneWay}"
+        ItemsSource="{Binding QueryCardsViewModel.Collection, Mode=OneWay}"
+        Style="{StaticResource MTGAdaptiveGridViewStyle}"
+        SelectionMode="None"
+        DesiredWidth="250">
+        <controls:AdaptiveGridView.ItemTemplate>
+          <DataTemplate x:DataType="models:CardCollectionMTGCard">
+            <localControls:CardCollectionCardImageView
+              d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
+              DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
+              Model="{x:Bind Mode=OneTime}"
+              ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
+              SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
+              OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
+          </DataTemplate>
+        </controls:AdaptiveGridView.ItemTemplate>
+      </controls:AdaptiveGridView>
+      <!--#endregion-->
+
+    </controls:DockPanel>
+  </Grid>
+</Page>

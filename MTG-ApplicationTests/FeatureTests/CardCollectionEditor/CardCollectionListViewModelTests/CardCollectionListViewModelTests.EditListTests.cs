@@ -1,0 +1,268 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
+using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
+
+namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
+public partial class CardCollectionListViewModelTests
+{
+  [TestClass]
+  public class EditListTests : CardCollectionListViewModelTestsBase, ICanExecuteCommandAsyncTests
+  {
+    [TestMethod("Should not be able to execute if the list does not have a name")]
+    public async Task InvalidState_CanNotExecute()
+    {
+      var viewmodel = await new Mocker(_dependencies).MockVM();
+
+      Assert.IsFalse(viewmodel.EditListCommand.CanExecute(null));
+    }
+
+    [TestMethod("Should be able to execute if the list has a name")]
+    public async Task ValidState_CanExecute()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+      }.MockVM();
+
+      Assert.IsTrue(viewmodel.EditListCommand.CanExecute(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_EditConfirmationShown()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new TestExceptionConfirmer<(string, string)?, (string, string)>(),
+        }
+      }.MockVM();
+
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_Cancel_NoChanges()
+    {
+      var searchQuery = _savedList.SearchQuery;
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult<(string, string)?>(null)
+          }
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(searchQuery, viewmodel.Query);
+    }
+
+    [TestMethod]
+    public async Task EditList_Success_NameChanged()
+    {
+      var name = "New Name";
+      var query = "New Query";
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, query))
+          }
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(name, viewmodel.Name);
+    }
+
+    [TestMethod]
+    public async Task EditList_Success_QueryChanged()
+    {
+      var name = "New Name";
+      var query = "New Query";
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, query))
+          }
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(query, viewmodel.Query);
+    }
+
+    [TestMethod]
+    public async Task EditList_Success_QueryCardsUpdated()
+    {
+      var name = "New Name";
+      var query = "New Query";
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, query))
+          }
+        }
+      }.MockVM();
+
+      Assert.AreEqual(0, viewmodel.QueryCardsViewModel.TotalCardCount);
+
+      _dependencies.Importer.ExpectedCards = [new(MTGCardInfoMocker.MockInfo(name: "Card"))];
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(1, viewmodel.QueryCardsViewModel.TotalCardCount);
+    }
+
+    [TestMethod]
+    public async Task EditList_Success_HasUnsavedChanges()
+    {
+      var name = "New Name";
+      var query = "New Query";
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, query))
+          }
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.IsTrue(viewmodel.HasUnsavedChanges);
+    }
+
+    [TestMethod]
+    public async Task EditList_NoName_ErrorNotificationShown()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((string.Empty, "New Query"))
+          }
+        },
+        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+      }.MockVM();
+
+      await NotificationAssert.NotificationSent(NotificationType.Error,
+        () => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_NoQuery_ErrorNotificationShown()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(("New Name", string.Empty))
+          }
+        },
+        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+      }.MockVM();
+
+      await NotificationAssert.NotificationSent(NotificationType.Error,
+        () => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_Exists_ErrorNotificationShown()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(("Name", "New Query"))
+          }
+        },
+        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) },
+        ExistsValidator = (name) => true
+      }.MockVM();
+
+      await NotificationAssert.NotificationSent(NotificationType.Error,
+        () => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_SameName_NoErrorNotificationShown()
+    {
+      var name = _savedList.Name;
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, "New Query"))
+          }
+        },
+        Notifier = new()
+        {
+          OnNotify = msg =>
+          {
+            if (msg.NotificationType == NotificationType.Error)
+              Assert.Fail();
+          }
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+    }
+
+    [TestMethod]
+    public async Task EditList_Success_SuccessNotificationShown()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+          }
+        },
+        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+      }.MockVM();
+
+      await NotificationAssert.NotificationSent(NotificationType.Success,
+        () => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+  }
+}
