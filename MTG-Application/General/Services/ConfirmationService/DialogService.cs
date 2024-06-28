@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Extensions;
 using System;
 using System.Threading.Tasks;
@@ -22,17 +23,40 @@ public static partial class DialogService
   /// </summary>
   public class DialogWrapper(XamlRoot xamlRoot)
   {
-    public XamlRoot XamlRoot { get; set; } = xamlRoot;
     public ContentDialog CurrentDialog { get; private set; }
+    public XamlRoot XamlRoot { get; set; } = xamlRoot;
 
+    public async Task<T> ShowAsync<T>(CustomContentDialog<T> dialog, bool force = false)
+    {
+      dialog.XamlRoot = XamlRoot;
+      var contentDialog = dialog;
+
+      // Only one dialog can be open on a window
+      if (force)
+        CurrentDialog?.Hide();
+      else if (CurrentDialog != null)
+        return default;
+
+      CurrentDialog = contentDialog;
+      var result = await contentDialog.ShowAsync();
+
+      if (CurrentDialog == contentDialog)
+        CurrentDialog = null;
+
+      return result;
+    }
+
+    [Obsolete("Use ContentDialogs")]
     public virtual async Task<ContentDialogResult> ShowAsync(Dialog dialog, bool force = false)
     {
       var contentDialog = dialog.GetDialog(XamlRoot);
 
-      // TODO: opening multiple dialogs still crashes the app
-      // Only one dialog can be open at once on the window
-      if (force && CurrentDialog != null) { CurrentDialog.Hide(); CurrentDialog = null; }
-      if (CurrentDialog != null) { return ContentDialogResult.None; }
+      // Only one dialog can be open on a window
+      if (force)
+        CurrentDialog?.Hide();
+      else if (CurrentDialog != null)
+        return ContentDialogResult.None;
+
       CurrentDialog = contentDialog;
       var result = await contentDialog.ShowAsync();
       CurrentDialog = null;
@@ -122,51 +146,6 @@ public static partial class DialogService
 public static partial class DialogService
 {
   #region Dialog Types
-  /// <summary>
-  /// Dialog that asks confirmation from the user.
-  /// </summary>
-  public class ConfirmationDialog(string title = "") : Dialog<bool?>(title)
-  {
-    public string Message { get; set; }
-
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      var dialog = base.GetDialog(root);
-      dialog.Content = Message;
-      return dialog;
-    }
-
-    public override bool? ProcessResult(ContentDialogResult result)
-    {
-      return result switch
-      {
-        ContentDialogResult.Primary => true,
-        ContentDialogResult.Secondary => false,
-        _ => null
-      };
-    }
-  }
-
-  /// <summary>
-  /// Dialog that shows a message to the used.
-  /// Dialog has only close button
-  /// </summary>
-  public class MessageDialog(string title = "") : Dialog<bool?>(title)
-  {
-    public string Message { get; set; }
-
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      var dialog = base.GetDialog(root);
-      dialog.Content = Message;
-      dialog.CloseButtonText = "Close";
-      dialog.PrimaryButtonText = string.Empty;
-      dialog.SecondaryButtonText = string.Empty;
-      return dialog;
-    }
-
-    public override bool? ProcessResult(ContentDialogResult result) => true;
-  }
 
   /// <summary>
   /// Dialog with a checkbox
@@ -330,42 +309,6 @@ public static partial class DialogService
       return result switch
       {
         ContentDialogResult.Primary => TextInputText,
-        ContentDialogResult.Secondary => string.Empty,
-        _ => null,
-      };
-    }
-  }
-
-  /// <summary>
-  /// Dialog with a combobox input
-  /// </summary>
-  public class ComboBoxDialog(string title = "") : Dialog<string>(title)
-  {
-    protected ComboBox comboBox;
-
-    public string Selection { get; set; }
-    public string InputHeader { get; set; }
-    public string[] Items { get; set; }
-
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      comboBox = new ComboBox()
-      {
-        ItemsSource = Items,
-        Header = InputHeader,
-      };
-      var dialog = base.GetDialog(root);
-      dialog.Content = comboBox;
-
-      comboBox.SelectionChanged += (s, e) => { Selection = (string)comboBox.SelectedValue; };
-      return dialog;
-    }
-
-    public override string ProcessResult(ContentDialogResult result)
-    {
-      return result switch
-      {
-        ContentDialogResult.Primary => Selection,
         ContentDialogResult.Secondary => string.Empty,
         _ => null,
       };

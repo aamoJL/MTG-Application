@@ -1,4 +1,6 @@
-﻿namespace MTGApplication.General.Services.ConfirmationService.Extensions;
+﻿using Microsoft.UI.Xaml.Controls;
+
+namespace MTGApplication.General.Services.ConfirmationService.Extensions;
 
 public static partial class ConfirmationExtensions
 {

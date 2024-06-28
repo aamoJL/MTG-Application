@@ -18,7 +18,14 @@ public sealed partial class DeckEditorPage : Page
   {
     InitializeComponent();
 
-    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, () => new(XamlRoot));
+    Loaded += DeckEditorPage_Loaded;
+  }
+
+  private void DeckEditorPage_Loaded(object sender, RoutedEventArgs e)
+  {
+    Loaded -= DeckEditorPage_Loaded;
+    
+    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, wrapper: new(XamlRoot));
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 

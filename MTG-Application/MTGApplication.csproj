@@ -7,7 +7,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
@@ -15,7 +14,6 @@
     <SignAssembly>False</SignAssembly>
     <WindowsPackageType>None</WindowsPackageType>
     <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
-    <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <!--JsonSerializerIsReflectionEnabledByDefault needs to be true, if trim mode is enabled-->
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
@@ -65,6 +63,9 @@
     <None Remove="Features\CardSearch\Views\Controls\ScryfallCardSearchInputControl.xaml" />
     <None Remove="General\Views\Controls\LinedHeader.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\ComboBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml" />
     <None Remove="General\Views\Styles\CustomButtonStyles.xaml" />
     <None Remove="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml" />
     <None Remove="README.md" />
@@ -239,6 +240,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Styles\CustomButtonStyles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\ComboBoxDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\EdhrecSearch\Views\EdhrecSearchPage.xaml">
