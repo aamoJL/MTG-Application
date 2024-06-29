@@ -49,6 +49,7 @@
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
+    <None Remove="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml" />
@@ -289,6 +290,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="General\Views\Dialogs\Controls\GridViewDialog.xaml">
