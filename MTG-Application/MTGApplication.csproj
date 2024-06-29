@@ -65,6 +65,7 @@
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ComboBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\TextBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml" />
     <None Remove="General\Views\Styles\CustomButtonStyles.xaml" />
@@ -282,5 +283,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\TextBoxDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>
