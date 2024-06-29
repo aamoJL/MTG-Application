@@ -65,6 +65,7 @@
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ComboBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\GridViewDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\TextAreaDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\TextBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml" />
@@ -288,6 +289,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\GridViewDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="General\Views\Dialogs\Controls\TextBoxDialog.xaml">

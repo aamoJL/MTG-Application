@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.Models;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Dialogs.UseCases;
@@ -17,14 +18,19 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
     confirmers.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(wrapper).Execute((msg.Title, msg.Message));
     confirmers.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(wrapper).Execute((msg.Title, msg.Message));
     confirmers.ShowTokensConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
-      {
-        Items = msg.Data.ToArray(),
-        PrimaryButtonText = string.Empty,
-        SecondaryButtonText = string.Empty,
-        CloseButtonText = "Close"
-      }.ShowAsync(wrapper) as MTGCard;
+      =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
 
+      return (await wrapper.ShowAsync(new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template)
+      {
+        PrimaryButtonText = string.Empty,
+        CloseButtonText = "Close",
+      })) as MTGCard;
+    };
     confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg
       => await wrapper.ShowAsync(new TextAreaDialog(msg.Title)
       {
@@ -47,17 +53,27 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
     confirmers.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg)
       => await wrapper.ShowAsync(new TwoButtonConfirmationDialog(msg.Title, msg.Message));
     confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
-      {
-        Items = msg.Data.ToArray(),
-        SecondaryButtonText = string.Empty
-      }.ShowAsync(wrapper) as MTGCard;
+      =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await wrapper.ShowAsync(new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template))) as MTGCard;
+    };
     confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await wrapper.ShowAsync(new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template)
       {
-        Items = msg.Data.ToArray(),
         PrimaryButtonText = "Change",
-        SecondaryButtonText = string.Empty,
-      }.ShowAsync(wrapper) as MTGCard;
+      })) as MTGCard;
+    };
   }
 }

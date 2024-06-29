@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using MTGApplication.General.Views.Dialogs.Controls;
@@ -62,6 +60,7 @@ public static partial class DialogService
     }
   }
 
+  [Obsolete("Use Content Dialog")]
   /// <summary>
   /// Base class for dialogs
   /// </summary>
@@ -120,6 +119,7 @@ public static partial class DialogService
     }
   }
 
+  [Obsolete("Use Content Dialog")]
   /// <summary>
   /// Base class for dialogs that returns a value.
   /// Returned value is <typeparamref name="T"/>
@@ -138,98 +138,4 @@ public static partial class DialogService
     public new async Task<T> ShowAsync(DialogWrapper wrapper, bool force = false)
       => ProcessResult(await base.ShowAsync(wrapper, force));
   }
-}
-
-// TODO: dialogs to views?
-// Basic dialog types
-public static partial class DialogService
-{
-  #region Dialog Types
-
-  /// <summary>
-  /// Dialog with a gridview input
-  /// </summary>
-  public class GridViewDialog<T>(string title = "", string itemTemplate = "", string gridStyle = "") : Dialog<object>(title)
-  {
-    protected GridView gridView;
-
-    public T Selection { get; set; }
-    public T[] Items { get; set; }
-    public object GridStyle { get; } = gridStyle;
-    public object GridItemTemplate { get; } = itemTemplate;
-
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      Application.Current.Resources.TryGetValue(GridItemTemplate, out var template);
-      Application.Current.Resources.TryGetValue(GridStyle, out var style);
-
-      gridView = new AdaptiveGridView()
-      {
-        DesiredWidth = 250,
-        Style = (Style)style,
-        ItemTemplate = (DataTemplate)template,
-        ItemsSource = Items,
-      };
-
-      var dialog = base.GetDialog(root);
-      dialog.Content = gridView;
-
-      gridView.SelectionChanged += (s, e) => { Selection = (T)gridView.SelectedItem; };
-
-      dialog.Loaded += (sender, e) =>
-      {
-        var root = VisualTreeHelper.GetParent(dialog);
-        var primaryButton = root.FindChildByName("PrimaryButton") as Button;
-
-        // Add event to click the primary button when selected item has been double tapped.
-        (dialog.Content as GridView).DoubleTapped += (sender, e) =>
-        {
-          var PrimaryFeap = FrameworkElementAutomationPeer.FromElement(primaryButton) as ButtonAutomationPeer;
-          if (PrimaryFeap != null)
-          {
-            // Click the primary button
-            PrimaryFeap?.Invoke();
-          }
-          else
-          {
-            // If primary button is not available, close the dialog
-            dialog.Hide();
-          }
-        };
-      };
-      return dialog;
-    }
-
-    public override object ProcessResult(ContentDialogResult result)
-    {
-      return result switch
-      {
-        ContentDialogResult.Primary => Selection,
-        _ => null
-      };
-    }
-  }
-
-  /// <summary>
-  /// GridViewDialog that has draggable items.
-  /// Dragging will close the dialog automaticly.
-  /// </summary>
-  /// <typeparam name="T">Items type</typeparam>
-  public class DraggableGridViewDialog<T>(string title = "", string itemTemplate = "", string gridStyle = "") : GridViewDialog<T>(title, itemTemplate, gridStyle)
-  {
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      var dialog = base.GetDialog(root);
-
-      var gridview = (dialog.Content as GridView);
-      gridview.CanDragItems = true;
-
-      (dialog.Content as GridView).DragItemsStarting += (s, e) => DraggableGridViewDialog_DragItemsStarting(dialog, e);
-
-      return dialog;
-    }
-
-    protected virtual void DraggableGridViewDialog_DragItemsStarting(ContentDialog dialog, DragItemsStartingEventArgs e) => dialog.Hide();
-  }
-  #endregion
 }

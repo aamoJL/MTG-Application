@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.CardCollectionEditor.Editor.Services;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.Controls;
@@ -35,10 +36,14 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
         InputText = msg.Data,
         PrimaryButtonText = "Copy to Clipboard",
       });
-    confirmers.CardCollectionListConfirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg) => (await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+    confirmers.CardCollectionListConfirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg) =>
     {
-      Items = msg.Data.ToArray(),
-      SecondaryButtonText = string.Empty
-    }.ShowAsync(wrapper)) as MTGCard;
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await wrapper.ShowAsync(new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template))) as MTGCard;
+    };
   }
 }
