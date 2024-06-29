@@ -65,6 +65,7 @@
     <None Remove="CustomPlaceholderImageStyle.xaml" />
     <None Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ComboBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\TextAreaDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\TextBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml" />
@@ -207,6 +208,10 @@
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="General\Views\Dialogs\Controls\TextAreaDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

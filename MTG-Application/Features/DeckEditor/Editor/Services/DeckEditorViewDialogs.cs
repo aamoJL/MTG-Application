@@ -25,19 +25,19 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
         CloseButtonText = "Close"
       }.ShowAsync(wrapper) as MTGCard;
 
-    confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
-    {
-      TextInputText = msg.Data,
-      PrimaryButtonText = "Copy to Clipboard",
-      SecondaryButtonText = string.Empty
-    }.ShowAsync(wrapper);
-    confirmers.CardListConfirmers.ImportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
-    {
-      TextInputText = msg.Data,
-      InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
-      PrimaryButtonText = "Import",
-      SecondaryButtonText = string.Empty
-    }.ShowAsync(wrapper);
+    confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg
+      => await wrapper.ShowAsync(new TextAreaDialog(msg.Title)
+      {
+        InputText = msg.Data,
+        PrimaryButtonText = "Copy to Clipboard",
+      });
+    confirmers.CardListConfirmers.ImportConfirmer.OnConfirm = async msg
+      => await wrapper.ShowAsync(new TextAreaDialog(msg.Title)
+      {
+        InputText = msg.Data,
+        InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
+        PrimaryButtonText = "Import",
+      });
     confirmers.CardListConfirmers.AddMultipleConflictConfirmer.OnConfirm = async (msg)
       => await wrapper.ShowAsync(new CheckBoxDialog(msg.Title, msg.Message)
       {

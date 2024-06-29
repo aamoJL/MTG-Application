@@ -147,66 +147,6 @@ public static partial class DialogService
   #region Dialog Types
 
   /// <summary>
-  /// Dialog with a text area input
-  /// </summary>
-  public class TextAreaDialog(string title = "") : Dialog<string>(title)
-  {
-    protected TextBox textBox;
-
-    public string TextInputText { get; set; } = "";
-    public string InputHeaderText { get; set; } = "";
-    public string InputPlaceholderText { get; set; } = "";
-    public char[] InvalidInputCharacters { get; init; } = Array.Empty<char>();
-    public bool IsSpellCheckEnabled { get; set; }
-
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      textBox = new()
-      {
-        Header = InputHeaderText,
-        AcceptsReturn = true,
-        IsSpellCheckEnabled = IsSpellCheckEnabled,
-        PlaceholderText = InputPlaceholderText,
-        Text = TextInputText ?? string.Empty,
-        SelectionStart = TextInputText?.Length ?? 0,
-        Height = 500,
-        Width = 800,
-      };
-      var dialog = base.GetDialog(root);
-      dialog.Content = textBox;
-
-      if (InvalidInputCharacters.Length > 0)
-      {
-        textBox.TextChanging += (sender, args) =>
-        {
-          var text = sender.Text;
-          foreach (var c in System.IO.Path.GetInvalidFileNameChars())
-          {
-            text = text.Replace(c.ToString(), string.Empty);
-          }
-          var oldSelectionStart = sender.SelectionStart;
-          sender.Text = text;
-          sender.Select(oldSelectionStart, 0);
-        };
-      }
-
-      TextInputText = textBox.Text;
-      textBox.TextChanged += (s, e) => { TextInputText = textBox.Text; };
-      return dialog;
-    }
-
-    public override string ProcessResult(ContentDialogResult result)
-    {
-      return result switch
-      {
-        ContentDialogResult.Primary => TextInputText,
-        ContentDialogResult.Secondary => string.Empty,
-        _ => null,
-      };
-    }
-  }
-
-  /// <summary>
   /// Dialog with a gridview input
   /// </summary>
   public class GridViewDialog<T>(string title = "", string itemTemplate = "", string gridStyle = "") : Dialog<object>(title)
