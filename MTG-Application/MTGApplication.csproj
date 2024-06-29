@@ -63,6 +63,7 @@
     <None Remove="Features\CardSearch\Views\Controls\ScryfallCardSearchInputControl.xaml" />
     <None Remove="General\Views\Controls\LinedHeader.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ComboBoxDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml" />
     <None Remove="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml" />
@@ -275,5 +276,11 @@
     <Page Update="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
   </ItemGroup>
 </Project>

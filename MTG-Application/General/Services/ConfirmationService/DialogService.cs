@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.ConfirmationService;
 
-// TODO: dialogs to views?
-
 /// <summary>
 /// Service to show dialogs on windows.
 /// </summary>
@@ -142,61 +140,11 @@ public static partial class DialogService
   }
 }
 
+// TODO: dialogs to views?
 // Basic dialog types
 public static partial class DialogService
 {
   #region Dialog Types
-
-  /// <summary>
-  /// Dialog with a checkbox
-  /// </summary>
-  public class CheckBoxDialog(string title = "") : Dialog<(bool? answer, bool? isChecked)>(title)
-  {
-    protected CheckBox checkBox;
-    protected TextBlock textBlock;
-
-    public string Message { get; set; }
-    public string InputText { get; set; }
-    public bool? IsChecked { get; set; }
-    public bool InputDefaultValue { get; set; }
-
-    public override ContentDialog GetDialog(XamlRoot root)
-    {
-      checkBox = new()
-      {
-        IsChecked = InputDefaultValue,
-        Content = InputText,
-      };
-      textBlock = new()
-      {
-        Text = Message
-      };
-
-      var dialog = base.GetDialog(root);
-      dialog.Content = new StackPanel()
-      {
-        Orientation = Orientation.Vertical,
-        Children =
-        {
-          textBlock,
-          checkBox
-        }
-      };
-
-      checkBox.Checked += (s, e) => { IsChecked = checkBox.IsChecked; };
-      checkBox.Unchecked += (s, e) => { IsChecked = checkBox.IsChecked; };
-      return dialog;
-    }
-
-    public override (bool? answer, bool? isChecked) ProcessResult(ContentDialogResult result)
-    {
-      return result switch
-      {
-        ContentDialogResult.Primary => (answer: true, isChecked: IsChecked),
-        _ => (answer: null, isChecked: IsChecked),
-      };
-    }
-  }
 
   /// <summary>
   /// Dialog with a textbox input

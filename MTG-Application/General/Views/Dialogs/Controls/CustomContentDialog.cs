@@ -66,3 +66,5 @@ public abstract class BasicDialog(string title) : CustomContentDialog<ContentDia
 public abstract class ConfirmationDialog(string title) : CustomContentDialog<ConfirmationResult>(title);
 
 public abstract class StringDialog(string title) : CustomContentDialog<string>(title);
+
+public abstract class ConfirmationDialogWithBool(string title) : CustomContentDialog<(ConfirmationResult, bool)>(title);

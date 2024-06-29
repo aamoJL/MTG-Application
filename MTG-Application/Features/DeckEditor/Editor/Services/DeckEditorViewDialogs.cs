@@ -1,5 +1,4 @@
 ﻿using MTGApplication.General.Models;
-using MTGApplication.General.Services.ConfirmationService.Extensions;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Dialogs.UseCases;
@@ -39,18 +38,12 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       PrimaryButtonText = "Import",
       SecondaryButtonText = string.Empty
     }.ShowAsync(wrapper);
-    confirmers.CardListConfirmers.AddMultipleConflictConfirmer.OnConfirm = async (msg) =>
-    {
-      var (answer, isChecked) = await new CheckBoxDialog(msg.Title)
+    confirmers.CardListConfirmers.AddMultipleConflictConfirmer.OnConfirm = async (msg)
+      => await wrapper.ShowAsync(new CheckBoxDialog(msg.Title, msg.Message)
       {
-        Message = msg.Message,
         InputText = "Same for all cards.",
-        SecondaryButtonText = string.Empty,
-        CloseButtonText = "No"
-      }.ShowAsync(wrapper);
-
-      return new(answer.ToConfirmationResult(), isChecked ?? false);
-    };
+        CloseButtonText = "No",
+      });
     confirmers.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg)
       => await wrapper.ShowAsync(new TwoButtonConfirmationDialog(msg.Title, msg.Message));
     confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
