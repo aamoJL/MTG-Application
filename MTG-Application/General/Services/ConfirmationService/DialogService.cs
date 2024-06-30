@@ -20,14 +20,14 @@ public static class DialogService
 
     // Only one dialog can be open on a window
     // Return default or force the current dialog to close if exists
-    if(CurrentDialogs.GetValueOrDefault(root) is ContentDialog currentDialog)
+    if (CurrentDialogs.GetValueOrDefault(root) is ContentDialog currentDialog)
     {
       if (force) currentDialog.Hide();
       else return default;
     }
 
     CurrentDialogs[root] = dialog;
-    
+
     var result = await dialog.ShowAsync();
 
     // Remove dialog from dialogs if the result was from the current dialog
