@@ -1,75 +1,76 @@
-﻿using MTGApplication.General.Models;
-using MTGApplication.General.Services.ConfirmationService.Extensions;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.Models;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.Dialogs;
+using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Dialogs.UseCases;
-using System;
 using System.Linq;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
 {
-  public static void RegisterConfirmDialogs(DeckEditorConfirmers confirmers, Func<DialogWrapper> getWrapper)
+  public static void RegisterConfirmDialogs(DeckEditorConfirmers confirmers, XamlRoot root)
   {
-    confirmers.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
-    confirmers.LoadDeckConfirmer.OnConfirm = async msg => await new ShowOpenDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
-    confirmers.SaveDeckConfirmer.OnConfirm = async msg => await new ShowSaveDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message, msg.Data));
-    confirmers.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
-    confirmers.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(getWrapper.Invoke()).Execute((msg.Title, msg.Message));
-    confirmers.ShowTokensConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+    confirmers.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(root).Execute((msg.Title, msg.Message));
+    confirmers.LoadDeckConfirmer.OnConfirm = async msg => await new ShowOpenDialog(root).Execute((msg.Title, msg.Message, msg.Data));
+    confirmers.SaveDeckConfirmer.OnConfirm = async msg => await new ShowSaveDialog(root).Execute((msg.Title, msg.Message, msg.Data));
+    confirmers.OverrideDeckConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(root).Execute((msg.Title, msg.Message));
+    confirmers.DeleteDeckConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(root).Execute((msg.Title, msg.Message));
+    confirmers.ShowTokensConfirmer.OnConfirm = async (msg) =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await DialogService.ShowAsync(root, new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template)
       {
-        Items = msg.Data.ToArray(),
         PrimaryButtonText = string.Empty,
-        SecondaryButtonText = string.Empty,
-        CloseButtonText = "Close"
-      }.ShowAsync(getWrapper.Invoke()) as MTGCard;
-
-    confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
-    {
-      TextInputText = msg.Data,
-      PrimaryButtonText = "Copy to Clipboard",
-      SecondaryButtonText = string.Empty
-    }.ShowAsync(getWrapper.Invoke());
-    confirmers.CardListConfirmers.ImportConfirmer.OnConfirm = async msg => await new TextAreaDialog(msg.Title)
-    {
-      TextInputText = msg.Data,
-      InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
-      PrimaryButtonText = "Import",
-      SecondaryButtonText = string.Empty
-    }.ShowAsync(getWrapper.Invoke());
-    confirmers.CardListConfirmers.AddMultipleConflictConfirmer.OnConfirm = async (msg) =>
-    {
-      var (answer, isChecked) = await new CheckBoxDialog(msg.Title)
-      {
-        Message = msg.Message,
-        InputText = "Same for all cards.",
-        SecondaryButtonText = string.Empty,
-        CloseButtonText = "No"
-      }.ShowAsync(getWrapper.Invoke());
-
-      return new(answer.ToConfirmationResult(), isChecked ?? false);
+        CloseButtonText = "Close",
+      })) as MTGCard;
     };
-    confirmers.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg) => (await new ConfirmationDialog(msg.Title)
+    confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TextAreaDialog(msg.Title)
+      {
+        InputText = msg.Data,
+        PrimaryButtonText = "Copy to Clipboard",
+      });
+    confirmers.CardListConfirmers.ImportConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TextAreaDialog(msg.Title)
+      {
+        InputText = msg.Data,
+        InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
+        PrimaryButtonText = "Import",
+      });
+    confirmers.CardListConfirmers.AddMultipleConflictConfirmer.OnConfirm = async (msg)
+      => await DialogService.ShowAsync(root, new CheckBoxDialog(msg.Title, msg.Message)
+      {
+        InputText = "Same for all cards.",
+        CloseButtonText = "No",
+      });
+    confirmers.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg)
+      => await DialogService.ShowAsync(root, new TwoButtonConfirmationDialog(msg.Title, msg.Message));
+    confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>
     {
-      Message = msg.Message,
-      SecondaryButtonText = string.Empty,
-      CloseButtonText = "No",
-      PrimaryButtonText = "Yes"
-    }.ShowAsync(getWrapper.Invoke())).ToConfirmationResult();
-    confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await DialogService.ShowAsync(root, new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template))) as MTGCard;
+    };
+    confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await DialogService.ShowAsync(root, new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template)
       {
-        Items = msg.Data.ToArray(),
-        SecondaryButtonText = string.Empty
-      }.ShowAsync(getWrapper.Invoke()) as MTGCard;
-    confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      => await new GridViewDialog<MTGCard>(msg.Title, "MTGPrintGridViewItemTemplate", "MTGAdaptiveGridViewStyle")
-      {
-        Items = msg.Data.ToArray(),
         PrimaryButtonText = "Change",
-        SecondaryButtonText = string.Empty,
-      }.ShowAsync(getWrapper.Invoke()) as MTGCard;
+      })) as MTGCard;
+    };
   }
 }

@@ -7,7 +7,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
@@ -15,7 +14,6 @@
     <SignAssembly>False</SignAssembly>
     <WindowsPackageType>None</WindowsPackageType>
     <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
-    <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <!--JsonSerializerIsReflectionEnabledByDefault needs to be true, if trim mode is enabled-->
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
@@ -51,6 +49,7 @@
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
+    <None Remove="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml" />
@@ -65,6 +64,13 @@
     <None Remove="Features\CardSearch\Views\Controls\ScryfallCardSearchInputControl.xaml" />
     <None Remove="General\Views\Controls\LinedHeader.xaml" />
     <None Remove="CustomPlaceholderImageStyle.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\ComboBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\GridViewDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\TextAreaDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\TextBoxDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml" />
+    <None Remove="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml" />
     <None Remove="General\Views\Styles\CustomButtonStyles.xaml" />
     <None Remove="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml" />
     <None Remove="README.md" />
@@ -205,6 +211,10 @@
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Update="General\Views\Dialogs\Controls\TextAreaDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
@@ -241,6 +251,21 @@
     <Resource Remove="General\Views\Styles\CustomButtonStyles.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\TwoButtonConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\ComboBoxDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\ThreeButtonConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Features\EdhrecSearch\Views\EdhrecSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -257,6 +282,27 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckTesting\Views\Controls\CardView\DeckTestingCardImageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\GridViewDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="General\Views\Dialogs\Controls\TextBoxDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

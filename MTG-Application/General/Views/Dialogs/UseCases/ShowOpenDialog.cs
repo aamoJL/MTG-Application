@@ -1,17 +1,17 @@
-﻿using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Views.Dialogs.Controls;
+using System.Threading.Tasks;
 
 namespace MTGApplication.General.Views.Dialogs.UseCases;
 
-public class ShowOpenDialog : ShowDialogUseCase<string, string[]>
+public class ShowOpenDialog(XamlRoot root) : ShowDialogUseCase<string, string[]>(root)
 {
-  public ShowOpenDialog(DialogWrapper dialogWrapper) : base(dialogWrapper) { }
-
-  protected override async Task<string> ShowDialog(string title, string message, string[] data) => await new ComboBoxDialog(title)
-  {
-    InputHeader = message,
-    Items = data,
-    PrimaryButtonText = "Open",
-    SecondaryButtonText = string.Empty
-  }.ShowAsync(DialogWrapper);
+  protected override async Task<string> ShowDialog(string title, string message, string[] data)
+   => await DialogService.ShowAsync(Root, new ComboBoxDialog(title, data)
+   {
+     InputHeader = message,
+     PrimaryButtonText = "Open",
+     SecondaryButtonText = string.Empty,
+   });
 }

@@ -1,16 +1,15 @@
-﻿using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.General.Services.ConfirmationService.Extensions;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Views.Dialogs.Controls;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.General.Views.Dialogs.UseCases;
 
-public class ShowDeleteDialog(DialogWrapper dialogWrapper) : ShowDialogUseCase<ConfirmationResult>(dialogWrapper)
+public class ShowDeleteDialog(XamlRoot root) : ShowDialogUseCase<ConfirmationResult>(root)
 {
-  protected override async Task<ConfirmationResult> ShowDialog(string title, string message) => (await new ConfirmationDialog(title)
-  {
-    Message = message,
-    PrimaryButtonText = "Delete",
-    SecondaryButtonText = string.Empty
-  }.ShowAsync(DialogWrapper)).ToConfirmationResult();
+  protected override async Task<ConfirmationResult> ShowDialog(string title, string message)
+    => await DialogService.ShowAsync(Root, new TwoButtonConfirmationDialog(title, message)
+    {
+      PrimaryButtonText = "Delete",
+    });
 }

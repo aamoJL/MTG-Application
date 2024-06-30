@@ -13,7 +13,14 @@ public sealed partial class CardCollectionPage : Page
   {
     InitializeComponent();
 
-    CardCollectionEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, () => new(XamlRoot));
+    Loaded += CardCollectionPage_Loaded;
+  }
+
+  private void CardCollectionPage_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+  {
+    Loaded -= CardCollectionPage_Loaded;
+
+    CardCollectionEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, root: XamlRoot);
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
     WindowClosing.Closing += WindowClosing_Closing;
     WindowClosing.Closed += WindowClosing_Closed;
