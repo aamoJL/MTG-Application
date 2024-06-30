@@ -25,7 +25,7 @@ public sealed partial class DeckEditorPage : Page
   {
     Loaded -= DeckEditorPage_Loaded;
     
-    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, wrapper: new(XamlRoot));
+    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, root: XamlRoot);
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 

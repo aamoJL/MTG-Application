@@ -1,14 +1,15 @@
-﻿using MTGApplication.General.Views.Dialogs.Controls;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Views.Dialogs.Controls;
 using System.IO;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.General.Views.Dialogs.UseCases;
 
-public class ShowSaveDialog(DialogWrapper dialogWrapper) : ShowDialogUseCase<string, string>(dialogWrapper)
+public class ShowSaveDialog(XamlRoot root) : ShowDialogUseCase<string, string>(root)
 {
   protected override async Task<string> ShowDialog(string title, string message, string data)
-    => await DialogWrapper.ShowAsync(new TextBoxDialog(title)
+    => await DialogService.ShowAsync(Root, new TextBoxDialog(title)
     {
       InvalidInputCharacters = Path.GetInvalidFileNameChars(),
       InputText = data,

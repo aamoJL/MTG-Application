@@ -2,11 +2,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardSearch.ViewModels;
 using MTGApplication.General.Models;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.Features.CardSearch.Views;
 public sealed partial class CardSearchPage : Page
@@ -29,7 +29,7 @@ public sealed partial class CardSearchPage : Page
     {
       Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
 
-      return (await new DialogWrapper(XamlRoot).ShowAsync(new GridViewDialog(
+      return (await DialogService.ShowAsync(XamlRoot, new GridViewDialog(
         title: msg.Title,
         items: msg.Data.ToArray(),
         itemTemplate: (DataTemplate)template)

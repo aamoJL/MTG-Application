@@ -31,7 +31,6 @@ public partial class ThemedWindow : Window
   }
 
   public string IconUri { set => AppWindow.SetIcon(value); }
-
   /// <summary>
   /// Window's width
   /// </summary>
@@ -40,7 +39,6 @@ public partial class ThemedWindow : Window
     get => AppWindow.Size.Width;
     set => AppWindow.Resize(new(value, Height));
   }
-
   /// <summary>
   /// Window's height
   /// </summary>
@@ -54,18 +52,18 @@ public partial class ThemedWindow : Window
 
   private void NotificationService_OnShow(object sender, NotificationService.Notification e)
   {
-    if ((sender as FrameworkElement)?.XamlRoot == Content.XamlRoot)
+    if ((sender as FrameworkElement)?.XamlRoot != Content.XamlRoot)
+      return;
+
+    InAppNotification.Background = e.NotificationType switch
     {
-      InAppNotification.Background = e.NotificationType switch
-      {
-        NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
-        NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
-        NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
-        _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
-      };
-      InAppNotification.RequestedTheme = ElementTheme.Light;
-      InAppNotification.Show(e.Message, NotificationService.NotificationDuration);
-    }
+      NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
+      NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
+      NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
+      _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
+    };
+    InAppNotification.RequestedTheme = ElementTheme.Light;
+    InAppNotification.Show(e.Message, NotificationService.NotificationDuration);
   }
 
   private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -81,7 +79,7 @@ public partial class ThemedWindow : Window
     // The Window will close if the CanClose variable has been set to true.
     // Otherwise the user will be asked to save unsaved changes.
     // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
-    if (CanClose) { return; }
+    if (CanClose) return;
 
     e.Handled = true;
     CanClose = await new WindowClosing(Content.XamlRoot).Close();
@@ -89,11 +87,16 @@ public partial class ThemedWindow : Window
     if (CanClose)
     {
       e.Handled = false;
-      AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
-      NotificationService.OnShow -= NotificationService_OnShow;
-      Closed -= ThemedWindow_Closed;
-      Content = null;
+      OnClose();
       Close();
     }
+  }
+
+  private void OnClose()
+  {
+    AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
+    NotificationService.OnShow -= NotificationService_OnShow;
+    Closed -= ThemedWindow_Closed;
+    Content = null;
   }
 }

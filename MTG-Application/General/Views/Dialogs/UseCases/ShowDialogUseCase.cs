@@ -1,12 +1,12 @@
-﻿using MTGApplication.General.ViewModels;
+﻿using Microsoft.UI.Xaml;
+using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.ConfirmationService.DialogService;
 
 namespace MTGApplication.General.Views.Dialogs.UseCases;
 
-public abstract class ShowDialogUseCase<TReturn>(DialogWrapper dialogWrapper) : UseCase<(string title, string message), Task<TReturn>>
+public abstract class ShowDialogUseCase<TReturn>(XamlRoot root) : UseCase<(string title, string message), Task<TReturn>>
 {
-  public DialogWrapper DialogWrapper { get; } = dialogWrapper;
+  public XamlRoot Root { get; } = root;
 
   public override async Task<TReturn> Execute((string title, string message) args)
   {
@@ -18,9 +18,9 @@ public abstract class ShowDialogUseCase<TReturn>(DialogWrapper dialogWrapper) : 
   protected abstract Task<TReturn> ShowDialog(string title, string message);
 }
 
-public abstract class ShowDialogUseCase<TReturn, TData>(DialogWrapper dialogWrapper) : UseCase<(string title, string message, TData data), Task<TReturn>>
+public abstract class ShowDialogUseCase<TReturn, TData>(XamlRoot root) : UseCase<(string title, string message, TData data), Task<TReturn>>
 {
-  public DialogWrapper DialogWrapper { get; } = dialogWrapper;
+  public XamlRoot Root { get; } = root;
 
   public override async Task<TReturn> Execute((string title, string message, TData data) args)
   {

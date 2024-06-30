@@ -1,6 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Views.Dialogs.Controls;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.ConfirmationService;
@@ -10,33 +12,29 @@ namespace MTGApplication.General.Services.ConfirmationService;
 /// </summary>
 public static class DialogService
 {
-  /// <summary>
-  /// Class that can be used to call dialog's showAsync method.
-  /// <see cref="TestDialogWrapper"/> can be used to unit test dialogs without calling UI thread.
-  /// </summary>
-  public class DialogWrapper(XamlRoot xamlRoot)
+  public static Dictionary<XamlRoot, ContentDialog> CurrentDialogs { get; } = [];
+
+  public static async Task<T> ShowAsync<T>(XamlRoot root, CustomContentDialog<T> dialog, bool force = false)
   {
-    public ContentDialog CurrentDialog { get; private set; }
-    public XamlRoot XamlRoot { get; set; } = xamlRoot;
+    dialog.XamlRoot = root;
 
-    public async Task<T> ShowAsync<T>(CustomContentDialog<T> dialog, bool force = false)
+    // Only one dialog can be open on a window
+    // Return default or force the current dialog to close if exists
+    if(CurrentDialogs.GetValueOrDefault(root) is ContentDialog currentDialog)
     {
-      dialog.XamlRoot = XamlRoot;
-      var contentDialog = dialog;
-
-      // Only one dialog can be open on a window
-      if (force)
-        CurrentDialog?.Hide();
-      else if (CurrentDialog != null)
-        return default;
-
-      CurrentDialog = contentDialog;
-      var result = await contentDialog.ShowAsync();
-
-      if (CurrentDialog == contentDialog)
-        CurrentDialog = null;
-
-      return result;
+      if (force) currentDialog.Hide();
+      else return default;
     }
+
+    CurrentDialogs[root] = dialog;
+    
+    var result = await dialog.ShowAsync();
+
+    // Remove dialog from dialogs if the result was from the current dialog
+    // Prevents crash if user tries to open multiple dialogs on a window
+    if (CurrentDialogs.GetValueOrDefault(root) == dialog)
+      CurrentDialogs.Remove(root);
+
+    return result;
   }
 }
