@@ -41,8 +41,8 @@
             <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
           </CommandBarFlyout.PrimaryCommands>
           <CommandBarFlyout.SecondaryCommands>
-            <AppBarButton Label="Toggle +1/+1 counters" Click="PlusCounterFlyoutButton_Click"/>
-            <AppBarButton Label="Toggle count counters" Click="CountCounterFlyoutButton_Click"/>
+            <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Label="Toggle +1/+1 counters" Click="PlusCounterFlyoutButton_Click"/>
+            <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Label="Toggle count counters" Click="CountCounterFlyoutButton_Click"/>
           </CommandBarFlyout.SecondaryCommands>
         </CommandBarFlyout>
       </controls:ImageEx.ContextFlyout>
