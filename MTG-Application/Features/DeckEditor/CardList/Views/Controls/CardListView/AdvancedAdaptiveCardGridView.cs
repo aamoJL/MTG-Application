@@ -8,6 +8,7 @@ using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using static MTGApplication.Features.DeckEditor.CardList.Services.CardSortProperties;
 
@@ -27,12 +28,12 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 
   public AdvancedAdaptiveCardGridView()
   {
-    DragAndDrop = new(itemToArgsConverter: (item) => { return new CardMoveArgs(item, item.Count); })
+    DragAndDrop = new(itemToArgsConverter: (item) => new CardMoveArgs(item, item.Count))
     {
-      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
       OnRemove = (item) => OnDropRemove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
-      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
-      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
+      OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnExecuteMove = (item) => OnDropExecuteMove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count))
     };

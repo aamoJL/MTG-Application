@@ -12,7 +12,7 @@
   xmlns:models="using:MTGApplication.Features.DeckTesting.Models" 
   xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
   xmlns:cardview="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView" 
-  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls"
+  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls" xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -110,6 +110,9 @@
             ScrollViewer.VerticalScrollMode="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Disabled"
             Padding="0 0 0 10"
+            AllowDrop="True"
+            DragOver="{x:Bind DragAndDropEvents.ListView_DragOver, Mode=OneTime}"
+            Drop="{x:Bind DragAndDropEvents.ListView_Drop, Mode=OneTime}"
             PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
             PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
             PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
@@ -156,6 +159,9 @@
             BorderBrush="{ThemeResource RegionBrush}"
             BorderThickness="1 0 0 0"
             Margin="0 0 0 10"
+            AllowDrop="True"
+            DragOver="{x:Bind DragAndDropEvents.ListView_DragOver, Mode=OneTime}"
+            Drop="{x:Bind DragAndDropEvents.ListView_Drop, Mode=OneTime}"
             PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
             PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
             PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">
@@ -240,6 +246,9 @@
               ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="None"
               Visibility="{x:Bind LibraryVisibility, Mode=OneWay}"
+              AllowDrop="True"
+              DragOver="{x:Bind DragAndDropEvents.ListView_DragOver, Mode=OneTime}"
+              Drop="{x:Bind DragAndDropEvents.ListView_Drop, Mode=OneTime}"
               PointerEntered="{x:Bind PointerEvents.Droppable_PointerEntered, Mode=OneTime}"
               PointerExited="{x:Bind PointerEvents.Droppable_PointerExited, Mode=OneTime}"
               PointerReleased="{x:Bind PointerEvents.DroppableListView_PointerReleased, Mode=OneTime}">

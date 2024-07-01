@@ -73,12 +73,14 @@ public abstract class DragAndDrop<T>()
 
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
     {
-      await OnCopy?.Invoke(item);
+      if (OnCopy != null)
+        await OnCopy?.Invoke(item);
     }
     else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
     {
       DragOrigin?.OnBeginMoveFrom?.Invoke(item);
-      await OnBeginMoveTo?.Invoke(item);
+      if (OnBeginMoveTo != null)
+        await OnBeginMoveTo?.Invoke(item);
 
       OnExecuteMove?.Invoke(item);
       DragOrigin?.OnExecuteMove?.Invoke(item);
@@ -88,7 +90,8 @@ public abstract class DragAndDrop<T>()
   protected virtual async Task OnExternalDrop(DataPackageOperation operation, string data)
   {
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
-      await OnExternalImport?.Invoke(data);
+      if (OnExternalImport != null)
+        await OnExternalImport?.Invoke(data);
   }
 
   public virtual void DropCompleted()

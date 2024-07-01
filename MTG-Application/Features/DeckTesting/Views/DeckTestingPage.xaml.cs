@@ -28,6 +28,7 @@ public sealed partial class DeckTestingPage : Page
 
   public DeckTestingPageViewModel ViewModel { get; set; }
   public DeckTestingPointerEvents PointerEvents { get; } = new();
+  public DeckTestingDragAndDropEvents DragAndDropEvents { get; } = new();
 
   [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
 
