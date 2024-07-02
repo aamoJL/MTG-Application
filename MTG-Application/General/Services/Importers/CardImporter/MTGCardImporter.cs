@@ -9,7 +9,7 @@ public abstract class MTGCardImporter : ICardImporter
   public abstract string Name { get; }
   public abstract int PageSize { get; }
 
-  public abstract Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams);
+  public abstract Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true);
   public abstract Task<CardImportResult> ImportFromString(string importText);
   public abstract Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
   /// <summary>

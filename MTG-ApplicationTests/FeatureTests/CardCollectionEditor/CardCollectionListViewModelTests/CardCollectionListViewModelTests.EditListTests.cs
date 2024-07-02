@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
@@ -263,6 +265,117 @@ public partial class CardCollectionListViewModelTests
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
         () => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_Conflict_ConflictConfirmationShown()
+    {
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+          },
+          EditCollectionListQueryConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>(),
+        }
+      }.MockVM();
+
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.EditListCommand.ExecuteAsync(null));
+    }
+
+    [TestMethod]
+    public async Task EditList_Conflict_Cancel_NoChanges()
+    {
+      var oldName = _savedList.Name;
+      var oldQuery = _savedList.SearchQuery;
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+          },
+          EditCollectionListQueryConflictConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel)
+          },
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(oldName, viewmodel.Name);
+      Assert.AreEqual(oldQuery, viewmodel.Query);
+    }
+
+    [TestMethod]
+    public async Task EditList_Conflict_Accept_QueryAndNameChanged()
+    {
+      var name = "New Name";
+      var query = "New Query";
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult((name, query))
+          },
+          EditCollectionListQueryConflictConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
+          },
+        }
+      }.MockVM();
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(name, viewmodel.Name);
+      Assert.AreEqual(query, viewmodel.Query);
+    }
+
+    [TestMethod]
+    public async Task EditList_Conflict_Accept_OwnedCardsChanged()
+    {
+      var expectedCards = new CardImportResult.Card[]
+      {
+        new(_savedList.Cards[0].Info),
+        new(MTGCardInfoMocker.MockInfo())
+      };
+
+      _dependencies.Importer.ExpectedCards = expectedCards;
+
+      var viewmodel = await new Mocker(_dependencies)
+      {
+        Model = _savedList,
+        Confirmers = new()
+        {
+          EditCollectionListConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+          },
+          EditCollectionListQueryConflictConfirmer = new()
+          {
+            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
+          },
+        }
+      }.MockVM();
+
+      CollectionAssert.AreNotEquivalent(
+        new Guid[] { expectedCards.First().Info.ScryfallId },
+        viewmodel.OwnedCards.Select(x => x.Info.ScryfallId).ToArray());
+
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      CollectionAssert.AreEquivalent(
+        new Guid[] { expectedCards.First().Info.ScryfallId },
+        viewmodel.OwnedCards.Select(x => x.Info.ScryfallId).ToArray());
     }
   }
 }

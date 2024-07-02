@@ -12,7 +12,7 @@ public class TestMTGCardImporter(Card[]? expectedCards = null, int notFoundCount
   public override int PageSize => 40;
   public override string Name => "Test Card API";
 
-  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams)
+  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
     return string.IsNullOrEmpty(searchParams)
       ? Empty(ImportSource.External)

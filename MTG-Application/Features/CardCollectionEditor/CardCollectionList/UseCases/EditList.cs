@@ -4,6 +4,7 @@ using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCases;
@@ -31,10 +32,34 @@ public partial class CardCollectionEditorViewModelCommands
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListExistsError);
       else
       {
-        Viewmodel.Name = name;
-        Viewmodel.HasUnsavedChanges = true;
+        if (query != Viewmodel.Query)
+        {
+          // Fetch new query cards and remove cards that are not in the new query from the owned cards if the user accepts the conflict
+          var result = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(query, pagination: false));
+          var found = result.Found;
 
-        await Viewmodel.UpdateQuery(query);
+          var excludedCards = Viewmodel.OwnedCards
+            .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.Info.ScryfallId)
+            .ToList();
+
+          if (excludedCards.Count != 0)
+            if (await Viewmodel.Confirmers.EditCollectionListQueryConflictConfirmer
+              .Confirm(CardCollectionListConfirmers.GetEditCollectionListQueryConflictConfirmation(excludedCards.Count))
+              is not General.Services.ConfirmationService.ConfirmationResult.Yes)
+              return; // Cancel edit if user cancels the conflict
+
+          foreach (var item in excludedCards)
+            Viewmodel.OwnedCards.Remove(item);
+
+          Viewmodel.Query = query;
+
+          await Viewmodel.Worker.DoWork(Viewmodel.UpdateQueryCards());
+        }
+
+        if (name != Viewmodel.Name)
+          Viewmodel.Name = name;
+
+        Viewmodel.HasUnsavedChanges = true;
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListSuccess);
       }

@@ -46,7 +46,7 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
   public string Query
   {
     get => Model.SearchQuery;
-    private set
+    set
     {
       if (Model.SearchQuery == value) return;
 
@@ -76,13 +76,4 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
   private SwitchCardOwnership switchCardOwnership;
 
   public async Task UpdateQueryCards() => await Worker.DoWork(QueryCardsViewModel.UpdateQueryCards(Model.SearchQuery));
-
-  public async Task UpdateQuery(string query)
-  {
-    if (Query == query) return;
-
-    Query = query;
-
-    await UpdateQueryCards();
-  }
 }

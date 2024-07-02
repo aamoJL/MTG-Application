@@ -34,10 +34,12 @@ public partial class ScryfallAPI : MTGCardImporter
   public override string Name => "Scryfall";
   public override int PageSize => 175;
 
-  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams)
+  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
-    if (string.IsNullOrEmpty(searchParams)) { return CardImportResult.Empty(); }
-    return await ImportFromUri(GetSearchUri(searchParams));
+    if (string.IsNullOrEmpty(searchParams))
+      return CardImportResult.Empty();
+
+    return await ImportFromUri(GetSearchUri(searchParams), fetchAll: !pagination);
   }
 
   public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)

@@ -7,6 +7,7 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Servic
 public class CardCollectionListConfirmers
 {
   public Confirmer<(string Name, string Query)?, (string Name, string Query)> EditCollectionListConfirmer { get; init; } = new();
+  public Confirmer<ConfirmationResult> EditCollectionListQueryConflictConfirmer { get; init; } = new();
   public Confirmer<string> ImportCardsConfirmer { get; init; } = new();
   public Confirmer<string, string> ExportCardsConfirmer { get; init; } = new();
   public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
@@ -17,6 +18,13 @@ public class CardCollectionListConfirmers
       Title: "Edit list",
       Message: string.Empty,
       Data: args);
+  }
+
+  public static Confirmation GetEditCollectionListQueryConflictConfirmation(int count)
+  {
+    return new(
+      Title: "Query conflict",
+      Message: $"{count} owned cards are not in the new query. Cards will be removed from the collection list.");
   }
 
   public static Confirmation GetImportCardsConfirmation()

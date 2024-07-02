@@ -3,6 +3,7 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
+using Windows.ApplicationModel.Search;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
@@ -115,7 +116,7 @@ public partial class CardCollectionListViewModelTests
 
       var viewmodel = await new Mocker(_dependencies)
       {
-        Model = new() { Name = "Asd", Cards = [] },
+        Model = new() { Name = "Asd", SearchQuery = "asd", Cards = [] },
         Confirmers = new()
         {
           ImportCardsConfirmer = new()

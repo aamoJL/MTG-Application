@@ -20,7 +20,7 @@ public partial interface ICardImporter
   /// <summary>
   /// Fetch cards from the API using API search query
   /// </summary>
-  public Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams);
+  public Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true);
 
   /// <summary>
   /// Fetches cards from the given <paramref name="pageUri"/>
