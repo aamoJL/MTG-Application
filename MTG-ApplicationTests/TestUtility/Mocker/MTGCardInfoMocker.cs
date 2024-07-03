@@ -64,7 +64,8 @@ public class MTGCardInfoMocker
       name: name,
       imageUri: imageUri,
       illustrationId: illustrationId ?? Guid.Parse("a35ceece-124c-41aa-b9f1-ef95f7d20228"),
-      oracleText: oracleText);
+      oracleText: oracleText,
+      artCropUri: imageUri);
   }
 
   public static MTGCardInfo FromDTO(MTGCardDTO dto)

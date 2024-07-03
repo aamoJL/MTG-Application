@@ -27,19 +27,19 @@ public record MTGCardInfo
     public ColorTypes[] Colors { get; }
     public string Name { get; }
     public string ImageUri { get; }
+    public string ArtCropUri { get; }
     public Guid? IllustrationId { get; }
     public string OracleText { get; }
 
     [JsonConstructor]
-    public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId, string oracleText)
+    public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId, string oracleText, string artCropUri)
     {
-      if (colors.Length == 0) colors = [ColorTypes.C];
-
-      Colors = colors;
+      Colors = colors.Length == 0 ? [ColorTypes.C] : colors;
       Name = name;
       ImageUri = imageUri;
       IllustrationId = illustrationId;
       OracleText = oracleText;
+      ArtCropUri = artCropUri;
     }
   }
 

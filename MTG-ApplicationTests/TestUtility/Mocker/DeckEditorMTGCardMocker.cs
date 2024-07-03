@@ -69,7 +69,8 @@ public static class DeckEditorMTGCardMocker
         name: name,
         imageUri: imageUri,
         illustrationId: illustrationId,
-        oracleText: oracleText);
+        oracleText: oracleText,
+        artCropUri: imageUri);
   }
 
   /// <summary>
