@@ -109,7 +109,7 @@
           <!--#region List Selector-->
           <customControls:ComboBoxWithCommands
             ItemsSource="{x:Bind ViewModel.CardCollectionViewModel.CollectionLists, Mode=OneWay}"
-            SelectedItem="{x:Bind ViewModel.SelectedCardCollectionList, Mode=TwoWay}"
+            SelectedItem="{x:Bind ViewModel.SelectedCardCollectionList, Mode=OneWay}"
             SelectionChangedCommand="{x:Bind ViewModel.ChangeListCommand, Mode=OneTime}"
             VerticalAlignment="Center"
             Width="200"

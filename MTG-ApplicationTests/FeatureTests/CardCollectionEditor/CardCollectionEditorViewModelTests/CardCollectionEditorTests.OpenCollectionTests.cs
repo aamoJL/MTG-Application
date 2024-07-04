@@ -167,5 +167,23 @@ public partial class CardCollectionEditorTests
 
       await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
     }
+
+    [TestMethod]
+    public async Task Open_Success_HasNoUnsavedChanges()
+    {
+      var viewmodel = new Mocker(_dependencies)
+      {
+        HasUnsavedChanges = true,
+        Confirmers = new()
+        {
+          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
+          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+        },
+      }.MockVM();
+
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      Assert.IsFalse(viewmodel.HasUnsavedChanges);
+    }
   }
 }

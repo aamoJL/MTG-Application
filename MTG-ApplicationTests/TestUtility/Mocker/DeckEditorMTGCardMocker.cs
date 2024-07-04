@@ -49,7 +49,8 @@ public static class DeckEditorMTGCardMocker
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
       tokens: tokens ?? [],
-      oracleId: oracleId ?? Guid.NewGuid()), count);
+      oracleId: oracleId ?? Guid.NewGuid(),
+      colorIdentity: (frontFace ?? CreateCardFace()).Colors), count);
   }
 
   /// <summary>
@@ -65,12 +66,12 @@ public static class DeckEditorMTGCardMocker
     colors ??= [ColorTypes.W];
     illustrationId ??= Guid.Parse("a35ceece-124c-41aa-b9f1-ef95f7d20228");
     return new CardFace(
-        colors: colors,
-        name: name,
-        imageUri: imageUri,
-        illustrationId: illustrationId,
-        oracleText: oracleText,
-        artCropUri: imageUri);
+      colors: colors,
+      name: name,
+      imageUri: imageUri,
+      illustrationId: illustrationId,
+      oracleText: oracleText,
+      artCropUri: imageUri);
   }
 
   /// <summary>

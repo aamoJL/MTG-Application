@@ -49,7 +49,8 @@ public class MTGCardInfoMocker
       cardMarketUri: cardMarketUri,
       tokens: tokens ?? [],
       oracleId: oracleId ?? Guid.NewGuid(),
-      importerName: "Mocker");
+      importerName: "Mocker",
+      colorIdentity: (frontFace ?? MockFace()).Colors);
   }
 
   public static CardFace MockFace(

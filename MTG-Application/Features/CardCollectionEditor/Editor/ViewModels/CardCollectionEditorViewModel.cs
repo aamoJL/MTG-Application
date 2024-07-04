@@ -87,6 +87,8 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
   public async Task ChangeCollection(MTGCardCollection collection)
   {
     CardCollectionViewModel = CreateCardCollectionViewModel(collection);
+    HasUnsavedChanges = false;
+    
     await ChangeCollectionList(collection.CollectionLists.FirstOrDefault());
   }
 
