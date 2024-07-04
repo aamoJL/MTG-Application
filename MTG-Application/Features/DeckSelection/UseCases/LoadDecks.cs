@@ -26,7 +26,6 @@ public partial class DeckSelectorViewModelCommands
         },
       }.Execute());
 
-      // TODO: save image and colors to database so they don't need to be fetched here
       var commanderDTOs = new List<MTGCardDTO>();
       commanderDTOs.AddRange(deckDTOs.Where(x => x.Commander != null).Select(x => x.Commander));
       commanderDTOs.AddRange(deckDTOs.Where(x => x.CommanderPartner != null).Select(x => x.CommanderPartner));
@@ -41,9 +40,9 @@ public partial class DeckSelectorViewModelCommands
 
         if (dto.Commander != null)
         {
-          colors = commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.Colors.ToList();
+          colors = commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.ColorIdentity.ToList();
 
-          if (dto.CommanderPartner != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.CommanderPartner?.ScryfallId)?.Info.Colors is ColorTypes[] partnerColors)
+          if (dto.CommanderPartner != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.CommanderPartner?.ScryfallId)?.Info.ColorIdentity is ColorTypes[] partnerColors)
             colors.AddRange(partnerColors);
         }
 

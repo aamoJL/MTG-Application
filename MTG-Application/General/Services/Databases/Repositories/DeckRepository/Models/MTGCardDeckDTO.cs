@@ -1,12 +1,11 @@
-﻿using MTGApplication.Features.DeckEditor.Models;
-using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 
 /// <summary>
-/// Data transfer object for <see cref="DeckEditorMTGDeck"/> class
+/// Data transfer object for MTG card decks
 /// </summary>
 public record MTGCardDeckDTO
 {

@@ -142,7 +142,7 @@ public partial class ScryfallAPI : MTGCardImporter
   private MTGCardInfo GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
   {
     /// <summary>
-    /// Converts the <paramref name="colorArray"/> to <see cref="ColorTypes"/> array
+    /// Converts the colorArray to <see cref="ColorTypes"/> array
     /// </summary>
     static ColorTypes[] GetColors(string[] colorArray)
     {
@@ -173,6 +173,7 @@ public partial class ScryfallAPI : MTGCardImporter
     var setIconUri = $"{SET_ICON_URL}/{setCode}.svg";
     var printSearchUri = json["prints_search_uri"]?.GetValue<string>();
     var cardMarketUri = json["purchase_uris"]?["cardmarket"]?.GetValue<string>();
+    var colorIdentity = GetColors(json["color_identity"].AsArray().Select(x => x.GetValue<string>()).ToArray());
 
     CardFace frontFace = null;
     CardFace backFace = null;
@@ -188,16 +189,13 @@ public partial class ScryfallAPI : MTGCardImporter
       );
 
     if (json["card_faces"] != null)
-    {
       backFace = new CardFace(
         colors: json["card_faces"]!.AsArray()[1]["colors"] != null ? GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()) : [],
         name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>() ?? string.Empty,
         imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>() ?? null,
         artCropUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["art_crop"]?.GetValue<string>() ?? null,
         illustrationId: json["card_faces"]?.AsArray()[1]["illustration_id"]?.GetValue<Guid?>() ?? null,
-        oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? string.Empty
-        );
-    }
+        oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? string.Empty);
 
     var rarityString = json["rarity"].GetValue<string>();
     var rarityType = RarityTypes.Common;
@@ -207,14 +205,11 @@ public partial class ScryfallAPI : MTGCardImporter
 
     var producedManaStringArray = json["produced_mana"]?.AsArray().Select(x => x.GetValue<string>()).ToArray();
     var producedManaList = new List<ColorTypes>();
+
     if (producedManaStringArray != null)
-    {
       foreach (var colorString in producedManaStringArray)
-      {
         if (Enum.TryParse(colorString, true, out ColorTypes color))
           producedManaList.Add(color);
-      }
-    }
 
     var tokens = json["all_parts"]?.AsArray().Where(x => x["component"]?.GetValue<string>() == "token").Select(x => new CardToken(x["id"]!.GetValue<Guid>())).ToArray();
     var oracle = json["oracle_id"]?.GetValue<Guid>() ?? json["card_faces"]?.AsArray()[0]["oracle_id"]?.GetValue<Guid>() ?? Guid.Empty;
@@ -233,12 +228,13 @@ public partial class ScryfallAPI : MTGCardImporter
       apiWebsiteUri: apiWebsiteUri,
       setIconUri: setIconUri,
       rarityType: rarityType,
-      producedMana: producedManaList.ToArray(),
+      producedMana: [.. producedManaList],
       printSearchUri: printSearchUri,
       cardMarketUri: cardMarketUri,
-      tokens: tokens ?? Array.Empty<CardToken>(),
+      tokens: tokens ?? [],
       importerName: Name,
-      oracleId: oracle);
+      oracleId: oracle,
+      colorIdentity: colorIdentity);
   }
 
   /// <summary>
