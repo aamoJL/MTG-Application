@@ -13,6 +13,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
+    <EmbeddedResource Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
+    <None Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
+    <Page Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.4.3" />
     <PackageReference Include="MSTest.TestFramework" Version="3.4.3" />
@@ -33,6 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GeneralTests\ServiceTests\IOServiceTests\" />
+    <PRIResource Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
   </ItemGroup>
 </Project>

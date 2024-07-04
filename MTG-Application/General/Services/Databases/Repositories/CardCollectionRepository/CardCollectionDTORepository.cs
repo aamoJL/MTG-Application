@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory = null) : IRepository<MTGCardCollectionDTO>
 {
-  //TODO: unit tests
-
   public CardDbContextFactory DbContextFactory { get; } = dbContextFactory ?? new();
 
   public virtual async Task<bool> Add(MTGCardCollectionDTO item)
