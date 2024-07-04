@@ -17,22 +17,20 @@ public partial class DeckSelectorViewModelCommands
   {
     protected override async Task Execute()
     {
-      var deckDTOs = await Viewmodel.Worker.DoWork(new GetDeckDTOs(Viewmodel.Repository)
+      var deckDTOs = (await Viewmodel.Worker.DoWork(new GetDeckDTOs(Viewmodel.Repository)
       {
         SetIncludes = (set) =>
         {
           set.Include(x => x.Commander).Load();
           set.Include(x => x.CommanderPartner).Load();
         },
-      }.Execute());
+      }.Execute())).OrderBy(x => x.Name);
 
       var commanderDTOs = new List<MTGCardDTO>();
       commanderDTOs.AddRange(deckDTOs.Where(x => x.Commander != null).Select(x => x.Commander));
       commanderDTOs.AddRange(deckDTOs.Where(x => x.CommanderPartner != null).Select(x => x.CommanderPartner));
 
       var commanders = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromDTOs(commanderDTOs))).Found;
-
-      var decks = new List<DeckSelectionDeck>();
 
       foreach (var dto in deckDTOs)
       {
