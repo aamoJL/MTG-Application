@@ -92,9 +92,9 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
     var missingCardsTasks = new List<Task>()
       {
         Task.Run(() => missingDeckCards.AddRange(existingDeck.DeckCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
-        Task.Run(() => missingWishlistCards.AddRange(existingDeck.WishlistCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
-        Task.Run(() => missingMaybelistCards.AddRange(existingDeck.MaybelistCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
-        Task.Run(() => missingRemovelistCards.AddRange(existingDeck.RemovelistCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
+        Task.Run(() => missingWishlistCards.AddRange(existingDeck.WishlistCards.Where(existingCard => !item.WishlistCards.Any(itemCard => itemCard.Compare(existingCard))))),
+        Task.Run(() => missingMaybelistCards.AddRange(existingDeck.MaybelistCards.Where(existingCard => !item.MaybelistCards.Any(itemCard => itemCard.Compare(existingCard))))),
+        Task.Run(() => missingRemovelistCards.AddRange(existingDeck.RemovelistCards.Where(existingCard => !item.RemovelistCards.Any(itemCard => itemCard.Compare(existingCard))))),
       };
 
     await Task.WhenAll(missingCardsTasks);
