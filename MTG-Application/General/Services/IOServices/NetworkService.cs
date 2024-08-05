@@ -5,16 +5,24 @@ using Windows.System;
 
 namespace MTGApplication.General.Services.IOServices;
 
+// TODO: remove NetworkService and make the network requests on the origin method so the errors can be handled better.
 public static class NetworkService
 {
-  public static readonly HttpClient HttpClient = new();
+  private static readonly string JSON_MEDIA_TYPE = "application/json";
 
   /// <summary>
   /// Fetches text from the given <paramref name="url"/> using GET
   /// </summary>
   public static async Task<string> TryFetchStringFromUrlGetAsync(string url)
   {
-    try { return await HttpClient.GetStringAsync(url); }
+    try
+    {
+      var client = new HttpClient();
+      client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
+      client.DefaultRequestHeaders.UserAgent.Add(new("MTGApplication", "1"));
+
+      return await client.GetStringAsync(url);
+    }
     catch { return null; }
   }
 
@@ -25,7 +33,11 @@ public static class NetworkService
   {
     try
     {
-      return await (await HttpClient.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, "application/json")))
+      var client = new HttpClient();
+      client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
+      client.DefaultRequestHeaders.UserAgent.Add(new("MTGApplication", "1"));
+
+      return await (await client.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, JSON_MEDIA_TYPE)))
         .Content.ReadAsStringAsync();
     }
     catch { return null; }
