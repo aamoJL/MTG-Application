@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
@@ -8,7 +9,9 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, ISavable.ConfirmArgs>(viewmodel)
+  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand { get; } = new ConfirmUnsavedChanges(viewmodel).Command;
+
+  private class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, ISavable.ConfirmArgs>(viewmodel)
   {
     protected override bool CanExecute(ISavable.ConfirmArgs param) => !param.Cancelled && Viewmodel.HasUnsavedChanges;
 

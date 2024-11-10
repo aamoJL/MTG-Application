@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
@@ -11,7 +12,9 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class SaveDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public IAsyncRelayCommand SaveDeckCommand { get; } = new SaveDeck(viewmodel).Command;
+
+  private class SaveDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
     protected override async Task Execute()
     {

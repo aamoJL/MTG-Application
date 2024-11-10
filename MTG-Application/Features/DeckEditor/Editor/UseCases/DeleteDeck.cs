@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
@@ -10,7 +11,9 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class DeleteDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public IAsyncRelayCommand DeleteDeckCommand { get; } = new DeleteDeck(viewmodel).Command;
+
+  private class DeleteDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
     protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.Name);
 

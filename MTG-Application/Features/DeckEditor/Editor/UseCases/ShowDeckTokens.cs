@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
@@ -12,7 +13,9 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class ShowDeckTokens(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public IAsyncRelayCommand ShowTokensCommand { get; } = new ShowDeckTokens(viewmodel).Command;
+
+  private class ShowDeckTokens(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
     protected override bool CanExecute() => Viewmodel.Commander != null || Viewmodel.DeckCardList.Cards.Count != 0;
 
