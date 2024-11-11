@@ -8,4 +8,8 @@
   <Style x:Key="PrimaryButtonStyle" TargetType="Button">
     <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}" />
   </Style>
+
+  <Style x:Key="PrimaryAppBarButtonStyle" TargetType="AppBarButton" BasedOn="{StaticResource DefaultAppBarButtonStyle}">
+    <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight3}"/>
+  </Style>
 </ResourceDictionary>

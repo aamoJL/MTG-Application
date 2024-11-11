@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands.ChangeCardCount;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 public sealed partial class DeckEditorCardTextView : DeckEditorCardViewBase

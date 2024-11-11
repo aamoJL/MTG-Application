@@ -32,8 +32,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     var cardFilters = new CardFilters();
     var cardSorter = new CardSorter();
 
-    // Cardlists use same sorter and filters
-    DeckCardList = CreateCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
+    // Cardlists use the same sorter and filters
+    DeckCardList = CreateGroupedCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
     MaybeCardList = CreateCardListViewModel(Deck.Maybelist, cardFilters, cardSorter);
     WishCardList = CreateCardListViewModel(Deck.Wishlist, cardFilters, cardSorter);
     RemoveCardList = CreateCardListViewModel(Deck.Removelist, cardFilters, cardSorter);
@@ -49,7 +49,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public DeckEditorConfirmers Confirmers { get; }
   public Notifier Notifier { get; } = new();
   public MTGCardImporter Importer { get; }
-  public CardListViewModel DeckCardList { get; }
+  public GroupedCardListViewModel DeckCardList { get; }
   public CardListViewModel MaybeCardList { get; }
   public CardListViewModel WishCardList { get; }
   public CardListViewModel RemoveCardList { get; }
@@ -147,6 +147,27 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
   {
     return new(Importer)
+    {
+      Cards = cards,
+      OnChange = () =>
+      {
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(Size));
+        OnPropertyChanged(nameof(Price));
+        ShowDeckTokensCommand.NotifyCanExecuteChanged();
+      },
+      UndoStack = UndoStack,
+      Worker = this,
+      Confirmers = Confirmers.CardListConfirmers,
+      Notifier = Notifier,
+      CardFilters = filters,
+      CardSorter = sorter,
+    };
+  }
+
+  private GroupedCardListViewModel CreateGroupedCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
+  {
+    return new(Importer, (x) => x.Group)
     {
       Cards = cards,
       OnChange = () =>

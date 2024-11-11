@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
@@ -12,7 +13,9 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class AddCard(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
+  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardCommand { get; } = new AddCard(viewmodel).Command;
+
+  private class AddCard(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
   {
     protected override async Task Execute(DeckEditorMTGCard card)
     {

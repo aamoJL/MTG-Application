@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
@@ -12,7 +13,11 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class MoveCard
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand { get; } = new MoveCard.BeginMoveFrom(viewmodel).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand { get; } = new MoveCard.BeginMoveTo(viewmodel).Command;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand { get; } = new MoveCard.ExecuteMove(viewmodel).Command;
+
+  private class MoveCard
   {
     public class BeginMoveTo(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
     {

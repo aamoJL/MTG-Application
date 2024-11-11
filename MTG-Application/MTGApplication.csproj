@@ -55,6 +55,7 @@
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
     <None Remove="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml" />
+    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckSelection\Views\Controls\DeckSelectionDeckView.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
@@ -214,7 +215,6 @@
   <ItemGroup>
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
-    <Folder Include="Features\DeckEditor\Editor\Views\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
@@ -299,6 +299,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Features\DeckEditor\CardList\Views\Controls\CardGroupViewGroupHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckSelection\Views\Controls\DeckSelectionDeckView.xaml">
