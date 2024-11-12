@@ -16,6 +16,7 @@ public class DeckEditorConfirmers
   public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowTokensConfirmer { get; init; } = new();
 
   public CardListConfirmers CardListConfirmers { get; init; } = new();
+  public GroupedCardListConfirmers GroupedCardListConfirmers { get; init; } = new();
   public CommanderConfirmers CommanderConfirmers { get; init; } = new();
 
   public static Confirmation GetSaveUnsavedChangesConfirmation(string deckName)

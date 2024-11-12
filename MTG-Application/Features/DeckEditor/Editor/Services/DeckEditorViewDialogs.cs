@@ -72,5 +72,7 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
         PrimaryButtonText = "Change",
       })) as MTGCard;
     };
+    confirmers.GroupedCardListConfirmers.AddCardGroupConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title));
   }
 }

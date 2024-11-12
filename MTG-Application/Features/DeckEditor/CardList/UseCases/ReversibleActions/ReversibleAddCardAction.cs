@@ -25,7 +25,7 @@ public partial class CardListViewModelReversibleActions
       foreach (var item in addList)
         Viewmodel.Cards.Add(item);
 
-      Viewmodel.OnChange?.Invoke();
+      Viewmodel.OnListChange();
     }
 
     protected override void ReverseActionMethod(IEnumerable<DeckEditorMTGCard> cards)

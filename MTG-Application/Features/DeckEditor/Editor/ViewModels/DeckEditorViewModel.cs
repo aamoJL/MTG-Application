@@ -146,7 +146,9 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
   {
-    return new(Importer)
+    return new(
+      importer: Importer,
+      confirmers: Confirmers.CardListConfirmers)
     {
       Cards = cards,
       OnChange = () =>
@@ -158,7 +160,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       },
       UndoStack = UndoStack,
       Worker = this,
-      Confirmers = Confirmers.CardListConfirmers,
       Notifier = Notifier,
       CardFilters = filters,
       CardSorter = sorter,
@@ -167,7 +168,10 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private GroupedCardListViewModel CreateGroupedCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
   {
-    return new(Importer, (x) => x.Group)
+    return new(
+      importer: Importer,
+      groupBy: (x) => x.Group,
+      confirmers: Confirmers.GroupedCardListConfirmers)
     {
       Cards = cards,
       OnChange = () =>
@@ -179,7 +183,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       },
       UndoStack = UndoStack,
       Worker = this,
-      Confirmers = Confirmers.CardListConfirmers,
       Notifier = Notifier,
       CardFilters = filters,
       CardSorter = sorter,

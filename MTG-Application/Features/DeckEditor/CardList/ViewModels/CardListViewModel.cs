@@ -17,10 +17,11 @@ namespace MTGApplication.Features.DeckEditor.ViewModels;
 
 public partial class CardListViewModel : INotifyPropertyChanged, INotifyPropertyChanging
 {
-  public CardListViewModel(MTGCardImporter importer)
+  public CardListViewModel(MTGCardImporter importer, CardListConfirmers confirmers = null)
   {
     Commands = new(this);
     Importer = importer;
+    Confirmers = confirmers ?? new();
   }
 
   private ObservableCollection<DeckEditorMTGCard> cards = [];
@@ -41,9 +42,10 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
   public event PropertyChangedEventHandler PropertyChanged;
   public event PropertyChangingEventHandler PropertyChanging;
 
+  public virtual CardListConfirmers Confirmers { get; }
+
   public MTGCardImporter Importer { get; }
   public ReversibleCommandStack UndoStack { get; init; } = new();
-  public CardListConfirmers Confirmers { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public IWorker Worker { get; init; } = IWorker.Default;
@@ -51,9 +53,9 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
   public CardFilters CardFilters { get; init; } = new();
   public CardSorter CardSorter { get; init; } = new();
 
-  private CardListViewModelCommands Commands { get; }
+  protected virtual CardListViewModelCommands Commands { get; }
 
-  public Action OnChange { get; init; }
+  public Action OnChange { private get; init; }
 
   public IAsyncRelayCommand<DeckEditorMTGCard> AddCardCommand => Commands.AddCardCommand;
   public IRelayCommand<DeckEditorMTGCard> RemoveCardCommand => Commands.RemoveCardCommand;
@@ -65,4 +67,7 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
   public IAsyncRelayCommand<string> ExportCardsCommand => Commands.ExportCardsCommand;
   public IRelayCommand<CardCountChangeArgs> ChangeCardCountCommand => Commands.ChangeCardCountCommand;
   public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCardPrintCommand => Commands.ChangeCardPrintCommand;
+
+  public virtual void OnListChange() => OnChange?.Invoke();
+  public virtual void OnCardChange(DeckEditorMTGCard card) => OnChange?.Invoke();
 }

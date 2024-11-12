@@ -97,13 +97,12 @@ public partial class CardListViewModelTests
     public async Task MoveTo_AlreadyExists_ConflictConfirmationShown()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var target = new CardListViewModel(new TestMTGCardImporter())
+      var target = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        AddSingleConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+      })
       {
         Cards = [card],
-        Confirmers = new()
-        {
-          AddSingleConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
-        }
       };
 
       await ConfirmationAssert.ConfirmationShown(() => target.BeginMoveToCommand.ExecuteAsync(card));
@@ -115,17 +114,16 @@ public partial class CardListViewModelTests
       var undoStack = new ReversibleCommandStack();
       var originCard = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var targetCard = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var target = new CardListViewModel(new TestMTGCardImporter())
+      var target = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        AddSingleConflictConfirmer = new()
+        {
+          OnConfirm = async (arg) => await Task.FromResult(ConfirmationResult.No)
+        }
+      })
       {
         Cards = [targetCard],
         UndoStack = undoStack,
-        Confirmers = new()
-        {
-          AddSingleConflictConfirmer = new()
-          {
-            OnConfirm = async (arg) => await Task.FromResult(ConfirmationResult.No)
-          }
-        }
       };
       var origin = new CardListViewModel(new TestMTGCardImporter())
       {

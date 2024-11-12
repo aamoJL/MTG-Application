@@ -36,7 +36,7 @@ public partial class CardListViewModelReversibleActions
       foreach (var item in removeList)
         Viewmodel.Cards.Remove(item);
 
-      Viewmodel.OnChange?.Invoke();
+      Viewmodel.OnListChange();
     }
 
     private void Add(IEnumerable<DeckEditorMTGCard> cards)

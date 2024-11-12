@@ -1,4 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.CardList.UseCases;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using System;
@@ -21,42 +24,46 @@ public partial class CardGroup : ObservableObject
 
   public int Count => Items.Sum(x => x.Count);
 
+  public void OnChange() => OnPropertyChanged(nameof(Count));
+
   private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    => OnPropertyChanged(nameof(Count));
+    => OnChange();
 }
 
 public partial class GroupedCardListViewModel : CardListViewModel
 {
-  public GroupedCardListViewModel(MTGCardImporter importer, Func<DeckEditorMTGCard, string> groupBy) : base(importer)
+  public GroupedCardListViewModel(MTGCardImporter importer, Func<DeckEditorMTGCard, string> groupBy, GroupedCardListConfirmers confirmers = null) : base(importer, confirmers)
   {
+    Commands = new(this);
+    Confirmers = confirmers ?? new();
+
     GetItemKey = groupBy;
 
     PropertyChanging += GroupedCardListViewModel_PropertyChanging;
     PropertyChanged += GroupedCardListViewModel_PropertyChanged;
   }
 
+  public override GroupedCardListConfirmers Confirmers { get; }
+
   public ObservableCollection<CardGroup> Groups { get; } = [new(string.Empty)];
 
   private Func<DeckEditorMTGCard, string> GetItemKey { get; }
 
+  protected override GroupedCardListViewModelCommands Commands { get; }
+
+  public IAsyncRelayCommand AddCardGroupCommand => Commands.AddCardGroupCommand;
+
+  public override void OnCardChange(DeckEditorMTGCard card)
+  {
+    base.OnCardChange(card);
+
+    Groups.FirstOrDefault(x => x.Key == card.Group)?.OnChange();
+  }
+
   private void ResetGroups()
   {
     Groups.Clear();
-    AddGroup(string.Empty);
-  }
-
-  private void AddGroup(string key)
-  {
-    var index = Groups.IndexOf(Groups.FirstOrDefault(x =>
-    {
-      // Empty key will always be the last item
-      return x.Key == string.Empty || x.Key.CompareTo(key) >= 0;
-    }));
-
-    if (index >= 0)
-      Groups.Insert(index, new(key));
-    else
-      Groups.Add(new(key));
+    Groups.Add(new(string.Empty));
   }
 
   private void GroupedCardListViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)

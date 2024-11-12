@@ -505,7 +505,7 @@
 
             <!--#region Group View Controls -->
             <AppBarSeparator Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}"/>
-            <AppBarButton Icon="Add" Label="Add Group" AllowFocusOnInteraction="True" Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}"/>
+            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddCardGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" AllowFocusOnInteraction="True"/>
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">

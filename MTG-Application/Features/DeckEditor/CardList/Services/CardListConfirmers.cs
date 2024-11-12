@@ -50,3 +50,15 @@ public class CardListConfirmers
       Data: data);
   }
 }
+
+public class GroupedCardListConfirmers : CardListConfirmers
+{
+  public Confirmer<string> AddCardGroupConfirmer { get; init; } = new();
+
+  public static Confirmation GetAddCardGroupConfirmation()
+  {
+    return new(
+      Title: "Add new group",
+      Message: string.Empty);
+  }
+}

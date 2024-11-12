@@ -55,13 +55,10 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task ImportCards_WithoutData_ImportConfirmationShown()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        Confirmers = new()
-        {
-          ImportConfirmer = new TestExceptionConfirmer<string, string>()
-        }
-      };
+        ImportConfirmer = new TestExceptionConfirmer<string, string>()
+      });
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ImportCardsCommand.ExecuteAsync(null));
     }
@@ -69,13 +66,10 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Importcards_WithData_NoConfirmationShown()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        Confirmers = new()
-        {
-          ImportConfirmer = new TestExceptionConfirmer<string, string>()
-        }
-      };
+        ImportConfirmer = new TestExceptionConfirmer<string, string>()
+      });
 
       await viewmodel.ImportCardsCommand.ExecuteAsync("Data");
     }
@@ -87,14 +81,13 @@ public partial class CardListViewModelTests
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         ExpectedCards = [new(card.Info, card.Count)]
+      }, new()
+      {
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
+        AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
       })
       {
         Cards = new([card]),
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
-          AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
-        }
       };
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ImportCardsCommand.ExecuteAsync(null));
@@ -107,14 +100,11 @@ public partial class CardListViewModelTests
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         ExpectedCards = [new(card.Info, card.Count)]
-      })
+      }, new()
       {
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
-          AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
-        }
-      };
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
+        AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
+      });
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
     }
@@ -134,21 +124,20 @@ public partial class CardListViewModelTests
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         ExpectedCards = [.. cards.Select(x => new CardImportResult.Card(x.Info, x.Count))]
+      }, new()
+      {
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
+        AddMultipleConflictConfirmer = new()
+        {
+          OnConfirm = async (arg) =>
+          {
+            conflictConfirmationCount += 1;
+            return await Task.FromResult((ConfirmationResult.Yes, skipConflicts));
+          }
+        }
       })
       {
         Cards = new([.. cards]),
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-          AddMultipleConflictConfirmer = new()
-          {
-            OnConfirm = async (arg) =>
-            {
-              conflictConfirmationCount += 1;
-              return await Task.FromResult((ConfirmationResult.Yes, skipConflicts));
-            }
-          }
-        }
       };
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
@@ -171,21 +160,20 @@ public partial class CardListViewModelTests
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         ExpectedCards = [.. cards.Select(x => new CardImportResult.Card(x.Info, x.Count))]
+      }, new()
+      {
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
+        AddMultipleConflictConfirmer = new()
+        {
+          OnConfirm = async (arg) =>
+          {
+            conflictConfirmationCount += 1;
+            return await Task.FromResult((ConfirmationResult.Yes, skipConflicts));
+          }
+        }
       })
       {
         Cards = new([.. cards]),
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-          AddMultipleConflictConfirmer = new()
-          {
-            OnConfirm = async (arg) =>
-            {
-              conflictConfirmationCount += 1;
-              return await Task.FromResult((ConfirmationResult.Yes, skipConflicts));
-            }
-          }
-        }
       };
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
@@ -212,12 +200,11 @@ public partial class CardListViewModelTests
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         ExpectedCards = [new(MTGCardInfoMocker.MockInfo())]
+      }, new()
+      {
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       })
       {
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-        },
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };
 
@@ -232,12 +219,11 @@ public partial class CardListViewModelTests
       {
         NotFoundCount = 1,
         ExpectedCards = []
+      }, new()
+      {
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       })
       {
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-        },
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };
 
@@ -252,12 +238,11 @@ public partial class CardListViewModelTests
       {
         NotFoundCount = 1,
         ExpectedCards = [new(MTGCardInfoMocker.MockInfo())]
+      }, new()
+      {
+        ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       })
       {
-        Confirmers = new()
-        {
-          ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
-        },
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };
 
