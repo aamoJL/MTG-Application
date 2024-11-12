@@ -19,6 +19,9 @@ public partial class GroupedCardListViewModelCommands
     {
       key ??= await Viewmodel.Confirmers.AddCardGroupConfirmer.Confirm(GroupedCardListConfirmers.GetAddCardGroupConfirmation());
 
+      if (string.IsNullOrEmpty(key))
+        return;
+
       if (Viewmodel.Groups.Any(x => x.Key == key))
       {
         new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, "Group already exists."));

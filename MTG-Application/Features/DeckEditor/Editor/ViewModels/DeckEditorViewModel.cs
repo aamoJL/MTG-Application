@@ -170,7 +170,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   {
     return new(
       importer: Importer,
-      groupBy: (x) => x.Group,
       confirmers: Confirmers.GroupedCardListConfirmers)
     {
       Cards = cards,

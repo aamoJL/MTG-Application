@@ -69,5 +69,5 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
   public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCardPrintCommand => Commands.ChangeCardPrintCommand;
 
   public virtual void OnListChange() => OnChange?.Invoke();
-  public virtual void OnCardChange(DeckEditorMTGCard card) => OnChange?.Invoke();
+  public virtual void OnCardChange(DeckEditorMTGCard card, string property) => OnChange?.Invoke();
 }

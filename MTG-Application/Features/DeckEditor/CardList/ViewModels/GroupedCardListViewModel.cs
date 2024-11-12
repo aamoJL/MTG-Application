@@ -4,7 +4,6 @@ using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.CardList.UseCases;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -32,12 +31,10 @@ public partial class CardGroup : ObservableObject
 
 public partial class GroupedCardListViewModel : CardListViewModel
 {
-  public GroupedCardListViewModel(MTGCardImporter importer, Func<DeckEditorMTGCard, string> groupBy, GroupedCardListConfirmers confirmers = null) : base(importer, confirmers)
+  public GroupedCardListViewModel(MTGCardImporter importer, GroupedCardListConfirmers confirmers = null) : base(importer, confirmers)
   {
     Commands = new(this);
     Confirmers = confirmers ?? new();
-
-    GetItemKey = groupBy;
 
     PropertyChanging += GroupedCardListViewModel_PropertyChanging;
     PropertyChanged += GroupedCardListViewModel_PropertyChanged;
@@ -47,17 +44,29 @@ public partial class GroupedCardListViewModel : CardListViewModel
 
   public ObservableCollection<CardGroup> Groups { get; } = [new(string.Empty)];
 
-  private Func<DeckEditorMTGCard, string> GetItemKey { get; }
-
   protected override GroupedCardListViewModelCommands Commands { get; }
 
   public IAsyncRelayCommand AddCardGroupCommand => Commands.AddCardGroupCommand;
+  public IRelayCommand RemoveCardGroupCommand => Commands.RemoveCardGroupCommand;
 
-  public override void OnCardChange(DeckEditorMTGCard card)
+  public override void OnCardChange(DeckEditorMTGCard card, string property)
   {
-    base.OnCardChange(card);
+    base.OnCardChange(card, property);
 
-    Groups.FirstOrDefault(x => x.Key == card.Group)?.OnChange();
+    var key = card.Group;
+    var group = Groups.FirstOrDefault(x => x.Key == key);
+
+    switch (property)
+    {
+      case nameof(card.Group):
+        if (group == null)
+          Groups.Add(group = new(key));
+
+        group.Items.Add(card);
+        break;
+      case nameof(card.Info): break;
+      default: group?.OnChange(); break;
+    }
   }
 
   private void ResetGroups()
@@ -82,7 +91,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
     {
       foreach (var card in Cards)
       {
-        var key = GetItemKey.Invoke(card);
+        var key = card.Group;
         var group = Groups.FirstOrDefault(x => key == x.Key);
 
         if (group == null)
@@ -99,7 +108,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
   {
     if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
     {
-      var key = GetItemKey.Invoke(e.NewItems[0] as DeckEditorMTGCard);
+      var key = (e.NewItems[0] as DeckEditorMTGCard).Group;
       var group = Groups.FirstOrDefault(x => key == x.Key);
 
       if (group == null)
@@ -109,7 +118,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
     {
-      var key = GetItemKey.Invoke(e.OldItems[0] as DeckEditorMTGCard);
+      var key = (e.OldItems[0] as DeckEditorMTGCard).Group;
 
       Groups.FirstOrDefault(x => key == x.Key)
         ?.Items.Remove(e.OldItems[0] as DeckEditorMTGCard);

@@ -16,7 +16,6 @@ public partial class GroupedCardListViewModelTest
     {
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group,
         confirmers: new()
         {
           AddCardGroupConfirmer = new TestExceptionConfirmer<string>()
@@ -30,7 +29,6 @@ public partial class GroupedCardListViewModelTest
     {
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group,
         confirmers: new()
         {
           AddCardGroupConfirmer = new TestExceptionConfirmer<string>()
@@ -42,43 +40,65 @@ public partial class GroupedCardListViewModelTest
     [TestMethod]
     public async Task AddCardGroup_WithoutParameter_New_GroupAdded()
     {
+      var name = "New group";
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group,
         confirmers: new()
         {
-          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult("New group") }
+          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(name) }
         });
       var initCount = viewmodel.Groups.Count;
 
       await viewmodel.AddCardGroupCommand.ExecuteAsync(null);
 
       Assert.AreEqual(initCount + 1, viewmodel.Groups.Count);
+      Assert.IsTrue(viewmodel.Groups.Any(x => x.Key == name));
+    }
+
+    [TestMethod]
+    public async Task AddCardGroup_Cancel_GroupNotAdded()
+    {
+      var name = "New group";
+      var viewmodel = new GroupedCardListViewModel(
+        importer: new TestMTGCardImporter(),
+        confirmers: new()
+        {
+          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult<string?>(null) }
+        });
+      var initCount = viewmodel.Groups.Count;
+
+      await viewmodel.AddCardGroupCommand.ExecuteAsync(null);
+
+      Assert.AreEqual(initCount, viewmodel.Groups.Count);
+      Assert.IsFalse(viewmodel.Groups.Any(x => x.Key == name));
     }
 
     [TestMethod]
     public async Task AddCardGroup_WithParameter_New_GroupAdded()
     {
+      var name = "New group";
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group);
+        importer: new TestMTGCardImporter());
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync("New group");
+      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
 
       Assert.AreEqual(initCount + 1, viewmodel.Groups.Count);
+      Assert.IsTrue(viewmodel.Groups.Any(x => x.Key == name));
     }
 
     [TestMethod]
     public async Task AddCardGroup_WithoutParameter_Existing_GroupNotAdded()
     {
+      var name = "New Group";
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group,
         confirmers: new()
         {
-          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(string.Empty) }
+          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(name) }
         });
+
+      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
       var initCount = viewmodel.Groups.Count;
 
       await viewmodel.AddCardGroupCommand.ExecuteAsync(null);
@@ -89,12 +109,14 @@ public partial class GroupedCardListViewModelTest
     [TestMethod]
     public async Task AddCardGroup_WithParameter_Existing_GroupNotAdded()
     {
+      var name = "New Group";
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group);
+        importer: new TestMTGCardImporter());
+
+      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(string.Empty);
+      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
 
       Assert.AreEqual(initCount, viewmodel.Groups.Count);
     }
@@ -102,12 +124,12 @@ public partial class GroupedCardListViewModelTest
     [TestMethod]
     public async Task AddCardGroup_Existing_ErrorNotificationSent()
     {
+      var name = "New Group";
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group,
         confirmers: new()
         {
-          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(string.Empty) }
+          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(name) }
         })
       {
         Notifier = new()
@@ -115,6 +137,9 @@ public partial class GroupedCardListViewModelTest
           OnNotify = arg => throw new NotificationException(arg)
         }
       };
+
+      await NotificationAssert.NotificationSent(NotificationType.Success,
+        () => viewmodel.AddCardGroupCommand.ExecuteAsync(name));
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
         () => viewmodel.AddCardGroupCommand.ExecuteAsync(null));
@@ -125,7 +150,6 @@ public partial class GroupedCardListViewModelTest
     {
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group,
         confirmers: new()
         {
           AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult("New group") }
@@ -145,8 +169,7 @@ public partial class GroupedCardListViewModelTest
     public async Task AddCardGroup_Success_GroupsInAlphabeticalOrder()
     {
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        groupBy: x => x.Group);
+        importer: new TestMTGCardImporter());
 
       await viewmodel.AddCardGroupCommand.ExecuteAsync("A");
       await viewmodel.AddCardGroupCommand.ExecuteAsync("D");

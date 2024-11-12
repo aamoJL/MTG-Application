@@ -505,7 +505,7 @@
 
             <!--#region Group View Controls -->
             <AppBarSeparator Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}"/>
-            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddCardGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" AllowFocusOnInteraction="True"/>
+            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddCardGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
@@ -553,10 +553,21 @@
                         <ColumnDefinition Width="*" MaxWidth="600"/>
                       </Grid.ColumnDefinitions>
                       <controls1:CardGroupViewGroupHeader 
+                        d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
                         Grid.Column="0"
                         PrimaryHeader="{x:Bind Key, Mode=OneWay, Converter={StaticResource StringOrDefaultConverter}, ConverterParameter='Other'}"
                         SecondaryHeader="{x:Bind Count, Mode=OneWay}"
-                        Margin="0 0 0 5"/>
+                        Margin="0 0 0 5">
+                        <controls1:CardGroupViewGroupHeader.ContextFlyout>
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                            <MenuFlyoutItem 
+                              Command="{Binding RemoveCardGroupCommand, Mode=OneTime}" 
+                              CommandParameter="{x:Bind Key, Mode=OneWay}" 
+                              Text="Remove"
+                              Background="IndianRed"/>
+                          </MenuFlyout>
+                        </controls1:CardGroupViewGroupHeader.ContextFlyout>
+                      </controls1:CardGroupViewGroupHeader>
                     </Grid>
                     <cardlistview:AdvancedAdaptiveCardGridView
                       DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneTime}"

@@ -21,7 +21,7 @@ public partial class CardListViewModelReversibleActions
       if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
       {
         existingCard.Info = info;
-        Viewmodel.OnCardChange(existingCard);
+        Viewmodel.OnCardChange(existingCard, nameof(existingCard.Info));
       }
     }
   }

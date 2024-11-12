@@ -19,6 +19,7 @@ public record MTGCardDTO
     OracleId = oracleId;
     SetCode = setCode;
     CollectorNumber = collectorNumber;
+    //Group = group;
   }
   public MTGCardDTO(MTGCardInfo info, int count = 1)
   {
@@ -28,6 +29,7 @@ public record MTGCardDTO
     OracleId = info.OracleId;
     SetCode = info.SetCode;
     CollectorNumber = info.CollectorNumber;
+    //Group = string.Empty;
   }
 
   [Key] public int Id { get; init; }
@@ -37,6 +39,7 @@ public record MTGCardDTO
   public Guid OracleId { get; set; }
   public string SetCode { get; set; }
   public string CollectorNumber { get; set; }
+  //public string Group { get; set; } = string.Empty;
 
   /// <summary>
   /// Compares DTOs, excluding Id and Count

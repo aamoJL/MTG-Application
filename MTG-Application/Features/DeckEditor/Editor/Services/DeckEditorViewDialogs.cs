@@ -4,6 +4,7 @@ using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Dialogs.UseCases;
+using System.IO;
 using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services;
@@ -73,6 +74,10 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       })) as MTGCard;
     };
     confirmers.GroupedCardListConfirmers.AddCardGroupConfirmer.OnConfirm = async msg
-      => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title));
+      => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title)
+      {
+        InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+        PrimaryButtonText = "Add"
+      });
   }
 }
