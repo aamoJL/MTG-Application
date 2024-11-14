@@ -2,9 +2,11 @@
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.NotificationService.UseCases;
+using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
@@ -28,7 +30,11 @@ public partial class GroupedCardListViewModelCommands
         return;
       }
 
-      Viewmodel.AddNewGroup(key);
+      Viewmodel.UndoStack.PushAndExecute(
+        new ReversibleCommand<string>(key)
+        {
+          ReversibleAction = new ReversibleAddGroupAction(Viewmodel)
+        });
 
       new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group added successfully."));
     }

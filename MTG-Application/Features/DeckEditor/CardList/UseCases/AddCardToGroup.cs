@@ -19,7 +19,7 @@ public partial class CardGroupViewModelCommands
   {
     protected override async Task Execute(DeckEditorMTGCard card)
     {
-      if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
+      if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existing)
       {
         if (await listViewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
         {
@@ -33,9 +33,9 @@ public partial class CardGroupViewModelCommands
           };
 
           // Change group if needed
-          if (card.Group != Viewmodel.Key)
+          if (existing.Group != Viewmodel.Key)
           {
-            combinedCommand.Commands.Add(new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(card, card.Group, Viewmodel.Key, listViewmodel.CardCopier)
+            combinedCommand.Commands.Add(new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(card, existing.Group, Viewmodel.Key, listViewmodel.CardCopier)
             {
               ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
             });
