@@ -28,20 +28,7 @@ public partial class GroupedCardListViewModelCommands
         return;
       }
 
-      // Find the alphabetical index of the key
-      var index = Viewmodel.Groups.IndexOf(Viewmodel.Groups.FirstOrDefault(x =>
-      {
-        // Empty key will always be the last item
-        return x.Key == string.Empty || x.Key.CompareTo(key) >= 0;
-      }));
-
-      var group = new CardGroupViewModel(key);
-      group.Commands = new(group, viewmodel);
-
-      if (index >= 0)
-        Viewmodel.Groups.Insert(index, group);
-      else
-        Viewmodel.Groups.Add(group);
+      Viewmodel.AddNewGroup(key);
 
       new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group added successfully."));
     }

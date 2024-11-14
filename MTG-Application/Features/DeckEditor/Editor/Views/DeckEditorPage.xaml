@@ -196,11 +196,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneWay}"
-              OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneWay}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneWay}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}"
+              OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneTime}"
+              OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneTime}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneTime}"
+              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneTime}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked" />
@@ -251,11 +251,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneWay}"
-              OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneWay}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneWay}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneWay}"
+              OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneTime}"
+              OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneTime}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneTime}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneTime}"
+              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneTime}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
@@ -306,11 +306,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneWay}"
-              OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneWay}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneWay}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneWay}"
+              OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneTime}"
+              OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneTime}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneTime}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneTime}"
+              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneTime}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
@@ -582,9 +582,9 @@
                       AllowDrop="True"
                       CanDragItems="True"
                       OnDropCopy="{x:Bind AddCardToGroupCommand, Mode=OneTime}"
-                      OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneTime}"
-                      OnDropBeginMoveTo="{Binding BeginMoveToCommand, Mode=OneTime}"
-                      OnDropExecuteMove="{Binding ExecuteMoveCommand, Mode=OneTime}"
+                      OnDropBeginMoveFrom="{x:Bind BeginMoveFromCommand, Mode=OneTime}"
+                      OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
+                      OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
                       OnDropImport="{Binding ImportCardsCommand, Mode=OneTime}">
                       <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
@@ -626,11 +626,11 @@
           DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
           CanDragItems="True"
           AllowDrop="True"
-          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
-          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
-          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
-          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
+          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
           LosingFocus="ListView_LosingFocus">
           <cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
             <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
@@ -661,11 +661,11 @@
           SelectionMode="Single"
           CanDragItems="True"
           AllowDrop="True"
-          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
-          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
-          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
-          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
+          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
           LosingFocus="ListView_LosingFocus">
           <cardlistview:AdvancedCardListView.KeyboardAccelerators>
             <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>

@@ -27,7 +27,9 @@ public partial class CardGroupViewModel : ViewModelBase
   public CardGroupViewModelCommands Commands { get; set; }
 
   public IAsyncRelayCommand<DeckEditorMTGCard> AddCardToGroupCommand => Commands?.AddCardToGroupCommand;
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand { get; set; }
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => Commands?.BeginMoveFromCommand;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => Commands?.BeginMoveToCommand;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => Commands?.ExecuteMoveCommand;
 
   private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     => OnChange();
@@ -43,9 +45,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
     PropertyChanging += GroupedCardListViewModel_PropertyChanging;
     PropertyChanged += GroupedCardListViewModel_PropertyChanged;
 
-    var group = new CardGroupViewModel(string.Empty);
-    group.Commands = new(group, this);
-    Groups.Add(group);
+    AddNewGroup(string.Empty);
   }
 
   public override GroupedCardListConfirmers Confirmers { get; }
@@ -66,19 +66,48 @@ public partial class GroupedCardListViewModel : CardListViewModel
     switch (property)
     {
       case nameof(card.Group):
-        // add new group if does not exist
-        if (group == null)
-          Groups.Add(group = new(key));
-
         // remove card if exists in the old group
         if (Groups.FirstOrDefault(x => x.Items.Contains(card)) is CardGroupViewModel found)
           found.Items.Remove(card);
 
-        group.Items.Add(card);
+        (group ??= AddNewGroup(key)).Items.Add(card);
         break;
       case nameof(card.Info): break;
       default: group?.OnChange(); break;
     }
+  }
+
+  public CardGroupViewModel AddNewGroup(string key)
+  {
+    // Find the alphabetical index of the key. Empty key will always be the last item
+    var index = Groups.IndexOf(
+            Groups.FirstOrDefault(x => x.Key == string.Empty || x.Key.CompareTo(key) >= 0));
+
+    var group = new CardGroupViewModel(key);
+    group.Commands = new(group, this);
+
+    if (index >= 0)
+      Groups.Insert(index, group);
+    else
+      Groups.Add(group);
+
+    // Add items from default list of item has the same group key as the new group
+    if (group.Key != string.Empty)
+    {
+      if (Groups.FirstOrDefault(x => x.Key == string.Empty) is CardGroupViewModel defaultGroup)
+      {
+        foreach (var card in defaultGroup.Items)
+        {
+          if (card.Group == group.Key)
+          {
+            defaultGroup.Items.Remove(card);
+            group.Items.Add(card);
+          }
+        }
+      }
+    }
+
+    return group;
   }
 
   private void GroupedCardListViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
@@ -115,13 +144,11 @@ public partial class GroupedCardListViewModel : CardListViewModel
   {
     if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
     {
-      var key = (e.NewItems[0] as DeckEditorMTGCard).Group;
+      var item = (e.NewItems[0] as DeckEditorMTGCard);
+      var key = item.Group;
       var group = Groups.FirstOrDefault(x => key == x.Key);
 
-      if (group == null)
-        Groups.Add(group = new(key));
-
-      group.Items.Add(e.NewItems[0] as DeckEditorMTGCard);
+      (group ??= AddNewGroup(key)).Items.Add(item);
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
     {
@@ -131,10 +158,6 @@ public partial class GroupedCardListViewModel : CardListViewModel
         ?.Items.Remove(e.OldItems[0] as DeckEditorMTGCard);
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-    {
-      var group = new CardGroupViewModel(string.Empty);
-      group.Commands = new(group, this);
-      Groups.Add(group);
-    }
+      AddNewGroup(string.Empty);
   }
 }
