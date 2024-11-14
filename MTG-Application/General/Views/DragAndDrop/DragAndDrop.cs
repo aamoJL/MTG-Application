@@ -20,7 +20,6 @@ public abstract class DragAndDrop<T>()
   public Func<T, Task> OnBeginMoveTo { get; set; }
   public Action<T> OnBeginMoveFrom { get; set; }
   public Action<T> OnExecuteMove { get; set; }
-  public Action<T> OnRemove { get; set; }
   public Func<string, Task> OnExternalImport { get; set; }
 
   public virtual void OnDragStarting(T item, out DataPackageOperation requestedOperation)
@@ -39,7 +38,7 @@ public abstract class DragAndDrop<T>()
   public virtual void DragOver(DragEventArgs eventArgs)
   {
     // Block dropping if the origin is the same or the item is invalid
-    if (DragOrigin == this || !eventArgs.DataView.Contains(StandardDataFormats.Text) && Item == null)
+    if (DragOrigin == this || (!eventArgs.DataView.Contains(StandardDataFormats.Text) && Item == null))
       return;
 
     // Change operation to 'Move' if the shift key is down and move is an accepted operation.

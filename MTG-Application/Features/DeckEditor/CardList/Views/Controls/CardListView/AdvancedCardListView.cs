@@ -31,7 +31,6 @@ public partial class AdvancedCardListView : ListView
     DragAndDrop = new(itemToArgsConverter: (item) => { return new CardMoveArgs(item, item.Count); })
     {
       OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
-      OnRemove = (item) => OnDropRemove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
       OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
@@ -74,7 +73,6 @@ public partial class AdvancedCardListView : ListView
   }
 
   public IAsyncRelayCommand OnDropCopy { get; set; }
-  public ICommand OnDropRemove { get; set; }
   public IAsyncRelayCommand OnDropImport { get; set; }
   public ICommand OnDropBeginMoveFrom { get; set; }
   public IAsyncRelayCommand OnDropBeginMoveTo { get; set; }

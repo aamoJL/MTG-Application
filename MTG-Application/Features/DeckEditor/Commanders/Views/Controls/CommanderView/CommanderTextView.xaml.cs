@@ -26,7 +26,6 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
     DragAndDrop = new()
     {
       OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
-      OnRemove = (item) => OnDropRemove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
       OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),

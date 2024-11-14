@@ -197,7 +197,6 @@
               CanDragItems="True"
               AllowDrop="True"
               OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneWay}"
-              OnDropRemove="{x:Bind ViewModel.MaybeCardList.RemoveCardCommand, Mode=OneWay}"
               OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneWay}"
@@ -253,7 +252,6 @@
               CanDragItems="True"
               AllowDrop="True"
               OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneWay}"
-              OnDropRemove="{x:Bind ViewModel.WishCardList.RemoveCardCommand, Mode=OneWay}"
               OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneWay}"
@@ -309,7 +307,6 @@
               CanDragItems="True"
               AllowDrop="True"
               OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneWay}"
-              OnDropRemove="{x:Bind ViewModel.RemoveCardList.RemoveCardCommand, Mode=OneWay}"
               OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneWay}"
@@ -505,7 +502,7 @@
 
             <!--#region Group View Controls -->
             <AppBarSeparator Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}"/>
-            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddCardGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
+            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
@@ -546,7 +543,7 @@
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsRepeater ItemsSource="{Binding Groups, Mode=OneWay}">
               <ItemsRepeater.ItemTemplate>
-                <DataTemplate x:DataType="viewmodels:CardGroup">
+                <DataTemplate x:DataType="viewmodels:CardGroupViewModel">
                   <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="10">
                     <Grid HorizontalAlignment="Stretch">
                       <Grid.ColumnDefinitions>
@@ -561,7 +558,7 @@
                         <controls1:CardGroupViewGroupHeader.ContextFlyout>
                           <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                             <MenuFlyoutItem 
-                              Command="{Binding RemoveCardGroupCommand, Mode=OneTime}" 
+                              Command="{Binding RemoveGroupCommand, Mode=OneTime}" 
                               CommandParameter="{x:Bind Key, Mode=OneWay}" 
                               Text="Remove"
                               Background="IndianRed"/>
@@ -569,8 +566,9 @@
                         </controls1:CardGroupViewGroupHeader.ContextFlyout>
                       </controls1:CardGroupViewGroupHeader>
                     </Grid>
-                    <cardlistview:AdvancedAdaptiveCardGridView
-                      DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneTime}"
+                    <cardlistview:AdvancedAdaptiveGroupedCardGridView
+                      d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
+                      DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneWay}"
                       ItemsSource="{x:Bind Items, Mode=OneWay}"
                       SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
                       FilterProperties="{Binding CardFilters, Mode=OneWay}"
@@ -580,13 +578,20 @@
                       Padding="0"
                       Margin="0"
                       DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
-                      MinHeight="200">
-                      <cardlistview:AdvancedAdaptiveCardGridView.ItemContainerStyle>
+                      MinHeight="200"
+                      AllowDrop="True"
+                      CanDragItems="True"
+                      OnDropCopy="{x:Bind AddCardToGroupCommand, Mode=OneTime}"
+                      OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneTime}"
+                      OnDropBeginMoveTo="{Binding BeginMoveToCommand, Mode=OneTime}"
+                      OnDropExecuteMove="{Binding ExecuteMoveCommand, Mode=OneTime}"
+                      OnDropImport="{Binding ImportCardsCommand, Mode=OneTime}">
+                      <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
                           <Setter Property="Margin" Value="0"/>
                         </Style>
-                      </cardlistview:AdvancedAdaptiveCardGridView.ItemContainerStyle>
-                      <cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
+                      </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
+                      <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
                         <DataTemplate x:DataType="models:DeckEditorMTGCard">
                           <cardview:DeckEditorCardImageView
                             d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
@@ -596,8 +601,8 @@
                             CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                             ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
                         </DataTemplate>
-                      </cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
-                    </cardlistview:AdvancedAdaptiveCardGridView>
+                      </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
+                    </cardlistview:AdvancedAdaptiveGroupedCardGridView>
                   </StackPanel>
                 </DataTemplate>
               </ItemsRepeater.ItemTemplate>
@@ -622,7 +627,6 @@
           CanDragItems="True"
           AllowDrop="True"
           OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
-          OnDropRemove="{x:Bind ViewModel.DeckCardList.RemoveCardCommand, Mode=OneWay}"
           OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
           OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
@@ -658,7 +662,6 @@
           CanDragItems="True"
           AllowDrop="True"
           OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
-          OnDropRemove="{x:Bind ViewModel.DeckCardList.RemoveCardCommand, Mode=OneWay}"
           OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
           OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"

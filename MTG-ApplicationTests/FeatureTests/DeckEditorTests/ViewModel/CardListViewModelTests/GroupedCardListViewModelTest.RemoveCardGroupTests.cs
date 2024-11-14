@@ -17,8 +17,8 @@ public partial class GroupedCardListViewModelTest
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter());
 
-      Assert.IsFalse(viewmodel.RemoveCardGroupCommand.CanExecute(string.Empty));
-      Assert.IsFalse(viewmodel.RemoveCardGroupCommand.CanExecute(null));
+      Assert.IsFalse(viewmodel.RemoveGroupCommand.CanExecute(string.Empty));
+      Assert.IsFalse(viewmodel.RemoveGroupCommand.CanExecute(null));
     }
 
     [TestMethod]
@@ -27,7 +27,7 @@ public partial class GroupedCardListViewModelTest
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter());
 
-      Assert.IsTrue(viewmodel.RemoveCardGroupCommand.CanExecute("New Group"));
+      Assert.IsTrue(viewmodel.RemoveGroupCommand.CanExecute("New Group"));
     }
 
     [TestMethod]
@@ -39,7 +39,7 @@ public partial class GroupedCardListViewModelTest
 
       viewmodel.Groups.Add(new(name));
 
-      viewmodel.RemoveCardGroupCommand.Execute(name);
+      viewmodel.RemoveGroupCommand.Execute(name);
 
       Assert.AreEqual(1, viewmodel.Groups.Count);
       Assert.IsFalse(viewmodel.Groups.Any(x => x.Key == name));
@@ -59,7 +59,7 @@ public partial class GroupedCardListViewModelTest
 
       NotificationAssert.NotificationSent(
         MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Success,
-        () => viewmodel.RemoveCardGroupCommand.Execute(name));
+        () => viewmodel.RemoveGroupCommand.Execute(name));
     }
 
     [TestMethod]
@@ -73,7 +73,7 @@ public partial class GroupedCardListViewModelTest
 
       var initCount = viewmodel.Groups.Count;
 
-      viewmodel.RemoveCardGroupCommand.Execute("Nonexistent");
+      viewmodel.RemoveGroupCommand.Execute("Nonexistent");
 
       Assert.AreEqual(initCount, viewmodel.Groups.Count);
       Assert.IsTrue(viewmodel.Groups.Any(x => x.Key == name));
@@ -90,7 +90,7 @@ public partial class GroupedCardListViewModelTest
 
       NotificationAssert.NotificationSent(
         MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Error,
-        () => viewmodel.RemoveCardGroupCommand.Execute("New group"));
+        () => viewmodel.RemoveGroupCommand.Execute("New group"));
     }
 
     [TestMethod]
@@ -111,7 +111,7 @@ public partial class GroupedCardListViewModelTest
 
       Assert.AreEqual(0, viewmodel.Groups.FirstOrDefault(x => x.Key == string.Empty)?.Count);
 
-      viewmodel.RemoveCardGroupCommand.Execute(name);
+      viewmodel.RemoveGroupCommand.Execute(name);
 
       Assert.AreEqual(initCount, viewmodel.Groups.FirstOrDefault(x => x.Key == string.Empty)?.Count);
     }

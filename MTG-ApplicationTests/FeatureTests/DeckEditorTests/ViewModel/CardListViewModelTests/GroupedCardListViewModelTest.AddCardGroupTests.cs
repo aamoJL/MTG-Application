@@ -21,7 +21,7 @@ public partial class GroupedCardListViewModelTest
           AddCardGroupConfirmer = new TestExceptionConfirmer<string>()
         });
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.AddCardGroupCommand.ExecuteAsync(null));
+      await ConfirmationAssert.ConfirmationShown(() => viewmodel.AddGroupCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
@@ -34,7 +34,7 @@ public partial class GroupedCardListViewModelTest
           AddCardGroupConfirmer = new TestExceptionConfirmer<string>()
         });
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync("New group");
+      await viewmodel.AddGroupCommand.ExecuteAsync("New group");
     }
 
     [TestMethod]
@@ -49,7 +49,7 @@ public partial class GroupedCardListViewModelTest
         });
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(null);
+      await viewmodel.AddGroupCommand.ExecuteAsync(null);
 
       Assert.AreEqual(initCount + 1, viewmodel.Groups.Count);
       Assert.IsTrue(viewmodel.Groups.Any(x => x.Key == name));
@@ -67,7 +67,7 @@ public partial class GroupedCardListViewModelTest
         });
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(null);
+      await viewmodel.AddGroupCommand.ExecuteAsync(null);
 
       Assert.AreEqual(initCount, viewmodel.Groups.Count);
       Assert.IsFalse(viewmodel.Groups.Any(x => x.Key == name));
@@ -81,7 +81,7 @@ public partial class GroupedCardListViewModelTest
         importer: new TestMTGCardImporter());
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
+      await viewmodel.AddGroupCommand.ExecuteAsync(name);
 
       Assert.AreEqual(initCount + 1, viewmodel.Groups.Count);
       Assert.IsTrue(viewmodel.Groups.Any(x => x.Key == name));
@@ -98,10 +98,10 @@ public partial class GroupedCardListViewModelTest
           AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(name) }
         });
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
+      await viewmodel.AddGroupCommand.ExecuteAsync(name);
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(null);
+      await viewmodel.AddGroupCommand.ExecuteAsync(null);
 
       Assert.AreEqual(initCount, viewmodel.Groups.Count);
     }
@@ -113,10 +113,10 @@ public partial class GroupedCardListViewModelTest
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter());
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
+      await viewmodel.AddGroupCommand.ExecuteAsync(name);
       var initCount = viewmodel.Groups.Count;
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync(name);
+      await viewmodel.AddGroupCommand.ExecuteAsync(name);
 
       Assert.AreEqual(initCount, viewmodel.Groups.Count);
     }
@@ -139,10 +139,10 @@ public partial class GroupedCardListViewModelTest
       };
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.AddCardGroupCommand.ExecuteAsync(name));
+        () => viewmodel.AddGroupCommand.ExecuteAsync(name));
 
       await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.AddCardGroupCommand.ExecuteAsync(null));
+        () => viewmodel.AddGroupCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
@@ -162,7 +162,7 @@ public partial class GroupedCardListViewModelTest
       };
 
       await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.AddCardGroupCommand.ExecuteAsync(null));
+        () => viewmodel.AddGroupCommand.ExecuteAsync(null));
     }
 
     [TestMethod]
@@ -171,10 +171,10 @@ public partial class GroupedCardListViewModelTest
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter());
 
-      await viewmodel.AddCardGroupCommand.ExecuteAsync("A");
-      await viewmodel.AddCardGroupCommand.ExecuteAsync("D");
-      await viewmodel.AddCardGroupCommand.ExecuteAsync("B");
-      await viewmodel.AddCardGroupCommand.ExecuteAsync("C");
+      await viewmodel.AddGroupCommand.ExecuteAsync("A");
+      await viewmodel.AddGroupCommand.ExecuteAsync("D");
+      await viewmodel.AddGroupCommand.ExecuteAsync("B");
+      await viewmodel.AddGroupCommand.ExecuteAsync("C");
 
       var expected = new string[] { "A", "B", "C", "D", string.Empty };
 

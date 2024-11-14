@@ -11,7 +11,7 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class GroupedCardListViewModelCommands
 {
-  public IAsyncRelayCommand<string> AddCardGroupCommand { get; } = new AddCardGroup(viewmodel).Command;
+  public IAsyncRelayCommand<string> AddGroupCommand { get; } = new AddCardGroup(viewmodel).Command;
 
   private class AddCardGroup(GroupedCardListViewModel viewmodel) : ViewModelAsyncCommand<GroupedCardListViewModel, string>(viewmodel)
   {
@@ -35,10 +35,13 @@ public partial class GroupedCardListViewModelCommands
         return x.Key == string.Empty || x.Key.CompareTo(key) >= 0;
       }));
 
+      var group = new CardGroupViewModel(key);
+      group.Commands = new(group, viewmodel);
+
       if (index >= 0)
-        Viewmodel.Groups.Insert(index, new(key));
+        Viewmodel.Groups.Insert(index, group);
       else
-        Viewmodel.Groups.Add(new(key));
+        Viewmodel.Groups.Add(group);
 
       new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group added successfully."));
     }

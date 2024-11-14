@@ -53,7 +53,7 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
   public CardFilters CardFilters { get; init; } = new();
   public CardSorter CardSorter { get; init; } = new();
 
-  protected virtual CardListViewModelCommands Commands { get; }
+  private CardListViewModelCommands Commands { get; }
 
   public Action OnChange { private get; init; }
 

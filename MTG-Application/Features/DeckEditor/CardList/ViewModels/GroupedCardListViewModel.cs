@@ -1,17 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.CardList.UseCases;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 
-public partial class CardGroup : ObservableObject
+public partial class CardGroupViewModel : ViewModelBase
 {
-  public CardGroup(string key)
+  public CardGroupViewModel(string key)
   {
     Key = key;
 
@@ -20,10 +20,14 @@ public partial class CardGroup : ObservableObject
 
   public ObservableCollection<DeckEditorMTGCard> Items { get; } = [];
   public string Key { get; }
-
   public int Count => Items.Sum(x => x.Count);
 
   public void OnChange() => OnPropertyChanged(nameof(Count));
+
+  public CardGroupViewModelCommands Commands { get; set; }
+
+  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardToGroupCommand => Commands?.AddCardToGroupCommand;
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand { get; set; }
 
   private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     => OnChange();
@@ -34,20 +38,23 @@ public partial class GroupedCardListViewModel : CardListViewModel
   public GroupedCardListViewModel(MTGCardImporter importer, GroupedCardListConfirmers confirmers = null) : base(importer, confirmers)
   {
     Commands = new(this);
-    Confirmers = confirmers ?? new();
+    Confirmers ??= confirmers;
 
     PropertyChanging += GroupedCardListViewModel_PropertyChanging;
     PropertyChanged += GroupedCardListViewModel_PropertyChanged;
+
+    var group = new CardGroupViewModel(string.Empty);
+    group.Commands = new(group, this);
+    Groups.Add(group);
   }
 
   public override GroupedCardListConfirmers Confirmers { get; }
+  public ObservableCollection<CardGroupViewModel> Groups { get; } = [];
 
-  public ObservableCollection<CardGroup> Groups { get; } = [new(string.Empty)];
+  private GroupedCardListViewModelCommands Commands { get; }
 
-  protected override GroupedCardListViewModelCommands Commands { get; }
-
-  public IAsyncRelayCommand AddCardGroupCommand => Commands.AddCardGroupCommand;
-  public IRelayCommand RemoveCardGroupCommand => Commands.RemoveCardGroupCommand;
+  public IAsyncRelayCommand AddGroupCommand => Commands.AddGroupCommand;
+  public IRelayCommand RemoveGroupCommand => Commands.RemoveGroupCommand;
 
   public override void OnCardChange(DeckEditorMTGCard card, string property)
   {
@@ -59,8 +66,13 @@ public partial class GroupedCardListViewModel : CardListViewModel
     switch (property)
     {
       case nameof(card.Group):
+        // add new group if does not exist
         if (group == null)
           Groups.Add(group = new(key));
+
+        // remove card if exists in the old group
+        if (Groups.FirstOrDefault(x => x.Items.Contains(card)) is CardGroupViewModel found)
+          found.Items.Remove(card);
 
         group.Items.Add(card);
         break;
@@ -69,26 +81,21 @@ public partial class GroupedCardListViewModel : CardListViewModel
     }
   }
 
-  private void ResetGroups()
-  {
-    Groups.Clear();
-    Groups.Add(new(string.Empty));
-  }
-
   private void GroupedCardListViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
   {
     if (e.PropertyName == nameof(Cards))
-    {
-      ResetGroups();
-
       Cards.CollectionChanged -= Cards_CollectionChanged;
-    }
   }
 
   private void GroupedCardListViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(Cards))
     {
+      Groups.Clear();
+      var emptyGroup = new CardGroupViewModel(string.Empty);
+      emptyGroup.Commands = new(emptyGroup, this);
+      Groups.Add(emptyGroup);
+
       foreach (var card in Cards)
       {
         var key = card.Group;
@@ -124,6 +131,10 @@ public partial class GroupedCardListViewModel : CardListViewModel
         ?.Items.Remove(e.OldItems[0] as DeckEditorMTGCard);
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-      ResetGroups();
+    {
+      var group = new CardGroupViewModel(string.Empty);
+      group.Commands = new(group, this);
+      Groups.Add(group);
+    }
   }
 }

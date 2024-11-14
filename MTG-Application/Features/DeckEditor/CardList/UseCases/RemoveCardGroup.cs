@@ -9,7 +9,7 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class GroupedCardListViewModelCommands
 {
-  public IRelayCommand RemoveCardGroupCommand { get; } = new RemoveCardGroup(viewmodel).Command;
+  public IRelayCommand RemoveGroupCommand { get; } = new RemoveCardGroup(viewmodel).Command;
 
   private class RemoveCardGroup(GroupedCardListViewModel viewmodel) : ViewModelCommand<GroupedCardListViewModel, string>(viewmodel)
   {
