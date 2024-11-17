@@ -585,12 +585,16 @@
                       OnDropBeginMoveFrom="{x:Bind BeginMoveFromCommand, Mode=OneTime}"
                       OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
                       OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
-                      OnDropImport="{Binding ImportCardsCommand, Mode=OneTime}">
+                      OnDropImport="{Binding ImportCardsCommand, Mode=OneTime}"
+                      LosingFocus="ListView_LosingFocus">
                       <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
                           <Setter Property="Margin" Value="0"/>
                         </Style>
                       </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
+                      <cardlistview:AdvancedAdaptiveGroupedCardGridView.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+                      </cardlistview:AdvancedAdaptiveGroupedCardGridView.KeyboardAccelerators>
                       <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
                         <DataTemplate x:DataType="models:DeckEditorMTGCard">
                           <cardview:DeckEditorCardImageView

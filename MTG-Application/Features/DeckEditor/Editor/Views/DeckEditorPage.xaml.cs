@@ -107,7 +107,8 @@ public sealed partial class DeckEditorPage : Page
       var index = listview.SelectedIndex;
       var selectedCard = listview.Items[index];
 
-      if (viewmodel.RemoveCardCommand.CanExecute(selectedCard)) viewmodel.RemoveCardCommand.Execute(selectedCard);
+      if (viewmodel.RemoveCardCommand.CanExecute(selectedCard))
+        viewmodel.RemoveCardCommand.Execute(selectedCard);
 
       // Recalculate the index and focus the element in the index position if the element exists.
       if ((index = Math.Clamp(index, -1, listview.Items.Count - 1)) >= 0)
