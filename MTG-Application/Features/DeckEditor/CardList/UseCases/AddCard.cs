@@ -22,10 +22,11 @@ public partial class CardListViewModelCommands
       if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) == null
         || await Viewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
       {
-        Viewmodel.UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
-        {
-          ReversibleAction = new ReversibleAddCardAction(Viewmodel)
-        });
+        Viewmodel.UndoStack.PushAndExecute(
+          new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+          {
+            ReversibleAction = new ReversibleAddCardAction(Viewmodel)
+          });
       }
     }
   }

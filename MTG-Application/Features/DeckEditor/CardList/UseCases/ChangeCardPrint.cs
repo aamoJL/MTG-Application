@@ -29,7 +29,7 @@ public partial class CardListViewModelCommands
             return; // Same print
 
           Viewmodel.UndoStack.PushAndExecute(
-            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(existingCard, existingCard.Info, selection.Info, Viewmodel.CardCopier)
+            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(existingCard, existingCard.Info, selection.Info)
             {
               ReversibleAction = new ReversibleCardPrintChangeAction(Viewmodel)
             });

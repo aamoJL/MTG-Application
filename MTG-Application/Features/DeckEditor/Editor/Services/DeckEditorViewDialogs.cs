@@ -67,7 +67,16 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title)
       {
         InvalidInputCharacters = Path.GetInvalidFileNameChars(),
-        PrimaryButtonText = "Add"
+        PrimaryButtonText = "Add",
+        InputValidation = input => !string.IsNullOrEmpty(input)
+      });
+    confirmers.CardListConfirmers.RenameCardGroupConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title)
+      {
+        InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+        InputText = msg.Data,
+        PrimaryButtonText = "Rename",
+        InputValidation = input => !string.IsNullOrEmpty(input)
       });
 
     confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>

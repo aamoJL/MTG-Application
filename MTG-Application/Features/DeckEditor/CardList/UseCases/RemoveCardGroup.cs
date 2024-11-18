@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
-using System.Collections.Generic;
 using System.Linq;
 using static MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -40,21 +38,5 @@ public partial class GroupedCardListViewModelCommands
 
       new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group removed successfully."));
     }
-  }
-
-  private class GroupCopier : IClassCopier<CardGroupViewModel>
-  {
-    public CardGroupViewModel Copy(CardGroupViewModel item)
-    {
-      var group = new CardGroupViewModel(item.Key);
-
-      foreach (var card in item.Items)
-        group.Items.Add(card);
-
-      return group;
-    }
-
-    public IEnumerable<CardGroupViewModel> Copy(IEnumerable<CardGroupViewModel> items)
-      => items.Select(Copy);
   }
 }

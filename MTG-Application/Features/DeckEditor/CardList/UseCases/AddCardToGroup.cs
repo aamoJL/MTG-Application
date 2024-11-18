@@ -19,38 +19,39 @@ public partial class CardGroupViewModelCommands
   {
     protected override async Task Execute(DeckEditorMTGCard card)
     {
-      if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existing)
+      if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
       {
+        // Confirm change on existing card
         if (await listViewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
         {
-          var combinedCommand = new CombinedReversibleCommand()
+          listViewmodel.UndoStack.PushAndExecute(new CombinedReversibleCommand()
           {
             Commands = [
-              new ReversibleCollectionCommand<DeckEditorMTGCard>(card, listViewmodel.CardCopier)
+              new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(existingCard, existingCard.Count, card.Count + existingCard.Count)
               {
-                ReversibleAction = new ReversibleAddCardAction(listViewmodel)
+                ReversibleAction = new ReversibleCardCountChangeAction(listViewmodel)
+              },
+              new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(existingCard, existingCard.Group, Viewmodel.Key)
+              {
+                ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
               }]
-          };
-
-          // Change group if needed
-          if (existing.Group != Viewmodel.Key)
-          {
-            combinedCommand.Commands.Add(new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(card, existing.Group, Viewmodel.Key, listViewmodel.CardCopier)
-            {
-              ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
-            });
-          }
-
-          listViewmodel.UndoStack.PushAndExecute(combinedCommand);
+          });
         }
       }
       else
       {
-        card.Group = Viewmodel.Key;
-
-        listViewmodel.UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, listViewmodel.CardCopier)
+        // Add nonexistant card
+        listViewmodel.UndoStack.PushAndExecute(new CombinedReversibleCommand()
         {
-          ReversibleAction = new ReversibleAddCardAction(listViewmodel)
+          Commands = [
+            new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+            {
+              ReversibleAction = new ReversibleAddCardAction(listViewmodel)
+            },
+            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(card, card.Group, Viewmodel.Key)
+            {
+              ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
+            }]
         });
       }
     }

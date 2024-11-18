@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.CardList.UseCases;
 using MTGApplication.Features.DeckEditor.Editor.Models;
@@ -12,25 +13,28 @@ namespace MTGApplication.Features.DeckEditor.ViewModels;
 
 public partial class CardGroupViewModel : ViewModelBase
 {
-  public CardGroupViewModel(string key)
+  public CardGroupViewModel(string key, GroupedCardListViewModel listViewmodel)
   {
     Key = key;
+    Commands = new(this, listViewmodel);
 
     Items.CollectionChanged += Items_CollectionChanged;
   }
 
+  [ObservableProperty] private string key;
+
   public ObservableCollection<DeckEditorMTGCard> Items { get; } = [];
-  public string Key { get; }
   public int Count => Items.Sum(x => x.Count);
 
   public void OnChange() => OnPropertyChanged(nameof(Count));
 
-  public CardGroupViewModelCommands Commands { get; set; }
+  public CardGroupViewModelCommands Commands { get; }
 
-  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardToGroupCommand => Commands?.AddCardToGroupCommand;
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => Commands?.BeginMoveFromCommand;
-  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => Commands?.BeginMoveToCommand;
-  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => Commands?.ExecuteMoveCommand;
+  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardToGroupCommand => Commands.AddCardToGroupCommand;
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => Commands.BeginMoveFromCommand;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => Commands.BeginMoveToCommand;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => Commands.ExecuteMoveCommand;
+  public IAsyncRelayCommand RenameGroupCommand => Commands.RenameGroupCommand;
 
   private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     => OnChange();
@@ -61,20 +65,12 @@ public partial class GroupedCardListViewModel : CardListViewModel
   {
     base.OnCardChange(card, property);
 
-    var key = card.Group;
-    var group = Groups.FirstOrDefault(x => x.Key == key);
-
     switch (property)
     {
-      case nameof(card.Group):
-        // remove card if exists in the old group
-        if (Groups.FirstOrDefault(x => x.Items.Contains(card)) is CardGroupViewModel found)
-          found.Items.Remove(card);
-
-        (group ??= new ReversibleAddGroupAction(this).AddNewGroup(key)).Items.Add(card);
+      case nameof(card.Count):
+        Groups.FirstOrDefault(x => x.Key == card.Group)?.OnChange();
         break;
-      case nameof(card.Info): break;
-      default: group?.OnChange(); break;
+      default: break;
     }
   }
 
@@ -89,8 +85,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
     if (e.PropertyName == nameof(Cards))
     {
       Groups.Clear();
-      var emptyGroup = new CardGroupViewModel(string.Empty);
-      emptyGroup.Commands = new(emptyGroup, this);
+      var emptyGroup = new CardGroupViewModel(string.Empty, this);
       Groups.Add(emptyGroup);
 
       foreach (var card in Cards)
@@ -99,7 +94,11 @@ public partial class GroupedCardListViewModel : CardListViewModel
         var group = Groups.FirstOrDefault(x => key == x.Key);
 
         if (group == null)
-          Groups.Add(group = new(key));
+        {
+          var addAction = new ReversibleAddGroupAction(this);
+          addAction.Action.Invoke(key);
+          group = addAction.Group;
+        }
 
         group.Items.Add(card);
       }
@@ -112,11 +111,17 @@ public partial class GroupedCardListViewModel : CardListViewModel
   {
     if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
     {
-      var item = (e.NewItems[0] as DeckEditorMTGCard);
-      var key = item.Group;
+      var card = (e.NewItems[0] as DeckEditorMTGCard);
+      var key = card.Group;
       var group = Groups.FirstOrDefault(x => key == x.Key);
+      if (group == null)
+      {
+        var addAction = new ReversibleAddGroupAction(this);
+        addAction.Action.Invoke(key);
+        group = addAction.Group;
+      }
 
-      (group ??= new ReversibleAddGroupAction(this).AddNewGroup(key)).Items.Add(item);
+      group.Items.Add(card);
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
     {
@@ -125,7 +130,5 @@ public partial class GroupedCardListViewModel : CardListViewModel
       Groups.FirstOrDefault(x => key == x.Key)
         ?.Items.Remove(e.OldItems[0] as DeckEditorMTGCard);
     }
-    else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-      new ReversibleAddGroupAction(this).AddNewGroup(string.Empty);
   }
 }

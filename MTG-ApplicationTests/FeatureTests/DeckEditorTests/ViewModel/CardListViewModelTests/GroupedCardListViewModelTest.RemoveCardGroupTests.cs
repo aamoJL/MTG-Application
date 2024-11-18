@@ -37,7 +37,7 @@ public partial class GroupedCardListViewModelTest
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter());
 
-      viewmodel.Groups.Add(new(name));
+      viewmodel.Groups.Add(new(name, viewmodel));
 
       viewmodel.RemoveGroupCommand.Execute(name);
 
@@ -55,7 +55,7 @@ public partial class GroupedCardListViewModelTest
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };
 
-      viewmodel.Groups.Add(new(name));
+      viewmodel.Groups.Add(new(name, viewmodel));
 
       NotificationAssert.NotificationSent(
         MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Success,
@@ -69,7 +69,7 @@ public partial class GroupedCardListViewModelTest
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter());
 
-      viewmodel.Groups.Add(new(name));
+      viewmodel.Groups.Add(new(name, viewmodel));
 
       var initCount = viewmodel.Groups.Count;
 

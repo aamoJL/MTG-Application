@@ -558,6 +558,10 @@
                         <controls1:CardGroupViewGroupHeader.ContextFlyout>
                           <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                             <MenuFlyoutItem 
+                              Command="{x:Bind RenameGroupCommand, Mode=OneTime}"
+                              Text="Rename"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem 
                               Command="{Binding RemoveGroupCommand, Mode=OneTime}" 
                               CommandParameter="{x:Bind Key, Mode=OneWay}" 
                               Text="Remove"

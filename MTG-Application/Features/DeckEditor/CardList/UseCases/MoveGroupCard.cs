@@ -13,20 +13,13 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardGroupViewModelCommands
 {
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand { get; } = new MoveGroupCard.BeginMoveFrom(groupViewmodel, listViewmodel).Command;
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand { get; } = new MoveGroupCard.BeginMoveFrom(listViewmodel).Command;
   public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand { get; } = new MoveGroupCard.BeginMoveTo(groupViewmodel, listViewmodel).Command;
-  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand { get; } = new MoveGroupCard.ExecuteMove(groupViewmodel, listViewmodel).Command;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand { get; } = new MoveGroupCard.ExecuteMove(listViewmodel).Command;
 
-  private class MoveGroupCard
+  public class MoveGroupCard
   {
-    public class BeginMoveFrom(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
-    {
-      protected override void Execute(DeckEditorMTGCard card)
-      {
-        if (listViewmodel.BeginMoveFromCommand.CanExecute(card))
-          listViewmodel.BeginMoveFromCommand.Execute(card);
-      }
-    }
+    public class BeginMoveFrom(GroupedCardListViewModel listViewmodel) : CardListViewModelCommands.MoveCard.BeginMoveFrom(listViewmodel);
 
     public class BeginMoveTo(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelAsyncCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
     {
@@ -34,26 +27,34 @@ public partial class CardGroupViewModelCommands
       {
         var combinedCommands = listViewmodel.UndoStack.ActiveCombinedCommand.Commands;
 
-        if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existing)
+        if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
         {
-          // Card already in the list, confirm and/or add
-          if (existing == card
-            || await listViewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
+          if (existingCard == card)
           {
-            combinedCommands.Add(
-              new ReversibleCollectionCommand<DeckEditorMTGCard>(card, listViewmodel.CardCopier)
-              {
-                ReversibleAction = new ReversibleAddCardAction(listViewmodel)
-              });
+            // Card is from the same list
+            // Cancel move and change the group
+            listViewmodel.UndoStack.ActiveCombinedCommand.Cancel();
 
-            // Change group if needed
-            if (card.Group != Viewmodel.Key)
-            {
-              combinedCommands.Add(new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(card, card.Group, Viewmodel.Key, listViewmodel.CardCopier)
+            listViewmodel.UndoStack.PushAndExecute(
+              new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(existingCard, existingCard.Group, Viewmodel.Key)
               {
                 ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
               });
-            }
+          }
+          else if (await listViewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
+          {
+            combinedCommands.Add(new CombinedReversibleCommand()
+            {
+              Commands = [
+                new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(existingCard, existingCard.Count, card.Count + existingCard.Count)
+                {
+                  ReversibleAction = new ReversibleCardCountChangeAction(listViewmodel)
+                },
+                new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(existingCard, existingCard.Group, Viewmodel.Key)
+                {
+                  ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
+                }]
+            });
           }
           else
             listViewmodel.UndoStack.ActiveCombinedCommand.Cancel();
@@ -61,24 +62,22 @@ public partial class CardGroupViewModelCommands
         else
         {
           // Card not in the list, add
-          card.Group = Viewmodel.Key;
-
-          combinedCommands.Add(
-            new ReversibleCollectionCommand<DeckEditorMTGCard>(card, listViewmodel.CardCopier)
-            {
-              ReversibleAction = new ReversibleAddCardAction(listViewmodel)
-            });
+          combinedCommands.Add(new CombinedReversibleCommand()
+          {
+            Commands = [
+              new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+              {
+                ReversibleAction = new ReversibleAddCardAction(listViewmodel)
+              },
+              new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(card, card.Group, Viewmodel.Key)
+              {
+                ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
+              }]
+          });
         }
       }
     }
 
-    public class ExecuteMove(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
-    {
-      protected override void Execute(DeckEditorMTGCard card)
-      {
-        if (listViewmodel.ExecuteMoveCommand.CanExecute(card))
-          listViewmodel.ExecuteMoveCommand.Execute(card);
-      }
-    }
+    public class ExecuteMove(GroupedCardListViewModel listViewmodel) : CardListViewModelCommands.MoveCard.ExecuteMove(listViewmodel);
   }
 }

@@ -9,33 +9,60 @@ public partial class CardListViewModelReversibleActions
 {
   public class ReversibleRemoveGroupAction(GroupedCardListViewModel viewmodel) : ViewModelReversibleAction<GroupedCardListViewModel, string>(viewmodel)
   {
+    public CardGroupViewModel Group { get; set; }
+
     private DeckEditorMTGCard[] AffectedCards { get; set; } = [];
 
     protected override void ActionMethod(string key)
     {
-      AffectedCards = [];
-
-      if (Viewmodel.Groups.FirstOrDefault(x => x.Key == key) is not CardGroupViewModel group)
+      if (string.IsNullOrEmpty(key))
         return;
 
-      if (Viewmodel.Groups.FirstOrDefault(x => x.Key == string.Empty) is CardGroupViewModel defaultGroup)
-      {
-        AffectedCards = [.. group.Items];
+      Group ??= Viewmodel.Groups.FirstOrDefault(x => x.Key == key);
 
-        foreach (var card in AffectedCards)
-          new ReversibleCardGroupChangeAction(Viewmodel).Action.Invoke((card, defaultGroup.Key));
-      }
-
-      Viewmodel.Groups.Remove(group);
+      RemoveGroup(Group);
     }
 
     protected override void ReverseActionMethod(string key)
     {
-      new ReversibleAddGroupAction(Viewmodel).Action.Invoke(key);
+      if (Group == null)
+        return;
 
-      // Move the old items to the group
+      // Add old group back
+      new ReversibleAddGroupAction(Viewmodel)
+      {
+        Group = Group
+      }.Action.Invoke(Group.Key);
+
+      // Move old cards back
       foreach (var card in AffectedCards)
-        new ReversibleCardGroupChangeAction(Viewmodel).Action.Invoke((card, key));
+      {
+        new ReversibleCardGroupChangeAction(Viewmodel)
+        {
+          Card = card
+        }.Action.Invoke((card, key));
+      }
+    }
+
+    private void RemoveGroup(CardGroupViewModel group)
+    {
+      if (group == null)
+        return;
+
+      AffectedCards = [.. group.Items];
+
+      // Move cards to default group
+      foreach (var card in AffectedCards)
+      {
+        new ReversibleCardGroupChangeAction(Viewmodel)
+        {
+          Card = card
+        }.Action.Invoke((card, string.Empty));
+      }
+
+      group.Items.Clear();
+
+      Viewmodel.Groups.Remove(group);
     }
   }
 }

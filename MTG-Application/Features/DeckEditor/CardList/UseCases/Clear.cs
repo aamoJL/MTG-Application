@@ -21,7 +21,7 @@ public partial class CardListViewModelCommands
       if (!CanExecute()) return;
 
       Viewmodel.UndoStack.PushAndExecute(
-        new ReversibleCollectionCommand<DeckEditorMTGCard>(Viewmodel.Cards, Viewmodel.CardCopier)
+        new ReversibleCollectionCommand<DeckEditorMTGCard>(Viewmodel.Cards)
         {
           ReversibleAction = new ReversibleRemoveCardAction(Viewmodel)
         });
