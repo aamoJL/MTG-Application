@@ -35,6 +35,7 @@ public partial class CardGroupViewModel : ViewModelBase
   public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => Commands.BeginMoveToCommand;
   public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => Commands.ExecuteMoveCommand;
   public IAsyncRelayCommand RenameGroupCommand => Commands.RenameGroupCommand;
+  public IAsyncRelayCommand<string> ImportCardsToGroupCommand => Commands.ImportCardsToGroupCommand;
 
   private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     => OnChange();

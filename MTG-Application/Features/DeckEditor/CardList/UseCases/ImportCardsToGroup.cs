@@ -17,17 +17,17 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
-public partial class CardListViewModelCommands
+public partial class CardGroupViewModelCommands
 {
-  public IAsyncRelayCommand<string> ImportCardsCommand { get; } = new ImportCards(viewmodel).Command;
+  public IAsyncRelayCommand<string> ImportCardsToGroupCommand { get; } = new ImportCardsToGroup(groupViewmodel, listViewmodel).Command;
 
-  private class ImportCards(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, string>(viewmodel)
+  private class ImportCardsToGroup(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelAsyncCommand<CardGroupViewModel, string>(viewmodel)
   {
     protected override async Task Execute(string data)
     {
-      data ??= await Viewmodel.Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
+      data ??= await listViewmodel.Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
 
-      var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
+      var result = await listViewmodel.Worker.DoWork(new DeckEditorCardImporter(listViewmodel.Importer).Import(data));
 
       var newCards = new List<DeckEditorMTGCard>();
       var existingCards = new List<(DeckEditorMTGCard Card, int NewCount)>();
@@ -37,12 +37,12 @@ public partial class CardListViewModelCommands
       // Confirm imported cards, if already exists
       foreach (var card in result.Found)
       {
-        if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
+        if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
         {
           // Card exist in the list; confirm the import, unless the user skips confirmations
           if (!skipConflictConfirmation)
           {
-            (addConflictConfirmationResult, skipConflictConfirmation) = await Viewmodel.Confirmers.AddMultipleConflictConfirmer
+            (addConflictConfirmationResult, skipConflictConfirmation) = await listViewmodel.Confirmers.AddMultipleConflictConfirmer
               .Confirm(CardListConfirmers.GetAddMultipleConflictConfirmation(card.Info.Name));
           }
 
@@ -58,7 +58,7 @@ public partial class CardListViewModelCommands
         else if (newCards.FindIndex(x => x.Info.Name == card.Info.Name) is int index && index >= 0)
           newCards[index].Count += card.Count; // Already added new card; change count
         else
-          newCards.Add(new(card.Info, card.Count)); // add new card
+          newCards.Add(new(card.Info, card.Count) { Group = Viewmodel.Key }); // add new card
       }
 
       var combinedCommand = new CombinedReversibleCommand();
@@ -69,7 +69,7 @@ public partial class CardListViewModelCommands
         combinedCommand.Commands.Add(
             new ReversibleCollectionCommand<DeckEditorMTGCard>(newCards)
             {
-              ReversibleAction = new ReversibleAddCardAction(Viewmodel),
+              ReversibleAction = new ReversibleAddCardAction(listViewmodel),
             });
       }
 
@@ -77,15 +77,23 @@ public partial class CardListViewModelCommands
       if (existingCards.Count != 0)
       {
         combinedCommand.Commands.AddRange(
-            existingCards.Select(x => new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(x.Card, x.Card.Count, x.NewCount)
+            existingCards.Select(x => new CombinedReversibleCommand()
             {
-              ReversibleAction = new ReversibleCardCountChangeAction(Viewmodel)
+              Commands = [
+                  new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(x.Card, x.Card.Count, x.NewCount)
+                  {
+                    ReversibleAction = new ReversibleCardCountChangeAction(listViewmodel)
+                  },
+                  new ReversiblePropertyChangeCommand<DeckEditorMTGCard, string>(x.Card, x.Card.Group, Viewmodel.Key)
+                  {
+                    ReversibleAction = new ReversibleCardGroupChangeAction(listViewmodel)
+                  }]
             }));
       }
 
       // Execute
       if (combinedCommand.Commands.Count != 0)
-        Viewmodel.UndoStack.PushAndExecute(combinedCommand);
+        listViewmodel.UndoStack.PushAndExecute(combinedCommand);
 
       var importCount = newCards.Count + existingCards.Count;
       var skippedCount = result.Found.Length - importCount;
@@ -94,13 +102,13 @@ public partial class CardListViewModelCommands
       if (result.Source == CardImportResult.ImportSource.External)
       {
         if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
-          new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success,
+          new SendNotification(listViewmodel.Notifier).Execute(new(NotificationType.Success,
             $"{importCount} cards imported successfully." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
         else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
-          new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Warning,
+          new SendNotification(listViewmodel.Notifier).Execute(new(NotificationType.Warning,
             $"{importCount} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
         else if (result.NotFoundCount > 0) // None found
-          new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
+          new SendNotification(listViewmodel.Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
       }
     }
   }

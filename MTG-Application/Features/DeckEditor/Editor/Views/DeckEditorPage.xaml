@@ -589,7 +589,7 @@
                       OnDropBeginMoveFrom="{x:Bind BeginMoveFromCommand, Mode=OneTime}"
                       OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
                       OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
-                      OnDropImport="{Binding ImportCardsCommand, Mode=OneTime}"
+                      OnDropImport="{x:Bind ImportCardsToGroupCommand, Mode=OneTime}"
                       LosingFocus="ListView_LosingFocus">
                       <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
