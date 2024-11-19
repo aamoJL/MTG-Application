@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using System;
 
 namespace MTGApplication.General.Views.Dialogs.Controls;
 public sealed partial class TextBoxDialog : StringDialog
@@ -6,7 +7,6 @@ public sealed partial class TextBoxDialog : StringDialog
   public TextBoxDialog(string title) : base(title)
   {
     InitializeComponent();
-
     SecondaryButtonText = string.Empty;
   }
 
@@ -15,6 +15,17 @@ public sealed partial class TextBoxDialog : StringDialog
   public string InputPlaceholderText { get; set; } = string.Empty;
   public char[] InvalidInputCharacters { get; set; } = [];
   public bool IsSpellCheckEnabled { get; set; } = false;
+
+  private Func<string, bool> inputValidation;
+  public Func<string, bool> InputValidation
+  {
+    get => inputValidation;
+    set
+    {
+      inputValidation = value;
+      IsPrimaryButtonEnabled = InputValidation?.Invoke(InputText) ?? true;
+    }
+  }
 
   protected override string ProcessResult(ContentDialogResult result)
     => result switch
@@ -25,7 +36,8 @@ public sealed partial class TextBoxDialog : StringDialog
 
   private void TextBox_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
   {
-    if (InvalidInputCharacters.Length == 0) return;
+    if (InvalidInputCharacters.Length == 0)
+      return;
 
     var text = sender.Text;
     var oldSelectionStart = sender.SelectionStart;
@@ -35,5 +47,7 @@ public sealed partial class TextBoxDialog : StringDialog
 
     sender.Text = text;
     sender.Select(oldSelectionStart, 0);
+
+    IsPrimaryButtonEnabled = InputValidation?.Invoke(text) ?? true;
   }
 }

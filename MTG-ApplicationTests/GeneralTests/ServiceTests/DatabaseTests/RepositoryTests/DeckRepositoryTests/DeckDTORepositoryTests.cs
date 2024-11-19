@@ -27,7 +27,7 @@ public class DeckDTORepositoryTests
     {
       DeckCards =
       [
-        MTGCardDTOMocker.Mock("first"),
+        MTGCardDTOMocker.Mock("first", group: "Group"),
         MTGCardDTOMocker.Mock("second"),
         MTGCardDTOMocker.Mock("third")
       ],
@@ -45,6 +45,7 @@ public class DeckDTORepositoryTests
     Assert.AreEqual(deck.DeckCards.Count, dbDeck?.DeckCards.Count, "Card cound does not match");
     Assert.AreEqual(deck.Commander.Name, dbDeck?.Commander.Name, "Commanders don't match");
     Assert.AreEqual(deck.CommanderPartner.Name, dbDeck?.CommanderPartner.Name, "Partners don't match");
+    Assert.AreEqual(deck.DeckCards.First(x => x.Name == "first")?.Group, dbDeck?.DeckCards.First(x => x.Name == "first")?.Group);
   }
 
   [TestMethod]
@@ -98,6 +99,7 @@ public class DeckDTORepositoryTests
   {
     _savedDeck.WishlistCards.Add(MTGCardDTOMocker.Mock("New card"));
     _savedDeck.DeckCards[0].Count = 3;
+    _savedDeck.DeckCards[0].Group = "Group";
     _savedDeck.DeckCards.RemoveAt(1);
     _savedDeck.Commander = MTGCardDTOMocker.Mock("New Commander");
     _savedDeck.CommanderPartner = MTGCardDTOMocker.Mock("New Partner");
@@ -113,5 +115,6 @@ public class DeckDTORepositoryTests
     Assert.AreEqual(_savedDeck.DeckCards.Sum(x => x.Count), dbDeck?.DeckCards.Sum(x => x.Count), "Deck card sums don't match");
     Assert.AreEqual(_savedDeck.Commander.Name, dbDeck?.Commander.Name, "Commander names don't match");
     Assert.AreEqual(_savedDeck.CommanderPartner.Name, dbDeck?.CommanderPartner.Name, "Partner names don't match");
+    Assert.AreEqual("Group", _savedDeck.DeckCards.First(x => x.Name == "first").Group);
   }
 }

@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
@@ -12,27 +13,36 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
+  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand { get; } = new MoveCard.BeginMoveFrom(viewmodel).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand { get; } = new MoveCard.BeginMoveTo(viewmodel).Command;
+  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand { get; } = new MoveCard.ExecuteMove(viewmodel).Command;
+
   public class MoveCard
   {
     public class BeginMoveTo(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
     {
       protected override async Task Execute(DeckEditorMTGCard card)
       {
-        if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
+        if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
         {
+          // Card already in the list
           if (await Viewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
-            Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
-            {
-              ReversibleAction = new ReversibleAddCardAction(Viewmodel)
-            });
+          {
+            Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
+              new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(existingCard, existingCard.Count, card.Count + existingCard.Count)
+              {
+                ReversibleAction = new ReversibleCardCountChangeAction(Viewmodel)
+              });
+          }
           else
             Viewmodel.UndoStack.ActiveCombinedCommand.Cancel();
         }
         else
-          Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
-          {
-            ReversibleAction = new ReversibleAddCardAction(Viewmodel)
-          });
+          Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
+            new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+            {
+              ReversibleAction = new ReversibleAddCardAction(Viewmodel)
+            });
       }
     }
 
@@ -40,7 +50,7 @@ public partial class CardListViewModelCommands
     {
       protected override void Execute(DeckEditorMTGCard card)
         => Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
-          new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier)
+          new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
           {
             ReversibleAction = new ReversibleRemoveCardAction(Viewmodel)
           });

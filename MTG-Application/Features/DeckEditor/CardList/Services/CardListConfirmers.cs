@@ -50,3 +50,24 @@ public class CardListConfirmers
       Data: data);
   }
 }
+
+public class GroupedCardListConfirmers : CardListConfirmers
+{
+  public Confirmer<string> AddCardGroupConfirmer { get; init; } = new();
+  public Confirmer<string, string> RenameCardGroupConfirmer { get; init; } = new();
+
+  public static Confirmation GetAddCardGroupConfirmation()
+  {
+    return new(
+      Title: "Add new group",
+      Message: string.Empty);
+  }
+
+  public static Confirmation<string> GetRenameCardGroupConfirmation(string oldName)
+  {
+    return new(
+      Title: "Rename group",
+      Message: string.Empty,
+      Data: oldName);
+  }
+}

@@ -15,15 +15,15 @@ using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 {
-  // TODO: DeckViewModel like CardCollectionPage's CardCollectionViewModel
   public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
   {
+    Commands = new(this);
+
     Importer = importer;
     Notifier = notifier ?? new();
     Confirmers = confirmers ?? new();
@@ -32,8 +32,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     var cardFilters = new CardFilters();
     var cardSorter = new CardSorter();
 
-    // Cardlists use same sorter and filters
-    DeckCardList = CreateCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
+    // Cardlists use the same sorter and filters
+    DeckCardList = CreateGroupedCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
     MaybeCardList = CreateCardListViewModel(Deck.Maybelist, cardFilters, cardSorter);
     WishCardList = CreateCardListViewModel(Deck.Wishlist, cardFilters, cardSorter);
     RemoveCardList = CreateCardListViewModel(Deck.Removelist, cardFilters, cardSorter);
@@ -49,7 +49,7 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public DeckEditorConfirmers Confirmers { get; }
   public Notifier Notifier { get; } = new();
   public MTGCardImporter Importer { get; }
-  public CardListViewModel DeckCardList { get; }
+  public GroupedCardListViewModel DeckCardList { get; }
   public CardListViewModel MaybeCardList { get; }
   public CardListViewModel WishCardList { get; }
   public CardListViewModel RemoveCardList { get; }
@@ -62,7 +62,19 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public MTGCardDeckDTO DTO => DeckEditorMTGDeckToDTOConverter.Convert(Deck);
   public IWorker Worker => this;
 
-  public string Name { get => Deck.Name; set { if (deckName != value) { deckName = value; Deck.Name = value; OnPropertyChanged(nameof(Name)); } } }
+  public string Name
+  {
+    get => Deck.Name;
+    set
+    {
+      if (deckName != value)
+      {
+        deckName = value;
+        Deck.Name = value;
+        OnPropertyChanged(nameof(Name));
+      }
+    }
+  }
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
   public double Price => Deck.DeckCards.Sum(x => x.Info.Price * x.Count) + (Deck.Commander?.Info.Price ?? 0) + (Deck.CommanderPartner?.Info.Price ?? 0);
   public DeckEditorMTGCard Commander
@@ -72,7 +84,6 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     {
       Deck.Commander = value;
       OnPropertyChanged(nameof(Commander));
-
     }
   }
   public DeckEditorMTGCard Partner
@@ -90,32 +101,22 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
     get => deck;
     set => SetProperty(ref deck, value);
   }
+  private DeckEditorViewModelCommands Commands { get; }
 
-  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => (confirmUnsavedChanges ??= new ConfirmUnsavedChanges(this)).Command;
-  public IAsyncRelayCommand NewDeckCommand => (newDeck ??= new NewDeck(this)).Command;
-  public IAsyncRelayCommand<string> OpenDeckCommand => (openDeck ??= new OpenDeck(this)).Command;
-  public IAsyncRelayCommand SaveDeckCommand => (saveDeck ??= new SaveDeck(this)).Command;
-  public IAsyncRelayCommand DeleteDeckCommand => (deleteDeck ??= new DeleteDeck(this)).Command;
-  public IRelayCommand UndoCommand => (undo ??= new Undo(this)).Command;
-  public IRelayCommand RedoCommand => (redo ??= new Redo(this)).Command;
-  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => (openEdhrecCommanderWebsite ??= new OpenEdhrecCommanderWebsite(this)).Command;
-  public IAsyncRelayCommand ShowDeckTokensCommand => (showDeckTokens ??= new ShowDeckTokens(this)).Command;
-  public IRelayCommand OpenDeckTestingWindowCommand => (openDeckTestingWindow ??= new OpenDeckTestingWindow(this)).Command;
-  public IRelayCommand OpenEdhrecSearchWindowCommand => (openEdhrecSearchWindow ??= new OpenEdhrecSearchWindow(this)).Command;
-
-  private string deckName = string.Empty;
   private DeckEditorMTGDeck deck;
-  private ConfirmUnsavedChanges confirmUnsavedChanges;
-  private NewDeck newDeck;
-  private OpenDeck openDeck;
-  private SaveDeck saveDeck;
-  private DeleteDeck deleteDeck;
-  private Undo undo;
-  private Redo redo;
-  private OpenEdhrecCommanderWebsite openEdhrecCommanderWebsite;
-  private ShowDeckTokens showDeckTokens;
-  private OpenDeckTestingWindow openDeckTestingWindow;
-  private OpenEdhrecSearchWindow openEdhrecSearchWindow;
+  private string deckName = string.Empty;
+
+  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => Commands.ConfirmUnsavedChangesCommand;
+  public IAsyncRelayCommand NewDeckCommand => Commands.NewDeckCommand;
+  public IAsyncRelayCommand<string> OpenDeckCommand => Commands.OpenDeckCommand;
+  public IAsyncRelayCommand SaveDeckCommand => Commands.SaveDeckCommand;
+  public IAsyncRelayCommand DeleteDeckCommand => Commands.DeleteDeckCommand;
+  public IRelayCommand UndoCommand => Commands.UndoCommand;
+  public IRelayCommand RedoCommand => Commands.RedoCommand;
+  public IAsyncRelayCommand OpenEdhrecCommanderWebsiteCommand => Commands.OpenEdhrecCommanderWebsiteCommand;
+  public IAsyncRelayCommand ShowDeckTokensCommand => Commands.ShowTokensCommand;
+  public IRelayCommand OpenDeckTestingWindowCommand => Commands.OpenDeckTestingWindowCommand;
+  public IRelayCommand OpenEdhrecSearchWindowCommand => Commands.OpenEdhrecSearchWindowCommand;
 
   public void SetDeck(DeckEditorMTGDeck deck)
   {
@@ -145,7 +146,9 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
 
   private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
   {
-    return new(Importer)
+    return new(
+      importer: Importer,
+      confirmers: Confirmers.CardListConfirmers)
     {
       Cards = cards,
       OnChange = () =>
@@ -157,7 +160,28 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
       },
       UndoStack = UndoStack,
       Worker = this,
-      Confirmers = Confirmers.CardListConfirmers,
+      Notifier = Notifier,
+      CardFilters = filters,
+      CardSorter = sorter,
+    };
+  }
+
+  private GroupedCardListViewModel CreateGroupedCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
+  {
+    return new(
+      importer: Importer,
+      confirmers: Confirmers.CardListConfirmers)
+    {
+      Cards = cards,
+      OnChange = () =>
+      {
+        HasUnsavedChanges = true;
+        OnPropertyChanged(nameof(Size));
+        OnPropertyChanged(nameof(Price));
+        ShowDeckTokensCommand.NotifyCanExecuteChanged();
+      },
+      UndoStack = UndoStack,
+      Worker = this,
       Notifier = Notifier,
       CardFilters = filters,
       CardSorter = sorter,

@@ -4,7 +4,7 @@ namespace MTGApplication.General.Services.ReversibleCommandService;
 
 public class CombinedReversibleCommand : IReversibleCommand
 {
-  public List<IReversibleCommand> Commands { get; } = new();
+  public List<IReversibleCommand> Commands { get; init; } = [];
 
   private bool Canceled { get; set; } = false;
 

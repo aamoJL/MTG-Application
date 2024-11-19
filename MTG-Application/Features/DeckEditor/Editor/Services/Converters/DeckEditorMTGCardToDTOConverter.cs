@@ -13,6 +13,7 @@ public class DeckEditorMTGCardToDTOConverter
       scryfallId: card.Info.ScryfallId,
       oracleId: card.Info.OracleId,
       setCode: card.Info.SetCode,
-      collectorNumber: card.Info.CollectorNumber);
+      collectorNumber: card.Info.CollectorNumber,
+      group: card.Group);
   }
 }

@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.CardList.Services;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
@@ -12,17 +13,21 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class AddCard(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
+  public IAsyncRelayCommand<DeckEditorMTGCard> AddCardCommand { get; } = new AddCard(viewmodel).Command;
+
+  private class AddCard(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
   {
     protected override async Task Execute(DeckEditorMTGCard card)
     {
-      if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
+      if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) == null
+        || await Viewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
       {
-        if (await Viewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
-          Viewmodel.UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier) { ReversibleAction = new ReversibleAddCardAction(Viewmodel) });
+        Viewmodel.UndoStack.PushAndExecute(
+          new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+          {
+            ReversibleAction = new ReversibleAddCardAction(Viewmodel)
+          });
       }
-      else
-        Viewmodel.UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card, Viewmodel.CardCopier) { ReversibleAction = new ReversibleAddCardAction(Viewmodel) });
     }
   }
 }

@@ -10,7 +10,8 @@ public static class MTGCardDTOMocker
     Guid? scryfallId = null,
     Guid? oracleId = null,
     string? setCode = null,
-    string? collectorNumber = null)
+    string? collectorNumber = null,
+    string group = "")
   {
     return new(
         scryfallId: scryfallId ?? new("4f8dc511-e307-4412-bb79-375a6077312d"),
@@ -18,6 +19,7 @@ public static class MTGCardDTOMocker
         setCode: setCode ?? "otj",
         collectorNumber: collectorNumber ?? "1",
         name: name,
-        count: 1);
+        count: count,
+        group: group);
   }
 }

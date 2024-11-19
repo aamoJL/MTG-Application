@@ -7,8 +7,14 @@ namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
 public class DeckEditorMTGCardCopier : IClassCopier<DeckEditorMTGCard>
 {
-  public DeckEditorMTGCard Copy(DeckEditorMTGCard item) => new(item.Info, item.Count);
+  public DeckEditorMTGCard Copy(DeckEditorMTGCard item) => new(item.Info, item.Count)
+  {
+    Group = item.Group,
+  };
 
   public IEnumerable<DeckEditorMTGCard> Copy(IEnumerable<DeckEditorMTGCard> items)
-    => items.Select(x => new DeckEditorMTGCard(x.Info, x.Count));
+    => items.Select(x => new DeckEditorMTGCard(x.Info, x.Count)
+    {
+      Group = x.Group
+    });
 }

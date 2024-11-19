@@ -18,11 +18,17 @@
   xmlns:deckeditor="using:MTGApplication.Features.DeckEditor" 
   xmlns:cardtypedistributionchart="using:MTGApplication.Features.DeckEditor.Charts.Views.Controls.CardTypeDistributionChart" 
   xmlns:colordistributionchart="using:MTGApplication.Features.DeckEditor.Charts.Views.Controls.ColorDistributionChart" 
-  xmlns:viewmodels="using:MTGApplication.Features.DeckEditor.ViewModels"
+  xmlns:viewmodels="using:MTGApplication.Features.DeckEditor.ViewModels" 
+  xmlns:converters="using:MTGApplication.Features.DeckEditor.Editor.Views.Converters" 
+  xmlns:controls1="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
 
+  <Page.Resources>
+    <converters:StringOrDefaultConverter x:Key="StringOrDefaultConverter"/>
+  </Page.Resources>
+  
   <!--#region Keyboard Accelerators -->
   <!--NOTE: KeyboardAccelerators needs to be here because menu flyout accelerators does not work if the flyout has not been opened-->
   <Page.KeyboardAccelerators>
@@ -59,6 +65,18 @@
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}" />
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+
+      <!--NOTE: Changes filter button color when filters has been applied-->
+      <VisualStateGroup x:Name="DeckFilterAppBarButtonState">
+        <VisualState>
+          <VisualState.StateTriggers>
+            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.DeckCardList.CardFilters.FiltersApplied, Mode=OneWay}" To="True"/>
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="DeckFilterAppBarButton.Style" Value="{StaticResource PrimaryAppBarButtonStyle}"/>
           </VisualState.Setters>
         </VisualState>
       </VisualStateGroup>
@@ -178,12 +196,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneWay}"
-              OnDropRemove="{x:Bind ViewModel.MaybeCardList.RemoveCardCommand, Mode=OneWay}"
-              OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneWay}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneWay}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}"
+              OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneTime}"
+              OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneTime}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneTime}"
+              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneTime}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked" />
@@ -234,12 +251,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneWay}"
-              OnDropRemove="{x:Bind ViewModel.WishCardList.RemoveCardCommand, Mode=OneWay}"
-              OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneWay}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneWay}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneWay}"
+              OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneTime}"
+              OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneTime}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneTime}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneTime}"
+              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneTime}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
@@ -290,12 +306,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneWay}"
-              OnDropRemove="{x:Bind ViewModel.RemoveCardList.RemoveCardCommand, Mode=OneWay}"
-              OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneWay}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneWay}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneWay}"
+              OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneTime}"
+              OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneTime}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneTime}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneTime}"
+              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneTime}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
@@ -416,6 +431,7 @@
             <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Group" Text="Groups" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Folder}" />
                   <RadioMenuFlyoutItem IsChecked="{x:Bind DeckImageViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Image" Text="Images" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Pictures}" />
                   <RadioMenuFlyoutItem IsChecked="{x:Bind DeckTextViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Text" Text="Text" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                 </MenuFlyout>
@@ -453,7 +469,7 @@
             <!--#endregion-->
 
             <!--#region Filter -->
-            <AppBarButton Icon="Filter" Label="Filter" AllowFocusOnInteraction="True">
+            <AppBarButton x:Name="DeckFilterAppBarButton" Icon="Filter" Label="Filter" AllowFocusOnInteraction="True">
               <AppBarButton.KeyboardAccelerators>
                 <KeyboardAccelerator Key="F" Modifiers="Control"/>
               </AppBarButton.KeyboardAccelerators>
@@ -482,6 +498,11 @@
                 </Flyout>
               </AppBarButton.Flyout>
             </AppBarButton>
+            <!--#endregion-->
+
+            <!--#region Group View Controls -->
+            <AppBarSeparator Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}"/>
+            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
@@ -514,6 +535,90 @@
       <!--#region Deck Card Views -->
       <Grid controls:DockPanel.Dock="Top">
 
+        <!--#region Group View -->
+        <Grid 
+          x:Name="DeckCardsGroupView"
+          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
+          Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsRepeater ItemsSource="{Binding Groups, Mode=OneWay}">
+              <ItemsRepeater.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:CardGroupViewModel">
+                  <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="10">
+                    <Grid HorizontalAlignment="Stretch">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MaxWidth="600"/>
+                      </Grid.ColumnDefinitions>
+                      <controls1:CardGroupViewGroupHeader 
+                        d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
+                        Grid.Column="0"
+                        PrimaryHeader="{x:Bind Key, Mode=OneWay, Converter={StaticResource StringOrDefaultConverter}, ConverterParameter='Other'}"
+                        SecondaryHeader="{x:Bind Count, Mode=OneWay}"
+                        Margin="0 0 0 5">
+                        <controls1:CardGroupViewGroupHeader.ContextFlyout>
+                          <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
+                            <MenuFlyoutItem 
+                              Command="{x:Bind RenameGroupCommand, Mode=OneTime}"
+                              Text="Rename"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem 
+                              Command="{Binding RemoveGroupCommand, Mode=OneTime}" 
+                              CommandParameter="{x:Bind Key, Mode=OneWay}" 
+                              Text="Remove"
+                              Background="IndianRed"/>
+                          </MenuFlyout>
+                        </controls1:CardGroupViewGroupHeader.ContextFlyout>
+                      </controls1:CardGroupViewGroupHeader>
+                    </Grid>
+                    <cardlistview:AdvancedAdaptiveGroupedCardGridView
+                      d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
+                      DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneWay}"
+                      ItemsSource="{x:Bind Items, Mode=OneWay}"
+                      SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
+                      FilterProperties="{Binding CardFilters, Mode=OneWay}"
+                      Style="{StaticResource MTGAdaptiveGridViewStyle}"
+                      BorderBrush="{ThemeResource RegionColor}"
+                      SelectionMode="Single"
+                      Padding="0"
+                      Margin="0"
+                      DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
+                      MinHeight="200"
+                      AllowDrop="True"
+                      CanDragItems="True"
+                      OnDropCopy="{x:Bind AddCardToGroupCommand, Mode=OneTime}"
+                      OnDropBeginMoveFrom="{x:Bind BeginMoveFromCommand, Mode=OneTime}"
+                      OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
+                      OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
+                      OnDropImport="{Binding ImportCardsCommand, Mode=OneTime}"
+                      LosingFocus="ListView_LosingFocus">
+                      <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                          <Setter Property="Margin" Value="0"/>
+                        </Style>
+                      </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
+                      <cardlistview:AdvancedAdaptiveGroupedCardGridView.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+                      </cardlistview:AdvancedAdaptiveGroupedCardGridView.KeyboardAccelerators>
+                      <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
+                        <DataTemplate x:DataType="models:DeckEditorMTGCard">
+                          <cardview:DeckEditorCardImageView
+                            d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
+                            DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneTime}"
+                            Model="{x:Bind Mode=OneTime}"
+                            DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                            CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                            ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
+                        </DataTemplate>
+                      </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
+                    </cardlistview:AdvancedAdaptiveGroupedCardGridView>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+          </ScrollViewer>
+        </Grid>
+        <!--#endregion-->
+
         <!--#region Grid View -->
         <cardlistview:AdvancedAdaptiveCardGridView
           x:Name="DeckCardsGridView"
@@ -529,12 +634,11 @@
           DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
           CanDragItems="True"
           AllowDrop="True"
-          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
-          OnDropRemove="{x:Bind ViewModel.DeckCardList.RemoveCardCommand, Mode=OneWay}"
-          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
-          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
-          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
+          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
           LosingFocus="ListView_LosingFocus">
           <cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
             <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
@@ -565,12 +669,11 @@
           SelectionMode="Single"
           CanDragItems="True"
           AllowDrop="True"
-          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
-          OnDropRemove="{x:Bind ViewModel.DeckCardList.RemoveCardCommand, Mode=OneWay}"
-          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
-          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
-          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
+          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
           LosingFocus="ListView_LosingFocus">
           <cardlistview:AdvancedCardListView.KeyboardAccelerators>
             <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>

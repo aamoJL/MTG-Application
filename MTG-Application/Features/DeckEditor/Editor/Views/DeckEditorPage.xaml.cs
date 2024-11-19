@@ -31,22 +31,16 @@ public sealed partial class DeckEditorPage : Page
 
   public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
-  [ObservableProperty] private bool deckImageViewVisible = true;
+  [ObservableProperty] private bool deckGroupViewVisible = true;
+  [ObservableProperty] private bool deckImageViewVisible = false;
   [ObservableProperty] private bool deckTextViewVisible = false;
 
   [RelayCommand]
   private void SetDeckDisplayType(string type)
   {
-    if (type == "Image")
-    {
-      DeckImageViewVisible = true;
-      DeckTextViewVisible = false;
-    }
-    else if (type == "Text")
-    {
-      DeckImageViewVisible = false;
-      DeckTextViewVisible = true;
-    }
+    DeckGroupViewVisible = type == "Group";
+    DeckImageViewVisible = type == "Image";
+    DeckTextViewVisible = type == "Text";
   }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -54,9 +48,8 @@ public sealed partial class DeckEditorPage : Page
     base.OnNavigatedTo(e);
 
     if (e.Parameter is string deckName)
-    {
-      if (ViewModel.OpenDeckCommand.CanExecute(deckName)) ViewModel.OpenDeckCommand.Execute(deckName);
-    }
+      if (ViewModel.OpenDeckCommand.CanExecute(deckName))
+        ViewModel.OpenDeckCommand.Execute(deckName);
   }
 
   private async void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
@@ -85,26 +78,26 @@ public sealed partial class DeckEditorPage : Page
 
   private void ResetFiltersKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
+    args.Handled = true;
+
     if (ViewModel.DeckCardList.CardFilters.ResetCommand.CanExecute(null))
       ViewModel.DeckCardList.CardFilters.ResetCommand.Execute(null);
-
-    args.Handled = true;
   }
 
   private void UndoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
+    args.Handled = true;
+
     if (ViewModel.UndoCommand.CanExecute(null))
       ViewModel.UndoCommand.Execute(null);
-
-    args.Handled = true;
   }
 
   private void RedoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
+    args.Handled = true;
+
     if (ViewModel.RedoCommand.CanExecute(null))
       ViewModel.RedoCommand.Execute(null);
-
-    args.Handled = true;
   }
 
   private void DeleteCardKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
@@ -114,7 +107,8 @@ public sealed partial class DeckEditorPage : Page
       var index = listview.SelectedIndex;
       var selectedCard = listview.Items[index];
 
-      if (viewmodel.RemoveCardCommand.CanExecute(selectedCard)) viewmodel.RemoveCardCommand.Execute(selectedCard);
+      if (viewmodel.RemoveCardCommand.CanExecute(selectedCard))
+        viewmodel.RemoveCardCommand.Execute(selectedCard);
 
       // Recalculate the index and focus the element in the index position if the element exists.
       if ((index = Math.Clamp(index, -1, listview.Items.Count - 1)) >= 0)

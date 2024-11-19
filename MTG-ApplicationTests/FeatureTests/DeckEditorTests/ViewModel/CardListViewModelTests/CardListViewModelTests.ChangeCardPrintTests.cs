@@ -16,13 +16,12 @@ public partial class CardListViewModelTests
     public async Task ChangePrint_ConfirmationShown()
     {
       var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
+      })
       {
         Cards = [existingCard],
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
-        }
       };
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard));
@@ -33,13 +32,12 @@ public partial class CardListViewModelTests
     {
       var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+      })
       {
         Cards = [existingCard],
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
-        }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
@@ -52,13 +50,12 @@ public partial class CardListViewModelTests
     {
       var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(name: "abc", setCode: "abc");
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), Name = "zyx", SetCode = "zyx" };
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+      })
       {
         Cards = [existingCard],
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
-        }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
@@ -72,13 +69,12 @@ public partial class CardListViewModelTests
     {
       var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+      })
       {
         Cards = [existingCard],
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
-        }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
@@ -92,13 +88,12 @@ public partial class CardListViewModelTests
     {
       var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+      })
       {
         Cards = [existingCard],
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
-        }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);

@@ -260,8 +260,8 @@ public partial class ScryfallAPI : MTGCardImporter
           {
             if (GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
             {
-              var count = chunk.FirstOrDefault(x => x.Compare(cardInfo)).CardCount;
-              fetchedCards.Add(new(cardInfo, count));
+              var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo));
+              fetchedCards.Add(new(Info: cardInfo, Count: identifier.CardCount, Group: identifier.CardGroup));
             }
           }
         }

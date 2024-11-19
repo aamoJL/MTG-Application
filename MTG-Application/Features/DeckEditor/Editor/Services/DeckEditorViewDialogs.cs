@@ -4,6 +4,7 @@ using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Dialogs.UseCases;
+using System.IO;
 using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services;
@@ -30,6 +31,7 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
         CloseButtonText = "Close",
       })) as MTGCard;
     };
+
     confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg
       => await DialogService.ShowAsync(root, new TextAreaDialog(msg.Title)
       {
@@ -51,7 +53,8 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       });
     confirmers.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg)
       => await DialogService.ShowAsync(root, new TwoButtonConfirmationDialog(msg.Title, msg.Message));
-    confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>
+    confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
+      =>
     {
       Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
 
@@ -60,6 +63,22 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
         items: msg.Data.ToArray(),
         itemTemplate: (DataTemplate)template))) as MTGCard;
     };
+    confirmers.CardListConfirmers.AddCardGroupConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title)
+      {
+        InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+        PrimaryButtonText = "Add",
+        InputValidation = input => !string.IsNullOrEmpty(input)
+      });
+    confirmers.CardListConfirmers.RenameCardGroupConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title)
+      {
+        InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+        InputText = msg.Data,
+        PrimaryButtonText = "Rename",
+        InputValidation = input => !string.IsNullOrEmpty(input)
+      });
+
     confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>
     {
       Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);

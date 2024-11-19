@@ -41,13 +41,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ExportConfirmer = new TestExceptionConfirmer<string, string>()
+      })
       {
         Cards = new(cards),
-        Confirmers = new()
-        {
-          ExportConfirmer = new TestExceptionConfirmer<string, string>()
-        }
       };
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync("Name"));
@@ -63,13 +62,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ExportConfirmer = new TestExceptionConfirmer<string, string>()
+      })
       {
         Cards = new(cards),
-        Confirmers = new()
-        {
-          ExportConfirmer = new TestExceptionConfirmer<string, string>()
-        }
       };
 
       await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync("Id"));
@@ -87,13 +85,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string?>(default); } }
+      })
       {
         Cards = new(cards),
-        Confirmers = new()
-        {
-          ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string?>(default); } }
-        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
@@ -113,13 +110,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string?>(default); } }
+      })
       {
         Cards = new(cards),
-        Confirmers = new()
-        {
-          ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string?>(default); } }
-        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Id");
@@ -140,13 +136,12 @@ public partial class CardListViewModelTests
       };
       var clipboard = new TestClipboardService();
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult(exportText); } }
+      })
       {
         Cards = new(cards),
-        Confirmers = new()
-        {
-          ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult(exportText); } }
-        },
         ClipboardService = clipboard
       };
 
@@ -166,13 +161,12 @@ public partial class CardListViewModelTests
       };
       var clipboard = new TestClipboardService();
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter())
+      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      {
+        ExportConfirmer = new() { OnConfirm = async (msg) => { return await Task.FromResult(msg.Data); } }
+      })
       {
         Cards = new(cards),
-        Confirmers = new()
-        {
-          ExportConfirmer = new() { OnConfirm = async (msg) => { return await Task.FromResult(msg.Data); } }
-        },
         ClipboardService = clipboard,
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };

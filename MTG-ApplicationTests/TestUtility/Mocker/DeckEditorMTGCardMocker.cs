@@ -28,9 +28,10 @@ public static class DeckEditorMTGCardMocker
       string printSearchUri = "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A2ee5f5ad-2f16-40d9-831a-2aefece31b36&unique=prints",
       ColorTypes[]? producedMana = null,
       string cardMarketUri = "https://www.cardmarket.com/en/Magic/Products/Search?referrer=scryfall&searchString=Befriending+the+Moths&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
-      CardToken[]? tokens = default)
+      CardToken[]? tokens = default,
+      string group = "")
   {
-    // NOTE: Remember to also update FromDTO method !
+    /// NOTE: Remember to also update <see cref="FromDTO(MTGCardDTO)"/> method !
     return new DeckEditorMTGCard(new(
       scryfallId: scryfallId ?? Guid.NewGuid(),
       frontFace: frontFace ?? CreateCardFace(),
@@ -50,7 +51,9 @@ public static class DeckEditorMTGCardMocker
       cardMarketUri: cardMarketUri,
       tokens: tokens ?? [],
       oracleId: oracleId ?? Guid.NewGuid(),
-      colorIdentity: (frontFace ?? CreateCardFace()).Colors), count);
+      colorIdentity: (frontFace ?? CreateCardFace()).Colors),
+      count)
+    { Group = group };
   }
 
   /// <summary>
@@ -85,6 +88,7 @@ public static class DeckEditorMTGCardMocker
       count: dto.Count,
       oracleId: dto.OracleId,
       setCode: dto.SetCode,
-      collectionNumber: dto.CollectorNumber);
+      collectionNumber: dto.CollectorNumber,
+      group: dto.Group);
   }
 }

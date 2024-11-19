@@ -10,7 +10,7 @@ namespace MTGApplication.General.Services.Databases.Context;
 /// <summary>
 /// Card database context for Entity Framework Core
 /// </summary>
-public class CardDbContext(DbContextOptions options) : DbContext(options)
+public partial class CardDbContext(DbContextOptions options) : DbContext(options)
 {
   public DbSet<MTGCardDeckDTO> MTGDecks { get; set; }
   public DbSet<MTGCardDTO> MTGCards { get; set; }
@@ -22,6 +22,13 @@ public class CardDbContext(DbContextOptions options) : DbContext(options)
     OnMTGCardDeckDTOCreating(modelBuilder);
     OnMTGCardCollectionDTOCreating(modelBuilder);
     OnMTGCardCollectionListDTOCreating(modelBuilder);
+  }
+
+  protected static void OnMTGCardDTOCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<MTGCardDTO>()
+      .Property(x => x.Group)
+      .HasDefaultValue(string.Empty);
   }
 
   /// <summary>

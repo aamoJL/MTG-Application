@@ -5,4 +5,4 @@ namespace MTGApplication.General.ViewModels;
 /// <summary>
 /// Base class for view models
 /// </summary>
-public class ViewModelBase : ObservableObject { }
+public partial class ViewModelBase : ObservableObject { }

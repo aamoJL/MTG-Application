@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
@@ -6,17 +7,22 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
-public class OpenDeckTestingWindow(DeckEditorViewModel viewmodel) : ViewModelCommand<DeckEditorViewModel>(viewmodel)
+public partial class DeckEditorViewModelCommands
 {
-  protected override bool CanExecute() => Viewmodel.DeckCardList.Cards.Any();
+  public IRelayCommand OpenDeckTestingWindowCommand { get; } = new OpenDeckTestingWindow(viewmodel).Command;
 
-  protected override void Execute()
+  private class OpenDeckTestingWindow(DeckEditorViewModel viewmodel) : ViewModelCommand<DeckEditorViewModel>(viewmodel)
   {
-    var testingDeck = new DeckTestingDeck(
-      DeckCards: Viewmodel.DeckCardList.Cards.SelectMany(c => Enumerable.Range(1, c.Count).Select(i => c as MTGCard)).ToList(),
-      Commander: Viewmodel.Commander,
-      Partner: Viewmodel.Partner);
+    protected override bool CanExecute() => Viewmodel.DeckCardList.Cards.Any();
 
-    new AppWindows.DeckTestingWindow.DeckTestingWindow(testingDeck).Activate();
+    protected override void Execute()
+    {
+      var testingDeck = new DeckTestingDeck(
+        DeckCards: Viewmodel.DeckCardList.Cards.SelectMany(c => Enumerable.Range(1, c.Count).Select(i => c as MTGCard)).ToList(),
+        Commander: Viewmodel.Commander,
+        Partner: Viewmodel.Partner);
+
+      new AppWindows.DeckTestingWindow.DeckTestingWindow(testingDeck).Activate();
+    }
   }
 }
