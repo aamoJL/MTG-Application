@@ -37,9 +37,8 @@ public partial class DeckEditorViewModelCommands
       if (string.IsNullOrEmpty(loadName))
         return;
 
-      if (await Viewmodel.Worker.DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer).Convert(
-        dto: await new GetDeckDTO(Viewmodel.Repository).Execute(loadName)))
-        is DeckEditorMTGDeck deck)
+      if (await Viewmodel.Worker.DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer)
+        .Convert(dto: await new GetDeckDTO(Viewmodel.Repository).Execute(loadName))) is DeckEditorMTGDeck deck)
       {
         Viewmodel.SetDeck(deck);
 

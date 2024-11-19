@@ -114,6 +114,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
       var card = (e.NewItems[0] as DeckEditorMTGCard);
       var key = card.Group;
       var group = Groups.FirstOrDefault(x => key == x.Key);
+
       if (group == null)
       {
         var addAction = new ReversibleAddGroupAction(this);

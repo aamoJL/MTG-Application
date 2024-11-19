@@ -11,7 +11,7 @@ namespace MTGApplication.General.Services.Databases.Repositories.CardRepository.
 public record MTGCardDTO
 {
   private MTGCardDTO() { }
-  public MTGCardDTO(string name, int count, Guid scryfallId, Guid oracleId, string setCode, string collectorNumber)
+  public MTGCardDTO(string name, int count, Guid scryfallId, Guid oracleId, string setCode, string collectorNumber, string group)
   {
     Name = name;
     Count = count;
@@ -19,7 +19,7 @@ public record MTGCardDTO
     OracleId = oracleId;
     SetCode = setCode;
     CollectorNumber = collectorNumber;
-    //Group = group;
+    Group = group;
   }
   public MTGCardDTO(MTGCardInfo info, int count = 1)
   {
@@ -29,7 +29,6 @@ public record MTGCardDTO
     OracleId = info.OracleId;
     SetCode = info.SetCode;
     CollectorNumber = info.CollectorNumber;
-    //Group = string.Empty;
   }
 
   [Key] public int Id { get; init; }
@@ -39,7 +38,7 @@ public record MTGCardDTO
   public Guid OracleId { get; set; }
   public string SetCode { get; set; }
   public string CollectorNumber { get; set; }
-  //public string Group { get; set; } = string.Empty;
+  [Required] public string Group { get; set; } = string.Empty;
 
   /// <summary>
   /// Compares DTOs, excluding Id and Count

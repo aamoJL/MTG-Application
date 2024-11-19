@@ -11,7 +11,7 @@ public record CardImportResult(
 {
   public enum ImportSource { Internal, External }
 
-  public record Card(MTGCardInfo Info, int Count = 1);
+  public record Card(MTGCardInfo Info, int Count = 1, string Group = "");
 
   /// <summary>
   /// Returns empty result object

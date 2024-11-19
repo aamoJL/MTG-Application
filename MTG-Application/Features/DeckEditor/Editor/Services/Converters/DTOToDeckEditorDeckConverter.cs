@@ -12,7 +12,8 @@ public class DTOToDeckEditorDeckConverter(MTGCardImporter importer)
 {
   public async Task<DeckEditorMTGDeck> Convert(MTGCardDeckDTO dto)
   {
-    if (dto == null) return null;
+    if (dto == null)
+      return null;
 
     CardImportResult.Card commander = null;
     CardImportResult.Card partner = null;
@@ -36,7 +37,7 @@ public class DTOToDeckEditorDeckConverter(MTGCardImporter importer)
       Name = dto.Name,
       Commander = commander != null ? new DeckEditorMTGCard(commander.Info, commander.Count) : null,
       CommanderPartner = partner != null ? new DeckEditorMTGCard(partner.Info, partner.Count) : null,
-      DeckCards = [.. deckCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],
+      DeckCards = [.. deckCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count) { Group = x.Group })],
       Wishlist = [.. wishCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],
       Maybelist = [.. maybeCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],
       Removelist = [.. removeCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],

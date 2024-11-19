@@ -82,13 +82,13 @@ public static class DeckEditorMTGCardMocker
   /// </summary>
   public static DeckEditorMTGCard FromDTO(MTGCardDTO dto)
   {
-    // TODO: group
     return CreateMTGCardModel(
       name: dto.Name,
       scryfallId: dto.ScryfallId,
       count: dto.Count,
       oracleId: dto.OracleId,
       setCode: dto.SetCode,
-      collectionNumber: dto.CollectorNumber);
+      collectionNumber: dto.CollectorNumber,
+      group: dto.Group);
   }
 }
