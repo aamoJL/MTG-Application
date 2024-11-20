@@ -4,13 +4,13 @@ using System.Linq;
 using System.Windows.Input;
 
 namespace MTGApplication.General.Views.Controls;
-public class ComboBoxWithCommands : ComboBox
+public partial class ComboBoxWithCommands : ComboBox
 {
   public static readonly DependencyProperty SelectionChangedCommandProperty =
-      DependencyProperty.Register(nameof(SelectionChangedCommand), typeof(ICommand),
-        typeof(ComboBoxWithCommands), new PropertyMetadata(default(ICommand)));
+      DependencyProperty.Register(nameof(SelectionChangedCommand), typeof(ICommand), typeof(ComboBoxWithCommands), new PropertyMetadata(default(ICommand)));
 
-  public ComboBoxWithCommands() : base() => SelectionChanged += ComboBox_SelectionChanged;
+  public ComboBoxWithCommands() : base()
+    => SelectionChanged += ComboBox_SelectionChanged;
 
   public ICommand SelectionChangedCommand
   {
