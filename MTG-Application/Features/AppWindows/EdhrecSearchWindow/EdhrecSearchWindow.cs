@@ -3,7 +3,7 @@ using MTGApplication.General.Views.AppWindows;
 using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 
 namespace MTGApplication.Features.AppWindows.EdhrecSearchWindow;
-public class EdhrecSearchWindow : ThemedWindow
+public partial class EdhrecSearchWindow : ThemedWindow
 {
   public EdhrecSearchWindow(CommanderTheme[] themes)
   {

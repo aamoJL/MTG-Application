@@ -17,7 +17,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.CardCollection.Editor.ViewModels;
 
-public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IWorker
+public partial class CardCollectionEditorViewModel : ObservableObject, ISavable, IWorker
 {
   public CardCollectionEditorViewModel(MTGCardImporter importer, CardCollectionEditorConfirmers confirmers, Notifier notifier, IRepository<MTGCardCollectionDTO> repository, ClipboardService clipboardService)
   {
@@ -39,20 +39,12 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
   public IRepository<MTGCardCollectionDTO> Repository { get; }
   public ClipboardService ClipboardService { get; }
 
+  [ObservableProperty] public partial CardCollectionViewModel CardCollectionViewModel { get; set; }
+  [ObservableProperty] public partial CardCollectionListViewModel CardCollectionListViewModel { get; set; }
   public IWorker Worker => this;
-  public CardCollectionViewModel CardCollectionViewModel
-  {
-    get => cardCollectionViewModel;
-    private set => SetProperty(ref cardCollectionViewModel, value);
-  }
-  public CardCollectionListViewModel CardCollectionListViewModel
-  {
-    get => cardCollectionListViewModel;
-    private set => SetProperty(ref cardCollectionListViewModel, value);
-  }
   public bool HasUnsavedChanges
   {
-    get => CardCollectionViewModel.HasUnsavedChanges || cardCollectionListViewModel.HasUnsavedChanges;
+    get => CardCollectionViewModel.HasUnsavedChanges || CardCollectionListViewModel.HasUnsavedChanges;
     set
     {
       CardCollectionViewModel.HasUnsavedChanges = value;
@@ -67,9 +59,9 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
     set => SetProperty(ref isBusy, value);
   }
 
-  [ObservableProperty] private MTGCardCollectionList selectedCardCollectionList = new();
+  [ObservableProperty] public partial MTGCardCollectionList SelectedCardCollectionList { get; set; } = new();
   // Used to bind collection name to visual state trigger, so it does not update when CardCollectionViewModel changes with the same name
-  [ObservableProperty] private string collectionName;
+  [ObservableProperty] public partial string CollectionName { get; set; }
 
   public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => (confirmUnsavedChanges ??= new ConfirmUnsavedChanges(this)).Command;
   public IAsyncRelayCommand NewCollectionCommand => (newCollection ??= new ConfirmNewCollection(this)).Command;
@@ -77,8 +69,6 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
   public IAsyncRelayCommand<MTGCardCollectionList> ChangeListCommand => (changeList ??= new ChangeList(this)).Command;
 
   private bool isBusy;
-  private CardCollectionViewModel cardCollectionViewModel;
-  private CardCollectionListViewModel cardCollectionListViewModel;
   private ConfirmUnsavedChanges confirmUnsavedChanges;
   private ConfirmNewCollection newCollection;
   private ConfirmOpenCollection openCollection;
@@ -88,7 +78,7 @@ public partial class CardCollectionEditorViewModel : ViewModelBase, ISavable, IW
   {
     CardCollectionViewModel = CreateCardCollectionViewModel(collection);
     HasUnsavedChanges = false;
-    
+
     await ChangeCollectionList(collection.CollectionLists.FirstOrDefault());
   }
 

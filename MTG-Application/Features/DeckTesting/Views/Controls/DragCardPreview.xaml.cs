@@ -1,15 +1,14 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using MTGApplication.Features.DeckTesting.Services;
 using System;
+using System.ComponentModel;
 using System.Numerics;
 
 namespace MTGApplication.Features.DeckTesting.Views.Controls;
 
-[ObservableObject]
-public sealed partial class DragCardPreview : UserControl
+public sealed partial class DragCardPreview : UserControl, INotifyPropertyChanged
 {
   public class DragCardPreviewEventArgs(XamlRoot root) : EventArgs
   {
@@ -40,15 +39,47 @@ public sealed partial class DragCardPreview : UserControl
     Unloaded += DragCardPreview_Unloaded;
   }
 
-  [ObservableProperty] private double left = 0;
-  [ObservableProperty] private double top = 0;
-  [ObservableProperty] private Visibility visibility = Visibility.Collapsed;
-  [ObservableProperty] private double opacity = DroppableOpacity;
-  [ObservableProperty] private double angle = 0;
-  [ObservableProperty] private BitmapImage imageSource = null;
+  public double Left
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(Left)));
+    }
+  } = 0;
+  public double Top
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(Top)));
+    }
+  } = 0;
+  public double Angle
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(Angle)));
+    }
+  } = 0;
+  public BitmapImage ImageSource
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(ImageSource)));
+    }
+  }
 
   public double ImageWidth { get; } = ImageX;
   public double ImageHeight { get; } = ImageY;
+
+  public event PropertyChangedEventHandler PropertyChanged;
 
   private void DragCardPreview_OnChange(object sender, DragCardPreviewEventArgs e)
   {

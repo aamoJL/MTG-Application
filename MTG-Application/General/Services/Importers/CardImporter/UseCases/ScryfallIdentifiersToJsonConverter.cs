@@ -10,41 +10,54 @@ namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
 public class ScryfallIdentifiersToJsonConverter : UseCase<ScryfallIdentifier[], string>
 {
   public override string Execute(ScryfallIdentifier[] identifiers)
-    => JsonSerializer.Serialize(new { identifiers = identifiers.Select(x => GetIdentifierJsonObject(x)) });
+    => GetJson(identifiers);
 
-  private static object GetIdentifierJsonObject(ScryfallIdentifier identifier)
+  private static string GetJson(ScryfallIdentifier[] identifiers)
   {
-    switch (identifier.PreferedSchema)
+    return JsonSerializer.Serialize(new
     {
-      case IdentifierSchema.ID:
-        if (identifier.ScryfallId != Guid.Empty) { return new { id = identifier.ScryfallId }; }
-        break;
-      case IdentifierSchema.ILLUSTRATION_ID:
-        if (identifier.ScryfallId != Guid.Empty && identifier.IllustrationId != Guid.Empty) { return new { illustration_id = identifier.IllustrationId }; }
-        break;
-      case IdentifierSchema.NAME:
-        if (!string.IsNullOrEmpty(identifier.Name)) { return new { name = identifier.Name }; }
-        break;
-      case IdentifierSchema.NAME_SET:
-        if (!string.IsNullOrEmpty(identifier.Name) && !string.IsNullOrEmpty(identifier.SetCode)) { return new { name = identifier.Name, set = identifier.SetCode }; }
-        break;
-      case IdentifierSchema.COLLECTORNUMBER_SET:
-        if (!string.IsNullOrEmpty(identifier.CollectorNumber) && !string.IsNullOrEmpty(identifier.SetCode)) { return new { set = identifier.SetCode, collector_number = identifier.CollectorNumber }; }
-        break;
-      default: break;
-    }
+      identifiers = identifiers.Select<ScryfallIdentifier, object>(identifier =>
+    {
+      var schemaPriorityEnumerator = new IdentifierSchema[]
+    {
+      identifier.PreferedSchema,
+      IdentifierSchema.ID,
+      IdentifierSchema.COLLECTORNUMBER_SET,
+      IdentifierSchema.ILLUSTRATION_ID,
+      IdentifierSchema.NAME_SET,
+      IdentifierSchema.NAME
+    }.GetEnumerator();
 
-    // If prefered schema does not work, select secondary if possible
-    // Scryfall Id
-    if (identifier.ScryfallId != Guid.Empty) { return new { id = identifier.ScryfallId }; }
-    // Set Code + Collector Number
-    else if (!string.IsNullOrEmpty(identifier.SetCode) && !string.IsNullOrEmpty(identifier.CollectorNumber)) { return new { set = identifier.SetCode, collector_number = identifier.CollectorNumber }; }
-    // Illustration Id
-    else if (identifier.ScryfallId != Guid.Empty && identifier.IllustrationId != Guid.Empty) { return new { illustration_id = identifier.IllustrationId }; }
-    // Name + Set Code
-    else if (!string.IsNullOrEmpty(identifier.Name) && !string.IsNullOrEmpty(identifier.SetCode)) { return new { name = identifier.Name, set = identifier.SetCode }; }
-    // Name
-    else if (!string.IsNullOrEmpty(identifier.Name)) { return new { name = identifier.Name }; }
-    else { return string.Empty; }
+      while (schemaPriorityEnumerator.MoveNext())
+      {
+        switch ((IdentifierSchema)schemaPriorityEnumerator.Current)
+        {
+          case IdentifierSchema.ID:
+            if (identifier.ScryfallId != Guid.Empty)
+              return new { id = identifier.ScryfallId };
+            break;
+          case IdentifierSchema.ILLUSTRATION_ID:
+            if (identifier.ScryfallId != Guid.Empty && identifier.IllustrationId != Guid.Empty)
+              return new { illustration_id = identifier.IllustrationId };
+            break;
+          case IdentifierSchema.NAME:
+            if (!string.IsNullOrEmpty(identifier.Name))
+              return new { name = identifier.Name };
+            break;
+          case IdentifierSchema.NAME_SET:
+            if (!string.IsNullOrEmpty(identifier.Name) && !string.IsNullOrEmpty(identifier.SetCode))
+              return new { name = identifier.Name, set = identifier.SetCode };
+            break;
+          case IdentifierSchema.COLLECTORNUMBER_SET:
+            if (!string.IsNullOrEmpty(identifier.CollectorNumber) && !string.IsNullOrEmpty(identifier.SetCode))
+              return new { set = identifier.SetCode, collector_number = identifier.CollectorNumber };
+            break;
+          default: break;
+        }
+      }
+
+      return string.Empty;
+    })
+    });
   }
 }

@@ -1,14 +1,13 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
+using System.ComponentModel;
 using System.Numerics;
 
 namespace MTGApplication.General.Views.Controls;
 
-[ObservableObject]
-public sealed partial class CardPreview : UserControl
+public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
 {
   public class CardPreviewEventArgs(XamlRoot root) : EventArgs
   {
@@ -29,22 +28,56 @@ public sealed partial class CardPreview : UserControl
   {
     InitializeComponent();
 
-    Loaded += (s, e) => { OnChange += CardPreview_OnChange; };
-    Unloaded += (s, e) => { OnChange -= CardPreview_OnChange; };
+    Loaded += (_, _) => { OnChange += CardPreview_OnChange; };
+    Unloaded += (_, _) => { OnChange -= CardPreview_OnChange; };
   }
 
-  [ObservableProperty] private double left = 0;
-  [ObservableProperty] private double top = 0;
-  [ObservableProperty] private Visibility visibility = Visibility.Collapsed;
-  [ObservableProperty] private BitmapImage imageSource = null;
-  [ObservableProperty] private BitmapImage placeholderSource = null;
+  public double Left
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(Left)));
+    }
+  } = 0;
+  public double Top
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(Top)));
+    }
+  } = 0;
+  public BitmapImage ImageSource
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(ImageSource)));
+    }
+  }
+  public BitmapImage PlaceholderSource
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(PlaceholderSource)));
+    }
+  }
 
   public double ImageWidth { get; } = ImageX;
   public double ImageHeight { get; } = ImageY;
 
+  public event PropertyChangedEventHandler PropertyChanged;
+
   private void CardPreview_OnChange(object sender, CardPreviewEventArgs e)
   {
-    if (e.Root != XamlRoot) return;
+    if (e.Root != XamlRoot)
+      return;
 
     if (string.IsNullOrEmpty(e.Uri))
     {

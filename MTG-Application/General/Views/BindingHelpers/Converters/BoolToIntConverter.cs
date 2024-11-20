@@ -3,7 +3,7 @@ using System;
 
 namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
-public class BoolToIntConverter : IValueConverter
+public partial class BoolToIntConverter : IValueConverter
 {
   public object Convert(object value, Type targetType, object parameter, string language)
     => parameter != null && int.TryParse((string)parameter, out var angle) ? (bool)value ? angle : 0 : 0;

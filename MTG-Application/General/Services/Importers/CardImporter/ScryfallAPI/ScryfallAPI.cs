@@ -79,7 +79,8 @@ public partial class ScryfallAPI : MTGCardImporter
   {
     if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty(CardImportResult.ImportSource.External);
 
-    var lines = importText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    var separator = new[] { '\n', '\r' };
+    var lines = importText.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     // Convert each line to scryfall identifier objects
     var identifiers = await Task.WhenAll(lines.Select(line => Task.Run(() =>

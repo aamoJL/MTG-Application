@@ -11,13 +11,13 @@ namespace MTGApplication.Features.DeckTesting.Services;
 
 public class DeckTestingPointerEvents
 {
-  public void Droppable_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  public void Droppable_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
     if (DeckTestingCardDrag.IsDragging)
       DragCardPreview.Change(this, new((sender as FrameworkElement).XamlRoot) { Opacity = DragCardPreview.DroppableOpacity });
   }
 
-  public void Droppable_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  public void Droppable_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
     if (DeckTestingCardDrag.IsDragging)
       DragCardPreview.Change(this, new((sender as FrameworkElement).XamlRoot) { Opacity = DragCardPreview.UndroppableOpacity });
@@ -36,7 +36,7 @@ public class DeckTestingPointerEvents
       DropAndReorder(item: item, target: sender as ListViewBase, e: e);
   }
 
-  public void LibraryTop_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  public void LibraryTop_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
     if (!DeckTestingCardDrag.IsDragging) return;
 
@@ -50,7 +50,7 @@ public class DeckTestingPointerEvents
     DeckTestingCardDrag.Complete();
   }
 
-  public void LibraryBottom_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  public void LibraryBottom_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
     if (!DeckTestingCardDrag.IsDragging) return;
 
@@ -64,7 +64,7 @@ public class DeckTestingPointerEvents
     DeckTestingCardDrag.Complete();
   }
 
-  public void BattlefieldCanvas_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  public void BattlefieldCanvas_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
     if (DeckTestingCardDrag.IsDragging)
       DragCardPreview.Change(this, new((sender as FrameworkElement).XamlRoot) { Opacity = DragCardPreview.BattlefieldOpacity });

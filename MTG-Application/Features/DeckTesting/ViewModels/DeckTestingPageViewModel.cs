@@ -17,22 +17,17 @@ public partial class DeckTestingPageViewModel(DeckTestingDeck deck) : Observable
   public ObservableCollection<DeckTestingMTGCard> CommandZone { get; } = [];
   public ObservableCollection<DeckTestingMTGCard> Tokens { get; } = [];
 
-  [ObservableProperty] private int playerHP = 40;
-  [ObservableProperty] private int enemyHP = 40;
-  [ObservableProperty] private int turnCount = 0;
+  public int PlayerHP { get; set { field = value; OnPropertyChanged(); } } = 40;
+  public int EnemyHP { get; set { field = value; OnPropertyChanged(); } } = 40;
+  public int TurnCount { get; set { field = value; OnPropertyChanged(); } } = 0;
 
   public event Action NewGameStarted;
   public event Action NewTurnStarted;
 
-  public IRelayCommand StartNewGameCommand => (startNewGame ??= new StartNewGame(this)).Command;
-  public IRelayCommand DrawCardCommand => (drawCard ??= new DrawCard(this)).Command;
-  public IRelayCommand StartNewTurnCommand => (startNewTurn ??= new StartNewTurn(this)).Command;
-  public IRelayCommand ShuffleDeckCommand => (shuffleDeck ??= new ShuffleDeck(this)).Command;
-
-  private StartNewGame startNewGame;
-  private DrawCard drawCard;
-  private StartNewTurn startNewTurn;
-  private ShuffleDeck shuffleDeck;
+  public IRelayCommand StartNewGameCommand => field ??= new StartNewGame(this).Command;
+  public IRelayCommand DrawCardCommand => field ??= new DrawCard(this).Command;
+  public IRelayCommand StartNewTurnCommand => field ??= new StartNewTurn(this).Command;
+  public IRelayCommand ShuffleDeckCommand => field ??= new ShuffleDeck(this).Command;
 
   public void RaiseNewGameStarted() => NewGameStarted?.Invoke();
 

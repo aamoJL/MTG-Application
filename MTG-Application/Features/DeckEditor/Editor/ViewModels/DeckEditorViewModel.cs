@@ -18,7 +18,7 @@ using System.Linq;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
-public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
+public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 {
   public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
   {
@@ -56,8 +56,8 @@ public partial class DeckEditorViewModel : ViewModelBase, ISavable, IWorker
   public CommanderCommands CommanderCommands { get; }
   public CommanderCommands PartnerCommands { get; }
 
-  [ObservableProperty] private bool isBusy;
-  [ObservableProperty] private bool hasUnsavedChanges;
+  [ObservableProperty] public partial bool IsBusy { get; set; }
+  [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
 
   public MTGCardDeckDTO DTO => DeckEditorMTGDeckToDTOConverter.Convert(Deck);
   public IWorker Worker => this;

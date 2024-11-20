@@ -56,24 +56,18 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
   }
   public ObservableCollection<CardCollectionMTGCard> OwnedCards => Model.Cards;
 
-  [ObservableProperty] private bool hasUnsavedChanges;
-  [ObservableProperty] private bool isBusy;
+  [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
+  [ObservableProperty] public partial bool IsBusy { get; set; }
 
   public Func<string, bool> ExistsValidation { get; }
 
   private MTGCardCollectionList Model { get; }
 
-  public IAsyncRelayCommand EditListCommand => (editList ??= new EditList(this)).Command;
-  public IAsyncRelayCommand ImportCardsCommand => (importCards ??= new ImportCards(this)).Command;
-  public IAsyncRelayCommand ExportCardsCommand => (exportCards ??= new ExportCards(this)).Command;
-  public IAsyncRelayCommand<CardCollectionMTGCard> ShowCardPrintsCommand => (showCardPrints ??= new ShowCardPrints(this)).Command;
-  public IRelayCommand<CardCollectionMTGCard> SwitchCardOwnershipCommand => (switchCardOwnership ??= new SwitchCardOwnership(this)).Command;
-
-  private EditList editList;
-  private ImportCards importCards;
-  private ExportCards exportCards;
-  private ShowCardPrints showCardPrints;
-  private SwitchCardOwnership switchCardOwnership;
+  public IAsyncRelayCommand EditListCommand => field ??= new EditList(this).Command;
+  public IAsyncRelayCommand ImportCardsCommand => field ??= new ImportCards(this).Command;
+  public IAsyncRelayCommand ExportCardsCommand => field ??= new ExportCards(this).Command;
+  public IAsyncRelayCommand<CardCollectionMTGCard> ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
+  public IRelayCommand<CardCollectionMTGCard> SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
 
   public async Task UpdateQueryCards() => await Worker.DoWork(QueryCardsViewModel.UpdateQueryCards(Model.SearchQuery));
 }

@@ -4,7 +4,7 @@ using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication.Features.AppWindows.DeckTestingWindow;
 
-public class DeckTestingWindow : ThemedWindow
+public partial class DeckTestingWindow : ThemedWindow
 {
   public DeckTestingWindow(DeckTestingDeck deck)
   {

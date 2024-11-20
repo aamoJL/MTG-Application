@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml;
@@ -9,10 +8,10 @@ using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.NotificationService;
 using System;
+using System.ComponentModel;
 
 namespace MTGApplication.Features.DeckEditor.Views;
-[ObservableObject]
-public sealed partial class DeckEditorPage : Page
+public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 {
   public DeckEditorPage()
   {
@@ -31,9 +30,35 @@ public sealed partial class DeckEditorPage : Page
 
   public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
-  [ObservableProperty] private bool deckGroupViewVisible = true;
-  [ObservableProperty] private bool deckImageViewVisible = false;
-  [ObservableProperty] private bool deckTextViewVisible = false;
+  public bool DeckGroupViewVisible
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(DeckGroupViewVisible)));
+    }
+  } = true;
+  public bool DeckImageViewVisible
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(DeckImageViewVisible)));
+    }
+  } = false;
+  public bool DeckTextViewVisible
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(DeckTextViewVisible)));
+    }
+  } = false;
+
+  public event PropertyChangedEventHandler PropertyChanged;
 
   [RelayCommand]
   private void SetDeckDisplayType(string type)

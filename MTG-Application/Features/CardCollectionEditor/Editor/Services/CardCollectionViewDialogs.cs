@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
-using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.Dialogs;
@@ -10,7 +9,7 @@ using MTGApplication.General.Views.Dialogs.UseCases;
 using System.Linq;
 using static MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.CardCollectionEditorViewDialogs;
 
-namespace MTGApplication.Features.CardCollection.Editor.Services;
+namespace MTGApplication.Features.CardCollectionEditor.Editor.Services;
 
 public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollectionEditorConfirmers>
 {
@@ -53,10 +52,10 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
     {
       Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
 
-      return (await DialogService.ShowAsync(root, new GridViewDialog(
+      return await DialogService.ShowAsync(root, new GridViewDialog(
         title: msg.Title,
         items: msg.Data.ToArray(),
-        itemTemplate: (DataTemplate)template))) as MTGCard;
+        itemTemplate: (DataTemplate)template)) as MTGCard;
     };
   }
 }

@@ -24,20 +24,19 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
     Confirmers = confirmers ?? new();
   }
 
-  private ObservableCollection<DeckEditorMTGCard> cards = [];
   public ObservableCollection<DeckEditorMTGCard> Cards
   {
-    get => cards;
+    get;
     set
     {
-      if (value != cards)
+      if (value != field)
       {
         PropertyChanging?.Invoke(this, new(nameof(Cards)));
-        cards = value;
+        field = value;
         PropertyChanged?.Invoke(this, new(nameof(Cards)));
       }
     }
-  }
+  } = [];
 
   public event PropertyChangedEventHandler PropertyChanged;
   public event PropertyChangingEventHandler PropertyChanging;

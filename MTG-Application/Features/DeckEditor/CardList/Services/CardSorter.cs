@@ -7,7 +7,7 @@ namespace MTGApplication.Features.DeckEditor.CardList.Services;
 
 public partial class CardSorter : ObservableObject
 {
-  [ObservableProperty] private CardSortProperties sortProperties = new();
+  [ObservableProperty] public partial CardSortProperties SortProperties { get; set; } = new();
 
   [RelayCommand]
   private void ChangeSortDirection(string direction)

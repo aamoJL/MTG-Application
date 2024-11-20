@@ -4,14 +4,13 @@ using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.CardList.UseCases;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 
-public partial class CardGroupViewModel : ViewModelBase
+public partial class CardGroupViewModel : ObservableObject
 {
   public CardGroupViewModel(string key, GroupedCardListViewModel listViewmodel)
   {
@@ -21,7 +20,7 @@ public partial class CardGroupViewModel : ViewModelBase
     Items.CollectionChanged += Items_CollectionChanged;
   }
 
-  [ObservableProperty] private string key;
+  [ObservableProperty] public partial string Key { get; set; }
 
   public ObservableCollection<DeckEditorMTGCard> Items { get; } = [];
   public int Count => Items.Sum(x => x.Count);

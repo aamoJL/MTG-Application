@@ -10,8 +10,8 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models
 public partial class MTGCardCollectionList : ObservableObject
 {
   // These are bbservable properties so combobox header will update when changed
-  [ObservableProperty] private string name = string.Empty;
-  [ObservableProperty] private string searchQuery = string.Empty;
+  [ObservableProperty] public partial string Name { get; set; } = string.Empty;
+  [ObservableProperty] public partial string SearchQuery { get; set; } = string.Empty;
 
   public ObservableCollection<CardCollectionMTGCard> Cards { get; set; } = [];
 }

@@ -1,12 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.ViewModels;
 using System.Text;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl;
 
-[ObservableObject]
 public sealed partial class ScryfallCardSearchInputControl : UserControl
 {
   public ScryfallCardSearchInputControl() => InitializeComponent();
@@ -23,7 +21,7 @@ public sealed partial class ScryfallCardSearchInputControl : UserControl
   }
 }
 
-public partial class ScryfallCardSearchControlViewModel : ViewModelBase
+public partial class ScryfallCardSearchControlViewModel : ObservableObject
 {
   public string SearchQuery
   {
@@ -49,9 +47,9 @@ public partial class ScryfallCardSearchControlViewModel : ViewModelBase
     }
   }
 
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private string searchText;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private GameFormat searchGameFormat;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private CardUniqueness searchCardUniqueness;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private SearchOrderProperty searchOrderProperty;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] private SearchOrderDirection searchOrderDirection;
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial string SearchText { get; set; }
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial GameFormat SearchGameFormat { get; set; }
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial CardUniqueness SearchCardUniqueness { get; set; }
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial SearchOrderProperty SearchOrderProperty { get; set; }
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial SearchOrderDirection SearchOrderDirection { get; set; }
 }

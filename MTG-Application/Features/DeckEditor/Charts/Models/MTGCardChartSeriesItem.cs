@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.Charts.Models;
 
-public class MTGCardChartSeriesItem : ObservableObject
+public partial class MTGCardChartSeriesItem : ObservableObject
 {
   public MTGCardChartSeriesItem() => Cards.CollectionChanged += Cards_CollectionChanged;
 

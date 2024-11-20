@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.CardCollection.Editor.Services;
 using MTGApplication.Features.CardCollection.Editor.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.AppWindows;

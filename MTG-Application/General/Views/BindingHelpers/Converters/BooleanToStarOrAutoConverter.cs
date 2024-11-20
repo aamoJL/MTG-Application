@@ -4,7 +4,7 @@ using System;
 
 namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
-public class BooleanToStarOrAutoConverter : IValueConverter
+public partial class BooleanToStarOrAutoConverter : IValueConverter
 {
   public object Convert(object value, Type targetType, object parameter, string language)
     => value is true ? new GridLength(1, GridUnitType.Star) : GridLength.Auto;

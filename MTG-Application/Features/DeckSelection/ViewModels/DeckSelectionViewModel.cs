@@ -9,14 +9,14 @@ using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.DeckSelection.ViewModels;
-public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, MTGCardImporter importer) : ViewModelBase, IWorker
+public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, MTGCardImporter importer) : ObservableObject, IWorker
 {
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];
   public IRepository<MTGCardDeckDTO> Repository { get; } = repository;
   public MTGCardImporter Importer { get; } = importer;
   public IWorker Worker => this;
 
-  [ObservableProperty] private bool isBusy;
+  [ObservableProperty] public partial bool IsBusy { get; set; }
 
   public IAsyncRelayCommand LoadDecksCommand => (loadDecks ??= (loadDecks = new DeckSelectorViewModelCommands.LoadDecks(this))).Command;
 

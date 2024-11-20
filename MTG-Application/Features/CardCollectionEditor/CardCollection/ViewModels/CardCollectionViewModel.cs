@@ -17,7 +17,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
 
-public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImporter importer) : ViewModelBase, IWorker, ISavable
+public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImporter importer) : ObservableObject, IWorker, ISavable
 {
   public MTGCardImporter Importer { get; } = importer;
   public CardCollectionConfirmers Confirmers { get; set; } = new();
@@ -33,13 +33,13 @@ public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImp
       if (Model.Name == value) return;
 
       Model.Name = value;
-      OnPropertyChanged(nameof(Name));
+      OnPropertyChanged();
     }
   }
   public ObservableCollection<MTGCardCollectionList> CollectionLists => Model.CollectionLists;
 
-  [ObservableProperty] private bool isBusy;
-  [ObservableProperty] private bool hasUnsavedChanges;
+  public bool IsBusy { get; set { field = value; OnPropertyChanged(); } }
+  public bool HasUnsavedChanges { get; set { field = value; OnPropertyChanged(); } }
 
   private MTGCardCollection Model { get; } = model;
 
@@ -48,15 +48,10 @@ public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImp
   public Func<MTGCardCollectionList, Task> OnListAdded { get; init; }
   public Func<MTGCardCollectionList, Task> OnListRemoved { get; init; }
 
-  public IAsyncRelayCommand SaveCollectionCommand => (saveCollection ??= new ConfirmSaveCollection(this)).Command;
-  public IAsyncRelayCommand DeleteCollectionCommand => (deleteCollection ??= new ConfirmDeleteCollection(this)).Command;
-  public IAsyncRelayCommand NewListCommand => (newList ??= new ConfirmNewList(this)).Command;
-  public IAsyncRelayCommand<MTGCardCollectionList> DeleteListCommand => (deleteList ??= new ConfirmDeleteList(this)).Command;
-
-  private ConfirmSaveCollection saveCollection;
-  private ConfirmDeleteCollection deleteCollection;
-  private ConfirmNewList newList;
-  private ConfirmDeleteList deleteList;
+  public IAsyncRelayCommand SaveCollectionCommand => field ??= new ConfirmSaveCollection(this).Command;
+  public IAsyncRelayCommand DeleteCollectionCommand => field ??= new ConfirmDeleteCollection(this).Command;
+  public IAsyncRelayCommand NewListCommand => field ??= new ConfirmNewList(this).Command;
+  public IAsyncRelayCommand<MTGCardCollectionList> DeleteListCommand => field ??= new ConfirmDeleteList(this).Command;
 
   public MTGCardCollectionDTO AsDTO() => CardCollectionToDTOConverter.Convert(Model);
 }

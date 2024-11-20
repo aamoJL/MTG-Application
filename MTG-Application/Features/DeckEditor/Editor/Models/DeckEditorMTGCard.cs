@@ -8,24 +8,22 @@ namespace MTGApplication.Features.DeckEditor.Editor.Models;
 /// </summary>
 public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCard(info)
 {
-  protected int count = LimitCount(count);
-
   /// <summary>
   /// Card count. Minimum is 1
   /// </summary>
   public int Count
   {
-    get => count;
+    get;
     set
     {
       value = LimitCount(value);
-      if (count != value)
+      if (field != value)
       {
-        count = value;
+        field = value;
         OnPropertyChanged(nameof(Count));
       }
     }
-  }
+  } = LimitCount(count);
 
   /// <summary>
   /// Card's group name

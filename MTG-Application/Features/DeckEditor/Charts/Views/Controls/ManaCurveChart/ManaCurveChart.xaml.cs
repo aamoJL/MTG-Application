@@ -18,23 +18,23 @@ public sealed partial class ManaCurveChart : MTGCardChart
 {
   public ManaCurveChart() : base() => InitializeComponent();
 
-  public ICartesianAxis[] XAxes { get; set; } = new Axis[]
-  {
-    new() {
+  public ICartesianAxis[] XAxes { get; set; } =
+  [
+    new Axis() {
       LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       ForceStepToMin = true,
       MinStep = 1,
     }
-  };
-  public ICartesianAxis[] YAxes { get; set; } = new Axis[]
-  {
-    new() {
+  ];
+  public ICartesianAxis[] YAxes { get; set; } =
+  [
+    new Axis() {
       LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       ForceStepToMin = true,
       MinStep = 5,
       MinLimit = 0,
     }
-  };
+  ];
 
   protected override void AddToSeries(DeckEditorMTGCard card)
   {

@@ -4,7 +4,7 @@ using System;
 
 namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
-public class IntMoreThanToVisibilityConverter : IValueConverter
+public partial class IntMoreThanToVisibilityConverter : IValueConverter
 {
   /// <summary>
   /// Returns <see cref="Visibility"/> depending on the <paramref name="value"/> being more than the <paramref name="parameter"/>

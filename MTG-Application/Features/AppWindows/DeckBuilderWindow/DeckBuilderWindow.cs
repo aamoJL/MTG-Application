@@ -2,7 +2,7 @@
 
 namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 
-public class DeckBuilderWindow : ThemedWindow
+public partial class DeckBuilderWindow : ThemedWindow
 {
   public DeckBuilderWindow() : base()
   {

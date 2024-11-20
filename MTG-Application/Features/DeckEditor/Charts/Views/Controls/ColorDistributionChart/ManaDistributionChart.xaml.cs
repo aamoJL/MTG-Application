@@ -24,8 +24,8 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     AddNewSeries(null);
   }
 
-  public IPolarAxis[] AngleAxes { get; } = new PolarAxis[] { new() { Labels = _colorRange.Select(x => x.GetFullName()).ToList() } };
-  public IPolarAxis[] RadiusAxes { get; } = new PolarAxis[] { new() { Labeler = value => value.ToString() } };
+  public IPolarAxis[] AngleAxes { get; } = [new PolarAxis() { Labels = _colorRange.Select(x => x.GetFullName()).ToList() }];
+  public IPolarAxis[] RadiusAxes { get; } = [new PolarAxis() { Labeler = value => value.ToString() }];
 
   protected override void AddToSeries(DeckEditorMTGCard card)
   {

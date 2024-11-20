@@ -7,7 +7,7 @@ namespace MTGApplication.General.Views.BindingHelpers.Converters;
 /// <summary>
 /// Converts <see cref="string"/> uri to <see cref="BitmapImage"/>
 /// </summary>
-public class StringToBitmapConverter : IValueConverter
+public partial class StringToBitmapConverter : IValueConverter
 {
   public object Convert(object value, Type targetType, object parameter, string language)
   {

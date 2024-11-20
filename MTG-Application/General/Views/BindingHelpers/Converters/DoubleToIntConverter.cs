@@ -6,7 +6,7 @@ namespace MTGApplication.General.Views.BindingHelpers.Converters;
 /// <summary>
 /// Converts <see cref="double"/> to <see cref="int"/>
 /// </summary>
-public class DoubleToIntConverter : IValueConverter
+public partial class DoubleToIntConverter : IValueConverter
 {
   public object Convert(object value, Type targetType, object parameter, string language) => (int)(double)value;
 

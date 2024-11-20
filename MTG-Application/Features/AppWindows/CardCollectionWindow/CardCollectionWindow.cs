@@ -3,7 +3,7 @@ using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication.Features.AppWindows.CardCollectionWindow;
 
-public class CardCollectionWindow : ThemedWindow
+public partial class CardCollectionWindow : ThemedWindow
 {
   public CardCollectionWindow()
   {

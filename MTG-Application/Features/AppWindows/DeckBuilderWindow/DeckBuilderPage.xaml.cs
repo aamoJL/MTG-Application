@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -6,16 +5,19 @@ using MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
-[ObservableObject]
-public sealed partial class DeckBuilderPage : Page
+
+public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 {
   public DeckBuilderPage() => InitializeComponent();
 
   public ObservableCollection<DeckSelectionAndEditorTabViewItem> TabViewItems { get; } = [new CreateNewDeckViewTabItem().Execute()];
 
-  [ObservableProperty] private bool isSearchPaneOpen = false;
+  public bool IsSearchPaneOpen { get => field; set { field = value; PropertyChanged?.Invoke(this, new(nameof(IsSearchPaneOpen))); } } = false;
+
+  public event PropertyChangedEventHandler PropertyChanged;
 
   [RelayCommand] public void SwitchSearchPanel() => IsSearchPaneOpen = !IsSearchPaneOpen;
 

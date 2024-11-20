@@ -19,7 +19,7 @@ public partial class CardSearchViewModel(MTGCardImporter importer) : ViewModelBa
   public CardSearchConfirmers Confirmers { get; init; } = new();
   public IWorker Worker => this;
 
-  [ObservableProperty] private bool isBusy;
+  [ObservableProperty] public partial bool IsBusy { get; set; }
 
   public IAsyncRelayCommand SubmitSearchCommand => (submitSearch ??= new SubmitSearch(this)).Command;
   public IAsyncRelayCommand<MTGCard> ShowCardPrintsCommand => (showCardPrints ??= new ShowCardPrints(this)).Command;

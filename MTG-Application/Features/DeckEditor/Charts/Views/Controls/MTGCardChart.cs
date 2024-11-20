@@ -65,5 +65,4 @@ public abstract class MTGCardChart : UserControl
 
   protected static void CardsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     => (sender as MTGCardChart).OnCardsChanged(e.OldValue as ObservableCollection<DeckEditorMTGCard>);
-
 }

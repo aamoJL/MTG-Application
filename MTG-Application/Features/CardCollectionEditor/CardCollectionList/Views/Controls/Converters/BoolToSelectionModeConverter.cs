@@ -3,7 +3,7 @@ using System;
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls.Converters;
 
-public class BoolToSelectionModeConverter : IValueConverter
+public partial class BoolToSelectionModeConverter : IValueConverter
 {
   public object Convert(object value, Type targetType, object parameter, string language)
     => value is true ? SelectionMode.SingleTap : SelectionMode.DoubleTap;

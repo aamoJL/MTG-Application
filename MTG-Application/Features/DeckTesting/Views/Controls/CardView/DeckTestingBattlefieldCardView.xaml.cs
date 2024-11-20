@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -16,26 +15,15 @@ public sealed partial class DeckTestingBattlefieldCardView : DeckTestingCardView
 
   public DeckTestingBattlefieldCardView() => InitializeComponent();
 
-  public int PlusCounters
-  {
-    get => plusCounters;
-    set => SetProperty(ref plusCounters, Math.Max(0, value));
-  }
-  public int CountCounters
-  {
-    get => countCounters;
-    set => SetProperty(ref countCounters, Math.Max(1, value));
-  }
-
-  [ObservableProperty] private bool isTapped = false;
-  [ObservableProperty] private Visibility plusCounterVisibility = Visibility.Collapsed;
-  [ObservableProperty] private Visibility countCounterVisibility = Visibility.Collapsed;
+  public int PlusCounters { get => field; set => SetProperty(ref field, Math.Max(0, value)); } = 0;
+  public int CountCounters { get => field; set => SetProperty(ref field, Math.Max(1, value)); } = 1;
+  public bool IsTapped { get => field; set => SetProperty(ref field, value); } = false;
+  public Visibility PlusCounterVisibility { get => field; set => SetProperty(ref field, value); } = Visibility.Collapsed;
+  public Visibility CountCounterVisibility { get => field; set => SetProperty(ref field, value); } = Visibility.Collapsed;
 
   public double CardWidth => DragCardPreview.ImageX;
   public double CardHeight => DragCardPreview.ImageY;
 
-  private int plusCounters = 0;
-  private int countCounters = 1;
   private PointerButton lastButtonPress = PointerButton.None; // used for click actions using press/release/move events
 
   protected override void OnPointerPressed(PointerRoutedEventArgs e)

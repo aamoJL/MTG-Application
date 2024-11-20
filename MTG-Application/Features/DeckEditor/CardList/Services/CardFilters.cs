@@ -15,27 +15,27 @@ public partial class CardFilters : ObservableObject
   public enum ColorGroups { All, Mono, Multi }
 
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private string nameText = string.Empty;
+  public partial string NameText { get; set; } = string.Empty;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private string typeText = string.Empty;
+  public partial string TypeText { get; set; } = string.Empty;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private string oracleText = string.Empty;
+  public partial string OracleText { get; set; } = string.Empty;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private bool white = true;
+  public partial bool White { get; set; } = true;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private bool blue = true;
+  public partial bool Blue { get; set; } = true;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private bool black = true;
+  public partial bool Black { get; set; } = true;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private bool red = true;
+  public partial bool Red { get; set; } = true;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private bool green = true;
+  public partial bool Green { get; set; } = true;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private bool colorless = true;
+  public partial bool Colorless { get; set; } = true;
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private ColorGroups colorGroup = ColorGroups.All; // All, Mono, Multi
+  public partial ColorGroups ColorGroup { get; set; } = ColorGroups.All; // All, Mono, Multi
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
-  private double cmc = double.NaN;
+  public partial double Cmc { get; set; } = double.NaN;
 
   /// <summary>
   /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value

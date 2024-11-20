@@ -10,7 +10,7 @@ namespace MTGApplication.Features.DeckTesting.Services;
 
 public class DeckTestingDragAndDropEvents
 {
-  public void ListView_Drop(object sender, DragEventArgs e)
+  public void ListView_Drop(object sender, DragEventArgs _)
   {
     if (DragAndDrop<CardMoveArgs>.Item?.Card is MTGCard internalCard)
       ((sender as ListViewBase)?.ItemsSource as Collection<DeckTestingMTGCard>)

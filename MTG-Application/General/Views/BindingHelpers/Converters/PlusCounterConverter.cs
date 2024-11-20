@@ -3,7 +3,7 @@ using System;
 
 namespace MTGApplication.General.Views.BindingHelpers.Converters;
 
-public class PlusCounterConverter : IValueConverter
+public partial class PlusCounterConverter : IValueConverter
 {
   public object Convert(object value, Type targetType, object parameter, string language)
     => value is not null and int count ? $"+{count}" : "";

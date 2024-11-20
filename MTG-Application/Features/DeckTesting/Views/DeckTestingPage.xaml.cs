@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,10 +6,11 @@ using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.Services;
 using MTGApplication.Features.DeckTesting.ViewModels;
 using MTGApplication.Features.DeckTesting.Views.Controls.CardView;
+using System.ComponentModel;
 
 namespace MTGApplication.Features.DeckTesting.Views;
-[ObservableObject]
-public sealed partial class DeckTestingPage : Page
+
+public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
 {
   public DeckTestingPage() => InitializeComponent();
 
@@ -30,7 +30,17 @@ public sealed partial class DeckTestingPage : Page
   public DeckTestingPointerEvents PointerEvents { get; } = new();
   public DeckTestingDragAndDropEvents DragAndDropEvents { get; } = new();
 
-  [ObservableProperty] private Visibility libraryVisibility = Visibility.Collapsed;
+  public Visibility LibraryVisibility
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(LibraryVisibility)));
+    }
+  } = Visibility.Collapsed;
+
+  public event PropertyChangedEventHandler PropertyChanged;
 
   [RelayCommand] private void LibraryVisibilitySwitch() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 

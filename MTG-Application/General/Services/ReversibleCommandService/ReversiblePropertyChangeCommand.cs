@@ -7,7 +7,7 @@ public class ReversiblePropertyChangeCommand<TModel, TValue>(TModel model, TValu
   public TModel Model { get; } = model;
   public TValue OldValue { get; } = oldValue;
   public TValue NewValue { get; } = newValue;
-  public IClassCopier<TModel> Copier { get; } = copier == null ? new ReversibleCommand<TModel>.DefaultCopier() : copier;
+  public IClassCopier<TModel> Copier { get; } = copier ?? new ReversibleCommand<TModel>.DefaultCopier();
 
   public void Execute() => ReversibleAction?.Action?.Invoke((Copier.Copy(Model), NewValue));
   public void Undo() => ReversibleAction?.ReverseAction?.Invoke((Copier.Copy(Model), OldValue));

@@ -1,17 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.IOServices;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MTGApplication.General.Views.Controls;
 
-[ObservableObject]
-public abstract partial class BasicCardView<TCard> : UserControl where TCard : MTGCard
+public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropertyChanged where TCard : MTGCard
 {
   public static readonly DependencyProperty ModelProperty =
       DependencyProperty.Register(nameof(Model), typeof(TCard), typeof(BasicCardView<TCard>),
@@ -42,7 +42,17 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
   }
   public string CardName => Model?.Info.Name ?? string.Empty;
 
-  [ObservableProperty] protected string selectedFaceUri = "";
+  public string SelectedFaceUri
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(SelectedFaceUri)));
+    }
+  } = "";
+
+  public event PropertyChangedEventHandler PropertyChanged;
 
   public IAsyncRelayCommand OnDropCopy { get; set; }
   public ICommand OnDropRemove { get; set; }
@@ -94,7 +104,7 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
 
     if (newValue != null) newValue.PropertyChanged += Model_PropertyChanged;
 
-    OnPropertyChanged(nameof(CardName));
+    PropertyChanged?.Invoke(this, new(nameof(CardName)));
     SwitchFaceImageCommand.NotifyCanExecuteChanged();
     OpenAPIWebsiteCommand.NotifyCanExecuteChanged();
     OpenCardmarketWebsiteCommand.NotifyCanExecuteChanged();
@@ -118,13 +128,13 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
     CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
   }
 
-  protected void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  protected void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(MTGCard.Info))
       SelectedFaceUri = Model?.Info.FrontFace.ImageUri;
   }
 
-  protected void AppSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  protected void AppSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
   {
     // Requested theme needs to be changed to the selected theme here, because flyouts will not change theme if
     // the requested theme is Default.
@@ -153,5 +163,14 @@ public abstract partial class BasicCardView<TCard> : UserControl where TCard : M
       Uri = SelectedFaceUri,
       Coordinates = new((float)point.X, (float)point.Y)
     });
+  }
+
+  protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+  {
+    if (Equals(storage, value))
+      return;
+
+    storage = value;
+    PropertyChanged?.Invoke(this, new(propertyName));
   }
 }

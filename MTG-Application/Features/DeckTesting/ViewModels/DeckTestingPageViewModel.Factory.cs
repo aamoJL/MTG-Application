@@ -48,6 +48,5 @@ public partial class DeckTestingPageViewModel
         .ToList(); // Filter duplicates out using oracleId
     }
   }
-
 }
 

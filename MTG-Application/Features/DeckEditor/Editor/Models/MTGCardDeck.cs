@@ -9,9 +9,9 @@ namespace MTGApplication.Features.DeckEditor.Models;
 /// </summary>
 public partial class DeckEditorMTGDeck : ObservableObject
 {
-  [ObservableProperty] private string name = "";
-  [ObservableProperty] private DeckEditorMTGCard commander;
-  [ObservableProperty] private DeckEditorMTGCard commanderPartner;
+  [ObservableProperty] public partial string Name { get; set; } = "";
+  [ObservableProperty] public partial DeckEditorMTGCard Commander { get; set; }
+  [ObservableProperty] public partial DeckEditorMTGCard CommanderPartner { get; set; }
 
   public ObservableCollection<DeckEditorMTGCard> DeckCards { get; set; } = [];
   public ObservableCollection<DeckEditorMTGCard> Wishlist { get; set; } = [];
