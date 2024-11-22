@@ -5,12 +5,33 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:local="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:converters="using:MTGApplication.General.Views.BindingHelpers.Converters"
   mc:Ignorable="d">
 
+  <UserControl.Resources>
+    <converters:InvertedBoolToDoubleConverter x:Key="InvertedBoolToDoubleConverter"/>
+    <converters:BoolToDoubleConverter x:Key="BoolToDoubleConverter"/>
+
+    <Storyboard x:Name="ChevronStoryboard">
+      <DoubleAnimation From="{x:Bind IsExpanded, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter=-90, Mode=OneWay}" 
+                       To="{x:Bind IsExpanded, Converter={StaticResource InvertedBoolToDoubleConverter}, ConverterParameter=-90, Mode=OneWay}" 
+                       Duration="0:0:0.1"
+                       Storyboard.TargetName="Chevron"
+                       Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" />
+    </Storyboard>
+  </UserControl.Resources>
+  
   <Grid>
     <Grid Margin="0 0 40 0" Padding="10 5 40 5" Background="{ThemeResource SystemAccentColorLight3}">
-      <TextBlock Text="{x:Bind PrimaryHeader, Mode=OneWay}" VerticalAlignment="Bottom" FontSize="20"/>
+      <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+        <FontIcon x:Name="Chevron" Glyph="&#xE972;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin=".5, .5">
+          <FontIcon.RenderTransform>
+            <RotateTransform />
+          </FontIcon.RenderTransform>
+        </FontIcon>
+        <TextBlock Text="{x:Bind PrimaryHeader, Mode=OneWay}" FontSize="20"/>
+      </StackPanel>
     </Grid>
     <Grid Width="50" HorizontalAlignment="Right">
       <Grid Background="{ThemeResource SystemAccentColorLight2}" CornerRadius="0 2 2 0">
