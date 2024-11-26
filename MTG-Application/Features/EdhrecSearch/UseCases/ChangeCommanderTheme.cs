@@ -25,6 +25,9 @@ public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewMod
           nextPageUri: searchResult.NextPageUri,
           totalCount: searchResult.TotalCount);
     }
-    catch { }
+    catch (Exception e)
+    {
+      Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+    }
   }
 }

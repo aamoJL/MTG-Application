@@ -47,7 +47,7 @@ public record MTGCardInfo
   /// Constructor for JSON deserialization
   /// </summary>
   [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-  public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace backFace, RarityTypes rarityType, ColorTypes[] colors, ColorTypes[] colorIdentity, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string importerName, Guid oracleId)
+  public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, ColorTypes[] colorIdentity, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string importerName, Guid oracleId)
   {
     ScryfallId = scryfallId;
     OracleId = oracleId;
@@ -72,7 +72,7 @@ public record MTGCardInfo
     Tokens = tokens;
     ImporterName = importerName;
   }
-  public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, ColorTypes[] colorIdentity, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string importerName = "")
+  public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, ColorTypes[] colorIdentity, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string importerName = "")
   {
     ScryfallId = scryfallId;
     OracleId = oracleId;
@@ -110,7 +110,7 @@ public record MTGCardInfo
   public string APIWebsiteUri { get; init; }
   public string SetIconUri { get; init; }
   public CardFace FrontFace { get; init; }
-  public CardFace BackFace { get; init; }
+  public CardFace? BackFace { get; init; }
   public string PrintSearchUri { get; init; }
   public CardToken[] Tokens { get; init; }
   public RarityTypes RarityType { get; init; }
@@ -124,18 +124,17 @@ public record MTGCardInfo
   /// <summary>
   /// Returns all the <see cref="ColorTypes"/> that the given faces have
   /// </summary>
-  private static ColorTypes[] GetColors(CardFace frontFace, CardFace backFace)
+  private static ColorTypes[] GetColors(CardFace frontFace, CardFace? backFace)
   {
     var colors = new List<ColorTypes>();
 
     foreach (var color in frontFace.Colors)
       if (!colors.Contains(color)) { colors.Add(color); }
 
-    if (backFace != null)
-    {
-      foreach (var color in backFace?.Colors)
-        if (!colors.Contains(color)) { colors.Add(color); }
-    }
+    if (backFace?.Colors is ColorTypes[] backColors)
+      foreach (var color in backColors)
+        if (!colors.Contains(color))
+          colors.Add(color);
 
     return [.. colors];
   }

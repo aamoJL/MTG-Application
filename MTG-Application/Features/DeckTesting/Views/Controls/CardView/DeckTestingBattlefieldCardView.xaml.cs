@@ -105,7 +105,7 @@ public sealed partial class DeckTestingBattlefieldCardView : DeckTestingCardView
       return;
 
     canvas?.Children.Remove(canvas.Children
-      .FirstOrDefault(c => (c as DeckTestingBattlefieldCardView).Model == item));
+      .FirstOrDefault(c => (c as DeckTestingBattlefieldCardView)?.Model == item));
   }
 
   private void OnDragEnded()

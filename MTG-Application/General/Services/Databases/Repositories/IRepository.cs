@@ -38,10 +38,10 @@ public interface IRepository<T> where T : class
   /// <summary>
   /// Returns all the items from the database.
   /// </summary>
-  public Task<IEnumerable<T>> Get(Action<DbSet<T>> setIncludes = null);
+  public Task<IEnumerable<T>> Get(Action<DbSet<T>>? setIncludes = null);
 
   /// <summary>
   /// Returns an item with the given <paramref name="name"/> from the database.
   /// </summary>
-  public Task<T> Get(string name, Action<DbSet<T>> setIncludes = null);
+  public Task<T?> Get(string name, Action<DbSet<T>>? setIncludes = null);
 }

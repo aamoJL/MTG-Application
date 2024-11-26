@@ -15,7 +15,7 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewMo
 
 public partial class CardCollectionListViewModel : ObservableObject, ISavable, IWorker
 {
-  public CardCollectionListViewModel(MTGCardCollectionList model, MTGCardImporter importer, Func<string, bool> existsValidation = null)
+  public CardCollectionListViewModel(MTGCardCollectionList model, MTGCardImporter importer, Func<string, bool>? existsValidation = null)
   {
     Model = model ?? new();
 
@@ -59,15 +59,15 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
   [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
   [ObservableProperty] public partial bool IsBusy { get; set; }
 
-  public Func<string, bool> ExistsValidation { get; }
+  public Func<string, bool>? ExistsValidation { get; }
 
   private MTGCardCollectionList Model { get; }
 
-  public IAsyncRelayCommand EditListCommand => field ??= new EditList(this).Command;
-  public IAsyncRelayCommand ImportCardsCommand => field ??= new ImportCards(this).Command;
-  public IAsyncRelayCommand ExportCardsCommand => field ??= new ExportCards(this).Command;
-  public IAsyncRelayCommand<CardCollectionMTGCard> ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
-  public IRelayCommand<CardCollectionMTGCard> SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
+  public IAsyncRelayCommand? EditListCommand => field ??= new EditList(this).Command;
+  public IAsyncRelayCommand? ImportCardsCommand => field ??= new ImportCards(this).Command;
+  public IAsyncRelayCommand? ExportCardsCommand => field ??= new ExportCards(this).Command;
+  public IAsyncRelayCommand<CardCollectionMTGCard>? ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
+  public IRelayCommand<CardCollectionMTGCard>? SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
 
   public async Task UpdateQueryCards() => await Worker.DoWork(QueryCardsViewModel.UpdateQueryCards(Model.SearchQuery));
 }

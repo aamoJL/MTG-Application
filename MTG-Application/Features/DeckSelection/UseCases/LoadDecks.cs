@@ -30,24 +30,31 @@ public partial class DeckSelectorViewModelCommands
       commanderDTOs.AddRange(deckDTOs.Where(x => x.Commander != null).Select(x => x.Commander));
       commanderDTOs.AddRange(deckDTOs.Where(x => x.CommanderPartner != null).Select(x => x.CommanderPartner));
 
-      var commanders = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromDTOs(commanderDTOs))).Found;
-
-      foreach (var dto in deckDTOs)
+      try
       {
-        List<ColorTypes> colors = null;
+        var commanders = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromDTOs(commanderDTOs))).Found;
 
-        if (dto.Commander != null)
+        foreach (var dto in deckDTOs)
         {
-          colors = commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.ColorIdentity.ToList();
+          List<ColorTypes> colors = null;
 
-          if (dto.CommanderPartner != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.CommanderPartner?.ScryfallId)?.Info.ColorIdentity is ColorTypes[] partnerColors)
-            colors.AddRange(partnerColors);
+          if (dto.Commander != null)
+          {
+            colors = commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.ColorIdentity.ToList();
+
+            if (dto.CommanderPartner != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.CommanderPartner?.ScryfallId)?.Info.ColorIdentity is ColorTypes[] partnerColors)
+              colors?.AddRange(partnerColors);
+          }
+
+          Viewmodel.DeckItems.Add(new DeckSelectionDeck(
+            title: dto.Name,
+            imageUri: commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.FrontFace.ArtCropUri ?? string.Empty,
+            colors: colors?.Distinct().ToArray()));
         }
-
-        Viewmodel.DeckItems.Add(new DeckSelectionDeck(
-          title: dto.Name,
-          imageUri: commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.FrontFace.ArtCropUri ?? string.Empty,
-          colors: colors?.Distinct().ToArray()));
+      }
+      catch (System.Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
       }
     }
   }

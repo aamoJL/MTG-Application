@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 
-public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : IRepository<MTGCardDeckDTO>
+public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : IRepository<MTGCardDeckDTO>
 {
   public CardDbContextFactory DbContextFactory { get; } = dbContextFactory ?? new();
 
@@ -29,7 +29,7 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
     return await Task.FromResult(db.MTGDecks.FirstOrDefault(x => x.Name == name) != null);
   }
 
-  public virtual async Task<IEnumerable<MTGCardDeckDTO>> Get(Action<DbSet<MTGCardDeckDTO>> setIncludes = null)
+  public virtual async Task<IEnumerable<MTGCardDeckDTO>> Get(Action<DbSet<MTGCardDeckDTO>>? setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -45,7 +45,7 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
     return await Task.FromResult(items);
   }
 
-  public virtual async Task<MTGCardDeckDTO> Get(string name, Action<DbSet<MTGCardDeckDTO>> setIncludes = null)
+  public virtual async Task<MTGCardDeckDTO?> Get(string name, Action<DbSet<MTGCardDeckDTO>>? setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -53,11 +53,14 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
 
     var set = db.MTGDecks;
 
-    if (setIncludes != null) setIncludes.Invoke(set);
-    else SetDefaultIncludes(set);
+    if (setIncludes != null)
+      setIncludes.Invoke(set);
+    else
+      SetDefaultIncludes(set);
 
     var deck = set.Where(x => x.Name == name).FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
+
     return await Task.FromResult(deck);
   }
 
@@ -149,15 +152,15 @@ public class DeckDTORepository(CardDbContextFactory dbContextFactory = null) : I
       if (existingDeck.Commander != null)
         db.Remove(existingDeck.Commander);
 
-      existingDeck.Commander = item.Commander ?? null;
+      existingDeck.Commander = item?.Commander ?? null;
     }
 
-    if ((existingDeck.CommanderPartner != null || item.CommanderPartner != null) && existingDeck.CommanderPartner?.Compare(item?.CommanderPartner) is not true)
+    if ((existingDeck.CommanderPartner != null || item?.CommanderPartner != null) && existingDeck.CommanderPartner?.Compare(item?.CommanderPartner) is not true)
     {
       if (existingDeck.CommanderPartner != null)
         db.Remove(existingDeck.CommanderPartner);
 
-      existingDeck.CommanderPartner = item.CommanderPartner ?? null;
+      existingDeck.CommanderPartner = item?.CommanderPartner ?? null;
     }
 
     db.Update(existingDeck);

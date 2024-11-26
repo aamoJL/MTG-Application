@@ -10,7 +10,7 @@ namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.
 public record MTGCardDeckDTO
 {
   private MTGCardDeckDTO() { }
-  public MTGCardDeckDTO(string name, MTGCardDTO commander = null, MTGCardDTO partner = null, List<MTGCardDTO> deckCards = null, List<MTGCardDTO> wishlistCards = null, List<MTGCardDTO> maybelistCards = null, List<MTGCardDTO> removelistCards = null)
+  public MTGCardDeckDTO(string name, MTGCardDTO? commander = null, MTGCardDTO? partner = null, List<MTGCardDTO>? deckCards = null, List<MTGCardDTO>? wishlistCards = null, List<MTGCardDTO>? maybelistCards = null, List<MTGCardDTO>? removelistCards = null)
   {
     Name = name;
     Commander = commander;
@@ -22,9 +22,9 @@ public record MTGCardDeckDTO
   }
 
   [Key] public int Id { get; set; }
-  public string Name { get; set; }
-  public MTGCardDTO Commander { get; set; }
-  public MTGCardDTO CommanderPartner { get; set; }
+  [Required] public string Name { get; set; } = string.Empty;
+  public MTGCardDTO? Commander { get; set; }
+  public MTGCardDTO? CommanderPartner { get; set; }
   public List<MTGCardDTO> DeckCards { get; set; } = [];
   public List<MTGCardDTO> WishlistCards { get; set; } = [];
   public List<MTGCardDTO> MaybelistCards { get; set; } = [];

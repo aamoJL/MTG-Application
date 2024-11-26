@@ -47,32 +47,29 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
     get => CardCollectionViewModel.HasUnsavedChanges || CardCollectionListViewModel.HasUnsavedChanges;
     set
     {
-      CardCollectionViewModel.HasUnsavedChanges = value;
-      CardCollectionListViewModel.HasUnsavedChanges = value;
+      if (CardCollectionViewModel.HasUnsavedChanges != value || CardCollectionListViewModel.HasUnsavedChanges != value)
+      {
+        CardCollectionViewModel.HasUnsavedChanges = value;
+        CardCollectionListViewModel.HasUnsavedChanges = value;
 
-      OnPropertyChanged(nameof(HasUnsavedChanges));
+        OnPropertyChanged(nameof(HasUnsavedChanges));
+      }
     }
   }
   public bool IsBusy
   {
-    get => isBusy || CardCollectionViewModel.IsBusy || CardCollectionListViewModel.IsBusy;
-    set => SetProperty(ref isBusy, value);
+    get => field || CardCollectionViewModel.IsBusy || CardCollectionListViewModel.IsBusy;
+    set => SetProperty(ref field, value);
   }
 
   [ObservableProperty] public partial MTGCardCollectionList SelectedCardCollectionList { get; set; } = new();
   // Used to bind collection name to visual state trigger, so it does not update when CardCollectionViewModel changes with the same name
-  [ObservableProperty] public partial string CollectionName { get; set; }
+  [ObservableProperty] public partial string CollectionName { get; set; } = string.Empty;
 
-  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => (confirmUnsavedChanges ??= new ConfirmUnsavedChanges(this)).Command;
-  public IAsyncRelayCommand NewCollectionCommand => (newCollection ??= new ConfirmNewCollection(this)).Command;
-  public IAsyncRelayCommand OpenCollectionCommand => (openCollection ??= new ConfirmOpenCollection(this)).Command;
-  public IAsyncRelayCommand<MTGCardCollectionList> ChangeListCommand => (changeList ??= new ChangeList(this)).Command;
-
-  private bool isBusy;
-  private ConfirmUnsavedChanges confirmUnsavedChanges;
-  private ConfirmNewCollection newCollection;
-  private ConfirmOpenCollection openCollection;
-  private ChangeList changeList;
+  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => field ??= (new ConfirmUnsavedChanges(this).Command);
+  public IAsyncRelayCommand NewCollectionCommand => field ??= (new ConfirmNewCollection(this).Command);
+  public IAsyncRelayCommand OpenCollectionCommand => field ??= (new ConfirmOpenCollection(this).Command);
+  public IAsyncRelayCommand<MTGCardCollectionList> ChangeListCommand => field ??= (new ChangeList(this).Command);
 
   public async Task ChangeCollection(MTGCardCollection collection)
   {

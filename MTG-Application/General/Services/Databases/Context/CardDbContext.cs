@@ -12,10 +12,10 @@ namespace MTGApplication.General.Services.Databases.Context;
 /// </summary>
 public partial class CardDbContext(DbContextOptions options) : DbContext(options)
 {
-  public DbSet<MTGCardDeckDTO> MTGDecks { get; set; }
-  public DbSet<MTGCardDTO> MTGCards { get; set; }
-  public DbSet<MTGCardCollectionDTO> MTGCardCollections { get; set; }
-  public DbSet<MTGCardCollectionListDTO> MTGCardCollectionLists { get; set; }
+  public DbSet<MTGCardDeckDTO>? MTGDecks { get; set; }
+  public DbSet<MTGCardDTO>? MTGCards { get; set; }
+  public DbSet<MTGCardCollectionDTO>? MTGCardCollections { get; set; }
+  public DbSet<MTGCardCollectionListDTO>? MTGCardCollectionLists { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

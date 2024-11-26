@@ -132,7 +132,9 @@ public sealed partial class ManaCurveChart : MTGCardChart
   /// </summary>
   protected override void UpdateTheme()
   {
-    (XAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
-    (YAxes[0] as Axis).LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
+    if (XAxes[0] is Axis x)
+      x.LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
+    if (YAxes[0] is Axis y)
+      y.LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
   }
 }

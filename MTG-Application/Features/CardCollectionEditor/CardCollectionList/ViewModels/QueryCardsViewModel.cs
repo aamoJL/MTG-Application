@@ -46,12 +46,12 @@ public partial class QueryCardsViewModel : ObservableObject
     switch (e.Action)
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.NewItems[0] as MTGCard).Info.ScryfallId)
+        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.NewItems?[0] as MTGCard)?.Info.ScryfallId)
           is CardCollectionMTGCard existingNew)
           existingNew.IsOwned = true;
         break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.OldItems[0] as MTGCard).Info.ScryfallId)
+        if (QueryCards.Collection.FirstOrDefault(x => x.Info.ScryfallId == (e.OldItems?[0] as MTGCard)?.Info.ScryfallId)
           is CardCollectionMTGCard existingOld)
           existingOld.IsOwned = false;
         break;
@@ -63,7 +63,7 @@ public partial class QueryCardsViewModel : ObservableObject
     switch (e.Action)
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-        if (e.NewItems[0] is CardCollectionMTGCard newCard)
+        if (e.NewItems?[0] is CardCollectionMTGCard newCard)
           newCard.IsOwned = OwnedCards.FirstOrDefault(x => x.Info.ScryfallId == newCard.Info.ScryfallId) != null;
         break;
     }

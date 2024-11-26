@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 using MTGApplication.Features.DeckEditor.Editor.Models;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
@@ -25,9 +26,9 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
 
     DragAndDrop = new()
     {
-      OnCopy = async (item) => await OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
-      OnExternalImport = async (data) => await OnDropImport?.ExecuteAsync(data),
-      OnBeginMoveTo = async (item) => await OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+      OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
+      OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
+      OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
       OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       OnExecuteMove = (item) => OnDropExecuteMove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
       IsDropContentVisible = false,
@@ -67,9 +68,12 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
 
   private static void OnDependencyPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
+    if (sender is not CommanderTextView view)
+      return;
+
     if (e.Property.Equals(DragCopyCaptionTextProperty))
-      (sender as CommanderTextView).DragAndDrop.CopyCaptionOverride = (string)e.NewValue;
+      view.DragAndDrop.CopyCaptionOverride = (string)e.NewValue;
     else if (e.Property.Equals(DragMoveCaptionTextProperty))
-      (sender as CommanderTextView).DragAndDrop.MoveCaptionOverride = (string)e.NewValue;
+      view.DragAndDrop.MoveCaptionOverride = (string)e.NewValue;
   }
 }

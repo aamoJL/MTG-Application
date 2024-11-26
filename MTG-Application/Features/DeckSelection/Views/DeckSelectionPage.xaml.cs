@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckSelection.Models;
 using MTGApplication.Features.DeckSelection.ViewModels;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
+using MTGApplication.General.Services.NotificationService;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckSelection.Views;
@@ -36,5 +37,7 @@ public sealed partial class DeckSelectionPage : Page
 
     if (ViewModel.LoadDecksCommand.CanExecute(null))
       await ViewModel.LoadDecksCommand.ExecuteAsync(null);
+
+    NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 }

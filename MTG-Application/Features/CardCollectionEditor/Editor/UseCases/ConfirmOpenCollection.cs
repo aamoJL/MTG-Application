@@ -5,6 +5,7 @@ using MTGApplication.Features.CardCollectionEditor.Editor.Services.Converters;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,22 +21,33 @@ public partial class CardCollectionEditorViewModelCommands
 
       await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
 
-      if (unsavedArgs.Cancelled) return;
+      if (unsavedArgs.Cancelled)
+        return;
 
       if (await Viewmodel.Confirmers.LoadCollectionConfirmer.Confirm(
         CardCollectionEditorConfirmers.GetLoadCollectionConfirmation((await Viewmodel.Repository.Get(setIncludes: (set) => { })).Select(x => x.Name).OrderBy(x => x)))
         is not string loadName)
         return;
 
-      if (await Viewmodel.Worker.DoWork(LoadCollection(loadName)) is MTGCardCollection loadedCollection)
+      try
       {
-        await Viewmodel.ChangeCollection(loadedCollection);
+        if (await Viewmodel.Worker.DoWork(LoadCollection(loadName)) is MTGCardCollection loadedCollection)
+        {
+          await Viewmodel.ChangeCollection(loadedCollection);
 
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
+          new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
+        }
+        else new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
       }
-      else new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
+      catch (Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+      }
     }
 
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     private async Task<MTGCardCollection> LoadCollection(string loadName)
     {
       var dto = await new GetCardCollectionDTO(Viewmodel.Repository).Execute(loadName);
@@ -43,7 +55,11 @@ public partial class CardCollectionEditorViewModelCommands
       if (dto == null)
         return null;
 
-      return await new DTOToCardCollectionConverter(Viewmodel.Importer).Convert(dto);
+      try
+      {
+        return await new DTOToCardCollectionConverter(Viewmodel.Importer).Convert(dto);
+      }
+      catch { throw; }
     }
   }
 }

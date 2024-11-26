@@ -6,7 +6,6 @@ using Windows.System;
 
 namespace MTGApplication.General.Services.IOServices;
 
-// TODO: remove NetworkService and make the network requests on the origin method so the errors can be handled better.
 public static class NetworkService
 {
   public static readonly string JSON_MEDIA_TYPE = "application/json";
@@ -22,9 +21,10 @@ public static class NetworkService
     try
     {
       var client = new HttpClient();
-      var assemblyName = Assembly.GetExecutingAssembly().GetName();
+      var assemblyName = Assembly.GetExecutingAssembly().GetName() ?? throw new Exception("Assembly is null");
+
       client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
-      client.DefaultRequestHeaders.UserAgent.Add(new(assemblyName.Name, assemblyName.Version.ToString()));
+      client.DefaultRequestHeaders.UserAgent.Add(new(assemblyName!.Name ?? string.Empty, assemblyName!.Version?.ToString()));
 
       return await client.GetStringAsync(url);
     }
@@ -32,20 +32,25 @@ public static class NetworkService
   }
 
   /// <summary>
-  /// Fetches text from the given <paramref name="url"/> using POST with the given <paramref name="content"/>
+  /// Fetches Json string from the given url using POST
   /// </summary>
-  public static async Task<string> TryFetchStringFromUrlPostAsync(string url, string content)
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  public static async Task<string> PostJsonFromUrl(string url, string content)
   {
     try
     {
       var client = new HttpClient();
+      var assemblyName = Assembly.GetExecutingAssembly().GetName() ?? throw new Exception("Assembly is null");
+
       client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
-      client.DefaultRequestHeaders.UserAgent.Add(new("MTGApplication", "1"));
+      client.DefaultRequestHeaders.UserAgent.Add(new(assemblyName!.Name ?? string.Empty, assemblyName!.Version?.ToString()));
 
       return await (await client.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, JSON_MEDIA_TYPE)))
         .Content.ReadAsStringAsync();
     }
-    catch { return null; }
+    catch { throw; }
   }
 
   /// <summary>

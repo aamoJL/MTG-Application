@@ -142,19 +142,19 @@ public partial class CardCollectionEditorTests
     [TestMethod]
     public async Task Open_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
           LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success, () => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
@@ -162,19 +162,19 @@ public partial class CardCollectionEditorTests
     {
       _dependencies.Repository.GetFailure = true;
 
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
           LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]

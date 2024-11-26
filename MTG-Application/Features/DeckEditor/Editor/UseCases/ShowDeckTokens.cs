@@ -34,10 +34,17 @@ public partial class DeckEditorViewModelCommands
       if (Viewmodel.Partner != null)
         stringBuilder.AppendJoin(Environment.NewLine, Viewmodel.Partner.Info.Tokens.Select(t => t.ScryfallId.ToString()));
 
-      var tokens = (await Viewmodel.Worker.DoWork(new FetchCardsWithImportString(Viewmodel.Importer).Execute(stringBuilder.ToString()))).Found
-        .DistinctBy(t => t.Info.OracleId).Select(x => x.Info); // Filter duplicates out using OracleId
+      try
+      {
+        var tokens = (await Viewmodel.Worker.DoWork(new FetchCardsWithImportString(Viewmodel.Importer).Execute(stringBuilder.ToString()))).Found
+          .DistinctBy(t => t.Info.OracleId).Select(x => x.Info); // Filter duplicates out using OracleId
 
-      await Viewmodel.Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens.Select(x => new MTGCard(x))));
+        await Viewmodel.Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens.Select(x => new MTGCard(x))));
+      }
+      catch (Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+      }
     }
   }
 }

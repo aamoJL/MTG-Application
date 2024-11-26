@@ -18,8 +18,8 @@ public class MTGCardCollectionListDTO
   }
 
   [Key] public int Id { get; init; }
-  public string Name { get; set; }
-  public string SearchQuery { get; set; }
+  [Required] public string Name { get; set; } = string.Empty;
+  public string SearchQuery { get; set; } = string.Empty;
 
   public List<MTGCardDTO> Cards { get; init; } = [];
 }

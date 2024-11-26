@@ -87,7 +87,7 @@ public sealed partial class CardTypeDistributionChart : MTGCardChart
       DataLabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       DataLabelsSize = 10,
       DataLabelsPosition = PolarLabelsPosition.Outer,
-      DataLabelsFormatter = p => p.Context.Series.Name,
+      DataLabelsFormatter = p => p!.Context!.Series!.Name!,
       Mapping = (value, _) => new(double.NaN, value.Count)
     };
 

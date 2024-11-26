@@ -17,7 +17,7 @@ public record MTGCardCollectionDTO
   }
 
   [Key] public int Id { get; init; }
-  public string Name { get; init; }
+  [Required] public string Name { get; init; } = string.Empty;
 
   public List<MTGCardCollectionListDTO> CollectionLists { get; init; } = [];
 }

@@ -16,11 +16,18 @@ public partial class DeckTestingPageViewModel
     {
       var viewmodel = new DeckTestingPageViewModel(deck);
 
-      _ = UpdateTokens(viewmodel, deck);
-
+      try
+      {
+        _ = UpdateTokens(viewmodel, deck);
+      }
+      catch { }
+      
       return viewmodel;
     }
 
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     private async Task UpdateTokens(DeckTestingPageViewModel viewmodel, DeckTestingDeck deck)
     {
       var cardsWithTokens = new List<MTGCard>([.. deck.DeckCards.Where(x => x.Info.Tokens.Length > 0)]);
@@ -31,21 +38,32 @@ public partial class DeckTestingPageViewModel
       if (deck.Partner != null && deck.Partner.Info.Tokens.Length > 0)
         cardsWithTokens.Add(deck.Partner);
 
-      var tokens = await GetTokens(cardsWithTokens);
+      try
+      {
+        var tokens = await GetTokens(cardsWithTokens);
 
-      foreach (var item in tokens)
-        viewmodel.Tokens.Add(item);
+        foreach (var item in tokens)
+          viewmodel.Tokens.Add(item);
+      }
+      catch { throw; }
     }
 
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     private async Task<List<DeckTestingMTGCard>> GetTokens(List<MTGCard> cards)
     {
       var ids = string.Join(Environment.NewLine,
         cards.SelectMany(c => c.Info.Tokens.Select(t => t.ScryfallId.ToString())));
 
-      return (await new FetchCardsWithImportString(importer).Execute(ids)).Found
-        .Select(x => new DeckTestingMTGCard(x.Info) { IsToken = true })
-        .DistinctBy(x => x.Info.OracleId)
-        .ToList(); // Filter duplicates out using oracleId
+      try
+      {
+        return (await new FetchCardsWithImportString(importer).Execute(ids)).Found
+          .Select(x => new DeckTestingMTGCard(x.Info) { IsToken = true })
+          .DistinctBy(x => x.Info.OracleId) // Filter duplicates out using oracleId
+          .ToList();
+      }
+      catch { throw; }
     }
   }
 }

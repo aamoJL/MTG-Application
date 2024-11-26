@@ -30,7 +30,7 @@ public abstract class MTGCardChart : UserControl
 
   protected abstract void AddToSeries(DeckEditorMTGCard card);
 
-  protected abstract ISeries AddNewSeries(object property);
+  protected abstract ISeries? AddNewSeries(object property);
 
   protected virtual void ResetSeries() => Series.Clear();
 
@@ -38,31 +38,44 @@ public abstract class MTGCardChart : UserControl
 
   protected void OnCardsChanged(ObservableCollection<DeckEditorMTGCard> oldValue)
   {
-    if (oldValue != null) oldValue.CollectionChanged -= Cards_CollectionChanged;
-    if (Cards != null) Cards.CollectionChanged += Cards_CollectionChanged;
+    if (oldValue != null)
+      oldValue.CollectionChanged -= Cards_CollectionChanged;
+
+    if (Cards != null)
+      Cards.CollectionChanged += Cards_CollectionChanged;
 
     ResetSeries();
 
-    foreach (var card in Cards)
-      AddToSeries(card);
+    if (Cards != null)
+      foreach (var card in Cards)
+        AddToSeries(card);
   }
 
-  protected void Cards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  protected void Cards_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
     switch (e.Action)
     {
-      case System.Collections.Specialized.NotifyCollectionChangedAction.Add: AddToSeries(e.NewItems[0] as DeckEditorMTGCard); break;
-      case System.Collections.Specialized.NotifyCollectionChangedAction.Remove: RemoveFromSeries(e.OldItems[0] as DeckEditorMTGCard); break;
+      case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+        if (e.NewItems?[0] is DeckEditorMTGCard newCard)
+          AddToSeries(newCard);
+        break;
+      case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+        if (e.OldItems?[0] is DeckEditorMTGCard oldCard)
+          RemoveFromSeries(oldCard);
+        break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Reset: Series.Clear(); break;
     }
   }
 
-  protected void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  protected void LocalSettings_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
       UpdateTheme();
   }
 
   protected static void CardsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-    => (sender as MTGCardChart).OnCardsChanged(e.OldValue as ObservableCollection<DeckEditorMTGCard>);
+  {
+    if (sender is MTGCardChart chart && e.OldValue is ObservableCollection<DeckEditorMTGCard> collection)
+      chart.OnCardsChanged(collection);
+  }
 }

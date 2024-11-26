@@ -29,7 +29,8 @@ public sealed partial class TextAreaDialog : StringDialog
   {
     Loaded -= TextAreaDialog_Loaded;
 
-    (Content as TextBox).SelectionStart = InputText.Length;
+    if (Content is TextBox box)
+      box.SelectionStart = InputText.Length;
   }
 
   private void TextBox_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)

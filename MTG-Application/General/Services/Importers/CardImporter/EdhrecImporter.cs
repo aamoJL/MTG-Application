@@ -61,12 +61,12 @@ public partial class EdhrecImporter
     try
     {
       var json = JsonNode.Parse(await NetworkService.GetJsonFromUrl(uri));
-      var themeNodes = json["panels"]?["tribelinks"]?.AsArray();
+      var themeNodes = json?["panels"]?["tribelinks"]?.AsArray();
 
       return themeNodes?.Select(
         x => new CommanderTheme(
-          x["value"].GetValue<string>(),
-          GetApiUri(commander, partner, GetLeadingSlash().Replace(x["href-suffix"].GetValue<string>(), string.Empty))))
+          x?["value"]?.GetValue<string>(),
+          GetApiUri(commander, partner, GetLeadingSlash().Replace(x?["href-suffix"]?.GetValue<string>() ?? string.Empty, string.Empty))))
         .ToArray()
        ?? [];
     }
@@ -84,9 +84,9 @@ public partial class EdhrecImporter
       var jsonString = await NetworkService.GetJsonFromUrl(uri);
       var json = JsonNode.Parse(jsonString);
 
-      return json["container"]?["json_dict"]?["cardlists"].AsArray()
-        .FirstOrDefault(x => x["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
-        .Select(x => x["name"]!.GetValue<string>()).ToArray()
+      return json?["container"]?["json_dict"]?["cardlists"]?.AsArray()
+        .FirstOrDefault(x => x?["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
+        .Select(x => x?["name"]?.GetValue<string>()).ToArray()
         ?? [];
     }
     catch { throw; }

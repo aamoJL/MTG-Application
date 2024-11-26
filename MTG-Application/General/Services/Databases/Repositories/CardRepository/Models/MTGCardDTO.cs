@@ -32,12 +32,12 @@ public record MTGCardDTO
   }
 
   [Key] public int Id { get; init; }
-  public string Name { get; init; }
-  public int Count { get; set; }
-  public Guid ScryfallId { get; set; }
-  public Guid OracleId { get; set; }
-  public string SetCode { get; set; }
-  public string CollectorNumber { get; set; }
+  [Required] public string Name { get; init; } = string.Empty;
+  [Required] public int Count { get; set; } = 1;
+  public Guid ScryfallId { get; set; } = Guid.Empty;
+  public Guid OracleId { get; set; } = Guid.Empty;
+  public string SetCode { get; set; } = string.Empty;
+  public string CollectorNumber { get; set; } = string.Empty;
   [Required] public string Group { get; set; } = string.Empty;
 
   /// <summary>

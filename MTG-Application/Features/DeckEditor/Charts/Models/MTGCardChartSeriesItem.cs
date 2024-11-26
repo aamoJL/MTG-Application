@@ -18,9 +18,13 @@ public partial class MTGCardChartSeriesItem : ObservableObject
     switch (e.Action)
     {
       case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-        (e.NewItems[0] as DeckEditorMTGCard).PropertyChanged += CardsItem_PropertyChanged; break;
+        if (e.NewItems?[0] is DeckEditorMTGCard newCard)
+          newCard.PropertyChanged += CardsItem_PropertyChanged;
+        break;
       case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-        (e.OldItems[0] as DeckEditorMTGCard).PropertyChanged -= CardsItem_PropertyChanged; break;
+        if (e.OldItems?[0] is DeckEditorMTGCard oldCard)
+          oldCard.PropertyChanged -= CardsItem_PropertyChanged;
+        break;
     }
 
     OnPropertyChanged(nameof(Count));

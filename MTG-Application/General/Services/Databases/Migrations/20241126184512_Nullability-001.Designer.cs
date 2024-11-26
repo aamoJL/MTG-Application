@@ -3,16 +3,19 @@ using System;
 using MTGApplication.General.Services.Databases.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace MTGApplication.General.Databases
+namespace MTGApplication.General.Services.Databases.Migrations
 {
     [DbContext(typeof(CardDbContext))]
-    partial class CardDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241126184512_Nullability-001")]
+    partial class Nullability001
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");

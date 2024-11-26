@@ -24,28 +24,35 @@ public partial class CardCollectionEditorViewModelCommands
         is not string importText || string.IsNullOrEmpty(importText))
         return;
 
-      // Fetch imported cards and add the cards that are included in the query but not in the owned cards
-      var importResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(importText));
-      var queryResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(Viewmodel.Query, pagination: false));
+      try
+      {
+        // Fetch imported cards and add the cards that are included in the query but not in the owned cards
+        var importResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(importText));
+        var queryResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(Viewmodel.Query, pagination: false));
 
-      var addedCards = importResult.Found.Select(f => new CardCollectionMTGCard(f.Info))
-        .IntersectBy(queryResult.Found.Select(c => c.Info.ScryfallId), f => f.Info.ScryfallId)
-        .ExceptBy(Viewmodel.OwnedCards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
-        .DistinctBy(x => x.Info.ScryfallId)
-        .ToList();
+        var addedCards = importResult.Found.Select(f => new CardCollectionMTGCard(f.Info))
+          .IntersectBy(queryResult.Found.Select(c => c.Info.ScryfallId), f => f.Info.ScryfallId)
+          .ExceptBy(Viewmodel.OwnedCards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
+          .DistinctBy(x => x.Info.ScryfallId)
+          .ToList();
 
-      foreach (var card in addedCards)
-        Viewmodel.OwnedCards.Add(new(card.Info));
+        foreach (var card in addedCards)
+          Viewmodel.OwnedCards.Add(new(card.Info));
 
-      Viewmodel.HasUnsavedChanges = true;
+        Viewmodel.HasUnsavedChanges = true;
 
-      if (importResult.Found.Length == 0)
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsError);
-      else
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsSuccessOrWarning(
-          added: addedCards.Count,
-          skipped: importResult.Found.Length - addedCards.Count,
-          notFound: importResult.NotFoundCount));
+        if (importResult.Found.Length == 0)
+          new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsError);
+        else
+          new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsSuccessOrWarning(
+            added: addedCards.Count,
+            skipped: importResult.Found.Length - addedCards.Count,
+            notFound: importResult.NotFoundCount));
+      }
+      catch (System.Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+      }
     }
   }
 }

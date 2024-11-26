@@ -49,17 +49,18 @@ public partial class GroupedCardListViewModelTest
     public void RemoveCardGroup_Exists_SuccessNotificationSent()
     {
       var name = "New Group";
+      var notifier = new TestNotifier();
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter())
       {
-        Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
+        Notifier = notifier
       };
 
       viewmodel.Groups.Add(new(name, viewmodel));
 
-      NotificationAssert.NotificationSent(
-        MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Success,
-        () => viewmodel.RemoveGroupCommand.Execute(name));
+      viewmodel.RemoveGroupCommand.Execute(name);
+
+      NotificationAssert.NotificationSent(MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Success, notifier);
     }
 
     [TestMethod]
@@ -82,15 +83,16 @@ public partial class GroupedCardListViewModelTest
     [TestMethod]
     public void RemoveCardGroup_DoesNotExist_ErrorNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter())
       {
-        Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
+        Notifier = notifier
       };
 
-      NotificationAssert.NotificationSent(
-        MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Error,
-        () => viewmodel.RemoveGroupCommand.Execute("New group"));
+      viewmodel.RemoveGroupCommand.Execute("New group");
+
+      NotificationAssert.NotificationSent(MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Error, notifier);
     }
 
     [TestMethod]

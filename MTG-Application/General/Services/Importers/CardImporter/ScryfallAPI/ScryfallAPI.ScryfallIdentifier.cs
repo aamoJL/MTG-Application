@@ -17,7 +17,8 @@ public partial class ScryfallAPI
     public ScryfallIdentifier() { }
     public ScryfallIdentifier(MTGCardDTO card)
     {
-      if (card == null) return;
+      if (card == null)
+        return;
 
       ScryfallId = card.ScryfallId;
       Name = card.Name;

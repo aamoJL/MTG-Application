@@ -98,7 +98,9 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
 
     WindowClosing.Closing -= WindowClosing_Closing;
     WindowClosing.Closed -= WindowClosing_Closed;
-    Frame.Navigated -= Frame_Navigated;
+
+    if (Frame != null)
+      Frame.Navigated -= Frame_Navigated;
   }
 }
 

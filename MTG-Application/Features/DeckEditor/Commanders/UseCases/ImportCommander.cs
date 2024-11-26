@@ -14,18 +14,25 @@ public partial class CommanderViewModelCommands
   {
     protected override async Task Execute(string data)
     {
-      var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
-
-      if (result.Found.Length == 0)
-        new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportError);
-      else if (!result.Found[0].Info.TypeLine.Contains("Legendary", System.StringComparison.OrdinalIgnoreCase))
-        new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportNotLegendaryError);
-      else
+      try
       {
-        // Only legendary cards are allowed to be commanders
-        await Viewmodel.ChangeCommanderCommand.ExecuteAsync(new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count));
+        var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
 
-        new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
+        if (result.Found.Length == 0)
+          new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportError);
+        else if (!result.Found[0].Info.TypeLine.Contains("Legendary", System.StringComparison.OrdinalIgnoreCase))
+          new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportNotLegendaryError);
+        else
+        {
+          // Only legendary cards are allowed to be commanders
+          await Viewmodel.ChangeCommanderCommand.ExecuteAsync(new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count));
+
+          new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
+        }
+      }
+      catch (System.Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
       }
     }
   }

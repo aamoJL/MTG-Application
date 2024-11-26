@@ -42,14 +42,17 @@ public abstract partial class CustomContentDialog<T> : ContentDialog
     var smokeLayer = root.FindChildByName("SmokeLayerBackground") as FrameworkElement;
     var pressed = false;
 
-    smokeLayer.PointerPressed += (sender, e) => pressed = true;
-    smokeLayer.PointerReleased += (sender, e) =>
+    if (smokeLayer != null)
     {
-      if (pressed == true)
-        Hide();
+      smokeLayer.PointerPressed += (sender, e) => pressed = true;
+      smokeLayer.PointerReleased += (sender, e) =>
+      {
+        if (pressed == true)
+          Hide();
 
-      pressed = false;
-    };
+        pressed = false;
+      };
+    }
   }
 
   private void SetPrimaryButtonStyle()

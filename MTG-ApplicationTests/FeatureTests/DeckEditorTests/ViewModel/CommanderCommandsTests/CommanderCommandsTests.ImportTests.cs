@@ -51,49 +51,49 @@ public partial class CommanderCommandsTests
     [TestMethod("Success notifications should be sent when the import was successfull")]
     public async Task Import_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       };
 
       JsonService.TrySerializeObject(import, out var json);
 
-      await NotificationAssert.NotificationSent(CommanderNotifications.ImportSuccess, () => viewmodel.ImportCommanderCommand.ExecuteAsync(json));
+      await viewmodel.ImportCommanderCommand.ExecuteAsync(json);
+
+      NotificationAssert.NotificationSent(CommanderNotifications.ImportSuccess, notifier);
     }
 
     [TestMethod("Error notification should be sent when the import fails")]
     public async Task Import_Failure_ErrorNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(CommanderNotifications.ImportError, () => viewmodel.ImportCommanderCommand.ExecuteAsync("Invalid json"));
+      await viewmodel.ImportCommanderCommand.ExecuteAsync("Invalid json");
+
+      NotificationAssert.NotificationSent(CommanderNotifications.ImportError, notifier);
     }
 
     [TestMethod("Error notification should be sent when the import fails")]
     public async Task Import_NotLegendary_LegendaryErrorNotificationSent()
     {
+      var notifier = new TestNotifier();
       var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       };
 
       JsonService.TrySerializeObject(import, out var json);
 
-      await NotificationAssert.NotificationSent(CommanderNotifications.ImportNotLegendaryError, () => viewmodel.ImportCommanderCommand.ExecuteAsync(json));
+      await viewmodel.ImportCommanderCommand.ExecuteAsync(json);
+
+      NotificationAssert.NotificationSent(CommanderNotifications.ImportNotLegendaryError, notifier);
     }
   }
 }

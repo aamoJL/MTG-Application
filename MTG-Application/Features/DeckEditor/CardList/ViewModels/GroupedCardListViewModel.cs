@@ -36,16 +36,16 @@ public partial class CardGroupViewModel : ObservableObject
   public IAsyncRelayCommand RenameGroupCommand => Commands.RenameGroupCommand;
   public IAsyncRelayCommand<string> ImportCardsToGroupCommand => Commands.ImportCardsToGroupCommand;
 
-  private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  private void Items_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs __)
     => OnChange();
 }
 
 public partial class GroupedCardListViewModel : CardListViewModel
 {
-  public GroupedCardListViewModel(MTGCardImporter importer, GroupedCardListConfirmers confirmers = null) : base(importer, confirmers)
+  public GroupedCardListViewModel(MTGCardImporter importer, GroupedCardListConfirmers? confirmers = null) : base(importer, confirmers)
   {
     Commands = new(this);
-    Confirmers ??= confirmers;
+    Confirmers ??= confirmers ?? new();
 
     PropertyChanging += GroupedCardListViewModel_PropertyChanging;
     PropertyChanged += GroupedCardListViewModel_PropertyChanged;
@@ -74,13 +74,13 @@ public partial class GroupedCardListViewModel : CardListViewModel
     }
   }
 
-  private void GroupedCardListViewModel_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
+  private void GroupedCardListViewModel_PropertyChanging(object? _, System.ComponentModel.PropertyChangingEventArgs e)
   {
     if (e.PropertyName == nameof(Cards))
       Cards.CollectionChanged -= Cards_CollectionChanged;
   }
 
-  private void GroupedCardListViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void GroupedCardListViewModel_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(Cards))
     {
@@ -107,12 +107,12 @@ public partial class GroupedCardListViewModel : CardListViewModel
     }
   }
 
-  private void Cards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  private void Cards_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
-    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add
+      && e.NewItems?[0] is DeckEditorMTGCard newCard)
     {
-      var card = (e.NewItems[0] as DeckEditorMTGCard);
-      var key = card.Group;
+      var key = newCard.Group;
       var group = Groups.FirstOrDefault(x => key == x.Key);
 
       if (group == null)
@@ -122,14 +122,14 @@ public partial class GroupedCardListViewModel : CardListViewModel
         group = addAction.Group;
       }
 
-      group.Items.Add(card);
+      group.Items.Add(newCard);
     }
-    else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+    else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove
+      && e.OldItems?[0] is DeckEditorMTGCard oldCard)
     {
-      var key = (e.OldItems[0] as DeckEditorMTGCard).Group;
+      var key = oldCard.Group;
 
-      Groups.FirstOrDefault(x => key == x.Key)
-        ?.Items.Remove(e.OldItems[0] as DeckEditorMTGCard);
+      Groups.FirstOrDefault(x => key == x.Key)?.Items.Remove(oldCard);
     }
   }
 }

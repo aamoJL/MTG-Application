@@ -165,6 +165,7 @@ public partial class CardCollectionListViewModelTests
     {
       _dependencies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo())];
 
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -175,11 +176,12 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult<string?>("Import"),
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
@@ -188,6 +190,7 @@ public partial class CardCollectionListViewModelTests
       _dependencies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo())];
       _dependencies.Importer.NotFoundCount = 1;
 
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -198,11 +201,12 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult<string?>("Import"),
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Warning,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Warning, notifier);
     }
 
     [TestMethod]
@@ -212,6 +216,7 @@ public partial class CardCollectionListViewModelTests
 
       _dependencies.Importer.ExpectedCards = [card];
 
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = new() { Name = "asd", Cards = [new(card.Info)] },
@@ -222,11 +227,12 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult<string?>("Import"),
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
@@ -239,6 +245,7 @@ public partial class CardCollectionListViewModelTests
         new CardImportResult.Card(MTGCardInfoMocker.MockInfo())
       ];
 
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = new() { Name = "asd", Cards = [new(existingCard.Info)] },
@@ -249,11 +256,12 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult<string?>("Import"),
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
@@ -262,6 +270,7 @@ public partial class CardCollectionListViewModelTests
       _dependencies.Importer.ExpectedCards = [];
       _dependencies.Importer.NotFoundCount = 1;
 
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -272,11 +281,12 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult<string?>("Import"),
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
   }
 }

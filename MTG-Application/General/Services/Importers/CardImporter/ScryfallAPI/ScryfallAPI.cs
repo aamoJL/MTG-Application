@@ -34,10 +34,6 @@ public partial class ScryfallAPI : MTGCardImporter
   public override string Name => "Scryfall";
   public override int PageSize => 175;
 
-  /// <exception cref="InvalidOperationException"></exception>
-  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-  /// <exception cref="UriFormatException"></exception>
-  /// <exception cref="System.Text.Json.JsonException"></exception>
   public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
     if (string.IsNullOrEmpty(searchParams))
@@ -50,10 +46,6 @@ public partial class ScryfallAPI : MTGCardImporter
     catch { throw; }
   }
 
-  /// <exception cref="InvalidOperationException"></exception>
-  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-  /// <exception cref="UriFormatException"></exception>
-  /// <exception cref="System.Text.Json.JsonException"></exception>
   public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var pageResults = new List<CardImportResult>();
@@ -66,10 +58,11 @@ public partial class ScryfallAPI : MTGCardImporter
         if (await NetworkService.GetJsonFromUrl(currentPage) is not string data || string.IsNullOrEmpty(data))
           break;
 
-        var rootNode = JsonNode.Parse(data);
+        if (JsonNode.Parse(data) is not JsonNode rootNode)
+          break;
 
         List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
-        var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
+        var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() ?? "" : "";
         var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
         pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
 
@@ -120,19 +113,27 @@ public partial class ScryfallAPI : MTGCardImporter
       {
         return new ScryfallIdentifier()
         {
-          Name = nameMatch.Trim(),
+          Name = nameMatch?.Trim() ?? "",
           CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
         };
       }
     })));
 
-    return await FetchWithIdentifiers(identifiers);
+    try
+    {
+      return await FetchWithIdentifiers(identifiers);
+    }
+    catch { throw; }
   }
 
   public override async Task<CardImportResult> ImportFromDTOs(IEnumerable<MTGCardDTO> dtos)
   {
-    var identifiers = dtos.Select(x => new ScryfallIdentifier(x)).ToArray();
-    return await FetchWithIdentifiers(identifiers);
+    try
+    {
+      var identifiers = dtos.Select(x => new ScryfallIdentifier(x)).ToArray();
+      return await FetchWithIdentifiers(identifiers);
+    }
+    catch { throw; }
   }
 
   /// <summary>
@@ -140,12 +141,13 @@ public partial class ScryfallAPI : MTGCardImporter
   /// </summary>
   protected async Task<IEnumerable<CardImportResult.Card>> GetCardsFromJsonObject(JsonNode jsonNode, bool paperOnly = false)
   {
-    if (jsonNode == null) { return []; }
+    if (jsonNode == null)
+      return [];
 
     var cards = new List<CardImportResult.Card>();
 
-    if (jsonNode?["data"] is JsonNode dataNode)
-      foreach (var itemInfo in await Task.WhenAll(dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x, paperOnly)))))
+    if (jsonNode["data"] is JsonNode dataNode)
+      foreach (var itemInfo in await Task.WhenAll(dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x!, paperOnly)))))
         if (itemInfo != null)
           cards.Add(new(itemInfo));
 
@@ -155,7 +157,7 @@ public partial class ScryfallAPI : MTGCardImporter
   /// <summary>
   /// Converts Scryfall API Json object to <see cref="MTGCardInfo"/> object
   /// </summary>
-  private MTGCardInfo GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
+  private MTGCardInfo? GetCardInfoFromJSON(JsonNode json, bool paperOnly = false)
   {
     /// <summary>
     /// Converts the colorArray to <see cref="ColorTypes"/> array
@@ -173,53 +175,53 @@ public partial class ScryfallAPI : MTGCardImporter
 
     if (json == null || json["object"]?.GetValue<string>() != "card")
       return null;
-    if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x.GetValue<string>() == "paper") is null)
+    if (paperOnly && json["games"]?.AsArray().FirstOrDefault(x => x?.GetValue<string>() == "paper") is null)
       return null;
 
     // https://scryfall.com/docs/api/cards
-    var scryfallId = json["id"].GetValue<Guid>();
-    var cmc = (int)(json["cmc"]?.GetValue<float>() ?? json["card_faces"].AsArray()[0]["cmc"].GetValue<float>());
-    var name = json["name"].GetValue<string>();
-    var typeLine = json["type_line"]?.GetValue<string>() ?? json["card_faces"].AsArray()[0]["type_line"].GetValue<string>();
-    var setCode = json["set"].GetValue<string>();
-    var setName = json["set_name"].GetValue<string>();
-    var collectorNumber = json["collector_number"].GetValue<string>();
+    var scryfallId = json["id"]?.GetValue<Guid>();
+    var cmc = (int?)(json["cmc"]?.GetValue<float>() ?? json["card_faces"]?.AsArray()[0]?["cmc"]?.GetValue<float>());
+    var name = json["name"]?.GetValue<string>() ?? string.Empty;
+    var typeLine = json["type_line"]?.GetValue<string>() ?? json["card_faces"]?.AsArray()[0]?["type_line"]?.GetValue<string>() ?? string.Empty;
+    var setCode = json["set"]?.GetValue<string>() ?? string.Empty;
+    var setName = json["set_name"]?.GetValue<string>() ?? string.Empty;
+    var collectorNumber = json["collector_number"]?.GetValue<string>() ?? string.Empty;
     _ = float.TryParse(json["prices"]?["eur"]?.GetValue<string>(), NumberStyles.Float, CultureInfo.InvariantCulture, out var price);
-    var apiWebsiteUri = json["scryfall_uri"]?.GetValue<string>();
+    var apiWebsiteUri = json["scryfall_uri"]?.GetValue<string>() ?? string.Empty;
     var setIconUri = $"{SET_ICON_URL}/{setCode}.svg";
-    var printSearchUri = json["prints_search_uri"]?.GetValue<string>();
-    var cardMarketUri = json["purchase_uris"]?["cardmarket"]?.GetValue<string>();
-    var colorIdentity = GetColors(json["color_identity"].AsArray().Select(x => x.GetValue<string>()).ToArray());
+    var printSearchUri = json["prints_search_uri"]?.GetValue<string>() ?? string.Empty;
+    var cardMarketUri = json["purchase_uris"]?["cardmarket"]?.GetValue<string>() ?? string.Empty;
+    var colorIdentity = GetColors(json["color_identity"]?.AsArray().Select(x => x!.GetValue<string>()).ToArray() ?? []);
 
-    CardFace frontFace = null;
-    CardFace backFace = null;
+    CardFace? frontFace = null;
+    CardFace? backFace = null;
 
     frontFace = new CardFace(
-      colors: json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray())
-        : GetColors(json["card_faces"]?.AsArray()[0]["colors"]?.AsArray().Select(x => x.GetValue<string>()).ToArray()),
-      name: json["card_faces"]?.AsArray()[0]["name"]?.GetValue<string>() ?? json["name"]?.GetValue<string>(),
-      imageUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["normal"]?.GetValue<string>() ?? json["image_uris"]?["normal"]?.GetValue<string>(),
-      artCropUri: json["card_faces"]?.AsArray()[0]["image_uris"]?["art_crop"]?.GetValue<string>() ?? json["image_uris"]?["art_crop"]?.GetValue<string>(),
-      illustrationId: json["card_faces"]?.AsArray()[0]["illustration_id"]?.GetValue<Guid?>() ?? json["illustration_id"]?.GetValue<Guid?>(),
-      oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? json["oracle_text"]?.GetValue<string>() ?? string.Empty
+      colors: json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray())
+        : GetColors(json["card_faces"]?.AsArray()[0]?["colors"]?.AsArray().Select(x => x!.GetValue<string>()).ToArray() ?? []),
+      name: json["card_faces"]?.AsArray()[0]?["name"]?.GetValue<string>() ?? json["name"]?.GetValue<string>() ?? string.Empty,
+      imageUri: json["card_faces"]?.AsArray()[0]?["image_uris"]?["normal"]?.GetValue<string>() ?? json["image_uris"]?["normal"]?.GetValue<string>() ?? string.Empty,
+      artCropUri: json["card_faces"]?.AsArray()[0]?["image_uris"]?["art_crop"]?.GetValue<string>() ?? json["image_uris"]?["art_crop"]?.GetValue<string>() ?? string.Empty,
+      illustrationId: json["card_faces"]?.AsArray()[0]?["illustration_id"]?.GetValue<Guid?>() ?? json["illustration_id"]?.GetValue<Guid?>(),
+      oracleText: json["card_faces"]?.AsArray()[0]?["oracle_text"]?.GetValue<string>() ?? json["oracle_text"]?.GetValue<string>() ?? string.Empty
       );
 
-    if (json["card_faces"] != null)
+    if (json["card_faces"]?.AsArray() is JsonNode faces)
       backFace = new CardFace(
-        colors: json["card_faces"]!.AsArray()[1]["colors"] != null ? GetColors(json["card_faces"]?.AsArray()[1]["colors"]!.AsArray().Select(x => x.GetValue<string>()).ToArray()) : [],
-        name: json["card_faces"]?.AsArray()[1]["name"]?.GetValue<string>() ?? string.Empty,
-        imageUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["normal"]?.GetValue<string>() ?? null,
-        artCropUri: json["card_faces"]?.AsArray()[1]["image_uris"]?["art_crop"]?.GetValue<string>() ?? null,
-        illustrationId: json["card_faces"]?.AsArray()[1]["illustration_id"]?.GetValue<Guid?>() ?? null,
-        oracleText: json["card_faces"]?.AsArray()[0]["oracle_text"]?.GetValue<string>() ?? string.Empty);
+        colors: GetColors(faces[1]?["colors"]?.AsArray().Select(x => x!.GetValue<string>()).ToArray() ?? []),
+        name: faces[1]?["name"]?.GetValue<string>() ?? string.Empty,
+        imageUri: faces[1]?["image_uris"]?["normal"]?.GetValue<string>() ?? string.Empty,
+        artCropUri: faces[1]?["image_uris"]?["art_crop"]?.GetValue<string>() ?? string.Empty,
+        illustrationId: faces[1]?["illustration_id"]?.GetValue<Guid?>() ?? null,
+        oracleText: faces[0]?["oracle_text"]?.GetValue<string>() ?? string.Empty);
 
-    var rarityString = json["rarity"].GetValue<string>();
+    var rarityString = json["rarity"]?.GetValue<string>();
     var rarityType = RarityTypes.Common;
 
     if (Enum.TryParse(rarityString, true, out RarityTypes type))
       rarityType = type;
 
-    var producedManaStringArray = json["produced_mana"]?.AsArray().Select(x => x.GetValue<string>()).ToArray();
+    var producedManaStringArray = json["produced_mana"]?.AsArray().Select(x => x?.GetValue<string>()).ToArray();
     var producedManaList = new List<ColorTypes>();
 
     if (producedManaStringArray != null)
@@ -227,14 +229,17 @@ public partial class ScryfallAPI : MTGCardImporter
         if (Enum.TryParse(colorString, true, out ColorTypes color))
           producedManaList.Add(color);
 
-    var tokens = json["all_parts"]?.AsArray().Where(x => x["component"]?.GetValue<string>() == "token").Select(x => new CardToken(x["id"]!.GetValue<Guid>())).ToArray();
-    var oracle = json["oracle_id"]?.GetValue<Guid>() ?? json["card_faces"]?.AsArray()[0]["oracle_id"]?.GetValue<Guid>() ?? Guid.Empty;
+    var tokens = json["all_parts"]?.AsArray().Where(x => x?["component"]?.GetValue<string>() == "token").Select(x => new CardToken(x?["id"]?.GetValue<Guid>() ?? new())).ToArray();
+    var oracle = json["oracle_id"]?.GetValue<Guid>() ?? json["card_faces"]?.AsArray()[0]?["oracle_id"]?.GetValue<Guid>() ?? Guid.Empty;
+
+    if (scryfallId == null || cmc == null)
+      return null;
 
     return new MTGCardInfo(
-      scryfallId: scryfallId,
+      scryfallId: scryfallId!.Value,
       frontFace: frontFace,
       backFace: backFace,
-      cmc: cmc,
+      cmc: cmc!.Value,
       name: name,
       typeLine: typeLine,
       setCode: setCode,
@@ -256,6 +261,9 @@ public partial class ScryfallAPI : MTGCardImporter
   /// <summary>
   /// Fetches MTGCards from the API using the given identifier objects
   /// </summary>
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
   private async Task<CardImportResult> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
   {
     var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
@@ -265,25 +273,29 @@ public partial class ScryfallAPI : MTGCardImporter
       var fetchedCards = new List<CardImportResult.Card>();
       var notFoundCount = 0;
 
-      // Fetch and covert the JSON to card objects
-      if (JsonService.TryParseJson(await NetworkService.TryFetchStringFromUrlPostAsync(COLLECTION_URL, identifiersJson), out var rootNode))
+      try
       {
-        notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
-
-        if (rootNode?["data"]?.AsArray() is JsonArray dataArray)
+        // Fetch and covert the JSON to card objects
+        if (JsonService.TryParseJson(await NetworkService.PostJsonFromUrl(COLLECTION_URL, identifiersJson), out var rootNode))
         {
-          foreach (var item in dataArray)
+          notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
+
+          if (rootNode?["data"]?.AsArray() is JsonArray dataArray)
           {
-            if (GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
+            foreach (var item in dataArray)
             {
-              var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo));
-              fetchedCards.Add(new(Info: cardInfo, Count: identifier.CardCount, Group: identifier.CardGroup));
+              if (item != null && GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
+              {
+                var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo));
+                fetchedCards.Add(new(Info: cardInfo, Count: identifier.CardCount, Group: identifier.CardGroup));
+              }
             }
           }
         }
-      }
 
-      return (Found: fetchedCards, NotFoundCount: notFoundCount);
+        return (Found: fetchedCards, NotFoundCount: notFoundCount);
+      }
+      catch { throw; }
     })));
 
     var found = fetchResults.SelectMany(x => x.Found).ToArray();

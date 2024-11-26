@@ -39,7 +39,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     RemoveFromProducers(card);
   }
 
-  protected override ISeries AddNewSeries(object property)
+  protected override ISeries? AddNewSeries(object? property)
   {
     Series.Add(CreateNewCostsSeries());
     Series.Add(CreateNewProducersSeries());

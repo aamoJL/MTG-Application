@@ -47,7 +47,7 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     get => field;
     set
     {
-      if(field != value)
+      if (field != value)
       {
         field = value;
         PropertyChanged?.Invoke(this, new(nameof(SelectedFaceUri)));
@@ -73,7 +73,7 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     if (!CanExecuteSwitchFaceImage()) return;
 
     SelectedFaceUri = Model?.Info.FrontFace.ImageUri == SelectedFaceUri
-      ? Model.Info.BackFace?.ImageUri : Model.Info.FrontFace.ImageUri;
+      ? Model.Info.BackFace?.ImageUri : Model?.Info.FrontFace.ImageUri;
   }
 
   /// <summary>
@@ -148,7 +148,8 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
 
   protected static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
-    var view = (sender as BasicCardView<TCard>);
+    if (sender is not BasicCardView<TCard> view)
+      return;
 
     if (e.Property.Equals(ModelProperty))
     {

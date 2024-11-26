@@ -203,6 +203,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task ImportExternalCards_AllFound_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         ExpectedCards = [new(MTGCardInfoMocker.MockInfo())]
@@ -211,16 +212,18 @@ public partial class CardListViewModelTests
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       })
       {
-        Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(NotificationService.NotificationType.Success,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationService.NotificationType.Success, notifier);
     }
 
     [TestMethod]
     public async Task ImportExternalCards_NotFound_ErrorNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         NotFoundCount = 1,
@@ -230,16 +233,18 @@ public partial class CardListViewModelTests
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       })
       {
-        Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(NotificationService.NotificationType.Error,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationService.NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task ImportExternalCards_SomeFound_WarningNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
         NotFoundCount = 1,
@@ -249,11 +254,12 @@ public partial class CardListViewModelTests
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult("expcted cards"); } },
       })
       {
-        Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(NotificationService.NotificationType.Warning,
-        () => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationService.NotificationType.Warning, notifier);
     }
 
     [TestMethod]

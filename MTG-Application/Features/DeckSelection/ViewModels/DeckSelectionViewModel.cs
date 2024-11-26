@@ -7,6 +7,7 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Mode
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckSelection.ViewModels;
 public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, MTGCardImporter importer) : ObservableObject, IWorker
@@ -14,6 +15,7 @@ public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> reposito
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];
   public IRepository<MTGCardDeckDTO> Repository { get; } = repository;
   public MTGCardImporter Importer { get; } = importer;
+  public Notifier Notifier { get; } = new();
   public IWorker Worker => this;
 
   [ObservableProperty] public partial bool IsBusy { get; set; }

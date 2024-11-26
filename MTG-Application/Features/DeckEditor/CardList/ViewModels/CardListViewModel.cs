@@ -17,7 +17,7 @@ namespace MTGApplication.Features.DeckEditor.ViewModels;
 
 public partial class CardListViewModel : INotifyPropertyChanged, INotifyPropertyChanging
 {
-  public CardListViewModel(MTGCardImporter importer, CardListConfirmers confirmers = null)
+  public CardListViewModel(MTGCardImporter importer, CardListConfirmers? confirmers = null)
   {
     Commands = new(this);
     Importer = importer;
@@ -38,8 +38,8 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
     }
   } = [];
 
-  public event PropertyChangedEventHandler PropertyChanged;
-  public event PropertyChangingEventHandler PropertyChanging;
+  public event PropertyChangedEventHandler? PropertyChanged;
+  public event PropertyChangingEventHandler? PropertyChanging;
 
   public virtual CardListConfirmers Confirmers { get; }
 
@@ -54,7 +54,7 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
 
   private CardListViewModelCommands Commands { get; }
 
-  public Action OnChange { private get; init; }
+  public Action? OnChange { private get; init; }
 
   public IAsyncRelayCommand<DeckEditorMTGCard> AddCardCommand => Commands.AddCardCommand;
   public IRelayCommand<DeckEditorMTGCard> RemoveCardCommand => Commands.RemoveCardCommand;
