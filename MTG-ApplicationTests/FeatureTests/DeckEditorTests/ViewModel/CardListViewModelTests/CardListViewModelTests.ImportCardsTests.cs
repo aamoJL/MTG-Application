@@ -55,12 +55,15 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task ImportCards_WithoutData_ImportConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ImportConfirmer = new TestExceptionConfirmer<string, string>()
+        ImportConfirmer = confirmer
       });
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -68,7 +71,7 @@ public partial class CardListViewModelTests
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ImportConfirmer = new TestExceptionConfirmer<string, string>()
+        ImportConfirmer = new TestConfirmer<string, string>()
       });
 
       await viewmodel.ImportCardsCommand.ExecuteAsync("Data");
@@ -77,6 +80,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task ImportCards_CardExists_ConflictImportConfirmationShown()
     {
+      var confirmer = new TestConfirmer<(ConfirmationResult, bool)>();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var viewmodel = new CardListViewModel(new TestMTGCardImporter()
       {
@@ -84,13 +88,15 @@ public partial class CardListViewModelTests
       }, new()
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
-        AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
+        AddMultipleConflictConfirmer = confirmer,
       })
       {
         Cards = new([card]),
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -103,7 +109,7 @@ public partial class CardListViewModelTests
       }, new()
       {
         ImportConfirmer = new() { OnConfirm = async (arg) => { return await Task.FromResult(card.Info.Name); } },
-        AddMultipleConflictConfirmer = new TestExceptionConfirmer<(ConfirmationResult, bool)>(),
+        AddMultipleConflictConfirmer = new TestConfirmer<(ConfirmationResult, bool)>(),
       });
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);

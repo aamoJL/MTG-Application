@@ -30,16 +30,19 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task ChangePrint_ConfirmationShown()
     {
+      var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
       var existingCard = _savedDeck.Commander;
       var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
       {
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
+          ChangeCardPrintConfirmer = confirmer
         }
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard));
+      await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

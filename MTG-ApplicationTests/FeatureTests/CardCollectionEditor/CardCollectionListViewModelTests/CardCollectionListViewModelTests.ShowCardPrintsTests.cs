@@ -13,16 +13,19 @@ public partial class CardCollectionListViewModelTests
     [TestMethod]
     public async Task ShowPrints_PrintConfirmationShown()
     {
+      var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
       var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
       var viewmodel = await new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          ShowCardPrintsConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
+          ShowCardPrintsConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ShowCardPrintsCommand.ExecuteAsync(card));
+      await viewmodel.ShowCardPrintsCommand.ExecuteAsync(card);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
   }
 }

@@ -34,14 +34,26 @@ public partial class ScryfallAPI : MTGCardImporter
   public override string Name => "Scryfall";
   public override int PageSize => 175;
 
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  /// <exception cref="System.Text.Json.JsonException"></exception>
   public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
     if (string.IsNullOrEmpty(searchParams))
       return CardImportResult.Empty();
 
-    return await ImportFromUri(GetSearchUri(searchParams), fetchAll: !pagination);
+    try
+    {
+      return await ImportFromUri(GetSearchUri(searchParams), fetchAll: !pagination);
+    }
+    catch { throw; }
   }
 
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  /// <exception cref="System.Text.Json.JsonException"></exception>
   public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var pageResults = new List<CardImportResult>();
@@ -49,18 +61,21 @@ public partial class ScryfallAPI : MTGCardImporter
 
     do
     {
-      if (await NetworkService.TryFetchStringFromUrlGetAsync(currentPage) is not string data)
-        break;
+      try
+      {
+        if (await NetworkService.GetJsonFromUrl(currentPage) is not string data || string.IsNullOrEmpty(data))
+          break;
 
-      if (!JsonService.TryParseJson(data, out var rootNode))
-        break;
+        var rootNode = JsonNode.Parse(data);
 
-      List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
-      var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
-      var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
-      pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
+        List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
+        var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() : "";
+        var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
+        pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
 
-      currentPage = nextPage;
+        currentPage = nextPage;
+      }
+      catch { throw; }
     } while (fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
 
     return pageResults.Count switch

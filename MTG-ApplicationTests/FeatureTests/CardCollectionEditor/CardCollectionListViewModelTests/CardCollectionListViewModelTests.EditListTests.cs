@@ -34,16 +34,19 @@ public partial class CardCollectionListViewModelTests
     [TestMethod]
     public async Task EditList_EditConfirmationShown()
     {
+      var confirmer = new TestConfirmer<(string, string)?, (string, string)>();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
         Confirmers = new()
         {
-          EditCollectionListConfirmer = new TestExceptionConfirmer<(string, string)?, (string, string)>(),
+          EditCollectionListConfirmer = confirmer,
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.EditListCommand.ExecuteAsync(null));
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -270,6 +273,7 @@ public partial class CardCollectionListViewModelTests
     [TestMethod]
     public async Task EditList_Conflict_ConflictConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -279,11 +283,13 @@ public partial class CardCollectionListViewModelTests
           {
             OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
           },
-          EditCollectionListQueryConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>(),
+          EditCollectionListQueryConflictConfirmer = confirmer,
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.EditListCommand.ExecuteAsync(null));
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

@@ -38,8 +38,8 @@ public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImp
   }
   public ObservableCollection<MTGCardCollectionList> CollectionLists => Model.CollectionLists;
 
-  public bool IsBusy { get; set { field = value; OnPropertyChanged(); } }
-  public bool HasUnsavedChanges { get; set { field = value; OnPropertyChanged(); } }
+  public bool IsBusy { get; set { if (field != value) { field = value; OnPropertyChanged(); } } }
+  public bool HasUnsavedChanges { get; set { if (field != value) { field = value; OnPropertyChanged(); } } }
 
   private MTGCardCollection Model { get; } = model;
 

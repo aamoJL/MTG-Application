@@ -12,16 +12,19 @@ public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewMod
 {
   protected override async Task Execute(CommanderTheme theme)
   {
-    Viewmodel.SelectedTheme = theme;
+    try
+    {
+      var query = string.Join(Environment.NewLine,
+        await Viewmodel.Worker.DoWork(FetchNewCardNames(theme.Uri)));
 
-    var query = string.Join(Environment.NewLine,
-      await Viewmodel.Worker.DoWork(FetchNewCardNames(theme.Uri)));
+      var searchResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(query));
 
-    var searchResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(query));
-
-    Viewmodel.Cards.SetCollection(
-        cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],
-        nextPageUri: searchResult.NextPageUri,
-        totalCount: searchResult.TotalCount);
+      Viewmodel.SelectedTheme = theme;
+      Viewmodel.Cards.SetCollection(
+          cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],
+          nextPageUri: searchResult.NextPageUri,
+          totalCount: searchResult.TotalCount);
+    }
+    catch { }
   }
 }

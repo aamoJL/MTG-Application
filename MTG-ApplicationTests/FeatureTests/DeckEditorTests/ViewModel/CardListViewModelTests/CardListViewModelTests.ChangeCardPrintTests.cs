@@ -15,16 +15,19 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task ChangePrint_ConfirmationShown()
     {
+      var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
       var existingCard = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ChangeCardPrintConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>()
+        ChangeCardPrintConfirmer = confirmer
       })
       {
         Cards = [existingCard],
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard));
+      await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

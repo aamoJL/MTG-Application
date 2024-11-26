@@ -34,6 +34,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_ByName_ConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var cards = new DeckEditorMTGCard[]
       {
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
@@ -43,18 +44,21 @@ public partial class CardListViewModelTests
 
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ExportConfirmer = new TestExceptionConfirmer<string, string>()
+        ExportConfirmer = confirmer
       })
       {
         Cards = new(cards),
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync("Name"));
+      await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
     public async Task Execute_ById_ConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var cards = new DeckEditorMTGCard[]
       {
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First", scryfallId: Guid.NewGuid()),
@@ -64,13 +68,15 @@ public partial class CardListViewModelTests
 
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ExportConfirmer = new TestExceptionConfirmer<string, string>()
+        ExportConfirmer = confirmer
       })
       {
         Cards = new(cards),
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync("Id"));
+      await viewmodel.ExportCardsCommand.ExecuteAsync("Id");
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

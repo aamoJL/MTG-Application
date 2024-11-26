@@ -25,24 +25,28 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task ConfirmUnsavedChanges_UnsavedChangesConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>(),
+          SaveUnsavedChangesConfirmer = confirmer,
         },
       }.MockVM();
 
       var args = new ISavable.ConfirmArgs();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
     public async Task ConfirmUnsavedChanges_Accept_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
@@ -50,13 +54,15 @@ public partial class DeckEditorViewModelTests
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveDeckConfirmer = new TestExceptionConfirmer<string, string>(),
+          SaveDeckConfirmer = confirmer,
         },
       }.MockVM();
 
       var args = new ISavable.ConfirmArgs();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

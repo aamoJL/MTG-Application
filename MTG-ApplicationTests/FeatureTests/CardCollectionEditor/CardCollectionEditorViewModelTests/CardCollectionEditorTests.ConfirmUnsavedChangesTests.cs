@@ -28,23 +28,27 @@ public partial class CardCollectionEditorTests
     [TestMethod]
     public async Task ConfirmUnsavedChanges_UnsavedChangesConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>(),
+          SaveUnsavedChangesConfirmer = confirmer,
         },
       }.MockVM();
 
       var args = new ISavable.ConfirmArgs();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
     public async Task ConfirmUnsavedChanges_Accept_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         HasUnsavedChanges = true,
@@ -53,14 +57,16 @@ public partial class CardCollectionEditorTests
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
           CardCollectionConfirmers = new()
           {
-            SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>(),
+            SaveCollectionConfirmer = confirmer,
           }
         },
       }.MockVM();
 
       var args = new ISavable.ConfirmArgs();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args));
+      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

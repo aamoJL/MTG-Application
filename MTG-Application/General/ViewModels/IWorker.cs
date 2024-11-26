@@ -14,9 +14,19 @@ public interface IWorker
   /// </summary>
   public async Task<T> DoWork<T>(Task<T> task)
   {
+    T result;
+
     IsBusy = true;
-    var result = await task;
-    IsBusy = false;
+
+    try
+    {
+      result = await task;
+    }
+    catch { throw; }
+    finally
+    {
+      IsBusy = false;
+    }
     return result;
   }
 
@@ -26,8 +36,16 @@ public interface IWorker
   public async Task DoWork(Task task)
   {
     IsBusy = true;
-    await task;
-    IsBusy = false;
+
+    try
+    {
+      await task;
+    }
+    catch { throw; }
+    finally
+    {
+      IsBusy = false;
+    }
   }
 }
 

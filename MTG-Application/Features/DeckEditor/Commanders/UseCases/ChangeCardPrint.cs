@@ -4,6 +4,7 @@ using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActions.CommanderViewModelReversibleActions;
@@ -20,18 +21,25 @@ public partial class CommanderViewModelCommands
     {
       if (!CanExecute()) return;
 
-      var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: Viewmodel.GetCommander().Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
-
-      if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CommanderConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
+      try
       {
-        if (selection.Info.ScryfallId == Viewmodel.GetCommander().Info.ScryfallId)
-          return; // Same print
+        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: Viewmodel.GetCommander().Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
-        Viewmodel.UndoStack.PushAndExecute(
-          new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(Viewmodel.GetCommander(), Viewmodel.GetCommander().Info, selection.Info, Viewmodel.CardCopier)
-          {
-            ReversibleAction = new ReversibleCardPrintChangeAction(Viewmodel)
-          });
+        if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CommanderConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
+        {
+          if (selection.Info.ScryfallId == Viewmodel.GetCommander().Info.ScryfallId)
+            return; // Same print
+
+          Viewmodel.UndoStack.PushAndExecute(
+            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(Viewmodel.GetCommander(), Viewmodel.GetCommander().Info, selection.Info, Viewmodel.CardCopier)
+            {
+              ReversibleAction = new ReversibleCardPrintChangeAction(Viewmodel)
+            });
+        }
+      }
+      catch (Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
       }
     }
   }

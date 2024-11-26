@@ -31,16 +31,19 @@ public partial class CardCollectionListViewModelTests
     [TestMethod]
     public async Task ExportCards_ExportConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
         Confirmers = new()
         {
-          ExportCardsConfirmer = new TestExceptionConfirmer<string, string>()
+          ExportCardsConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ExportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ExportCardsCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

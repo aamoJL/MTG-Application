@@ -47,8 +47,11 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(SelectedFaceUri)));
+      if(field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(SelectedFaceUri)));
+      }
     }
   } = "";
 

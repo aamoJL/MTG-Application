@@ -35,8 +35,11 @@ public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(LibraryVisibility)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(LibraryVisibility)));
+      }
     }
   } = Visibility.Collapsed;
 

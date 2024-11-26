@@ -14,14 +14,17 @@ public partial class GroupedCardListViewModelTest
     [TestMethod]
     public async Task AddCardGroup_WithoutParameter_ConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string>();
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
         confirmers: new()
         {
-          AddCardGroupConfirmer = new TestExceptionConfirmer<string>()
+          AddCardGroupConfirmer = confirmer
         });
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.AddGroupCommand.ExecuteAsync(null));
+      await viewmodel.AddGroupCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -31,7 +34,7 @@ public partial class GroupedCardListViewModelTest
         importer: new TestMTGCardImporter(),
         confirmers: new()
         {
-          AddCardGroupConfirmer = new TestExceptionConfirmer<string>()
+          AddCardGroupConfirmer = new TestConfirmer<string>()
         });
 
       await viewmodel.AddGroupCommand.ExecuteAsync("New group");

@@ -3,6 +3,7 @@ using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,9 +15,16 @@ public partial class CardCollectionEditorViewModelCommands
   {
     protected override async Task Execute(CardCollectionMTGCard card)
     {
-      var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+      try
+      {
+        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
-      await Viewmodel.Confirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionListConfirmers.GetShowCardPrintsConfirmation(prints.Select(x => new MTGCard(x.Info))));
+        await Viewmodel.Confirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionListConfirmers.GetShowCardPrintsConfirmation(prints.Select(x => new MTGCard(x.Info))));
+      }
+      catch (Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+      }
     }
   }
 }

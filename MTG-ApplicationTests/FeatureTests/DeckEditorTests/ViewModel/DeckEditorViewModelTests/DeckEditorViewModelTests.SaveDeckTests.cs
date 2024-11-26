@@ -16,17 +16,20 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Should show save confirmation when saving the deck")]
     public async Task Save_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
         Confirmers = new()
         {
-          SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
+          SaveDeckConfirmer = confirmer
 
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.SaveDeckCommand.ExecuteAsync(null));
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Should not save if the confirmation was canceled")]
@@ -88,22 +91,26 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Should not show override confirmation if saving with the same name")]
     public async Task Save_SameName_NoOverrideConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
         Confirmers = new()
         {
           SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
-          OverrideDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() },
+          OverrideDeckConfirmer = confirmer,
         }
       }.MockVM();
 
       await viewmodel.SaveDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationNotShown(confirmer);
     }
 
     [TestMethod("Should show override confirmation when trying to save over an existing deck")]
     public async Task Save_Override_OverrideConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var newDeck = MTGCardDeckMocker.Mock("New Deck");
       var viewmodel = new Mocker(_dependencies)
       {
@@ -111,11 +118,13 @@ public partial class DeckEditorViewModelTests
         Confirmers = new()
         {
           SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) },
-          OverrideDeckConfirmer = new() { OnConfirm = (arg) => throw new ConfirmationException() },
+          OverrideDeckConfirmer = confirmer,
         }
       }.MockVM();
 
-      await Assert.ThrowsExceptionAsync<ConfirmationException>(() => viewmodel.SaveDeckCommand.ExecuteAsync(null));
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Saving should be canceled if overriding was canceled")]

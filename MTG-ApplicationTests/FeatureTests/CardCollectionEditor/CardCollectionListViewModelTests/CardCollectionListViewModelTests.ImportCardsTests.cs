@@ -3,7 +3,6 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
-using Windows.ApplicationModel.Search;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
@@ -37,16 +36,19 @@ public partial class CardCollectionListViewModelTests
     [TestMethod]
     public async Task ImportCards_ImportConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string>();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
         Confirmers = new()
         {
-          ImportCardsConfirmer = new TestExceptionConfirmer<string>(),
+          ImportCardsConfirmer = confirmer,
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ImportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ImportCardsCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardSearch.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Linq;
@@ -47,5 +48,7 @@ public sealed partial class CardSearchPage : Page
         }
       })) as MTGCard;
     };
+
+    NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 }

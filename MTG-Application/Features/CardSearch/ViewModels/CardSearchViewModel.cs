@@ -7,6 +7,7 @@ using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using static MTGApplication.Features.CardSearch.UseCases.CardSearchViewModelCommands;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardSearch.ViewModels;
 /// <summary>
@@ -18,6 +19,7 @@ public partial class CardSearchViewModel(MTGCardImporter importer) : ViewModelBa
   public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new CardSearchIncrementalCardSource(importer));
   public CardSearchConfirmers Confirmers { get; init; } = new();
   public IWorker Worker => this;
+  public Notifier Notifier { get; } = new();
 
   [ObservableProperty] public partial bool IsBusy { get; set; }
 

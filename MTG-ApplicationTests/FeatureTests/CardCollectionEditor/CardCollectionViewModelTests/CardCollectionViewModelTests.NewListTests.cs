@@ -12,15 +12,18 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task NewList_NewListConfirmationShown()
     {
+      var confirmer = new TestConfirmer<(string, string)?>();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new TestExceptionConfirmer<(string, string)?>(),
+          NewCollectionListConfirmer = confirmer,
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.NewListCommand.ExecuteAsync(null));
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

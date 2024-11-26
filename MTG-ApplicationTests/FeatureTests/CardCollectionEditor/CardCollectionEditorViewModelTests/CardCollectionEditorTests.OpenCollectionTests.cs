@@ -14,16 +14,19 @@ public partial class CardCollectionEditorTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          SaveUnsavedChangesConfirmer = confirmer
         },
         HasUnsavedChanges = true
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -64,6 +67,7 @@ public partial class CardCollectionEditorTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
@@ -71,27 +75,32 @@ public partial class CardCollectionEditorTests
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
           CardCollectionConfirmers = new()
           {
-            SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>()
+            SaveCollectionConfirmer = confirmer
           }
         },
         HasUnsavedChanges = true
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
     public async Task Open_OpenConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, IEnumerable<string>>();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          LoadCollectionConfirmer = new TestExceptionConfirmer<string, IEnumerable<string>>()
+          LoadCollectionConfirmer = confirmer
         },
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenCollectionCommand.ExecuteAsync(null));
+      await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

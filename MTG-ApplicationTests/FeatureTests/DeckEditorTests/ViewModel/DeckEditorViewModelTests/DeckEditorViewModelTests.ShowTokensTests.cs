@@ -50,16 +50,19 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task ShowTokens_ConfirmationShown()
     {
+      var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
         Confirmers = new()
         {
-          ShowTokensConfirmer = new TestExceptionConfirmer<MTGCard, IEnumerable<MTGCard>>(),
+          ShowTokensConfirmer = confirmer,
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.ShowDeckTokensCommand.ExecuteAsync(null));
+      await viewmodel.ShowDeckTokensCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
   }
 }

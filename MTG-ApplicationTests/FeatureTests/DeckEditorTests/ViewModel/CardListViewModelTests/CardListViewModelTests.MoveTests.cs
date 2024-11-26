@@ -96,16 +96,19 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task MoveTo_AlreadyExists_ConflictConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var target = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        AddSingleConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+        AddSingleConflictConfirmer = confirmer
       })
       {
         Cards = [card],
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => target.BeginMoveToCommand.ExecuteAsync(card));
+      await target.BeginMoveToCommand.ExecuteAsync(card);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Card should change list when executing move command")]

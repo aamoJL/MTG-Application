@@ -47,6 +47,10 @@ public partial class EdhrecImporter
     return stringBuilder.ToString();
   }
 
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  /// <exception cref="System.Text.Json.JsonException"></exception>
   public static async Task<CommanderTheme[]> GetThemes(string commander, string partner = null)
   {
     var uri = GetApiUri(commander, partner);
@@ -54,14 +58,9 @@ public partial class EdhrecImporter
     if (string.IsNullOrEmpty(uri))
       return [];
 
-    var jsonString = await NetworkService.TryFetchStringFromUrlGetAsync(uri);
-
-    if (string.IsNullOrEmpty(jsonString))
-      return [];
-
     try
     {
-      var json = JsonNode.Parse(jsonString) ?? throw new Exception();
+      var json = JsonNode.Parse(await NetworkService.GetJsonFromUrl(uri));
       var themeNodes = json["panels"]?["tribelinks"]?.AsArray();
 
       return themeNodes?.Select(
@@ -71,18 +70,26 @@ public partial class EdhrecImporter
         .ToArray()
        ?? [];
     }
-    catch { return []; }
+    catch { throw; }
   }
 
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  /// <exception cref="System.Text.Json.JsonException"></exception>
   public static async Task<string[]> FetchNewCardNames(string uri)
   {
-    if (JsonNode.Parse(await NetworkService.TryFetchStringFromUrlGetAsync(uri)) is not JsonNode json)
-      return [];
+    try
+    {
+      var jsonString = await NetworkService.GetJsonFromUrl(uri);
+      var json = JsonNode.Parse(jsonString);
 
-    return json["container"]?["json_dict"]?["cardlists"].AsArray()
-      .FirstOrDefault(x => x["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
-      .Select(x => x["name"]!.GetValue<string>()).ToArray()
-      ?? [];
+      return json["container"]?["json_dict"]?["cardlists"].AsArray()
+        .FirstOrDefault(x => x["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
+        .Select(x => x["name"]!.GetValue<string>()).ToArray()
+        ?? [];
+    }
+    catch { throw; }
   }
 
   /// <summary>

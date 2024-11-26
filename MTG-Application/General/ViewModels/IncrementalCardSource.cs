@@ -19,9 +19,13 @@ public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : o
     if (!string.IsNullOrEmpty(NextPage))
     {
       // Load next page
-      var result = await importer.ImportFromUri(NextPage);
-      NextPage = result.NextPageUri;
-      Cards.AddRange(result.Found.Select(ConvertToCardType));
+      try
+      {
+        var result = await importer.ImportFromUri(NextPage);
+        NextPage = result.NextPageUri;
+        Cards.AddRange(result.Found.Select(ConvertToCardType));
+      }
+      catch { }
     }
 
     return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize);

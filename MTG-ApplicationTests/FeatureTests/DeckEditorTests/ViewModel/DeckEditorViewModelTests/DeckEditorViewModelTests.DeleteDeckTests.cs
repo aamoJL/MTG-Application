@@ -30,16 +30,19 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task Delete_DeleteConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
         Confirmers = new()
         {
-          DeleteDeckConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          DeleteDeckConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.DeleteDeckCommand.ExecuteAsync(null));
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Deck should not be deleted if the deletion was canceled")]

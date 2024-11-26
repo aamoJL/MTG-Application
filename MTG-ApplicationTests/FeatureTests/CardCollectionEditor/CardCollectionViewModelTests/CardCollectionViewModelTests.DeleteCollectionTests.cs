@@ -29,16 +29,19 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Delete_DeleteConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
         Confirmers = new()
         {
-          DeleteCollectionConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          DeleteCollectionConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.DeleteCollectionCommand.ExecuteAsync(null));
+      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Collection should not be deleted if the deletion was canceled")]

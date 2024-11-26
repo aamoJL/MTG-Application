@@ -44,8 +44,11 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(Left)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(Left)));
+      }
     }
   } = 0;
   public double Top
@@ -53,8 +56,11 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(Top)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(Top)));
+      }
     }
   } = 0;
   public double Angle
@@ -62,8 +68,11 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(Angle)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(Angle)));
+      }
     }
   } = 0;
   public BitmapImage ImageSource
@@ -71,8 +80,11 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(ImageSource)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(ImageSource)));
+      }
     }
   }
 

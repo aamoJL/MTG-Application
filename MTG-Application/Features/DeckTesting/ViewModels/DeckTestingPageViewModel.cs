@@ -17,9 +17,9 @@ public partial class DeckTestingPageViewModel(DeckTestingDeck deck) : Observable
   public ObservableCollection<DeckTestingMTGCard> CommandZone { get; } = [];
   public ObservableCollection<DeckTestingMTGCard> Tokens { get; } = [];
 
-  public int PlayerHP { get; set { field = value; OnPropertyChanged(); } } = 40;
-  public int EnemyHP { get; set { field = value; OnPropertyChanged(); } } = 40;
-  public int TurnCount { get; set { field = value; OnPropertyChanged(); } } = 0;
+  public int PlayerHP { get; set { if (field != value) { field = value; OnPropertyChanged(); } } } = 40;
+  public int EnemyHP { get; set { if (field != value) { field = value; OnPropertyChanged(); } } } = 40;
+  public int TurnCount { get; set { if (field != value) { field = value; OnPropertyChanged(); } } } = 0;
 
   public event Action NewGameStarted;
   public event Action NewTurnStarted;

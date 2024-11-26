@@ -14,16 +14,19 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Save_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
         Confirmers = new()
         {
-          SaveCollectionConfirmer = new TestExceptionConfirmer<string, string>()
+          SaveCollectionConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.SaveCollectionCommand.ExecuteAsync(null));
+      await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -98,17 +101,20 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Save_Override_OverrideConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = new() { CollectionLists = [new()] },
         Confirmers = new()
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
-          OverrideCollectionConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          OverrideCollectionConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.SaveCollectionCommand.ExecuteAsync(null));
+      await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

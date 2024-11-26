@@ -57,16 +57,19 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task AddCard_Existing_ConflictConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        AddSingleConflictConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+        AddSingleConflictConfirmer = confirmer
       })
       {
         Cards = [card],
       };
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.AddCardCommand.ExecuteAsync(card));
+      await viewmodel.AddCardCommand.ExecuteAsync(card);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
   }
 }

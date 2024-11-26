@@ -3,28 +3,39 @@ using MTGApplication.General.Services.ConfirmationService;
 
 namespace MTGApplicationTests.TestUtility.Services;
 
-public class ConfirmationException : UnitTestAssertException { }
-
-public class TestExceptionConfirmer<TReturn, TArgs> : Confirmer<TReturn, TArgs>
+public class TestConfirmer<TReturn, TArgs> : Confirmer<TReturn, TArgs>
 {
+  public bool Confirmed { get; private set; } = false;
+
   public override Func<Confirmation<TArgs>, Task<TReturn>> OnConfirm
   {
-    protected get => (arg) => { throw new ConfirmationException(); };
+    protected get { Confirmed = true; return base.OnConfirm; }
     set => base.OnConfirm = value;
   }
 }
 
-public class TestExceptionConfirmer<TReturn> : Confirmer<TReturn>
+public class TestConfirmer<TReturn> : Confirmer<TReturn>
 {
+  public bool Confirmed { get; private set; } = false;
+
   public override Func<Confirmation, Task<TReturn>> OnConfirm
   {
-    protected get => (arg) => { throw new ConfirmationException(); };
+    protected get { Confirmed = true; return base.OnConfirm; }
     set => base.OnConfirm = value;
   }
 }
 
 public static class ConfirmationAssert
 {
-  public static async Task ConfirmationShown(Func<Task> task)
-    => await Assert.ThrowsExceptionAsync<ConfirmationException>(task);
+  public static void ConfirmationShown<TReturn, TArgs>(TestConfirmer<TReturn, TArgs> confirmer)
+    => Assert.IsTrue(confirmer.Confirmed);
+
+  public static void ConfirmationShown<TReturn>(TestConfirmer<TReturn> confirmer)
+    => Assert.IsTrue(confirmer.Confirmed);
+
+  public static void ConfirmationNotShown<TReturn, TArgs>(TestConfirmer<TReturn, TArgs> confirmer)
+    => Assert.IsFalse(confirmer.Confirmed);
+
+  public static void ConfirmationNotShown<TReturn>(TestConfirmer<TReturn> confirmer)
+    => Assert.IsFalse(confirmer.Confirmed);
 }

@@ -15,17 +15,20 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Unsaved changes confirmation should be shown when setting new deck if there are unsaved changes")]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = MTGCardDeckMocker.Mock("Deck"),
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          SaveUnsavedChangesConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.NewDeckCommand.ExecuteAsync(null));
+      await viewmodel.NewDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -67,6 +70,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = MTGCardDeckMocker.Mock("Deck"),
@@ -74,11 +78,13 @@ public partial class DeckEditorViewModelTests
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
+          SaveDeckConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.NewDeckCommand.ExecuteAsync(null));
+      await viewmodel.NewDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

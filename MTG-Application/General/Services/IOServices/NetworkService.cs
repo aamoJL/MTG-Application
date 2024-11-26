@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Windows.System;
 
@@ -8,22 +9,26 @@ namespace MTGApplication.General.Services.IOServices;
 // TODO: remove NetworkService and make the network requests on the origin method so the errors can be handled better.
 public static class NetworkService
 {
-  private static readonly string JSON_MEDIA_TYPE = "application/json";
+  public static readonly string JSON_MEDIA_TYPE = "application/json";
 
   /// <summary>
-  /// Fetches text from the given <paramref name="url"/> using GET
+  /// Fetches Json string from the given url using GET
   /// </summary>
-  public static async Task<string> TryFetchStringFromUrlGetAsync(string url)
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  public static async Task<string> GetJsonFromUrl(string url)
   {
     try
     {
       var client = new HttpClient();
+      var assemblyName = Assembly.GetExecutingAssembly().GetName();
       client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
-      client.DefaultRequestHeaders.UserAgent.Add(new("MTGApplication", "1"));
+      client.DefaultRequestHeaders.UserAgent.Add(new(assemblyName.Name, assemblyName.Version.ToString()));
 
       return await client.GetStringAsync(url);
     }
-    catch { return null; }
+    catch { throw; }
   }
 
   /// <summary>

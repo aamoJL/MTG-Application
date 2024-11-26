@@ -37,7 +37,7 @@ public partial class DeckEditorViewModelTests
       {
         Confirmers = new()
         {
-          LoadDeckConfirmer = new TestExceptionConfirmer<string, string[]>()
+          LoadDeckConfirmer = new TestConfirmer<string, string[]>()
         }
       }.MockVM();
 
@@ -53,7 +53,7 @@ public partial class DeckEditorViewModelTests
       {
         Confirmers = new()
         {
-          LoadDeckConfirmer = new TestExceptionConfirmer<string, string[]>()
+          LoadDeckConfirmer = new TestConfirmer<string, string[]>()
         }
       }.MockVM();
 
@@ -74,17 +74,20 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          SaveUnsavedChangesConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenDeckCommand.ExecuteAsync(null));
+      await viewmodel.OpenDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]
@@ -127,6 +130,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_Accept_SaveConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
@@ -134,25 +138,30 @@ public partial class DeckEditorViewModelTests
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) },
-          SaveDeckConfirmer = new TestExceptionConfirmer<string, string>()
+          SaveDeckConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenDeckCommand.ExecuteAsync(null));
+      await viewmodel.OpenDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Load confirmation should be shown when loading a deck without a name")]
     public async Task Open_OpenConfirmationShown()
     {
+      var confirmer = new TestConfirmer<string, string[]>();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          LoadDeckConfirmer = new TestExceptionConfirmer<string, string[]>()
+          LoadDeckConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.OpenDeckCommand.ExecuteAsync(null));
+      await viewmodel.OpenDeckCommand.ExecuteAsync(null);
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod("Deck should be the same if the loading was canceled when loading a deck")]

@@ -37,8 +37,11 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(Left)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(Left)));
+      }
     }
   } = 0;
   public double Top
@@ -46,8 +49,11 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(Top)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(Top)));
+      }
     }
   } = 0;
   public BitmapImage ImageSource
@@ -55,8 +61,11 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(ImageSource)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(ImageSource)));
+      }
     }
   }
   public BitmapImage PlaceholderSource
@@ -64,8 +73,11 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
     get => field;
     set
     {
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(PlaceholderSource)));
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(PlaceholderSource)));
+      }
     }
   }
 

@@ -31,16 +31,19 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task DeleteList_DeleteConfirmationShown()
     {
+      var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
         Confirmers = new()
         {
-          DeleteCollectionListConfirmer = new TestExceptionConfirmer<ConfirmationResult>()
+          DeleteCollectionListConfirmer = confirmer
         }
       }.MockVM();
 
-      await ConfirmationAssert.ConfirmationShown(() => viewmodel.DeleteListCommand.ExecuteAsync(_savedCollection.CollectionLists.First()));
+      await viewmodel.DeleteListCommand.ExecuteAsync(_savedCollection.CollectionLists.First());
+
+      ConfirmationAssert.ConfirmationShown(confirmer);
     }
 
     [TestMethod]

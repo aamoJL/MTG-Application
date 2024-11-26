@@ -8,16 +8,12 @@ public partial class ScryfallAPITests
   public class FetchFromUriTests
   {
     [TestMethod]
-    public async Task Fetch_WithEmptyUri_NoCardsFound()
+    public async Task Fetch_WithEmptyUri_ExceptionThrown()
     {
       var api = new ScryfallAPI();
       var uri = string.Empty;
 
-      var result = await api.ImportFromUri(uri);
-
-      Assert.AreEqual(0, result.TotalCount);
-      Assert.AreEqual(0, result.Found.Length);
-      Assert.AreEqual(string.Empty, result.NextPageUri);
+      await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => api.ImportFromUri(uri));
     }
 
     [TestMethod]
