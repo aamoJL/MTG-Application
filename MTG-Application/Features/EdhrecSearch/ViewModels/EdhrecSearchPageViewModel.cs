@@ -7,10 +7,8 @@ using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImport
 namespace MTGApplication.Features.EdhrecSearch.ViewModels;
 public partial class EdhrecSearchPageViewModel(MTGCardImporter importer) : CardSearchViewModel(importer)
 {
-  public CommanderTheme[] CommanderThemes { get; set; }
+  public CommanderTheme[] CommanderThemes { get; set; } = [];
   public CommanderTheme SelectedTheme { get; set; }
 
-  public IAsyncRelayCommand<CommanderTheme> ChangeCommanderThemeCommand => (changeCommanderTheme ??= new ChangeCommanderTheme(this)).Command;
-
-  private ChangeCommanderTheme changeCommanderTheme;
+  public IAsyncRelayCommand<CommanderTheme>? ChangeCommanderThemeCommand => field ??= new ChangeCommanderTheme(this).Command;
 }

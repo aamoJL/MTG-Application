@@ -9,13 +9,16 @@ public partial class CardListViewModelReversibleActions
 {
   public class ReversibleCardCountChangeAction(CardListViewModel viewmodel) : ViewModelReversibleAction<CardListViewModel, (DeckEditorMTGCard Card, int Value)>(viewmodel)
   {
-    public DeckEditorMTGCard Card { get; set; }
+    public DeckEditorMTGCard? Card { get; set; }
 
     protected override void ActionMethod((DeckEditorMTGCard Card, int Value) param)
-      => CountChange(Card ??= Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name), param.Value);
+    {
+      if ((Card ??= Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name)) is DeckEditorMTGCard card)
+        CountChange(card, param.Value);
+    }
 
     protected override void ReverseActionMethod((DeckEditorMTGCard Card, int Value) param)
-      => CountChange(Card ??= Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name), param.Value);
+      => ActionMethod(param);
 
     private void CountChange(DeckEditorMTGCard card, int value)
     {

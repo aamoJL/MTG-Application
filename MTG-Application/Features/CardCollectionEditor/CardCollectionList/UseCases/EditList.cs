@@ -28,7 +28,7 @@ public partial class CardCollectionEditorViewModelCommands
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListNameError);
       else if (string.IsNullOrEmpty(query))
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListQueryError);
-      else if (Viewmodel.Name != name && Viewmodel.ExistsValidation.Invoke(name))
+      else if (Viewmodel.Name != name && Viewmodel.ExistsValidation?.Invoke(name) is true)
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListExistsError);
       else
       {

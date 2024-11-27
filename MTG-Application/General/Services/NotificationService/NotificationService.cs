@@ -11,7 +11,7 @@ public static partial class NotificationService
   /// </summary>
   public static int NotificationDuration => 5000;
 
-  public static event EventHandler<Notification> OnShow;
+  public static event EventHandler<Notification>? OnShow;
 
   public static void RegisterNotifications(Notifier notifier, object sender)
     => notifier.OnNotify = (arg) => RaiseNotification(sender, arg);

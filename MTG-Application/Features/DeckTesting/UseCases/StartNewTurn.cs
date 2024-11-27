@@ -8,7 +8,7 @@ public class StartNewTurn(DeckTestingPageViewModel viewmodel) : ViewModelCommand
   protected override void Execute()
   {
     Viewmodel.TurnCount++;
-    Viewmodel.DrawCardCommand.Execute(null);
+    Viewmodel.DrawCardCommand?.Execute(null);
     Viewmodel.RaiseNewTurnStarted();
   }
 }

@@ -9,7 +9,7 @@ public partial class CardListViewModelReversibleActions
 {
   public class ReversibleRemoveGroupAction(GroupedCardListViewModel viewmodel) : ViewModelReversibleAction<GroupedCardListViewModel, string>(viewmodel)
   {
-    public CardGroupViewModel Group { get; set; }
+    public CardGroupViewModel? Group { get; set; }
 
     private DeckEditorMTGCard[] AffectedCards { get; set; } = [];
 
@@ -20,7 +20,8 @@ public partial class CardListViewModelReversibleActions
 
       Group ??= Viewmodel.Groups.FirstOrDefault(x => x.Key == key);
 
-      RemoveGroup(Group);
+      if (Group != null)
+        RemoveGroup(Group);
     }
 
     protected override void ReverseActionMethod(string key)
@@ -32,7 +33,7 @@ public partial class CardListViewModelReversibleActions
       new ReversibleAddGroupAction(Viewmodel)
       {
         Group = Group
-      }.Action.Invoke(Group.Key);
+      }.Action?.Invoke(Group.Key);
 
       // Move old cards back
       foreach (var card in AffectedCards)
@@ -40,7 +41,7 @@ public partial class CardListViewModelReversibleActions
         new ReversibleCardGroupChangeAction(Viewmodel)
         {
           Card = card
-        }.Action.Invoke((card, key));
+        }.Action?.Invoke((card, key));
       }
     }
 
@@ -57,7 +58,7 @@ public partial class CardListViewModelReversibleActions
         new ReversibleCardGroupChangeAction(Viewmodel)
         {
           Card = card
-        }.Action.Invoke((card, string.Empty));
+        }.Action?.Invoke((card, string.Empty));
       }
 
       group.Items.Clear();

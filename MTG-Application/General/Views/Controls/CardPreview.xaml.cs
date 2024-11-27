@@ -22,7 +22,7 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
   public static double ImageY { get; } = 350;
   public static Vector2 ImageOffset { get; } = new(175, 100);
 
-  public static event EventHandler<CardPreviewEventArgs> OnChange;
+  public static event EventHandler<CardPreviewEventArgs>? OnChange;
 
   public CardPreview()
   {
@@ -56,7 +56,7 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
       }
     }
   } = 0;
-  public BitmapImage ImageSource
+  public BitmapImage? ImageSource
   {
     get => field;
     set
@@ -68,7 +68,7 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
       }
     }
   }
-  public BitmapImage PlaceholderSource
+  public BitmapImage? PlaceholderSource
   {
     get => field;
     set
@@ -84,9 +84,9 @@ public sealed partial class CardPreview : UserControl, INotifyPropertyChanged
   public double ImageWidth { get; } = ImageX;
   public double ImageHeight { get; } = ImageY;
 
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
 
-  private void CardPreview_OnChange(object sender, CardPreviewEventArgs e)
+  private void CardPreview_OnChange(object? _, CardPreviewEventArgs e)
   {
     if (e.Root != XamlRoot)
       return;

@@ -10,13 +10,16 @@ public partial class CardListViewModelReversibleActions
 {
   public class ReversibleCardPrintChangeAction(CardListViewModel viewmodel) : ViewModelReversibleAction<CardListViewModel, (DeckEditorMTGCard Card, MTGCardInfo Info)>(viewmodel)
   {
-    public DeckEditorMTGCard Card { get; set; }
+    public DeckEditorMTGCard? Card { get; set; }
 
     protected override void ActionMethod((DeckEditorMTGCard Card, MTGCardInfo Info) param)
-      => CardPrintChange(Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name), param.Info);
+    {
+      if ((Card ??= Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name)) is DeckEditorMTGCard card)
+        CardPrintChange(card, param.Info);
+    }
 
     protected override void ReverseActionMethod((DeckEditorMTGCard Card, MTGCardInfo Info) param)
-      => CardPrintChange(Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name), param.Info);
+      => ActionMethod(param);
 
     private void CardPrintChange(DeckEditorMTGCard card, MTGCardInfo info)
     {

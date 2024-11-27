@@ -2,6 +2,7 @@
 using MTGApplication.Features.DeckSelection.ViewModels;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.ViewModel;
 
 namespace MTGApplicationTests.FeatureTests.DeckSelectionTests;
 [TestClass]

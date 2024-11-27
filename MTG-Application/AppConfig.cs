@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.UI.Xaml;
 using MTGApplication.General.Services.IOServices;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -31,10 +32,9 @@ public static partial class AppConfig
   /// </summary>
   public class GlobalAppSettings
   {
-    private static IConfigurationRoot configurationRoot;
     private static readonly string fileName = "appsettings.json";
 
-    public string CompanyName { get; set; }
+    public string CompanyName { get; set; } = string.Empty;
 
     /// <summary>
     /// Loads global settings from the application settings file.
@@ -45,10 +45,10 @@ public static partial class AppConfig
         throw new Exception("Error: App settings file not found. Look at 'appsettings - Template.json' file for more information");
 
       var builder = new ConfigurationBuilder().AddJsonFile(fileName, optional: false);
-      configurationRoot = builder.Build();
+      var configurationRoot = builder.Build();
 
-      var config = configurationRoot.GetSection("AppInformation").GetChildren();
-      CompanyName = config.First(x => x.Key == "Company").Value;
+      if (configurationRoot.GetSection("AppInformation").GetChildren() is IEnumerable<IConfigurationSection> config)
+        CompanyName = config.FirstOrDefault(x => x.Key == "Company")?.Value ?? CompanyName;
     }
   }
 

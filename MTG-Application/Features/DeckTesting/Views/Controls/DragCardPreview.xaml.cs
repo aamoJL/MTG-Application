@@ -14,7 +14,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
   {
     public XamlRoot Root { get; } = root;
 
-    public string Uri { get; init; } = null;
+    public string? Uri { get; init; } = null;
     public Vector2? Coordinates { get; init; } = null;
     public Vector2? Offset { get; init; } = null;
     public double? Opacity { get; init; } = null;
@@ -29,7 +29,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
   public static double ImageX { get; } = 215;
   public static double ImageY { get; } = 300;
 
-  public static event EventHandler<DragCardPreviewEventArgs> OnChange;
+  public static event EventHandler<DragCardPreviewEventArgs>? OnChange;
 
   public DragCardPreview()
   {
@@ -37,11 +37,13 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
 
     Loaded += DragCardPreview_Loaded;
     Unloaded += DragCardPreview_Unloaded;
+
+    Visibility = Visibility.Collapsed;
   }
 
   public double Left
   {
-    get => field;
+    get;
     set
     {
       if (field != value)
@@ -53,7 +55,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
   } = 0;
   public double Top
   {
-    get => field;
+    get;
     set
     {
       if (field != value)
@@ -65,7 +67,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
   } = 0;
   public double Angle
   {
-    get => field;
+    get;
     set
     {
       if (field != value)
@@ -75,9 +77,9 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
       }
     }
   } = 0;
-  public BitmapImage ImageSource
+  public BitmapImage? ImageSource
   {
-    get => field;
+    get;
     set
     {
       if (field != value)
@@ -91,9 +93,9 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
   public double ImageWidth { get; } = ImageX;
   public double ImageHeight { get; } = ImageY;
 
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
 
-  private void DragCardPreview_OnChange(object sender, DragCardPreviewEventArgs e)
+  private void DragCardPreview_OnChange(object? _, DragCardPreviewEventArgs e)
   {
     if (e.Root != XamlRoot) return;
 
@@ -109,7 +111,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     if (e.IsTapped is bool isTapped) Angle = isTapped ? 90 : 0;
   }
 
-  private void DragCardPreview_Loaded(object sender, RoutedEventArgs e)
+  private void DragCardPreview_Loaded(object _, RoutedEventArgs __)
   {
     OnChange += DragCardPreview_OnChange;
     DeckTestingCardDrag.Started += CardDragArgs_Started;
@@ -117,7 +119,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     XamlRoot.Content.PointerMoved += Root_PointerMoved;
   }
 
-  private void DragCardPreview_Unloaded(object sender, RoutedEventArgs e)
+  private void DragCardPreview_Unloaded(object _, RoutedEventArgs __)
   {
     OnChange -= DragCardPreview_OnChange;
     DeckTestingCardDrag.Started -= CardDragArgs_Started;
@@ -127,7 +129,7 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
       XamlRoot.Content.PointerMoved -= Root_PointerMoved;
   }
 
-  private void Root_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  private void Root_PointerMoved(object _, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
     if (!DeckTestingCardDrag.IsDragging) return;
 

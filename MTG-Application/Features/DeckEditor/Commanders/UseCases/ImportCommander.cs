@@ -25,9 +25,14 @@ public partial class CommanderViewModelCommands
         else
         {
           // Only legendary cards are allowed to be commanders
-          await Viewmodel.ChangeCommanderCommand.ExecuteAsync(new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count));
+          var card = new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count);
 
-          new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
+          if (Viewmodel.ChangeCommanderCommand != null && Viewmodel.ChangeCommanderCommand.CanExecute(card))
+          {
+            await Viewmodel.ChangeCommanderCommand.ExecuteAsync(card);
+
+            new SendNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
+          }
         }
       }
       catch (System.Exception e)

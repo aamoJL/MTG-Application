@@ -50,7 +50,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
     PropertyChanging += GroupedCardListViewModel_PropertyChanging;
     PropertyChanged += GroupedCardListViewModel_PropertyChanged;
 
-    new ReversibleAddGroupAction(this).Action.Invoke(string.Empty);
+    new ReversibleAddGroupAction(this).Action?.Invoke(string.Empty);
   }
 
   public override GroupedCardListConfirmers Confirmers { get; }

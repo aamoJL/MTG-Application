@@ -22,7 +22,7 @@ public class ReversibleCommand<T> : IReversibleCommand<T>
   protected T Item { get; }
   protected IClassCopier<T> Copier { get; } = new DefaultCopier();
 
-  public ReversibleAction<T> ReversibleAction { get; set; }
+  public required ReversibleAction<T> ReversibleAction { get; set; }
 
   public void Execute() => ReversibleAction?.Action?.Invoke(Copier.Copy(Item));
 

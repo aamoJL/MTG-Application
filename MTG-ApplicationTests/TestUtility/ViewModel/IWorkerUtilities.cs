@@ -1,43 +1,29 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.ViewModels;
 using System.ComponentModel;
 
-namespace MTGApplicationTests;
+namespace MTGApplicationTests.TestUtility.ViewModel;
 
 public class IsBusyException : UnitTestAssertException { }
-
-public partial class TestExceptionWorker : ObservableObject, IWorker
-{
-  [ObservableProperty] private bool isBusy;
-
-  public TestExceptionWorker() => PropertyChanged += TestExceptionWorker_PropertyChanged;
-
-  public IWorker Worker => this;
-
-  private void TestExceptionWorker_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(IsBusy)) { throw new IsBusyException(); }
-  }
-}
 
 public static class WorkerAssert
 {
   public static async Task IsBusy(IWorker worker, Func<Task> task)
   {
+    var wasBusy = false;
+
     if (worker is not INotifyPropertyChanged propertyNotifier)
       throw new AssertFailedException($"Worker does not implement {nameof(INotifyPropertyChanged)} interface");
 
-    propertyNotifier.PropertyChanged += WorkerPropertyNotifier_PropertyChanged;
+    propertyNotifier.PropertyChanged += (s, e) =>
+    {
+      if (e.PropertyName == nameof(IWorker.IsBusy) && s is IWorker worker)
+        wasBusy = wasBusy || worker.IsBusy;
+    };
 
-    await Assert.ThrowsExceptionAsync<IsBusyException>(task);
+    await task.Invoke();
 
-    propertyNotifier.PropertyChanged -= WorkerPropertyNotifier_PropertyChanged;
-  }
-
-  private static void WorkerPropertyNotifier_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(IWorker.IsBusy)) throw new IsBusyException();
+    Assert.IsTrue(wasBusy);
   }
 }
 

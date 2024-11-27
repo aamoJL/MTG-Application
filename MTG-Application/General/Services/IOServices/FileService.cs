@@ -8,17 +8,25 @@ namespace MTGApplication.General.Services.IOServices;
 
 public static class FileService
 {
+  // TODO: remove try methods for better exception handling
+
   /// <summary>
   /// Returns the application's AppData directory path. The path will be to the company's directory inside the AppData directory.
   /// If the debugger is attached, the path will be /Debug directory inside the company directory instead.
   /// </summary>
   public static string GetAppDataPath()
   {
-    var path = System.Diagnostics.Debugger.IsAttached ? Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.GlobalSettings.CompanyName,
-        Assembly.GetCallingAssembly().GetName().Name, "Debug") : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.GlobalSettings.CompanyName,
-        Assembly.GetCallingAssembly().GetName().Name);
+    var path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConfig.GlobalSettings.CompanyName, Assembly.GetCallingAssembly().GetName().Name);
 
-    Directory.CreateDirectory(path);
+    if (System.Diagnostics.Debugger.IsAttached)
+      path = Path.Join(path, "Debug");
+
+    try
+    {
+      Directory.CreateDirectory(path);
+    }
+    catch { }
+
     return path;
   }
 

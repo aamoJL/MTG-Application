@@ -3,6 +3,7 @@ using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
+using MTGApplicationTests.TestUtility.ViewModel;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 

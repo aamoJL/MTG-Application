@@ -35,7 +35,7 @@ public sealed partial class DeckSelectionPage : Page
   {
     Loaded -= MTGDeckSelectorView_Loaded;
 
-    if (ViewModel.LoadDecksCommand.CanExecute(null))
+    if (ViewModel.LoadDecksCommand?.CanExecute(null) is true)
       await ViewModel.LoadDecksCommand.ExecuteAsync(null);
 
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);

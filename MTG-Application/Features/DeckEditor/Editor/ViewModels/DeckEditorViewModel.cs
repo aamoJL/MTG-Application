@@ -20,7 +20,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 {
-  public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck deck = null, Notifier notifier = null, DeckEditorConfirmers confirmers = null)
+  public DeckEditorViewModel(MTGCardImporter importer, DeckEditorMTGDeck? deck = null, Notifier? notifier = null, DeckEditorConfirmers? confirmers = null)
   {
     Commands = new(this);
 
@@ -98,12 +98,11 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 
   private DeckEditorMTGDeck Deck
   {
-    get => deck;
-    set => SetProperty(ref deck, value);
+    get;
+    set => SetProperty(ref field, value);
   }
   private DeckEditorViewModelCommands Commands { get; }
 
-  private DeckEditorMTGDeck deck;
   private string deckName = string.Empty;
 
   public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => Commands.ConfirmUnsavedChangesCommand;
@@ -200,17 +199,17 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     };
   }
 
-  private void DeckEditorViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckEditorViewModel_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
     switch (e.PropertyName)
     {
       case nameof(Deck):
         Name = Deck.Name;
 
-        DeckCardList.Cards = deck.DeckCards;
-        MaybeCardList.Cards = deck.Maybelist;
-        WishCardList.Cards = deck.Wishlist;
-        RemoveCardList.Cards = deck.Removelist;
+        DeckCardList.Cards = Deck.DeckCards;
+        MaybeCardList.Cards = Deck.Maybelist;
+        WishCardList.Cards = Deck.Wishlist;
+        RemoveCardList.Cards = Deck.Removelist;
 
         OnPropertyChanged(nameof(Size));
         OnPropertyChanged(nameof(Price));

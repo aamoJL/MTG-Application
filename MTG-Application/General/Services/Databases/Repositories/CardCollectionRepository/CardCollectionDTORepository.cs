@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
-public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory = null) : IRepository<MTGCardCollectionDTO>
+public class CardCollectionDTORepository(CardDbContextFactory? dbContextFactory = null) : IRepository<MTGCardCollectionDTO>
 {
   public CardDbContextFactory DbContextFactory { get; } = dbContextFactory ?? new();
 
@@ -26,7 +26,7 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
   {
     using var db = DbContextFactory.CreateDbContext();
 
-    if (await db.MTGCardCollections.FirstOrDefaultAsync(x => x.Name == item.Name) is not MTGCardCollectionDTO existingItem)
+    if (db.MTGCardCollections == null || await db.MTGCardCollections.FirstOrDefaultAsync(x => x.Name == item.Name) is not MTGCardCollectionDTO existingItem)
       return false;
 
     db.Remove(existingItem);
@@ -36,10 +36,11 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
   public virtual async Task<bool> Exists(string name)
   {
     using var db = DbContextFactory.CreateDbContext();
-    return await Task.FromResult(db.MTGCardCollections.FirstOrDefault(x => x.Name == name) != null);
+
+    return await Task.FromResult(db.MTGCardCollections?.FirstOrDefault(x => x.Name == name) != null);
   }
 
-  public virtual async Task<IEnumerable<MTGCardCollectionDTO>> Get(Action<DbSet<MTGCardCollectionDTO>> setIncludes = null)
+  public virtual async Task<IEnumerable<MTGCardCollectionDTO>> Get(Action<DbSet<MTGCardCollectionDTO>>? setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -47,15 +48,20 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
 
     var set = db.MTGCardCollections;
 
-    if (setIncludes != null) setIncludes.Invoke(set);
-    else SetDefaultIncludes(set);
+    if (set == null)
+      return [];
+
+    if (setIncludes != null)
+      setIncludes.Invoke(set);
+    else
+      SetDefaultIncludes(set);
 
     var items = set.ToList();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
     return await Task.FromResult(items);
   }
 
-  public virtual async Task<MTGCardCollectionDTO> Get(string name, Action<DbSet<MTGCardCollectionDTO>> setIncludes = null)
+  public virtual async Task<MTGCardCollectionDTO?> Get(string name, Action<DbSet<MTGCardCollectionDTO>>? setIncludes = null)
   {
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
@@ -63,8 +69,13 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
 
     var set = db.MTGCardCollections;
 
-    if (setIncludes != null) setIncludes.Invoke(set);
-    else SetDefaultIncludes(set);
+    if (set == null)
+      return null;
+
+    if (setIncludes != null)
+      setIncludes.Invoke(set);
+    else
+      SetDefaultIncludes(set);
 
     var item = set.Where(x => x.Name == name).FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
@@ -84,7 +95,7 @@ public class CardCollectionDTORepository(CardDbContextFactory dbContextFactory =
     foreach (var listDTO in existingCollection.CollectionLists)
     {
       if (item.CollectionLists.FirstOrDefault(x => x.Name == listDTO.Name) is null)
-        db.MTGCardCollectionLists.Remove(listDTO);
+        db.MTGCardCollectionLists?.Remove(listDTO);
     }
 
     foreach (var itemList in item.CollectionLists)

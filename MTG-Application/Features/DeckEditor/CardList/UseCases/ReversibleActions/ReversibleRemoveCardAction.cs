@@ -10,13 +10,13 @@ public partial class CardListViewModelReversibleActions
 {
   public class ReversibleRemoveCardAction(CardListViewModel viewmodel) : ViewModelReversibleAction<CardListViewModel, IEnumerable<DeckEditorMTGCard>>(viewmodel)
   {
-    public IEnumerable<DeckEditorMTGCard> Cards { get; set; }
+    public IEnumerable<DeckEditorMTGCard>? Cards { get; set; }
 
     protected override void ActionMethod(IEnumerable<DeckEditorMTGCard> cards)
       => Remove(Cards ??= cards);
 
     protected override void ReverseActionMethod(IEnumerable<DeckEditorMTGCard> cards)
-      => new ReversibleAddCardAction(Viewmodel).Action.Invoke(Cards ??= cards);
+      => new ReversibleAddCardAction(Viewmodel).Action?.Invoke(Cards ??= cards);
 
     private void Remove(IEnumerable<DeckEditorMTGCard> cards)
     {

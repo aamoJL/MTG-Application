@@ -48,9 +48,9 @@ public partial class ThemedWindow : Window
     set => AppWindow.Resize(new(Width, value));
   }
 
-  public bool Navigate(Type pageType, object parameters = null) => MainFrame.Navigate(pageType, parameters);
+  public bool Navigate(Type pageType, object? parameters = null) => MainFrame.Navigate(pageType, parameters);
 
-  private void NotificationService_OnShow(object sender, NotificationService.Notification e)
+  private void NotificationService_OnShow(object? sender, NotificationService.Notification e)
   {
     if ((sender as FrameworkElement)?.XamlRoot != Content.XamlRoot)
       return;
@@ -66,25 +66,26 @@ public partial class ThemedWindow : Window
     InAppNotification.Show(e.Message, NotificationService.NotificationDuration);
   }
 
-  private void LocalSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void LocalSettings_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (Content is not FrameworkElement element) return;
+    if (Content is not FrameworkElement element)
+      return;
 
     if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
       element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
   }
 
-  private async void ThemedWindow_Closed(object sender, WindowEventArgs e)
+  private async void ThemedWindow_Closed(object? _, WindowEventArgs e)
   {
     // The Window will close if the CanClose variable has been set to true.
     // Otherwise the user will be asked to save unsaved changes.
     // If the user does not cancel the closing event, this method will be called again with the close variable set to true.
-    if (CanClose) return;
+    if (CanClose)
+      return;
 
     e.Handled = true;
-    CanClose = await new WindowClosing(Content.XamlRoot).Close();
 
-    if (CanClose)
+    if (CanClose = await new WindowClosing(Content.XamlRoot).Close())
     {
       e.Handled = false;
       OnClose();

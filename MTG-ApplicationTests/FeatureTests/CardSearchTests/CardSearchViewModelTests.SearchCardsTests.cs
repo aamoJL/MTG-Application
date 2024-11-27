@@ -3,6 +3,7 @@ using MTGApplication.Features.CardSearch.ViewModels;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.ViewModel;
 
 namespace MTGApplicationTests.FeatureTests.CardSearchTests;
 

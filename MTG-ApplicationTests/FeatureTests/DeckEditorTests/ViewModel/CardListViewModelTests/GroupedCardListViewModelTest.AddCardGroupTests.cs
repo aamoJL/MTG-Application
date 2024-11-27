@@ -66,7 +66,7 @@ public partial class GroupedCardListViewModelTest
         importer: new TestMTGCardImporter(),
         confirmers: new()
         {
-          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult<string?>(null) }
+          AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult<string>(null) }
         });
       var initCount = viewmodel.Groups.Count;
 
@@ -128,6 +128,7 @@ public partial class GroupedCardListViewModelTest
     public async Task AddCardGroup_Existing_ErrorNotificationSent()
     {
       var name = "New Group";
+      var notifier = new TestNotifier();
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
         confirmers: new()
@@ -135,22 +136,22 @@ public partial class GroupedCardListViewModelTest
           AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult(name) }
         })
       {
-        Notifier = new()
-        {
-          OnNotify = arg => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.AddGroupCommand.ExecuteAsync(name));
+      await viewmodel.AddGroupCommand.ExecuteAsync(name);
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.AddGroupCommand.ExecuteAsync(null));
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
+
+      await viewmodel.AddGroupCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task AddCardGroup_New_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new GroupedCardListViewModel(
         importer: new TestMTGCardImporter(),
         confirmers: new()
@@ -158,14 +159,12 @@ public partial class GroupedCardListViewModelTest
           AddCardGroupConfirmer = new() { OnConfirm = async arg => await Task.FromResult("New group") }
         })
       {
-        Notifier = new()
-        {
-          OnNotify = arg => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.AddGroupCommand.ExecuteAsync(null));
+      await viewmodel.AddGroupCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]

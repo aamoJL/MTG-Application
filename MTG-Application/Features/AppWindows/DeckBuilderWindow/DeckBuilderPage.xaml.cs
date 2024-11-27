@@ -17,7 +17,7 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 
   public bool IsSearchPaneOpen { get => field; set { field = value; PropertyChanged?.Invoke(this, new(nameof(IsSearchPaneOpen))); } } = false;
 
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
 
   [RelayCommand] public void SwitchSearchPanel() => IsSearchPaneOpen = !IsSearchPaneOpen;
 

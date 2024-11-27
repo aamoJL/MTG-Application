@@ -4,13 +4,13 @@ using System;
 namespace MTGApplication.Features.DeckTesting.Services;
 public static class DeckTestingCardDrag
 {
-  public static DeckTestingMTGCard Item { get; private set; }
+  public static DeckTestingMTGCard? Item { get; private set; }
   public static bool IsDragging { get; private set; } = false;
 
-  public static event Action Started;
-  public static event Action<DeckTestingMTGCard> Completed;
-  public static event Action Canceled;
-  public static event Action Ended;
+  public static event Action? Started;
+  public static event Action<DeckTestingMTGCard?>? Completed;
+  public static event Action? Canceled;
+  public static event Action? Ended;
 
   public static void Start(DeckTestingMTGCard item)
   {

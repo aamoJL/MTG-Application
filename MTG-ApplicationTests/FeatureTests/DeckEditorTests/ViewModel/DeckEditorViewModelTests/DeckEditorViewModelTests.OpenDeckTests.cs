@@ -2,6 +2,7 @@
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Services;
+using MTGApplicationTests.TestUtility.ViewModel;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
@@ -173,7 +174,7 @@ public partial class DeckEditorViewModelTests
         Deck = unsavedDeck,
         Confirmers = new()
         {
-          LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string?>(null) }
+          LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string>(null) }
         }
       }.MockVM();
 
@@ -201,6 +202,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Success notification should be sent when deck has been loaded")]
     public async Task Open_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         HasUnsavedChanges = true,
@@ -209,14 +211,12 @@ public partial class DeckEditorViewModelTests
           SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
           LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.OpenDeckCommand.ExecuteAsync(null));
+      await viewmodel.OpenDeckCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod("Error notification should be sent when there are failure on loading")]
@@ -224,6 +224,7 @@ public partial class DeckEditorViewModelTests
     {
       _dependencies.Repository.GetFailure = true;
 
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         HasUnsavedChanges = true,
@@ -232,14 +233,12 @@ public partial class DeckEditorViewModelTests
           SaveUnsavedChangesConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.No) },
           LoadDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.OpenDeckCommand.ExecuteAsync(null));
+      await viewmodel.OpenDeckCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]

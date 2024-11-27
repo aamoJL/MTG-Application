@@ -6,6 +6,8 @@ namespace MTGApplication.General.Services.IOServices;
 
 public static class JsonService
 {
+  // TODO: remove try methods for better exception handling
+
   /// <summary>
   /// Tries to parse data to json object
   /// </summary>

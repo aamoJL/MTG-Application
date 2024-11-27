@@ -22,14 +22,14 @@ public partial class EdhrecImporter
   /// <param name="data">EDHREC card Uri</param>
   /// <param name="name">Parsed card name</param>
   /// <returns><see langword="true"/> if the <paramref name="data"/> was successfully parsed; otherwise, <see langword="false"/></returns>
-  public static bool TryParseCardNameFromEdhrecUri(string data, out string name)
+  public static bool TryParseCardNameFromEdhrecUri(string data, out string? name)
   {
     if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == "edhrec.com")
       name = uri.Segments[^1]; // Name is the last segment of the Uri
     else
-      name = default;
+      name = null;
 
-    return name != default;
+    return name != null;
   }
 
   public static string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard partner, string themeSuffix = "")
@@ -51,7 +51,7 @@ public partial class EdhrecImporter
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
   /// <exception cref="System.Text.Json.JsonException"></exception>
-  public static async Task<CommanderTheme[]> GetThemes(string commander, string partner = null)
+  public static async Task<CommanderTheme[]> GetThemes(string commander, string? partner = null)
   {
     var uri = GetApiUri(commander, partner);
 
@@ -63,12 +63,14 @@ public partial class EdhrecImporter
       var json = JsonNode.Parse(await NetworkService.GetJsonFromUrl(uri));
       var themeNodes = json?["panels"]?["tribelinks"]?.AsArray();
 
-      return themeNodes?.Select(
-        x => new CommanderTheme(
-          x?["value"]?.GetValue<string>(),
-          GetApiUri(commander, partner, GetLeadingSlash().Replace(x?["href-suffix"]?.GetValue<string>() ?? string.Empty, string.Empty))))
-        .ToArray()
-       ?? [];
+      var themes = themeNodes?.Select(x => (
+        x?["value"]?.GetValue<string>(),
+        GetApiUri(commander, partner, GetLeadingSlash().Replace(x?["href-suffix"]?.GetValue<string>() ?? string.Empty, string.Empty))))
+        .Where(x => x.Item1 != null && x.Item2 != string.Empty)
+        .Select(x => new CommanderTheme(x.Item1!, x.Item2))
+        .ToArray() ?? [];
+
+      return themes;
     }
     catch { throw; }
   }
@@ -84,10 +86,13 @@ public partial class EdhrecImporter
       var jsonString = await NetworkService.GetJsonFromUrl(uri);
       var json = JsonNode.Parse(jsonString);
 
-      return json?["container"]?["json_dict"]?["cardlists"]?.AsArray()
+      var names = json?["container"]?["json_dict"]?["cardlists"]?.AsArray()
         .FirstOrDefault(x => x?["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
-        .Select(x => x?["name"]?.GetValue<string>()).ToArray()
-        ?? [];
+        .Select(x => x?["name"]?.GetValue<string>())
+        .Where(x => !string.IsNullOrEmpty(x))
+        .Select(x => x!).ToArray();
+
+      return names ?? [];
     }
     catch { throw; }
   }
@@ -95,7 +100,7 @@ public partial class EdhrecImporter
   /// <summary>
   /// Returns the api uri for the given commanders
   /// </summary>
-  private static string GetApiUri(string commander, string partner = null, string themeSuffix = "")
+  private static string GetApiUri(string commander, string? partner = null, string themeSuffix = "")
   {
     // Example fetch uri:
     // https://json.edhrec.com/pages/commanders/{commander-names-like-this}/{theme}.json

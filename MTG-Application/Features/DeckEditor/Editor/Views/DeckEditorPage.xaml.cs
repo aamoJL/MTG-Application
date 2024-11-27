@@ -67,7 +67,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
     }
   } = false;
 
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
 
   [RelayCommand]
   private void SetDeckDisplayType(string type)

@@ -44,7 +44,7 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
 
   public string SelectedFaceUri
   {
-    get => field;
+    get;
     set
     {
       if (field != value)
@@ -55,14 +55,14 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     }
   } = "";
 
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
 
-  public IAsyncRelayCommand OnDropCopy { get; set; }
-  public ICommand OnDropRemove { get; set; }
-  public IAsyncRelayCommand OnDropImport { get; set; }
-  public ICommand OnDropBeginMoveFrom { get; set; }
-  public IAsyncRelayCommand OnDropBeginMoveTo { get; set; }
-  public ICommand OnDropExecuteMove { get; set; }
+  public IAsyncRelayCommand? OnDropCopy { get; set; }
+  public ICommand? OnDropRemove { get; set; }
+  public IAsyncRelayCommand? OnDropImport { get; set; }
+  public ICommand? OnDropBeginMoveFrom { get; set; }
+  public IAsyncRelayCommand? OnDropBeginMoveTo { get; set; }
+  public ICommand? OnDropExecuteMove { get; set; }
 
   /// <summary>
   /// Changes selected face image if possible
@@ -72,8 +72,10 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
   {
     if (!CanExecuteSwitchFaceImage()) return;
 
-    SelectedFaceUri = Model?.Info.FrontFace.ImageUri == SelectedFaceUri
-      ? Model.Info.BackFace?.ImageUri : Model?.Info.FrontFace.ImageUri;
+    SelectedFaceUri = (Model?.Info.FrontFace.ImageUri == SelectedFaceUri
+      ? Model.Info.BackFace?.ImageUri
+      : Model?.Info.FrontFace.ImageUri)
+      ?? string.Empty;
   }
 
   /// <summary>
@@ -81,14 +83,20 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
   /// </summary>
   [RelayCommand(CanExecute = nameof(CanExecuteOpenAPIWebsite))]
   protected async Task OpenAPIWebsite()
-    => await NetworkService.OpenUri(Model?.Info.APIWebsiteUri);
+  {
+    if (CanExecuteOpenAPIWebsite())
+      await NetworkService.OpenUri(Model!.Info.APIWebsiteUri);
+  }
 
   /// <summary>
   /// Opens card's Cardmarket page in web browser
   /// </summary>    
   [RelayCommand(CanExecute = nameof(CanExecuteOpenCardmarketWebsite))]
   protected async Task OpenCardmarketWebsite()
-    => await NetworkService.OpenUri(Model?.Info.CardMarketUri);
+  {
+    if (CanExecuteOpenCardmarketWebsite())
+      await NetworkService.OpenUri(Model!.Info.CardMarketUri);
+  }
 
   protected bool CanExecuteSwitchFaceImage() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);
 
@@ -131,13 +139,13 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
   }
 
-  protected void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+  protected void Model_PropertyChanged(object? _, PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(MTGCard.Info))
-      SelectedFaceUri = Model?.Info.FrontFace.ImageUri;
+      SelectedFaceUri = Model?.Info.FrontFace.ImageUri ?? string.Empty;
   }
 
-  protected void AppSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+  protected void AppSettings_PropertyChanged(object? _, PropertyChangedEventArgs e)
   {
     // Requested theme needs to be changed to the selected theme here, because flyouts will not change theme if
     // the requested theme is Default.
@@ -169,7 +177,7 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     });
   }
 
-  protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+  protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
   {
     if (Equals(storage, value))
       return;

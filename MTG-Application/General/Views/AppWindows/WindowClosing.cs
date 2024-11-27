@@ -15,8 +15,8 @@ public class WindowClosing(XamlRoot root)
   };
   public class ClosedEventArgs(XamlRoot root) : EventArgs { public XamlRoot Root { get; } = root; }
 
-  public static event EventHandler<ClosingEventArgs> Closing;
-  public static event EventHandler<ClosedEventArgs> Closed;
+  public static event EventHandler<ClosingEventArgs>? Closing;
+  public static event EventHandler<ClosedEventArgs>? Closed;
 
   public XamlRoot Root { get; } = root;
 

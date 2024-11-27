@@ -16,7 +16,10 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
   public virtual async Task<bool> Add(MTGCardDeckDTO item)
   {
     using var db = DbContextFactory.CreateDbContext();
-    if (!await Exists(item.Name)) db.Add(item);
+
+    if (!await Exists(item.Name))
+      db.Add(item);
+
     return await db.SaveChangesAsync() > 0;
   }
 
@@ -35,14 +38,20 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
 
-    var set = db.MTGDecks;
+    if (db.MTGDecks is DbSet<MTGCardDeckDTO> set)
+    {
+      if (setIncludes != null)
+        setIncludes.Invoke(set);
+      else
+        SetDefaultIncludes(set);
 
-    if (setIncludes != null) setIncludes.Invoke(set);
-    else SetDefaultIncludes(set);
+      var items = set.ToList();
+      db.ChangeTracker.AutoDetectChangesEnabled = true;
 
-    var items = set.ToList();
-    db.ChangeTracker.AutoDetectChangesEnabled = true;
-    return await Task.FromResult(items);
+      return await Task.FromResult(items);
+    }
+
+    return [];
   }
 
   public virtual async Task<MTGCardDeckDTO?> Get(string name, Action<DbSet<MTGCardDeckDTO>>? setIncludes = null)

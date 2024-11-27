@@ -20,14 +20,17 @@ public class StartNewGame(DeckTestingPageViewModel viewmodel) : ViewModelCommand
     foreach (var item in Viewmodel.Deck.DeckCards)
       Viewmodel.Library.Add(new(item.Info));
 
-    Viewmodel.ShuffleDeckCommand.Execute(null);
+    Viewmodel.ShuffleDeckCommand?.Execute(null);
 
     // Add commanders to the command zone
-    if (Viewmodel.Deck.Commander != null) { Viewmodel.CommandZone.Add(new(Viewmodel.Deck.Commander.Info)); }
-    if (Viewmodel.Deck.Partner != null) { Viewmodel.CommandZone.Add(new(Viewmodel.Deck.Partner.Info)); }
+    if (Viewmodel.Deck.Commander != null)
+      Viewmodel.CommandZone.Add(new(Viewmodel.Deck.Commander.Info));
+
+    if (Viewmodel.Deck.Partner != null)
+      Viewmodel.CommandZone.Add(new(Viewmodel.Deck.Partner.Info));
 
     for (var i = 0; i < 7; i++)
-      Viewmodel.DrawCardCommand.Execute(null); // Draw 7 cards from library to hand
+      Viewmodel.DrawCardCommand?.Execute(null); // Draw 7 cards from library to hand
 
     Viewmodel.RaiseNewGameStarted();
   }

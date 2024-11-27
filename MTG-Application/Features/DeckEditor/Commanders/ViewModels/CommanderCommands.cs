@@ -23,23 +23,15 @@ public partial class CommanderCommands(DeckEditorViewModel viewmodel, CommanderC
   public IWorker Worker { get; init; } = viewmodel;
   public Notifier Notifier { get; init; } = viewmodel.Notifier;
 
-  public Action<DeckEditorMTGCard> OnChange { get; init; }
+  public Action<DeckEditorMTGCard?>? OnChange { get; init; }
 
-  public IAsyncRelayCommand<DeckEditorMTGCard> ChangeCommanderCommand => (changeCommander ??= new ChangeCommander(this)).Command;
-  public IRelayCommand<DeckEditorMTGCard> RemoveCommanderCommand => (removeCommander ??= new RemoveCommander(this)).Command;
-  public IRelayCommand<DeckEditorMTGCard> BeginMoveFromCommand => (beginMoveFrom ??= new MoveCard.BeginMoveFrom(this)).Command;
-  public IAsyncRelayCommand<DeckEditorMTGCard> BeginMoveToCommand => (beginMoveTo ??= new MoveCard.BeginMoveTo(this)).Command;
-  public IRelayCommand<DeckEditorMTGCard> ExecuteMoveCommand => (executeMove ??= new MoveCard.ExecuteMove(this)).Command;
-  public IAsyncRelayCommand<string> ImportCommanderCommand => (importCommander ??= new ImportCommander(this)).Command;
-  public IAsyncRelayCommand ChangeCardPrintCommand => (changeCardPrint ??= new ChangeCardPrint(this)).Command;
-
-  private ChangeCommander changeCommander;
-  private RemoveCommander removeCommander;
-  private MoveCard.BeginMoveFrom beginMoveFrom;
-  private MoveCard.BeginMoveTo beginMoveTo;
-  private MoveCard.ExecuteMove executeMove;
-  private ImportCommander importCommander;
-  private ChangeCardPrint changeCardPrint;
+  public IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCommanderCommand => field ??= new ChangeCommander(this).Command;
+  public IRelayCommand<DeckEditorMTGCard>? RemoveCommanderCommand => field ??= new RemoveCommander(this).Command;
+  public IRelayCommand<DeckEditorMTGCard>? BeginMoveFromCommand => field ??= new MoveCard.BeginMoveFrom(this).Command;
+  public IAsyncRelayCommand<DeckEditorMTGCard>? BeginMoveToCommand => field ??= new MoveCard.BeginMoveTo(this).Command;
+  public IRelayCommand<DeckEditorMTGCard>? ExecuteMoveCommand => field ??= new MoveCard.ExecuteMove(this).Command;
+  public IAsyncRelayCommand<string>? ImportCommanderCommand => field ??= new ImportCommander(this).Command;
+  public IAsyncRelayCommand? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 
   public DeckEditorMTGCard GetCommander() => commanderType == CommanderType.Commander ? viewmodel.Commander : viewmodel.Partner;
 }

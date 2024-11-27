@@ -18,15 +18,18 @@ public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
   {
     base.OnNavigatedTo(e);
 
-    ViewModel = new DeckTestingPageViewModel.Factory(App.MTGCardImporter)
-      .Build(e.Parameter as DeckTestingDeck);
+    if (e.Parameter is DeckTestingDeck deck)
+    {
+      ViewModel = new DeckTestingPageViewModel.Factory(App.MTGCardImporter)
+        .Build(deck);
 
-    ViewModel.NewGameStarted += OnNewGameStarted;
-    ViewModel.NewTurnStarted += OnNewTurnStarted;
-    ViewModel.StartNewGameCommand.Execute(null);
+      ViewModel.NewGameStarted += OnNewGameStarted;
+      ViewModel.NewTurnStarted += OnNewTurnStarted;
+      ViewModel.StartNewGameCommand?.Execute(null);
+    }
   }
 
-  public DeckTestingPageViewModel ViewModel { get; set; }
+  public DeckTestingPageViewModel? ViewModel { get; set; }
   public DeckTestingPointerEvents PointerEvents { get; } = new();
   public DeckTestingDragAndDropEvents DragAndDropEvents { get; } = new();
 
@@ -43,7 +46,7 @@ public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
     }
   } = Visibility.Collapsed;
 
-  public event PropertyChangedEventHandler PropertyChanged;
+  public event PropertyChangedEventHandler? PropertyChanged;
 
   [RelayCommand] private void LibraryVisibilitySwitch() => LibraryVisibility = LibraryVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 

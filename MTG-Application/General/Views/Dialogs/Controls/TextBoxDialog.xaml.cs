@@ -16,18 +16,17 @@ public sealed partial class TextBoxDialog : StringDialog
   public char[] InvalidInputCharacters { get; set; } = [];
   public bool IsSpellCheckEnabled { get; set; } = false;
 
-  private Func<string, bool> inputValidation;
-  public Func<string, bool> InputValidation
+  public Func<string, bool>? InputValidation
   {
-    get => inputValidation;
+    get;
     set
     {
-      inputValidation = value;
+      field = value;
       IsPrimaryButtonEnabled = InputValidation?.Invoke(InputText) ?? true;
     }
   }
 
-  protected override string ProcessResult(ContentDialogResult result)
+  protected override string? ProcessResult(ContentDialogResult result)
     => result switch
     {
       ContentDialogResult.Primary => InputText,

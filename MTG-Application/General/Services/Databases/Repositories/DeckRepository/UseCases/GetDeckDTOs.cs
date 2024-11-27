@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 public class GetDeckDTOs(IRepository<MTGCardDeckDTO> repository) : UseCase<Task<IEnumerable<MTGCardDeckDTO>>>
 {
-  public Action<DbSet<MTGCardDeckDTO>> SetIncludes { get; init; }
+  public Action<DbSet<MTGCardDeckDTO>>? SetIncludes { get; init; }
 
   public override async Task<IEnumerable<MTGCardDeckDTO>> Execute() => await repository.Get(SetIncludes);
 }

@@ -13,7 +13,7 @@ public class TestNotifier : Notifier
   public TestNotifier()
     => OnNotify = (msg) => Notified = msg;
 
-  public Notification? Notified { get; private set; } = null;
+  public Notification Notified { get; private set; } = null;
 }
 
 public static class NotificationAssert
@@ -26,7 +26,7 @@ public static class NotificationAssert
   }
 
   public static void NotificationSent(NotificationType type, TestNotifier notifier)
-    => Assert.IsTrue(notifier.Notified?.NotificationType.Equals(type), "Notification types do not match");
+    => Assert.IsTrue(notifier.Notified?.NotificationType.Equals(type), $"Expected {type}, was {notifier.Notified.NotificationType}");
 
   public static void NotificationSent(Notification notification, TestNotifier notifier)
     => Assert.IsTrue(notifier.Notified?.Equals(notification), "Notifications do not match");

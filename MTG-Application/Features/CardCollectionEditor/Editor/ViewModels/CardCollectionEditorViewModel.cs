@@ -66,10 +66,10 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
   // Used to bind collection name to visual state trigger, so it does not update when CardCollectionViewModel changes with the same name
   [ObservableProperty] public partial string CollectionName { get; set; } = string.Empty;
 
-  public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => field ??= (new ConfirmUnsavedChanges(this).Command);
-  public IAsyncRelayCommand NewCollectionCommand => field ??= (new ConfirmNewCollection(this).Command);
-  public IAsyncRelayCommand OpenCollectionCommand => field ??= (new ConfirmOpenCollection(this).Command);
-  public IAsyncRelayCommand<MTGCardCollectionList> ChangeListCommand => field ??= (new ChangeList(this).Command);
+  public IAsyncRelayCommand<ISavable.ConfirmArgs>? ConfirmUnsavedChangesCommand => field ??= new ConfirmUnsavedChanges(this).Command;
+  public IAsyncRelayCommand? NewCollectionCommand => field ??= new ConfirmNewCollection(this).Command;
+  public IAsyncRelayCommand? OpenCollectionCommand => field ??= new ConfirmOpenCollection(this).Command;
+  public IAsyncRelayCommand<MTGCardCollectionList>? ChangeListCommand => field ??= new ChangeList(this).Command;
 
   public async Task ChangeCollection(MTGCardCollection collection)
   {
@@ -81,9 +81,10 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
 
   public async Task ChangeCollectionList(MTGCardCollectionList list)
   {
-    if (!ChangeListCommand.CanExecute(list)) return;
+    if (ChangeListCommand?.CanExecute(list) is not true)
+      return;
 
-    SelectedCardCollectionList = list ?? new();
+    SelectedCardCollectionList = list;
     CardCollectionListViewModel = CreateCardCollectionListViewModel(list);
 
     await CardCollectionListViewModel.UpdateQueryCards();

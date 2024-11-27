@@ -8,19 +8,19 @@ namespace MTGApplication.General.Views.DragAndDrop;
 
 public abstract class DragAndDrop<T>()
 {
-  public static DragAndDrop<T> DragOrigin { get; set; }
-  public static T Item { get; set; }
+  public static DragAndDrop<T>? DragOrigin { get; set; }
+  public static T? Item { get; set; }
 
   public bool AcceptMove { get; set; } = true;
   public string CopyCaptionOverride { get; set; } = string.Empty;
   public string MoveCaptionOverride { get; set; } = string.Empty;
   public bool IsDropContentVisible { get; set; } = true;
 
-  public Func<T, Task> OnCopy { get; set; }
-  public Func<T, Task> OnBeginMoveTo { get; set; }
-  public Action<T> OnBeginMoveFrom { get; set; }
-  public Action<T> OnExecuteMove { get; set; }
-  public Func<string, Task> OnExternalImport { get; set; }
+  public Func<T, Task>? OnCopy { get; set; }
+  public Func<T, Task>? OnBeginMoveTo { get; set; }
+  public Action<T>? OnBeginMoveFrom { get; set; }
+  public Action<T>? OnExecuteMove { get; set; }
+  public Func<string, Task>? OnExternalImport { get; set; }
 
   public virtual void OnDragStarting(T item, out DataPackageOperation requestedOperation)
   {
