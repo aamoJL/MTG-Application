@@ -13,7 +13,7 @@ public partial class CommanderViewModelCommands
   {
     public class BeginMoveFrom(CommanderCommands viewmodel) : ViewModelCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
     {
-      protected override void Execute(DeckEditorMTGCard _)
+      protected override void Execute(DeckEditorMTGCard? _)
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
           new ReversibleCommanderChangeCommand(null, Viewmodel.GetCommander(), Viewmodel.CardCopier)
@@ -25,7 +25,7 @@ public partial class CommanderViewModelCommands
 
     public class BeginMoveTo(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
     {
-      protected override async Task Execute(DeckEditorMTGCard card)
+      protected override async Task Execute(DeckEditorMTGCard? card)
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCommanderChangeCommand(card, Viewmodel.GetCommander(), Viewmodel.CardCopier)
         {
@@ -37,7 +37,7 @@ public partial class CommanderViewModelCommands
 
     public class ExecuteMove(CommanderCommands viewmodel) : ViewModelCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
     {
-      protected override void Execute(DeckEditorMTGCard _)
+      protected override void Execute(DeckEditorMTGCard? _)
         => Viewmodel.UndoStack.PushAndExecuteActiveCombinedCommand();
     }
   }

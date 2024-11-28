@@ -12,10 +12,12 @@ public partial class CommanderViewModelCommands
 {
   public class ImportCommander(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands, string>(viewmodel)
   {
-    protected override async Task Execute(string data)
+    protected override async Task Execute(string? data)
     {
       try
       {
+        data ??= string.Empty;
+
         var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
 
         if (result.Found.Length == 0)

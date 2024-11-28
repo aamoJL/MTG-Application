@@ -23,8 +23,11 @@ public partial class CardGroupViewModelCommands
 
     public class BeginMoveTo(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelAsyncCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
     {
-      protected override async Task Execute(DeckEditorMTGCard card)
+      protected override async Task Execute(DeckEditorMTGCard? card)
       {
+        if (card == null)
+          return;
+
         var combinedCommands = listViewmodel.UndoStack.ActiveCombinedCommand.Commands;
 
         if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)

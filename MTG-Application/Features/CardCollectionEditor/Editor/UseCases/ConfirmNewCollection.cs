@@ -12,7 +12,8 @@ public partial class CardCollectionEditorViewModelCommands
     {
       var unsavedArgs = new ISavable.ConfirmArgs();
 
-      await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
+      if (Viewmodel.ConfirmUnsavedChangesCommand != null)
+        await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
 
       if (unsavedArgs.Cancelled)
         return;

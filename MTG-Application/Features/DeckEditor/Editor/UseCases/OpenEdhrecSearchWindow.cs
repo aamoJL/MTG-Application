@@ -17,12 +17,13 @@ public partial class DeckEditorViewModelCommands
 
     protected override async Task Execute()
     {
-      if (!CanExecute()) return;
+      if (!CanExecute())
+        return;
 
       try
       {
         var themes = await EdhrecImporter.GetThemes(
-          commander: Viewmodel.Commander.Info.Name,
+          commander: Viewmodel.Commander!.Info.Name,
           partner: Viewmodel.Partner?.Info.Name);
 
         new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow(themes).Activate();

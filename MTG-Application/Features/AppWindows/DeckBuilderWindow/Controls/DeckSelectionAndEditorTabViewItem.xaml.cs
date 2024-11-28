@@ -40,7 +40,7 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
   {
     if (e.Content is DeckSelectionPage selectorPage)
     {
-      selectorPage.DeckSelectedCommand = new RelayCommand<string>((string selectedDeck) =>
+      selectorPage.DeckSelectedCommand = new RelayCommand<string>((selectedDeck) =>
       {
         Frame.Navigate(typeof(DeckEditorPage), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
       });
@@ -53,7 +53,7 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
     }
   }
 
-  private void DeckEditorPageViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckEditorPageViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (sender is DeckEditorViewModel deckEditorViewModel)
     {
@@ -65,14 +65,14 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
     }
   }
 
-  private void WindowClosing_Closing(object sender, WindowClosing.ClosingEventArgs e)
+  private void WindowClosing_Closing(object? _, WindowClosing.ClosingEventArgs e)
   {
     if (e.Root != XamlRoot) return;
 
     e.Tasks.Add(ConfirmClosure);
   }
 
-  private void WindowClosing_Closed(object sender, WindowClosing.ClosedEventArgs e)
+  private void WindowClosing_Closed(object? _, WindowClosing.ClosedEventArgs e)
   {
     if (e.Root != XamlRoot) return;
 

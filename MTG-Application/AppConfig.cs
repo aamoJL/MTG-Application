@@ -75,9 +75,9 @@ public static partial class AppConfig
     /// </summary>
     public void Load()
     {
-      if (FileService.TryReadTextFromFile(filePath, out var data))
+      if (FileService.TryReadTextFromFile(filePath, out var data) && data != null)
       {
-        if (JsonService.TryParseJson(data, out var json))
+        if (JsonService.TryParseJson(data, out var json) && json != null)
         {
           var appTheme = json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default;
           AppTheme = appTheme switch

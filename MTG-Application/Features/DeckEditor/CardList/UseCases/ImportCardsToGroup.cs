@@ -23,12 +23,15 @@ public partial class CardGroupViewModelCommands
 
   private class ImportCardsToGroup(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelAsyncCommand<CardGroupViewModel, string>(viewmodel)
   {
-    protected override async Task Execute(string data)
+    protected override async Task Execute(string? data)
     {
       data ??= await listViewmodel.Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
 
       try
       {
+        if (string.IsNullOrEmpty(data))
+          throw new ArgumentNullException(nameof(data));
+
         var result = await listViewmodel.Worker.DoWork(new DeckEditorCardImporter(listViewmodel.Importer).Import(data));
 
         var newCards = new List<DeckEditorMTGCard>();

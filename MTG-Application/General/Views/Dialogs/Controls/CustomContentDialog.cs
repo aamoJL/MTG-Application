@@ -24,9 +24,9 @@ public abstract partial class CustomContentDialog<T> : ContentDialog
     Loaded += CustomContentDialog_Loaded;
   }
 
-  public new async Task<T> ShowAsync() => ProcessResult(await base.ShowAsync());
+  public new async Task<T?> ShowAsync() => ProcessResult(await base.ShowAsync());
 
-  protected abstract T ProcessResult(ContentDialogResult result);
+  protected abstract T? ProcessResult(ContentDialogResult result);
 
   private void CustomContentDialog_Loaded(object sender, RoutedEventArgs e)
   {

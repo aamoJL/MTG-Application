@@ -15,9 +15,9 @@ public partial class GroupedCardListViewModelCommands
 
   private class RemoveCardGroup(GroupedCardListViewModel viewmodel) : ViewModelCommand<GroupedCardListViewModel, string>(viewmodel)
   {
-    protected override bool CanExecute(string key) => !string.IsNullOrEmpty(key);
+    protected override bool CanExecute(string? key) => !string.IsNullOrEmpty(key);
 
-    protected override void Execute(string key)
+    protected override void Execute(string? key)
     {
       if (!CanExecute(key))
         return;
@@ -31,7 +31,7 @@ public partial class GroupedCardListViewModelCommands
       }
 
       Viewmodel.UndoStack.PushAndExecute(
-        new ReversibleCommand<string>(key)
+        new ReversibleCommand<string>(key!)
         {
           ReversibleAction = new ReversibleRemoveGroupAction(Viewmodel)
         });

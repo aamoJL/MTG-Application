@@ -41,7 +41,7 @@ public partial class QueryCardsViewModel : ObservableObject
     OnPropertyChanged(nameof(TotalCardCount));
   }
 
-  private void OwnedCards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  private void OwnedCards_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
     switch (e.Action)
     {
@@ -58,7 +58,7 @@ public partial class QueryCardsViewModel : ObservableObject
     }
   }
 
-  private void QueryCardsCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  private void QueryCardsCollection_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
     switch (e.Action)
     {

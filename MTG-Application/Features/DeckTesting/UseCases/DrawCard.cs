@@ -19,6 +19,6 @@ public class DrawCard : ViewModelCommand<DeckTestingPageViewModel>
     Viewmodel.Hand.Add(card);
   }
 
-  private void Library_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  private void Library_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     => Command.NotifyCanExecuteChanged();
 }

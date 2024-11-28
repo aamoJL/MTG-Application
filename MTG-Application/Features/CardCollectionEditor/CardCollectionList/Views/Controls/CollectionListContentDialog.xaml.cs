@@ -15,8 +15,8 @@ public sealed partial class CollectionListContentDialog : StringStringDialog
     Loaded += CollectionListContentDialog_Loaded;
   }
 
-  public string NameInputText { get; set; }
-  public string QueryInputText { get; set; }
+  public string NameInputText { get; set; } = string.Empty;
+  public string QueryInputText { get; set; } = string.Empty;
 
   protected override (string, string) ProcessResult(ContentDialogResult result)
     => result switch

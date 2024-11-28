@@ -96,11 +96,11 @@ public partial class GroupedCardListViewModel : CardListViewModel
         if (group == null)
         {
           var addAction = new ReversibleAddGroupAction(this);
-          addAction.Action.Invoke(key);
+          addAction.Action?.Invoke(key);
           group = addAction.Group;
         }
 
-        group.Items.Add(card);
+        group?.Items.Add(card);
       }
 
       Cards.CollectionChanged += Cards_CollectionChanged;
@@ -118,11 +118,11 @@ public partial class GroupedCardListViewModel : CardListViewModel
       if (group == null)
       {
         var addAction = new ReversibleAddGroupAction(this);
-        addAction.Action.Invoke(key);
+        addAction.Action?.Invoke(key);
         group = addAction.Group;
       }
 
-      group.Items.Add(newCard);
+      group?.Items.Add(newCard);
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove
       && e.OldItems?[0] is DeckEditorMTGCard oldCard)

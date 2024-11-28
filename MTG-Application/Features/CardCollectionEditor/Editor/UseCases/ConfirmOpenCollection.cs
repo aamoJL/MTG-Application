@@ -19,7 +19,8 @@ public partial class CardCollectionEditorViewModelCommands
     {
       var unsavedArgs = new ISavable.ConfirmArgs();
 
-      await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
+      if (Viewmodel.ConfirmUnsavedChangesCommand != null)
+        await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
 
       if (unsavedArgs.Cancelled)
         return;
@@ -37,26 +38,24 @@ public partial class CardCollectionEditorViewModelCommands
 
           new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
         }
-        else new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
+        else
+          throw new InvalidOperationException("Collection was not found");
       }
-      catch (Exception e)
+      catch
       {
-        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
       }
     }
 
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="UriFormatException"></exception>
-    private async Task<MTGCardCollection> LoadCollection(string loadName)
+    private async Task<MTGCardCollection?> LoadCollection(string loadName)
     {
-      var dto = await new GetCardCollectionDTO(Viewmodel.Repository).Execute(loadName);
-
-      if (dto == null)
-        return null;
-
       try
       {
+        var dto = await new GetCardCollectionDTO(Viewmodel.Repository).Execute(loadName);
+
         return await new DTOToCardCollectionConverter(Viewmodel.Importer).Convert(dto);
       }
       catch { throw; }

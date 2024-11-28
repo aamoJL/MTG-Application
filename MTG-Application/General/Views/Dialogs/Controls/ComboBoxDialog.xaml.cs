@@ -12,10 +12,10 @@ public sealed partial class ComboBoxDialog : StringDialog
   }
 
   public string[] Items { get; }
-  public string InputHeader { get; set; }
-  public string Selection { get; set; }
+  public string InputHeader { get; set; } = string.Empty;
+  public string? Selection { get; set; } = null;
 
-  protected override string ProcessResult(ContentDialogResult result)
+  protected override string? ProcessResult(ContentDialogResult result)
   {
     return result switch
     {

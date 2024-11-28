@@ -79,9 +79,9 @@ public partial class DeckTestingCardViewBase : BasicCardView<DeckTestingMTGCard>
       DeckTestingCardDrag.Cancel();
   }
 
-  private void OnDragCompleted(DeckTestingMTGCard item)
+  private void OnDragCompleted(DeckTestingMTGCard? item)
   {
-    if (!item.IsToken)
+    if (item != null && !item.IsToken)
       (this.FindParentByType<ListViewBase>()?.ItemsSource as ObservableCollection<DeckTestingMTGCard>)?.Remove(item);
   }
 

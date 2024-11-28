@@ -13,10 +13,12 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ShowCardPrints(CardCollectionListViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionListViewModel, CardCollectionMTGCard>(viewmodel)
   {
-    protected override async Task Execute(CardCollectionMTGCard card)
+    protected override async Task Execute(CardCollectionMTGCard? card)
     {
       try
       {
+        ArgumentNullException.ThrowIfNull(card);
+
         var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
         await Viewmodel.Confirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionListConfirmers.GetShowCardPrintsConfirmation(prints.Select(x => new MTGCard(x.Info))));

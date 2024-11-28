@@ -62,7 +62,7 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
     set => SetProperty(ref field, value);
   }
 
-  [ObservableProperty] public partial MTGCardCollectionList SelectedCardCollectionList { get; set; } = new();
+  [ObservableProperty] public partial MTGCardCollectionList? SelectedCardCollectionList { get; set; } = new();
   // Used to bind collection name to visual state trigger, so it does not update when CardCollectionViewModel changes with the same name
   [ObservableProperty] public partial string CollectionName { get; set; } = string.Empty;
 
@@ -79,13 +79,13 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
     await ChangeCollectionList(collection.CollectionLists.FirstOrDefault());
   }
 
-  public async Task ChangeCollectionList(MTGCardCollectionList list)
+  public async Task ChangeCollectionList(MTGCardCollectionList? list)
   {
     if (ChangeListCommand?.CanExecute(list) is not true)
       return;
 
     SelectedCardCollectionList = list;
-    CardCollectionListViewModel = CreateCardCollectionListViewModel(list);
+    CardCollectionListViewModel = CreateCardCollectionListViewModel(list ?? new());
 
     await CardCollectionListViewModel.UpdateQueryCards();
   }
@@ -139,11 +139,9 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
     return viewmodel;
   }
 
-  private void CardCollectionEditorViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void CardCollectionEditorViewModel_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    switch (e.PropertyName)
-    {
-      case nameof(CardCollectionViewModel): CollectionName = CardCollectionViewModel.Name; break;
-    }
+    if (e.PropertyName == nameof(CardCollectionViewModel))
+      CollectionName = CardCollectionViewModel.Name;
   }
 }

@@ -21,8 +21,11 @@ public partial class CardListViewModelCommands
   {
     public class BeginMoveTo(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
     {
-      protected override async Task Execute(DeckEditorMTGCard card)
+      protected override async Task Execute(DeckEditorMTGCard? card)
       {
+        if (card == null)
+          return;
+
         if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
         {
           // Card already in the list
@@ -48,17 +51,22 @@ public partial class CardListViewModelCommands
 
     public class BeginMoveFrom(CardListViewModel viewmodel) : ViewModelCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
     {
-      protected override void Execute(DeckEditorMTGCard card)
-        => Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
+      protected override void Execute(DeckEditorMTGCard? card)
+      {
+        if (card == null)
+          return;
+
+        Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
           new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
           {
             ReversibleAction = new ReversibleRemoveCardAction(Viewmodel)
           });
+      }
     }
 
     public class ExecuteMove(CardListViewModel viewmodel) : ViewModelCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
     {
-      protected override void Execute(DeckEditorMTGCard card)
+      protected override void Execute(DeckEditorMTGCard? card)
         => Viewmodel.UndoStack.PushAndExecuteActiveCombinedCommand();
     }
   }

@@ -18,9 +18,10 @@ public partial class CardCollectionViewModel
     public CardCollectionConfirmers Confirmers { get; init; } = new();
     public Notifier Notifier { get; init; } = new();
     public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
-    public Func<Task> OnDeleted { get; init; }
-    public Func<MTGCardCollectionList, Task> OnListAdded { get; init; }
-    public Func<MTGCardCollectionList, Task> OnListRemoved { get; init; }
+
+    public Func<Task>? OnDeleted { get; init; }
+    public Func<MTGCardCollectionList, Task>? OnListAdded { get; init; }
+    public Func<MTGCardCollectionList, Task>? OnListRemoved { get; init; }
 
     public CardCollectionViewModel Build(MTGCardCollection model, MTGCardImporter importer)
     {

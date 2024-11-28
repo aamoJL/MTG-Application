@@ -13,71 +13,66 @@ public class DeckTestingPointerEvents
 {
   public void Droppable_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
-    if (DeckTestingCardDrag.IsDragging)
-      DragCardPreview.Change(this, new((sender as FrameworkElement).XamlRoot) { Opacity = DragCardPreview.DroppableOpacity });
+    if (DeckTestingCardDrag.IsDragging && sender is FrameworkElement element)
+      DragCardPreview.Change(this, new(element.XamlRoot) { Opacity = DragCardPreview.DroppableOpacity });
   }
 
   public void Droppable_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
-    if (DeckTestingCardDrag.IsDragging)
-      DragCardPreview.Change(this, new((sender as FrameworkElement).XamlRoot) { Opacity = DragCardPreview.UndroppableOpacity });
+    if (DeckTestingCardDrag.IsDragging && sender is FrameworkElement element)
+      DragCardPreview.Change(this, new(element.XamlRoot) { Opacity = DragCardPreview.UndroppableOpacity });
   }
 
   public void DroppableListView_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
-    if (!DeckTestingCardDrag.IsDragging) return;
-
-    var item = DeckTestingCardDrag.Item;
+    if (!DeckTestingCardDrag.IsDragging || DeckTestingCardDrag.Item is not DeckTestingMTGCard item)
+      return;
 
     // Tokens will not be added to the list, but they will be removed from the battlefield
     if (item.IsToken)
       DeckTestingCardDrag.Complete();
-    else
-      DropAndReorder(item: item, target: sender as ListViewBase, e: e);
+    else if (sender is ListViewBase list)
+      DropAndReorder(item: item, target: list, e: e);
   }
 
   public void LibraryTop_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
-    if (!DeckTestingCardDrag.IsDragging) return;
-
-    var item = DeckTestingCardDrag.Item;
+    if (!DeckTestingCardDrag.IsDragging || DeckTestingCardDrag.Item is not DeckTestingMTGCard item)
+      return;
 
     // Tokens will not be added to the list, but they will be removed from the battlefield
-    if (!item.IsToken)
-      ((sender as FrameworkElement).DataContext as ObservableCollection<DeckTestingMTGCard>)
-        ?.Insert(0, item);
+    if (!item.IsToken && sender is FrameworkElement element)
+      (element.DataContext as ObservableCollection<DeckTestingMTGCard>)?.Insert(0, item);
 
     DeckTestingCardDrag.Complete();
   }
 
   public void LibraryBottom_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
-    if (!DeckTestingCardDrag.IsDragging) return;
-
-    var item = DeckTestingCardDrag.Item;
+    if (!DeckTestingCardDrag.IsDragging || DeckTestingCardDrag.Item is not DeckTestingMTGCard item)
+      return;
 
     // Tokens will not be added to the list, but they will be removed from the battlefield
-    if (!item.IsToken)
-      ((sender as FrameworkElement).DataContext as ObservableCollection<DeckTestingMTGCard>)
-        ?.Add(item);
+    if (!item.IsToken && sender is FrameworkElement element)
+      (element.DataContext as ObservableCollection<DeckTestingMTGCard>)?.Add(item);
 
     DeckTestingCardDrag.Complete();
   }
 
   public void BattlefieldCanvas_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs _)
   {
-    if (DeckTestingCardDrag.IsDragging)
-      DragCardPreview.Change(this, new((sender as FrameworkElement).XamlRoot) { Opacity = DragCardPreview.BattlefieldOpacity });
+    if (DeckTestingCardDrag.IsDragging && sender is FrameworkElement element)
+      DragCardPreview.Change(this, new(element.XamlRoot) { Opacity = DragCardPreview.BattlefieldOpacity });
   }
 
   public void BattlefieldCanvas_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
   {
-    if (!DeckTestingCardDrag.IsDragging) return;
+    if (!DeckTestingCardDrag.IsDragging)
+      return;
 
-    if (sender is Canvas canvas)
+    if (sender is Canvas canvas && DeckTestingCardDrag.Item is DeckTestingMTGCard item)
     {
       var pos = e.GetCurrentPoint(canvas).Position;
-      var item = DeckTestingCardDrag.Item;
 
       if (canvas.Children.FirstOrDefault(x => (x as DeckTestingBattlefieldCardView)?.Model == item) is UIElement existingElement)
       {
@@ -183,19 +178,22 @@ public class DeckTestingPointerEvents
     //      the first). In that case, the insertion index will remain zero.
 
     // Insert the item into the target's ItemsSource
-    var targetSource = target.ItemsSource as ObservableCollection<DeckTestingMTGCard>;
-    var oldIndex = targetSource.IndexOf(item);
-
-    if (oldIndex == -1 || oldIndex != insertIndex && oldIndex + 1 != insertIndex)
+    if (target.ItemsSource is ObservableCollection<DeckTestingMTGCard> targetSource)
     {
-      if (oldIndex != -1 && oldIndex < insertIndex)
-        insertIndex--; // Removing the old item will move other items back
+      var oldIndex = targetSource.IndexOf(item);
 
-      DeckTestingCardDrag.Complete(); // Removes old item from the original collection (might be the same as targetSource)
+      if (oldIndex == -1 || oldIndex != insertIndex && oldIndex + 1 != insertIndex)
+      {
+        if (oldIndex != -1 && oldIndex < insertIndex)
+          insertIndex--; // Removing the old item will move other items back
 
-      // using targetSource.Move() will make the list UI flicker, so the item needs to be removed and inserted
-      targetSource.Insert(Math.Clamp(insertIndex, 0, targetSource.Count), item);
+        DeckTestingCardDrag.Complete(); // Removes old item from the original collection (might be the same as targetSource)
+
+        // using targetSource.Move() will make the list UI flicker, so the item needs to be removed and inserted
+        targetSource.Insert(Math.Clamp(insertIndex, 0, targetSource.Count), item);
+      }
     }
+
     DeckTestingCardDrag.Cancel();
   }
 }

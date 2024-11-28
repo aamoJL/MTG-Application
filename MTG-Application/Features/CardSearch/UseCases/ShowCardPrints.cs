@@ -12,12 +12,11 @@ public partial class CardSearchViewModelCommands
 {
   public class ShowCardPrints(CardSearchViewModel viewmodel) : ViewModelAsyncCommand<CardSearchViewModel, MTGCard>(viewmodel)
   {
-    protected override async Task Execute(MTGCard card)
+    protected override async Task Execute(MTGCard? card)
     {
       try
       {
-        if (card == null)
-          throw new ArgumentNullException(nameof(card), "Card is null.");
+        ArgumentNullException.ThrowIfNull(card);
 
         var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => new MTGCard(x.Info));
 

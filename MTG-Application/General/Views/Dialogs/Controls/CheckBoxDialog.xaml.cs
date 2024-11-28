@@ -13,8 +13,8 @@ public sealed partial class CheckBoxDialog : ConfirmationDialogWithBool
     SecondaryButtonText = string.Empty;
   }
 
-  public string Message { get; }
-  public string InputText { get; set; }
+  public string Message { get; } = string.Empty;
+  public string InputText { get; set; } = string.Empty;
   public bool IsChecked { get; set; }
 
   protected override (ConfirmationResult, bool) ProcessResult(ContentDialogResult result)

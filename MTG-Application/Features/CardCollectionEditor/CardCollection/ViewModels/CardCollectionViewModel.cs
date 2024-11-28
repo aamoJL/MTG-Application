@@ -43,15 +43,15 @@ public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImp
 
   private MTGCardCollection Model { get; } = model;
 
-  public Func<Task> OnDelete { get; init; }
+  public Func<Task>? OnDelete { get; init; }
   // List change actions are used to update selected list on CardCollectionPage, because Combobox does not work with collection change events
-  public Func<MTGCardCollectionList, Task> OnListAdded { get; init; }
-  public Func<MTGCardCollectionList, Task> OnListRemoved { get; init; }
+  public Func<MTGCardCollectionList, Task>? OnListAdded { get; init; }
+  public Func<MTGCardCollectionList, Task>? OnListRemoved { get; init; }
 
-  public IAsyncRelayCommand SaveCollectionCommand => field ??= new ConfirmSaveCollection(this).Command;
-  public IAsyncRelayCommand DeleteCollectionCommand => field ??= new ConfirmDeleteCollection(this).Command;
-  public IAsyncRelayCommand NewListCommand => field ??= new ConfirmNewList(this).Command;
-  public IAsyncRelayCommand<MTGCardCollectionList> DeleteListCommand => field ??= new ConfirmDeleteList(this).Command;
+  public IAsyncRelayCommand? SaveCollectionCommand => field ??= new ConfirmSaveCollection(this).Command;
+  public IAsyncRelayCommand? DeleteCollectionCommand => field ??= new ConfirmDeleteCollection(this).Command;
+  public IAsyncRelayCommand? NewListCommand => field ??= new ConfirmNewList(this).Command;
+  public IAsyncRelayCommand<MTGCardCollectionList>? DeleteListCommand => field ??= new ConfirmDeleteList(this).Command;
 
   public MTGCardCollectionDTO AsDTO() => CardCollectionToDTOConverter.Convert(Model);
 }

@@ -19,7 +19,7 @@ public record CardSortProperties(
 
   public class MTGCardPropertyComparer(MTGSortProperty sortProperty) : IComparer
   {
-    public int Compare(object x, object y)
+    public int Compare(object? x, object? y)
     {
       var cx = GetComparable(x as DeckEditorMTGCard, sortProperty);
       var cy = GetComparable(y as DeckEditorMTGCard, sortProperty);
@@ -27,8 +27,11 @@ public record CardSortProperties(
       return cx == cy ? 0 : cx == null ? -1 : cy == null ? +1 : cx.CompareTo(cy);
     }
 
-    private static IComparable GetComparable(DeckEditorMTGCard card, MTGSortProperty sortProperty)
+    private static IComparable? GetComparable(DeckEditorMTGCard? card, MTGSortProperty sortProperty)
     {
+      if (card == null)
+        return null;
+
       return sortProperty switch
       {
         MTGSortProperty.CMC => card.Info.CMC,

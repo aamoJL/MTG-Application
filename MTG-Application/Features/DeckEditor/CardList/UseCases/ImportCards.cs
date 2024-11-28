@@ -23,12 +23,15 @@ public partial class CardListViewModelCommands
 
   private class ImportCards(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, string>(viewmodel)
   {
-    protected override async Task Execute(string data)
+    protected override async Task Execute(string? data)
     {
       data ??= await Viewmodel.Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
 
       try
       {
+        if (string.IsNullOrEmpty(data))
+          throw new ArgumentNullException(nameof(data));
+
         var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
 
         var newCards = new List<DeckEditorMTGCard>();

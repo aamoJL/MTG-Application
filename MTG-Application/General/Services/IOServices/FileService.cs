@@ -56,7 +56,7 @@ public static class FileService
   /// </summary>
   /// <param name="path">File path</param>
   /// <returns></returns>
-  public static bool TryReadTextFromFile(string path, out string output)
+  public static bool TryReadTextFromFile(string path, out string? output)
   {
     try { output = File.ReadAllText(path); }
     catch { output = null; }
@@ -67,7 +67,7 @@ public static class FileService
   /// <summary>
   /// Returns text from the given file
   /// </summary>
-  public static async Task<string> TryReadTextFromFileAsync(string path)
+  public static async Task<string?> TryReadTextFromFileAsync(string path)
   {
     try { return await File.ReadAllTextAsync(path); }
     catch { return null; }

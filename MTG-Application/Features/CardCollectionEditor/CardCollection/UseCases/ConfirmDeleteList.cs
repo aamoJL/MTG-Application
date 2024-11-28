@@ -14,9 +14,9 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmDeleteList(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel, MTGCardCollectionList>(viewmodel)
   {
-    protected override bool CanExecute(MTGCardCollectionList list) => Viewmodel.CollectionLists.Contains(list);
+    protected override bool CanExecute(MTGCardCollectionList? list) => list != null && Viewmodel.CollectionLists.Contains(list);
 
-    protected override async Task Execute(MTGCardCollectionList list)
+    protected override async Task Execute(MTGCardCollectionList? list)
     {
       if (!CanExecute(list))
       {
@@ -29,11 +29,11 @@ public partial class CardCollectionEditorViewModelCommands
         is not ConfirmationResult.Yes)
         return;
 
-      if (Viewmodel.CollectionLists.Remove(list))
+      if (Viewmodel.CollectionLists.Remove(list!))
       {
         Viewmodel.HasUnsavedChanges = true;
 
-        Viewmodel.OnListRemoved?.Invoke(list);
+        Viewmodel.OnListRemoved?.Invoke(list!);
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListSuccess);
       }

@@ -13,11 +13,16 @@ public partial class CardListViewModelCommands
 
   private class RemoveCard(CardListViewModel viewmodel) : ViewModelCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
   {
-    protected override void Execute(DeckEditorMTGCard card)
-      => Viewmodel.UndoStack.PushAndExecute(
+    protected override void Execute(DeckEditorMTGCard? card)
+    {
+      if (card == null)
+        return;
+
+      Viewmodel.UndoStack.PushAndExecute(
         new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
         {
           ReversibleAction = new ReversibleRemoveCardAction(Viewmodel)
         });
+    }
   }
 }

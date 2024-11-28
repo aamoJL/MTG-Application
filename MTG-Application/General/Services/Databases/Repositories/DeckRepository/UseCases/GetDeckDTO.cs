@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 
-public class GetDeckDTO(IRepository<MTGCardDeckDTO> repository) : UseCase<string, Task<MTGCardDeckDTO>>
+public class GetDeckDTO(IRepository<MTGCardDeckDTO> repository) : UseCase<string, Task<MTGCardDeckDTO?>>
 {
-  public Action<DbSet<MTGCardDeckDTO>> SetIncludes { get; init; }
+  public Action<DbSet<MTGCardDeckDTO>>? SetIncludes { get; init; }
 
-  public async override Task<MTGCardDeckDTO> Execute(string name) => string.IsNullOrEmpty(name) ? null : await repository.Get(name, SetIncludes);
+  public async override Task<MTGCardDeckDTO?> Execute(string name)
+    => string.IsNullOrEmpty(name) ? null : await repository.Get(name, SetIncludes);
 }

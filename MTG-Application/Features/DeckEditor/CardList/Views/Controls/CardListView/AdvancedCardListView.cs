@@ -73,15 +73,16 @@ public partial class AdvancedCardListView : ListView
     }
   }
 
-  public IAsyncRelayCommand OnDropCopy { get; set; }
-  public IAsyncRelayCommand OnDropImport { get; set; }
-  public ICommand OnDropBeginMoveFrom { get; set; }
-  public IAsyncRelayCommand OnDropBeginMoveTo { get; set; }
-  public ICommand OnDropExecuteMove { get; set; }
+  public IAsyncRelayCommand? OnDropCopy { get; set; }
+  public IAsyncRelayCommand? OnDropImport { get; set; }
+  public ICommand? OnDropBeginMoveFrom { get; set; }
+  public IAsyncRelayCommand? OnDropBeginMoveTo { get; set; }
+  public ICommand? OnDropExecuteMove { get; set; }
 
-  private void OnItemsSourceDependencyPropertyChanged(IList list)
+  private void OnItemsSourceDependencyPropertyChanged(IList? list)
   {
-    if (list is null) return;
+    if (list is null)
+      return;
 
     var source = new AdvancedCollectionView(list, true);
     source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardPropertyComparer(SortProperties.PrimarySortProperty)));
@@ -89,9 +90,10 @@ public partial class AdvancedCardListView : ListView
     FilteredAndSortedCardSource = source;
   }
 
-  private void OnSortPropertiesDependencyPropertyChanged(CardSortProperties sortProperties)
+  private void OnSortPropertiesDependencyPropertyChanged(CardSortProperties? sortProperties)
   {
-    if (sortProperties is null || FilteredAndSortedCardSource.SortDescriptions.Count == 0) return;
+    if (sortProperties is null || FilteredAndSortedCardSource.SortDescriptions.Count == 0)
+      return;
 
     FilteredAndSortedCardSource.SortDescriptions[0]
       = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.PrimarySortProperty));
@@ -99,13 +101,13 @@ public partial class AdvancedCardListView : ListView
       = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.SecondarySortProperty));
   }
 
-  private void OnFilterPropertiesDependencyPropertyChanged(CardFilters filterProperties)
+  private void OnFilterPropertiesDependencyPropertyChanged(CardFilters? filterProperties)
   {
     if (filterProperties is not null)
       filterProperties.PropertyChanged += FilterProperties_PropertyChanged;
   }
 
-  private void FilterProperties_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void FilterProperties_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (FilterProperties.FiltersApplied)
     {
@@ -117,7 +119,8 @@ public partial class AdvancedCardListView : ListView
 
   private static void OnDependencyPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
-    if (sender is not AdvancedCardListView view) return;
+    if (sender is not AdvancedCardListView view)
+      return;
 
     if (e.Property == ItemsSourceProperty)
       view.OnItemsSourceDependencyPropertyChanged(e.NewValue as IList);

@@ -73,17 +73,16 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     set => SetValue(FilterPropertiesProperty, value);
   }
 
-  private AdvancedCollectionView filteredAndSortedCardSource = [];
   protected ListViewDragAndDrop<DeckEditorMTGCard> DragAndDrop { get; }
   private AdvancedCollectionView FilteredAndSortedCardSource
   {
-    get => filteredAndSortedCardSource;
+    get;
     set
     {
-      filteredAndSortedCardSource = value;
-      base.ItemsSource = filteredAndSortedCardSource;
+      field = value;
+      base.ItemsSource = field;
     }
-  }
+  } = [];
 
   public IAsyncRelayCommand OnDropCopy
   {
@@ -111,7 +110,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     set => SetValue(OnDropExecuteMoveProperty, value);
   }
 
-  private void OnItemsSourceDependencyPropertyChanged(IList list)
+  private void OnItemsSourceDependencyPropertyChanged(IList? list)
   {
     if (list is null)
       return;
@@ -122,7 +121,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     FilteredAndSortedCardSource = source;
   }
 
-  private void OnSortPropertiesDependencyPropertyChanged(CardSortProperties sortProperties)
+  private void OnSortPropertiesDependencyPropertyChanged(CardSortProperties? sortProperties)
   {
     if (sortProperties is null || FilteredAndSortedCardSource.SortDescriptions.Count == 0)
       return;
@@ -133,13 +132,13 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
       = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.SecondarySortProperty));
   }
 
-  private void OnFilterPropertiesDependencyPropertyChanged(CardFilters filterProperties)
+  private void OnFilterPropertiesDependencyPropertyChanged(CardFilters? filterProperties)
   {
     if (filterProperties is not null)
       filterProperties.PropertyChanged += FilterProperties_PropertyChanged;
   }
 
-  private void FilterProperties_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void FilterProperties_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (FilterProperties.FiltersApplied)
     {

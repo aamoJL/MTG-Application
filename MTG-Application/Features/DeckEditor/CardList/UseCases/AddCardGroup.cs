@@ -17,7 +17,7 @@ public partial class GroupedCardListViewModelCommands
 
   private class AddCardGroup(GroupedCardListViewModel viewmodel) : ViewModelAsyncCommand<GroupedCardListViewModel, string>(viewmodel)
   {
-    protected override async Task Execute(string key)
+    protected override async Task Execute(string? key)
     {
       key ??= await Viewmodel.Confirmers.AddCardGroupConfirmer.Confirm(GroupedCardListConfirmers.GetAddCardGroupConfirmation());
 

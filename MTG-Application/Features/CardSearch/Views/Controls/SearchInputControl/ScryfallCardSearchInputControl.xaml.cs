@@ -11,7 +11,7 @@ public sealed partial class ScryfallCardSearchInputControl : UserControl
 
   public ScryfallCardSearchControlViewModel ViewModel { get; } = new();
 
-  public ICommand Submit { get; set; }
+  public ICommand? Submit { get; set; }
 
   private void SubmitButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
   {

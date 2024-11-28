@@ -99,7 +99,7 @@ public sealed partial class DeckTestingBattlefieldCardView : DeckTestingCardView
     lastButtonPress = PointerButton.None;
   }
 
-  private void OnDragCompleted(DeckTestingMTGCard item)
+  private void OnDragCompleted(DeckTestingMTGCard? item)
   {
     if (this.FindParentByType<Canvas>() is not Canvas canvas)
       return;

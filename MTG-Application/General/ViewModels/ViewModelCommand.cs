@@ -32,9 +32,9 @@ public abstract class ViewModelCommand<TViewModel, TParam>
 
   protected TViewModel Viewmodel { get; }
 
-  protected virtual bool CanExecute(TParam param) => true;
+  protected virtual bool CanExecute(TParam? param) => true;
 
-  protected abstract void Execute(TParam param);
+  protected abstract void Execute(TParam? param);
 }
 
 public abstract class ViewModelAsyncCommand<TViewModel>
@@ -66,7 +66,7 @@ public abstract class ViewModelAsyncCommand<TViewModel, TParam>
 
   protected TViewModel Viewmodel { get; }
 
-  protected virtual bool CanExecute(TParam param) => true;
+  protected virtual bool CanExecute(TParam? param) => true;
 
-  protected abstract Task Execute(TParam param);
+  protected abstract Task Execute(TParam? param);
 }

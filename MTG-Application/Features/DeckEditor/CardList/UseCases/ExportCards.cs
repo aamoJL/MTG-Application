@@ -18,13 +18,14 @@ public partial class CardListViewModelCommands
 
   private class ExportCards(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, string>(viewmodel)
   {
-    protected override bool CanExecute(string byProperty) => byProperty is "Id" or "Name";
+    protected override bool CanExecute(string? byProperty) => byProperty is "Id" or "Name";
 
-    protected override async Task Execute(string byProperty)
+    protected override async Task Execute(string? byProperty)
     {
-      if (!CanExecute(byProperty)) return;
+      if (!CanExecute(byProperty))
+        return;
 
-      if (await Viewmodel.Confirmers.ExportConfirmer.Confirm(CardListConfirmers.GetExportConfirmation(GetExportString(Viewmodel.Cards, byProperty)))
+      if (await Viewmodel.Confirmers.ExportConfirmer.Confirm(CardListConfirmers.GetExportConfirmation(GetExportString(Viewmodel.Cards, byProperty!)))
         is not string response || string.IsNullOrEmpty(response))
         return;
 

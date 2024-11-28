@@ -17,8 +17,11 @@ public partial class CardListViewModelCommands
 
   private class AddCard(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
   {
-    protected override async Task Execute(DeckEditorMTGCard card)
+    protected override async Task Execute(DeckEditorMTGCard? card)
     {
+      if (card == null)
+        return;
+
       if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) == null
         || await Viewmodel.Confirmers.AddSingleConflictConfirmer.Confirm(CardListConfirmers.GetAddSingleConflictConfirmation(card.Info.Name)) is ConfirmationResult.Yes)
       {

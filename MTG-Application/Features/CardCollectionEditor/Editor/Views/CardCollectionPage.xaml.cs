@@ -32,7 +32,7 @@ public sealed partial class CardCollectionPage : Page
   {
     args.Handled = true;
 
-    if (ViewModel.NewCollectionCommand.CanExecute(null))
+    if (ViewModel.NewCollectionCommand?.CanExecute(null) is true)
       await ViewModel.NewCollectionCommand.ExecuteAsync(null);
   }
 
@@ -48,20 +48,23 @@ public sealed partial class CardCollectionPage : Page
   {
     args.Handled = true;
 
-    if (ViewModel.OpenCollectionCommand.CanExecute(null))
+    if (ViewModel.OpenCollectionCommand?.CanExecute(null) is true)
       await ViewModel.OpenCollectionCommand.ExecuteAsync(null);
   }
 
-  private void WindowClosing_Closing(object sender, WindowClosing.ClosingEventArgs e)
+  private void WindowClosing_Closing(object? _, WindowClosing.ClosingEventArgs e)
   {
-    if (e.Root != XamlRoot) return;
+    if (e.Root != XamlRoot)
+      return;
 
-    e.Tasks.Add(ViewModel.ConfirmUnsavedChangesCommand.ExecuteAsync);
+    if (ViewModel.ConfirmUnsavedChangesCommand != null)
+      e.Tasks.Add(ViewModel.ConfirmUnsavedChangesCommand.ExecuteAsync);
   }
 
-  private void WindowClosing_Closed(object sender, WindowClosing.ClosedEventArgs e)
+  private void WindowClosing_Closed(object? _, WindowClosing.ClosedEventArgs e)
   {
-    if (e.Root != XamlRoot) return;
+    if (e.Root != XamlRoot)
+      return;
 
     WindowClosing.Closing -= WindowClosing_Closing;
     WindowClosing.Closed -= WindowClosing_Closed;

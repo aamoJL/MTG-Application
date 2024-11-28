@@ -15,14 +15,15 @@ public partial class CardListViewModelCommands
 
   private class ChangeCardCount(CardListViewModel viewmodel) : ViewModelCommand<CardListViewModel, CardCountChangeArgs>(viewmodel)
   {
-    protected override bool CanExecute(CardCountChangeArgs args)
-      => args.Card.Count != args.Value && args.Value > 0;
+    protected override bool CanExecute(CardCountChangeArgs? args)
+      => args != null && args.Card.Count != args.Value && args.Value > 0;
 
-    protected override void Execute(CardCountChangeArgs args)
+    protected override void Execute(CardCountChangeArgs? args)
     {
-      if (!CanExecute(args)) return;
+      if (!CanExecute(args))
+        return;
 
-      var (card, newValue) = args;
+      var (card, newValue) = args!;
 
       Viewmodel.UndoStack.PushAndExecute(
         new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(card, card.Count, newValue)

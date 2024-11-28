@@ -11,7 +11,7 @@ namespace MTGApplication.General.ViewModels;
 public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : object(), IIncrementalSource<TCard> where TCard : MTGCard
 {
   public List<TCard> Cards { get; set; } = [];
-  public string NextPage { get; set; }
+  public string NextPage { get; set; } = string.Empty;
   public int PageSize => importer.PageSize;
 
   public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)

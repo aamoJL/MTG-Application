@@ -46,9 +46,10 @@ public partial class CardFilters : ObservableObject
   /// <summary>
   /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
   /// </summary>
-  public bool CardValidation(DeckEditorMTGCard card)
+  public bool CardValidation(DeckEditorMTGCard? card)
   {
-    if (card.Info.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
+    if (card != null
+      && card.Info.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
       && card.Info.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)
       && (card.Info.FrontFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)
       || (card.Info.BackFace != null && card.Info.BackFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)))

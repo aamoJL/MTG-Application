@@ -18,8 +18,11 @@ public partial class CardListViewModelCommands
 
   private class ChangeCardPrint(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, DeckEditorMTGCard>(viewmodel)
   {
-    protected override async Task Execute(DeckEditorMTGCard card)
+    protected override async Task Execute(DeckEditorMTGCard? card)
     {
+      if (card == null)
+        return;
+
       if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
       {
         try

@@ -20,12 +20,12 @@ public sealed partial class GridViewDialog : ObjectDialog
 
   public object[] Items { get; }
   public DataTemplate ItemTemplate { get; }
-  public object Selection { get; set; }
+  public object? Selection { get; set; }
   public bool CanDragItems { get; set; } = false;
 
-  public Action<DragItemsStartingEventArgs> OnItemDragStarting { get; set; }
+  public Action<DragItemsStartingEventArgs>? OnItemDragStarting { get; set; }
 
-  protected override object ProcessResult(ContentDialogResult result)
+  protected override object? ProcessResult(ContentDialogResult result)
     => result switch
     {
       ContentDialogResult.Primary => Selection,

@@ -77,7 +77,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   }
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
   public double Price => Deck.DeckCards.Sum(x => x.Info.Price * x.Count) + (Deck.Commander?.Info.Price ?? 0) + (Deck.CommanderPartner?.Info.Price ?? 0);
-  public DeckEditorMTGCard Commander
+  public DeckEditorMTGCard? Commander
   {
     get => Deck.Commander;
     set
@@ -86,7 +86,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       OnPropertyChanged(nameof(Commander));
     }
   }
-  public DeckEditorMTGCard Partner
+  public DeckEditorMTGCard? Partner
   {
     get => Deck.CommanderPartner;
     set
@@ -127,7 +127,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     HasUnsavedChanges = false;
   }
 
-  private void OnCommanderChanged(DeckEditorMTGCard card)
+  private void OnCommanderChanged(DeckEditorMTGCard? card)
   {
     if (Commander == card) return;
 
@@ -135,7 +135,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     HasUnsavedChanges = true;
   }
 
-  private void OnPartnerChanged(DeckEditorMTGCard card)
+  private void OnPartnerChanged(DeckEditorMTGCard? card)
   {
     if (Partner == card) return;
 

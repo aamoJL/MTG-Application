@@ -3,9 +3,11 @@ using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,11 +19,12 @@ public partial class DeckEditorViewModelCommands
 
   private class OpenDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, string>(viewmodel)
   {
-    protected override bool CanExecute(string name) => name != string.Empty;
+    protected override bool CanExecute(string? name) => name != string.Empty;
 
-    protected override async Task Execute(string loadName)
+    protected override async Task Execute(string? loadName)
     {
-      if (!CanExecute(loadName)) return;
+      if (!CanExecute(loadName))
+        return;
 
       var unsavedArgs = new ISavable.ConfirmArgs();
 
@@ -39,8 +42,10 @@ public partial class DeckEditorViewModelCommands
 
       try
       {
-        if (await Viewmodel.Worker.DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer)
-          .Convert(dto: await new GetDeckDTO(Viewmodel.Repository).Execute(loadName))) is DeckEditorMTGDeck deck)
+        if (await new GetDeckDTO(Viewmodel.Repository).Execute(loadName) is not MTGCardDeckDTO dto)
+          throw new InvalidOperationException("Deck was not found");
+
+        if (await Viewmodel.Worker.DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer).Convert(dto)) is DeckEditorMTGDeck deck)
         {
           Viewmodel.SetDeck(deck);
 

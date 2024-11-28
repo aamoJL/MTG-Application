@@ -20,7 +20,7 @@ public class ReversibleCollectionCommand<T> : IReversibleCommand<IEnumerable<T>>
     Items = new List<T>(Copier.Copy(items));
   }
 
-  public ReversibleAction<IEnumerable<T>> ReversibleAction { get; set; }
+  public required ReversibleAction<IEnumerable<T>> ReversibleAction { get; set; }
 
   private IEnumerable<T> Items { get; }
   private IClassCopier<T> Copier { get; } = new ReversibleCommand<T>.DefaultCopier();

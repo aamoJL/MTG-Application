@@ -17,8 +17,11 @@ public partial class CardGroupViewModelCommands
 
   private class AddCardToGroup(CardGroupViewModel viewmodel, GroupedCardListViewModel listViewmodel) : ViewModelAsyncCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
   {
-    protected override async Task Execute(DeckEditorMTGCard card)
+    protected override async Task Execute(DeckEditorMTGCard? card)
     {
+      if (card == null)
+        return;
+
       if (listViewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
       {
         // Confirm change on existing card
