@@ -541,8 +541,8 @@
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}">
           <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <ItemsRepeater ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
-              <ItemsRepeater.ItemTemplate>
+            <ItemsControl ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
+              <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:CardGroupViewModel">
                   <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <customControls:CustomExpander IsExpanded="True" HorizontalAlignment="Stretch">
@@ -621,8 +621,8 @@
                     </customControls:CustomExpander>
                   </StackPanel>
                 </DataTemplate>
-              </ItemsRepeater.ItemTemplate>
-            </ItemsRepeater>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </ScrollViewer>
         </Grid>
         <!--#endregion-->
