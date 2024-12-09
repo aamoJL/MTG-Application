@@ -8,5 +8,9 @@ public class DeleteCardCollectionDTO(IRepository<MTGCardCollectionDTO> repositor
 {
   public override async Task<bool> Execute(MTGCardCollectionDTO collection) => await repository.Delete(collection);
 
-  public async Task<bool> Execute(string name) => await repository.Delete(await repository.Get(name, (set) => { }));
+  public async Task<bool> Execute(string name)
+  {
+    return await repository.Get(name, RepositoryUtilities<MTGCardCollectionDTO>.EmptyIncludes) is MTGCardCollectionDTO item
+      && await repository.Delete(item);
+  }
 }

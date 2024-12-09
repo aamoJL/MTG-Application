@@ -29,7 +29,7 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
   public virtual async Task<bool> Exists(string name)
   {
     using var db = DbContextFactory.CreateDbContext();
-    return await Task.FromResult(db.MTGDecks.FirstOrDefault(x => x.Name == name) != null);
+    return await Task.FromResult(db.MTGDecks?.FirstOrDefault(x => x.Name == name) != null);
   }
 
   public virtual async Task<IEnumerable<MTGCardDeckDTO>> Get(Action<DbSet<MTGCardDeckDTO>>? setIncludes = null)
@@ -60,14 +60,15 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
 
-    var set = db.MTGDecks;
+    if (db.MTGDecks is not DbSet<MTGCardDeckDTO> set)
+      return null;
 
     if (setIncludes != null)
       setIncludes.Invoke(set);
     else
       SetDefaultIncludes(set);
 
-    var deck = set.Where(x => x.Name == name).FirstOrDefault();
+    var deck = set?.Where(x => x.Name == name).FirstOrDefault();
     db.ChangeTracker.AutoDetectChangesEnabled = true;
 
     return await Task.FromResult(deck);
@@ -78,15 +79,19 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
     if (item == null) return false;
 
     using var db = DbContextFactory.CreateDbContext();
+    var set = db.MTGDecks;
 
-    if (await db.MTGDecks.FirstOrDefaultAsync(x => x.Name == item.Name) is MTGCardDeckDTO existingItem)
+    if (set != null && await set.FirstOrDefaultAsync(x => x.Name == item.Name) is MTGCardDeckDTO existingItem)
       db.Remove(existingItem);
 
     return await db.SaveChangesAsync() > 0;
   }
 
+  /// <exception cref="ArgumentNullException"></exception>
   public virtual async Task<bool> Update(MTGCardDeckDTO item)
   {
+    ArgumentNullException.ThrowIfNull(item);
+
     using var db = DbContextFactory.CreateDbContext();
     db.ChangeTracker.LazyLoadingEnabled = false;
     db.ChangeTracker.AutoDetectChangesEnabled = false;
@@ -156,7 +161,7 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
     await Task.WhenAll(updateCardsTasks);
 
     // Remove old commander and add new one if the commander changed
-    if ((existingDeck.Commander != null || item.Commander != null) && existingDeck.Commander?.Compare(item?.Commander) is not true)
+    if ((existingDeck.Commander != null || item.Commander != null) && existingDeck.Commander?.Compare(item.Commander) is not true)
     {
       if (existingDeck.Commander != null)
         db.Remove(existingDeck.Commander);

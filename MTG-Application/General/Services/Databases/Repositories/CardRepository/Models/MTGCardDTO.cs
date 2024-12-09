@@ -43,8 +43,11 @@ public record MTGCardDTO
   /// <summary>
   /// Compares DTOs, excluding Id and Count
   /// </summary>
-  public bool Compare(MTGCardDTO other)
+  public bool Compare(MTGCardDTO? other)
   {
+    if (other == null)
+      return false;
+
     var x = this with { Id = 0, Count = 1 };
     var y = other with { Id = 0, Count = 1 };
 

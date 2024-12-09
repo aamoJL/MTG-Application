@@ -16,7 +16,12 @@ public partial class DeckEditorViewModelCommands
     protected override bool CanExecute() => Viewmodel.Commander != null;
 
     protected override async Task Execute()
-      => await NetworkService.OpenUri(
-        EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Commander, Viewmodel.Partner));
+    {
+      if (!CanExecute())
+        return;
+
+      await NetworkService.OpenUri(
+        EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Commander!, Viewmodel.Partner));
+    }
   }
 }

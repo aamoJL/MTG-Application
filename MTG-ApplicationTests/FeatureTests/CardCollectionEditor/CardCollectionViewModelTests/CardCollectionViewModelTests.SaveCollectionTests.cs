@@ -37,7 +37,7 @@ public partial class CardCollectionViewModelTests
         Model = new() { Name = "New", CollectionLists = [new()] },
         Confirmers = new()
         {
-          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) },
+          SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string>(null) },
         }
       }.MockVM();
 
@@ -213,6 +213,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task Save_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -221,13 +222,12 @@ public partial class CardCollectionViewModelTests
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success, () => viewmodel.SaveCollectionCommand.ExecuteAsync(null));
+      await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
@@ -235,6 +235,7 @@ public partial class CardCollectionViewModelTests
     {
       _dependencies.Repository.UpdateFailure = true;
 
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -243,13 +244,12 @@ public partial class CardCollectionViewModelTests
         {
           SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) },
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.SaveCollectionCommand.ExecuteAsync(null));
+      await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]

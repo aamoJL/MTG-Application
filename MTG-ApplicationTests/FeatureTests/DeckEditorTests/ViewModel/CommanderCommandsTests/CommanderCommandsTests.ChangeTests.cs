@@ -14,7 +14,7 @@ public partial class CommanderCommandsTests
     public async Task Change_ToCard_InvokedWithCard()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
         OnChange = (card) => { result = card; }
@@ -28,7 +28,7 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task Change_ToNull_InvokedWithNull()
     {
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
         OnChange = (card) => { result = card; }

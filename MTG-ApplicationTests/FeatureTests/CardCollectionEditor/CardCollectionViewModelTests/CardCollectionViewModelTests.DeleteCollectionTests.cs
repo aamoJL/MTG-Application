@@ -81,6 +81,7 @@ public partial class CardCollectionViewModelTests
     [TestMethod("Success notification should be sent when the collection was deleted")]
     public async Task Delete_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -88,14 +89,12 @@ public partial class CardCollectionViewModelTests
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.DeleteCollectionCommand.ExecuteAsync(null));
+      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod("Error notification should be sent when there are failure on deletion")]
@@ -103,6 +102,7 @@ public partial class CardCollectionViewModelTests
     {
       _dependencies.Repository.DeleteFailure = true;
 
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -110,14 +110,12 @@ public partial class CardCollectionViewModelTests
         {
           DeleteCollectionConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.DeleteCollectionCommand.ExecuteAsync(null));
+      await viewmodel.DeleteCollectionCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]

@@ -9,8 +9,8 @@ public static class MTGCardDTOMocker
     int count = 1,
     Guid? scryfallId = null,
     Guid? oracleId = null,
-    string? setCode = null,
-    string? collectorNumber = null,
+    string setCode = null,
+    string collectorNumber = null,
     string group = "")
   {
     return new(

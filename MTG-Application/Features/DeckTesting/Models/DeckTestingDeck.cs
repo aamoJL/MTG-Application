@@ -5,6 +5,6 @@ namespace MTGApplication.Features.DeckTesting.Models;
 
 public record DeckTestingDeck(
   List<MTGCard> DeckCards,
-  MTGCard Commander,
-  MTGCard Partner)
+  MTGCard? Commander,
+  MTGCard? Partner)
 { }

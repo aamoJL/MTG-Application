@@ -60,7 +60,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>(null),
+            OnConfirm = async msg => await Task.FromResult<string>(null),
           }
         }
       }.MockVM();
@@ -79,7 +79,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>(string.Empty),
+            OnConfirm = async msg => await Task.FromResult(string.Empty),
           }
         }
       }.MockVM();
@@ -101,7 +101,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         }
       }.MockVM();
@@ -123,7 +123,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         }
       }.MockVM();
@@ -150,7 +150,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         }
       }.MockVM();
@@ -173,7 +173,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         },
         Notifier = notifier
@@ -198,7 +198,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         },
         Notifier = notifier
@@ -224,7 +224,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         },
         Notifier = notifier
@@ -253,7 +253,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         },
         Notifier = notifier
@@ -278,7 +278,7 @@ public partial class CardCollectionListViewModelTests
         {
           ImportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>("Import"),
+            OnConfirm = async msg => await Task.FromResult("Import"),
           }
         },
         Notifier = notifier

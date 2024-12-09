@@ -113,6 +113,7 @@ public partial class CardCollectionViewModelTests
     public async Task DeleteList_Success_SuccessNotificationSent()
     {
       var list = _savedCollection.CollectionLists.First();
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -123,17 +124,19 @@ public partial class CardCollectionViewModelTests
             OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.DeleteListCommand.ExecuteAsync(list));
+      await viewmodel.DeleteListCommand.ExecuteAsync(list);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
     public async Task DeleteList_Error_ErrorNotificationSent()
     {
       var list = _savedCollection.CollectionLists.First();
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -144,20 +147,21 @@ public partial class CardCollectionViewModelTests
             OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
       // Remove list manually, so the command will fail to remove it
       viewmodel.CollectionLists.Remove(list);
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.DeleteListCommand.ExecuteAsync(list));
+      await viewmodel.DeleteListCommand.ExecuteAsync(list);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task DeleteList_Success_OnListRemovedInvoked()
     {
-      MTGCardCollectionList? invoked = null;
+      MTGCardCollectionList invoked = null;
       var list = _savedCollection.CollectionLists.First();
       var viewmodel = new Mocker(_dependencies)
       {

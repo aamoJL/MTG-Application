@@ -4,9 +4,9 @@ using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.Importers.CardImporter.CardImportResult;
 
 namespace MTGApplicationTests.TestUtility.Importers;
-public class TestMTGCardImporter(Card[]? expectedCards = null, int notFoundCount = 0) : MTGCardImporter
+public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount = 0) : MTGCardImporter
 {
-  public Card[]? ExpectedCards { get; set; } = expectedCards;
+  public Card[] ExpectedCards { get; set; } = expectedCards;
   public int NotFoundCount { get; set; } = notFoundCount;
 
   public override int PageSize => 40;

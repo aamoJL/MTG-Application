@@ -10,9 +10,9 @@ public partial class CommanderViewModelCommands
 {
   public class RemoveCommander(CommanderCommands viewmodel) : ViewModelCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
   {
-    protected override bool CanExecute(DeckEditorMTGCard param) => Viewmodel.GetCommander() != null;
+    protected override bool CanExecute(DeckEditorMTGCard? param) => Viewmodel.GetCommander() != null;
 
-    protected override void Execute(DeckEditorMTGCard param)
+    protected override void Execute(DeckEditorMTGCard? param)
     {
       if (!CanExecute(param)) return;
 

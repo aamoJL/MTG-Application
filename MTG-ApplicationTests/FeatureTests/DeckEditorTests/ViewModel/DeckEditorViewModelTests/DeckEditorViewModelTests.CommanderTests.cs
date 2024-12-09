@@ -36,17 +36,16 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task SetCommander_Import_NotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.CommanderCommands.ImportCommanderCommand.ExecuteAsync("null"));
+      await viewmodel.CommanderCommands.ImportCommanderCommand.ExecuteAsync("null");
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]

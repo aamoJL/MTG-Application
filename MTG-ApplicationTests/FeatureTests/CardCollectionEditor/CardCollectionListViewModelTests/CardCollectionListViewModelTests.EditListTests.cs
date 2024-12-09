@@ -165,6 +165,7 @@ public partial class CardCollectionListViewModelTests
     [TestMethod]
     public async Task EditList_NoName_ErrorNotificationShown()
     {
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -175,16 +176,18 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult((string.Empty, "New Query"))
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.EditListCommand.ExecuteAsync(null));
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task EditList_NoQuery_ErrorNotificationShown()
     {
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -195,16 +198,18 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult(("New Name", string.Empty))
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.EditListCommand.ExecuteAsync(null));
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task EditList_Exists_ErrorNotificationShown()
     {
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -215,18 +220,20 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult(("Name", "New Query"))
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) },
+        Notifier = notifier,
         ExistsValidator = (name) => true
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.EditListCommand.ExecuteAsync(null));
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task EditList_SameName_NoErrorNotificationShown()
     {
       var name = _savedList.Name;
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -237,22 +244,18 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult((name, "New Query"))
           }
         },
-        Notifier = new()
-        {
-          OnNotify = msg =>
-          {
-            if (msg.NotificationType == NotificationType.Error)
-              Assert.Fail();
-          }
-        }
+        Notifier = notifier
       }.MockVM();
 
       await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationNotSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task EditList_Success_SuccessNotificationShown()
     {
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -263,11 +266,12 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
           }
         },
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.EditListCommand.ExecuteAsync(null));
+      await viewmodel.EditListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]

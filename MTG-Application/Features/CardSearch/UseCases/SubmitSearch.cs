@@ -11,9 +11,9 @@ public partial class CardSearchViewModelCommands
 {
   public class SubmitSearch(CardSearchViewModel viewmodel) : ViewModelAsyncCommand<CardSearchViewModel, string>(viewmodel)
   {
-    protected override async Task Execute(string query)
+    protected override async Task Execute(string? query)
     {
-      var searchResult = await Viewmodel.Worker.DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query));
+      var searchResult = await Viewmodel.Worker.DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query ?? string.Empty));
 
       Viewmodel.Cards.SetCollection(
         cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],

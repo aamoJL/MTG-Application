@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories;
 
+public static class RepositoryUtilities<T> where T : class
+{
+  public static Action<DbSet<T>> EmptyIncludes => (T) => { };
+}
+
 /// <summary>
 /// Interface for database repositories
 /// </summary>

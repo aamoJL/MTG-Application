@@ -33,6 +33,6 @@ public partial class CommanderCommands(DeckEditorViewModel viewmodel, CommanderC
   public IAsyncRelayCommand<string>? ImportCommanderCommand => field ??= new ImportCommander(this).Command;
   public IAsyncRelayCommand? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 
-  public DeckEditorMTGCard GetCommander() => commanderType == CommanderType.Commander ? viewmodel.Commander : viewmodel.Partner;
+  public DeckEditorMTGCard? GetCommander() => commanderType == CommanderType.Commander ? viewmodel.Commander : viewmodel.Partner;
 }
 

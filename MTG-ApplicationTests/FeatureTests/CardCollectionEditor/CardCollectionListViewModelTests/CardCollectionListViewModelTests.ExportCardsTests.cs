@@ -57,7 +57,7 @@ public partial class CardCollectionListViewModelTests
         {
           ExportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>(null),
+            OnConfirm = async msg => await Task.FromResult<string>(null),
           }
         },
         ClipboardService = clipboard
@@ -80,7 +80,7 @@ public partial class CardCollectionListViewModelTests
         {
           ExportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>(exportText),
+            OnConfirm = async msg => await Task.FromResult<string>(exportText),
           }
         },
         ClipboardService = clipboard
@@ -106,7 +106,7 @@ public partial class CardCollectionListViewModelTests
             OnConfirm = async msg =>
             {
               exportData = msg.Data;
-              return await Task.FromResult<string?>(msg.Data);
+              return await Task.FromResult<string>(msg.Data);
             },
           }
         },
@@ -125,6 +125,7 @@ public partial class CardCollectionListViewModelTests
     {
       var exportText = "Export";
       var clipboard = new TestClipboardService();
+      var notifier = new TestNotifier();
       var viewmodel = await new Mocker(_dependencies)
       {
         Model = _savedList,
@@ -132,15 +133,16 @@ public partial class CardCollectionListViewModelTests
         {
           ExportCardsConfirmer = new()
           {
-            OnConfirm = async msg => await Task.FromResult<string?>(exportText),
+            OnConfirm = async msg => await Task.FromResult<string>(exportText),
           }
         },
         ClipboardService = clipboard,
-        Notifier = new() { OnNotify = msg => throw new NotificationException(msg) }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Info,
-        () => viewmodel.ExportCardsCommand.ExecuteAsync(null));
+      await viewmodel.ExportCardsCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Info, notifier);
     }
   }
 }

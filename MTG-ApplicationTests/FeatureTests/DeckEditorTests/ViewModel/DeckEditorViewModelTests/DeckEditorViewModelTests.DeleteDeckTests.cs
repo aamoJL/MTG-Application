@@ -100,6 +100,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Success notification should be sent when the deck was deleted")]
     public async Task Delete_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
@@ -107,14 +108,12 @@ public partial class DeckEditorViewModelTests
         {
           DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.DeleteDeckCommand.ExecuteAsync(null));
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod("Error notification should be sent when there are failure on deletion")]
@@ -122,6 +121,7 @@ public partial class DeckEditorViewModelTests
     {
       _dependencies.Repository.DeleteFailure = true;
 
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
@@ -129,14 +129,12 @@ public partial class DeckEditorViewModelTests
         {
           DeleteDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(ConfirmationResult.Yes) }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.DeleteDeckCommand.ExecuteAsync(null));
+      await viewmodel.DeleteDeckCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
   }
 }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Views.Dialogs.UseCases;
 
-public class ShowSaveDialog(XamlRoot root) : ShowDialogUseCase<string, string>(root)
+public class ShowSaveDialog(XamlRoot root) : ShowDialogUseCase<string?, string>(root)
 {
-  protected override async Task<string> ShowDialog(string title, string message, string data)
+  protected override async Task<string?> ShowDialog(string title, string message, string data)
     => await DialogService.ShowAsync(Root, new TextBoxDialog(title)
     {
       InvalidInputCharacters = Path.GetInvalidFileNameChars(),

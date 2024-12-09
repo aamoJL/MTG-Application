@@ -18,7 +18,7 @@ public partial class CommanderCommandsTests
     public async Task Import_NotLegendary_InvokedWithNull()
     {
       var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
         OnChange = (card) => { result = card; }
@@ -35,7 +35,7 @@ public partial class CommanderCommandsTests
     public async Task Import_Legendary_InvokedWithCard()
     {
       var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {
         OnChange = (card) => { result = card; }

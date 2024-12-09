@@ -14,8 +14,8 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task ExecuteMove_OnChangesInvoked()
     {
-      DeckEditorMTGCard? originResult = null;
-      DeckEditorMTGCard? targetResult = null;
+      DeckEditorMTGCard originResult = null;
+      DeckEditorMTGCard targetResult = null;
 
       var undoStack = new ReversibleCommandStack();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();

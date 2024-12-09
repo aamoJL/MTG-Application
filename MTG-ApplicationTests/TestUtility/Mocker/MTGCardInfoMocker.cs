@@ -12,8 +12,8 @@ public class MTGCardInfoMocker
   public static MTGCardInfo MockInfo(
       Guid? scryfallId = null,
       Guid? oracleId = null,
-      CardFace? frontFace = null,
-      CardFace? backFace = null,
+      CardFace frontFace = null,
+      CardFace backFace = null,
       int cmc = 4,
       string name = "Befriending the Moths // Imperial Moth",
       string typeLine = "Enchantment — Saga // Enchantment Creature — Insect",
@@ -25,9 +25,9 @@ public class MTGCardInfoMocker
       string collectionNumber = "4",
       string apiWebsiteUri = "https://scryfall.com/card/neo/4/befriending-the-moths-imperial-moth?utm_source=api",
       string printSearchUri = "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A2ee5f5ad-2f16-40d9-831a-2aefece31b36&unique=prints",
-      ColorTypes[]? producedMana = null,
+      ColorTypes[] producedMana = null,
       string cardMarketUri = "https://www.cardmarket.com/en/Magic/Products/Search?referrer=scryfall&searchString=Befriending+the+Moths&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
-      CardToken[]? tokens = default)
+      CardToken[] tokens = default)
   {
     // NOTE: Remember to also update FromDTO method !
     return new(
@@ -54,7 +54,7 @@ public class MTGCardInfoMocker
   }
 
   public static CardFace MockFace(
-    ColorTypes[]? colors = null,
+    ColorTypes[] colors = null,
     string name = "Befriending the Moths",
     string imageUri = "https://cards.scryfall.io/normal/front/8/a/8ad44884-ae0d-40ae-87a9-bad043d4e9ad.jpg?1656453019",
     Guid? illustrationId = null,

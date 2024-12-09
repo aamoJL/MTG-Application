@@ -40,9 +40,9 @@ public partial class CardCollectionViewModelTests
       public CardCollectionConfirmers Confirmers { get; set; } = new();
       public MTGCardCollection Model { get; set; } = new();
       public Notifier Notifier { get; set; } = new();
-      public Func<Task>? OnDeleted { get; init; }
-      public Func<MTGCardCollectionList, Task>? OnListAdded { get; init; }
-      public Func<MTGCardCollectionList, Task>? OnListRemoved { get; init; }
+      public Func<Task> OnDeleted { get; init; }
+      public Func<MTGCardCollectionList, Task> OnListAdded { get; init; }
+      public Func<MTGCardCollectionList, Task> OnListRemoved { get; init; }
 
       public CardCollectionViewModel MockVM()
       {

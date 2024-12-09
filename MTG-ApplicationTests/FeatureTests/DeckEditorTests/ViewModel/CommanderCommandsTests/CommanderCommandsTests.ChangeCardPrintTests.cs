@@ -48,7 +48,7 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task ChangePrint_InvokedWithPrint()
     {
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
       var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
@@ -68,7 +68,7 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task ChangePrint_Undo_InvokedWithOldPrint()
     {
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
       var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
@@ -89,7 +89,7 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task ChangePrint_Redo_InvokedWithNewPrint()
     {
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
       var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
       var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)

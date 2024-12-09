@@ -23,15 +23,16 @@ public partial class CommanderViewModelCommands
 
       try
       {
-        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: Viewmodel.GetCommander().Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
+        var commander = Viewmodel.GetCommander()!;
+        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: commander.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
         if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CommanderConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
         {
-          if (selection.Info.ScryfallId == Viewmodel.GetCommander().Info.ScryfallId)
+          if (selection.Info.ScryfallId == commander.Info.ScryfallId)
             return; // Same print
 
           Viewmodel.UndoStack.PushAndExecute(
-            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(Viewmodel.GetCommander(), Viewmodel.GetCommander().Info, selection.Info, Viewmodel.CardCopier)
+            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(commander, commander.Info, selection.Info, Viewmodel.CardCopier)
             {
               ReversibleAction = new ReversibleCardPrintChangeAction(Viewmodel)
             });

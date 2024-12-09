@@ -12,10 +12,9 @@ public partial class StringToBitmapConverter : IValueConverter
   public object Convert(object value, Type targetType, object parameter, string language)
   {
     if (value is string uri)
-    {
       return new BitmapImage(new Uri(uri));
-    }
-    return null;
+    else
+      return new BitmapImage();
   }
 
   public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();

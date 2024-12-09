@@ -18,7 +18,7 @@ public sealed partial class TextAreaDialog : StringDialog
   public char[] InvalidInputCharacters { get; set; } = [];
   public bool IsSpellCheckEnabled { get; set; } = false;
 
-  protected override string ProcessResult(ContentDialogResult result)
+  protected override string? ProcessResult(ContentDialogResult result)
     => result switch
     {
       ContentDialogResult.Primary => InputText,

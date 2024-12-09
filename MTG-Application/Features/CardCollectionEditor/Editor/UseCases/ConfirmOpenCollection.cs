@@ -2,6 +2,7 @@
 using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services.Converters;
+using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
@@ -54,9 +55,10 @@ public partial class CardCollectionEditorViewModelCommands
     {
       try
       {
-        var dto = await new GetCardCollectionDTO(Viewmodel.Repository).Execute(loadName);
-
-        return await new DTOToCardCollectionConverter(Viewmodel.Importer).Convert(dto);
+        if (await new GetCardCollectionDTO(Viewmodel.Repository).Execute(loadName) is MTGCardCollectionDTO dto)
+          return await new DTOToCardCollectionConverter(Viewmodel.Importer).Convert(dto);
+        else
+          return null;
       }
       catch { throw; }
     }

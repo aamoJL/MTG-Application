@@ -82,7 +82,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_ByName_ExportStringShown()
     {
-      string? exportText = null;
+      string exportText = null;
 
       var cards = new DeckEditorMTGCard[]
       {
@@ -93,7 +93,7 @@ public partial class CardListViewModelTests
 
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string?>(default); } }
+        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string>(default); } }
       })
       {
         Cards = new(cards),
@@ -107,7 +107,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_ById_ExportStringShown()
     {
-      string? exportText = null;
+      string exportText = null;
 
       var cards = new DeckEditorMTGCard[]
       {
@@ -118,7 +118,7 @@ public partial class CardListViewModelTests
 
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
-        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string?>(default); } }
+        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string>(default); } }
       })
       {
         Cards = new(cards),
@@ -132,7 +132,7 @@ public partial class CardListViewModelTests
     [TestMethod]
     public async Task Execute_CopyToClipboard_CopiedToClipboard()
     {
-      string? exportText = null;
+      string exportText = null;
 
       var cards = new DeckEditorMTGCard[]
       {
@@ -166,6 +166,7 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
       var clipboard = new TestClipboardService();
+      var notifier = new TestNotifier();
 
       var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
       {
@@ -174,10 +175,12 @@ public partial class CardListViewModelTests
       {
         Cards = new(cards),
         ClipboardService = clipboard,
-        Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
+        Notifier = notifier
       };
 
-      await NotificationAssert.NotificationSent(NotificationType.Info, () => viewmodel.ExportCardsCommand.ExecuteAsync("Name"));
+      await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
+
+      NotificationAssert.NotificationSent(NotificationType.Info, notifier);
     }
   }
 }

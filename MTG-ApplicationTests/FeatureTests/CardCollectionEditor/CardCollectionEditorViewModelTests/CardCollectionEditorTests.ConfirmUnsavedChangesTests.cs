@@ -160,7 +160,7 @@ public partial class CardCollectionEditorTests
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
           CardCollectionConfirmers = new()
           {
-            SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) },
+            SaveCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string>(null) },
           }
         },
       }.MockVM();

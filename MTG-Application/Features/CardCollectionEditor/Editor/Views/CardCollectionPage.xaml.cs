@@ -40,7 +40,7 @@ public sealed partial class CardCollectionPage : Page
   {
     args.Handled = true;
 
-    if (ViewModel.CardCollectionViewModel.SaveCollectionCommand.CanExecute(null))
+    if (ViewModel.CardCollectionViewModel.SaveCollectionCommand?.CanExecute(null) is true)
       await ViewModel.CardCollectionViewModel.SaveCollectionCommand.ExecuteAsync(null);
   }
 

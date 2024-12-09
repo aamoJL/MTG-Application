@@ -2,9 +2,9 @@
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplicationTests.TestUtility.Services;
-public class TestClipboardService : ClipboardService, IDisposable
+public partial class TestClipboardService : ClipboardService, IDisposable
 {
-  public object? Content { get; set; }
+  public object Content { get; set; }
 
   public override void CopyToClipboard(string text)
   {

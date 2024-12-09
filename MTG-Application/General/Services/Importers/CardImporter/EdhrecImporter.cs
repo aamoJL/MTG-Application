@@ -32,9 +32,10 @@ public partial class EdhrecImporter
     return name != null;
   }
 
-  public static string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard partner, string themeSuffix = "")
+  public static string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard? partner, string themeSuffix = "")
   {
-    if (commander == null) return string.Empty;
+    if (commander == null)
+      return string.Empty;
 
     var stringBuilder = new StringBuilder($"{WEBSITE_BASE_URI}/{commander.Info.Name.ToKebabCase().ToLower()}");
 

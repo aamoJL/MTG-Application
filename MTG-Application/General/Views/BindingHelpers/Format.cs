@@ -32,5 +32,5 @@ public static class Format
   /// Returns given default text, if the value is empty or null
   /// </summary>
   public static string ValueOrDefault(object value, string defaultText)
-    => string.IsNullOrEmpty(value?.ToString()) ? defaultText : value.ToString();
+    => string.IsNullOrEmpty(value?.ToString()) ? defaultText : value.ToString()!;
 }

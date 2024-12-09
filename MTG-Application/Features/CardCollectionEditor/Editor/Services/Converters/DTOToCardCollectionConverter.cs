@@ -10,16 +10,16 @@ namespace MTGApplication.Features.CardCollectionEditor.Editor.Services.Converter
 
 public class DTOToCardCollectionConverter(MTGCardImporter importer)
 {
+  /// <exception cref="ArgumentNullException"></exception>
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
   public async Task<MTGCardCollection> Convert(MTGCardCollectionDTO dto)
   {
-    if (dto == null)
-      return null;
-
     try
     {
+      ArgumentNullException.ThrowIfNull(dto);
+
       return new MTGCardCollection()
       {
         Name = dto.Name,

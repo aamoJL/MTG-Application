@@ -128,37 +128,37 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task NewList_NoName_ErrorNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
           NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((string.Empty, "Query")) },
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.NewListCommand.ExecuteAsync(null));
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task NewList_NoQuery_ErrorNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
           NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", string.Empty)) },
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.NewListCommand.ExecuteAsync(null));
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
@@ -183,6 +183,7 @@ public partial class CardCollectionViewModelTests
     public async Task NewList_Exists_ErrorNotificationSent()
     {
       var list = _savedCollection.CollectionLists[0];
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Model = _savedCollection,
@@ -190,37 +191,36 @@ public partial class CardCollectionViewModelTests
         {
           NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, "New Query")) },
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error, () => viewmodel.NewListCommand.ExecuteAsync(null));
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod]
     public async Task NewList_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
           NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success, () => viewmodel.NewListCommand.ExecuteAsync(null));
+      await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod]
     public async Task NewList_Success_OnListAddedInvoked()
     {
-      MTGCardCollectionList? invoked = null;
+      MTGCardCollectionList invoked = null;
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()

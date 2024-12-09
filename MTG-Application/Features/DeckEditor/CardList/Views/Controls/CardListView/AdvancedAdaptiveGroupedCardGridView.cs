@@ -11,10 +11,13 @@ public partial class AdvancedAdaptiveGroupedCardGridView : AdvancedAdaptiveCardG
   {
     base.OnDragOver(e);
 
+    if (DataContext is not CardListViewModel viewmodel || ListViewDragAndDrop<DeckEditorMTGCard>.Item?.Card is not DeckEditorMTGCard item)
+      return;
+
     // Only accept Move if the card was moved from the same list, but from a different group 
     if (e.AcceptedOperation != Windows.ApplicationModel.DataTransfer.DataPackageOperation.None
-      && ((DataContext as CardListViewModel)?.Cards.Contains(ListViewDragAndDrop<DeckEditorMTGCard>.Item?.Card as DeckEditorMTGCard) is true)
-      && !Items.Contains(ListViewDragAndDrop<DeckEditorMTGCard>.Item?.Card as DeckEditorMTGCard))
+      && viewmodel.Cards.Contains(item)
+      && !Items.Contains(item))
     {
       e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
       e.DragUIOverride.Caption = "Change";

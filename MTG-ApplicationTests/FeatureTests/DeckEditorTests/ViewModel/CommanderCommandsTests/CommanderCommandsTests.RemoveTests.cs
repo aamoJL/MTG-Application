@@ -12,7 +12,7 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public async Task Remove_InvokedWithNull()
     {
-      DeckEditorMTGCard? result = null;
+      DeckEditorMTGCard result = null;
 
       var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
       {

@@ -14,7 +14,7 @@ public static class DialogService
 {
   public static Dictionary<XamlRoot, ContentDialog> CurrentDialogs { get; } = [];
 
-  public static async Task<T> ShowAsync<T>(XamlRoot root, CustomContentDialog<T> dialog, bool force = false)
+  public static async Task<T?> ShowAsync<T>(XamlRoot root, CustomContentDialog<T> dialog, bool force = false)
   {
     dialog.XamlRoot = root;
 
@@ -22,8 +22,10 @@ public static class DialogService
     // Return default or force the current dialog to close if exists
     if (CurrentDialogs.GetValueOrDefault(root) is ContentDialog currentDialog)
     {
-      if (force) currentDialog.Hide();
-      else return default;
+      if (force)
+        currentDialog.Hide();
+      else
+        return default;
     }
 
     CurrentDialogs[root] = dialog;

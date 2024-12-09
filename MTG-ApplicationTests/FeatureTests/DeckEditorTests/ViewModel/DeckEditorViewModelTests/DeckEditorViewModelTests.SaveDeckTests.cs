@@ -42,7 +42,7 @@ public partial class DeckEditorViewModelTests
         Deck = newDeck,
         Confirmers = new()
         {
-          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string?>(null) }
+          SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult<string>(null) }
         }
       }.MockVM();
 
@@ -230,6 +230,7 @@ public partial class DeckEditorViewModelTests
     [TestMethod("Success notification should be sent when the deck was saved")]
     public async Task Save_Success_SuccessNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
@@ -238,14 +239,12 @@ public partial class DeckEditorViewModelTests
         {
           SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
         },
-        Notifier =
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Success,
-        () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Success, notifier);
     }
 
     [TestMethod("Error notification should be sent when there are failure on saving")]
@@ -253,6 +252,7 @@ public partial class DeckEditorViewModelTests
     {
       _dependencies.Repository.UpdateFailure = true;
 
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Deck = _savedDeck,
@@ -261,14 +261,12 @@ public partial class DeckEditorViewModelTests
         {
           SaveDeckConfirmer = new() { OnConfirm = (arg) => Task.FromResult(_savedDeck.Name) }
         },
-        Notifier =
-        {
-          OnNotify = (arg) => throw new NotificationException(arg)
-        }
+        Notifier = notifier
       }.MockVM();
 
-      await NotificationAssert.NotificationSent(NotificationType.Error,
-        () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
+      await viewmodel.SaveDeckCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationSent(NotificationType.Error, notifier);
     }
 
     [TestMethod("ViewModel should be busy when saving the deck")]

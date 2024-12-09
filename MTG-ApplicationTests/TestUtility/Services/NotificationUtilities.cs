@@ -30,4 +30,7 @@ public static class NotificationAssert
 
   public static void NotificationSent(Notification notification, TestNotifier notifier)
     => Assert.IsTrue(notifier.Notified?.Equals(notification), "Notifications do not match");
+
+  public static void NotificationNotSent(NotificationType type, TestNotifier notifier)
+    => Assert.IsFalse(notifier.Notified?.NotificationType.Equals(type), $"Should not have been {notifier.Notified.NotificationType}");
 }

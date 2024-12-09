@@ -153,7 +153,7 @@ public partial class DeckEditorViewModelTests
         Confirmers = new()
         {
           SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
-          SaveDeckConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string?>(null) },
+          SaveDeckConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string>(null) },
         },
       }.MockVM();
 
