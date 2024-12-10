@@ -6,14 +6,15 @@
   xmlns:local="using:MTGApplication.Features.DeckSelection.Views.Controls"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:models="using:MTGApplication.Features.DeckSelection.Models"
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+  xmlns:models="using:MTGApplication.Features.DeckSelection.Models" 
+  xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx"
   d:DataContext="{d:DesignInstance Type=models:DeckSelectionDeck}"
   mc:Ignorable="d">
 
   <Grid Background="Transparent" Margin="5" Width="230" Height="300">
     <Grid Margin="0 0 10 0">
-      <controls:ImageEx
+      <controls1:ImageEx
         Source="{Binding ImageUri, Mode=OneTime}"
         PlaceholderSource="/Assets/back.png"
         Stretch="UniformToFill"
@@ -21,7 +22,7 @@
         PlaceholderStretch="UniformToFill"
         HorizontalAlignment="Center"
         CornerRadius="0">
-      </controls:ImageEx>
+      </controls1:ImageEx>
       <Grid>
         <Rectangle Stroke="Black" Margin="5" Opacity="0.3"/>
         <Rectangle Stroke="Black" Margin="4" Opacity="0.25"/>

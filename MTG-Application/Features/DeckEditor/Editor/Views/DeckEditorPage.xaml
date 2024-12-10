@@ -5,9 +5,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:ui="using:CommunityToolkit.WinUI.UI"
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:ui="using:CommunityToolkit.WinUI"
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls"
   xmlns:sys="using:System" 
   xmlns:commanderview="using:MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView" 
   xmlns:customControls="using:MTGApplication.General.Views.Controls" 
@@ -49,7 +48,7 @@
         <!--NOTE: Changes deck name text to "Unsaved", if the deck has no name-->
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.Name, Mode=OneWay}" To="{x:Bind sys:String.Empty}" />
+            <ui:IsEqualStateTrigger Value="{x:Bind ViewModel.Name, Mode=OneWay}" To="{x:Bind sys:String.Empty}" />
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SelectedDeckNameTitle.Text" Value="Unsaved" />
@@ -61,7 +60,7 @@
         <!--NOTE: Changes deck name text to different color to show that the deck has unsaved changes-->
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True" />
+            <ui:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True" />
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SelectedDeckNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}" />
@@ -73,7 +72,7 @@
       <VisualStateGroup x:Name="DeckFilterAppBarButtonState">
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.DeckCardList.CardFilters.FiltersApplied, Mode=OneWay}" To="True"/>
+            <ui:IsEqualStateTrigger Value="{x:Bind ViewModel.DeckCardList.CardFilters.FiltersApplied, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="DeckFilterAppBarButton.Style" Value="{StaticResource PrimaryAppBarButtonStyle}"/>

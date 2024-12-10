@@ -5,7 +5,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d">
 
@@ -16,7 +16,7 @@
       <VisualStateGroup x:Name="UnsavedTextColorState">
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind UnsavedIndicator, Mode=OneWay}" To="True"/>
+            <ui:IsEqualStateTrigger Value="{x:Bind UnsavedIndicator, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="HeaderText.Foreground" Value="{ThemeResource SystemAccentColorLight1}"/>

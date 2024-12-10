@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.WinUI.UI;
+﻿using CommunityToolkit.WinUI.Collections;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using System;
 using System.Collections;

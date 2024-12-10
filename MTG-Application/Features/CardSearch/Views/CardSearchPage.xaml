@@ -5,13 +5,14 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls"
   xmlns:sys="using:System"
-  xmlns:ui="using:CommunityToolkit.WinUI.UI"
+  xmlns:ui="using:CommunityToolkit.WinUI"
   xmlns:models="using:MTGApplication.General.Models" 
   xmlns:customControls="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
   xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl" 
-  xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels"
+  xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels" 
+  xmlns:controls1="using:MTGApplication.General.Views.Controls.AdaptiveGridView"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -54,7 +55,7 @@
 
       <!--#region Card View -->
       <Grid controls:DockPanel.Dock="Top">
-        <controls:AdaptiveGridView
+        <controls1:AdaptiveGridView
           x:Name="SearchCardsImageView"
           DataContext="{x:Bind ViewModel, Mode=OneTime}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
@@ -66,7 +67,7 @@
           CanDragItems="True"
           DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
           DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
-          <controls:AdaptiveGridView.ItemTemplate>
+          <controls1:AdaptiveGridView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardImageView
                 d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
@@ -74,8 +75,8 @@
                 Model="{x:Bind Mode=OneWay}"
                 ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
             </DataTemplate>
-          </controls:AdaptiveGridView.ItemTemplate>
-        </controls:AdaptiveGridView>
+          </controls1:AdaptiveGridView.ItemTemplate>
+        </controls1:AdaptiveGridView>
         <ListView
           x:Name="SearchCardsTextView"
           DataContext="{x:Bind ViewModel}"

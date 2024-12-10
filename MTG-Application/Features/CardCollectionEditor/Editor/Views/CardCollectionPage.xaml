@@ -5,16 +5,17 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls" 
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
   xmlns:sys="using:System"
   xmlns:customControls="using:MTGApplication.General.Views.Controls"
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:ui="using:CommunityToolkit.WinUI"
   xmlns:converters="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls.Converters" 
   xmlns:localControls="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Views.Controls" 
   xmlns:models="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models" 
   xmlns:viewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels" 
-  xmlns:listViewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels"
+  xmlns:listViewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels" 
+  xmlns:controls1="using:MTGApplication.General.Views.Controls.AdaptiveGridView"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
@@ -40,7 +41,7 @@
         <!--NOTE: Changes name text to "Unsaved" if the collection has no name-->
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.CollectionName, Mode=OneWay}" To="{x:Bind sys:String.Empty}" />
+            <ui:IsEqualStateTrigger Value="{x:Bind ViewModel.CollectionName, Mode=OneWay}" To="{x:Bind sys:String.Empty}" />
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SelectedCollectionNameTitle.Text" Value="Unsaved" />
@@ -52,7 +53,7 @@
         <!--NOTE: Changes name text to different color to show that the collection has unsaved changes-->
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True" />
+            <ui:IsEqualStateTrigger Value="{x:Bind ViewModel.HasUnsavedChanges, Mode=OneWay}" To="True" />
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="SelectedCollectionNameTitle.Foreground" Value="{ThemeResource SystemAccentColorLight1}" />
@@ -152,7 +153,7 @@
       <!--#endregion-->
 
       <!--#region Card View -->
-      <controls:AdaptiveGridView
+      <controls1:AdaptiveGridView
         x:Name="ListCardImageView"
         controls:DockPanel.Dock="Top"
         DataContext="{x:Bind ViewModel.CardCollectionListViewModel, Mode=OneWay}"
@@ -160,7 +161,7 @@
         Style="{StaticResource MTGAdaptiveGridViewStyle}"
         SelectionMode="None"
         DesiredWidth="250">
-        <controls:AdaptiveGridView.ItemTemplate>
+        <controls1:AdaptiveGridView.ItemTemplate>
           <DataTemplate x:DataType="models:CardCollectionMTGCard">
             <localControls:CardCollectionCardImageView
               d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
@@ -170,8 +171,8 @@
               SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
               OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
           </DataTemplate>
-        </controls:AdaptiveGridView.ItemTemplate>
-      </controls:AdaptiveGridView>
+        </controls1:AdaptiveGridView.ItemTemplate>
+      </controls1:AdaptiveGridView>
       <!--#endregion-->
 
     </controls:DockPanel>

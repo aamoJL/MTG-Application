@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Collections;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 using MTGApplication.General.Models;

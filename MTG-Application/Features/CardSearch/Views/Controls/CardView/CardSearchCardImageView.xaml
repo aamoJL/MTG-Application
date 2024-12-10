@@ -6,9 +6,10 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
-  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers"
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+  xmlns:ui="using:CommunityToolkit.WinUI" 
+  xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx"
   mc:Ignorable="d">
 
   <Grid Background="Transparent">
@@ -24,7 +25,7 @@
       </CommandBarFlyout>
     </Grid.ContextFlyout>
     <StackPanel Orientation="Vertical">
-      <controls:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
+      <controls1:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
       <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
     </StackPanel>
   </Grid>

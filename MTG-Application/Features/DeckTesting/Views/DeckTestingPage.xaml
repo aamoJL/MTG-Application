@@ -5,14 +5,15 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls" 
   xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
   xmlns:sys="using:System" 
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
   xmlns:models="using:MTGApplication.Features.DeckTesting.Models" 
-  xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+  xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:cardview="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView" 
-  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls" xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView"
+  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls" 
+  xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -23,7 +24,7 @@
       <VisualStateGroup x:Name="LibraryVisibilityState">
         <VisualState>
           <VisualState.StateTriggers>
-            <triggers:IsEqualStateTrigger Value="{x:Bind LibraryVisibility, Mode=OneWay}" To="Visible"/>
+            <ui:IsEqualStateTrigger Value="{x:Bind LibraryVisibility, Mode=OneWay}" To="Visible"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="LibraryVisibilitySwitchButton.Content" Value="Hide library"/>
@@ -371,7 +372,6 @@
         <Canvas 
           x:Name="BattlefieldCanvas"
           Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
-          xmlns:ui="using:CommunityToolkit.WinUI.UI"
           ui:UIElementExtensions.ClipToBounds="True"
           PointerEntered="{x:Bind PointerEvents.BattlefieldCanvas_PointerEntered, Mode=OneTime}"
           PointerReleased="{x:Bind PointerEvents.BattlefieldCanvas_PointerReleased, Mode=OneTime}"/>

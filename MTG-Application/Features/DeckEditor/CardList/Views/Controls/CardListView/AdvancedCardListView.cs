@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI.Collections;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckEditor.CardList.Services;
@@ -114,7 +114,7 @@ public partial class AdvancedCardListView : ListView
       FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as DeckEditorMTGCard);
       FilteredAndSortedCardSource.RefreshFilter();
     }
-    else { FilteredAndSortedCardSource.Filter = null; }
+    else { FilteredAndSortedCardSource.Filter = x => true; }
   }
 
   private static void OnDependencyPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
