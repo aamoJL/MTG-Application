@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Collections;
 using MTGApplication.General.Models;
 using System.Collections.Generic;
 

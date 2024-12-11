@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Common.Collections;
+﻿using CommunityToolkit.WinUI.Collections;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using System.Collections.Generic;

@@ -6,7 +6,7 @@
   xmlns:local="using:MTGApplication.General.Views.Dialogs.Controls"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:controls="using:MTGApplication.General.Views.Controls.AdaptiveGridView"
   mc:Ignorable="d"
   Style="{StaticResource DefaultContentDialogStyle}">
 

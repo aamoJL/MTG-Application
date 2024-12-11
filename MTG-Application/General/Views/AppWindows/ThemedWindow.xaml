@@ -5,17 +5,22 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls" 
+  xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors" 
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   mc:Ignorable="d">
 
   <Grid>
     <Frame x:Name="MainFrame" />
 
-    <controls:InAppNotification 
-      x:Name="InAppNotification"
-      ShowDismissButton="True"
-      VerticalOffset="100"
-      HorizontalOffset="0"
-      StackMode="Replace"/>
+    <InfoBar 
+      VerticalAlignment="Bottom" 
+      Margin="24 24 24 75"
+      MaxWidth="900"
+      RequestedTheme="Light">
+      <interactivity:Interaction.Behaviors>
+        <behaviors:StackedNotificationsBehavior x:Name="InAppNotification" />
+      </interactivity:Interaction.Behaviors>
+    </InfoBar>
   </Grid>
 </Window>

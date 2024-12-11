@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI;
-using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.Collections;
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
+using MTGApplication.General.Views.Controls.AdaptiveGridView;
 using MTGApplication.General.Views.DragAndDrop;
 using System.Collections;
 using System.Collections.Generic;
@@ -146,7 +146,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
       FilteredAndSortedCardSource.RefreshFilter();
     }
     else
-      FilteredAndSortedCardSource.Filter = null;
+      FilteredAndSortedCardSource.Filter = x => true;
   }
 
   private static void OnDependencyPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)

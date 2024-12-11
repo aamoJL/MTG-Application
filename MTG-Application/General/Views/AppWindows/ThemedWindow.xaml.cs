@@ -1,9 +1,9 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Services.NotificationService;
 using System;
-using Windows.UI;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.General.Views.AppWindows;
 
@@ -24,7 +24,7 @@ public partial class ThemedWindow : Window
 
     Closed += ThemedWindow_Closed;
     AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
-    NotificationService.OnShow += NotificationService_OnShow;
+    OnShow += NotificationService_OnShow;
 
     if (Content is FrameworkElement element)
       element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
@@ -50,20 +50,25 @@ public partial class ThemedWindow : Window
 
   public bool Navigate(Type pageType, object? parameters = null) => MainFrame.Navigate(pageType, parameters);
 
-  private void NotificationService_OnShow(object? sender, NotificationService.Notification e)
+  private void NotificationService_OnShow(object? sender, Notification e)
   {
     if ((sender as FrameworkElement)?.XamlRoot != Content.XamlRoot)
       return;
 
-    InAppNotification.Background = e.NotificationType switch
+    //InAppNotification.RequestedTheme = ElementTheme.Light;
+    InAppNotification.Show(new()
     {
-      NotificationService.NotificationType.Error => new SolidColorBrush(Color.FromArgb(255, 248, 215, 218)),
-      NotificationService.NotificationType.Warning => new SolidColorBrush(Color.FromArgb(255, 255, 243, 205)),
-      NotificationService.NotificationType.Success => new SolidColorBrush(Color.FromArgb(255, 212, 237, 218)),
-      _ => new SolidColorBrush(Color.FromArgb(255, 204, 229, 255)),
-    };
-    InAppNotification.RequestedTheme = ElementTheme.Light;
-    InAppNotification.Show(e.Message, NotificationService.NotificationDuration);
+      Title = e.Message,
+      Severity = e.NotificationType switch
+      {
+        NotificationType.Error => InfoBarSeverity.Error,
+        NotificationType.Warning => InfoBarSeverity.Warning,
+        NotificationType.Success => InfoBarSeverity.Success,
+        _ => InfoBarSeverity.Informational,
+      },
+      IsIconVisible = false,
+      Duration = TimeSpan.FromMilliseconds(NotificationDuration),
+    });
   }
 
   private void LocalSettings_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)

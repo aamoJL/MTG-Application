@@ -6,9 +6,10 @@
   xmlns:local="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:ui="using:CommunityToolkit.WinUI.UI" 
+  xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:converters="using:MTGApplication.General.Views.BindingHelpers.Converters" 
-  xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+  xmlns:controls="using:CommunityToolkit.WinUI.Controls" 
+  xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx"
   mc:Ignorable="d">
 
   <local:DeckTestingCardViewBase.Resources>
@@ -24,7 +25,7 @@
     </Grid.RenderTransform>
 
     <!--#region Image -->
-    <controls:ImageEx 
+    <controls1:ImageEx 
       MaxWidth="{x:Bind CardWidth, Mode=OneTime}"
       MaxHeight="{x:Bind CardHeight, Mode=OneTime}"
       CornerRadius="12"
@@ -32,7 +33,7 @@
       IsCacheEnabled="True"
       Source="{x:Bind SelectedFaceUri, Mode=OneWay}"
       Style="{StaticResource PreviewImagePlaceholderStyle}">
-      <controls:ImageEx.ContextFlyout>
+      <controls1:ImageEx.ContextFlyout>
         <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
           <CommandBarFlyout.PrimaryCommands>
             <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
@@ -45,8 +46,8 @@
             <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Label="Toggle count counters" Click="CountCounterFlyoutButton_Click"/>
           </CommandBarFlyout.SecondaryCommands>
         </CommandBarFlyout>
-      </controls:ImageEx.ContextFlyout>
-    </controls:ImageEx>
+      </controls1:ImageEx.ContextFlyout>
+    </controls1:ImageEx>
     <!--#endregion-->
 
     <!--#region Plus Counters -->
