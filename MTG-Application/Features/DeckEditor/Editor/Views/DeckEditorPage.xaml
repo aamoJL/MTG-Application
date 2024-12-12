@@ -537,8 +537,8 @@
         <!--#region Group View -->
         <Grid 
           x:Name="DeckCardsGroupView"
-          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
-          Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}">
+          x:Load="{x:Bind DeckGroupViewVisible, Mode=OneWay}"
+          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}">
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
               <ItemsControl.ItemTemplate>
@@ -629,13 +629,13 @@
         <!--#region Grid View -->
         <cardlistview:AdvancedAdaptiveCardGridView
           x:Name="DeckCardsGridView"
+          x:Load="{x:Bind DeckImageViewVisible, Mode=OneWay}"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           ItemsSource="{Binding Cards, Mode=OneWay}"
           SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{Binding CardFilters, Mode=OneWay}"
           Style="{StaticResource MTGAdaptiveGridViewStyle}"
           BorderBrush="{ThemeResource RegionColor}"
-          Visibility="{x:Bind DeckImageViewVisible, Mode=OneWay}"
           SelectionMode="Single"
           BorderThickness="0"
           DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
@@ -667,11 +667,11 @@
         <!--#region List View -->
         <cardlistview:AdvancedCardListView
           x:Name="DeckCardsListView"
+          x:Load="{x:Bind DeckTextViewVisible, Mode=OneWay}"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           ItemsSource="{Binding Cards, Mode=OneWay}"
           SortProperties="{Binding CardSorter.SortProperties, Mode=OneWay}"
           FilterProperties="{Binding CardFilters, Mode=OneWay}"
-          Visibility="{x:Bind DeckTextViewVisible, Mode=OneWay}"
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"

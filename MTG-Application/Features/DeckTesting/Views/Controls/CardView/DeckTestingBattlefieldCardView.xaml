@@ -29,8 +29,6 @@
       MaxWidth="{x:Bind CardWidth, Mode=OneTime}"
       MaxHeight="{x:Bind CardHeight, Mode=OneTime}"
       CornerRadius="12"
-      CacheMode="BitmapCache"
-      IsCacheEnabled="True"
       Source="{x:Bind SelectedFaceUri, Mode=OneWay}"
       Style="{StaticResource PreviewImagePlaceholderStyle}">
       <controls1:ImageEx.ContextFlyout>

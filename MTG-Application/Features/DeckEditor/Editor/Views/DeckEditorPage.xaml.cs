@@ -41,7 +41,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(DeckGroupViewVisible)));
       }
     }
-  } = false;
+  } = true;
   public bool DeckImageViewVisible
   {
     get => field;
@@ -53,7 +53,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(DeckImageViewVisible)));
       }
     }
-  } = true;
+  } = false;
   public bool DeckTextViewVisible
   {
     get => field;
