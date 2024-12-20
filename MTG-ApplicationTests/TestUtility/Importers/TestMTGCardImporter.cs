@@ -8,12 +8,16 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
 {
   public Card[] ExpectedCards { get; set; } = expectedCards;
   public int NotFoundCount { get; set; } = notFoundCount;
+  public Exception Exception { get; set; } = null;
 
   public override int PageSize => 40;
   public override string Name => "Test Card API";
 
   public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
+    if (Exception != null)
+      throw Exception;
+
     return string.IsNullOrEmpty(searchParams)
       ? Empty(ImportSource.External)
       : await Task.Run(() => ExpectedCards != null
@@ -23,6 +27,9 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
 
   public override async Task<CardImportResult> ImportFromDTOs(IEnumerable<MTGCardDTO> dtoArray)
   {
+    if (Exception != null)
+      throw Exception;
+
     var cards = dtoArray.Select(x => new Card(MTGCardInfoMocker.FromDTO(x), x.Count)).ToArray();
 
     if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length, ImportSource.External)); }
@@ -36,11 +43,20 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
   }
 
   public override async Task<CardImportResult> ImportFromString(string importText)
-    => await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
+  {
+    if (Exception != null)
+      throw Exception;
+
+    return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
+  }
 
   public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
+    if (Exception != null)
+      throw Exception;
+
     var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
+
     return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length, ImportSource.External));
   }
 }

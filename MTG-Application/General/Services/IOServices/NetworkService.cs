@@ -10,6 +10,8 @@ public static class NetworkService
 {
   public static readonly string JSON_MEDIA_TYPE = "application/json";
 
+  private static HttpClient Client { get; } = new();
+
   /// <summary>
   /// Fetches Json string from the given url using GET
   /// </summary>
@@ -20,13 +22,25 @@ public static class NetworkService
   {
     try
     {
-      var client = new HttpClient();
       var assemblyName = Assembly.GetExecutingAssembly().GetName() ?? throw new Exception("Assembly is null");
 
-      client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
-      client.DefaultRequestHeaders.UserAgent.Add(new(assemblyName!.Name ?? string.Empty, assemblyName!.Version?.ToString()));
+      using var request = new HttpRequestMessage
+      {
+        RequestUri = new(url),
+        Method = HttpMethod.Get
+      };
 
-      return await client.GetStringAsync(url);
+      request.Headers.Accept.Add(new(JSON_MEDIA_TYPE));
+      request.Headers.UserAgent.Add(new(assemblyName!.Name ?? string.Empty, assemblyName!.Version?.ToString()));
+
+      using var response = await Client.SendAsync(request);
+
+      if (response.IsSuccessStatusCode)
+        return await response.Content.ReadAsStringAsync();
+      if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        return string.Empty;
+      else
+        throw new HttpRequestException(response.StatusCode.ToString());
     }
     catch { throw; }
   }
@@ -41,14 +55,21 @@ public static class NetworkService
   {
     try
     {
-      var client = new HttpClient();
       var assemblyName = Assembly.GetExecutingAssembly().GetName() ?? throw new Exception("Assembly is null");
 
-      client.DefaultRequestHeaders.Accept.Add(new(JSON_MEDIA_TYPE));
-      client.DefaultRequestHeaders.UserAgent.Add(new(assemblyName!.Name ?? string.Empty, assemblyName!.Version?.ToString()));
+      using var request = new HttpRequestMessage
+      {
+        RequestUri = new(url),
+        Method = HttpMethod.Post
+      };
 
-      return await (await client.PostAsync(url, new StringContent(content, System.Text.Encoding.UTF8, JSON_MEDIA_TYPE)))
-        .Content.ReadAsStringAsync();
+      request.Headers.Accept.Add(new(JSON_MEDIA_TYPE));
+      request.Headers.UserAgent.Add(new(assemblyName!.Name ?? string.Empty, assemblyName!.Version?.ToString()));
+      request.Content = new StringContent(content, System.Text.Encoding.UTF8, JSON_MEDIA_TYPE);
+
+      using var response = await Client.SendAsync(request);
+
+      return await response.Content.ReadAsStringAsync();
     }
     catch { throw; }
   }
@@ -58,7 +79,13 @@ public static class NetworkService
   /// </summary>
   public static async Task<bool> OpenUri(string uri)
   {
-    try { return await Launcher.LaunchUriAsync(new(uri)); }
-    catch { return false; }
+    try
+    {
+      return await Launcher.LaunchUriAsync(new(uri));
+    }
+    catch
+    {
+      return false;
+    }
   }
 }

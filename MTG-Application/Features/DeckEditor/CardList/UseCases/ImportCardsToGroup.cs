@@ -118,7 +118,7 @@ public partial class CardGroupViewModelCommands
       }
       catch (Exception e)
       {
-        listViewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+        listViewmodel.Notifier.Notify(new(NotificationType.Error, $"Error: {e.Message}"));
       }
     }
   }

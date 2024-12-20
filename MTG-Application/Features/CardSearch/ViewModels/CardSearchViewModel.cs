@@ -19,7 +19,7 @@ public partial class CardSearchViewModel(MTGCardImporter importer) : ViewModelBa
   public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new CardSearchIncrementalCardSource(importer));
   public CardSearchConfirmers Confirmers { get; init; } = new();
   public IWorker Worker => this;
-  public Notifier Notifier { get; } = new();
+  public Notifier Notifier { get; init; } = new();
 
   [ObservableProperty] public partial bool IsBusy { get; set; }
 

@@ -3,6 +3,7 @@ using MTGApplication.Features.CardSearch.ViewModels;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Database;
 using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel;
 
 namespace MTGApplicationTests.FeatureTests.CardSearchTests;
@@ -60,6 +61,35 @@ public partial class CardSearchViewModelTests
       var search = new CardSearchViewModel(_dependensies.Importer);
 
       await WorkerAssert.IsBusy(search, () => search.SubmitSearchCommand.ExecuteAsync(query));
+    }
+
+    [TestMethod]
+    public async Task SearchCards_Error_NoCardsFound()
+    {
+      var query = "Black Lotus";
+      _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
+      _dependensies.Importer.Exception = new HttpRequestException();
+
+      var search = new CardSearchViewModel(_dependensies.Importer);
+
+      await search.SubmitSearchCommand.ExecuteAsync(query);
+
+      Assert.AreEqual(0, search.Cards.TotalCardCount);
+    }
+
+    [TestMethod]
+    public async Task SearchCards_Error_NotificationSent()
+    {
+      var query = "Black Lotus";
+      _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
+      _dependensies.Importer.Exception = new HttpRequestException();
+
+      var notifier = new TestNotifier();
+      var search = new CardSearchViewModel(_dependensies.Importer) { Notifier = notifier };
+
+      await search.SubmitSearchCommand.ExecuteAsync(query);
+
+      NotificationAssert.NotificationSent(MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Error, notifier);
     }
   }
 }

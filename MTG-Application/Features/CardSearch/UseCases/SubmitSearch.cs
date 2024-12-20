@@ -2,6 +2,7 @@
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,12 +14,19 @@ public partial class CardSearchViewModelCommands
   {
     protected override async Task Execute(string? query)
     {
-      var searchResult = await Viewmodel.Worker.DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query ?? string.Empty));
+      try
+      {
+        var searchResult = await Viewmodel.Worker.DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query ?? string.Empty));
 
-      Viewmodel.Cards.SetCollection(
-        cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],
-        nextPageUri: searchResult.NextPageUri,
-        totalCount: searchResult.TotalCount);
+        Viewmodel.Cards.SetCollection(
+          cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],
+          nextPageUri: searchResult.NextPageUri,
+          totalCount: searchResult.TotalCount);
+      }
+      catch (Exception e)
+      {
+        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, e.Message));
+      }
     }
   }
 }

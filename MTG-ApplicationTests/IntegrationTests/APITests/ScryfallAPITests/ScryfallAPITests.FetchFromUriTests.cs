@@ -13,7 +13,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var uri = string.Empty;
 
-      await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => api.ImportFromUri(uri));
+      await Assert.ThrowsExceptionAsync<UriFormatException>(() => api.ImportFromUri(uri));
     }
 
     [TestMethod]

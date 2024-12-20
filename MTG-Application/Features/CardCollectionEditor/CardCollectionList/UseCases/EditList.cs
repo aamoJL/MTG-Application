@@ -34,26 +34,33 @@ public partial class CardCollectionEditorViewModelCommands
       {
         if (query != Viewmodel.Query)
         {
-          // Fetch new query cards and remove cards that are not in the new query from the owned cards if the user accepts the conflict
-          var result = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(query, pagination: false));
-          var found = result.Found;
+          try
+          {
+            // Fetch new query cards and remove cards that are not in the new query from the owned cards if the user accepts the conflict
+            var result = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(query, pagination: false));
+            var found = result.Found;
 
-          var excludedCards = Viewmodel.OwnedCards
-            .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.Info.ScryfallId)
-            .ToList();
+            var excludedCards = Viewmodel.OwnedCards
+              .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.Info.ScryfallId)
+              .ToList();
 
-          if (excludedCards.Count != 0)
-            if (await Viewmodel.Confirmers.EditCollectionListQueryConflictConfirmer
-              .Confirm(CardCollectionListConfirmers.GetEditCollectionListQueryConflictConfirmation(excludedCards.Count))
-              is not General.Services.ConfirmationService.ConfirmationResult.Yes)
-              return; // Cancel edit if user cancels the conflict
+            if (excludedCards.Count != 0)
+              if (await Viewmodel.Confirmers.EditCollectionListQueryConflictConfirmer
+                .Confirm(CardCollectionListConfirmers.GetEditCollectionListQueryConflictConfirmation(excludedCards.Count))
+                is not General.Services.ConfirmationService.ConfirmationResult.Yes)
+                return; // Cancel edit if user cancels the conflict
 
-          foreach (var item in excludedCards)
-            Viewmodel.OwnedCards.Remove(item);
+            foreach (var item in excludedCards)
+              Viewmodel.OwnedCards.Remove(item);
 
-          Viewmodel.Query = query;
+            Viewmodel.Query = query;
 
-          await Viewmodel.Worker.DoWork(Viewmodel.UpdateQueryCards());
+            await Viewmodel.Worker.DoWork(Viewmodel.UpdateQueryCards());
+          }
+          catch (Exception e)
+          {
+            Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, e.Message));
+          }
         }
 
         if (name != Viewmodel.Name)
