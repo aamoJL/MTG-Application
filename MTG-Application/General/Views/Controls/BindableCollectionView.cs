@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.WinUI.Helpers;
 using Microsoft.UI.Xaml;
+using MTGApplication.General.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -153,7 +154,7 @@ public partial class BindableCollectionView : DependencyObject
     if (Filter == null || Filter(item))
     {
       if (SortComparer != null && sort)
-        View.Insert(FindIndex(item, View, SortComparer), item);
+        View.Insert(View.FindPosition(item, SortComparer), item);
       else
         View.Add(item);
     }
@@ -176,15 +177,5 @@ public partial class BindableCollectionView : DependencyObject
       collectionView?.OnFilterChanged();
     else if (e.Property == SortComparerProperty)
       collectionView?.OnSortDescriptionsChanged();
-  }
-
-  private static int FindIndex(object item, ObservableCollection<object> items, IComparer<object> comparer)
-  {
-    // TODO: better search algorithm
-    for (var i = 0; i < items.Count; i++)
-      if (comparer.Compare(item, items[i]) <= 0)
-        return i;
-
-    return items.Count;
   }
 }
