@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.WinUI.Collections;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using static MTGApplication.Features.DeckEditor.CardList.Services.CardSortProperties;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -17,31 +17,43 @@ public record CardSortProperties(
 {
   public enum MTGSortProperty { CMC, Name, Rarity, Color, Set, Count, Price, SpellType }
 
-  public class MTGCardPropertyComparer(MTGSortProperty sortProperty) : IComparer
+  public IComparer<object> Comparer => new MTGCardPropertyComparer([PrimarySortProperty, SecondarySortProperty], SortDirection);
+
+  public class MTGCardPropertyComparer(IEnumerable<MTGSortProperty> properties, SortDirection direction) : IComparer<object>
   {
     public int Compare(object? x, object? y)
     {
-      var cx = GetComparable(x as DeckEditorMTGCard, sortProperty);
-      var cy = GetComparable(y as DeckEditorMTGCard, sortProperty);
+      var result = 1;
 
-      return cx == cy ? 0 : cx == null ? -1 : cy == null ? +1 : cx.CompareTo(cy);
+      foreach (var property in properties)
+      {
+        var cx = GetComparable(x as DeckEditorMTGCard, property);
+        var cy = GetComparable(y as DeckEditorMTGCard, property);
+
+        result = cx == cy ? 0 : cx == null ? -1 : cy == null ? +1 : cx.CompareTo(cy);
+
+        if (direction == SortDirection.Descending)
+          result *= -1;
+
+        if (result != 0)
+          break;
+      }
+
+      return result;
     }
 
     private static IComparable? GetComparable(DeckEditorMTGCard? card, MTGSortProperty sortProperty)
     {
-      if (card == null)
-        return null;
-
       return sortProperty switch
       {
-        MTGSortProperty.CMC => card.Info.CMC,
-        MTGSortProperty.Name => card.Info.Name,
-        MTGSortProperty.Rarity => card.Info.RarityType,
-        MTGSortProperty.Color => card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0],
-        MTGSortProperty.Set => card.Info.SetCode,
-        MTGSortProperty.Count => card.Count,
-        MTGSortProperty.Price => card.Info.Price,
-        MTGSortProperty.SpellType => card.Info.SpellTypes[0],
+        MTGSortProperty.CMC => card?.Info.CMC,
+        MTGSortProperty.Name => card?.Info.Name,
+        MTGSortProperty.Rarity => card?.Info.RarityType,
+        MTGSortProperty.Color => card == null ? null : (card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0]),
+        MTGSortProperty.Set => card?.Info.SetCode,
+        MTGSortProperty.Count => card?.Count,
+        MTGSortProperty.Price => card?.Info.Price,
+        MTGSortProperty.SpellType => card?.Info.SpellTypes[0],
         _ => null
       };
     }

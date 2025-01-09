@@ -17,13 +17,13 @@ public partial class CardGroupViewModel : ObservableObject
     Key = key;
     Commands = new(this, listViewmodel);
 
-    Items.CollectionChanged += Items_CollectionChanged;
+    Cards.CollectionChanged += Items_CollectionChanged;
   }
 
   [ObservableProperty] public partial string Key { get; set; }
 
-  public ObservableCollection<DeckEditorMTGCard> Items { get; } = [];
-  public int Count => Items.Sum(x => x.Count);
+  public ObservableCollection<DeckEditorMTGCard> Cards { get; } = [];
+  public int Count => Cards.Sum(x => x.Count);
 
   public void OnChange() => OnPropertyChanged(nameof(Count));
 
@@ -100,7 +100,7 @@ public partial class GroupedCardListViewModel : CardListViewModel
           group = addAction.Group;
         }
 
-        group?.Items.Add(card);
+        group?.Cards.Add(card);
       }
 
       Cards.CollectionChanged += Cards_CollectionChanged;
@@ -122,14 +122,14 @@ public partial class GroupedCardListViewModel : CardListViewModel
         group = addAction.Group;
       }
 
-      group?.Items.Add(newCard);
+      group?.Cards.Add(newCard);
     }
     else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove
       && e.OldItems?[0] is DeckEditorMTGCard oldCard)
     {
       var key = oldCard.Group;
 
-      Groups.FirstOrDefault(x => key == x.Key)?.Items.Remove(oldCard);
+      Groups.FirstOrDefault(x => key == x.Key)?.Cards.Remove(oldCard);
     }
   }
 }

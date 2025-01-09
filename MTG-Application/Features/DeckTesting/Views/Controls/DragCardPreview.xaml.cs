@@ -97,18 +97,27 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
 
   private void DragCardPreview_OnChange(object? _, DragCardPreviewEventArgs e)
   {
-    if (e.Root != XamlRoot) return;
+    if (e.Root != XamlRoot)
+      return;
 
-    if (e.Uri is string uri && ImageSource?.UriSource.OriginalString != uri) ImageSource = new BitmapImage(new Uri(uri));
-    if (e.Offset is Vector2 offset) CurrentOffset = offset;
+    if (e.Uri is string uri && ImageSource?.UriSource.OriginalString != uri)
+      ImageSource = new BitmapImage(new Uri(uri));
+
+    if (e.Offset is Vector2 offset)
+      CurrentOffset = offset;
+
     if (e.Coordinates is Vector2 coordinates)
     {
       var imagePosition = coordinates + CurrentOffset;
       Left = imagePosition.X;
       Top = imagePosition.Y;
     }
-    if (e.Opacity is double opacity) Opacity = opacity;
-    if (e.IsTapped is bool isTapped) Angle = isTapped ? 90 : 0;
+
+    if (e.Opacity is double opacity)
+      Opacity = opacity;
+
+    if (e.IsTapped is bool isTapped)
+      Angle = isTapped ? 90 : 0;
   }
 
   private void DragCardPreview_Loaded(object _, RoutedEventArgs __)

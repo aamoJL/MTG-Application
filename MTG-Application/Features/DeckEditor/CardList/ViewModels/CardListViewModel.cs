@@ -49,8 +49,6 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
   public Notifier Notifier { get; init; } = new();
   public IWorker Worker { get; init; } = IWorker.Default;
   public DeckEditorMTGCardCopier CardCopier { get; } = new();
-  public CardFilters CardFilters { get; init; } = new();
-  public CardSorter CardSorter { get; init; } = new();
 
   private CardListViewModelCommands Commands { get; }
 

@@ -24,7 +24,7 @@ public partial class CardListViewModelReversibleActions
       Viewmodel.Key = key;
 
       // Change item groups
-      foreach (var card in Viewmodel.Items)
+      foreach (var card in Viewmodel.Cards)
         card.Group = key;
     }
   }

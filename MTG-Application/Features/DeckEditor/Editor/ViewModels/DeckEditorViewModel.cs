@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
@@ -29,14 +28,11 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     Confirmers = confirmers ?? new();
     Deck = deck ?? new();
 
-    var cardFilters = new CardFilters();
-    var cardSorter = new CardSorter();
-
     // Cardlists use the same sorter and filters
-    DeckCardList = CreateGroupedCardListViewModel(Deck.DeckCards, cardFilters, cardSorter);
-    MaybeCardList = CreateCardListViewModel(Deck.Maybelist, cardFilters, cardSorter);
-    WishCardList = CreateCardListViewModel(Deck.Wishlist, cardFilters, cardSorter);
-    RemoveCardList = CreateCardListViewModel(Deck.Removelist, cardFilters, cardSorter);
+    DeckCardList = CreateGroupedCardListViewModel(Deck.DeckCards);
+    MaybeCardList = CreateCardListViewModel(Deck.Maybelist);
+    WishCardList = CreateCardListViewModel(Deck.Wishlist);
+    RemoveCardList = CreateCardListViewModel(Deck.Removelist);
 
     CommanderCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Commander);
     PartnerCommands = CreateCommanderCommands(CommanderCommands.CommanderType.Partner);
@@ -67,11 +63,10 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     get => Deck.Name;
     set
     {
-      if (deckName != value)
+      if (Name != value)
       {
-        deckName = value;
         Deck.Name = value;
-        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged();
       }
     }
   }
@@ -102,8 +97,6 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     set => SetProperty(ref field, value);
   }
   private DeckEditorViewModelCommands Commands { get; }
-
-  private string deckName = string.Empty;
 
   public IAsyncRelayCommand<ISavable.ConfirmArgs> ConfirmUnsavedChangesCommand => Commands.ConfirmUnsavedChangesCommand;
   public IAsyncRelayCommand NewDeckCommand => Commands.NewDeckCommand;
@@ -143,7 +136,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     HasUnsavedChanges = true;
   }
 
-  private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
+  private CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
     return new(
       importer: Importer,
@@ -159,13 +152,11 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       },
       UndoStack = UndoStack,
       Worker = this,
-      Notifier = Notifier,
-      CardFilters = filters,
-      CardSorter = sorter,
+      Notifier = Notifier
     };
   }
 
-  private GroupedCardListViewModel CreateGroupedCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, CardFilters filters, CardSorter sorter)
+  private GroupedCardListViewModel CreateGroupedCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
     return new(
       importer: Importer,
@@ -182,8 +173,6 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       UndoStack = UndoStack,
       Worker = this,
       Notifier = Notifier,
-      CardFilters = filters,
-      CardSorter = sorter,
     };
   }
 
@@ -204,13 +193,12 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     switch (e.PropertyName)
     {
       case nameof(Deck):
-        Name = Deck.Name;
-
         DeckCardList.Cards = Deck.DeckCards;
         MaybeCardList.Cards = Deck.Maybelist;
         WishCardList.Cards = Deck.Wishlist;
         RemoveCardList.Cards = Deck.Removelist;
 
+        OnPropertyChanged(nameof(Name));
         OnPropertyChanged(nameof(Size));
         OnPropertyChanged(nameof(Price));
         OnPropertyChanged(nameof(Commander));

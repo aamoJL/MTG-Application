@@ -14,28 +14,30 @@ public partial class CardFilters : ObservableObject
 {
   public enum ColorGroups { All, Mono, Multi }
 
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial string NameText { get; set; } = string.Empty;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial string TypeText { get; set; } = string.Empty;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial string OracleText { get; set; } = string.Empty;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial bool White { get; set; } = true;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial bool Blue { get; set; } = true;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial bool Black { get; set; } = true;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial bool Red { get; set; } = true;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial bool Green { get; set; } = true;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial bool Colorless { get; set; } = true;
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial ColorGroups ColorGroup { get; set; } = ColorGroups.All; // All, Mono, Multi
-  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied))]
+  [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial double Cmc { get; set; } = double.NaN;
+
+  public Predicate<object> ValidationPredicate => (item) => CardValidation(item as DeckEditorMTGCard);
 
   /// <summary>
   /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
@@ -48,8 +50,13 @@ public partial class CardFilters : ObservableObject
   /// </summary>
   public bool CardValidation(DeckEditorMTGCard? card)
   {
-    if (card != null
-      && card.Info.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
+    if (card == null)
+      return false;
+
+    if (!FiltersApplied)
+      return true;
+
+    if (card.Info.Name.Contains(NameText, StringComparison.OrdinalIgnoreCase)
       && card.Info.TypeLine.Contains(TypeText, StringComparison.OrdinalIgnoreCase)
       && (card.Info.FrontFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)
       || (card.Info.BackFace != null && card.Info.BackFace.OracleText.Contains(OracleText, StringComparison.OrdinalIgnoreCase)))
