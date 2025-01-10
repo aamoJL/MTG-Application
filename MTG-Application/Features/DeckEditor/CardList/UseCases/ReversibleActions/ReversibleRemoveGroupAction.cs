@@ -50,7 +50,7 @@ public partial class CardListViewModelReversibleActions
       if (group == null)
         return;
 
-      AffectedCards = [.. group.Items];
+      AffectedCards = [.. group.Cards];
 
       // Move cards to default group
       foreach (var card in AffectedCards)
@@ -61,7 +61,7 @@ public partial class CardListViewModelReversibleActions
         }.Action?.Invoke((card, string.Empty));
       }
 
-      group.Items.Clear();
+      group.Cards.Clear();
 
       Viewmodel.Groups.Remove(group);
     }

@@ -1,30 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.Collections;
 using Microsoft.UI.Xaml;
-using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.Controls.AdaptiveGridView;
 using MTGApplication.General.Views.DragAndDrop;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using static MTGApplication.Features.DeckEditor.CardList.Services.CardSortProperties;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
 public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 {
-  public new static readonly DependencyProperty ItemsSourceProperty =
-      DependencyProperty.Register(nameof(ItemsSource), typeof(IList<DeckEditorMTGCard>), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(null, OnDependencyPropertyChanged));
-
-  public static readonly DependencyProperty SortPropertiesProperty =
-      DependencyProperty.Register(nameof(SortProperties), typeof(CardSortProperties), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
-        new CardSortProperties(MTGSortProperty.CMC, MTGSortProperty.Name, SortDirection.Ascending), OnDependencyPropertyChanged));
-
-  public static readonly DependencyProperty FilterPropertiesProperty =
-      DependencyProperty.Register(nameof(FilterProperties), typeof(CardFilters), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(
-        new CardFilters(), OnDependencyPropertyChanged));
-
   public static readonly DependencyProperty OnDropCopyProperty =
       DependencyProperty.Register(nameof(OnDropCopy), typeof(IAsyncRelayCommand), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(default));
 
@@ -55,34 +39,7 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
     DragItemsCompleted += DragAndDrop.DragCompleted;
   }
 
-  // Needs to be overridden with new,
-  //  otherwise the filtering and sorting bindings do not work on the ItemSource
-  public new IList<DeckEditorMTGCard> ItemsSource
-  {
-    get => (IList<DeckEditorMTGCard>)GetValue(ItemsSourceProperty);
-    set => SetValue(ItemsSourceProperty, value);
-  }
-  public CardSortProperties SortProperties
-  {
-    get => (CardSortProperties)GetValue(SortPropertiesProperty);
-    set => SetValue(SortPropertiesProperty, value);
-  }
-  public CardFilters FilterProperties
-  {
-    get => (CardFilters)GetValue(FilterPropertiesProperty);
-    set => SetValue(FilterPropertiesProperty, value);
-  }
-
   protected ListViewDragAndDrop<DeckEditorMTGCard> DragAndDrop { get; }
-  private AdvancedCollectionView FilteredAndSortedCardSource
-  {
-    get;
-    set
-    {
-      field = value;
-      base.ItemsSource = field;
-    }
-  } = [];
 
   public IAsyncRelayCommand OnDropCopy
   {
@@ -108,59 +65,6 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
   {
     get => (IRelayCommand)GetValue(OnDropExecuteMoveProperty);
     set => SetValue(OnDropExecuteMoveProperty, value);
-  }
-
-  private void OnItemsSourceDependencyPropertyChanged(IList? list)
-  {
-    if (list is null)
-      return;
-
-    var source = new AdvancedCollectionView(list, true);
-    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardPropertyComparer(SortProperties.PrimarySortProperty)));
-    source.SortDescriptions.Add(new(SortProperties.SortDirection, new MTGCardPropertyComparer(SortProperties.SecondarySortProperty)));
-    FilteredAndSortedCardSource = source;
-  }
-
-  private void OnSortPropertiesDependencyPropertyChanged(CardSortProperties? sortProperties)
-  {
-    if (sortProperties is null || FilteredAndSortedCardSource.SortDescriptions.Count == 0)
-      return;
-
-    FilteredAndSortedCardSource.SortDescriptions[0]
-      = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.PrimarySortProperty));
-    FilteredAndSortedCardSource.SortDescriptions[1]
-      = new(sortProperties.SortDirection, new MTGCardPropertyComparer(sortProperties.SecondarySortProperty));
-  }
-
-  private void OnFilterPropertiesDependencyPropertyChanged(CardFilters? filterProperties)
-  {
-    if (filterProperties is not null)
-      filterProperties.PropertyChanged += FilterProperties_PropertyChanged;
-  }
-
-  private void FilterProperties_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (FilterProperties.FiltersApplied)
-    {
-      FilteredAndSortedCardSource.Filter = x => FilterProperties.CardValidation(x as DeckEditorMTGCard);
-      FilteredAndSortedCardSource.RefreshFilter();
-    }
-    else
-      FilteredAndSortedCardSource.Filter = x => true;
-  }
-
-  private static void OnDependencyPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-  {
-    if (sender is not AdvancedAdaptiveCardGridView view) return;
-
-    if (e.Property == ItemsSourceProperty)
-      view.OnItemsSourceDependencyPropertyChanged(e.NewValue as IList);
-
-    if (e.Property == SortPropertiesProperty)
-      view.OnSortPropertiesDependencyPropertyChanged(e.NewValue as CardSortProperties);
-
-    if (e.Property == FilterPropertiesProperty)
-      view.OnFilterPropertiesDependencyPropertyChanged(e.NewValue as CardFilters);
   }
 
   protected override void OnDrop(DragEventArgs e) => DragAndDrop.Drop(e);

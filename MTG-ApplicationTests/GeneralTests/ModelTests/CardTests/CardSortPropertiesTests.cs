@@ -21,9 +21,9 @@ public class CardSortPropertiesTests
         setCode: "bbb", count: 2, price: 2, typeLine: SpellType.Creature.ToString(),
         frontFace: DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.U]));
 
-      foreach (var property in Enum.GetNames(typeof(MTGSortProperty)))
+      foreach (var property in Enum.GetNames<MTGSortProperty>())
       {
-        var comparer = new MTGCardPropertyComparer(Enum.Parse<MTGSortProperty>(property));
+        var comparer = new MTGCardPropertyComparer([Enum.Parse<MTGSortProperty>(property)], CommunityToolkit.WinUI.Collections.SortDirection.Ascending);
         Assert.AreEqual(1, comparer.Compare(card2, card1), $"{property} was not compared correctly");
       };
     }

@@ -27,7 +27,7 @@ public partial class CardListViewModelReversibleActions
 
       // remove card if exists in the old group
       if (Viewmodel.Groups.FirstOrDefault(x => x.Key == card.Group) is CardGroupViewModel oldGroup)
-        oldGroup.Items.Remove(card);
+        oldGroup.Cards.Remove(card);
 
       // Change group
       card.Group = key;
@@ -46,7 +46,7 @@ public partial class CardListViewModelReversibleActions
         }
 
         // Add card to the new group
-        newGroup?.Items.Add(card);
+        newGroup?.Cards.Add(card);
 
         Viewmodel.OnCardChange(card, nameof(card.Group));
       }

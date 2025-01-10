@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
+using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.NotificationService;
@@ -30,6 +31,8 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
   public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
+  public CardFilters CardFilter { get; } = new();
+  public CardSorter CardSorter { get; } = new();
   public bool DeckGroupViewVisible
   {
     get => field;
@@ -81,9 +84,8 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     base.OnNavigatedTo(e);
 
-    if (e.Parameter is string deckName)
-      if (ViewModel.OpenDeckCommand.CanExecute(deckName))
-        ViewModel.OpenDeckCommand.Execute(deckName);
+    if (e.Parameter is string deckName && ViewModel.OpenDeckCommand.CanExecute(deckName))
+      ViewModel.OpenDeckCommand.Execute(deckName);
   }
 
   private async void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
@@ -114,8 +116,8 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     args.Handled = true;
 
-    if (ViewModel.DeckCardList.CardFilters.ResetCommand.CanExecute(null))
-      ViewModel.DeckCardList.CardFilters.ResetCommand.Execute(null);
+    if (CardFilter.ResetCommand.CanExecute(null))
+      CardFilter.ResetCommand.Execute(null);
   }
 
   private void UndoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
@@ -160,9 +162,9 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     // Deselect list selection if the list loses focus so
     // the delete keyboard accelerator does not delete item in the list
-    if (sender is ListViewBase listview)
-      if (args.NewFocusedElement is not ListViewItem item || !listview.Items.Contains(item.Content))
-        listview.DeselectAll();
+    if (sender is ListViewBase listview
+      && (args.NewFocusedElement is not ListViewItem item || !listview.Items.Contains(item.Content)))
+      listview.DeselectAll();
 
     args.Handled = true;
   }
