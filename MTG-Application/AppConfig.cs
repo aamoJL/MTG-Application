@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.UI.Xaml;
-using MTGApplication.General.Services.IOServices;
+using MTGApplication.General.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace MTGApplication;
 
@@ -61,23 +62,30 @@ public static partial class AppConfig
     [ObservableProperty] public partial ElementTheme AppTheme { get; set; } = ElementTheme.Default;
 
     private readonly static string fileName = "settings.json";
-    private readonly static string filePath = Path.Join(FileService.GetAppDataPath(), fileName);
+    private readonly static string filePath = Path.Join(PathExtensions.GetAppDataPath(), fileName);
 
     public LocalAppSettings() => PropertyChanged += (s, e) => Save();
 
     /// <summary>
     /// Saves local settings to json file
     /// </summary>
-    private bool Save() => FileService.TryWriteTextToFile(filePath, JsonSerializer.Serialize(new { AppTheme = AppTheme }));
+    private void Save()
+    {
+      try
+      {
+        File.WriteAllText(filePath, JsonSerializer.Serialize(new { AppTheme = AppTheme }));
+      }
+      catch { }
+    }
 
     /// <summary>
     /// Loads local settings from json file
     /// </summary>
     public void Load()
     {
-      if (FileService.TryReadTextFromFile(filePath, out var data) && data != null)
+      try
       {
-        if (JsonService.TryParseJson(data, out var json) && json != null)
+        if (JsonNode.Parse(File.ReadAllText(filePath)) is JsonNode json)
         {
           var appTheme = json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default;
           AppTheme = appTheme switch
@@ -88,6 +96,7 @@ public static partial class AppConfig
           };
         }
       }
+      catch { }
     }
   }
 }

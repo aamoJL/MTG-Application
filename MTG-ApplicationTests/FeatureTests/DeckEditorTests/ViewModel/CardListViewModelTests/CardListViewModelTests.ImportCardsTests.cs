@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
@@ -20,7 +20,7 @@ public partial class CardListViewModelTests
     public async Task ImportCards_SerializedCardData_CardAdded()
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter());
-      JsonService.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
+      JsonExtensions.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
 
@@ -31,7 +31,7 @@ public partial class CardListViewModelTests
     public async Task ImportCards_SerializedCardData_Undo_CardRemoved()
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter());
-      JsonService.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
+      JsonExtensions.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
       viewmodel.UndoStack.Undo();
@@ -43,7 +43,7 @@ public partial class CardListViewModelTests
     public async Task ImportCards_SerializedCardData_Redo_CardAddedAgain()
     {
       var viewmodel = new CardListViewModel(new TestMTGCardImporter());
-      JsonService.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
+      JsonExtensions.TrySerializeObject(new CardImportResult.Card(MTGCardInfoMocker.MockInfo()), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
       viewmodel.UndoStack.Undo();
@@ -195,7 +195,7 @@ public partial class CardListViewModelTests
         Notifier = new() { OnNotify = (arg) => throw new NotificationException(arg) }
       };
 
-      JsonService.TrySerializeObject(DeckEditorMTGCardMocker.CreateMTGCardModel(), out var json);
+      JsonExtensions.TrySerializeObject(DeckEditorMTGCardMocker.CreateMTGCardModel(), out var json);
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(json);
     }
@@ -276,7 +276,7 @@ public partial class CardListViewModelTests
 
       await viewmodel.ImportCardsCommand.ExecuteAsync("API import");
 
-      Assert.AreEqual(2, viewmodel.Cards.FirstOrDefault(x => x.Info.Name == cardName)?.Count);
+      Assert.AreEqual(2, viewmodel.Cards.FirstOrDefault(x => x.Info.Name == cardName).Count);
     }
   }
 }

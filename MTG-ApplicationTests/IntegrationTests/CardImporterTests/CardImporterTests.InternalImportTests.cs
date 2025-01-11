@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.IntegrationTests.CardImporterTests;
@@ -17,7 +17,7 @@ public partial class CardImporterTests
       var importer = new DeckEditorCardImporter(new ScryfallAPI());
       var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(), Count: 5);
 
-      JsonService.TrySerializeObject(card, out var json);
+      JsonExtensions.TrySerializeObject(card, out var json);
 
       var result = await importer.Import(json);
 

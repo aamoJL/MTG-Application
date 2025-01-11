@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using MTGApplication.General.Services.IOServices;
+using MTGApplication.General.Extensions;
 using System.IO;
 
 namespace MTGApplication.General.Services.Databases.Context;
@@ -13,7 +13,7 @@ public class CardDesignTimeDbContextFactory : IDesignTimeDbContextFactory<CardDb
 {
   public CardDbContext CreateDbContext(string[] args)
   {
-    var dbPath = Path.Join(FileService.GetAppDataPath(), CardDbContextFactory.DbFileName);
+    var dbPath = Path.Join(PathExtensions.GetAppDataPath(), CardDbContextFactory.DbFileName);
     var connectionString = $"Data Source={dbPath}";
 
     var options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;

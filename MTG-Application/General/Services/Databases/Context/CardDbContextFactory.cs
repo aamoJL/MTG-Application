@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MTGApplication.General.Services.IOServices;
+using MTGApplication.General.Extensions;
 using System.IO;
 
 namespace MTGApplication.General.Services.Databases.Context;
@@ -13,7 +13,7 @@ public class CardDbContextFactory
   {
     if (string.IsNullOrEmpty(connectionString))
     {
-      var dbPath = Path.Join(FileService.GetAppDataPath(), DbFileName);
+      var dbPath = Path.Join(PathExtensions.GetAppDataPath(), DbFileName);
       connectionString = $"Data Source={dbPath}";
     }
     this.connectionString = connectionString;

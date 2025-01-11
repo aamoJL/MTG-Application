@@ -2,8 +2,8 @@
 using MTGApplication.Features.DeckEditor.Commanders.Services;
 using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
@@ -24,7 +24,7 @@ public partial class CommanderCommandsTests
         OnChange = (card) => { result = card; }
       };
 
-      JsonService.TrySerializeObject(import, out var json);
+      JsonExtensions.TrySerializeObject(import, out var json);
 
       await viewmodel.ImportCommanderCommand.ExecuteAsync(json);
 
@@ -41,11 +41,11 @@ public partial class CommanderCommandsTests
         OnChange = (card) => { result = card; }
       };
 
-      JsonService.TrySerializeObject(import, out var json);
+      JsonExtensions.TrySerializeObject(import, out var json);
 
       await viewmodel.ImportCommanderCommand.ExecuteAsync(json);
 
-      Assert.AreEqual(import.Info.Name, result?.Info.Name);
+      Assert.AreEqual(import.Info.Name, result.Info.Name);
     }
 
     [TestMethod("Success notifications should be sent when the import was successfull")]
@@ -58,7 +58,7 @@ public partial class CommanderCommandsTests
         Notifier = notifier
       };
 
-      JsonService.TrySerializeObject(import, out var json);
+      JsonExtensions.TrySerializeObject(import, out var json);
 
       await viewmodel.ImportCommanderCommand.ExecuteAsync(json);
 
@@ -89,7 +89,7 @@ public partial class CommanderCommandsTests
         Notifier = notifier
       };
 
-      JsonService.TrySerializeObject(import, out var json);
+      JsonExtensions.TrySerializeObject(import, out var json);
 
       await viewmodel.ImportCommanderCommand.ExecuteAsync(json);
 

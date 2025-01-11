@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -45,7 +45,7 @@ public class MTGCardTests
   {
     var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo());
 
-    JsonService.TrySerializeObject(card, out var serialized);
+    JsonExtensions.TrySerializeObject(card, out var serialized);
 
     Assert.IsNotNull(serialized);
   }
@@ -55,8 +55,8 @@ public class MTGCardTests
   {
     var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo());
 
-    JsonService.TrySerializeObject(card, out var serialized);
-    JsonService.TryDeserializeJson(serialized, out DeckEditorMTGCard deserialized);
+    JsonExtensions.TrySerializeObject(card, out var serialized);
+    JsonExtensions.TryDeserializeJson(serialized, out DeckEditorMTGCard deserialized);
 
     Assert.IsNotNull(deserialized);
     Assert.AreEqual(card.Info.Name, deserialized.Info.Name);

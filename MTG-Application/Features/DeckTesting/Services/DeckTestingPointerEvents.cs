@@ -95,9 +95,6 @@ public class DeckTestingPointerEvents
         if (item.IsToken)
           cardElement.CountCounterVisibility = Visibility.Visible;
 
-        // TODO: Item repeater for canvas items?
-        // CanvasView: https://dev.azure.com/dotnet/CommunityToolkit/_artifacts/feed/CommunityToolkit-Labs/NuGet/CommunityToolkit.Labs.WinUI.CanvasView/overview/0.1.230830
-
         Canvas.SetLeft(cardElement, pos.X + DragCardPreview.CurrentOffset.X);
         Canvas.SetTop(cardElement, pos.Y + DragCardPreview.CurrentOffset.Y);
 

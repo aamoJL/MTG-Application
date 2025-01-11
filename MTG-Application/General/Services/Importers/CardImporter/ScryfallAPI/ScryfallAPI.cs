@@ -276,7 +276,7 @@ public partial class ScryfallAPI : MTGCardImporter
       try
       {
         // Fetch and covert the JSON to card objects
-        if (JsonService.TryParseJson(await NetworkService.PostJsonFromUrl(COLLECTION_URL, identifiersJson), out var rootNode))
+        if (JsonNode.Parse(await NetworkService.PostJsonFromUrl(COLLECTION_URL, identifiersJson)) is JsonNode rootNode)
         {
           notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
 

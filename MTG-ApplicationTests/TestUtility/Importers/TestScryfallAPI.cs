@@ -1,19 +1,17 @@
-﻿using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Extensions;
+using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using System.Text.Json.Nodes;
 
 namespace MTGApplicationTests.TestUtility.Importers;
 
 public class TestScryfallAPI() : ScryfallAPI
 {
-  private readonly string _apiSamplePath = Path.Join(FileService.GetAssetDirectoryPath(), "ScryfallAPIDeckSample.json");
+  private readonly string _apiSamplePath = Path.Join(PathExtensions.GetAssetDirectoryPath(), "ScryfallAPIDeckSample.json");
 
   public async Task<CardImportResult.Card[]> GetCardsFromSampleJSON()
   {
-    FileService.TryReadTextFromFile(_apiSamplePath, out var data);
-
-    var jsonNode = JsonNode.Parse(data);
+    var jsonNode = JsonNode.Parse(File.ReadAllText(_apiSamplePath));
 
     return (await GetCardsFromJsonObject(jsonNode)).ToArray();
   }
