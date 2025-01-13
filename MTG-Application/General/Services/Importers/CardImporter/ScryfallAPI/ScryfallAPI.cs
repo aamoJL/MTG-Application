@@ -41,12 +41,12 @@ public partial class ScryfallAPI : MTGCardImporter
 
     try
     {
-      return await ImportFromUri(GetSearchUri(searchParams), fetchAll: !pagination);
+      return await ImportWithUri(GetSearchUri(searchParams), fetchAll: !pagination);
     }
     catch { throw; }
   }
 
-  public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public override async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var pageResults = new List<CardImportResult>();
     var currentPage = pageUri;
@@ -63,7 +63,7 @@ public partial class ScryfallAPI : MTGCardImporter
 
         List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
         var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() ?? "" : "";
-        var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? 0;
+        var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? found.Count;
         pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
 
         currentPage = nextPage;
@@ -83,9 +83,10 @@ public partial class ScryfallAPI : MTGCardImporter
     };
   }
 
-  public override async Task<CardImportResult> ImportFromString(string importText)
+  public override async Task<CardImportResult> ImportWithString(string importText)
   {
-    if (string.IsNullOrEmpty(importText)) return CardImportResult.Empty(CardImportResult.ImportSource.External);
+    if (string.IsNullOrEmpty(importText))
+      return CardImportResult.Empty(CardImportResult.ImportSource.External);
 
     var separator = new[] { '\n', '\r' };
     var lines = importText.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -126,7 +127,16 @@ public partial class ScryfallAPI : MTGCardImporter
     catch { throw; }
   }
 
-  public override async Task<CardImportResult> ImportFromDTOs(IEnumerable<MTGCardDTO> dtos)
+  public async Task<CardImportResult> ImportWithName(string name, bool fuzzy)
+  {
+    var searchType = fuzzy ? "fuzzy" : "exact";
+
+    return await ImportWithUri($"{CARDS_URL}/named?{searchType}={name.Replace(' ', '+')}");
+  }
+
+  public async Task<CardImportResult> ImportWithId(Guid id) => await ImportWithUri($"{CARDS_URL}/{id}");
+
+  public override async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtos)
   {
     try
     {
@@ -145,11 +155,11 @@ public partial class ScryfallAPI : MTGCardImporter
       return [];
 
     var cards = new List<CardImportResult.Card>();
+    var cardNodes = jsonNode["data"]?.AsArray() ?? new JsonArray(jsonNode);
 
-    if (jsonNode["data"] is JsonNode dataNode)
-      foreach (var itemInfo in await Task.WhenAll(dataNode.AsArray().Select(x => Task.Run(() => GetCardInfoFromJSON(x!, paperOnly)))))
-        if (itemInfo != null)
-          cards.Add(new(itemInfo));
+    foreach (var itemInfo in await Task.WhenAll(cardNodes.Select(x => Task.Run(() => GetCardInfoFromJSON(x!, paperOnly)))))
+      if (itemInfo != null)
+        cards.Add(new(itemInfo));
 
     return cards;
   }

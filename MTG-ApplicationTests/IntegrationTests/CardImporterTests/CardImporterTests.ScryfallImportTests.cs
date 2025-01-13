@@ -45,5 +45,44 @@ public partial class CardImporterTests
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual(4, result.NotFoundCount);
     }
+
+    [TestMethod]
+    public async Task Import_WithIdUri_CardFound()
+    {
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var uri = "https://cards.scryfall.io/large/front/8/0/80fc51aa-64ca-4236-8cdb-670533b75f59.jpg?1736467426";
+
+      var result = await importer.Import(uri);
+
+      Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
+      Assert.AreEqual(1, result.Found.Length);
+      Assert.AreEqual(new Guid("80fc51aa-64ca-4236-8cdb-670533b75f59"), result.Found[0].Info.ScryfallId);
+    }
+
+    [TestMethod]
+    public async Task Import_WithNameUri_CardFound()
+    {
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var uri = "https://scryfall.com/card/inr/2/decimator-of-the-provinces";
+
+      var result = await importer.Import(uri);
+
+      Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
+      Assert.AreEqual(1, result.Found.Length);
+      Assert.AreEqual("Decimator of the Provinces", result.Found[0].Info.Name);
+    }
+
+    [TestMethod]
+    public async Task Import_WithInvalidUri_CardNotFound()
+    {
+      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var uri = "https://scryfall.com/xxxxxx/inr/2/xxxxxxxx-xx";
+
+      var result = await importer.Import(uri);
+
+      Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
+      Assert.AreEqual(1, result.NotFoundCount);
+      Assert.AreEqual(0, result.Found.Length);
+    }
   }
 }

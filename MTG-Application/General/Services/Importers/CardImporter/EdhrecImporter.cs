@@ -12,19 +12,19 @@ namespace MTGApplication.General.Services.Importers.CardImporter;
 
 public partial class EdhrecImporter
 {
+  private static readonly string WEBSITE_HOST = "edhrec.com";
   private static readonly string API_URI = "https://json.edhrec.com/pages/commanders";
   private static readonly string WEBSITE_BASE_URI = "https://edhrec.com/commanders";
 
   /// <summary>
   /// Tries to parse a card <paramref name="name"/> from the given <paramref name="data"/>
-  /// The <paramref name="data"/> should be an EDHREC card uri.
   /// </summary>
   /// <param name="data">EDHREC card Uri</param>
   /// <param name="name">Parsed card name</param>
   /// <returns><see langword="true"/> if the <paramref name="data"/> was successfully parsed; otherwise, <see langword="false"/></returns>
   public static bool TryParseCardNameFromEdhrecUri(string data, out string? name)
   {
-    if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == "edhrec.com")
+    if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == WEBSITE_HOST)
       name = uri.Segments[^1]; // Name is the last segment of the Uri
     else
       name = null;

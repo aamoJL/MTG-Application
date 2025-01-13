@@ -29,7 +29,7 @@ public class DTOToCardCollectionConverter(MTGCardImporter importer)
           {
             Name = x.Name,
             SearchQuery = x.SearchQuery,
-            Cards = new((await importer.ImportFromDTOs([.. x.Cards])).Found.Select(x => new CardCollectionMTGCard(x.Info)))
+            Cards = new((await importer.ImportWithDTOs([.. x.Cards])).Found.Select(x => new CardCollectionMTGCard(x.Info)))
           };
         })))
       };

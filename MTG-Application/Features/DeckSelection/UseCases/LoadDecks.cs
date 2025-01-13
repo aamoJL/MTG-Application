@@ -36,7 +36,7 @@ public partial class DeckSelectorViewModelCommands
         commanderDTOs.AddRange(deckDTOs.Where(x => x.Commander != null).Select(x => x.Commander!));
         commanderDTOs.AddRange(deckDTOs.Where(x => x.CommanderPartner != null).Select(x => x.CommanderPartner!));
 
-        var commanders = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromDTOs(commanderDTOs))).Found;
+        var commanders = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithDTOs(commanderDTOs))).Found;
 
         foreach (var dto in deckDTOs)
         {

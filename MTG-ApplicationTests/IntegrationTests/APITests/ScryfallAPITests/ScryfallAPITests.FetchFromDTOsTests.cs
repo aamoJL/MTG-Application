@@ -20,7 +20,7 @@ public partial class ScryfallAPITests
         MTGCardDTOMocker.Mock(name: "Apostle of Invasion", scryfallId: Guid.Parse("8a973487-5def-4771-bb77-5748cbd2f469")),
       };
 
-      var result = await api.ImportFromDTOs(dtos);
+      var result = await api.ImportWithDTOs(dtos);
 
       CollectionAssert.AreEquivalent(
         dtos.Select(x => x.Name).ToArray(),

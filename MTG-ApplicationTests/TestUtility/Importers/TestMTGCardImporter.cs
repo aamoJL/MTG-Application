@@ -25,7 +25,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
       : Empty(ImportSource.External));
   }
 
-  public override async Task<CardImportResult> ImportFromDTOs(IEnumerable<MTGCardDTO> dtoArray)
+  public override async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtoArray)
   {
     if (Exception != null)
       throw Exception;
@@ -42,7 +42,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
     }
   }
 
-  public override async Task<CardImportResult> ImportFromString(string importText)
+  public override async Task<CardImportResult> ImportWithString(string importText)
   {
     if (Exception != null)
       throw Exception;
@@ -50,7 +50,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
     return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
   }
 
-  public override async Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public override async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     if (Exception != null)
       throw Exception;

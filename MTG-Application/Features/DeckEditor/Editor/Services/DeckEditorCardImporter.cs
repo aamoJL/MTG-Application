@@ -14,12 +14,46 @@ public class DeckEditorCardImporter(MTGCardImporter importer)
   {
     try
     {
-      if (JsonExtensions.TryDeserializeJson<CardImportResult.Card>(data, out var card) && card != null)
-        return new([new CardImportResult.Card(card.Info, card.Count)], 0, 1, CardImportResult.ImportSource.Internal); // Imported from the app
+      return TryInternalImport(data)
+        ?? await TryEdhrecImageImport(data)
+        ?? await TryScryfallImageImport(data)
+        ?? await ApiImport(data);
+    }
+    catch { throw; }
+  }
 
-      if (EdhrecImporter.TryParseCardNameFromEdhrecUri(data, out var name) && name != null)
-        return await new FetchCardsWithImportString(importer).Execute(name); // Imported from EDHREC.com
+  private CardImportResult? TryInternalImport(string data)
+  {
+    if (JsonExtensions.TryDeserializeJson<CardImportResult.Card>(data, out var card) && card != null)
+      return new([new CardImportResult.Card(card.Info, card.Count)], 0, 1, CardImportResult.ImportSource.Internal);
+    else
+      return null;
+  }
 
+  private async Task<CardImportResult?> TryEdhrecImageImport(string data)
+  {
+    try
+    {
+      _ = EdhrecImporter.TryParseCardNameFromEdhrecUri(data, out var name);
+
+      return name != null ? await new FetchCardsWithImportString(importer).Execute(name) : null;
+    }
+    catch { throw; }
+  }
+
+  private async Task<CardImportResult?> TryScryfallImageImport(string data)
+  {
+    try
+    {
+      return await ScryfallImporter.TryImportFromUri(data);
+    }
+    catch { throw; }
+  }
+
+  private async Task<CardImportResult> ApiImport(string data)
+  {
+    try
+    {
       return await new FetchCardsWithImportString(importer).Execute(data);
     }
     catch { throw; }
