@@ -28,6 +28,7 @@
 
   <Page.Resources>
     <converters:StringOrDefaultConverter x:Key="StringOrDefaultConverter"/>
+    <converters:CardColorGroupToBoolConverter x:Key="CardColorGroupToBoolConverter"/>
   </Page.Resources>
   
   <!--#region Keyboard Accelerators -->
@@ -502,9 +503,9 @@
                       <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind CardFilter.Colorless, Mode=TwoWay}"/>
                     </StackPanel>
                     <RadioButtons Header="Color group" MaxColumns="3" SelectedIndex="0">
-                      <RadioButton Content="All" GroupName="ColorGroup" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="All"/>
-                      <RadioButton Content="Mono" GroupName="ColorGroup" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Mono"/>
-                      <RadioButton Content="Multi" GroupName="ColorGroup" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Multi"/>
+                      <RadioButton Content="All" GroupName="ColorGroup" IsChecked="{x:Bind CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=All, Mode=OneWay}" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="All"/>
+                      <RadioButton Content="Mono" GroupName="ColorGroup" IsChecked="{x:Bind CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=Mono, Mode=OneWay}" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Mono"/>
+                      <RadioButton Content="Multi" GroupName="ColorGroup" IsChecked="{x:Bind CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=Multi, Mode=OneWay}" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Multi"/>
                     </RadioButtons>
                     <Button Content="Reset filters" Command="{x:Bind CardFilter.ResetCommand, Mode=OneTime}"/>
                   </StackPanel>
@@ -644,20 +645,12 @@
         </Grid>
         <!--#endregion-->
 
-        <Grid>
-          <Grid.Resources>
-            <customControls:BindableCollectionView 
-              x:Name="DeckCardCollectionSource" Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
-              Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
-              SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-          </Grid.Resources>
-          
-          <!--#region Grid View -->
-          <cardlistview:AdvancedAdaptiveCardGridView
+        <!--#region Grid View -->
+        <cardlistview:AdvancedAdaptiveCardGridView
             x:Name="DeckCardsGridView"
             x:Load="{x:Bind DeckImageViewVisible, Mode=OneWay}"
             DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
-            ItemsSource="{x:Bind DeckCardCollectionSource.View, Mode=OneWay}"
+            ItemsSource="{x:Bind DeckCardsGridViewCollectionSource.View, Mode=OneWay}"
             Style="{StaticResource MTGAdaptiveGridViewStyle}"
             BorderBrush="{ThemeResource RegionColor}"
             SelectionMode="Single"
@@ -671,29 +664,35 @@
             OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
             OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
             LosingFocus="ListView_LosingFocus">
-            <cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
-              <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-            </cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
-            <cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
-              <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                <cardview:DeckEditorCardImageView
+          <cardlistview:AdvancedAdaptiveCardGridView.Resources>
+            <customControls:BindableCollectionView 
+              x:Name="DeckCardsGridViewCollectionSource" Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
+              Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
+              SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
+          </cardlistview:AdvancedAdaptiveCardGridView.Resources>
+          <cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+          </cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
+          <cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
+            <DataTemplate x:DataType="models:DeckEditorMTGCard">
+              <cardview:DeckEditorCardImageView
                   d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                   DataContext="{Binding ElementName=DeckCardsGridView, Path=DataContext, Mode=OneTime}"
                   Model="{x:Bind Mode=OneTime}"
                   DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
                   CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                   ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
-              </DataTemplate>
-            </cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
-          </cardlistview:AdvancedAdaptiveCardGridView>
-          <!--#endregion-->
+            </DataTemplate>
+          </cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
+        </cardlistview:AdvancedAdaptiveCardGridView>
+        <!--#endregion-->
 
-          <!--#region List View -->
-          <cardlistview:AdvancedCardListView
+        <!--#region List View -->
+        <cardlistview:AdvancedCardListView
             x:Name="DeckCardsListView"
             x:Load="{x:Bind DeckTextViewVisible, Mode=OneWay}"
             DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
-            ItemsSource="{x:Bind DeckCardCollectionSource.View, Mode=OneWay}"
+            ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneWay}"
             ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
             SelectionMode="Single"
             CanDragItems="True"
@@ -704,12 +703,18 @@
             OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
             OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
             LosingFocus="ListView_LosingFocus">
-            <cardlistview:AdvancedCardListView.KeyboardAccelerators>
-              <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-            </cardlistview:AdvancedCardListView.KeyboardAccelerators>
-            <cardlistview:AdvancedCardListView.ItemTemplate>
-              <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                <cardview:DeckEditorCardTextView
+          <cardlistview:AdvancedCardListView.Resources>
+            <customControls:BindableCollectionView 
+              x:Name="DeckCardsListViewCollectionSource" Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
+              Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
+              SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
+          </cardlistview:AdvancedCardListView.Resources>
+          <cardlistview:AdvancedCardListView.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+          </cardlistview:AdvancedCardListView.KeyboardAccelerators>
+          <cardlistview:AdvancedCardListView.ItemTemplate>
+            <DataTemplate x:DataType="models:DeckEditorMTGCard">
+              <cardview:DeckEditorCardTextView
                   d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
                   DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
                   Model="{x:Bind Mode=OneTime}" 
@@ -717,12 +722,11 @@
                   DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
                   CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
                   ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
-              </DataTemplate>
-            </cardlistview:AdvancedCardListView.ItemTemplate>
-          </cardlistview:AdvancedCardListView>
-          <!--#endregion-->
-        
-        </Grid>
+            </DataTemplate>
+          </cardlistview:AdvancedCardListView.ItemTemplate>
+        </cardlistview:AdvancedCardListView>
+        <!--#endregion-->
+
       </Grid>
       <!--#endregion-->
 
