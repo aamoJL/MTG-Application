@@ -21,7 +21,7 @@ public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : o
       // Load next page
       try
       {
-        var result = await importer.ImportFromUri(NextPage);
+        var result = await importer.ImportWithUri(NextPage);
         NextPage = result.NextPageUri;
         Cards.AddRange(result.Found.Select(ConvertToCardType));
       }

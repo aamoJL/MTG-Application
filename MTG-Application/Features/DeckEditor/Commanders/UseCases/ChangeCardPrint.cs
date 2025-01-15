@@ -24,7 +24,7 @@ public partial class CommanderViewModelCommands
       try
       {
         var commander = Viewmodel.GetCommander()!;
-        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromUri(pageUri: commander.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
+        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithUri(pageUri: commander.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
         if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CommanderConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
         {

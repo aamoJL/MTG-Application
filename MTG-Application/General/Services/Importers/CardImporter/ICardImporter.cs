@@ -26,11 +26,11 @@ public partial interface ICardImporter
   /// Fetches cards from the given <paramref name="pageUri"/>
   /// </summary>
   /// <param name="paperOnly">Fetches only cards that are printed on paper</param>
-  public Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
+  public Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
 
   /// <summary>
   /// Fetch cards from the API using formatted text.
   /// The text formatting depends on the API implementation
   /// </summary>
-  public Task<CardImportResult> ImportFromString(string importText);
+  public Task<CardImportResult> ImportWithString(string importText);
 }

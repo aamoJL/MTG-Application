@@ -22,7 +22,7 @@ public partial class ScryfallAPITests
               2 57e547cd-eba4-4a75-9c4e-8eeb6e00ddc4
               ";
 
-      var result = await api.ImportFromString(importString);
+      var result = await api.ImportWithString(importString);
 
       Assert.AreEqual(7, result.Found.Length);
       Assert.AreEqual(11, result.Found.Sum(x => x.Count));
@@ -34,7 +34,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var importString = string.Empty;
 
-      var result = await api.ImportFromString(importString);
+      var result = await api.ImportWithString(importString);
 
       Assert.AreEqual(0, result.Found.Length);
       Assert.AreEqual(0, result.NotFoundCount);
@@ -49,7 +49,7 @@ public partial class ScryfallAPITests
             oashdpo aasjdpo
             2 aosdaposdpoad";
 
-      var result = await api.ImportFromString(importString);
+      var result = await api.ImportWithString(importString);
 
       Assert.AreEqual(0, result.Found.Length);
       Assert.AreEqual(3, result.NotFoundCount);
@@ -65,7 +65,7 @@ public partial class ScryfallAPITests
             oashdpo aasjdpo
             2 aosdaposdpoad";
 
-      var result = await api.ImportFromString(importString);
+      var result = await api.ImportWithString(importString);
 
       Assert.AreEqual(1, result.Found.Length);
       Assert.AreEqual(2, result.NotFoundCount);

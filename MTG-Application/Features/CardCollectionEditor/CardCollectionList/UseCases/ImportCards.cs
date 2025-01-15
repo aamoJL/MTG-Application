@@ -27,7 +27,7 @@ public partial class CardCollectionEditorViewModelCommands
       try
       {
         // Fetch imported cards and add the cards that are included in the query but not in the owned cards
-        var importResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportFromString(importText));
+        var importResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithString(importText));
         var queryResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(Viewmodel.Query, pagination: false));
 
         var addedCards = importResult.Found.Select(f => new CardCollectionMTGCard(f.Info))

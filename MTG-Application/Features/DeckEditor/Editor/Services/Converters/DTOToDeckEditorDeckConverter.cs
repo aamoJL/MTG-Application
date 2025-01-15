@@ -31,12 +31,12 @@ public class DTOToDeckEditorDeckConverter(MTGCardImporter importer)
 
       await Task.WhenAll(
       [
-        Task.Run(async () => commander = dto.Commander != null ? (await importer.ImportFromDTOs([dto.Commander])).Found.FirstOrDefault() : null),
-        Task.Run(async () => partner = dto.CommanderPartner != null ? (await importer.ImportFromDTOs([dto.CommanderPartner])).Found.FirstOrDefault() : null),
-        Task.Run(async () => deckCards.AddRange((await importer.ImportFromDTOs([.. dto.DeckCards])).Found)),
-        Task.Run(async () => wishCards.AddRange((await importer.ImportFromDTOs([.. dto.WishlistCards])).Found)),
-        Task.Run(async () => maybeCards.AddRange((await importer.ImportFromDTOs([.. dto.MaybelistCards])).Found)),
-        Task.Run(async () => removeCards.AddRange((await importer.ImportFromDTOs([.. dto.RemovelistCards])).Found)),
+        Task.Run(async () => commander = dto.Commander != null ? (await importer.ImportWithDTOs([dto.Commander])).Found.FirstOrDefault() : null),
+        Task.Run(async () => partner = dto.CommanderPartner != null ? (await importer.ImportWithDTOs([dto.CommanderPartner])).Found.FirstOrDefault() : null),
+        Task.Run(async () => deckCards.AddRange((await importer.ImportWithDTOs([.. dto.DeckCards])).Found)),
+        Task.Run(async () => wishCards.AddRange((await importer.ImportWithDTOs([.. dto.WishlistCards])).Found)),
+        Task.Run(async () => maybeCards.AddRange((await importer.ImportWithDTOs([.. dto.MaybelistCards])).Found)),
+        Task.Run(async () => removeCards.AddRange((await importer.ImportWithDTOs([.. dto.RemovelistCards])).Found)),
       ]);
 
       return new DeckEditorMTGDeck()

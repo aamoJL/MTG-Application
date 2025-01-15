@@ -36,18 +36,18 @@ public class TestCardAPITests
     };
     //No expected cards
     var dtos = expectedCards.Select(x => new MTGCardDTO(x.Info)).ToArray();
-    Assert.AreEqual(3, (await api.ImportFromDTOs(dtos)).Found.Length);
+    Assert.AreEqual(3, (await api.ImportWithDTOs(dtos)).Found.Length);
 
     // Expected cards are same as DTOs
     api.ExpectedCards = [.. expectedCards];
-    Assert.AreEqual(3, (await api.ImportFromDTOs(dtos)).Found.Length);
-    Assert.AreEqual(0, (await api.ImportFromDTOs(dtos)).NotFoundCount);
+    Assert.AreEqual(3, (await api.ImportWithDTOs(dtos)).Found.Length);
+    Assert.AreEqual(0, (await api.ImportWithDTOs(dtos)).NotFoundCount);
 
     // Expected cards has one more card than DTOs
     expectedCards.Add(new(MTGCardInfoMocker.MockInfo()));
     api.ExpectedCards = [.. expectedCards];
-    Assert.AreEqual(3, (await api.ImportFromDTOs(dtos)).Found.Length);
-    Assert.AreEqual(1, (await api.ImportFromDTOs(dtos)).NotFoundCount);
+    Assert.AreEqual(3, (await api.ImportWithDTOs(dtos)).Found.Length);
+    Assert.AreEqual(1, (await api.ImportWithDTOs(dtos)).NotFoundCount);
   }
 
   [TestMethod]
@@ -62,12 +62,12 @@ public class TestCardAPITests
     };
 
     //No expected cards
-    Assert.AreEqual(0, (await api.ImportFromString("")).Found.Length);
+    Assert.AreEqual(0, (await api.ImportWithString("")).Found.Length);
 
     // Expected cards
     api.ExpectedCards = [.. cards];
     api.NotFoundCount = 4;
-    Assert.AreEqual(3, (await api.ImportFromString("")).Found.Length);
-    Assert.AreEqual(4, (await api.ImportFromString("")).NotFoundCount);
+    Assert.AreEqual(3, (await api.ImportWithString("")).Found.Length);
+    Assert.AreEqual(4, (await api.ImportWithString("")).NotFoundCount);
   }
 }

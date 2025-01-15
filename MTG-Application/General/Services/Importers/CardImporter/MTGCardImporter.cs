@@ -18,17 +18,17 @@ public abstract class MTGCardImporter : ICardImporter
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
-  public abstract Task<CardImportResult> ImportFromString(string importText);
+  public abstract Task<CardImportResult> ImportWithString(string importText);
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
   /// <exception cref="System.Text.Json.JsonException"></exception>
-  public abstract Task<CardImportResult> ImportFromUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
+  public abstract Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false);
   /// <summary>
   /// Fetch cards from the API using <see cref="MTGCardDTO"/> array
   /// </summary>
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
-  public abstract Task<CardImportResult> ImportFromDTOs(IEnumerable<MTGCardDTO> dtos);
+  public abstract Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtos);
 }

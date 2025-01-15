@@ -13,7 +13,7 @@ public class FetchCardsWithImportString(MTGCardImporter importer) : UseCase<stri
   {
     try
     {
-      return await importer.ImportFromString(importString);
+      return await importer.ImportWithString(importString);
     }
     catch { throw; }
   }
