@@ -12,4 +12,11 @@
     <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
     <Setter Property="BorderThickness" Value="1 1 0 0" />
   </Style>
+
+  <Style x:Name="GridItemsViewStyle" TargetType="ItemsView">
+    <Setter Property="MinWidth" Value="100" />
+    <Setter Property="Padding" Value="10 10 5 10" />
+    <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
+    <Setter Property="BorderThickness" Value="1 1 0 0" />
+  </Style>
 </ResourceDictionary>

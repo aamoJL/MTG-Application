@@ -20,6 +20,15 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
   public static readonly DependencyProperty HoverPreviewEnabledProperty =
       DependencyProperty.Register(nameof(HoverPreviewEnabled), typeof(bool), typeof(BasicCardView<TCard>), new PropertyMetadata(false));
 
+  public static readonly DependencyProperty OnDropRemoveProperty =
+      DependencyProperty.Register(nameof(OnDropRemove), typeof(ICommand), typeof(BasicCardView<TCard>), new PropertyMetadata(default));
+
+  public static readonly DependencyProperty OnDropBeginMoveFromProperty =
+      DependencyProperty.Register(nameof(OnDropBeginMoveFrom), typeof(ICommand), typeof(BasicCardView<TCard>), new PropertyMetadata(default));
+
+  public static readonly DependencyProperty OnDropExecuteMoveProperty =
+      DependencyProperty.Register(nameof(OnDropExecuteMove), typeof(ICommand), typeof(BasicCardView<TCard>), new PropertyMetadata(default));
+
   public BasicCardView()
   {
     Loaded += (_, _) =>
@@ -57,12 +66,21 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
-  public IAsyncRelayCommand? OnDropCopy { get; set; }
-  public ICommand? OnDropRemove { get; set; }
-  public IAsyncRelayCommand? OnDropImport { get; set; }
-  public ICommand? OnDropBeginMoveFrom { get; set; }
-  public IAsyncRelayCommand? OnDropBeginMoveTo { get; set; }
-  public ICommand? OnDropExecuteMove { get; set; }
+  public ICommand OnDropRemove
+  {
+    get => (ICommand)GetValue(OnDropRemoveProperty);
+    set => SetValue(OnDropRemoveProperty, value);
+  }
+  public ICommand OnDropBeginMoveFrom
+  {
+    get => (ICommand)GetValue(OnDropBeginMoveFromProperty);
+    set => SetValue(OnDropBeginMoveFromProperty, value);
+  }
+  public ICommand OnDropExecuteMove
+  {
+    get => (ICommand)GetValue(OnDropExecuteMoveProperty);
+    set => SetValue(OnDropExecuteMoveProperty, value);
+  }
 
   /// <summary>
   /// Changes selected face image if possible

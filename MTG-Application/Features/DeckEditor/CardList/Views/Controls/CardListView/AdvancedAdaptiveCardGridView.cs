@@ -26,20 +26,18 @@ public partial class AdvancedAdaptiveCardGridView : AdaptiveGridView
 
   public AdvancedAdaptiveCardGridView()
   {
-    DragAndDrop = new(itemToArgsConverter: (item) => new CardMoveArgs(item, item.Count))
-    {
-      OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
-      OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
-      OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
-      OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)),
-      OnExecuteMove = (item) => OnDropExecuteMove?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count))
-    };
-
-    DragItemsStarting += DragAndDrop.DragStarting;
-    DragItemsCompleted += DragAndDrop.DragCompleted;
+    DragItemsStarting += DragAndDrop!.DragStarting;
+    DragItemsCompleted += DragAndDrop!.DragCompleted;
   }
 
-  protected ListViewDragAndDrop<DeckEditorMTGCard> DragAndDrop { get; }
+  protected ListViewDragAndDrop<DeckEditorMTGCard> DragAndDrop => field ??= new(itemToArgsConverter: (item) => new CardMoveArgs(item, item.Count))
+  {
+    OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
+    OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
+    OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
+    OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)),
+    OnExecuteMove = (item) => OnDropExecuteMove?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count))
+  };
 
   public IAsyncRelayCommand OnDropCopy
   {
