@@ -36,7 +36,7 @@ public partial class QueryCardsViewModel : ObservableObject
   public async Task UpdateQueryCards(string query)
   {
     var searchResult = await new FetchCardsWithSearchQuery(Importer).Execute(query);
-    QueryCards.SetCollection([.. searchResult.Found.Select(x => new CardCollectionMTGCard(x.Info))], searchResult.NextPageUri, searchResult.TotalCount);
+    await QueryCards.SetCollection([.. searchResult.Found.Select(x => new CardCollectionMTGCard(x.Info))], searchResult.NextPageUri, searchResult.TotalCount);
 
     OnPropertyChanged(nameof(TotalCardCount));
   }

@@ -1,21 +1,10 @@
 <ResourceDictionary
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:controls="using:MTGApplication.General.Views.Controls.AdaptiveGridView">
-
-  <Style x:Name="MTGAdaptiveGridViewStyle" TargetType="controls:AdaptiveGridView">
-    <!--Min Width must be over 0, otherwise the program crashes when the view expands from 0 using GripSplitter-->
-    <Setter Property="MinWidth" Value="100" />
-    <Setter Property="Padding" Value="10 10 5 10" />
-    <Setter Property="StretchContentForSingleRow" Value="False" />
-    <Setter Property="ItemContainerTransitions" Value="{x:Null}" />
-    <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
-    <Setter Property="BorderThickness" Value="1 1 0 0" />
-  </Style>
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <Style x:Name="GridItemsViewStyle" TargetType="ItemsView">
     <Setter Property="MinWidth" Value="100" />
-    <Setter Property="Padding" Value="10 10 5 10" />
+    <Setter Property="Padding" Value="10" />
     <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
     <Setter Property="BorderThickness" Value="1 1 0 0" />
   </Style>

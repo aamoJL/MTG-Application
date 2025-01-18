@@ -224,7 +224,6 @@
   <ItemGroup>
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
-    <Folder Include="General\Views\Controls\AdaptiveGridView\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">

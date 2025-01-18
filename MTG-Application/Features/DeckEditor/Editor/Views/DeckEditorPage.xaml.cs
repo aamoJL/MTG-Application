@@ -3,23 +3,15 @@ using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.DeckEditor.CardList.Services;
-using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
-using MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.NotificationService;
-using MTGApplication.General.Views.DragAndDrop;
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics.Imaging;
 
 namespace MTGApplication.Features.DeckEditor.Views;
 public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
@@ -56,7 +48,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(DeckCardsViewType)));
       }
     }
-  } = CardViewType.Image;
+  } = CardViewType.Group;
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -127,11 +119,10 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     if (args.Element is ListViewBase listview)
     {
-      if (listview.SelectedIndex == -1
-        || listview.DataContext is not CardListViewModel listViewViewModel
+      if (listview.DataContext is not CardListViewModel listViewViewModel
         || (listview.SelectedIndex is int index && index < 0)
-        || listview.Items[index] is not ItemCollection selectedCard
-        || listViewViewModel.RemoveCardCommand.CanExecute(selectedCard))
+        || listview.SelectedItem is not DeckEditorMTGCard selectedCard
+        || !listViewViewModel.RemoveCardCommand.CanExecute(selectedCard))
         return;
 
       listViewViewModel.RemoveCardCommand.Execute(selectedCard);
@@ -177,124 +168,5 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
       args.Handled = true;
     }
-    else if (sender is ItemsView itemsView)
-    {
-      if (args.NewFocusedElement is ItemContainer itemContainer
-        && itemContainer.FindParent<ItemsView>() == itemsView)
-        return;
-
-      itemsView.DeselectAll();
-
-      args.Handled = true;
-    }
-  }
-}
-
-public partial class AdvancedCardItemsView : ItemsView
-{
-  public static readonly DependencyProperty OnDropCopyProperty =
-      DependencyProperty.Register(nameof(OnDropCopy), typeof(IAsyncRelayCommand), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(default));
-
-  public static readonly DependencyProperty OnDropImportProperty =
-      DependencyProperty.Register(nameof(OnDropImport), typeof(IAsyncRelayCommand), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(default));
-
-  public static readonly DependencyProperty OnDropBeginMoveFromProperty =
-      DependencyProperty.Register(nameof(OnDropBeginMoveFrom), typeof(IRelayCommand), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(default));
-
-  public static readonly DependencyProperty OnDropBeginMoveToProperty =
-      DependencyProperty.Register(nameof(OnDropBeginMoveTo), typeof(IAsyncRelayCommand), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(default));
-
-  public static readonly DependencyProperty OnDropExecuteMoveProperty =
-      DependencyProperty.Register(nameof(OnDropExecuteMove), typeof(IRelayCommand), typeof(AdvancedAdaptiveCardGridView), new PropertyMetadata(default));
-
-  protected DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
-  {
-    OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
-    OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
-    OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
-    OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)),
-    OnExecuteMove = (item) => OnDropExecuteMove?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count))
-  };
-
-  public IAsyncRelayCommand OnDropCopy
-  {
-    get => (IAsyncRelayCommand)GetValue(OnDropCopyProperty);
-    set => SetValue(OnDropCopyProperty, value);
-  }
-  public IAsyncRelayCommand OnDropImport
-  {
-    get => (IAsyncRelayCommand)GetValue(OnDropImportProperty);
-    set => SetValue(OnDropImportProperty, value);
-  }
-  public IRelayCommand OnDropBeginMoveFrom
-  {
-    get => (IRelayCommand)GetValue(OnDropBeginMoveFromProperty);
-    set => SetValue(OnDropBeginMoveFromProperty, value);
-  }
-  public IAsyncRelayCommand OnDropBeginMoveTo
-  {
-    get => (IAsyncRelayCommand)GetValue(OnDropBeginMoveToProperty);
-    set => SetValue(OnDropBeginMoveToProperty, value);
-  }
-  public IRelayCommand OnDropExecuteMove
-  {
-    get => (IRelayCommand)GetValue(OnDropExecuteMoveProperty);
-    set => SetValue(OnDropExecuteMoveProperty, value);
-  }
-
-  protected override async void OnDrop(DragEventArgs e)
-  {
-    var def = e.GetDeferral();
-
-    await DragAndDrop!.Drop(
-      e.AcceptedOperation,
-      e.DataView.Contains(StandardDataFormats.Text) ? await e.DataView.GetTextAsync() : string.Empty);
-
-    def.Complete();
-  }
-
-  protected override void OnDragOver(DragEventArgs e) => DragAndDrop?.DragOver(e);
-}
-
-public partial class AdvancedDeckEditorCardImageView : DeckEditorCardImageView
-{
-  public AdvancedDeckEditorCardImageView() : base()
-  {
-    DragStarting += AdvancedDeckEditorCardImageView_DragStarting;
-    DropCompleted += AdvancedDeckEditorCardImageView_DropCompleted;
-  }
-
-  protected DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
-  {
-    OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info, item.Count)),
-  };
-
-  private async void AdvancedDeckEditorCardImageView_DragStarting(UIElement sender, DragStartingEventArgs args)
-  {
-    var deferral = args.GetDeferral();
-
-    DragAndDrop!.OnDragStarting(new CardMoveArgs(Model, Model.Count), out var operation);
-
-    // Set the drag UI to the image element of the dragged element
-    args.DragUI.SetContentFromSoftwareBitmap(await GetDragUI(), args.GetPosition(ImageElement));
-    args.Data.RequestedOperation = operation;
-
-    deferral.Complete();
-  }
-
-  private void AdvancedDeckEditorCardImageView_DropCompleted(UIElement sender, DropCompletedEventArgs args)
-    => DragAndDrop!.DropCompleted();
-
-  private async Task<SoftwareBitmap> GetDragUI()
-  {
-    var renderTargetBitmap = new RenderTargetBitmap();
-    await renderTargetBitmap.RenderAsync(ImageElement);
-
-    return SoftwareBitmap.CreateCopyFromBuffer(
-      await renderTargetBitmap.GetPixelsAsync(),
-      BitmapPixelFormat.Bgra8,
-      renderTargetBitmap.PixelWidth,
-      renderTargetBitmap.PixelHeight,
-      BitmapAlphaMode.Premultiplied);
   }
 }

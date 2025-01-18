@@ -29,6 +29,7 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       {
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close",
+        CanSelectItems = false,
       })) as MTGCard;
     };
 
