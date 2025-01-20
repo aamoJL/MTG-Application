@@ -78,8 +78,7 @@
     <Setter Property="CornerRadius" Value="12"/>
     <Setter Property="PlaceholderSource" Value="/Assets/back.png"/>
     <Setter Property="PlaceholderStretch" Value="Fill"/>
-    <Setter Property="EnableLazyLoading" Value="True"/>
-    <Setter Property="LazyLoadingThreshold" Value="1000"/>
+    <Setter Property="EnableLazyLoading" Value="False"/>
     <Setter Property="IsCacheEnabled" Value="True"/>
   </Style>
 </ResourceDictionary>
