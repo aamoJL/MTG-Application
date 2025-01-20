@@ -163,7 +163,7 @@
           Style="{StaticResource GridItemsViewStyle}"
           SelectionMode="None">
           <ItemsView.Layout>
-            <UniformGridLayout MinItemWidth="250" ItemsStretch="Fill"/>
+            <UniformGridLayout MinItemWidth="230" ItemsStretch="Fill"/>
           </ItemsView.Layout>
           <interactivity:Interaction.Behaviors>
             <helpers:LoadMoreItemBehavior LoadingOffset="200" LoadCount="{x:Bind ViewModel.CardCollectionListViewModel.QueryCardsViewModel.Collection.Count, Mode=OneWay}"/>

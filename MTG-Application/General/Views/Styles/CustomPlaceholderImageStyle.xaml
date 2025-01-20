@@ -75,7 +75,7 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
-    <Setter Property="CornerRadius" Value="14"/>
+    <Setter Property="CornerRadius" Value="12"/>
     <Setter Property="PlaceholderSource" Value="/Assets/back.png"/>
     <Setter Property="PlaceholderStretch" Value="Fill"/>
     <Setter Property="EnableLazyLoading" Value="True"/>
