@@ -16,7 +16,7 @@ public partial class CardCollectionListViewModel
     public Notifier Notifier { get; init; } = new();
     public ClipboardService ClipboardService { get; init; } = new();
 
-    public async Task<CardCollectionListViewModel> Build(MTGCardCollectionList model, MTGCardImporter importer, Func<string, bool> existsValidation)
+    public async Task<CardCollectionListViewModel> Build(MTGCardCollectionList model, IMTGCardImporter importer, Func<string, bool> existsValidation)
     {
       var viewmodel = new CardCollectionListViewModel(model, importer, existsValidation)
       {

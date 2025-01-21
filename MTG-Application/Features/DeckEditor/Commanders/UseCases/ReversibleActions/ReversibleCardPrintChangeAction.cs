@@ -7,7 +7,7 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActio
 
 public partial class CommanderViewModelReversibleActions
 {
-  public class ReversibleCardPrintChangeAction(CommanderCommands viewmodel) : ViewModelReversibleAction<CommanderCommands, (DeckEditorMTGCard Card, MTGCardInfo Print)>(viewmodel)
+  public class ReversibleCardPrintChangeAction(CommanderViewModel viewmodel) : ViewModelReversibleAction<CommanderViewModel, (DeckEditorMTGCard Card, MTGCardInfo Print)>(viewmodel)
   {
     protected override void ActionMethod((DeckEditorMTGCard Card, MTGCardInfo Print) args)
       => ChangePrint(args.Print);
@@ -17,12 +17,11 @@ public partial class CommanderViewModelReversibleActions
 
     private void ChangePrint(MTGCardInfo print)
     {
-      if (Viewmodel.GetCommander() is not DeckEditorMTGCard card) return;
-
-      if (card.Info.Name != print.Name)
+      if (Viewmodel.Card is not DeckEditorMTGCard card
+        || card.Info.Name != print.Name)
         return;
 
-      Viewmodel.OnChange?.Invoke(new DeckEditorMTGCard(print, card.Count));
+      Viewmodel.Card = new DeckEditorMTGCard(print, card.Count);
     }
   }
 }

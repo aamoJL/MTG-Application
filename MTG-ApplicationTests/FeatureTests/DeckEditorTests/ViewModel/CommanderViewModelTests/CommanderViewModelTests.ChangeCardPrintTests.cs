@@ -6,7 +6,7 @@ using MTGApplicationTests.TestUtility.Services;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
-public partial class CommanderCommandsTests
+public partial class CommanderViewModelTests
 {
   [TestClass]
   public class ChangeCardPrintTests : DeckEditorViewModelTestsBase
@@ -14,7 +14,10 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public void ChangePrint_HasCard_CanExecute()
     {
-      var commands = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander);
+      var commands = new CommanderViewModel(_dependencies.Importer)
+      {
+        Card = _savedDeck.Commander
+      };
 
       Assert.IsTrue(commands.ChangeCardPrintCommand.CanExecute(null));
     }
@@ -22,7 +25,7 @@ public partial class CommanderCommandsTests
     [TestMethod]
     public void ChangePrint_HasNoCard_CanExecute()
     {
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander);
+      var viewmodel = new CommanderViewModel(_dependencies.Importer);
 
       Assert.IsFalse(viewmodel.ChangeCardPrintCommand.CanExecute(null));
     }
@@ -32,8 +35,9 @@ public partial class CommanderCommandsTests
     {
       var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
       var existingCard = _savedDeck.Commander;
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
+        Card = existingCard,
         Confirmers = new()
         {
           ChangeCardPrintConfirmer = confirmer
@@ -49,33 +53,43 @@ public partial class CommanderCommandsTests
     public async Task ChangePrint_InvokedWithPrint()
     {
       DeckEditorMTGCard result = null;
+
       var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
+        Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+          ChangeCardPrintConfirmer = new()
+          {
+            OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint))
+          }
         },
         OnChange = (card) => { result = card; }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
 
-      Assert.AreEqual(newPrint.SetCode, result?.Info.SetCode);
+      Assert.AreEqual(newPrint.SetCode, result.Info.SetCode);
     }
 
     [TestMethod]
     public async Task ChangePrint_Undo_InvokedWithOldPrint()
     {
       DeckEditorMTGCard result = null;
+
       var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
+        Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+          ChangeCardPrintConfirmer = new()
+          {
+            OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint))
+          }
         },
         OnChange = (card) => { result = card; }
       };
@@ -83,7 +97,7 @@ public partial class CommanderCommandsTests
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
       viewmodel.UndoStack.Undo();
 
-      Assert.AreEqual(result?.Info.SetCode, existingCard.Info.SetCode);
+      Assert.AreEqual(result.Info.SetCode, existingCard.Info.SetCode);
     }
 
     [TestMethod]
@@ -92,11 +106,15 @@ public partial class CommanderCommandsTests
       DeckEditorMTGCard result = null;
       var existingCard = _savedDeck.Commander;
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies) { Deck = _savedDeck }.MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
+        Card = existingCard,
         Confirmers = new()
         {
-          ChangeCardPrintConfirmer = new() { OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint)) }
+          ChangeCardPrintConfirmer = new()
+          {
+            OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint))
+          }
         },
         OnChange = (card) => { result = card; }
       };
@@ -105,7 +123,7 @@ public partial class CommanderCommandsTests
       viewmodel.UndoStack.Undo();
       viewmodel.UndoStack.Redo();
 
-      Assert.AreEqual(result?.Info.SetCode, newPrint.SetCode);
+      Assert.AreEqual(result.Info.SetCode, newPrint.SetCode);
     }
   }
 }

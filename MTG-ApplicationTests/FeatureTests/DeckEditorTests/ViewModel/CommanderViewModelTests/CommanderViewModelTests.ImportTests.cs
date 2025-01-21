@@ -9,7 +9,7 @@ using MTGApplicationTests.TestUtility.Services;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
-public partial class CommanderCommandsTests
+public partial class CommanderViewModelTests
 {
   [TestClass]
   public class ImportTests : DeckEditorViewModelTestsBase
@@ -17,12 +17,13 @@ public partial class CommanderCommandsTests
     [TestMethod("Card should not change if the imported card is not legendary")]
     public async Task Import_NotLegendary_InvokedWithNull()
     {
-      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
       DeckEditorMTGCard result = null;
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
+
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
         OnChange = (card) => { result = card; }
       };
+      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
 
       JsonExtensions.TrySerializeObject(import, out var json);
 
@@ -34,12 +35,13 @@ public partial class CommanderCommandsTests
     [TestMethod("Card should change if the imported card is legendary")]
     public async Task Import_Legendary_InvokedWithCard()
     {
-      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
       DeckEditorMTGCard result = null;
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
+
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
         OnChange = (card) => { result = card; }
       };
+      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
 
       JsonExtensions.TrySerializeObject(import, out var json);
 
@@ -52,11 +54,11 @@ public partial class CommanderCommandsTests
     public async Task Import_Success_SuccessNotificationSent()
     {
       var notifier = new TestNotifier();
-      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
         Notifier = notifier
       };
+      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Legendary Creature"));
 
       JsonExtensions.TrySerializeObject(import, out var json);
 
@@ -69,7 +71,7 @@ public partial class CommanderCommandsTests
     public async Task Import_Failure_ErrorNotificationSent()
     {
       var notifier = new TestNotifier();
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
         Notifier = notifier
       };
@@ -83,11 +85,11 @@ public partial class CommanderCommandsTests
     public async Task Import_NotLegendary_LegendaryErrorNotificationSent()
     {
       var notifier = new TestNotifier();
-      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
+      var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
         Notifier = notifier
       };
+      var import = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(typeLine: "Creature"));
 
       JsonExtensions.TrySerializeObject(import, out var json);
 

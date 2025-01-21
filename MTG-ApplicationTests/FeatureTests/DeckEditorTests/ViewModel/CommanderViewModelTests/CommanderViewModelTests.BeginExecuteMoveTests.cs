@@ -6,7 +6,8 @@ using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
-public partial class CommanderCommandsTests
+
+public partial class CommanderViewModelTests
 {
   [TestClass]
   public class BeginExecuteMoveTests : DeckEditorViewModelTestsBase
@@ -18,17 +19,17 @@ public partial class CommanderCommandsTests
       DeckEditorMTGCard targetResult = null;
 
       var undoStack = new ReversibleCommandStack();
-      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var origin = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander)
+      var origin = new CommanderViewModel(_dependencies.Importer)
       {
         UndoStack = undoStack,
         OnChange = (card) => { originResult = card; }
       };
-      var target = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Partner)
+      var target = new CommanderViewModel(_dependencies.Importer)
       {
         UndoStack = undoStack,
         OnChange = (card) => { targetResult = card; }
       };
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
       origin.BeginMoveFromCommand.Execute(card);
       await target.BeginMoveToCommand.ExecuteAsync(card);
@@ -37,7 +38,7 @@ public partial class CommanderCommandsTests
       target.ExecuteMoveCommand.Execute(card);
 
       Assert.IsNull(originResult);
-      Assert.AreEqual(card.Info.Name, targetResult?.Info.Name);
+      Assert.AreEqual(card.Info.Name, targetResult.Info.Name);
     }
   }
 }

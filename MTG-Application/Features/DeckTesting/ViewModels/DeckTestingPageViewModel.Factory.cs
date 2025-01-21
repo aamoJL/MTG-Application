@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MTGApplication.Features.DeckTesting.ViewModels;
 public partial class DeckTestingPageViewModel
 {
-  public class Factory(MTGCardImporter importer)
+  public class Factory(IMTGCardImporter importer)
   {
     public DeckTestingPageViewModel Build(DeckTestingDeck deck)
     {

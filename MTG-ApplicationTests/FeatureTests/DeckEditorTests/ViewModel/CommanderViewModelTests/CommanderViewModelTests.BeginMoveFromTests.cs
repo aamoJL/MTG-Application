@@ -4,18 +4,18 @@ using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderViewModelTests;
-public partial class CommanderCommandsTests
+public partial class CommanderViewModelTests
 {
   [TestClass]
-  public class BeginMoveToTests : DeckEditorViewModelTestsBase
+  public class BeginMoveFromTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
-    public async Task BeginMoveTo_CommandAddedToCombinedCommand()
+    public void BeginMoveFrom_CommandAddedToCombinedCommand()
     {
+      var viewmodel = new CommanderViewModel(_dependencies.Importer);
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var viewmodel = new CommanderCommands(new Mocker(_dependencies).MockVM(), CommanderCommands.CommanderType.Commander);
 
-      await viewmodel.BeginMoveToCommand.ExecuteAsync(card);
+      viewmodel.BeginMoveFromCommand.Execute(card);
 
       Assert.AreEqual(1, viewmodel.UndoStack.ActiveCombinedCommand.Commands.Count);
     }

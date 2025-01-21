@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.ViewModels;
+﻿using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System;
@@ -9,11 +8,9 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public IRelayCommand OpenEdhrecSearchWindowCommand { get; } = new OpenEdhrecSearchWindow(viewmodel).Command;
-
-  private class OpenEdhrecSearchWindow(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class OpenEdhrecSearchWindow(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
-    protected override bool CanExecute() => Viewmodel.Commander != null;
+    protected override bool CanExecute() => Viewmodel.Commander.Card != null;
 
     protected override async Task Execute()
     {
@@ -23,8 +20,8 @@ public partial class DeckEditorViewModelCommands
       try
       {
         var themes = await EdhrecImporter.GetThemes(
-          commander: Viewmodel.Commander!.Info.Name,
-          partner: Viewmodel.Partner?.Info.Name);
+          commander: Viewmodel.Commander.Card!.Info.Name,
+          partner: Viewmodel.Partner.Card?.Info.Name);
 
         new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow(themes).Activate();
       }

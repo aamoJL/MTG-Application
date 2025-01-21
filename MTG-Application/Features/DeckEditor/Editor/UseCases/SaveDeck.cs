@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
@@ -12,9 +12,7 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public IAsyncRelayCommand SaveDeckCommand { get; } = new SaveDeck(viewmodel).Command;
-
-  private class SaveDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class SaveDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
     protected override async Task Execute()
     {
@@ -36,7 +34,7 @@ public partial class DeckEditorViewModelCommands
         }
       }
 
-      if (await Viewmodel.Worker.DoWork(SaveDTO(Viewmodel.DTO, saveName, overrideOld)) is true)
+      if (await (Viewmodel as IWorker).DoWork(SaveDTO(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck), saveName, overrideOld)) is true)
       {
         Viewmodel.Name = saveName;
         Viewmodel.HasUnsavedChanges = false;

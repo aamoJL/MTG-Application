@@ -13,9 +13,9 @@ namespace MTGApplication.Features.CardSearch.ViewModels;
 /// <summary>
 /// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>
-public partial class CardSearchViewModel(MTGCardImporter importer) : ViewModelBase, IWorker
+public partial class CardSearchViewModel(IMTGCardImporter importer) : ViewModelBase, IWorker
 {
-  public MTGCardImporter Importer { get; } = importer;
+  public IMTGCardImporter Importer { get; } = importer;
   public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new CardSearchIncrementalCardSource(importer));
   public CardSearchConfirmers Confirmers { get; init; } = new();
   public IWorker Worker => this;

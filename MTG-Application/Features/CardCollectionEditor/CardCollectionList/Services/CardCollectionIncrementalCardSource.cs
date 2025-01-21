@@ -4,7 +4,7 @@ using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 
-public class CardCollectionIncrementalCardSource(MTGCardImporter importer) : IncrementalCardSource<CardCollectionMTGCard>(importer)
+public class CardCollectionIncrementalCardSource(IMTGCardImporter importer) : IncrementalCardSource<CardCollectionMTGCard>(importer)
 {
   protected override CardCollectionMTGCard ConvertToCardType(CardImportResult.Card card)
     => new(card.Info);

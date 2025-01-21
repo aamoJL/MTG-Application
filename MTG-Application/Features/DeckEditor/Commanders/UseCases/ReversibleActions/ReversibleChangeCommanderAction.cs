@@ -6,7 +6,7 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActio
 
 public partial class CommanderViewModelReversibleActions
 {
-  public class ReversibleChangeCommanderAction(CommanderCommands viewmodel) : ViewModelReversibleAction<CommanderCommands, DeckEditorMTGCard?>(viewmodel)
+  public class ReversibleChangeCommanderAction(CommanderViewModel viewmodel) : ViewModelReversibleAction<CommanderViewModel, DeckEditorMTGCard?>(viewmodel)
   {
     protected override void ActionMethod(DeckEditorMTGCard? card)
       => ChangeCommander(card);
@@ -15,6 +15,6 @@ public partial class CommanderViewModelReversibleActions
       => ChangeCommander(card);
 
     private void ChangeCommander(DeckEditorMTGCard? card)
-      => Viewmodel.OnChange?.Invoke(card);
+      => Viewmodel.Card = card;
   }
 }

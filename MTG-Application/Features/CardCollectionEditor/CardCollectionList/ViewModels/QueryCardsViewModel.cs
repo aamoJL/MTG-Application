@@ -14,7 +14,7 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewMo
 
 public partial class QueryCardsViewModel : ObservableObject
 {
-  public QueryCardsViewModel(ObservableCollection<CardCollectionMTGCard> ownedCards, MTGCardImporter importer)
+  public QueryCardsViewModel(ObservableCollection<CardCollectionMTGCard> ownedCards, IMTGCardImporter importer)
   {
     Importer = importer;
     OwnedCards = ownedCards;
@@ -24,7 +24,7 @@ public partial class QueryCardsViewModel : ObservableObject
     OwnedCards.CollectionChanged += OwnedCards_CollectionChanged;
   }
 
-  public MTGCardImporter Importer { get; }
+  public IMTGCardImporter Importer { get; }
 
   private IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; }
 

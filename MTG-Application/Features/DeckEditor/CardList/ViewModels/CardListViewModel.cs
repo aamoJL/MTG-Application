@@ -17,7 +17,7 @@ namespace MTGApplication.Features.DeckEditor.ViewModels;
 
 public partial class CardListViewModel : INotifyPropertyChanged, INotifyPropertyChanging
 {
-  public CardListViewModel(MTGCardImporter importer, CardListConfirmers? confirmers = null)
+  public CardListViewModel(IMTGCardImporter importer, CardListConfirmers? confirmers = null)
   {
     Commands = new(this);
     Importer = importer;
@@ -43,7 +43,7 @@ public partial class CardListViewModel : INotifyPropertyChanged, INotifyProperty
 
   public virtual CardListConfirmers Confirmers { get; }
 
-  public MTGCardImporter Importer { get; }
+  public IMTGCardImporter Importer { get; }
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public Notifier Notifier { get; init; } = new();

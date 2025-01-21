@@ -17,9 +17,9 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
 
-public partial class CardCollectionViewModel(MTGCardCollection model, MTGCardImporter importer) : ObservableObject, IWorker, ISavable
+public partial class CardCollectionViewModel(MTGCardCollection model, IMTGCardImporter importer) : ObservableObject, IWorker, ISavable
 {
-  public MTGCardImporter Importer { get; } = importer;
+  public IMTGCardImporter Importer { get; } = importer;
   public CardCollectionConfirmers Confirmers { get; set; } = new();
   public Notifier Notifier { get; set; } = new();
   public IRepository<MTGCardCollectionDTO> Repository { get; set; } = new CardCollectionDTORepository();

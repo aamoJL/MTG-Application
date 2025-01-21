@@ -17,7 +17,7 @@ namespace MTGApplication.General.Services.API.CardAPI;
 /// <summary>
 /// Scryfall API calls and helper functions
 /// </summary>
-public partial class ScryfallAPI : MTGCardImporter
+public partial class ScryfallAPI : IMTGCardImporter
 {
   private readonly static string API_URL = "https://api.scryfall.com";
   private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
@@ -31,10 +31,10 @@ public partial class ScryfallAPI : MTGCardImporter
   /// </summary>
   private static int MaxFetchIdentifierCount => 75;
 
-  public override string Name => "Scryfall";
-  public override int PageSize => 175;
+  public string Name => "Scryfall";
+  public int PageSize => 175;
 
-  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
     if (string.IsNullOrEmpty(searchParams))
       return CardImportResult.Empty();
@@ -46,7 +46,7 @@ public partial class ScryfallAPI : MTGCardImporter
     catch { throw; }
   }
 
-  public override async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     var pageResults = new List<CardImportResult>();
     var currentPage = pageUri;
@@ -83,7 +83,7 @@ public partial class ScryfallAPI : MTGCardImporter
     };
   }
 
-  public override async Task<CardImportResult> ImportWithString(string importText)
+  public async Task<CardImportResult> ImportWithString(string importText)
   {
     if (string.IsNullOrEmpty(importText))
       return CardImportResult.Empty(CardImportResult.ImportSource.External);
@@ -136,7 +136,7 @@ public partial class ScryfallAPI : MTGCardImporter
 
   public async Task<CardImportResult> ImportWithId(Guid id) => await ImportWithUri($"{CARDS_URL}/{id}");
 
-  public override async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtos)
+  public async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtos)
   {
     try
     {

@@ -10,11 +10,11 @@ using System.Collections.ObjectModel;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckSelection.ViewModels;
-public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, MTGCardImporter importer) : ObservableObject, IWorker
+public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer) : ObservableObject, IWorker
 {
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];
   public IRepository<MTGCardDeckDTO> Repository { get; } = repository;
-  public MTGCardImporter Importer { get; } = importer;
+  public IMTGCardImporter Importer { get; } = importer;
   public Notifier Notifier { get; } = new();
   public IWorker Worker => this;
 

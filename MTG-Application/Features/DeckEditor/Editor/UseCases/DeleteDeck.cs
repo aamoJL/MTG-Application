@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
@@ -11,9 +11,7 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public IAsyncRelayCommand DeleteDeckCommand { get; } = new DeleteDeck(viewmodel).Command;
-
-  private class DeleteDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class DeleteDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
   {
     protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.Name);
 
@@ -25,9 +23,11 @@ public partial class DeckEditorViewModelCommands
         is not ConfirmationResult.Yes)
         return; // Cancel
 
-      if (await Viewmodel.Worker.DoWork(new DeleteDeckDTO(Viewmodel.Repository).Execute(Viewmodel.DTO)))
+      if (await (Viewmodel as IWorker).DoWork(new DeleteDeckDTO(Viewmodel.Repository).Execute(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck))))
       {
-        Viewmodel.SetDeck(new());
+        Viewmodel.Deck = new();
+        Viewmodel.UndoStack.Clear();
+        Viewmodel.HasUnsavedChanges = false;
 
         new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.DeleteSuccess);
       }

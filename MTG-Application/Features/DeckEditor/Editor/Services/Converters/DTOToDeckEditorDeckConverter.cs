@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 
-public class DTOToDeckEditorDeckConverter(MTGCardImporter importer)
+public class DTOToDeckEditorDeckConverter(IMTGCardImporter importer)
 {
   /// <exception cref="ArgumentNullException"></exception>
   /// <exception cref="InvalidOperationException"></exception>

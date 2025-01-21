@@ -4,16 +4,16 @@ using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.Importers.CardImporter.CardImportResult;
 
 namespace MTGApplicationTests.TestUtility.Importers;
-public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount = 0) : MTGCardImporter
+public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount = 0) : IMTGCardImporter
 {
   public Card[] ExpectedCards { get; set; } = expectedCards;
   public int NotFoundCount { get; set; } = notFoundCount;
   public Exception Exception { get; set; } = null;
 
-  public override int PageSize => 40;
-  public override string Name => "Test Card API";
+  public int PageSize => 40;
+  public string Name => "Test Card API";
 
-  public override async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
     if (Exception != null)
       throw Exception;
@@ -25,7 +25,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
       : Empty(ImportSource.External));
   }
 
-  public override async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtoArray)
+  public async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtoArray)
   {
     if (Exception != null)
       throw Exception;
@@ -42,7 +42,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
     }
   }
 
-  public override async Task<CardImportResult> ImportWithString(string importText)
+  public async Task<CardImportResult> ImportWithString(string importText)
   {
     if (Exception != null)
       throw Exception;
@@ -50,7 +50,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
     return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
   }
 
-  public override async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
   {
     if (Exception != null)
       throw Exception;

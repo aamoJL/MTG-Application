@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
-public class DeckEditorCardImporter(MTGCardImporter importer)
+public class DeckEditorCardImporter(IMTGCardImporter importer)
 {
   /// <exception cref="System.InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>

@@ -26,11 +26,21 @@ public static class NotificationAssert
   }
 
   public static void NotificationSent(NotificationType type, TestNotifier notifier)
-    => Assert.IsTrue(notifier.Notified?.NotificationType.Equals(type), $"Expected {type}, was {notifier.Notified.NotificationType}");
+  {
+    if (notifier.Notified == null)
+      Assert.Fail("Notification was not sent");
+
+    Assert.IsTrue(notifier.Notified.NotificationType.Equals(type), $"Expected {type}, was {notifier.Notified.NotificationType}");
+  }
 
   public static void NotificationSent(Notification notification, TestNotifier notifier)
-    => Assert.IsTrue(notifier.Notified?.Equals(notification), "Notifications do not match");
+  {
+    if (notifier.Notified == null)
+      Assert.Fail("Notification was not sent");
+
+    Assert.IsTrue(notifier.Notified.Equals(notification), "Notifications do not match");
+  }
 
   public static void NotificationNotSent(NotificationType type, TestNotifier notifier)
-    => Assert.IsFalse(notifier.Notified?.NotificationType.Equals(type), $"Should not have been {notifier.Notified.NotificationType}");
+    => Assert.AreNotEqual(notifier.Notified.NotificationType, type, $"Should not have been {notifier.Notified.NotificationType}");
 }

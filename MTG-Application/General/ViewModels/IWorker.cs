@@ -6,7 +6,6 @@ public interface IWorker
 {
   public static IWorker Default => new DefaultWorker();
 
-  IWorker Worker { get; }
   public bool IsBusy { get; set; }
 
   /// <summary>
@@ -51,9 +50,5 @@ public interface IWorker
 
 public class DefaultWorker : IWorker
 {
-  public DefaultWorker() => Worker = this;
-
   public bool IsBusy { get; set; }
-
-  public IWorker Worker { get; init; }
 }

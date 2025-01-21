@@ -23,7 +23,7 @@ public partial class CardCollectionViewModel
     public Func<MTGCardCollectionList, Task>? OnListAdded { get; init; }
     public Func<MTGCardCollectionList, Task>? OnListRemoved { get; init; }
 
-    public CardCollectionViewModel Build(MTGCardCollection model, MTGCardImporter importer)
+    public CardCollectionViewModel Build(MTGCardCollection model, IMTGCardImporter importer)
     {
       var viewmodel = new CardCollectionViewModel(model, importer)
       {

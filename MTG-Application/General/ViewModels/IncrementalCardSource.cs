@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class IncrementalCardSource<TCard>(MTGCardImporter importer) : object(), IIncrementalSource<TCard> where TCard : MTGCard
+public abstract class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(), IIncrementalSource<TCard> where TCard : MTGCard
 {
   public List<TCard> Cards { get; set; } = [];
   public string NextPage { get; set; } = string.Empty;

@@ -15,7 +15,7 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewMo
 
 public partial class CardCollectionListViewModel : ObservableObject, ISavable, IWorker
 {
-  public CardCollectionListViewModel(MTGCardCollectionList model, MTGCardImporter importer, Func<string, bool>? existsValidation = null)
+  public CardCollectionListViewModel(MTGCardCollectionList model, IMTGCardImporter importer, Func<string, bool>? existsValidation = null)
   {
     Model = model ?? new();
 
@@ -25,7 +25,7 @@ public partial class CardCollectionListViewModel : ObservableObject, ISavable, I
     QueryCardsViewModel = new(OwnedCards, importer);
   }
 
-  public MTGCardImporter Importer { get; }
+  public IMTGCardImporter Importer { get; }
   public QueryCardsViewModel QueryCardsViewModel { get; }
   public CardCollectionListConfirmers Confirmers { get; set; } = new();
   public Notifier Notifier { get; set; } = new();

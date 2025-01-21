@@ -42,7 +42,7 @@ public partial class CardGroupViewModel : ObservableObject
 
 public partial class GroupedCardListViewModel : CardListViewModel
 {
-  public GroupedCardListViewModel(MTGCardImporter importer, GroupedCardListConfirmers? confirmers = null) : base(importer, confirmers)
+  public GroupedCardListViewModel(IMTGCardImporter importer, GroupedCardListConfirmers? confirmers = null) : base(importer, confirmers)
   {
     Commands = new(this);
     Confirmers ??= confirmers ?? new();

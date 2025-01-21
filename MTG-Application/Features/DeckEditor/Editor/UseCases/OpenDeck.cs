@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
@@ -15,9 +14,7 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public IAsyncRelayCommand<string> OpenDeckCommand { get; } = new OpenDeck(viewmodel).Command;
-
-  private class OpenDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, string>(viewmodel)
+  public class OpenDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, string>(viewmodel)
   {
     protected override bool CanExecute(string? name) => name != string.Empty;
 
@@ -35,7 +32,7 @@ public partial class DeckEditorViewModelCommands
 
       loadName ??= await Viewmodel.Confirmers.LoadDeckConfirmer
         .Confirm(DeckEditorConfirmers.GetLoadDeckConfirmation(
-          (await Viewmodel.Worker.DoWork(Viewmodel.Repository.Get((set) => { }))).Select(x => x.Name).ToArray()));
+          (await (Viewmodel as IWorker).DoWork(Viewmodel.Repository.Get((set) => { }))).Select(x => x.Name).ToArray()));
 
       if (string.IsNullOrEmpty(loadName))
         return;
@@ -45,9 +42,11 @@ public partial class DeckEditorViewModelCommands
         if (await new GetDeckDTO(Viewmodel.Repository).Execute(loadName) is not MTGCardDeckDTO dto)
           throw new InvalidOperationException("Deck was not found");
 
-        if (await Viewmodel.Worker.DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer).Convert(dto)) is DeckEditorMTGDeck deck)
+        if (await (Viewmodel as IWorker).DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer).Convert(dto)) is DeckEditorMTGDeck deck)
         {
-          Viewmodel.SetDeck(deck);
+          Viewmodel.Deck = deck;
+          Viewmodel.UndoStack.Clear();
+          Viewmodel.HasUnsavedChanges = false;
 
           new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.LoadSuccess);
         }

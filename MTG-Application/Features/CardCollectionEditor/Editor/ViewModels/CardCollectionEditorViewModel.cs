@@ -19,7 +19,7 @@ namespace MTGApplication.Features.CardCollection.Editor.ViewModels;
 
 public partial class CardCollectionEditorViewModel : ObservableObject, ISavable, IWorker
 {
-  public CardCollectionEditorViewModel(MTGCardImporter importer, CardCollectionEditorConfirmers confirmers, Notifier notifier, IRepository<MTGCardCollectionDTO> repository, ClipboardService clipboardService)
+  public CardCollectionEditorViewModel(IMTGCardImporter importer, CardCollectionEditorConfirmers confirmers, Notifier notifier, IRepository<MTGCardCollectionDTO> repository, ClipboardService clipboardService)
   {
     Importer = importer;
     Confirmers = confirmers;
@@ -33,7 +33,7 @@ public partial class CardCollectionEditorViewModel : ObservableObject, ISavable,
     CardCollectionListViewModel = CreateCardCollectionListViewModel(new());
   }
 
-  public MTGCardImporter Importer { get; }
+  public IMTGCardImporter Importer { get; }
   public CardCollectionEditorConfirmers Confirmers { get; }
   public Notifier Notifier { get; }
   public IRepository<MTGCardCollectionDTO> Repository { get; }

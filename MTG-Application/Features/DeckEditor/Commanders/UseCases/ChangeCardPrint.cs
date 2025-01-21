@@ -13,9 +13,9 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {
-  public class ChangeCardPrint(CommanderCommands viewmodel) : ViewModelAsyncCommand<CommanderCommands>(viewmodel)
+  public class ChangeCardPrint(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel>(viewmodel)
   {
-    protected override bool CanExecute() => Viewmodel.GetCommander() != null;
+    protected override bool CanExecute() => Viewmodel.Card != null;
 
     protected override async Task Execute()
     {
@@ -23,7 +23,7 @@ public partial class CommanderViewModelCommands
 
       try
       {
-        var commander = Viewmodel.GetCommander()!;
+        var commander = Viewmodel.Card!;
         var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithUri(pageUri: commander.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
         if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(CommanderConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)

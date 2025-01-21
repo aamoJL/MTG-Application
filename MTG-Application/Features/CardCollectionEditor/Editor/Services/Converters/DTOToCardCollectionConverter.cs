@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollectionEditor.Editor.Services.Converters;
 
-public class DTOToCardCollectionConverter(MTGCardImporter importer)
+public class DTOToCardCollectionConverter(IMTGCardImporter importer)
 {
   /// <exception cref="ArgumentNullException"></exception>
   /// <exception cref="InvalidOperationException"></exception>
