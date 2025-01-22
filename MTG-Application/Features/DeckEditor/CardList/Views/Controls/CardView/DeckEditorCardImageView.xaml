@@ -12,9 +12,9 @@
   xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx"
   mc:Ignorable="d">
 
-  <StackPanel x:Name="DeckGridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
+  <StackPanel x:Name="DeckGridViewItem" Background="Transparent" Orientation="Vertical" Padding="5">
     <Grid>
-      <controls1:ImageEx Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
+      <controls1:ImageEx x:Name="CardImageElement" Style="{StaticResource PlaceholderImageStyle}" Source="{x:Bind SelectedFaceUri, Mode=OneWay}">
         <controls1:ImageEx.ContextFlyout>
           <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
             <CommandBarFlyout.PrimaryCommands>

@@ -20,7 +20,10 @@ public sealed partial class CardSearchPage : Page
   }
 
   public CardSearchViewModel ViewModel { get; } = new(App.MTGCardImporter);
-  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new(itemToArgsConverter: (item) => { return new CardMoveArgs(item); }) { AcceptMove = false };
+  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new(itemToArgsConverter: (item) => new(item))
+  {
+    AcceptMove = false
+  };
 
   private void CardSearchPage_Loaded(object sender, RoutedEventArgs e)
   {

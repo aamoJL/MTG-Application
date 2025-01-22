@@ -12,7 +12,7 @@
   <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
 
   <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="models:MTGCard">
-    <StackPanel Orientation="Vertical" Padding="5" ToolTipService.ToolTip="{Binding Info.SetName}">
+    <StackPanel Orientation="Vertical" Padding="5" ToolTipService.ToolTip="{Binding Info.SetName}" Width="240">
       <controls:ImageEx Source="{Binding Info.FrontFace.ImageUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
       <Grid HorizontalAlignment="Stretch" ColumnSpacing="20">
         <Grid.ColumnDefinitions>

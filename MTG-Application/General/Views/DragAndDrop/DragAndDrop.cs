@@ -6,7 +6,7 @@ using Windows.ApplicationModel.DataTransfer.DragDrop;
 
 namespace MTGApplication.General.Views.DragAndDrop;
 
-public abstract class DragAndDrop<T>()
+public class DragAndDrop<T>()
 {
   public static DragAndDrop<T>? DragOrigin { get; set; }
   public static T? Item { get; set; }

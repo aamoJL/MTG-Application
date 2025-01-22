@@ -7,16 +7,13 @@ namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 public partial class DeckEditorCardViewBase : BasicCardView<DeckEditorMTGCard>
 {
   public static readonly DependencyProperty DeleteButtonClickProperty =
-      DependencyProperty.Register(nameof(DeleteButtonClick), typeof(ICommand), typeof(DeckEditorCardViewBase),
-        new PropertyMetadata(default(ICommand)));
+      DependencyProperty.Register(nameof(DeleteButtonClick), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(default(ICommand)));
 
   public static readonly DependencyProperty CountChangeCommandProperty =
-      DependencyProperty.Register(nameof(CountChangeCommand), typeof(ICommand), typeof(DeckEditorCardViewBase),
-        new PropertyMetadata(default(ICommand)));
+      DependencyProperty.Register(nameof(CountChangeCommand), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(default(ICommand)));
 
   public static readonly DependencyProperty ChangePrintCommandProperty =
-      DependencyProperty.Register(nameof(ChangePrintCommand), typeof(ICommand), typeof(DeckEditorCardViewBase),
-        new PropertyMetadata(default(ICommand)));
+      DependencyProperty.Register(nameof(ChangePrintCommand), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(default(ICommand)));
 
   public ICommand DeleteButtonClick
   {

@@ -20,7 +20,7 @@ public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewMod
       var searchResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithString(query));
 
       Viewmodel.SelectedTheme = theme;
-      Viewmodel.Cards.SetCollection(
+      await Viewmodel.Cards.SetCollection(
           cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],
           nextPageUri: searchResult.NextPageUri,
           totalCount: searchResult.TotalCount);

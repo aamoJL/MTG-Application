@@ -1,10 +1,13 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
-public sealed partial class DeckEditorCardImageView : DeckEditorCardViewBase
+public partial class DeckEditorCardImageView : DeckEditorCardViewBase
 {
   public DeckEditorCardImageView() => InitializeComponent();
+
+  public UIElement ImageElement => CardImageElement;
 
   private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs e)
   {

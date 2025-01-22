@@ -12,7 +12,7 @@
   xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx"
   mc:Ignorable="d">
 
-  <Grid Background="Transparent">
+  <Grid Background="Transparent" Padding="5">
     <Grid.ContextFlyout>
       <CommandBarFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
         <CommandBarFlyout.SecondaryCommands>
@@ -25,7 +25,10 @@
       </CommandBarFlyout>
     </Grid.ContextFlyout>
     <StackPanel Orientation="Vertical">
-      <controls1:ImageEx Source="{x:Bind SelectedFaceUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
+      <controls1:ImageEx 
+        x:Name="ImageElement"
+        Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
+        Style="{StaticResource PlaceholderImageStyle}"/>
       <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
     </StackPanel>
   </Grid>

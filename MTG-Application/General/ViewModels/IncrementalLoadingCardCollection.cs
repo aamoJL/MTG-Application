@@ -2,22 +2,24 @@
 using CommunityToolkit.WinUI.Collections;
 using MTGApplication.General.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
 public partial class IncrementalLoadingCardCollection<TCard>(IncrementalCardSource<TCard> source) : ObservableObject where TCard : MTGCard
 {
-  [ObservableProperty] public partial IncrementalLoadingCollection<IncrementalCardSource<TCard>, TCard> Collection { get; set; } = new(source: source, itemsPerPage: source.PageSize);
+  public IncrementalLoadingCollection<IncrementalCardSource<TCard>, TCard> Collection { get; } = new(source: source, itemsPerPage: source.PageSize);
+
   [ObservableProperty] public partial int TotalCardCount { get; set; }
 
   private IncrementalCardSource<TCard> Source { get; } = source;
 
-  public void SetCollection(List<TCard> cards, string nextPageUri, int totalCount)
+  public async Task SetCollection(List<TCard> cards, string nextPageUri, int totalCount)
   {
     TotalCardCount = totalCount;
     Source.NextPage = nextPageUri;
     Source.Cards = cards;
 
-    Collection.RefreshAsync();
+    await Collection.RefreshAsync();
   }
 }
