@@ -28,7 +28,11 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCar
   /// <summary>
   /// Card's group name
   /// </summary>
-  public string Group { get; set; } = string.Empty;
+  public string Group
+  {
+    get;
+    set => SetProperty(ref field, value);
+  } = string.Empty;
 
   private static int LimitCount(int value) => Math.Max(1, value);
 }

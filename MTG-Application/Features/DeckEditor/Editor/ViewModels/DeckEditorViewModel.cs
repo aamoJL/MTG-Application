@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.Editor.Services.Factories;
 using MTGApplication.Features.DeckEditor.Models;
@@ -10,6 +11,8 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Mode
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using System.Collections;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewModelCommands;
@@ -26,16 +29,49 @@ public partial class DeckEditorViewModel(
     get;
     set
     {
-      if (!SetProperty(ref field, value))
+      if (field == value)
         return;
 
-      DeckCardList.Cards = Deck.DeckCards;
-      MaybeCardList.Cards = Deck.Maybelist;
-      WishCardList.Cards = Deck.Wishlist;
-      RemoveCardList.Cards = Deck.Removelist;
+      if (field != null)
+      {
+        Deck.DeckCards.CollectionChanged -= Cardlist_CollectionChanged;
+        Deck.Maybelist.CollectionChanged -= Cardlist_CollectionChanged;
+        Deck.Wishlist.CollectionChanged -= Cardlist_CollectionChanged;
+        Deck.Removelist.CollectionChanged -= Cardlist_CollectionChanged;
 
-      Commander.Card = Deck.Commander;
-      Partner.Card = Deck.CommanderPartner;
+        foreach (var item in Deck.DeckCards)
+          item.PropertyChanged -= CardListItem_PropertyChanged;
+        foreach (var item in Deck.Maybelist)
+          item.PropertyChanged -= CardListItem_PropertyChanged;
+        foreach (var item in Deck.Wishlist)
+          item.PropertyChanged -= CardListItem_PropertyChanged;
+        foreach (var item in Deck.Removelist)
+          item.PropertyChanged -= CardListItem_PropertyChanged;
+      }
+
+      SetProperty(ref field, value);
+
+      Deck.DeckCards.CollectionChanged += Cardlist_CollectionChanged;
+      Deck.Maybelist.CollectionChanged += Cardlist_CollectionChanged;
+      Deck.Wishlist.CollectionChanged += Cardlist_CollectionChanged;
+      Deck.Removelist.CollectionChanged += Cardlist_CollectionChanged;
+
+      foreach (var item in Deck.DeckCards)
+        item.PropertyChanged += CardListItem_PropertyChanged;
+      foreach (var item in Deck.Maybelist)
+        item.PropertyChanged += CardListItem_PropertyChanged;
+      foreach (var item in Deck.Wishlist)
+        item.PropertyChanged += CardListItem_PropertyChanged;
+      foreach (var item in Deck.Removelist)
+        item.PropertyChanged += CardListItem_PropertyChanged;
+
+      DeckCardList.Cards = field.DeckCards;
+      MaybeCardList.Cards = field.Maybelist;
+      WishCardList.Cards = field.Wishlist;
+      RemoveCardList.Cards = field.Removelist;
+
+      Commander.Card = field.Commander;
+      Partner.Card = field.CommanderPartner;
 
       OnPropertyChanged(nameof(Name));
       OnPropertyChanged(nameof(Size));
@@ -54,10 +90,10 @@ public partial class DeckEditorViewModel(
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
   public ReversibleCommandStack UndoStack { get; } = new();
 
-  [NotNull] public GroupedCardListViewModel? DeckCardList => field ??= new DeckEditorCardListFactory(this).CreateGroupedCardListViewModel(Deck.DeckCards, OnCardListChanged);
-  [NotNull] public CardListViewModel? MaybeCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Maybelist, OnCardListChanged);
-  [NotNull] public CardListViewModel? WishCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Wishlist, OnCardListChanged);
-  [NotNull] public CardListViewModel? RemoveCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Removelist, OnCardListChanged);
+  [NotNull] public GroupedCardListViewModel? DeckCardList => field ??= new DeckEditorCardListFactory(this).CreateGroupedCardListViewModel(Deck.DeckCards);
+  [NotNull] public CardListViewModel? MaybeCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Maybelist);
+  [NotNull] public CardListViewModel? WishCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Wishlist);
+  [NotNull] public CardListViewModel? RemoveCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Removelist);
   [NotNull] public CommanderViewModel? Commander => field ??= new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.Commander, onChange: (card) => { Deck.Commander = card; OnCommandersChanged(); });
   [NotNull] public CommanderViewModel? Partner => field ??= new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.CommanderPartner, onChange: (card) => { Deck.CommanderPartner = card; OnCommandersChanged(); });
 
@@ -84,16 +120,6 @@ public partial class DeckEditorViewModel(
   [NotNull] public IRelayCommand? OpenDeckTestingWindowCommand => field ??= new OpenDeckTestingWindow(this).Command;
   [NotNull] public IRelayCommand? OpenEdhrecSearchWindowCommand => field ??= new OpenEdhrecSearchWindow(this).Command;
 
-  private void OnCardListChanged()
-  {
-    HasUnsavedChanges = true;
-
-    OnPropertyChanged(nameof(Size));
-    OnPropertyChanged(nameof(Price));
-    ShowDeckTokensCommand?.NotifyCanExecuteChanged();
-    OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
-  }
-
   private void OnCommandersChanged()
   {
     HasUnsavedChanges = true;
@@ -102,5 +128,34 @@ public partial class DeckEditorViewModel(
     OnPropertyChanged(nameof(Price));
     OpenEdhrecCommanderWebsiteCommand!.NotifyCanExecuteChanged();
     OpenEdhrecSearchWindowCommand!.NotifyCanExecuteChanged();
+  }
+
+  private void Cardlist_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is IList newItems)
+    {
+      foreach (var item in newItems.OfType<DeckEditorMTGCard>())
+        item.PropertyChanged += CardListItem_PropertyChanged;
+    }
+    else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is IList oldItems)
+    {
+      foreach (var item in oldItems.OfType<DeckEditorMTGCard>())
+        item.PropertyChanged -= CardListItem_PropertyChanged;
+    }
+
+    HasUnsavedChanges = true;
+
+    OnPropertyChanged(nameof(Size));
+    OnPropertyChanged(nameof(Price));
+    ShowDeckTokensCommand?.NotifyCanExecuteChanged();
+    OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
+  }
+
+  private void CardListItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    HasUnsavedChanges = true;
+
+    OnPropertyChanged(nameof(Size));
+    OnPropertyChanged(nameof(Price));
   }
 }

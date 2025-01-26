@@ -14,17 +14,16 @@
     <SignAssembly>False</SignAssembly>
     <WindowsPackageType>None</WindowsPackageType>
     <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
-    <TrimMode>partial</TrimMode>
     <!--JsonSerializerIsReflectionEnabledByDefault needs to be true, if trim mode is enabled-->
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <AssemblyVersion>1.5</AssemblyVersion>
     <FileVersion>1.5</FileVersion>
     <Version>1.5</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MvvmToolkitEnableINotifyPropertyChangingSupport>false</MvvmToolkitEnableINotifyPropertyChangingSupport>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Features\CardCollection\**" />
@@ -117,14 +116,14 @@
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.1.240916" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.1.240916" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-rc4.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.241107002" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.250108004" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
@@ -226,7 +225,6 @@
   <ItemGroup>
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
-    <Folder Include="General\Views\Controls\AdaptiveGridView\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">

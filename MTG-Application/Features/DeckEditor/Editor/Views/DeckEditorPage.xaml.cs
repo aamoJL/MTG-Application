@@ -5,15 +5,19 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.DeckEditor.CardList.Services;
+using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.NotificationService;
 using System;
+using System.Collections;
 using System.ComponentModel;
 
 namespace MTGApplication.Features.DeckEditor.Views;
 public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 {
+  public enum CardViewType { Group, Image, Text }
+
   public DeckEditorPage()
   {
     InitializeComponent();
@@ -33,51 +37,26 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
   public CardFilters CardFilter { get; } = new();
   public CardSorter CardSorter { get; } = new();
-  public bool DeckGroupViewVisible
+  public CardViewType DeckCardsViewType
   {
-    get => field;
+    get;
     set
     {
       if (field != value)
       {
         field = value;
-        PropertyChanged?.Invoke(this, new(nameof(DeckGroupViewVisible)));
+        PropertyChanged?.Invoke(this, new(nameof(DeckCardsViewType)));
       }
     }
-  } = true;
-  public bool DeckImageViewVisible
-  {
-    get => field;
-    set
-    {
-      if (field != value)
-      {
-        field = value;
-        PropertyChanged?.Invoke(this, new(nameof(DeckImageViewVisible)));
-      }
-    }
-  } = false;
-  public bool DeckTextViewVisible
-  {
-    get => field;
-    set
-    {
-      if (field != value)
-      {
-        field = value;
-        PropertyChanged?.Invoke(this, new(nameof(DeckTextViewVisible)));
-      }
-    }
-  } = false;
+  } = CardViewType.Group;
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
   [RelayCommand]
   private void SetDeckDisplayType(string type)
   {
-    DeckGroupViewVisible = type == "Group";
-    DeckImageViewVisible = type == "Image";
-    DeckTextViewVisible = type == "Text";
+    if (Enum.TryParse<CardViewType>(type, out var result))
+      DeckCardsViewType = result;
   }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -138,13 +117,15 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
   private void DeleteCardKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (args.Element is ListViewBase listview && listview.SelectedIndex != -1 && listview.DataContext is CardListViewModel viewmodel)
+    if (args.Element is ListViewBase listview)
     {
-      var index = listview.SelectedIndex;
-      var selectedCard = listview.Items[index];
+      if (listview.DataContext is not ICardListViewModel listViewViewModel
+        || (listview.SelectedIndex is int index && index < 0)
+        || listview.SelectedItem is not DeckEditorMTGCard selectedCard
+        || listViewViewModel.RemoveCardCommand?.CanExecute(selectedCard) is not true)
+        return;
 
-      if (viewmodel.RemoveCardCommand.CanExecute(selectedCard))
-        viewmodel.RemoveCardCommand.Execute(selectedCard);
+      listViewViewModel.RemoveCardCommand.Execute(selectedCard);
 
       // Recalculate the index and focus the element in the index position if the element exists.
       if ((index = Math.Clamp(index, -1, listview.Items.Count - 1)) >= 0)
@@ -153,19 +134,39 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
         listview.SelectedIndex = index;
       }
-    }
 
-    args.Handled = true;
+      args.Handled = true;
+    }
+    else if (args.Element is ItemsView itemsView)
+    {
+      if (itemsView.SelectedItem is not DeckEditorMTGCard selectedItem
+        || itemsView.DataContext is not ICardListViewModel itemsViewViewModel
+        || itemsView.ItemsSource is not IList source
+        || (source.IndexOf(selectedItem) is int index && index < 0)
+        || itemsViewViewModel.RemoveCardCommand?.CanExecute(selectedItem) is not true)
+        return;
+
+      itemsViewViewModel.RemoveCardCommand.Execute(selectedItem);
+
+      itemsView.Select(index < source.Count ? index : index - 1);
+
+      args.Handled = true;
+    }
   }
 
   private void ListView_LosingFocus(UIElement sender, LosingFocusEventArgs args)
   {
-    // Deselect list selection if the list loses focus so
-    // the delete keyboard accelerator does not delete item in the list
-    if (sender is ListViewBase listview
-      && (args.NewFocusedElement is not ListViewItem item || !listview.Items.Contains(item.Content)))
+    // Deselect list selection if the list loses focus
+    //    so the delete keyboard accelerator does not delete item in the list
+    if (sender is ListViewBase listview)
+    {
+      if (args.NewFocusedElement is ListViewItem item
+        && listview.Items.Contains(item.Content))
+        return;
+
       listview.DeselectAll();
 
-    args.Handled = true;
+      args.Handled = true;
+    }
   }
 }

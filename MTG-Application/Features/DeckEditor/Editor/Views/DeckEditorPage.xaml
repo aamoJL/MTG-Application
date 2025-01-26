@@ -3,6 +3,7 @@
   x:Name="Root"
   x:Class="MTGApplication.Features.DeckEditor.Views.DeckEditorPage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:local="using:MTGApplication.Features.DeckEditor.Views"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -29,6 +30,8 @@
   <Page.Resources>
     <converters:StringOrDefaultConverter x:Key="StringOrDefaultConverter"/>
     <converters:CardColorGroupToBoolConverter x:Key="CardColorGroupToBoolConverter"/>
+    <converters:ToStringToBoolConverter x:Key="ToStringToBoolConverter"/>
+    <converters:ToStringToVisibilityConverter x:Key="ToStringToVisibilityConverter"/>
   </Page.Resources>
   
   <!--#region Keyboard Accelerators -->
@@ -142,7 +145,6 @@
                 DragCopyCaptionText="Copy to Commander"
                 DragMoveCaptionText="Move to Commander"
                 OnDropCopy="{x:Bind ViewModel.Commander.ChangeCommanderCommand, Mode=OneTime}"
-                OnDropRemove="{x:Bind ViewModel.Commander.RemoveCommanderCommand, Mode=OneTime}"
                 OnDropBeginMoveFrom="{x:Bind ViewModel.Commander.BeginMoveFromCommand, Mode=OneTime}"
                 OnDropBeginMoveTo="{x:Bind ViewModel.Commander.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.Commander.ExecuteMoveCommand, Mode=OneTime}"
@@ -159,7 +161,6 @@
                 DragCopyCaptionText="Copy to Partner"
                 DragMoveCaptionText="Move to Partner"
                 OnDropCopy="{x:Bind ViewModel.Partner.ChangeCommanderCommand, Mode=OneTime}"
-                OnDropRemove="{x:Bind ViewModel.Partner.RemoveCommanderCommand, Mode=OneTime}"
                 OnDropBeginMoveFrom="{x:Bind ViewModel.Partner.BeginMoveFromCommand, Mode=OneTime}"
                 OnDropBeginMoveTo="{x:Bind ViewModel.Partner.BeginMoveToCommand, Mode=OneTime}"
                 OnDropExecuteMove="{x:Bind ViewModel.Partner.ExecuteMoveCommand, Mode=OneTime}"
@@ -445,9 +446,9 @@
             <AppBarButton Icon="PreviewLink" ToolTipService.ToolTip="Display" Label="Display">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Group" Text="Groups" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Folder}" />
-                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckImageViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Image" Text="Images" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Pictures}" />
-                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckTextViewVisible, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Text" Text="Text" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
+                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Group" Text="Groups" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Folder}" />
+                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Image, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Image" Text="Images" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=Pictures}" />
+                  <RadioMenuFlyoutItem IsChecked="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Text, Mode=OneWay}" Command="{x:Bind SetDeckDisplayTypeCommand, Mode=OneWay}" CommandParameter="Text" Text="Text" GroupName="DeckDisplayCheck" Icon="{ui:SymbolIcon Symbol=List}" />
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -515,8 +516,8 @@
             <!--#endregion-->
 
             <!--#region Group View Controls -->
-            <AppBarSeparator Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}"/>
-            <AppBarButton Visibility="{x:Bind DeckGroupViewVisible, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
+            <AppBarSeparator Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"/>
+            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
@@ -551,8 +552,8 @@
 
         <!--#region Group View -->
         <Grid 
-          x:Name="DeckCardsGroupView"
-          x:Load="{x:Bind DeckGroupViewVisible, Mode=OneWay}"
+          x:Name="DeckCardsGroupViews"
+          x:Load="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Group, Mode=OneWay}"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}">
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
@@ -567,7 +568,6 @@
                           </Grid.ColumnDefinitions>
                           <controls1:CardGroupViewGroupHeader
                             ui:FrameworkElementExtensions.AncestorType="customControls:CustomExpander"
-                            d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
                             Grid.Column="0"
                             IsExpanded="{Binding (ui:FrameworkElementExtensions.Ancestor).IsExpanded, RelativeSource={RelativeSource Mode=Self}, Mode=OneWay}"
                             PrimaryHeader="{x:Bind Key, Mode=OneWay, Converter={StaticResource StringOrDefaultConverter}, ConverterParameter='Other'}"
@@ -576,12 +576,17 @@
                             <controls1:CardGroupViewGroupHeader.ContextFlyout>
                               <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                                 <MenuFlyoutItem 
-                                  Command="{x:Bind RenameGroupCommand, Mode=OneTime}"
+                                  d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
+                                  DataContext="{Binding ElementName=DeckCardsGroupViews, Path=DataContext, Mode=OneTime}"
+                                  Command="{Binding RenameGroupCommand, Mode=OneTime}"
+                                  CommandParameter="{x:Bind Mode=OneTime}"
                                   Text="Rename"/>
                                 <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem 
+                                <MenuFlyoutItem
+                                  d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
+                                  DataContext="{Binding ElementName=DeckCardsGroupViews, Path=DataContext, Mode=OneTime}"
                                   Command="{Binding RemoveGroupCommand, Mode=OneTime}" 
-                                  CommandParameter="{x:Bind Key, Mode=OneWay}" 
+                                  CommandParameter="{x:Bind Mode=OneTime}"
                                   Text="Remove"
                                   Background="IndianRed"/>
                               </MenuFlyout>
@@ -590,51 +595,53 @@
                         </Grid>
                       </customControls:CustomExpander.Header>
                       <customControls:CustomExpander.Content>
-                        <cardlistview:AdvancedAdaptiveGroupedCardGridView
-                          d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
-                          DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneWay}"
-                          ItemsSource="{Binding ElementName=CardCollectionSource, Path=View, Mode=OneWay}"
-                          Style="{StaticResource MTGAdaptiveGridViewStyle}"
+                        <cardlistview:AdvancedGroupedCardItemsView
+                          x:Name="DeckCardsGroupView"
+                          d:DataContext="{d:DesignInstance Type=viewmodels:ICardListViewModel}"
+                          DataContext="{x:Bind Mode=OneTime}"
+                          ItemsSource="{Binding ElementName=DeckCardsGroupCollectionSource, Path=View, Mode=OneTime}"
+                          Style="{StaticResource GridItemsViewStyle}"
                           BorderBrush="{ThemeResource RegionColor}"
                           SelectionMode="Single"
                           Padding="0"
                           Margin="0 0 0 10"
-                          DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
                           MinHeight="200"
+                          LoseSelectionWithFocus="True"
                           AllowDrop="True"
-                          CanDragItems="True"
-                          OnDropCopy="{x:Bind AddCardToGroupCommand, Mode=OneTime}"
-                          OnDropBeginMoveFrom="{x:Bind BeginMoveFromCommand, Mode=OneTime}"
+                          OnDropCopy="{x:Bind AddCardCommand, Mode=OneTime}"
                           OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
                           OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
-                          OnDropImport="{x:Bind ImportCardsToGroupCommand, Mode=OneTime}"
-                          LosingFocus="ListView_LosingFocus">
-                          <cardlistview:AdvancedAdaptiveGroupedCardGridView.Resources>
+                          OnDropImport="{x:Bind ImportCardsCommand, Mode=OneTime}">
+                          <ItemsView.Layout>
+                            <UniformGridLayout 
+                              MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
+                              ItemsStretch="Fill"/>
+                          </ItemsView.Layout>
+                          <ItemsView.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+                          </ItemsView.KeyboardAccelerators>
+                          <ItemsView.Resources>
                             <customControls:BindableCollectionView 
-                              x:Name="CardCollectionSource" Source="{x:Bind Cards, Mode=OneTime}"
+                              x:Name="DeckCardsGroupCollectionSource" 
+                              Source="{x:Bind Cards, Mode=OneTime}"
                               Filter="{Binding ElementName=Root, Path=CardFilter.ValidationPredicate, Mode=OneWay}"
                               SortComparer="{Binding ElementName=Root, Path=CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-                          </cardlistview:AdvancedAdaptiveGroupedCardGridView.Resources>
-                          <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
-                            <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
-                              <Setter Property="Margin" Value="0"/>
-                            </Style>
-                          </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemContainerStyle>
-                          <cardlistview:AdvancedAdaptiveGroupedCardGridView.KeyboardAccelerators>
-                            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-                          </cardlistview:AdvancedAdaptiveGroupedCardGridView.KeyboardAccelerators>
-                          <cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
+                          </ItemsView.Resources>
+                          <ItemsView.ItemTemplate>
                             <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                              <cardview:DeckEditorCardImageView
-                                d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
-                                DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneTime}"
-                                Model="{x:Bind Mode=OneTime}"
-                                DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                                CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
-                                ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
+                              <customControls:DraggableItemContainer CanDrag="True">
+                                <cardview:AdvancedDeckEditorCardImageView
+                                  d:DataContext="{d:DesignInstance Type=viewmodels:CardGroupViewModel}"
+                                  DataContext="{Binding ElementName=DeckCardsGroupView, Path=DataContext, Mode=OneTime}"
+                                  Model="{x:Bind Mode=OneTime}"
+                                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                                  CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                                  ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"
+                                  OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneTime}"/>
+                              </customControls:DraggableItemContainer>
                             </DataTemplate>
-                          </cardlistview:AdvancedAdaptiveGroupedCardGridView.ItemTemplate>
-                        </cardlistview:AdvancedAdaptiveGroupedCardGridView>
+                          </ItemsView.ItemTemplate>
+                        </cardlistview:AdvancedGroupedCardItemsView>
                       </customControls:CustomExpander.Content>
                     </customControls:CustomExpander>
                   </StackPanel>
@@ -646,66 +653,75 @@
         <!--#endregion-->
 
         <!--#region Grid View -->
-        <cardlistview:AdvancedAdaptiveCardGridView
+        <!--TODO: remove scrollviewer if itemsview's scrolling speed has been increased on update.-->
+        <ScrollViewer
+          VerticalScrollBarVisibility="Auto"
+          x:Name="DeckCardsGridViewScrollViewer"
+          x:Load="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Image, Mode=OneWay}">
+          <cardlistview:AdvancedCardItemsView
             x:Name="DeckCardsGridView"
-            x:Load="{x:Bind DeckImageViewVisible, Mode=OneWay}"
             DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
             ItemsSource="{x:Bind DeckCardsGridViewCollectionSource.View, Mode=OneWay}"
-            Style="{StaticResource MTGAdaptiveGridViewStyle}"
-            BorderBrush="{ThemeResource RegionColor}"
+            Style="{StaticResource GridItemsViewStyle}"
             SelectionMode="Single"
-            BorderThickness="0"
-            DesiredWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
-            CanDragItems="True"
+            LoseSelectionWithFocus="True"
             AllowDrop="True"
             OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
             OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
-            OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
             OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
-            OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
-            LosingFocus="ListView_LosingFocus">
-          <cardlistview:AdvancedAdaptiveCardGridView.Resources>
-            <customControls:BindableCollectionView 
-              x:Name="DeckCardsGridViewCollectionSource" Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
-              Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
-              SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-          </cardlistview:AdvancedAdaptiveCardGridView.Resources>
-          <cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
-            <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-          </cardlistview:AdvancedAdaptiveCardGridView.KeyboardAccelerators>
-          <cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
-            <DataTemplate x:DataType="models:DeckEditorMTGCard">
-              <cardview:DeckEditorCardImageView
-                  d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
-                  DataContext="{Binding ElementName=DeckCardsGridView, Path=DataContext, Mode=OneTime}"
-                  Model="{x:Bind Mode=OneTime}"
-                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                  CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
-                  ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
-            </DataTemplate>
-          </cardlistview:AdvancedAdaptiveCardGridView.ItemTemplate>
-        </cardlistview:AdvancedAdaptiveCardGridView>
-        <!--#endregion-->
+            OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}">
+            <ItemsView.Layout>
+              <UniformGridLayout 
+                MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
+                ItemsStretch="Fill"/>
+            </ItemsView.Layout>
+            <ItemsView.KeyboardAccelerators>
+              <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
+            </ItemsView.KeyboardAccelerators>
+            <ItemsView.Resources>
+              <customControls:BindableCollectionView 
+                x:Name="DeckCardsGridViewCollectionSource" 
+                Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
+                Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
+                SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
+            </ItemsView.Resources>
+            <ItemsView.ItemTemplate>
+              <DataTemplate x:DataType="models:DeckEditorMTGCard">
+                <customControls:DraggableItemContainer CanDrag="True">
+                  <cardview:AdvancedDeckEditorCardImageView
+                    d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
+                    DataContext="{Binding ElementName=DeckCardsGridView, Path=DataContext, Mode=OneTime}"
+                    Model="{x:Bind Mode=OneTime}"
+                    DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                    CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                    ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"
+                    OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneTime}"/>
+                </customControls:DraggableItemContainer>
+              </DataTemplate>
+            </ItemsView.ItemTemplate>
+          </cardlistview:AdvancedCardItemsView>
+        </ScrollViewer>
 
         <!--#region List View -->
         <cardlistview:AdvancedCardListView
-            x:Name="DeckCardsListView"
-            x:Load="{x:Bind DeckTextViewVisible, Mode=OneWay}"
-            DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
-            ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneWay}"
-            ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
-            SelectionMode="Single"
-            CanDragItems="True"
-            AllowDrop="True"
-            OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
-            OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
-            OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
-            OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
-            OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
-            LosingFocus="ListView_LosingFocus">
+          x:Name="DeckCardsListView"
+          x:Load="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Text, Mode=OneWay}"
+          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
+          ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneWay}"
+          ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
+          SelectionMode="Single"
+          CanDragItems="True"
+          AllowDrop="True"
+          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
+          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
+          LosingFocus="ListView_LosingFocus">
           <cardlistview:AdvancedCardListView.Resources>
             <customControls:BindableCollectionView 
-              x:Name="DeckCardsListViewCollectionSource" Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
+              x:Name="DeckCardsListViewCollectionSource" 
+              Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
               Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
               SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
           </cardlistview:AdvancedCardListView.Resources>
@@ -715,13 +731,13 @@
           <cardlistview:AdvancedCardListView.ItemTemplate>
             <DataTemplate x:DataType="models:DeckEditorMTGCard">
               <cardview:DeckEditorCardTextView
-                  d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
-                  DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
-                  Model="{x:Bind Mode=OneTime}" 
-                  HoverPreviewEnabled="True"
-                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                  CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
-                  ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
+                d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
+                DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneTime}" 
+                HoverPreviewEnabled="True"
+                DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
+                CountChangeCommand="{Binding ChangeCardCountCommand, Mode=OneTime}"
+                ChangePrintCommand="{Binding ChangeCardPrintCommand, Mode=OneTime}"/>
             </DataTemplate>
           </cardlistview:AdvancedCardListView.ItemTemplate>
         </cardlistview:AdvancedCardListView>

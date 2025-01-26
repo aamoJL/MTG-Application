@@ -12,7 +12,9 @@
   xmlns:customControls="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
   xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl" 
   xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels" 
-  xmlns:controls1="using:MTGApplication.General.Views.Controls.AdaptiveGridView"
+  xmlns:controls1="using:MTGApplication.General.Views.Controls" 
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity" 
+  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -30,7 +32,7 @@
             <AppBarButton Icon="ZoomIn" Label="Zoom" ToolTipService.ToolTip="Zoom">
               <AppBarButton.Flyout>
                 <Flyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <Slider x:Name="CardImageSizeSlider" Header="Card size" Value="250" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside" />
+                  <Slider x:Name="CardImageSizeSlider" Header="Card size" Value="240" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside" />
                 </Flyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -55,33 +57,40 @@
 
       <!--#region Card View -->
       <Grid controls:DockPanel.Dock="Top">
-        <controls1:AdaptiveGridView
+        <ItemsView
           x:Name="SearchCardsImageView"
+          x:Load="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
           DataContext="{x:Bind ViewModel, Mode=OneTime}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
-          Visibility="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
-          DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
-          Style="{StaticResource MTGAdaptiveGridViewStyle}"
-          SelectionMode="None"
+          Style="{StaticResource GridItemsViewStyle}"
           BorderBrush="{ThemeResource RegionColor}"
-          CanDragItems="True"
-          DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
-          DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
-          <controls1:AdaptiveGridView.ItemTemplate>
+          SelectionMode="None">
+          <ItemsView.Layout>
+            <UniformGridLayout
+              MinItemWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
+              ItemsStretch="Fill"/>
+          </ItemsView.Layout>
+          <interactivity:Interaction.Behaviors>
+            <bindinghelpers:LoadMoreItemBehavior LoadingOffset="200" LoadCount="{x:Bind ViewModel.Cards.Collection.Count, Mode=OneWay}"/>
+          </interactivity:Interaction.Behaviors>
+          <ItemsView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
-              <customControls:CardSearchCardImageView
-                d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
-                DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
-                Model="{x:Bind Mode=OneWay}"
-                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+              <controls1:DraggableItemContainer CanDrag="True">
+                <customControls:CardSearchCardImageView
+                  d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
+                  DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
+                  Model="{x:Bind Mode=OneWay}"
+                  ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+              </controls1:DraggableItemContainer>
             </DataTemplate>
-          </controls1:AdaptiveGridView.ItemTemplate>
-        </controls1:AdaptiveGridView>
+          </ItemsView.ItemTemplate>
+        </ItemsView>
+
         <ListView
           x:Name="SearchCardsTextView"
+          x:Load="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
           DataContext="{x:Bind ViewModel}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
-          Visibility="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
           Style="{ThemeResource MTGListViewStyle}"
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"

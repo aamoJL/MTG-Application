@@ -29,6 +29,7 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       {
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close",
+        CanSelectItems = false,
       })) as MTGCard;
     };
 
@@ -77,6 +78,11 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
         InputText = msg.Data,
         PrimaryButtonText = "Rename",
         InputValidation = input => !string.IsNullOrEmpty(input)
+      });
+    confirmers.CardListConfirmers.MergeCardGroupsConfirmer.OnConfirm = async msg
+      => await DialogService.ShowAsync(root, new TwoButtonConfirmationDialog(msg.Title, msg.Message)
+      {
+        PrimaryButtonText = "Merge"
       });
 
     confirmers.CommanderConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>

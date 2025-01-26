@@ -55,7 +55,11 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
       return await DialogService.ShowAsync(root, new GridViewDialog(
         title: msg.Title,
         items: msg.Data.ToArray(),
-        itemTemplate: (DataTemplate)template)) as MTGCard;
+        itemTemplate: (DataTemplate)template)
+      {
+        PrimaryButtonText = string.Empty,
+        CanSelectItems = false
+      }) as MTGCard;
     };
   }
 }

@@ -32,7 +32,8 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 
   private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
   {
-    if (args.Item is not DeckSelectionAndEditorTabViewItem item) return;
+    if (args.Item is not DeckSelectionAndEditorTabViewItem item)
+      return;
 
     var unsavedArgs = new ISavable.ConfirmArgs();
 

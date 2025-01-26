@@ -6,31 +6,25 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions
 
 public partial class CardListViewModelReversibleActions
 {
-  public class ReversibleAddGroupAction(GroupedCardListViewModel viewmodel) : ViewModelReversibleAction<GroupedCardListViewModel, string>(viewmodel)
+  public class ReversibleAddGroupAction(GroupedCardListViewModel viewmodel) : ViewModelReversibleAction<GroupedCardListViewModel, CardGroupViewModel>(viewmodel)
   {
-    public CardGroupViewModel? Group { get; set; }
-
-    protected override void ActionMethod(string key)
+    protected override void ActionMethod(CardGroupViewModel group)
     {
-      if (Viewmodel.Groups.FirstOrDefault(x => x.Key == key) is not null)
+      if (group.Key == string.Empty
+        || Viewmodel.Groups.FirstOrDefault(x => x.Key == group.Key) is not null)
         return;
 
-      Group ??= new CardGroupViewModel(key, Viewmodel);
-
       // Find the alphabetical index of the key. Empty key will always be the last item
-      if (Viewmodel.Groups.FirstOrDefault(x => x.Key == string.Empty || x.Key.CompareTo(Group.Key) >= 0) is CardGroupViewModel group
-        && Viewmodel.Groups.IndexOf(group) is int index && index >= 0)
+      if (Viewmodel.Groups.FirstOrDefault(x => x.Key == string.Empty || x.Key.CompareTo(group.Key) >= 0) is CardGroupViewModel g
+        && Viewmodel.Groups.IndexOf(g) is int i && i >= 0)
       {
-        Viewmodel.Groups.Insert(index, Group);
+        Viewmodel.Groups.Insert(i, group);
       }
       else
-        Viewmodel.Groups.Add(Group);
+        Viewmodel.Groups.Add(group);
     }
 
-    protected override void ReverseActionMethod(string key)
-    {
-      if (Group != null)
-        new ReversibleRemoveGroupAction(Viewmodel) { Group = Group }.Action?.Invoke(Group.Key);
-    }
+    protected override void ReverseActionMethod(CardGroupViewModel group)
+      => new ReversibleRemoveGroupAction(Viewmodel).Action?.Invoke(group);
   }
 }

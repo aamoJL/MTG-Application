@@ -15,7 +15,7 @@
   xmlns:models="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models" 
   xmlns:viewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels" 
   xmlns:listViewmodels="using:MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels" 
-  xmlns:controls1="using:MTGApplication.General.Views.Controls.AdaptiveGridView"
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
@@ -153,26 +153,36 @@
       <!--#endregion-->
 
       <!--#region Card View -->
-      <controls1:AdaptiveGridView
-        x:Name="ListCardImageView"
-        controls:DockPanel.Dock="Top"
-        DataContext="{x:Bind ViewModel.CardCollectionListViewModel, Mode=OneWay}"
-        ItemsSource="{Binding QueryCardsViewModel.Collection, Mode=OneWay}"
-        Style="{StaticResource MTGAdaptiveGridViewStyle}"
-        SelectionMode="None"
-        DesiredWidth="250">
-        <controls1:AdaptiveGridView.ItemTemplate>
-          <DataTemplate x:DataType="models:CardCollectionMTGCard">
-            <localControls:CardCollectionCardImageView
-              d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
-              DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
-              Model="{x:Bind Mode=OneTime}"
-              ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
-              SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
-              OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
-          </DataTemplate>
-        </controls1:AdaptiveGridView.ItemTemplate>
-      </controls1:AdaptiveGridView>
+      <!--TODO: remove scrollviewer if itemsview's scrolling speed has been increased on update.-->
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsView
+          x:Name="ListCardImageView"
+          controls:DockPanel.Dock="Top"
+          DataContext="{x:Bind ViewModel.CardCollectionListViewModel, Mode=OneWay}"
+          ItemsSource="{Binding QueryCardsViewModel.Collection, Mode=OneWay}"
+          Style="{StaticResource GridItemsViewStyle}"
+          SelectionMode="None">
+          <ItemsView.Layout>
+            <UniformGridLayout MinItemWidth="230" ItemsStretch="Fill"/>
+          </ItemsView.Layout>
+          <interactivity:Interaction.Behaviors>
+            <helpers:LoadMoreItemBehavior LoadingOffset="200" LoadCount="{x:Bind ViewModel.CardCollectionListViewModel.QueryCardsViewModel.Collection.Count, Mode=OneWay}"/>
+          </interactivity:Interaction.Behaviors>
+          <ItemsView.ItemTemplate>
+            <DataTemplate x:DataType="models:CardCollectionMTGCard">
+              <ItemContainer>
+                <localControls:CardCollectionCardImageView
+                  d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
+                  DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
+                  Model="{x:Bind Mode=OneTime}"
+                  ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
+                  SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
+                  OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
+              </ItemContainer>
+            </DataTemplate>
+          </ItemsView.ItemTemplate>
+        </ItemsView>
+      </ScrollViewer>
       <!--#endregion-->
 
     </controls:DockPanel>

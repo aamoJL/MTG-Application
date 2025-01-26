@@ -11,8 +11,7 @@
   xmlns:models="using:MTGApplication.General.Models"
   xmlns:viewmodels="using:MTGApplication.Features.EdhrecSearch.ViewModels" 
   xmlns:sys="using:System" 
-  xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
-  xmlns:controls1="using:MTGApplication.General.Views.Controls.AdaptiveGridView"
+  xmlns:customcontrols="using:MTGApplication.General.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -62,27 +61,30 @@
 
       <!--#region Card View -->
       <Grid controls:DockPanel.Dock="Top">
-        <controls1:AdaptiveGridView 
+        <ItemsView
           x:Name="SearchCardsImageView"
           DataContext="{x:Bind ViewModel, Mode=OneTime}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
-          DesiredWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
-          Style="{StaticResource MTGAdaptiveGridViewStyle}"
+          Style="{StaticResource GridItemsViewStyle}"
           BorderBrush="{ThemeResource RegionColor}"
-          SelectionMode="None"
-          CanDragItems="True"
-          DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
-          DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
-          <controls1:AdaptiveGridView.ItemTemplate>
+          SelectionMode="None">
+          <ItemsView.Layout>
+            <UniformGridLayout
+              MinItemWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
+              ItemsStretch="Fill"/>
+          </ItemsView.Layout>
+          <ItemsView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
-              <cardview:CardSearchCardImageView
-                d:DataContext="{d:DesignInstance Type=viewmodels:EdhrecSearchPageViewModel}"
-                DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
-                Model="{x:Bind Mode=OneWay}"
-                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+              <customcontrols:DraggableItemContainer CanDrag="True">
+                <cardview:CardSearchCardImageView
+                  d:DataContext="{d:DesignInstance Type=viewmodels:EdhrecSearchPageViewModel}"
+                  DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
+                  Model="{x:Bind Mode=OneWay}"
+                  ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+              </customcontrols:DraggableItemContainer>
             </DataTemplate>
-          </controls1:AdaptiveGridView.ItemTemplate>
-        </controls1:AdaptiveGridView>
+          </ItemsView.ItemTemplate>
+        </ItemsView>
       </Grid>
       <!--#endregion-->
       

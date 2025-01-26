@@ -24,5 +24,5 @@ public class ListViewDragAndDrop<TItem>(Func<TItem, CardMoveArgs> itemToArgsConv
     def.Complete();
   }
 
-  public void DragCompleted(ListViewBase _, DragItemsCompletedEventArgs e) => DropCompleted();
+  public void DragCompleted(ListViewBase _, DragItemsCompletedEventArgs __) => DropCompleted();
 }

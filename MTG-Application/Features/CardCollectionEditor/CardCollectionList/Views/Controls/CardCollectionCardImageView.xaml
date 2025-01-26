@@ -10,7 +10,7 @@
   xmlns:controls="using:MTGApplication.General.Views.Controls.ImageEx"
   mc:Ignorable="d">
 
-  <StackPanel x:Name="GridViewItem" Background="Transparent" CornerRadius="10" Orientation="Vertical" Padding="5">
+  <StackPanel x:Name="GridViewItem" Background="Transparent" Orientation="Vertical" Padding="5">
     <Grid>
       <controls:ImageEx 
         x:Name="GridViewItemImage" 

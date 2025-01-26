@@ -55,6 +55,7 @@ public class GroupedCardListConfirmers : CardListConfirmers
 {
   public Confirmer<string> AddCardGroupConfirmer { get; init; } = new();
   public Confirmer<string, string> RenameCardGroupConfirmer { get; init; } = new();
+  public Confirmer<ConfirmationResult> MergeCardGroupsConfirmer { get; init; } = new();
 
   public static Confirmation GetAddCardGroupConfirmation()
   {
@@ -69,5 +70,12 @@ public class GroupedCardListConfirmers : CardListConfirmers
       Title: "Rename group",
       Message: string.Empty,
       Data: oldName);
+  }
+
+  public static Confirmation GetMergeCardGroupsConfirmation(string groupKey)
+  {
+    return new(
+      Title: $"Group '{groupKey}' already exists.",
+      Message: "Would you like to merge the groups?");
   }
 }

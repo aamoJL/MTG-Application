@@ -22,6 +22,9 @@ public sealed partial class GridViewDialog : ObjectDialog
   public DataTemplate ItemTemplate { get; }
   public object? Selection { get; set; }
   public bool CanDragItems { get; set; } = false;
+  public bool CanSelectItems { get; set; } = true;
+
+  private ListViewSelectionMode SelectionMode => CanSelectItems ? ListViewSelectionMode.Single : ListViewSelectionMode.None;
 
   public Action<DragItemsStartingEventArgs>? OnItemDragStarting { get; set; }
 
