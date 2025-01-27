@@ -1,13 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using MTGApplication.General.Models;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace MTGApplication.General.Services.ReversibleCommandService;
 
-public class ReversibleCommandStack
+public partial class ReversibleCommandStack : INotifyCollectionChanged
 {
-  private Stack<IReversibleCommand> UndoStack { get; } = new();
+  public ReversibleCommandStack()
+    => UndoStack.CollectionChanged += UndoStack_CollectionChanged;
+
+  private ObservableStack<IReversibleCommand> UndoStack { get; } = new();
   private Stack<IReversibleCommand> RedoStack { get; } = new();
 
   public CombinedReversibleCommand ActiveCombinedCommand { get; set; } = new();
+
+  public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
   public void Undo()
   {
@@ -52,4 +59,7 @@ public class ReversibleCommandStack
   public bool CanUndo => UndoStack.Count > 0;
 
   public bool CanRedo => RedoStack.Count > 0;
+
+  private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    => CollectionChanged?.Invoke(this, e);
 }

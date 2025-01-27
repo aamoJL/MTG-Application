@@ -19,7 +19,8 @@ public partial class CommanderViewModelCommands
 
     protected override async Task Execute()
     {
-      if (!CanExecute()) return;
+      if (!CanExecute())
+        return;
 
       try
       {
@@ -32,7 +33,7 @@ public partial class CommanderViewModelCommands
             return; // Same print
 
           Viewmodel.UndoStack.PushAndExecute(
-            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(commander, commander.Info, selection.Info, Viewmodel.CardCopier)
+            new ReversiblePropertyChangeCommand<DeckEditorMTGCard, MTGCardInfo>(commander, commander.Info, selection.Info)
             {
               ReversibleAction = new ReversibleCardPrintChangeAction(Viewmodel)
             });

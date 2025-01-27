@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
-using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
 using MTGApplicationTests.TestUtility.Services;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
@@ -50,11 +49,10 @@ public partial class CommanderViewModelTests
     }
 
     [TestMethod]
-    public async Task ChangePrint_InvokedWithPrint()
+    public async Task ChangePrint_PrintChanged()
     {
-      DeckEditorMTGCard result = null;
-
       var existingCard = _savedDeck.Commander;
+      var oldPrint = existingCard.Info with { };
       var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
       var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
@@ -65,65 +63,20 @@ public partial class CommanderViewModelTests
           {
             OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint))
           }
-        },
-        OnChange = (card) => { result = card; }
+        }
       };
 
       await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
 
-      Assert.AreEqual(newPrint.SetCode, result.Info.SetCode);
-    }
+      Assert.AreEqual(newPrint.SetCode, viewmodel.Card.Info.SetCode);
 
-    [TestMethod]
-    public async Task ChangePrint_Undo_InvokedWithOldPrint()
-    {
-      DeckEditorMTGCard result = null;
-
-      var existingCard = _savedDeck.Commander;
-      var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderViewModel(_dependencies.Importer)
-      {
-        Card = existingCard,
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new()
-          {
-            OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint))
-          }
-        },
-        OnChange = (card) => { result = card; }
-      };
-
-      await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
       viewmodel.UndoStack.Undo();
 
-      Assert.AreEqual(result.Info.SetCode, existingCard.Info.SetCode);
-    }
+      Assert.AreEqual(oldPrint.SetCode, viewmodel.Card.Info.SetCode);
 
-    [TestMethod]
-    public async Task ChangePrint_Redo_InvokedWithNewPrint()
-    {
-      DeckEditorMTGCard result = null;
-      var existingCard = _savedDeck.Commander;
-      var newPrint = existingCard.Info with { ScryfallId = Guid.NewGuid(), SetCode = "zyx" };
-      var viewmodel = new CommanderViewModel(_dependencies.Importer)
-      {
-        Card = existingCard,
-        Confirmers = new()
-        {
-          ChangeCardPrintConfirmer = new()
-          {
-            OnConfirm = async (arg) => await Task.FromResult(new MTGCard(newPrint))
-          }
-        },
-        OnChange = (card) => { result = card; }
-      };
-
-      await viewmodel.ChangeCardPrintCommand.ExecuteAsync(existingCard);
-      viewmodel.UndoStack.Undo();
       viewmodel.UndoStack.Redo();
 
-      Assert.AreEqual(result.Info.SetCode, newPrint.SetCode);
+      Assert.AreEqual(newPrint.SetCode, viewmodel.Card.Info.SetCode);
     }
   }
 }

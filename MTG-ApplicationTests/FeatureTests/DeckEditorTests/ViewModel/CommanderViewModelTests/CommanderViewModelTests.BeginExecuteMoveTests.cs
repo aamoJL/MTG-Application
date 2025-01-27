@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
-using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
@@ -13,23 +12,20 @@ public partial class CommanderViewModelTests
   public class BeginExecuteMoveTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
-    public async Task ExecuteMove_OnChangesInvoked()
+    public async Task ExecuteMove_CardChanges()
     {
-      DeckEditorMTGCard originResult = null;
-      DeckEditorMTGCard targetResult = null;
-
       var undoStack = new ReversibleCommandStack();
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var origin = new CommanderViewModel(_dependencies.Importer)
       {
-        UndoStack = undoStack,
-        OnChange = (card) => { originResult = card; }
+        Card = card,
+        UndoStack = undoStack
       };
       var target = new CommanderViewModel(_dependencies.Importer)
       {
-        UndoStack = undoStack,
-        OnChange = (card) => { targetResult = card; }
+        Card = null,
+        UndoStack = undoStack
       };
-      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
       origin.BeginMoveFromCommand.Execute(card);
       await target.BeginMoveToCommand.ExecuteAsync(card);
@@ -37,8 +33,18 @@ public partial class CommanderViewModelTests
       origin.ExecuteMoveCommand.Execute(card);
       target.ExecuteMoveCommand.Execute(card);
 
-      Assert.IsNull(originResult);
-      Assert.AreEqual(card.Info.Name, targetResult.Info.Name);
+      Assert.IsNull(origin.Card);
+      Assert.AreEqual(card, target.Card);
+
+      target.UndoStack.Undo();
+
+      Assert.IsNull(target.Card);
+      Assert.AreEqual(card, origin.Card);
+
+      target.UndoStack.Redo();
+
+      Assert.IsNull(origin.Card);
+      Assert.AreEqual(card, target.Card);
     }
   }
 }

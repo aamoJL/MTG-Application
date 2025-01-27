@@ -6,22 +6,28 @@ namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderVi
 public partial class CommanderViewModelTests
 {
   [TestClass]
-  public class RemoveTests : DeckEditorViewModelTestsBase
+  public class RemoveCommanderCommandTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
-    public void Remove_InvokedWithNull()
+    public void Remove_CardRemoved()
     {
-      var result = _savedDeck.Commander;
-
+      var card = _savedDeck.Commander;
       var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
-        Card = _savedDeck.Commander,
-        OnChange = (card) => { result = card; }
+        Card = card,
       };
 
       viewmodel.RemoveCommanderCommand.Execute(null);
 
-      Assert.IsNull(result);
+      Assert.IsNull(viewmodel.Card);
+
+      viewmodel.UndoStack.Undo();
+
+      Assert.AreEqual(card, viewmodel.Card);
+
+      viewmodel.UndoStack.Redo();
+
+      Assert.IsNull(viewmodel.Card);
     }
   }
 }

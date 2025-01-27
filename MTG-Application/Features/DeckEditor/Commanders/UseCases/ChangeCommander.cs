@@ -13,10 +13,11 @@ public partial class CommanderViewModelCommands
   {
     protected override async Task Execute(DeckEditorMTGCard? card)
     {
-      Viewmodel.UndoStack.PushAndExecute(new ReversibleCommanderChangeCommand(card, Viewmodel.Card, Viewmodel.CardCopier)
-      {
-        ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
-      });
+      Viewmodel.UndoStack.PushAndExecute(
+        new ReversibleCommanderChangeCommand(card, Viewmodel.Card)
+        {
+          ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
+        });
 
       await Task.Yield();
     }

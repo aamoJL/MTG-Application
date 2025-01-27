@@ -42,6 +42,9 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
     if (unsavedArgs.Cancelled)
       return;
 
+    // Workaround - removing tabview will throw an exception if list item has focus on the tab.
+    Focus(FocusState.Programmatic);
+
     TabViewItems.Remove(item);
 
     // Create new tab if there are no tabs

@@ -17,7 +17,7 @@ public partial class CommanderViewModelCommands
       if (!CanExecute(param)) return;
 
       Viewmodel.UndoStack.PushAndExecute(
-        new ReversibleCommanderChangeCommand(null, Viewmodel.Card, Viewmodel.CardCopier)
+        new ReversibleCommanderChangeCommand(null, Viewmodel.Card)
         {
           ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
         });

@@ -147,6 +147,6 @@ public partial class CardGroupViewModel : ObservableObject, ICardListViewModel
     }
   }
 
-  private void Cards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  private void Cards_CollectionChanged(object? _, NotifyCollectionChangedEventArgs __)
     => OnPropertyChanged(nameof(Count));
 }

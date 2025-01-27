@@ -1,13 +1,12 @@
 ﻿using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
-using System;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services.Factories;
 
 public class DeckEditorCommanderFactory(DeckEditorViewModel viewmodel)
 {
-  public CommanderViewModel CreateCommanderViewModel(DeckEditorMTGCard? card, Action<DeckEditorMTGCard?>? onChange = null)
+  public CommanderViewModel CreateCommanderViewModel(DeckEditorMTGCard? card)
   {
     return new(viewmodel.Importer)
     {
@@ -15,8 +14,7 @@ public class DeckEditorCommanderFactory(DeckEditorViewModel viewmodel)
       Confirmers = viewmodel.Confirmers.CommanderConfirmers,
       UndoStack = viewmodel.UndoStack,
       Notifier = viewmodel.Notifier,
-      Worker = viewmodel,
-      OnChange = onChange
+      Worker = viewmodel
     };
   }
 }

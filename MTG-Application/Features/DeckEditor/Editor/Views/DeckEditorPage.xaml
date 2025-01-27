@@ -701,6 +701,7 @@
             </ItemsView.ItemTemplate>
           </cardlistview:AdvancedCardItemsView>
         </ScrollViewer>
+        <!--#endregion-->
 
         <!--#region List View -->
         <cardlistview:AdvancedCardListView

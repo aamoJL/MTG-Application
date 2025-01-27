@@ -18,8 +18,7 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
       DependencyProperty.Register(nameof(DragMoveCaptionText), typeof(string), typeof(CommanderTextView), new PropertyMetadata(string.Empty, OnDependencyPropertyChangedCallback));
 
   public static readonly DependencyProperty EdhrecButtonClickProperty =
-      DependencyProperty.Register(nameof(EdhrecButtonClick), typeof(ICommand), typeof(CommanderTextView),
-        new PropertyMetadata(default(ICommand)));
+      DependencyProperty.Register(nameof(EdhrecButtonClick), typeof(ICommand), typeof(CommanderTextView), new PropertyMetadata(default(ICommand)));
 
   public static readonly DependencyProperty OnDropCopyProperty =
       DependencyProperty.Register(nameof(OnDropCopy), typeof(IAsyncRelayCommand), typeof(CommanderTextView), new PropertyMetadata(default));
@@ -40,13 +39,13 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
     Drop += DragAndDrop.Drop;
   }
 
-  private CommanderTextViewDragAndDrop DragAndDrop => field ??= new()
+  private CommanderTextViewDragAndDrop? DragAndDrop => field ??= new()
   {
-    OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
+    OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info)) ?? Task.CompletedTask),
     OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
-    OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
-    OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
-    OnExecuteMove = (item) => OnDropExecuteMove?.Execute(new DeckEditorMTGCard(item.Card.Info, item.Count)),
+    OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info)) ?? Task.CompletedTask),
+    OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(new DeckEditorMTGCard(item.Card.Info)),
+    OnExecuteMove = (item) => OnDropExecuteMove?.Execute(null),
     IsDropContentVisible = false,
   };
 
@@ -93,8 +92,8 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
       return;
 
     if (e.Property.Equals(DragCopyCaptionTextProperty))
-      view.DragAndDrop.CopyCaptionOverride = (string)e.NewValue;
+      view.DragAndDrop!.CopyCaptionOverride = (string)e.NewValue;
     else if (e.Property.Equals(DragMoveCaptionTextProperty))
-      view.DragAndDrop.MoveCaptionOverride = (string)e.NewValue;
+      view.DragAndDrop!.MoveCaptionOverride = (string)e.NewValue;
   }
 }

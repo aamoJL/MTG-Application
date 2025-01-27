@@ -16,7 +16,7 @@ public partial class CommanderViewModelCommands
       protected override void Execute(DeckEditorMTGCard? _)
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
-          new ReversibleCommanderChangeCommand(null, Viewmodel.Card, Viewmodel.CardCopier)
+          new ReversibleCommanderChangeCommand(null, Viewmodel.Card)
           {
             ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
           });
@@ -27,17 +27,19 @@ public partial class CommanderViewModelCommands
     {
       protected override async Task Execute(DeckEditorMTGCard? card)
       {
-        Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(new ReversibleCommanderChangeCommand(card, Viewmodel.Card, Viewmodel.CardCopier)
-        {
-          ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
-        });
+        Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
+          new ReversibleCommanderChangeCommand(card, Viewmodel.Card)
+          {
+            ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
+          });
+
         await Task.Yield();
       }
     }
 
-    public class ExecuteMove(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+    public class ExecuteMove(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel>(viewmodel)
     {
-      protected override void Execute(DeckEditorMTGCard? _)
+      protected override void Execute()
         => Viewmodel.UndoStack.PushAndExecuteActiveCombinedCommand();
     }
   }

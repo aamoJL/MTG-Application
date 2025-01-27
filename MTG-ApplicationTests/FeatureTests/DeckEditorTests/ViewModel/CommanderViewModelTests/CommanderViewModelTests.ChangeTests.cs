@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
-using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.DeckEditorViewModelTests.DeckEditorViewModelTests;
 
@@ -8,37 +7,47 @@ namespace MTGApplicationTests.FeatureTests.DeckEditorTests.ViewModel.CommanderVi
 public partial class CommanderViewModelTests
 {
   [TestClass]
-  public class ChangeTests : DeckEditorViewModelTestsBase
+  public class ChangeCommanderCommandTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
-    public async Task Change_ToCard_InvokedWithCard()
+    public async Task Change_ToCard_CardChanged()
     {
-      DeckEditorMTGCard result = null;
-
-      var viewmodel = new CommanderViewModel(_dependencies.Importer)
-      {
-        OnChange = (card) => { result = card; }
-      };
+      var viewmodel = new CommanderViewModel(_dependencies.Importer);
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
       await viewmodel.ChangeCommanderCommand.ExecuteAsync(card);
 
-      Assert.AreEqual(card.Info.Name, result.Info.Name);
+      Assert.AreEqual(card, viewmodel.Card);
+
+      viewmodel.UndoStack.Undo();
+
+      Assert.IsNull(viewmodel.Card);
+
+      viewmodel.UndoStack.Redo();
+
+      Assert.AreEqual(card, viewmodel.Card);
     }
 
     [TestMethod]
-    public async Task Change_ToNull_InvokedWithNull()
+    public async Task Change_ToNull_CardRemoved()
     {
-      DeckEditorMTGCard result = null;
-
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var viewmodel = new CommanderViewModel(_dependencies.Importer)
       {
-        OnChange = (card) => { result = card; }
+        Card = card
       };
 
       await viewmodel.ChangeCommanderCommand.ExecuteAsync(null);
 
-      Assert.IsNull(result);
+      Assert.IsNull(viewmodel.Card);
+
+      viewmodel.UndoStack.Undo();
+
+      Assert.AreEqual(card, viewmodel.Card);
+
+      viewmodel.UndoStack.Redo();
+
+      Assert.IsNull(viewmodel.Card);
     }
   }
 }

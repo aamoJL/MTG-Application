@@ -19,14 +19,21 @@ using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewMo
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
-public partial class DeckEditorViewModel(
-  IMTGCardImporter importer,
-  Notifier? notifier = null,
-  DeckEditorConfirmers? confirmers = null) : ObservableObject, ISavable, IWorker
+public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 {
-  public DeckEditorMTGDeck Deck
+  public DeckEditorViewModel(IMTGCardImporter importer, Notifier? notifier = null, DeckEditorConfirmers? confirmers = null)
   {
-    get;
+    Importer = importer;
+    Notifier = notifier ?? new();
+    Confirmers = confirmers ?? new();
+
+    UndoStack.CollectionChanged += UndoStack_CollectionChanged;
+  }
+
+  [NotNull]
+  public DeckEditorMTGDeck? Deck
+  {
+    get => field ??= Deck = new();
     set
     {
       if (field == value)
@@ -34,44 +41,33 @@ public partial class DeckEditorViewModel(
 
       if (field != null)
       {
-        Deck.DeckCards.CollectionChanged -= Cardlist_CollectionChanged;
-        Deck.Maybelist.CollectionChanged -= Cardlist_CollectionChanged;
-        Deck.Wishlist.CollectionChanged -= Cardlist_CollectionChanged;
-        Deck.Removelist.CollectionChanged -= Cardlist_CollectionChanged;
+        field.PropertyChanging -= Deck_PropertyChanging;
+        field.PropertyChanged -= Deck_PropertyChanged;
+        field.DeckCards.CollectionChanged -= DeckCards_CollectionChanged;
 
-        foreach (var item in Deck.DeckCards)
-          item.PropertyChanged -= CardListItem_PropertyChanged;
-        foreach (var item in Deck.Maybelist)
-          item.PropertyChanged -= CardListItem_PropertyChanged;
-        foreach (var item in Deck.Wishlist)
-          item.PropertyChanged -= CardListItem_PropertyChanged;
-        foreach (var item in Deck.Removelist)
-          item.PropertyChanged -= CardListItem_PropertyChanged;
+        foreach (var item in field.DeckCards)
+          item.PropertyChanged -= DeckCard_PropertyChanged;
       }
 
       SetProperty(ref field, value);
 
-      Deck.DeckCards.CollectionChanged += Cardlist_CollectionChanged;
-      Deck.Maybelist.CollectionChanged += Cardlist_CollectionChanged;
-      Deck.Wishlist.CollectionChanged += Cardlist_CollectionChanged;
-      Deck.Removelist.CollectionChanged += Cardlist_CollectionChanged;
+      if (field != null)
+      {
+        field.PropertyChanging += Deck_PropertyChanging;
+        field.PropertyChanged += Deck_PropertyChanged;
+        field.DeckCards.CollectionChanged += DeckCards_CollectionChanged;
 
-      foreach (var item in Deck.DeckCards)
-        item.PropertyChanged += CardListItem_PropertyChanged;
-      foreach (var item in Deck.Maybelist)
-        item.PropertyChanged += CardListItem_PropertyChanged;
-      foreach (var item in Deck.Wishlist)
-        item.PropertyChanged += CardListItem_PropertyChanged;
-      foreach (var item in Deck.Removelist)
-        item.PropertyChanged += CardListItem_PropertyChanged;
+        foreach (var item in field.DeckCards)
+          item.PropertyChanged += DeckCard_PropertyChanged;
+      }
 
-      DeckCardList.Cards = field.DeckCards;
-      MaybeCardList.Cards = field.Maybelist;
-      WishCardList.Cards = field.Wishlist;
-      RemoveCardList.Cards = field.Removelist;
+      DeckCardList.Cards = Deck.DeckCards;
+      MaybeCardList.Cards = Deck.Maybelist;
+      WishCardList.Cards = Deck.Wishlist;
+      RemoveCardList.Cards = Deck.Removelist;
 
-      Commander.Card = field.Commander;
-      Partner.Card = field.CommanderPartner;
+      Commander.Card = Deck.Commander;
+      Partner.Card = Deck.CommanderPartner;
 
       OnPropertyChanged(nameof(Name));
       OnPropertyChanged(nameof(Size));
@@ -82,11 +78,11 @@ public partial class DeckEditorViewModel(
       ShowDeckTokensCommand?.NotifyCanExecuteChanged();
       OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
     }
-  } = new();
+  }
 
-  public IMTGCardImporter Importer { get; } = importer;
-  public DeckEditorConfirmers Confirmers { get; } = confirmers ?? new();
-  public Notifier Notifier { get; } = notifier ?? new();
+  public IMTGCardImporter Importer { get; }
+  public DeckEditorConfirmers Confirmers { get; }
+  public Notifier Notifier { get; }
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
   public ReversibleCommandStack UndoStack { get; } = new();
 
@@ -94,8 +90,34 @@ public partial class DeckEditorViewModel(
   [NotNull] public CardListViewModel? MaybeCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Maybelist);
   [NotNull] public CardListViewModel? WishCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Wishlist);
   [NotNull] public CardListViewModel? RemoveCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Removelist);
-  [NotNull] public CommanderViewModel? Commander => field ??= new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.Commander, onChange: (card) => { Deck.Commander = card; OnCommandersChanged(); });
-  [NotNull] public CommanderViewModel? Partner => field ??= new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.CommanderPartner, onChange: (card) => { Deck.CommanderPartner = card; OnCommandersChanged(); });
+  [NotNull]
+  public CommanderViewModel? Commander
+  {
+    get => field ??= Commander = new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.Commander);
+    private set
+    {
+      if (field != null)
+        return;
+
+      field = value;
+
+      Commander.PropertyChanged += CommanderViewModel_PropertyChanged;
+    }
+  }
+  [NotNull]
+  public CommanderViewModel? Partner
+  {
+    get => field ??= Partner = new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.CommanderPartner);
+    private set
+    {
+      if (field != null)
+        return;
+
+      field = value;
+
+      Partner.PropertyChanged += CommanderViewModel_PropertyChanged;
+    }
+  }
 
   [ObservableProperty] public partial bool IsBusy { get; set; }
   [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
@@ -111,51 +133,88 @@ public partial class DeckEditorViewModel(
   [NotNull] public IAsyncRelayCommand<ISavable.ConfirmArgs>? ConfirmUnsavedChangesCommand => field ??= new ConfirmUnsavedChanges(this).Command;
   [NotNull] public IAsyncRelayCommand? NewDeckCommand => field ??= new NewDeck(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? OpenDeckCommand => field ??= new OpenDeck(this).Command;
-  [NotNull] public IAsyncRelayCommand? SaveDeckCommand => new SaveDeck(this).Command;
+  [NotNull] public IAsyncRelayCommand? SaveDeckCommand => field ??= new SaveDeck(this).Command;
   [NotNull] public IAsyncRelayCommand? DeleteDeckCommand => field ??= new DeleteDeck(this).Command;
-  [NotNull] public IRelayCommand? UndoCommand => new Undo(this).Command;
+  [NotNull] public IRelayCommand? UndoCommand => field ??= new Undo(this).Command;
   [NotNull] public IRelayCommand? RedoCommand => field ??= new Redo(this).Command;
   [NotNull] public IAsyncRelayCommand? OpenEdhrecCommanderWebsiteCommand => field ??= new OpenEdhrecCommanderWebsite(this).Command;
-  [NotNull] public IAsyncRelayCommand? ShowDeckTokensCommand => new ShowDeckTokens(this).Command;
+  [NotNull] public IAsyncRelayCommand? ShowDeckTokensCommand => field ??= new ShowDeckTokens(this).Command;
   [NotNull] public IRelayCommand? OpenDeckTestingWindowCommand => field ??= new OpenDeckTestingWindow(this).Command;
   [NotNull] public IRelayCommand? OpenEdhrecSearchWindowCommand => field ??= new OpenEdhrecSearchWindow(this).Command;
 
-  private void OnCommandersChanged()
-  {
-    HasUnsavedChanges = true;
-
-    OnPropertyChanged(nameof(Size));
-    OnPropertyChanged(nameof(Price));
-    OpenEdhrecCommanderWebsiteCommand!.NotifyCanExecuteChanged();
-    OpenEdhrecSearchWindowCommand!.NotifyCanExecuteChanged();
-  }
-
-  private void Cardlist_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  private void DeckCards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
     if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is IList newItems)
     {
       foreach (var item in newItems.OfType<DeckEditorMTGCard>())
-        item.PropertyChanged += CardListItem_PropertyChanged;
+        item.PropertyChanged += DeckCard_PropertyChanged;
     }
     else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is IList oldItems)
     {
       foreach (var item in oldItems.OfType<DeckEditorMTGCard>())
-        item.PropertyChanged -= CardListItem_PropertyChanged;
+        item.PropertyChanged -= DeckCard_PropertyChanged;
     }
-
-    HasUnsavedChanges = true;
 
     OnPropertyChanged(nameof(Size));
     OnPropertyChanged(nameof(Price));
+
     ShowDeckTokensCommand?.NotifyCanExecuteChanged();
     OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
   }
 
-  private void CardListItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void DeckCard_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    HasUnsavedChanges = true;
-
     OnPropertyChanged(nameof(Size));
     OnPropertyChanged(nameof(Price));
   }
+
+  private void CommanderViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(CommanderViewModel.Card))
+    {
+      if (sender == Commander)
+        Deck.Commander = Commander.Card;
+      else if (sender == Partner)
+        Deck.CommanderPartner = Partner.Card;
+    }
+  }
+
+  private void Deck_PropertyChanging(object? sender, System.ComponentModel.PropertyChangingEventArgs e)
+  {
+    if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
+      Deck.Commander.PropertyChanged -= DeckCard_PropertyChanged;
+    else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
+      Deck.CommanderPartner.PropertyChanged -= DeckCard_PropertyChanged;
+  }
+
+  private void Deck_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander))
+    {
+      if (Deck.Commander != null)
+        Deck.Commander.PropertyChanged += DeckCard_PropertyChanged;
+
+      OnPropertyChanged(nameof(Size));
+      OnPropertyChanged(nameof(Price));
+
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+      OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged();
+    }
+    else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner))
+    {
+      if (Deck.CommanderPartner != null)
+        Deck.CommanderPartner.PropertyChanged += DeckCard_PropertyChanged;
+
+      OnPropertyChanged(nameof(Size));
+      OnPropertyChanged(nameof(Price));
+
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+      OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged();
+    }
+  }
+
+  private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    => HasUnsavedChanges = e.Action != NotifyCollectionChangedAction.Reset;
 }
