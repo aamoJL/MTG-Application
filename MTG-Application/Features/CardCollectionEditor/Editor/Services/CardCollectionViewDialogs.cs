@@ -15,15 +15,14 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
 {
   public static void RegisterConfirmDialogs(CardCollectionEditorConfirmers confirmers, XamlRoot root)
   {
-    confirmers.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(root).Execute((msg.Title, msg.Message));
-    confirmers.LoadCollectionConfirmer.OnConfirm = async msg => await new ShowOpenDialog(root).Execute((msg.Title, msg.Message, msg.Data.ToArray()));
-
     RegisterCardCollectionDialogs(confirmers.CardCollectionConfirmers, root);
     RegisterCardCollectionListDialogs(confirmers.CardCollectionListConfirmers, root);
   }
 
   private static void RegisterCardCollectionDialogs(CardCollectionConfirmers confirmers, XamlRoot root)
   {
+    confirmers.SaveUnsavedChangesConfirmer.OnConfirm = async msg => await new ShowUnsavedChangesDialog(root).Execute((msg.Title, msg.Message));
+    confirmers.LoadCollectionConfirmer.OnConfirm = async msg => await new ShowOpenDialog(root).Execute((msg.Title, msg.Message, msg.Data.ToArray()));
     confirmers.SaveCollectionConfirmer.OnConfirm = async msg => await new ShowSaveDialog(root).Execute((msg.Title, msg.Message, msg.Data));
     confirmers.OverrideCollectionConfirmer.OnConfirm = async msg => await new ShowOverrideDialog(root).Execute((msg.Title, msg.Message));
     confirmers.DeleteCollectionConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(root).Execute((msg.Title, msg.Message));

@@ -1,73 +1,177 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.Collections;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
+using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.ViewModels;
-using System;
-using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using static MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCases.CardCollectionEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
 
-public partial class CardCollectionListViewModel : ObservableObject, ISavable, IWorker
+public partial class CardCollectionListViewModel : ObservableObject
 {
-  public CardCollectionListViewModel(MTGCardCollectionList model, IMTGCardImporter importer, Func<string, bool>? existsValidation = null)
+  public CardCollectionListViewModel(IMTGCardImporter importer)
   {
-    Model = model ?? new();
-
     Importer = importer;
-    ExistsValidation = existsValidation;
 
-    QueryCardsViewModel = new(OwnedCards, importer);
+    QueryCards = new(new CardCollectionIncrementalCardSource(importer));
+
+    QueryCards.Collection.CollectionChanged += QueryCards_CollectionChanged;
+    QueryCards.PropertyChanged += QueryCards_PropertyChanged;
+  }
+
+  [NotNull]
+  public MTGCardCollectionList? CollectionList
+  {
+    get => field ??= CollectionList = new();
+    set
+    {
+      if (field == value)
+        return;
+
+      if (field != null)
+      {
+        field.PropertyChanged -= CollectionList_PropertyChanged;
+        field.Cards.CollectionChanged -= CollectionListCards_CollectionChanged;
+      }
+
+      SetProperty(ref field, value);
+
+      if (field != null)
+      {
+        field.PropertyChanged += CollectionList_PropertyChanged;
+        field.Cards.CollectionChanged += CollectionListCards_CollectionChanged;
+      }
+
+      OnPropertyChanged(nameof(Name));
+      OnPropertyChanged(nameof(Query));
+      OnPropertyChanged(nameof(OwnedCount));
+      OnPropertyChanged(nameof(TotalCount));
+
+      UpdateCards();
+    }
   }
 
   public IMTGCardImporter Importer { get; }
-  public QueryCardsViewModel QueryCardsViewModel { get; }
-  public CardCollectionListConfirmers Confirmers { get; set; } = new();
-  public Notifier Notifier { get; set; } = new();
-  public ClipboardService ClipboardService { get; set; } = new();
-  public IWorker Worker => this;
+  public CardCollectionListConfirmers Confirmers { get; init; } = new();
+  public Notifier Notifier { get; init; } = new();
+  public ClipboardService ClipboardService { get; init; } = new();
+  public IWorker Worker { get; init; } = IWorker.Default;
 
   public string Name
   {
-    get => Model.Name;
-    set
-    {
-      if (Model.Name == value) return;
-
-      Model.Name = value;
-      OnPropertyChanged(nameof(Name));
-    }
+    get => CollectionList.Name;
+    set => CollectionList.Name = value;
   }
   public string Query
   {
-    get => Model.SearchQuery;
-    set
-    {
-      if (Model.SearchQuery == value) return;
-
-      Model.SearchQuery = value;
-      OnPropertyChanged(nameof(Query));
-    }
+    get => CollectionList.SearchQuery;
+    set => CollectionList.SearchQuery = value;
   }
-  public ObservableCollection<CardCollectionMTGCard> OwnedCards => Model.Cards;
+  public int OwnedCount => CollectionList.Cards.Count;
+  public int TotalCount => QueryCards.TotalCardCount;
 
-  [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
-  [ObservableProperty] public partial bool IsBusy { get; set; }
+  public IncrementalLoadingCollection<IncrementalCardSource<CardCollectionMTGCard>, CardCollectionMTGCard> Cards => QueryCards.Collection;
 
-  public Func<string, bool>? ExistsValidation { get; }
+  private IncrementalLoadingCardCollection<CardCollectionMTGCard> QueryCards { get; }
+  private NotifyTaskCompletion<CardImportResult>? FetchingCardsTask { get; set; }
+  private Task? UpdatingCardsTask { get; set; }
 
-  private MTGCardCollectionList Model { get; }
-
-  public IAsyncRelayCommand? EditListCommand => field ??= new EditList(this).Command;
   public IAsyncRelayCommand? ImportCardsCommand => field ??= new ImportCards(this).Command;
   public IAsyncRelayCommand? ExportCardsCommand => field ??= new ExportCards(this).Command;
+  // TODO: move to card viewmodel
   public IAsyncRelayCommand<CardCollectionMTGCard>? ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
   public IRelayCommand<CardCollectionMTGCard>? SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
 
-  public async Task UpdateQueryCards() => await Worker.DoWork(QueryCardsViewModel.UpdateQueryCards(Model.SearchQuery));
+  public async Task WaitForCardUpdate()
+  {
+    if (FetchingCardsTask != null)
+      await FetchingCardsTask.Task;
+
+    if (UpdatingCardsTask != null)
+      await UpdatingCardsTask;
+  }
+
+  private void UpdateCards()
+  {
+    if (FetchingCardsTask != null)
+      FetchingCardsTask.PropertyChanged -= UpdatingCardsTask_PropertyChanged;
+
+    FetchingCardsTask = new(Worker.DoWork(Task.Run(async () => await new FetchCardsWithSearchQuery(Importer).Execute(Query))));
+    FetchingCardsTask.PropertyChanged += UpdatingCardsTask_PropertyChanged;
+    FetchingCardsTask.Start();
+  }
+
+  private void UpdatingCardsTask_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(FetchingCardsTask.Result))
+    {
+      if (FetchingCardsTask?.Result == null)
+        return;
+
+      UpdatingCardsTask = Worker.DoWork(QueryCards.SetCollection(
+        cards: [.. FetchingCardsTask.Result.Found.Select(x => new CardCollectionMTGCard(x.Info))],
+        nextPageUri: FetchingCardsTask.Result.NextPageUri,
+        totalCount: FetchingCardsTask.Result.TotalCount));
+    }
+  }
+
+  private void CollectionList_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(MTGCardCollectionList.Name))
+      OnPropertyChanged(nameof(Name));
+    else if (e.PropertyName == nameof(MTGCardCollectionList.SearchQuery))
+    {
+      UpdateCards();
+
+      OnPropertyChanged(nameof(Query));
+    }
+  }
+
+  private void QueryCards_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(QueryCards.TotalCardCount))
+      OnPropertyChanged(nameof(TotalCount));
+  }
+
+  private void QueryCards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+    {
+      foreach (var item in e.NewItems.OfType<CardCollectionMTGCard>())
+      {
+        item.IsOwned = CollectionList.Cards
+          .FirstOrDefault(x => x.Info.ScryfallId == item.Info.ScryfallId) != null;
+      }
+    }
+
+    OnPropertyChanged(nameof(TotalCount));
+  }
+
+  private void CollectionListCards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+    {
+      foreach (var item in e.NewItems.OfType<CardCollectionMTGCard>())
+        if (QueryCards.Collection.TryFindIndex(x => x.Info.ScryfallId == item.Info.ScryfallId, out var index))
+          QueryCards.Collection[index].IsOwned = true;
+    }
+    else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+    {
+      foreach (var item in e.OldItems.OfType<CardCollectionMTGCard>())
+        if (QueryCards.Collection.TryFindIndex(x => x.Info.ScryfallId == item.Info.ScryfallId, out var index))
+          QueryCards.Collection[index].IsOwned = false;
+    }
+
+    OnPropertyChanged(nameof(OwnedCount));
+  }
 }

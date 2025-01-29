@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
-using MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
+﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
@@ -8,15 +8,15 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.CardCollectionEditor.CardCollection.UseCases;
+namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmNewList(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel>(viewmodel)
+  public class ConfirmNewList(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
   {
     protected override async Task Execute()
     {
-      if (await Viewmodel.Confirmers.NewCollectionListConfirmer.Confirm(CardCollectionConfirmers.GetNewCollectionListConfirmation())
+      if (await Viewmodel.Confirmers.CardCollectionConfirmers.NewCollectionListConfirmer.Confirm(CardCollectionConfirmers.GetNewCollectionListConfirmation())
       is not (string name, string query))
         return;
 
@@ -24,15 +24,14 @@ public partial class CardCollectionEditorViewModelCommands
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListNameError);
       else if (string.IsNullOrEmpty(query))
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListQueryError);
-      else if (Viewmodel.CollectionLists.FirstOrDefault(x => x.Name == name) is not null)
+      else if (Viewmodel.Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null)
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListExistsError);
       else
       {
         var newList = new MTGCardCollectionList() { Name = name, SearchQuery = query };
-        Viewmodel.CollectionLists.Add(newList);
-        Viewmodel.HasUnsavedChanges = true;
 
-        Viewmodel.OnListAdded?.Invoke(newList);
+        Viewmodel.Collection.CollectionLists.Add(newList);
+        Viewmodel.HasUnsavedChanges = true;
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListSuccess);
       }

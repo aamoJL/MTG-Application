@@ -18,7 +18,8 @@ public partial class CardCollectionEditorViewModelCommands
       if (unsavedArgs.Cancelled)
         return;
 
-      await Viewmodel.ChangeCollection(new());
+      Viewmodel.Collection = new();
+
       Viewmodel.HasUnsavedChanges = false;
     }
   }

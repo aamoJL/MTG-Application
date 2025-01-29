@@ -1,6 +1,8 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace MTGApplication.Features.DeckEditor.Models;
 
@@ -12,41 +14,17 @@ public partial class DeckEditorMTGDeck : INotifyPropertyChanged, INotifyProperty
   public string Name
   {
     get;
-    set
-    {
-      if (field != value)
-      {
-        PropertyChanging?.Invoke(this, new(nameof(Name)));
-        field = value;
-        PropertyChanged?.Invoke(this, new(nameof(Name)));
-      }
-    }
+    set => SetProperty(ref field, value);
   } = "";
   public DeckEditorMTGCard? Commander
   {
     get;
-    set
-    {
-      if (field != value)
-      {
-        PropertyChanging?.Invoke(this, new(nameof(Commander)));
-        field = value;
-        PropertyChanged?.Invoke(this, new(nameof(Commander)));
-      }
-    }
+    set => SetProperty(ref field, value);
   }
   public DeckEditorMTGCard? CommanderPartner
   {
     get;
-    set
-    {
-      if (field != value)
-      {
-        PropertyChanging?.Invoke(this, new(nameof(CommanderPartner)));
-        field = value;
-        PropertyChanged?.Invoke(this, new(nameof(CommanderPartner)));
-      }
-    }
+    set => SetProperty(ref field, value);
   }
 
   public ObservableCollection<DeckEditorMTGCard> DeckCards { get; set; } = [];
@@ -56,4 +34,14 @@ public partial class DeckEditorMTGDeck : INotifyPropertyChanged, INotifyProperty
 
   public event PropertyChangedEventHandler? PropertyChanged;
   public event PropertyChangingEventHandler? PropertyChanging;
+
+  private void SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+  {
+    if (!EqualityComparer<T>.Default.Equals(field, value))
+    {
+      PropertyChanging?.Invoke(this, new(propertyName));
+      field = value;
+      PropertyChanged?.Invoke(this, new(propertyName));
+    }
+  }
 }

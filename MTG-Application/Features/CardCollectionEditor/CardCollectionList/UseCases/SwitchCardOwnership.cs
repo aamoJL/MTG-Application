@@ -15,13 +15,11 @@ public partial class CardCollectionEditorViewModelCommands
     {
       if (!CanExecute(card)) return;
 
-      if (Viewmodel.OwnedCards.FirstOrDefault(x => x.Info.ScryfallId == card!.Info.ScryfallId)
+      if (Viewmodel.CollectionList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card!.Info.ScryfallId)
         is CardCollectionMTGCard existingCard)
-        Viewmodel.OwnedCards.Remove(existingCard);
+        Viewmodel.CollectionList.Cards.Remove(existingCard);
       else
-        Viewmodel.OwnedCards.Add(card!);
-
-      Viewmodel.HasUnsavedChanges = true;
+        Viewmodel.CollectionList.Cards.Add(card!);
     }
   }
 }

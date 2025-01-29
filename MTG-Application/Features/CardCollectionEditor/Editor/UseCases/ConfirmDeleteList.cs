@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
-using MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
+﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.ConfirmationService;
@@ -8,13 +8,13 @@ using MTGApplication.General.ViewModels;
 using System;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.CardCollectionEditor.CardCollection.UseCases;
+namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmDeleteList(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel, MTGCardCollectionList>(viewmodel)
+  public class ConfirmDeleteList(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, MTGCardCollectionList>(viewmodel)
   {
-    protected override bool CanExecute(MTGCardCollectionList? list) => list != null && Viewmodel.CollectionLists.Contains(list);
+    protected override bool CanExecute(MTGCardCollectionList? list) => list != null && Viewmodel.Collection.CollectionLists.Contains(list);
 
     protected override async Task Execute(MTGCardCollectionList? list)
     {
@@ -24,20 +24,19 @@ public partial class CardCollectionEditorViewModelCommands
         return;
       }
 
-      if (await Viewmodel.Confirmers.DeleteCollectionListConfirmer.Confirm(
-        CardCollectionConfirmers.GetDeleteCollectionListConfirmation(Viewmodel.Name))
+      if (await Viewmodel.Confirmers.CardCollectionConfirmers.DeleteCollectionListConfirmer.Confirm(
+        CardCollectionConfirmers.GetDeleteCollectionListConfirmation(Viewmodel.CollectionName))
         is not ConfirmationResult.Yes)
         return;
 
-      if (Viewmodel.CollectionLists.Remove(list!))
+      if (Viewmodel.Collection.CollectionLists.Remove(list!))
       {
         Viewmodel.HasUnsavedChanges = true;
 
-        Viewmodel.OnListRemoved?.Invoke(list!);
-
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListSuccess);
       }
-      else new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListError);
+      else
+        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.DeleteListError);
     }
   }
 }

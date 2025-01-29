@@ -8,12 +8,12 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
 
-public partial class CardCollectionEditorTests
+public partial class CardCollectionEditorViewModelTests
 {
   public class CardCollectionEditorViewModelTestsBase
   {
     protected readonly CardCollectionRepositoryDependencies _dependencies = new();
-    protected readonly MTGCardCollection _savedCollection = new()
+    protected readonly CardCollectionEditorCardCollection _savedCollection = new()
     {
       Name = "Saved Collection",
       CollectionLists = [
@@ -41,21 +41,16 @@ public partial class CardCollectionEditorTests
       public CardCollectionEditorConfirmers Confirmers { get; internal set; } = new();
       public Notifier Notifier { get; internal set; } = new();
 
-      public CardCollectionEditorViewModel MockVM()
+      public CardCollectionEditorViewModel MockVM(CardCollectionEditorCardCollection collection = null)
       {
-        return new CardCollectionEditorViewModel(dependencies.Importer, Confirmers, Notifier, dependencies.Repository, new())
+        return new(dependencies.Importer)
         {
+          Collection = collection ?? new(),
+          Repository = dependencies.Repository,
+          Confirmers = Confirmers,
+          Notifier = Notifier,
           HasUnsavedChanges = HasUnsavedChanges,
         };
-      }
-
-      public async Task<CardCollectionEditorViewModel> MockVM(MTGCardCollection collection)
-      {
-        var viewmodel = MockVM();
-
-        await viewmodel.ChangeCollection(collection);
-
-        return viewmodel;
       }
     }
   }

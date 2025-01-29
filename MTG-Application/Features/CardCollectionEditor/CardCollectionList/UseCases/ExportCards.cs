@@ -20,7 +20,7 @@ public partial class CardCollectionEditorViewModelCommands
       if (!CanExecute()) return;
 
       if (await Viewmodel.Confirmers.ExportCardsConfirmer.Confirm(
-        CardCollectionListConfirmers.GetExportCardsConfirmation(string.Join(Environment.NewLine, Viewmodel.OwnedCards.Select(x => x.Info.ScryfallId))))
+        CardCollectionListConfirmers.GetExportCardsConfirmation(string.Join(Environment.NewLine, Viewmodel.CollectionList.Cards.Select(x => x.Info.ScryfallId))))
         is not string response || string.IsNullOrEmpty(response))
         return;
 

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 
 /// <summary>
-/// Data transfer object for <see cref="MTGCardCollection"/> class
+/// Data transfer object for <see cref="CardCollectionEditorCardCollection"/> class
 /// </summary>
 public record MTGCardCollectionDTO
 {

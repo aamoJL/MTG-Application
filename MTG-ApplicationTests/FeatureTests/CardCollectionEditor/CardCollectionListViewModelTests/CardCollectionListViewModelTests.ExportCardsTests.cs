@@ -117,7 +117,7 @@ public partial class CardCollectionListViewModelTests
 
       Assert.AreEqual(
         exportData,
-        string.Join(Environment.NewLine, viewmodel.OwnedCards.Select(x => x.Info.ScryfallId)));
+        string.Join(Environment.NewLine, viewmodel.CollectionList.Cards.Select(x => x.Info.ScryfallId)));
     }
 
     [TestMethod]

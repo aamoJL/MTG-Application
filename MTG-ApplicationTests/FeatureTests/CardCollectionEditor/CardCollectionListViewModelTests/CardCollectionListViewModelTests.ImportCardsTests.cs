@@ -67,7 +67,7 @@ public partial class CardCollectionListViewModelTests
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(0, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public partial class CardCollectionListViewModelTests
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(0, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]
@@ -108,7 +108,7 @@ public partial class CardCollectionListViewModelTests
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(0, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]
@@ -130,7 +130,7 @@ public partial class CardCollectionListViewModelTests
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(1, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(1, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]
@@ -157,7 +157,7 @@ public partial class CardCollectionListViewModelTests
 
       await viewmodel.ImportCardsCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(1, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(1, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]

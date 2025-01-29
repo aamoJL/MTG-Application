@@ -23,6 +23,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 {
   public DeckEditorViewModel(IMTGCardImporter importer, Notifier? notifier = null, DeckEditorConfirmers? confirmers = null)
   {
+    // TODO: do confirmers and notifier need to be here?
     Importer = importer;
     Notifier = notifier ?? new();
     Confirmers = confirmers ?? new();
@@ -125,7 +126,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   public string Name
   {
     get => Deck.Name;
-    set { if (Name != value) { Deck.Name = value; OnPropertyChanged(); } }
+    set => Deck.Name = value;
   }
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
   public double Price => Deck.DeckCards.Sum(x => x.Info.Price * x.Count) + (Deck.Commander?.Info.Price ?? 0) + (Deck.CommanderPartner?.Info.Price ?? 0);
@@ -189,21 +190,13 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 
   private void Deck_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander))
+    if (e.PropertyName
+      is (nameof(DeckEditorMTGDeck.Commander))
+      or (nameof(DeckEditorMTGDeck.CommanderPartner)))
     {
-      if (Deck.Commander != null)
+      if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
         Deck.Commander.PropertyChanged += DeckCard_PropertyChanged;
-
-      OnPropertyChanged(nameof(Size));
-      OnPropertyChanged(nameof(Price));
-
-      ShowDeckTokensCommand.NotifyCanExecuteChanged();
-      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-      OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged();
-    }
-    else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner))
-    {
-      if (Deck.CommanderPartner != null)
+      else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
         Deck.CommanderPartner.PropertyChanged += DeckCard_PropertyChanged;
 
       OnPropertyChanged(nameof(Size));
@@ -213,6 +206,8 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
       OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged();
     }
+    else if (e.PropertyName == nameof(DeckEditorMTGDeck.Name))
+      OnPropertyChanged(nameof(Name));
   }
 
   private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

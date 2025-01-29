@@ -1,5 +1,6 @@
-﻿using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
-using MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
+﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
@@ -11,16 +12,17 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCas
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class EditList(CardCollectionListViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionListViewModel>(viewmodel)
+  public class EditList(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, MTGCardCollectionList>(viewmodel)
   {
-    protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.Name);
+    protected override bool CanExecute(MTGCardCollectionList? list) => !string.IsNullOrEmpty(list?.Name);
 
-    protected override async Task Execute()
+    protected override async Task Execute(MTGCardCollectionList? list)
     {
-      if (!CanExecute()) return;
+      if (!CanExecute(list))
+        return;
 
-      if (await Viewmodel.Confirmers.EditCollectionListConfirmer.Confirm(
-        CardCollectionListConfirmers.GetEditCollectionListConfirmation((Viewmodel.Name, Viewmodel.Query)))
+      if (await Viewmodel.Confirmers.CardCollectionListConfirmers.EditCollectionListConfirmer.Confirm(
+        CardCollectionListConfirmers.GetEditCollectionListConfirmation((list!.Name, list.SearchQuery)))
         is not (string name, string query) args)
         return;
 
@@ -28,34 +30,32 @@ public partial class CardCollectionEditorViewModelCommands
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListNameError);
       else if (string.IsNullOrEmpty(query))
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListQueryError);
-      else if (Viewmodel.Name != name && Viewmodel.ExistsValidation?.Invoke(name) is true)
+      else if (list.Name != name && Viewmodel.Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null)
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListExistsError);
       else
       {
-        if (query != Viewmodel.Query)
+        if (query != list.SearchQuery)
         {
           try
           {
             // Fetch new query cards and remove cards that are not in the new query from the owned cards if the user accepts the conflict
-            var result = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(query, pagination: false));
+            var result = await (Viewmodel as IWorker).DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(query, pagination: false));
             var found = result.Found;
 
-            var excludedCards = Viewmodel.OwnedCards
+            var excludedCards = list.Cards
               .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.Info.ScryfallId)
               .ToList();
 
             if (excludedCards.Count != 0)
-              if (await Viewmodel.Confirmers.EditCollectionListQueryConflictConfirmer
+              if (await Viewmodel.Confirmers.CardCollectionListConfirmers.EditCollectionListQueryConflictConfirmer
                 .Confirm(CardCollectionListConfirmers.GetEditCollectionListQueryConflictConfirmation(excludedCards.Count))
                 is not General.Services.ConfirmationService.ConfirmationResult.Yes)
                 return; // Cancel edit if user cancels the conflict
 
             foreach (var item in excludedCards)
-              Viewmodel.OwnedCards.Remove(item);
+              list.Cards.Remove(item);
 
-            Viewmodel.Query = query;
-
-            await Viewmodel.Worker.DoWork(Viewmodel.UpdateQueryCards());
+            list.SearchQuery = query;
           }
           catch (Exception e)
           {
@@ -63,10 +63,8 @@ public partial class CardCollectionEditorViewModelCommands
           }
         }
 
-        if (name != Viewmodel.Name)
-          Viewmodel.Name = name;
-
-        Viewmodel.HasUnsavedChanges = true;
+        if (name != list.Name)
+          list.Name = name;
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.EditListSuccess);
       }

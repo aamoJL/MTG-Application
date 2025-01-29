@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
 using MTGApplication.Features.CardCollectionEditor.CardCollection.Models;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services.Converters;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
@@ -26,16 +27,17 @@ public partial class CardCollectionEditorViewModelCommands
       if (unsavedArgs.Cancelled)
         return;
 
-      if (await Viewmodel.Confirmers.LoadCollectionConfirmer.Confirm(
-        CardCollectionEditorConfirmers.GetLoadCollectionConfirmation((await Viewmodel.Repository.Get(setIncludes: (set) => { })).Select(x => x.Name).OrderBy(x => x)))
+      if (await Viewmodel.Confirmers.CardCollectionConfirmers.LoadCollectionConfirmer.Confirm(
+        CardCollectionConfirmers.GetLoadCollectionConfirmation((await Viewmodel.Repository.Get(setIncludes: (set) => { })).Select(x => x.Name).OrderBy(x => x)))
         is not string loadName)
         return;
 
       try
       {
-        if (await Viewmodel.Worker.DoWork(LoadCollection(loadName)) is MTGCardCollection loadedCollection)
+        if (await (Viewmodel as IWorker).DoWork(LoadCollection(loadName)) is CardCollectionEditorCardCollection loadedCollection)
         {
-          await Viewmodel.ChangeCollection(loadedCollection);
+          Viewmodel.Collection = loadedCollection;
+          Viewmodel.HasUnsavedChanges = false;
 
           new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
         }
@@ -51,7 +53,7 @@ public partial class CardCollectionEditorViewModelCommands
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="System.Net.Http.HttpRequestException"></exception>
     /// <exception cref="UriFormatException"></exception>
-    private async Task<MTGCardCollection?> LoadCollection(string loadName)
+    private async Task<CardCollectionEditorCardCollection?> LoadCollection(string loadName)
     {
       try
       {

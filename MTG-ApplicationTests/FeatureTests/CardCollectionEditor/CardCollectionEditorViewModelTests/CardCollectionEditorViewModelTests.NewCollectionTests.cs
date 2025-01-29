@@ -1,14 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Services;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
 
-public partial class CardCollectionEditorTests
+public partial class CardCollectionEditorViewModelTests
 {
   [TestClass]
-  public class NewCollectionTests : CardCollectionEditorViewModelTestsBase, IUnsavedChangesCheckTests, INewCommandTests
+  public class NewCollectionTests : CardCollectionEditorViewModelTestsBase
   {
     [TestMethod]
     public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()
@@ -19,7 +18,10 @@ public partial class CardCollectionEditorTests
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = confirmer
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = confirmer
+          }
         }
       }.MockVM();
 
@@ -36,7 +38,11 @@ public partial class CardCollectionEditorTests
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) },
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) },
+
+          }
         }
       }.MockVM();
 
@@ -53,7 +59,11 @@ public partial class CardCollectionEditorTests
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
+
+          }
         }
       }.MockVM();
 
@@ -71,9 +81,9 @@ public partial class CardCollectionEditorTests
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
           CardCollectionConfirmers = new()
           {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
             SaveCollectionConfirmer = confirmer
           }
         }
@@ -87,19 +97,19 @@ public partial class CardCollectionEditorTests
     [TestMethod("Collection should be changed to a new collection when executed successfully")]
     public async Task New_Success_Reset()
     {
-      var viewmodel = await new Mocker(_dependencies).MockVM(collection: new()
+      var viewmodel = new Mocker(_dependencies).MockVM(collection: new()
       {
         Name = "Collection",
         CollectionLists = [new() { Name = "List" }]
       });
 
-      Assert.IsTrue(viewmodel.CardCollectionViewModel.Name != string.Empty);
-      Assert.IsTrue(viewmodel.CardCollectionViewModel.CollectionLists.First().Name != string.Empty);
+      Assert.AreNotEqual(string.Empty, viewmodel.Collection.Name);
+      Assert.AreNotEqual(string.Empty, viewmodel.Collection.CollectionLists.First().Name);
 
       await viewmodel.NewCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(string.Empty, viewmodel.CardCollectionViewModel.Name);
-      Assert.AreEqual(0, viewmodel.CardCollectionViewModel.CollectionLists.Count);
+      Assert.AreEqual(string.Empty, viewmodel.Collection.Name);
+      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
     }
   }
 }

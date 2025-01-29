@@ -6,7 +6,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests;
 
-public partial class CardCollectionEditorTests
+public partial class CardCollectionEditorViewModelTests
 {
   [TestClass]
   public class OpenCollectionTests : CardCollectionEditorViewModelTestsBase, IUnsavedChangesCheckTests, IOpenCommandTests
@@ -19,7 +19,10 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = confirmer
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = confirmer
+          }
         },
         HasUnsavedChanges = true
       }.MockVM();
@@ -36,7 +39,10 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) },
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel) },
+          }
         },
         HasUnsavedChanges = true
       }.MockVM();
@@ -53,8 +59,11 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
+            LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          }
         },
         HasUnsavedChanges = true
       }.MockVM();
@@ -72,9 +81,9 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
           CardCollectionConfirmers = new()
           {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes) },
             SaveCollectionConfirmer = confirmer
           }
         },
@@ -94,7 +103,10 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          LoadCollectionConfirmer = confirmer
+          CardCollectionConfirmers = new()
+          {
+            LoadCollectionConfirmer = confirmer
+          }
         },
       }.MockVM();
 
@@ -106,17 +118,20 @@ public partial class CardCollectionEditorTests
     [TestMethod]
     public async Task Open_Cancel_NoChanges()
     {
-      var viewmodel = await new Mocker(_dependencies)
+      var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string>(null) }
+          CardCollectionConfirmers = new()
+          {
+            LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult<string>(null) }
+          }
         },
       }.MockVM(_savedCollection);
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedCollection.Name, viewmodel.CardCollectionViewModel.Name);
+      Assert.AreEqual(_savedCollection.Name, viewmodel.Collection.Name);
     }
 
     [TestMethod]
@@ -126,17 +141,19 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          CardCollectionConfirmers = new()
+          {
+            LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          }
         },
       }.MockVM();
 
       await viewmodel.OpenCollectionCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(_savedCollection.Name, viewmodel.CardCollectionViewModel.Name);
-      Assert.AreEqual(_savedCollection.CollectionLists.Count, viewmodel.CardCollectionViewModel.CollectionLists.Count);
-      CollectionAssert.AreEquivalent(
-        _savedCollection.CollectionLists.SelectMany(l => l.Cards.Select(c => c.Info.Name)).ToList(),
-        viewmodel.CardCollectionViewModel.CollectionLists.SelectMany(l => l.Cards.Select(c => c.Info.Name)).ToList());
+      Assert.AreEqual(_savedCollection.Name, viewmodel.Collection.Name);
+      CollectionAssert.AreEqual(
+        _savedCollection.CollectionLists.Select(x => x.Name).ToArray(),
+        viewmodel.Collection.CollectionLists.Select(x => x.Name).ToArray());
     }
 
     [TestMethod]
@@ -147,7 +164,10 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          CardCollectionConfirmers = new()
+          {
+            LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          }
         },
         Notifier = notifier
       }.MockVM();
@@ -167,7 +187,10 @@ public partial class CardCollectionEditorTests
       {
         Confirmers = new()
         {
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          CardCollectionConfirmers = new()
+          {
+            LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          }
         },
         Notifier = notifier
       }.MockVM();
@@ -185,8 +208,11 @@ public partial class CardCollectionEditorTests
         HasUnsavedChanges = true,
         Confirmers = new()
         {
-          SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
-          LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          CardCollectionConfirmers = new()
+          {
+            SaveUnsavedChangesConfirmer = new() { OnConfirm = async msg => await Task.FromResult(ConfirmationResult.No) },
+            LoadCollectionConfirmer = new() { OnConfirm = async msg => await Task.FromResult(_savedCollection.Name) }
+          }
         },
       }.MockVM();
 

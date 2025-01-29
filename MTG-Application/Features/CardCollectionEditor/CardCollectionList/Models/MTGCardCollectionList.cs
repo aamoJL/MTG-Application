@@ -5,11 +5,10 @@ using System.Collections.ObjectModel;
 namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 
 /// <summary>
-/// <see cref="MTGCardCollection"/>'s list class
+/// <see cref="CardCollectionEditorCardCollection"/>'s list class
 /// </summary>
 public partial class MTGCardCollectionList : ObservableObject
 {
-  // These are bbservable properties so combobox header will update when changed
   [ObservableProperty] public partial string Name { get; set; } = string.Empty;
   [ObservableProperty] public partial string SearchQuery { get; set; } = string.Empty;
 

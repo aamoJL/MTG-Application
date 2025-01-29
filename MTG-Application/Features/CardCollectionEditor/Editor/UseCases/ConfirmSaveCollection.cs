@@ -1,5 +1,6 @@
-﻿using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
-using MTGApplication.Features.CardCollectionEditor.CardCollection.ViewModels;
+﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services.Converters;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
@@ -8,17 +9,17 @@ using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
-namespace MTGApplication.Features.CardCollectionEditor.CardCollection.UseCases;
+namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmSaveCollection(CardCollectionViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionViewModel>(viewmodel)
+  public class ConfirmSaveCollection(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
   {
     protected override async Task Execute()
     {
-      var oldName = Viewmodel.Name;
+      var oldName = Viewmodel.CollectionName;
       var overrideOld = false;
-      var saveName = await Viewmodel.Confirmers.SaveCollectionConfirmer.Confirm(
+      var saveName = await Viewmodel.Confirmers.CardCollectionConfirmers.SaveCollectionConfirmer.Confirm(
         CardCollectionConfirmers.GetSaveCollectionConfirmation(oldName));
 
       if (string.IsNullOrEmpty(saveName))
@@ -27,17 +28,21 @@ public partial class CardCollectionEditorViewModelCommands
       // Override confirmation
       if (saveName != oldName && await new CardCollectionDTOExists(Viewmodel.Repository).Execute(saveName))
       {
-        switch (await Viewmodel.Confirmers.OverrideCollectionConfirmer.Confirm(CardCollectionConfirmers.GetOverrideCollectionConfirmation(saveName)))
+        if ((await Viewmodel.Confirmers.CardCollectionConfirmers.OverrideCollectionConfirmer
+          .Confirm(CardCollectionConfirmers.GetOverrideCollectionConfirmation(saveName))
+          is ConfirmationResult.Yes))
         {
-          case ConfirmationResult.Yes: overrideOld = true; break;
-          case ConfirmationResult.No:
-          default: return; // Cancel
+          overrideOld = true;
         }
+        else
+          return; // Cancel
       }
 
-      if (await Viewmodel.Worker.DoWork(SaveCollectionDTO(Viewmodel.AsDTO(), saveName, overrideOld)))
+      var dto = CardCollectionToDTOConverter.Convert(Viewmodel.Collection);
+
+      if (await (Viewmodel as IWorker).DoWork(SaveCollectionDTO(dto, saveName, overrideOld)))
       {
-        Viewmodel.Name = saveName;
+        Viewmodel.CollectionName = saveName;
         Viewmodel.HasUnsavedChanges = false;
 
         new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionSuccess);

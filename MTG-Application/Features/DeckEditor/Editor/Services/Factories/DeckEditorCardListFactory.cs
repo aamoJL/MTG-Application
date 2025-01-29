@@ -3,7 +3,7 @@ using MTGApplication.Features.DeckEditor.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services.Factories;
-internal class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
+public class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
 {
   public CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {

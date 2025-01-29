@@ -1,13 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
+using static MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests.CardCollectionEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionViewModelTests
+public partial class CardCollectionEditorViewModelTests
 {
   [TestClass]
-  public class NewListTests : CardCollectionViewModelTestsBase
+  public class NewListTests : CardCollectionEditorViewModelTestsBase
   {
     [TestMethod]
     public async Task NewList_NewListConfirmationShown()
@@ -17,7 +17,10 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = confirmer,
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = confirmer,
+          }
         }
       }.MockVM();
 
@@ -33,13 +36,16 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(null) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(null) },
+          }
         }
       }.MockVM();
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.CollectionLists.Count);
+      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -49,13 +55,16 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((string.Empty, "Query")) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((string.Empty, "Query")) },
+          }
         }
       }.MockVM();
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.CollectionLists.Count);
+      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -65,13 +74,16 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", string.Empty)) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", string.Empty)) },
+          }
         }
       }.MockVM();
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(0, viewmodel.CollectionLists.Count);
+      Assert.AreEqual(0, viewmodel.Collection.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -81,16 +93,18 @@ public partial class CardCollectionViewModelTests
       var newQuery = "New Query";
       var viewmodel = new Mocker(_dependencies)
       {
-        Model = _savedCollection,
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, newQuery)) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, newQuery)) },
+          }
         }
-      }.MockVM();
+      }.MockVM(_savedCollection);
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.IsNull(viewmodel.CollectionLists.FirstOrDefault(x => x.SearchQuery == newQuery));
+      Assert.IsNull(viewmodel.Collection.CollectionLists.FirstOrDefault(x => x.SearchQuery == newQuery));
     }
 
     [TestMethod]
@@ -100,13 +114,16 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+          }
         }
       }.MockVM();
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(1, viewmodel.CollectionLists.Count);
+      Assert.AreEqual(1, viewmodel.Collection.CollectionLists.Count);
     }
 
     [TestMethod]
@@ -116,7 +133,10 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+          }
         }
       }.MockVM();
 
@@ -133,7 +153,10 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((string.Empty, "Query")) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((string.Empty, "Query")) },
+          }
         },
         Notifier = notifier
       }.MockVM();
@@ -151,7 +174,10 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", string.Empty)) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", string.Empty)) },
+          }
         },
         Notifier = notifier
       }.MockVM();
@@ -164,19 +190,22 @@ public partial class CardCollectionViewModelTests
     [TestMethod]
     public async Task NewList_Cancel_NoNotificationSent()
     {
+      var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(null) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(null) },
+          }
         },
-        Notifier = new()
-        {
-          OnNotify = (arg) => Assert.Fail(),
-        }
+        Notifier = notifier
       }.MockVM();
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
+
+      NotificationAssert.NotificationNotSent(notifier);
     }
 
     [TestMethod]
@@ -186,13 +215,18 @@ public partial class CardCollectionViewModelTests
       var notifier = new TestNotifier();
       var viewmodel = new Mocker(_dependencies)
       {
-        Model = _savedCollection,
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, "New Query")) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new()
+            {
+              OnConfirm = async msg => await Task.FromResult<(string, string)?>((list.Name, "New Query"))
+            },
+          }
         },
         Notifier = notifier
-      }.MockVM();
+      }.MockVM(_savedCollection);
 
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
@@ -207,7 +241,10 @@ public partial class CardCollectionViewModelTests
       {
         Confirmers = new()
         {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+          CardCollectionConfirmers = new()
+          {
+            NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
+          }
         },
         Notifier = notifier
       }.MockVM();
@@ -215,24 +252,6 @@ public partial class CardCollectionViewModelTests
       await viewmodel.NewListCommand.ExecuteAsync(null);
 
       NotificationAssert.NotificationSent(NotificationType.Success, notifier);
-    }
-
-    [TestMethod]
-    public async Task NewList_Success_OnListAddedInvoked()
-    {
-      MTGCardCollectionList invoked = null;
-      var viewmodel = new Mocker(_dependencies)
-      {
-        Confirmers = new()
-        {
-          NewCollectionListConfirmer = new() { OnConfirm = async msg => await Task.FromResult<(string, string)?>(("Name", "Query")) },
-        },
-        OnListAdded = async (list) => { invoked = list; await Task.Yield(); }
-      }.MockVM();
-
-      await viewmodel.NewListCommand.ExecuteAsync(null);
-
-      Assert.IsNotNull(invoked);
     }
   }
 }
