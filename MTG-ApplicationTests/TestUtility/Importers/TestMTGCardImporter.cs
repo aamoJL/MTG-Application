@@ -9,6 +9,7 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
   public Card[] ExpectedCards { get; set; } = expectedCards;
   public int NotFoundCount { get; set; } = notFoundCount;
   public Exception Exception { get; set; } = null;
+  public TimeSpan Delay { get; set; } = TimeSpan.Zero;
 
   public int PageSize => 40;
   public string Name => "Test Card API";
@@ -17,6 +18,8 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
   {
     if (Exception != null)
       throw Exception;
+
+    await Task.Delay(Delay);
 
     return string.IsNullOrEmpty(searchParams)
       ? Empty(ImportSource.External)
@@ -31,6 +34,8 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
       throw Exception;
 
     var cards = dtoArray.Select(x => new Card(MTGCardInfoMocker.FromDTO(x), x.Count)).ToArray();
+
+    await Task.Delay(Delay);
 
     if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length, ImportSource.External)); }
     else
@@ -47,6 +52,8 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
     if (Exception != null)
       throw Exception;
 
+    await Task.Delay(Delay);
+
     return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
   }
 
@@ -56,6 +63,8 @@ public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount 
       throw Exception;
 
     var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
+
+    await Task.Delay(Delay);
 
     return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length, ImportSource.External));
   }

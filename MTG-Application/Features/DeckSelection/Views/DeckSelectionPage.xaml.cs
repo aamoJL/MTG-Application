@@ -31,13 +31,16 @@ public sealed partial class DeckSelectionPage : Page
   [RelayCommand]
   public void SelectDeck(DeckSelectionDeck item) => DeckSelectedCommand?.Execute(item?.Title ?? string.Empty);
 
-  private async void MTGDeckSelectorView_Loaded(object sender, RoutedEventArgs e)
+  private void MTGDeckSelectorView_Loaded(object sender, RoutedEventArgs e)
   {
     Loaded -= MTGDeckSelectorView_Loaded;
 
-    if (ViewModel.LoadDecksCommand?.CanExecute(null) is true)
-      await ViewModel.LoadDecksCommand.ExecuteAsync(null);
-
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
+
+    // Workaround to notify user if the deck fetching sends a notification before the notifier has been registered to the view.
+    var deckUpdateTask = ViewModel.WaitForDeckUpdate();
+
+    if (deckUpdateTask.IsFaulted)
+      ViewModel.Notifier.Notify(new(NotificationService.NotificationType.Error, $"Error: {deckUpdateTask.Exception.Message}"));
   }
 }

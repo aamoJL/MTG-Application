@@ -5,9 +5,9 @@ public abstract class UseCase
   public abstract void Execute();
 }
 
-public abstract class UseCase<Response>
+public abstract class UseCase<TResponse>
 {
-  public abstract Response Execute();
+  public abstract TResponse Execute();
 }
 
 public abstract class UseCase<TArg, TReturn>
