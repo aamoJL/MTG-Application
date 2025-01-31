@@ -6,15 +6,7 @@ namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
 
 public class FetchCardsWithImportString(IMTGCardImporter importer) : UseCase<string, Task<CardImportResult>>
 {
-  /// <exception cref="InvalidOperationException"></exception>
-  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-  /// <exception cref="UriFormatException"></exception>
+  /// <exception cref="Exception"></exception>
   public override async Task<CardImportResult> Execute(string importString)
-  {
-    try
-    {
-      return await importer.ImportWithString(importString);
-    }
-    catch { throw; }
-  }
+    => await importer.ImportWithString(importString);
 }

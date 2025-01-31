@@ -20,8 +20,7 @@ public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
 
     if (e.Parameter is DeckTestingDeck deck)
     {
-      ViewModel = new DeckTestingPageViewModel.Factory(App.MTGCardImporter)
-        .Build(deck);
+      ViewModel = new DeckTestingPageViewModel(deck, App.MTGCardImporter);
 
       ViewModel.NewGameStarted += OnNewGameStarted;
       ViewModel.NewTurnStarted += OnNewTurnStarted;

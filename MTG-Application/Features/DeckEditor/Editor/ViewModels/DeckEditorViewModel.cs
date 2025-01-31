@@ -78,6 +78,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       DeleteDeckCommand?.NotifyCanExecuteChanged();
       ShowDeckTokensCommand?.NotifyCanExecuteChanged();
       OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
+      OpenEdhrecSearchWindowCommand?.NotifyCanExecuteChanged();
     }
   }
 
@@ -143,6 +144,36 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   [NotNull] public IRelayCommand? OpenDeckTestingWindowCommand => field ??= new OpenDeckTestingWindow(this).Command;
   [NotNull] public IRelayCommand? OpenEdhrecSearchWindowCommand => field ??= new OpenEdhrecSearchWindow(this).Command;
 
+  private void Deck_PropertyChanging(object? sender, System.ComponentModel.PropertyChangingEventArgs e)
+  {
+    if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
+      Deck.Commander.PropertyChanged -= DeckCard_PropertyChanged;
+    else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
+      Deck.CommanderPartner.PropertyChanged -= DeckCard_PropertyChanged;
+  }
+
+  private void Deck_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName
+      is (nameof(DeckEditorMTGDeck.Commander))
+      or (nameof(DeckEditorMTGDeck.CommanderPartner)))
+    {
+      if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
+        Deck.Commander.PropertyChanged += DeckCard_PropertyChanged;
+      else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
+        Deck.CommanderPartner.PropertyChanged += DeckCard_PropertyChanged;
+
+      OnPropertyChanged(nameof(Size));
+      OnPropertyChanged(nameof(Price));
+
+      ShowDeckTokensCommand.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
+      OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged();
+    }
+    else if (e.PropertyName == nameof(DeckEditorMTGDeck.Name))
+      OnPropertyChanged(nameof(Name));
+  }
+
   private void DeckCards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
     if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is IList newItems)
@@ -178,36 +209,6 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       else if (sender == Partner)
         Deck.CommanderPartner = Partner.Card;
     }
-  }
-
-  private void Deck_PropertyChanging(object? sender, System.ComponentModel.PropertyChangingEventArgs e)
-  {
-    if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
-      Deck.Commander.PropertyChanged -= DeckCard_PropertyChanged;
-    else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
-      Deck.CommanderPartner.PropertyChanged -= DeckCard_PropertyChanged;
-  }
-
-  private void Deck_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName
-      is (nameof(DeckEditorMTGDeck.Commander))
-      or (nameof(DeckEditorMTGDeck.CommanderPartner)))
-    {
-      if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
-        Deck.Commander.PropertyChanged += DeckCard_PropertyChanged;
-      else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
-        Deck.CommanderPartner.PropertyChanged += DeckCard_PropertyChanged;
-
-      OnPropertyChanged(nameof(Size));
-      OnPropertyChanged(nameof(Price));
-
-      ShowDeckTokensCommand.NotifyCanExecuteChanged();
-      OpenEdhrecCommanderWebsiteCommand.NotifyCanExecuteChanged();
-      OpenEdhrecSearchWindowCommand.NotifyCanExecuteChanged();
-    }
-    else if (e.PropertyName == nameof(DeckEditorMTGDeck.Name))
-      OnPropertyChanged(nameof(Name));
   }
 
   private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
