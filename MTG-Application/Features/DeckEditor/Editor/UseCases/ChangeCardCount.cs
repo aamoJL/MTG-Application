@@ -2,14 +2,15 @@
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
-using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 using static MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 
 namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
-public partial class CardGroupViewModelCommands
+public partial class CardListViewModelCommands
 {
-  public class ChangeCardCount(CardGroupViewModel viewmodel) : ViewModelCommand<CardGroupViewModel, CardCountChangeArgs>(viewmodel)
+  public record CardCountChangeArgs(DeckEditorMTGCard Card, int Value);
+
+  public class ChangeCardCount(DeckEditorViewModel viewmodel) : ViewModelCommand<DeckEditorViewModel, CardCountChangeArgs>(viewmodel)
   {
     protected override bool CanExecute(CardCountChangeArgs? args)
       => args != null && args.Card.Count != args.Value && args.Value > 0;

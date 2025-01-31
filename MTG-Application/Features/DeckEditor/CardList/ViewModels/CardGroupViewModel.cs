@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Helpers;
 using MTGApplication.Features.DeckEditor.CardList.Services;
-using MTGApplication.Features.DeckEditor.CardList.UseCases;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
@@ -98,8 +97,6 @@ public partial class CardGroupViewModel : ObservableObject, ICardListViewModel
   [NotNull] public IRelayCommand? ClearCommand => field ??= new ClearCardGroup(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? ImportCardsCommand => field ??= new ImportCardsToGroup(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? ExportCardsCommand => field ??= new AsyncRelayCommand<string>((_) => throw new NotImplementedException());
-  [NotNull] public IRelayCommand<CardListViewModelCommands.CardCountChangeArgs>? ChangeCardCountCommand => field ??= new ChangeCardCount(this).Command;
-  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 
   private void Source_CollectionChanged(object? _, NotifyCollectionChangedEventArgs e)
   {

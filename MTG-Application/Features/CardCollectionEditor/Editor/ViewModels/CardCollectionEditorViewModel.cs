@@ -102,6 +102,7 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
   [NotNull] public IAsyncRelayCommand<MTGCardCollectionList>? DeleteListCommand => field ??= new ConfirmDeleteList(this).Command;
   [NotNull] public IRelayCommand<MTGCardCollectionList>? ChangeListCommand => field ??= new ChangeList(this).Command;
   [NotNull] public IAsyncRelayCommand<MTGCardCollectionList>? EditListCommand => field ??= new EditList(this).Command;
+  [NotNull] public IAsyncRelayCommand<CardCollectionMTGCard>? ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
 
   private void CardCollection_PropertyChanged(object? sender, PropertyChangedEventArgs e)
   {

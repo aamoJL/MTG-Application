@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using System.Collections.ObjectModel;
-using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 
@@ -17,6 +16,4 @@ public interface ICardListViewModel
   IRelayCommand? ClearCommand { get; }
   IAsyncRelayCommand<string>? ImportCardsCommand { get; }
   IAsyncRelayCommand<string>? ExportCardsCommand { get; }
-  IRelayCommand<CardCountChangeArgs>? ChangeCardCountCommand { get; }
-  IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCardPrintCommand { get; }
 }

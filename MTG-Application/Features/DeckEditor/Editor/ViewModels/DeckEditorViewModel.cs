@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
@@ -137,12 +138,15 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   [NotNull] public IAsyncRelayCommand<string>? OpenDeckCommand => field ??= new OpenDeck(this).Command;
   [NotNull] public IAsyncRelayCommand? SaveDeckCommand => field ??= new SaveDeck(this).Command;
   [NotNull] public IAsyncRelayCommand? DeleteDeckCommand => field ??= new DeleteDeck(this).Command;
+  // TODO: Move to undostack?
   [NotNull] public IRelayCommand? UndoCommand => field ??= new Undo(this).Command;
   [NotNull] public IRelayCommand? RedoCommand => field ??= new Redo(this).Command;
   [NotNull] public IAsyncRelayCommand? OpenEdhrecCommanderWebsiteCommand => field ??= new OpenEdhrecCommanderWebsite(this).Command;
   [NotNull] public IAsyncRelayCommand? ShowDeckTokensCommand => field ??= new ShowDeckTokens(this).Command;
   [NotNull] public IRelayCommand? OpenDeckTestingWindowCommand => field ??= new OpenDeckTestingWindow(this).Command;
   [NotNull] public IRelayCommand? OpenEdhrecSearchWindowCommand => field ??= new OpenEdhrecSearchWindow(this).Command;
+  [NotNull] public IRelayCommand<CardCountChangeArgs>? ChangeCardCountCommand => field ??= new ChangeCardCount(this).Command;
+  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 
   private void Deck_PropertyChanging(object? sender, System.ComponentModel.PropertyChangingEventArgs e)
   {

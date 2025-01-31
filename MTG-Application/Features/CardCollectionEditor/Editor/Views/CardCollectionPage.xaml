@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
+  x:Name="Root"
   x:Class="MTGApplication.Features.CardCollectionEditor.Editor.Views.CardCollectionPage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -174,7 +175,7 @@
                   d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
                   DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
                   Model="{x:Bind Mode=OneTime}"
-                  ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
+                  ShowPrintsCommand="{Binding ElementName=Root, Path=ViewModel.ShowCardPrintsCommand, Mode=OneTime}"
                   SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
                   OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
               </ItemContainer>

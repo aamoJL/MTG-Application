@@ -3,23 +3,27 @@ using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.General.Models;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
+using static MTGApplicationTests.FeatureTests.CardCollectionEditor.CardCollectionEditorViewModelTests.CardCollectionEditorViewModelTests;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
-public partial class CardCollectionListViewModelTests
+public partial class CardCollectionEditorViewModelTests
 {
   [TestClass]
-  public class ShowCardPrintsTests : CardCollectionListViewModelTestsBase
+  public class ShowCardPrintsTests : CardCollectionEditorViewModelTestsBase
   {
     [TestMethod]
     public async Task ShowPrints_PrintConfirmationShown()
     {
       var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
       var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
-      var viewmodel = await new Mocker(_dependencies)
+      var viewmodel = new Mocker(_dependencies)
       {
         Confirmers = new()
         {
-          ShowCardPrintsConfirmer = confirmer
+          CardCollectionConfirmers = new()
+          {
+            ShowCardPrintsConfirmer = confirmer
+          }
         }
       }.MockVM();
 

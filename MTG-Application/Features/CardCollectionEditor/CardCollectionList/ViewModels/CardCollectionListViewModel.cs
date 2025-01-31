@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Collections;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
-using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.Services.IOServices;
@@ -41,7 +40,7 @@ public partial class CardCollectionListViewModel : ObservableObject
       if (field != null)
       {
         field.PropertyChanged -= CollectionList_PropertyChanged;
-        field.Cards.CollectionChanged -= CollectionListCards_CollectionChanged;
+        field.Cards.CollectionChanged -= Cards_CollectionChanged;
       }
 
       SetProperty(ref field, value);
@@ -49,7 +48,7 @@ public partial class CardCollectionListViewModel : ObservableObject
       if (field != null)
       {
         field.PropertyChanged += CollectionList_PropertyChanged;
-        field.Cards.CollectionChanged += CollectionListCards_CollectionChanged;
+        field.Cards.CollectionChanged += Cards_CollectionChanged;
       }
 
       OnPropertyChanged(nameof(Name));
@@ -86,11 +85,9 @@ public partial class CardCollectionListViewModel : ObservableObject
   private NotifyTaskCompletion<CardImportResult>? FetchingCardsTask { get; set; }
   private Task? UpdatingCardsTask { get; set; }
 
-  public IAsyncRelayCommand? ImportCardsCommand => field ??= new ImportCards(this).Command;
-  public IAsyncRelayCommand? ExportCardsCommand => field ??= new ExportCards(this).Command;
-  // TODO: move to card viewmodel
-  public IAsyncRelayCommand<CardCollectionMTGCard>? ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
-  public IRelayCommand<CardCollectionMTGCard>? SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
+  [NotNull] public IAsyncRelayCommand? ImportCardsCommand => field ??= new ImportCards(this).Command;
+  [NotNull] public IAsyncRelayCommand? ExportCardsCommand => field ??= new ExportCards(this).Command;
+  [NotNull] public IRelayCommand<CardCollectionMTGCard>? SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
 
   public async Task WaitForCardUpdate()
   {
@@ -118,8 +115,13 @@ public partial class CardCollectionListViewModel : ObservableObject
       if (FetchingCardsTask?.Result == null)
         return;
 
+      var cards = FetchingCardsTask.Result.Found.Select(x => new CardCollectionMTGCard(x.Info)
+      {
+        IsOwned = CollectionList.Cards.Any(clc => clc.Info.ScryfallId == clc.Info.ScryfallId),
+      }).ToList();
+
       UpdatingCardsTask = Worker.DoWork(QueryCards.SetCollection(
-        cards: [.. FetchingCardsTask.Result.Found.Select(x => new CardCollectionMTGCard(x.Info))],
+        cards: cards,
         nextPageUri: FetchingCardsTask.Result.NextPageUri,
         totalCount: FetchingCardsTask.Result.TotalCount));
     }
@@ -135,6 +137,24 @@ public partial class CardCollectionListViewModel : ObservableObject
 
       OnPropertyChanged(nameof(Query));
     }
+  }
+
+  private void Cards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+    {
+      foreach (var item in e.NewItems.OfType<CardCollectionMTGCard>())
+        if (Cards.FirstOrDefault(x => x.Info.ScryfallId == item.Info.ScryfallId) is CardCollectionMTGCard card)
+          card.IsOwned = true;
+    }
+    else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+    {
+      foreach (var item in e.OldItems.OfType<CardCollectionMTGCard>())
+        if (Cards.FirstOrDefault(x => x.Info.ScryfallId == item.Info.ScryfallId) is CardCollectionMTGCard card)
+          card.IsOwned = false;
+    }
+
+    OnPropertyChanged(nameof(OwnedCount));
   }
 
   private void QueryCards_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -155,23 +175,5 @@ public partial class CardCollectionListViewModel : ObservableObject
     }
 
     OnPropertyChanged(nameof(TotalCount));
-  }
-
-  private void CollectionListCards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-  {
-    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
-    {
-      foreach (var item in e.NewItems.OfType<CardCollectionMTGCard>())
-        if (QueryCards.Collection.TryFindIndex(x => x.Info.ScryfallId == item.Info.ScryfallId, out var index))
-          QueryCards.Collection[index].IsOwned = true;
-    }
-    else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
-    {
-      foreach (var item in e.OldItems.OfType<CardCollectionMTGCard>())
-        if (QueryCards.Collection.TryFindIndex(x => x.Info.ScryfallId == item.Info.ScryfallId, out var index))
-          QueryCards.Collection[index].IsOwned = false;
-    }
-
-    OnPropertyChanged(nameof(OwnedCount));
   }
 }

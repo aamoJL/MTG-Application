@@ -32,6 +32,15 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
         CanSelectItems = false,
       })) as MTGCard;
     };
+    confirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg) =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return (await DialogService.ShowAsync(root, new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template))) as MTGCard;
+    };
 
     confirmers.CardListConfirmers.ExportConfirmer.OnConfirm = async msg
       => await DialogService.ShowAsync(root, new TextAreaDialog(msg.Title)
@@ -54,16 +63,6 @@ public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
       });
     confirmers.CardListConfirmers.AddSingleConflictConfirmer.OnConfirm = async (msg)
       => await DialogService.ShowAsync(root, new TwoButtonConfirmationDialog(msg.Title, msg.Message));
-    confirmers.CardListConfirmers.ChangeCardPrintConfirmer.OnConfirm = async (msg)
-      =>
-    {
-      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
-
-      return (await DialogService.ShowAsync(root, new GridViewDialog(
-        title: msg.Title,
-        items: msg.Data.ToArray(),
-        itemTemplate: (DataTemplate)template))) as MTGCard;
-    };
     confirmers.CardListConfirmers.AddCardGroupConfirmer.OnConfirm = async msg
       => await DialogService.ShowAsync(root, new TextBoxDialog(msg.Title)
       {

@@ -28,6 +28,19 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
     confirmers.DeleteCollectionConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(root).Execute((msg.Title, msg.Message));
     confirmers.NewCollectionListConfirmer.OnConfirm = async msg => await new ShowCollectionListContentDialog(root).Execute((msg.Title, msg.Message, null));
     confirmers.DeleteCollectionListConfirmer.OnConfirm = async msg => await new ShowDeleteDialog(root).Execute((msg.Title, msg.Message));
+    confirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg) =>
+    {
+      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+
+      return await DialogService.ShowAsync(root, new GridViewDialog(
+        title: msg.Title,
+        items: msg.Data.ToArray(),
+        itemTemplate: (DataTemplate)template)
+      {
+        PrimaryButtonText = string.Empty,
+        CanSelectItems = false
+      }) as MTGCard;
+    };
   }
 
   private static void RegisterCardCollectionListDialogs(CardCollectionListConfirmers confirmers, XamlRoot root)
@@ -47,18 +60,5 @@ public partial class CardCollectionEditorViewDialogs : IViewDialogs<CardCollecti
       InputText = msg.Data,
       PrimaryButtonText = "Copy to Clipboard",
     });
-    confirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg) =>
-    {
-      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
-
-      return await DialogService.ShowAsync(root, new GridViewDialog(
-        title: msg.Title,
-        items: msg.Data.ToArray(),
-        itemTemplate: (DataTemplate)template)
-      {
-        PrimaryButtonText = string.Empty,
-        CanSelectItems = false
-      }) as MTGCard;
-    };
   }
 }

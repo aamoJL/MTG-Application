@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MTGApplication.General.Models;
 using System;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Models;
@@ -25,14 +26,7 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCar
     }
   } = LimitCount(count);
 
-  /// <summary>
-  /// Card's group name
-  /// </summary>
-  public string Group
-  {
-    get;
-    set => SetProperty(ref field, value);
-  } = string.Empty;
+  [ObservableProperty] public partial string Group { get; set; } = string.Empty;
 
   private static int LimitCount(int value) => Math.Max(1, value);
 }

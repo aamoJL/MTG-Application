@@ -51,6 +51,4 @@ public partial class CardListViewModel(IMTGCardImporter importer, CardListConfir
   [NotNull] public IRelayCommand? ClearCommand => field ??= new Clear(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? ImportCardsCommand => field ??= new ImportCards(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? ExportCardsCommand => field ??= new ExportCards(this).Command;
-  [NotNull] public IRelayCommand<CardCountChangeArgs>? ChangeCardCountCommand => field ??= new ChangeCardCount(this).Command;
-  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 }

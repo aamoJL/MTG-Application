@@ -13,10 +13,10 @@ public partial class CardCollectionEditorViewModelCommands
 
     protected override void Execute(CardCollectionMTGCard? card)
     {
-      if (!CanExecute(card)) return;
+      if (!CanExecute(card))
+        return;
 
-      if (Viewmodel.CollectionList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card!.Info.ScryfallId)
-        is CardCollectionMTGCard existingCard)
+      if (Viewmodel.CollectionList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card!.Info.ScryfallId) is CardCollectionMTGCard existingCard)
         Viewmodel.CollectionList.Cards.Remove(existingCard);
       else
         Viewmodel.CollectionList.Cards.Add(card!);

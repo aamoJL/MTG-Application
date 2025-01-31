@@ -31,6 +31,5 @@ public partial class CommanderViewModel(IMTGCardImporter importer) : ObservableO
   [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? BeginMoveToCommand => field ??= new MoveCard.BeginMoveTo(this).Command;
   [NotNull] public IRelayCommand? ExecuteMoveCommand => field ??= new MoveCard.ExecuteMove(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? ImportCommanderCommand => field ??= new ImportCommander(this).Command;
-  [NotNull] public IAsyncRelayCommand? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 }
 

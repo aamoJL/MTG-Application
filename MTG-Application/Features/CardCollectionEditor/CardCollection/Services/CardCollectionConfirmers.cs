@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Services.ConfirmationService;
+﻿using MTGApplication.General.Models;
+using MTGApplication.General.Services.ConfirmationService;
 using System.Collections.Generic;
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
@@ -12,6 +13,7 @@ public class CardCollectionConfirmers
   public Confirmer<ConfirmationResult> DeleteCollectionConfirmer { get; init; } = new();
   public Confirmer<(string Name, string Query)?> NewCollectionListConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteCollectionListConfirmer { get; init; } = new();
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
 
   public static Confirmation<string> GetSaveCollectionConfirmation(string oldName)
   {
@@ -61,6 +63,14 @@ public class CardCollectionConfirmers
     return new(
       Title: "Open collection",
       Message: "Name",
+      Data: data);
+  }
+
+  public static Confirmation<IEnumerable<MTGCard>> GetShowCardPrintsConfirmation(IEnumerable<MTGCard> data)
+  {
+    return new(
+      Title: "Card prints",
+      Message: string.Empty,
       Data: data);
   }
 }
