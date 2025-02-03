@@ -1,6 +1,4 @@
-﻿using MTGApplication.General.Models;
-using MTGApplication.General.Services.ConfirmationService;
-using System.Collections.Generic;
+﻿using MTGApplication.General.Services.ConfirmationService;
 
 namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 
@@ -10,7 +8,6 @@ public class CardCollectionListConfirmers
   public Confirmer<ConfirmationResult> EditCollectionListQueryConflictConfirmer { get; init; } = new();
   public Confirmer<string> ImportCardsConfirmer { get; init; } = new();
   public Confirmer<string, string> ExportCardsConfirmer { get; init; } = new();
-  public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowCardPrintsConfirmer { get; init; } = new();
 
   public static Confirmation<(string Name, string Query)> GetEditCollectionListConfirmation((string Name, string Query) args)
   {
@@ -38,14 +35,6 @@ public class CardCollectionListConfirmers
   {
     return new(
       Title: "Export cards",
-      Message: string.Empty,
-      Data: data);
-  }
-
-  public static Confirmation<IEnumerable<MTGCard>> GetShowCardPrintsConfirmation(IEnumerable<MTGCard> data)
-  {
-    return new(
-      Title: "Card prints",
       Message: string.Empty,
       Data: data);
   }

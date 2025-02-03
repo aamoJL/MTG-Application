@@ -14,6 +14,7 @@ public class DeckEditorConfirmers
   public Confirmer<ConfirmationResult> OverrideDeckConfirmer { get; init; } = new();
   public Confirmer<ConfirmationResult> DeleteDeckConfirmer { get; init; } = new();
   public Confirmer<MTGCard, IEnumerable<MTGCard>> ShowTokensConfirmer { get; init; } = new();
+  public Confirmer<MTGCard, IEnumerable<MTGCard>> ChangeCardPrintConfirmer { get; init; } = new();
 
   public GroupedCardListConfirmers CardListConfirmers { get; init; } = new();
   public CommanderConfirmers CommanderConfirmers { get; init; } = new();
@@ -59,6 +60,14 @@ public class DeckEditorConfirmers
   {
     return new(
       Title: "Tokens",
+      Message: string.Empty,
+      Data: data);
+  }
+
+  public static Confirmation<IEnumerable<MTGCard>> GetChangeCardPrintConfirmation(IEnumerable<MTGCard> data)
+  {
+    return new(
+      Title: "Card prints",
       Message: string.Empty,
       Data: data);
   }

@@ -12,7 +12,9 @@
   xmlns:customControls="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
   xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl" 
   xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels" 
-  xmlns:controls1="using:MTGApplication.General.Views.Controls" xmlns:interactivity="using:Microsoft.Xaml.Interactivity" xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers"
+  xmlns:controls1="using:MTGApplication.General.Views.Controls" 
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity" 
+  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 

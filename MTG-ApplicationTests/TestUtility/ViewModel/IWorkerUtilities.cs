@@ -10,7 +10,7 @@ public static class WorkerAssert
 {
   public static async Task IsBusy(IWorker worker, Func<Task> task)
   {
-    var wasBusy = false;
+    var wasBusy = worker.IsBusy;
 
     if (worker is not INotifyPropertyChanged propertyNotifier)
       throw new AssertFailedException($"Worker does not implement {nameof(INotifyPropertyChanged)} interface");

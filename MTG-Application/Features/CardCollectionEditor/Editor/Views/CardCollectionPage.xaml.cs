@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardCollection.Editor.ViewModels;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
-using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.AppWindows;
 
@@ -26,7 +25,7 @@ public sealed partial class CardCollectionPage : Page
     WindowClosing.Closed += WindowClosing_Closed;
   }
 
-  public CardCollectionEditorViewModel ViewModel { get; } = new(App.MTGCardImporter, new(), new(), new CardCollectionDTORepository(), new());
+  public CardCollectionEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
   private async void NewCollectionKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {
@@ -40,8 +39,8 @@ public sealed partial class CardCollectionPage : Page
   {
     args.Handled = true;
 
-    if (ViewModel.CardCollectionViewModel.SaveCollectionCommand?.CanExecute(null) is true)
-      await ViewModel.CardCollectionViewModel.SaveCollectionCommand.ExecuteAsync(null);
+    if (ViewModel.SaveCollectionCommand?.CanExecute(null) is true)
+      await ViewModel.SaveCollectionCommand.ExecuteAsync(null);
   }
 
   private async void OpenCollectionKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)

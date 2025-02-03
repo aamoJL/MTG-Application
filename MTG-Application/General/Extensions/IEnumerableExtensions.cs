@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MTGApplication.General.Extensions;
@@ -30,5 +31,21 @@ public static class IEnumerableExtensions
     };
 
     return index;
+  }
+
+  public static bool TryFindIndex<T>(this ObservableCollection<T> self, Predicate<T> predicate, out int index)
+  {
+    index = -1;
+
+    for (var i = 0; i < self.Count; i++)
+    {
+      if (predicate(self[i]))
+      {
+        index = i;
+        return true;
+      }
+    }
+
+    return false;
   }
 }

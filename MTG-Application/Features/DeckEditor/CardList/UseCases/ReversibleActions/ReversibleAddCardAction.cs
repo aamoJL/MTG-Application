@@ -1,6 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.ViewModels;
+using MTGApplication.General.Services.ReversibleCommandService;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,30 +7,32 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions
 
 public partial class CardListViewModelReversibleActions
 {
-  public class ReversibleAddCardAction(CardListViewModel viewmodel) : ViewModelReversibleAction<CardListViewModel, IEnumerable<DeckEditorMTGCard>>(viewmodel)
+  public class ReversibleAddCardsAction : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
   {
-    public IEnumerable<DeckEditorMTGCard>? Cards { get; set; }
+    public ReversibleAddCardsAction(IList<DeckEditorMTGCard> collection)
+    {
+      Collection = collection;
+      Action = ActionMethod;
+      ReverseAction = ReverseActionMethod;
+    }
 
-    protected override void ActionMethod(IEnumerable<DeckEditorMTGCard> cards)
-      => AddCards(Cards ??= cards);
+    private IList<DeckEditorMTGCard> Collection { get; }
 
-    protected override void ReverseActionMethod(IEnumerable<DeckEditorMTGCard> cards)
-      => new ReversibleRemoveCardAction(Viewmodel).Action?.Invoke(Cards ??= cards);
+    protected void ActionMethod(IEnumerable<DeckEditorMTGCard> cards)
+      => AddCards(cards);
+
+    protected void ReverseActionMethod(IEnumerable<DeckEditorMTGCard> cards)
+      => new ReversibleRemoveCardsAction(Collection).Action?.Invoke(cards);
 
     private void AddCards(IEnumerable<DeckEditorMTGCard> cards)
     {
       foreach (var card in cards)
       {
-        if (card == null)
-          return;
-
-        if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
+        if (Collection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
           existingCard.Count += card.Count;
         else
-          Viewmodel.Cards.Add(card);
+          Collection.Add(card);
       }
-
-      Viewmodel.OnListChange();
     }
   }
 }

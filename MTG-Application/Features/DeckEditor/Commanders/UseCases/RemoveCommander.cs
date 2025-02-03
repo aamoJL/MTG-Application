@@ -8,16 +8,16 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {
-  public class RemoveCommander(CommanderCommands viewmodel) : ViewModelCommand<CommanderCommands, DeckEditorMTGCard>(viewmodel)
+  public class RemoveCommander(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
   {
-    protected override bool CanExecute(DeckEditorMTGCard? param) => Viewmodel.GetCommander() != null;
+    protected override bool CanExecute(DeckEditorMTGCard? param) => Viewmodel.Card != null;
 
     protected override void Execute(DeckEditorMTGCard? param)
     {
       if (!CanExecute(param)) return;
 
       Viewmodel.UndoStack.PushAndExecute(
-        new ReversibleCommanderChangeCommand(null, Viewmodel.GetCommander(), Viewmodel.CardCopier)
+        new ReversibleCommanderChangeCommand(null, Viewmodel.Card)
         {
           ReversibleAction = new ReversibleChangeCommanderAction(Viewmodel)
         });

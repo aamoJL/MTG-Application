@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.ViewModels;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.FeatureTests.DeckTestingTests;
@@ -9,6 +10,8 @@ public partial class DeckTestingPageViewModelTests
   [TestClass]
   public class StartNewGameTests
   {
+    private readonly TestMTGCardImporter _importer = new();
+
     [TestMethod]
     public void StartNewGame_LibraryResetMinusSeven()
     {
@@ -16,7 +19,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -34,7 +37,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Graveyard.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -52,7 +55,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Exile.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -70,7 +73,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Hand.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -88,7 +91,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: MTGCardMocker.Mock(),
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       Assert.AreEqual(0, viewmodel.CommandZone.Count);
 
@@ -104,7 +107,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: MTGCardMocker.Mock());
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       Assert.AreEqual(0, viewmodel.CommandZone.Count);
 
@@ -120,7 +123,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck)
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer)
       {
         PlayerHP = 10,
         EnemyHP = 10
@@ -142,7 +145,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck)
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer)
       {
         TurnCount = 2
       };
@@ -162,7 +165,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.NewGameStarted += () =>
       {
@@ -181,7 +184,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 100)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.StartNewGameCommand.Execute(null);
 

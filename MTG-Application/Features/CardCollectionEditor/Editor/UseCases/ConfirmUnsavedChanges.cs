@@ -1,5 +1,5 @@
 ﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
-using MTGApplication.Features.CardCollectionEditor.Editor.Services;
+using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
@@ -17,14 +17,14 @@ public partial class CardCollectionEditorViewModelCommands
       if (!CanExecute(param))
         return;
 
-      switch (await Viewmodel.Confirmers.SaveUnsavedChangesConfirmer
-        .Confirm(CardCollectionEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.CardCollectionViewModel.Name)))
+      switch (await Viewmodel.Confirmers.CardCollectionConfirmers.SaveUnsavedChangesConfirmer
+        .Confirm(CardCollectionConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.CollectionName)))
       {
         case ConfirmationResult.Yes:
-          if (Viewmodel.CardCollectionViewModel.SaveCollectionCommand?.CanExecute(null) is true)
-            await Viewmodel.CardCollectionViewModel.SaveCollectionCommand.ExecuteAsync(null);
+          if (Viewmodel.SaveCollectionCommand?.CanExecute(null) is true)
+            await Viewmodel.SaveCollectionCommand.ExecuteAsync(null);
 
-          param!.Cancelled = Viewmodel.HasUnsavedChanges = Viewmodel.CardCollectionViewModel.HasUnsavedChanges;
+          param!.Cancelled = Viewmodel.HasUnsavedChanges;
           return;
         case ConfirmationResult.Cancel:
           param!.Cancelled = true;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.ViewModels;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.FeatureTests.DeckTestingTests;
@@ -9,6 +10,8 @@ public partial class DeckTestingPageViewModelTests
   [TestClass]
   public class StartNewTurnTests
   {
+    private readonly TestMTGCardImporter _importer = new();
+
     [TestMethod]
     public void StartNewTurn_TurnCountPlusOne()
     {
@@ -16,7 +19,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       Assert.AreEqual(0, viewmodel.TurnCount);
 
@@ -32,7 +35,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -50,7 +53,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -69,7 +72,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.NewTurnStarted += () =>
       {

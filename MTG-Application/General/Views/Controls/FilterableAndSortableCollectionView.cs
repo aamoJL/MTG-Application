@@ -17,11 +17,41 @@ public class FilterableAndSortableCollectionView
     get;
     set
     {
-      if (value != field)
+      if (field != value)
       {
-        OnSourceChanging();
+        if (Source is INotifyCollectionChanged observable)
+          foreach (var item in Source.OfType<INotifyPropertyChanged>())
+            item.PropertyChanged -= SourceItem_PropertyChanged;
+
         field = value;
-        OnSourceChanged();
+
+        View.Clear();
+
+        Source ??= Array.Empty<object>();
+
+        foreach (var item in Source)
+        {
+          AddToView(item, sort: false);
+
+          if (item is INotifyPropertyChanged observableItem)
+            observableItem.PropertyChanged += SourceItem_PropertyChanged;
+        }
+
+        Sort();
+
+
+        SourceWeakEventListener?.Detach();
+
+        if (Source is INotifyCollectionChanged observableCollection)
+        {
+          SourceWeakEventListener = new(this)
+          {
+            OnEventAction = (sender, _, e) => Source_CollectionChanged(sender, e),
+            OnDetachAction = (listener) => observableCollection.CollectionChanged -= SourceWeakEventListener!.OnEvent!
+          };
+
+          observableCollection.CollectionChanged += SourceWeakEventListener.OnEvent!;
+        }
       }
     }
   } = new List<object>();
@@ -50,47 +80,6 @@ public class FilterableAndSortableCollectionView
   public ObservableCollection<object> View { get; } = [];
 
   private WeakEventListener<FilterableAndSortableCollectionView, object, NotifyCollectionChangedEventArgs>? SourceWeakEventListener { get; set; }
-
-  private void OnSourceChanging()
-  {
-    if (Source is INotifyCollectionChanged observable)
-    {
-      SourceWeakEventListener?.Detach();
-
-      foreach (var item in Source.OfType<INotifyPropertyChanged>())
-        item.PropertyChanged -= SourceItem_PropertyChanged;
-    }
-  }
-
-  private void OnSourceChanged()
-  {
-    View.Clear();
-
-    Source ??= Array.Empty<object>();
-
-    foreach (var item in Source)
-    {
-      AddToView(item, sort: false);
-
-      if (item is INotifyPropertyChanged observableItem)
-        observableItem.PropertyChanged += SourceItem_PropertyChanged;
-    }
-
-    Sort();
-
-    SourceWeakEventListener?.Detach();
-
-    if (Source is INotifyCollectionChanged observableCollection)
-    {
-      SourceWeakEventListener = new(this)
-      {
-        OnEventAction = (sender, _, e) => Source_CollectionChanged(sender, e),
-        OnDetachAction = (listener) => observableCollection.CollectionChanged -= SourceWeakEventListener!.OnEvent!
-      };
-
-      observableCollection.CollectionChanged += SourceWeakEventListener.OnEvent!;
-    }
-  }
 
   private void OnSortComparerChanged() => Sort();
 
@@ -173,7 +162,7 @@ public class FilterableAndSortableCollectionView
 
   private void SourceItem_PropertyChanged(object? item, PropertyChangedEventArgs e)
   {
-    if (item == null)
+    if (item == null || !Source.Contains(item))
       return;
 
     var sorted = false;

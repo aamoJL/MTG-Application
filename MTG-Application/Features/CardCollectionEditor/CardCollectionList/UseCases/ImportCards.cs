@@ -32,14 +32,12 @@ public partial class CardCollectionEditorViewModelCommands
 
         var addedCards = importResult.Found.Select(f => new CardCollectionMTGCard(f.Info))
           .IntersectBy(queryResult.Found.Select(c => c.Info.ScryfallId), f => f.Info.ScryfallId)
-          .ExceptBy(Viewmodel.OwnedCards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
+          .ExceptBy(Viewmodel.CollectionList.Cards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
           .DistinctBy(x => x.Info.ScryfallId)
           .ToList();
 
         foreach (var card in addedCards)
-          Viewmodel.OwnedCards.Add(new(card.Info));
-
-        Viewmodel.HasUnsavedChanges = true;
+          Viewmodel.CollectionList.Cards.Add(new(card.Info));
 
         if (importResult.Found.Length == 0)
           new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsError);

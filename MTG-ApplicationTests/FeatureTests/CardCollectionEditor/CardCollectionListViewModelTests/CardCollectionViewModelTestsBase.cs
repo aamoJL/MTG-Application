@@ -33,14 +33,15 @@ public partial class CardCollectionListViewModelTests
 
       public async Task<CardCollectionListViewModel> MockVM()
       {
-        var viewmodel = await new CardCollectionListViewModel.Factory()
+        var viewmodel = new CardCollectionListViewModel(dependencies.Importer)
         {
+          CollectionList = Model,
           Notifier = Notifier,
           Confirmers = Confirmers,
           ClipboardService = ClipboardService
-        }.Build(Model, dependencies.Importer, ExistsValidator);
+        };
 
-        viewmodel.HasUnsavedChanges = HasUnsavedChanges;
+        await viewmodel.WaitForCardUpdate();
 
         return viewmodel;
       }

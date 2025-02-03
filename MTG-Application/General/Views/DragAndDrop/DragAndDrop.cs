@@ -78,6 +78,7 @@ public class DragAndDrop<T>()
     else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
     {
       DragOrigin?.OnBeginMoveFrom?.Invoke(item);
+
       if (OnBeginMoveTo != null)
         await OnBeginMoveTo.Invoke(item);
 

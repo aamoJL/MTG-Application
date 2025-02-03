@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.Features.DeckTesting.ViewModels;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
@@ -10,6 +11,8 @@ public partial class DeckTestingPageViewModelTests
   [TestClass]
   public class DrawCardTests : ICanExecuteCommandTests
   {
+    private readonly TestMTGCardImporter _importer = new();
+
     [TestMethod("Should not be able to execute if the library has no cards")]
     public void InvalidState_CanNotExecute()
     {
@@ -17,7 +20,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Clear();
 
@@ -31,7 +34,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -45,7 +48,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -63,7 +66,7 @@ public partial class DeckTestingPageViewModelTests
         DeckCards: [.. MTGCardMocker.Mock(count: 10)],
         Commander: null,
         Partner: null);
-      var viewmodel = new DeckTestingPageViewModel(deck);
+      var viewmodel = new DeckTestingPageViewModel(deck, _importer);
 
       viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 

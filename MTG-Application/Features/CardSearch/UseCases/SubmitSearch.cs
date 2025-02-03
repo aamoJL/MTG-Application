@@ -16,7 +16,7 @@ public partial class CardSearchViewModelCommands
     {
       try
       {
-        var searchResult = await Viewmodel.Worker.DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query ?? string.Empty));
+        var searchResult = await (Viewmodel as IWorker).DoWork(new FetchCardsWithSearchQuery(Viewmodel.Importer).Execute(query ?? string.Empty));
 
         await Viewmodel.Cards.SetCollection(
           cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],

@@ -7,6 +7,7 @@ using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
 using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -36,6 +37,7 @@ public partial class AdvancedCardItemsView : ItemsView
   public AdvancedCardItemsView()
     => LosingFocus += ItemsView_LosingFocus;
 
+  [NotNull]
   protected DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
   {
     OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info, item.Count)) ?? Task.CompletedTask),
@@ -81,7 +83,7 @@ public partial class AdvancedCardItemsView : ItemsView
   {
     var def = e.GetDeferral();
 
-    await DragAndDrop!.Drop(
+    await DragAndDrop.Drop(
       e.AcceptedOperation,
       e.DataView.Contains(StandardDataFormats.Text) ? await e.DataView.GetTextAsync() : string.Empty);
 

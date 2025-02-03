@@ -1,30 +1,26 @@
 ﻿using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Models;
-using MTGApplication.General.ViewModels;
-using System.Linq;
+using MTGApplication.General.Services.ReversibleCommandService;
 
 namespace MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions;
 
 public partial class CardListViewModelReversibleActions
 {
-  public class ReversibleCardPrintChangeAction(CardListViewModel viewmodel) : ViewModelReversibleAction<CardListViewModel, (DeckEditorMTGCard Card, MTGCardInfo Info)>(viewmodel)
+  public class ReversibleCardPrintChangeAction : ReversibleAction<(DeckEditorMTGCard Card, MTGCardInfo Info)>
   {
-    public DeckEditorMTGCard? Card { get; set; }
-
-    protected override void ActionMethod((DeckEditorMTGCard Card, MTGCardInfo Info) param)
+    public ReversibleCardPrintChangeAction()
     {
-      if ((Card ??= Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == param.Card.Info.Name)) is DeckEditorMTGCard card)
-        CardPrintChange(card, param.Info);
+      Action = ActionMethod;
+      ReverseAction = ReverseActionMethod;
     }
 
-    protected override void ReverseActionMethod((DeckEditorMTGCard Card, MTGCardInfo Info) param)
-      => ActionMethod(param);
+    protected void ActionMethod((DeckEditorMTGCard Card, MTGCardInfo Info) param)
+      => CardPrintChange(param.Card, param.Info);
+
+    protected void ReverseActionMethod((DeckEditorMTGCard Card, MTGCardInfo Info) param)
+      => CardPrintChange(param.Card, param.Info);
 
     private void CardPrintChange(DeckEditorMTGCard card, MTGCardInfo info)
-    {
-      card.Info = info;
-      Viewmodel.OnCardChange(card, nameof(card.Info));
-    }
+      => card.Info = info;
   }
 }

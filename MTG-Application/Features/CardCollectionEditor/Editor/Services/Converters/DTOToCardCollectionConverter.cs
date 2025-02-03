@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollectionEditor.Editor.Services.Converters;
 
-public class DTOToCardCollectionConverter(MTGCardImporter importer)
+public class DTOToCardCollectionConverter(IMTGCardImporter importer)
 {
   /// <exception cref="ArgumentNullException"></exception>
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
-  public async Task<MTGCardCollection> Convert(MTGCardCollectionDTO dto)
+  public async Task<CardCollectionEditorCardCollection> Convert(MTGCardCollectionDTO dto)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(dto);
 
-      return new MTGCardCollection()
+      return new CardCollectionEditorCardCollection()
       {
         Name = dto.Name,
         CollectionLists = new(await Task.WhenAll(dto.CollectionLists.Select(async x =>

@@ -1,30 +1,41 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.ViewModels;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.General.Services.ReversibleCommandService;
 
 namespace MTGApplication.Features.DeckEditor.CardList.UseCases.ReversibleActions;
 
 public partial class CardListViewModelReversibleActions
 {
-  public class ReversibleRenameGroupAction(CardGroupViewModel viewmodel) : ViewModelReversibleAction<CardGroupViewModel, string>(viewmodel)
+  public class ReversibleRenameGroupAction : ReversibleAction<(CardGroupViewModel Group, string Key)>
   {
-    protected override void ActionMethod(string key)
+    public ReversibleRenameGroupAction()
     {
-      if (string.IsNullOrEmpty(key) || key == Viewmodel.Key)
-        return;
-
-      Rename(key);
+      Action = ActionMethod;
+      ReverseAction = ReverseActionMethod;
     }
 
-    protected override void ReverseActionMethod(string key)
-      => ActionMethod(key);
+    private DeckEditorMTGCard[]? AffectedCards { get; set; }
 
-    private void Rename(string key)
+    protected void ActionMethod((CardGroupViewModel Group, string Key) param)
     {
-      // Change key
-      Viewmodel.Key = key;
+      var (group, key) = param;
 
-      // Change item groups
-      foreach (var card in Viewmodel.Cards)
+      if (string.IsNullOrEmpty(key) || key == group.Key)
+        return;
+
+      Rename(group, key);
+    }
+
+    protected void ReverseActionMethod((CardGroupViewModel Group, string Key) param)
+      => ActionMethod(param);
+
+    private void Rename(CardGroupViewModel group, string key)
+    {
+      group.Key = key;
+
+      AffectedCards ??= [.. group.Cards];
+
+      foreach (var card in AffectedCards)
         card.Group = key;
     }
   }

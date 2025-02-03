@@ -29,10 +29,10 @@ public partial class DeckEditorViewModelTests
       {
         return new(
           dependencies.Importer,
-          deck: Deck,
           confirmers: Confirmers,
           notifier: Notifier)
         {
+          Deck = Deck,
           Repository = dependencies.Repository,
           HasUnsavedChanges = HasUnsavedChanges,
         };

@@ -1,13 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplicationTests.TestUtility.Mocker;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.FeatureTests.CardCollection.CardCollectionViewModelTests;
 public partial class CardCollectionListViewModelTests
 {
   [TestClass]
-  public class SwitchCardOwnershipTests : CardCollectionListViewModelTestsBase, ICanExecuteWithParameterCommandAsyncTests
+  public class SwitchCardOwnershipTests : CardCollectionListViewModelTestsBase
   {
     [TestMethod("Should be able to execute if the given card is not null")]
     public async Task ValidParameter_CanExecute()
@@ -36,7 +35,7 @@ public partial class CardCollectionListViewModelTests
 
       viewmodel.SwitchCardOwnershipCommand.Execute(null);
 
-      Assert.AreEqual(0, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(0, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]
@@ -47,7 +46,7 @@ public partial class CardCollectionListViewModelTests
 
       viewmodel.SwitchCardOwnershipCommand.Execute(card);
 
-      Assert.AreEqual(1, viewmodel.OwnedCards.Count);
+      Assert.AreEqual(1, viewmodel.CollectionList.Cards.Count);
     }
 
     [TestMethod]
@@ -61,34 +60,7 @@ public partial class CardCollectionListViewModelTests
 
       viewmodel.SwitchCardOwnershipCommand.Execute(card);
 
-      Assert.AreEqual(0, viewmodel.OwnedCards.Count);
-    }
-
-    [TestMethod]
-    public async Task SwitchOwnership_Failure_NoUnsavedChanges()
-    {
-      var viewmodel = await new Mocker(_dependencies)
-      {
-        Model = _savedList
-      }.MockVM();
-
-      viewmodel.SwitchCardOwnershipCommand.Execute(null);
-
-      Assert.IsFalse(viewmodel.HasUnsavedChanges);
-    }
-
-    [TestMethod]
-    public async Task SwitchOwnership_Success_HasUnsavedChanges()
-    {
-      var card = new CardCollectionMTGCard(MTGCardInfoMocker.MockInfo());
-      var viewmodel = await new Mocker(_dependencies)
-      {
-        Model = new() { Cards = [card] }
-      }.MockVM();
-
-      viewmodel.SwitchCardOwnershipCommand.Execute(card);
-
-      Assert.IsTrue(viewmodel.HasUnsavedChanges);
+      Assert.AreEqual(0, viewmodel.CollectionList.Cards.Count);
     }
   }
 }

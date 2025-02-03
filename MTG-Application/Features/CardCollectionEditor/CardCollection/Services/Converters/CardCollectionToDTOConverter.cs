@@ -6,7 +6,7 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollection.Services.C
 
 public class CardCollectionToDTOConverter
 {
-  public static MTGCardCollectionDTO Convert(MTGCardCollection collection)
+  public static MTGCardCollectionDTO Convert(CardCollectionEditorCardCollection collection)
   {
     return new MTGCardCollectionDTO(
       name: collection.Name,

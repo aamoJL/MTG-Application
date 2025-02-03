@@ -43,7 +43,7 @@
 
           <!--#region Deck View Tabs -->
           <TabView
-            TabItemsSource="{x:Bind TabViewItems, Mode=OneWay}"
+            TabItemsSource="{x:Bind TabViewItems, Mode=OneTime}"
             IsAddTabButtonVisible="True" 
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" 

@@ -17,7 +17,7 @@ public class DeckSelectionViewModelTests
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(itemCount).ToArray());
     var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await vm.LoadDecksCommand.ExecuteAsync(null);
+    await vm.WaitForDeckUpdate();
 
     Assert.AreEqual(itemCount, vm.DeckItems.Count, "Item counts does not match");
   }
@@ -28,10 +28,10 @@ public class DeckSelectionViewModelTests
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
     var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await vm.LoadDecksCommand.ExecuteAsync(null);
+    await vm.WaitForDeckUpdate();
 
     foreach (var item in vm.DeckItems)
-      Assert.IsTrue(!string.IsNullOrEmpty(item.Title), "Deck should have a name");
+      Assert.IsFalse(string.IsNullOrEmpty(item.Title), "Deck should have a name");
   }
 
   [TestMethod("Deck items should have image URI when loaded if deck has an image")]
@@ -41,18 +41,21 @@ public class DeckSelectionViewModelTests
 
     var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await vm.LoadDecksCommand.ExecuteAsync(null);
+    await vm.WaitForDeckUpdate();
 
     foreach (var item in vm.DeckItems)
-      Assert.IsTrue(!string.IsNullOrEmpty(item.ImageUri), "Deck should have an image URI");
+      Assert.IsFalse(string.IsNullOrEmpty(item.ImageUri), "Deck should have an image URI");
   }
 
   [TestMethod("ViewModel should be busy when loading decks")]
   public async Task LoadDecks_IsBusy()
   {
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
+
+    _dependensies.Importer.Delay = TimeSpan.FromMilliseconds(50);
+
     var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await WorkerAssert.IsBusy(vm, () => vm.LoadDecksCommand.ExecuteAsync(null));
+    await WorkerAssert.IsBusy(vm, vm.WaitForDeckUpdate);
   }
 }

@@ -15,9 +15,9 @@ public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewMod
     try
     {
       var query = string.Join(Environment.NewLine,
-        await Viewmodel.Worker.DoWork(FetchNewCardNames(theme.Uri)));
+        await (Viewmodel as IWorker).DoWork(FetchNewCardNames(theme.Uri)));
 
-      var searchResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithString(query));
+      var searchResult = await (Viewmodel as IWorker).DoWork(Viewmodel.Importer.ImportWithString(query));
 
       Viewmodel.SelectedTheme = theme;
       await Viewmodel.Cards.SetCollection(
