@@ -25,7 +25,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
     Loaded += DeckEditorPage_Loaded;
   }
 
-  private void DeckEditorPage_Loaded(object sender, RoutedEventArgs e)
+  private void DeckEditorPage_Loaded(object _, RoutedEventArgs e)
   {
     Loaded -= DeckEditorPage_Loaded;
 
@@ -67,7 +67,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       ViewModel.OpenDeckCommand.Execute(deckName);
   }
 
-  private async void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private async void SaveDeckKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
 
@@ -75,7 +75,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       await ViewModel.SaveDeckCommand.ExecuteAsync(null);
   }
 
-  private async void OpenDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private async void OpenDeckKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
 
@@ -83,7 +83,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       await ViewModel.OpenDeckCommand.ExecuteAsync(null);
   }
 
-  private async void NewDeckKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private async void NewDeckKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
 
@@ -91,7 +91,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       await ViewModel.NewDeckCommand.ExecuteAsync(null);
   }
 
-  private void ResetFiltersKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private void ResetFiltersKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
 
@@ -99,23 +99,23 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       CardFilter.ResetCommand.Execute(null);
   }
 
-  private void UndoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private void UndoKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
 
-    if (ViewModel.UndoCommand.CanExecute(null))
-      ViewModel.UndoCommand.Execute(null);
+    if (ViewModel.UndoStack.UndoCommand.CanExecute(null))
+      ViewModel.UndoStack.UndoCommand.Execute(null);
   }
 
-  private void RedoKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private void RedoKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     args.Handled = true;
 
-    if (ViewModel.RedoCommand.CanExecute(null))
-      ViewModel.RedoCommand.Execute(null);
+    if (ViewModel.UndoStack.RedoCommand.CanExecute(null))
+      ViewModel.UndoStack.RedoCommand.Execute(null);
   }
 
-  private void DeleteCardKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+  private void DeleteCardKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
   {
     if (args.Element is ListViewBase listview)
     {

@@ -22,14 +22,17 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 {
-  public DeckEditorViewModel(IMTGCardImporter importer, Notifier? notifier = null, DeckEditorConfirmers? confirmers = null)
+  public DeckEditorViewModel(IMTGCardImporter importer)
   {
-    // TODO: do confirmers and notifier need to be here?
     Importer = importer;
-    Notifier = notifier ?? new();
-    Confirmers = confirmers ?? new();
 
     UndoStack.CollectionChanged += UndoStack_CollectionChanged;
+  }
+
+  public DeckEditorViewModel(IMTGCardImporter importer, DeckEditorConfirmers? confirmers = null, Notifier? notifier = null) : this(importer)
+  {
+    Confirmers = confirmers ?? new();
+    Notifier = notifier ?? new();
   }
 
   [NotNull]
@@ -84,10 +87,11 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   }
 
   public IMTGCardImporter Importer { get; }
-  public DeckEditorConfirmers Confirmers { get; }
-  public Notifier Notifier { get; }
-  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
+  public DeckEditorConfirmers Confirmers { get; } = new();
+  public Notifier Notifier { get; } = new();
   public ReversibleCommandStack UndoStack { get; } = new();
+
+  public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
 
   [NotNull] public GroupedCardListViewModel? DeckCardList => field ??= new DeckEditorCardListFactory(this).CreateGroupedCardListViewModel(Deck.DeckCards);
   [NotNull] public CardListViewModel? MaybeCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Maybelist);
@@ -133,14 +137,10 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   public int Size => Deck.DeckCards.Sum(x => x.Count) + (Deck.Commander != null ? 1 : 0) + (Deck.CommanderPartner != null ? 1 : 0);
   public double Price => Deck.DeckCards.Sum(x => x.Info.Price * x.Count) + (Deck.Commander?.Info.Price ?? 0) + (Deck.CommanderPartner?.Info.Price ?? 0);
 
-  [NotNull] public IAsyncRelayCommand<ISavable.ConfirmArgs>? ConfirmUnsavedChangesCommand => field ??= new ConfirmUnsavedChanges(this).Command;
   [NotNull] public IAsyncRelayCommand? NewDeckCommand => field ??= new NewDeck(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? OpenDeckCommand => field ??= new OpenDeck(this).Command;
   [NotNull] public IAsyncRelayCommand? SaveDeckCommand => field ??= new SaveDeck(this).Command;
   [NotNull] public IAsyncRelayCommand? DeleteDeckCommand => field ??= new DeleteDeck(this).Command;
-  // TODO: Move to undostack?
-  [NotNull] public IRelayCommand? UndoCommand => field ??= new Undo(this).Command;
-  [NotNull] public IRelayCommand? RedoCommand => field ??= new Redo(this).Command;
   [NotNull] public IAsyncRelayCommand? OpenEdhrecCommanderWebsiteCommand => field ??= new OpenEdhrecCommanderWebsite(this).Command;
   [NotNull] public IAsyncRelayCommand? ShowDeckTokensCommand => field ??= new ShowDeckTokens(this).Command;
   [NotNull] public IRelayCommand? OpenDeckTestingWindowCommand => field ??= new OpenDeckTestingWindow(this).Command;

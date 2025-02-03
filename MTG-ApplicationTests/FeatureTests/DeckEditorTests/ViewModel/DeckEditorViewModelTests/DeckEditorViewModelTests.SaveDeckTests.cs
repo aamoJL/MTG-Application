@@ -147,7 +147,7 @@ public partial class DeckEditorViewModelTests
       await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       var dbDeck = await _dependencies.Repository.Get(_savedDeck.Name);
-      Assert.AreEqual(_savedDeck.Commander?.Info.Name, dbDeck?.Commander?.Name);
+      Assert.AreEqual(_savedDeck.Commander.Info.Name, dbDeck.Commander.Name);
     }
 
     [TestMethod("Existing deck should be overridden if override was accepted")]
@@ -169,7 +169,7 @@ public partial class DeckEditorViewModelTests
       await viewmodel.SaveDeckCommand.ExecuteAsync(null);
 
       var dbDeck = await _dependencies.Repository.Get(_savedDeck.Name);
-      Assert.AreEqual(newDeck.Commander.Info.Name, dbDeck?.Commander?.Name);
+      Assert.AreEqual(newDeck.Commander.Info.Name, dbDeck.Commander.Name);
     }
 
     [TestMethod]
@@ -300,7 +300,7 @@ public partial class DeckEditorViewModelTests
       }.MockVM();
 
       var args = new ISavable.ConfirmArgs();
-      await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+      await viewmodel.SaveDeckCommand.ExecuteAsync(args);
 
       Assert.IsFalse(args.Cancelled);
     }

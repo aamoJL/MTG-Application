@@ -6,27 +6,26 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
-public partial class DeckEditorViewModelCommands
+public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : AsyncUseCase<ISavable.ConfirmArgs, ISavable.ConfirmArgs>
 {
-  public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, ISavable.ConfirmArgs>(viewmodel)
+  /// <returns><paramref name="param"/></returns>
+  public override async Task<ISavable.ConfirmArgs> ExecuteAsync(ISavable.ConfirmArgs param)
   {
-    protected override bool CanExecute(ISavable.ConfirmArgs? param) => param != null && !param.Cancelled && Viewmodel.HasUnsavedChanges;
+    if (param.Cancelled || !viewmodel.HasUnsavedChanges)
+      return param;
 
-    protected override async Task Execute(ISavable.ConfirmArgs? param)
+    switch (await viewmodel.Confirmers.SaveUnsavedChangesConfirmer
+      .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(viewmodel.Name)))
     {
-      if (!CanExecute(param)) return;
+      case ConfirmationResult.Yes:
+        await viewmodel.SaveDeckCommand.ExecuteAsync(null);
+        param!.Cancelled = viewmodel.HasUnsavedChanges;
+        break;
+      case ConfirmationResult.Cancel:
+        param!.Cancelled = true;
+        break;
+    };
 
-      switch (await Viewmodel.Confirmers.SaveUnsavedChangesConfirmer
-        .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.Name)))
-      {
-        case ConfirmationResult.Yes:
-          await Viewmodel.SaveDeckCommand.ExecuteAsync(null);
-          param!.Cancelled = Viewmodel.HasUnsavedChanges;
-          return;
-        case ConfirmationResult.Cancel:
-          param!.Cancelled = true;
-          return;
-      };
-    }
+    return param;
   }
 }

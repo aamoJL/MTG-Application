@@ -23,11 +23,7 @@ public partial class DeckEditorViewModelCommands
       if (!CanExecute(loadName))
         return;
 
-      var unsavedArgs = new ISavable.ConfirmArgs();
-
-      await new ConfirmUnsavedChanges(Viewmodel).Command.ExecuteAsync(unsavedArgs);
-
-      if (unsavedArgs.Cancelled)
+      if ((await new ConfirmUnsavedChanges(Viewmodel).ExecuteAsync(new())).Cancelled)
         return;
 
       loadName ??= await Viewmodel.Confirmers.LoadDeckConfirmer

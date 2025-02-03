@@ -11,29 +11,6 @@ public partial class DeckEditorViewModelTests
   public class CommanderTests : DeckEditorViewModelTestsBase
   {
     [TestMethod]
-    public async Task SetCommander_ToNull()
-    {
-      var deck = MTGCardDeckMocker.Mock("Deck", true, true);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
-
-      await viewmodel.Commander.ChangeCommanderCommand.ExecuteAsync(null);
-
-      Assert.IsNull(viewmodel.Commander.Card);
-    }
-
-    [TestMethod]
-    public async Task SetCommander_ToCard()
-    {
-      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var deck = MTGCardDeckMocker.Mock("Deck", true, true);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
-
-      await viewmodel.Commander.ChangeCommanderCommand.ExecuteAsync(card);
-
-      Assert.AreEqual(card.Info.Name, viewmodel.Commander.Card.Info.Name);
-    }
-
-    [TestMethod]
     public async Task SetCommander_Import_NotificationSent()
     {
       var notifier = new TestNotifier();
@@ -49,80 +26,91 @@ public partial class DeckEditorViewModelTests
     }
 
     [TestMethod]
-    public async Task SetPartner_ToNull()
-    {
-      var deck = MTGCardDeckMocker.Mock("Deck", true, true);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
-
-      await viewmodel.Partner.ChangeCommanderCommand.ExecuteAsync(null);
-
-      Assert.IsNull(viewmodel.Partner.Card);
-    }
-
-    [TestMethod]
-    public async Task SetPartner_ToCard()
+    public async Task SetCommander_Exists_ToNull_CommanderRemoved()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var deck = MTGCardDeckMocker.Mock("Deck", true, true);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = new()
+        {
+          Commander = card
+        }
+      }.MockVM();
 
-      await viewmodel.Partner.ChangeCommanderCommand.ExecuteAsync(card);
+      await viewmodel.Commander.ChangeCommanderCommand.ExecuteAsync(null);
 
-      Assert.AreEqual(card.Info.Name, viewmodel.Partner.Card.Info.Name);
-    }
+      Assert.IsNull(viewmodel.Commander.Card);
 
-    [TestMethod]
-    public async Task SetCommander_FromNullToCard_Undo_CommanderIsNull()
-    {
-      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: false);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
+      viewmodel.UndoStack.Undo();
 
-      await viewmodel.Commander.ChangeCommanderCommand.ExecuteAsync(card);
-      viewmodel.UndoCommand.Execute(null);
+      Assert.AreEqual(card, viewmodel.Commander.Card);
+
+      viewmodel.UndoStack.Redo();
 
       Assert.IsNull(viewmodel.Commander.Card);
     }
 
     [TestMethod]
-    public async Task SetCommander_FromNullToCard_Redo_CommanderIsCardAgain()
+    public async Task SetCommander_Null_ToCard_CommanderChanged()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: false);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       await viewmodel.Commander.ChangeCommanderCommand.ExecuteAsync(card);
-      viewmodel.UndoCommand.Execute(null);
-      viewmodel.RedoCommand.Execute(null);
 
-      Assert.AreEqual(card.Info.Name, viewmodel.Commander.Card.Info.Name);
+      Assert.AreEqual(card, viewmodel.Commander.Card);
+
+      viewmodel.UndoStack.Undo();
+
+      Assert.IsNull(viewmodel.Commander.Card);
+
+      viewmodel.UndoStack.Redo();
+
+      Assert.AreEqual(card, viewmodel.Commander.Card);
     }
 
     [TestMethod]
-    public async Task SetPartner_FromNullToCard_Undo_PartnerIsNull()
+    public async Task SetPartner_Exists_ToNull_PartnerRemoved()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: false);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = new()
+        {
+          CommanderPartner = card
+        }
+      }.MockVM();
 
-      await viewmodel.Partner.ChangeCommanderCommand.ExecuteAsync(card);
-      viewmodel.UndoCommand.Execute(null);
+      await viewmodel.Partner.ChangeCommanderCommand.ExecuteAsync(null);
+
+      Assert.IsNull(viewmodel.Partner.Card);
+
+      viewmodel.UndoStack.Undo();
+
+      Assert.AreEqual(card, viewmodel.Partner.Card);
+
+      viewmodel.UndoStack.Redo();
 
       Assert.IsNull(viewmodel.Partner.Card);
     }
 
     [TestMethod]
-    public async Task SetPartner_FromNullToCard_Redo_PartnerIsCardAgain()
+    public async Task SetPartner_Null_ToCard_PartnerChanged()
     {
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var deck = MTGCardDeckMocker.Mock("Deck", includeCommander: true);
-      var viewmodel = new Mocker(_dependencies) { Deck = deck }.MockVM();
+      var viewmodel = new Mocker(_dependencies).MockVM();
 
       await viewmodel.Partner.ChangeCommanderCommand.ExecuteAsync(card);
-      viewmodel.UndoCommand.Execute(null);
-      viewmodel.RedoCommand.Execute(null);
 
-      Assert.AreEqual(card.Info.Name, viewmodel.Partner.Card.Info.Name);
+      Assert.AreEqual(card, viewmodel.Partner.Card);
+
+      viewmodel.UndoStack.Undo();
+
+      Assert.IsNull(viewmodel.Partner.Card);
+
+      viewmodel.UndoStack.Redo();
+
+      Assert.AreEqual(card, viewmodel.Partner.Card);
     }
   }
 }

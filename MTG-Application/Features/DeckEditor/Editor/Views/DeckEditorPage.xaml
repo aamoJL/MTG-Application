@@ -430,8 +430,8 @@
             <AppBarButton Icon="Edit" Label="Edit">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.UndoCommand, Mode=OneTime}" Icon="Undo" Text="Undo" KeyboardAcceleratorTextOverride="Ctrl+Z"/>
-                  <MenuFlyoutItem Command="{x:Bind ViewModel.RedoCommand, Mode=OneTime}" Icon="Redo" Text="Redo" KeyboardAcceleratorTextOverride="Ctrl+Y"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.UndoStack.UndoCommand, Mode=OneTime}" Icon="Undo" Text="Undo" KeyboardAcceleratorTextOverride="Ctrl+Z"/>
+                  <MenuFlyoutItem Command="{x:Bind ViewModel.UndoStack.RedoCommand, Mode=OneTime}" Icon="Redo" Text="Redo" KeyboardAcceleratorTextOverride="Ctrl+Y"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>

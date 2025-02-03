@@ -13,7 +13,7 @@ public partial class DeckEditorViewModelTests
     {
       var viewmodel = new Mocker(_dependencies).MockVM();
 
-      Assert.IsFalse(viewmodel.RedoCommand.CanExecute(null));
+      Assert.IsFalse(viewmodel.UndoStack.RedoCommand.CanExecute(null));
     }
 
     [TestMethod]
@@ -22,9 +22,9 @@ public partial class DeckEditorViewModelTests
       var viewmodel = new Mocker(_dependencies).MockVM();
 
       viewmodel.DeckCardList.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
-      viewmodel.UndoCommand.Execute(null);
+      viewmodel.UndoStack.UndoCommand.Execute(null);
 
-      Assert.IsTrue(viewmodel.RedoCommand.CanExecute(null));
+      Assert.IsTrue(viewmodel.UndoStack.RedoCommand.CanExecute(null));
     }
 
     [TestMethod]
@@ -36,11 +36,11 @@ public partial class DeckEditorViewModelTests
 
       Assert.AreEqual(1, viewmodel.DeckCardList.Cards.Count);
 
-      viewmodel.UndoCommand.Execute(null);
+      viewmodel.UndoStack.UndoCommand.Execute(null);
 
       Assert.AreEqual(0, viewmodel.DeckCardList.Cards.Count);
 
-      viewmodel.RedoCommand.Execute(null);
+      viewmodel.UndoStack.RedoCommand.Execute(null);
 
       Assert.AreEqual(1, viewmodel.DeckCardList.Cards.Count);
     }

@@ -10,11 +10,7 @@ public partial class DeckEditorViewModelCommands
   {
     protected override async Task Execute()
     {
-      var unsavedArgs = new ISavable.ConfirmArgs();
-
-      await new ConfirmUnsavedChanges(Viewmodel).Command.ExecuteAsync(unsavedArgs);
-
-      if (unsavedArgs.Cancelled)
+      if ((await new ConfirmUnsavedChanges(Viewmodel).ExecuteAsync(new())).Cancelled)
         return;
 
       Viewmodel.Deck = new();

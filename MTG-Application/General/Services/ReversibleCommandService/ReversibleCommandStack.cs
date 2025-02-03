@@ -1,10 +1,12 @@
-﻿using MTGApplication.General.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MTGApplication.General.Models;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace MTGApplication.General.Services.ReversibleCommandService;
 
-public partial class ReversibleCommandStack : INotifyCollectionChanged
+public partial class ReversibleCommandStack : ObservableObject
 {
   public ReversibleCommandStack()
     => UndoStack.CollectionChanged += UndoStack_CollectionChanged;
@@ -16,6 +18,7 @@ public partial class ReversibleCommandStack : INotifyCollectionChanged
 
   public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
+  [RelayCommand(CanExecute = nameof(CanUndo))]
   public void Undo()
   {
     if (UndoStack.TryPop(out var command))
@@ -25,6 +28,7 @@ public partial class ReversibleCommandStack : INotifyCollectionChanged
     }
   }
 
+  [RelayCommand(CanExecute = nameof(CanRedo))]
   public void Redo()
   {
     if (RedoStack.TryPop(out var command))
@@ -61,5 +65,10 @@ public partial class ReversibleCommandStack : INotifyCollectionChanged
   public bool CanRedo => RedoStack.Count > 0;
 
   private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    => CollectionChanged?.Invoke(this, e);
+  {
+    CollectionChanged?.Invoke(this, e);
+
+    UndoCommand.NotifyCanExecuteChanged();
+    RedoCommand.NotifyCanExecuteChanged();
+  }
 }

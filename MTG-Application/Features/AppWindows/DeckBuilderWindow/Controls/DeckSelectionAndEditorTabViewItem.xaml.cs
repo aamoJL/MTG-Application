@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using MTGApplication.Features.DeckEditor.Editor.UseCases;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.Features.DeckEditor.Views;
 using MTGApplication.Features.DeckSelection.Views;
@@ -87,7 +88,7 @@ public sealed partial class DeckSelectionAndEditorTabViewItem : TabViewItem
     {
       IsSelected = true; // Will bring this tab view to the front
 
-      await deckEditorPage.ViewModel.ConfirmUnsavedChangesCommand.ExecuteAsync(args);
+      await new ConfirmUnsavedChanges(deckEditorPage.ViewModel).ExecuteAsync(args);
     }
   }
 
