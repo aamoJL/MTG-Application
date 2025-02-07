@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -15,7 +16,7 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
     ElementPrepared += AdvancedItemsRepeater_ElementPrepared;
     ElementClearing += AdvancedItemsRepeater_ElementClearing;
 
-    PointerClick.Clicked += ItemContainer_Clicked;
+    PointerClick.Clicked += Item_Clicked;
   }
 
   public ListViewSelectionMode SelectionMode
@@ -28,10 +29,10 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
   {
     get
     {
-      if (SelectedContainer == null)
+      if (SelectedElement == null)
         return null;
 
-      var index = GetElementIndex(SelectedContainer);
+      var index = GetElementIndex(SelectedElement);
 
       if (index == -1)
         return null;
@@ -40,7 +41,7 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
     }
   }
 
-  protected ItemContainer? SelectedContainer
+  protected UIElement? SelectedElement
   {
     get;
     set
@@ -48,65 +49,72 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
       if (field == value || SelectionMode == ListViewSelectionMode.None)
         return;
 
-      if (field != null)
-        field.IsSelected = false;
+      if (TryGetContainer(field) is ItemContainer oldContainer)
+        oldContainer.IsSelected = false;
 
       field = value;
 
-      if (field != null)
-      {
-        field.IsSelected = true;
-        field.StartBringIntoView();
-      }
+      if (TryGetContainer(field) is ItemContainer newContainer)
+        newContainer.IsSelected = true;
     }
   }
+
   protected PointerClick PointerClick { get; } = new();
 
-  public void DeselectAll() => SelectedContainer = null;
+  public void DeselectAll() => SelectedElement = null;
 
   public void SelectItem(object item)
   {
     if (ItemsSourceView.IndexOf(item) is int index && index == -1)
       return;
 
-    if (TryGetElement(index) is ItemContainer container)
-      container.Focus(FocusState.Programmatic);
+    if (TryGetElement(index) is UIElement element)
+      element.Focus(FocusState.Programmatic);
   }
 
   private void AdvancedItemsRepeater_ElementPrepared(ItemsRepeater sender, ItemsRepeaterElementPreparedEventArgs args)
   {
-    if (args.Element is ItemContainer container)
-    {
-      // Select the prepared item if it has focus
-      //  For example, if the user redo remove command, the container will have focus
-      if (container.FocusState != FocusState.Unfocused)
-        SelectedContainer = container;
+    // Select the prepared item if it has focus
+    //  For example, if the user redo remove command, the item will have focus
+    if (args.Element.FindDescendant<UIElement>(x => x.FocusState != FocusState.Unfocused) is not null)
+      SelectedElement = args.Element;
 
-      PointerClick.Register(container);
-      container.GotFocus += ItemContainer_GotFocus;
-    }
+    args.Element.GotFocus += Item_GotFocus;
+    PointerClick.Register(args.Element);
   }
 
   private void AdvancedItemsRepeater_ElementClearing(ItemsRepeater sender, ItemsRepeaterElementClearingEventArgs args)
   {
-    if (args.Element is ItemContainer container)
-    {
-      if (container == SelectedContainer)
-        DeselectAll();
+    if (args.Element == SelectedElement)
+      DeselectAll();
 
-      PointerClick.Unregister(container);
-      container.GotFocus -= ItemContainer_GotFocus;
-    }
+    args.Element.GotFocus -= Item_GotFocus;
+    PointerClick.Unregister(args.Element);
   }
 
-  private void ItemContainer_GotFocus(object sender, RoutedEventArgs e)
+  private void Item_GotFocus(object sender, RoutedEventArgs e)
   {
-    if (sender is not ItemContainer container)
+    if (sender is not UIElement element)
       return;
 
-    SelectedContainer = container;
+    if (e.OriginalSource is UIElement { FocusState: FocusState.Pointer or FocusState.Keyboard })
+    {
+      element.StartBringIntoView(new()
+      {
+        AnimationDesired = true,
+        VerticalAlignmentRatio = .5f,
+      });
+    }
+
+    SelectedElement = element;
   }
 
-  private void ItemContainer_Clicked(object? sender, PointerRoutedEventArgs e)
-    => (sender as ItemContainer)?.Focus(FocusState.Programmatic);
+  private void Item_Clicked(object? sender, PointerRoutedEventArgs e)
+    => (sender as UIElement)?.Focus(FocusState.Pointer);
+
+  /// <summary>
+  /// Returns ItemContainer from element's visualtree if possible
+  /// </summary>
+  private ItemContainer? TryGetContainer(UIElement? element)
+    => element?.FindDescendantOrSelf<ItemContainer>();
 }

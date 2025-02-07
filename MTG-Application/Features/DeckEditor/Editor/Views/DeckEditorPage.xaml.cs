@@ -9,6 +9,7 @@ using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.NotificationService;
+using MTGApplication.General.Views.Controls;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -48,7 +49,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(DeckCardsViewType)));
       }
     }
-  } = CardViewType.Group;
+  } = CardViewType.Image;
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -134,8 +135,6 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
         listview.SelectedIndex = index;
       }
-
-      args.Handled = true;
     }
     else if (args.Element is ItemsView itemsView)
     {
@@ -150,8 +149,25 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
       itemsView.Select(index < source.Count ? index : index - 1);
 
-      args.Handled = true;
     }
+    else if (args.Element is AdvancedItemsRepeater air)
+    {
+      if (air.SelectedItem is not DeckEditorMTGCard selectedItem
+        || air.DataContext is not ICardListViewModel itemsViewViewModel
+        || air.ItemsSource is not IList source
+        || (source.IndexOf(selectedItem) is int index && index < 0)
+        || itemsViewViewModel.RemoveCardCommand?.CanExecute(selectedItem) is not true)
+        return;
+
+      itemsViewViewModel.RemoveCardCommand.Execute(selectedItem);
+
+      // Recalculate the index and focus the element in the index position if the element exists.
+      if ((index = Math.Clamp(index, -1, source.Count - 1)) >= 0)
+        if (source[index] is object nextItem)
+          air.SelectItem(nextItem);
+    }
+
+    args.Handled = true;
   }
 
   private void ListView_LosingFocus(UIElement sender, LosingFocusEventArgs args)
@@ -165,8 +181,16 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         return;
 
       listview.DeselectAll();
-
-      args.Handled = true;
     }
+    else if (sender is AdvancedItemsRepeater air)
+    {
+      if (args.NewFocusedElement is ItemContainer item
+        && air.GetElementIndex(item) != -1)
+        return;
+
+      air.DeselectAll();
+    }
+
+    args.Handled = true;
   }
 }
