@@ -11,15 +11,15 @@ public partial class DeckEditorCardImageView : DeckEditorCardViewBase
 
   public UIElement ImageElement => CardImageElement;
 
-  private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs e)
+  private void NumberBox_ValueChanged(NumberBox _, NumberBoxValueChangedEventArgs e)
   {
     if (e.NewValue == Model.Count)
       return;
 
     var args = new CardCountChangeArgs(Model, (int)e.NewValue);
 
-    if (CountChangeCommand?.CanExecute(args) is true)
-      CountChangeCommand.Execute(args);
+    if (Model.ChangeCountCommand?.CanExecute(args) is true)
+      Model.ChangeCountCommand.Execute(args);
   }
 
   private IRelayCommand<DeckEditorMTGCard>? DeleteCommand => field ??= new RelayCommand<DeckEditorMTGCard>((card) =>

@@ -8,7 +8,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
 
-public partial class DeckEditorGroupedCardItemsRepeater : DeckEditorCardItemsRepeater
+public partial class DeckEditorGroupedListViewContainer : DeckEditorListViewContainer
 {
   protected override void OnDragOver(object sender, DragEventArgs e)
   {

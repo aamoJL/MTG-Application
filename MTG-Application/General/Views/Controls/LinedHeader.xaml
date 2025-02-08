@@ -13,7 +13,7 @@
       <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
     <Border Grid.Column="0" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center"/>
-    <ContentPresenter Grid.Column="1" Content="{x:Bind Header, Mode=OneTime}" Margin="10 0 10 0"/>
+    <ContentPresenter Grid.Column="1" Content="{x:Bind Header, Mode=OneTime}" Margin="10 0 10 0" FontWeight="Light"/>
     <Border Grid.Column="2" Height="1" HorizontalAlignment="Stretch" Background="{ThemeResource RegionColor}" VerticalAlignment="Center"/>
   </Grid>
 </UserControl>

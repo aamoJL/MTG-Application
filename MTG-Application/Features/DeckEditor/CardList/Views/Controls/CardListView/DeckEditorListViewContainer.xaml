@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+  x:Class="MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView.DeckEditorListViewContainer"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:controls="using:MTGApplication.General.Views.Controls"
+  mc:Ignorable="d">
+
+  <Grid Background="Transparent">
+    <controls:SelectableItemsRepeater 
+      ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
+      ItemTemplate="{x:Bind ItemTemplate, Mode=OneWay}"
+      Layout="{x:Bind Layout, Mode=OneWay}"
+      SelectionMode="Single"
+      DeselectOnLosingFocus="True">
+      <ItemsRepeater.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Delete" Invoked="KeyboardAccelerator_Invoked"/>
+      </ItemsRepeater.KeyboardAccelerators>
+    </controls:SelectableItemsRepeater>
+  </Grid>
+</UserControl>

@@ -131,15 +131,14 @@
               <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
 
-              <!--#region Commander / Partner -->
+              <!--#region Commander / Partner--> 
               <commanderview:CommanderTextView
                 PrefixText="Commander: "
                 Model="{x:Bind ViewModel.Commander.Card, Mode=OneWay}"
                 EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
                 DeleteButtonClick="{x:Bind ViewModel.Commander.RemoveCommanderCommand, Mode=OneTime}"
-                ChangePrintCommand="{x:Bind ViewModel.ChangeCardPrintCommand, Mode=OneTime}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Commander"
@@ -155,7 +154,6 @@
                 Model="{x:Bind ViewModel.Partner.Card, Mode=OneWay}"
                 EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
                 DeleteButtonClick="{x:Bind ViewModel.Partner.RemoveCommanderCommand, Mode=OneTime}"
-                ChangePrintCommand="{x:Bind ViewModel.ChangeCardPrintCommand, Mode=OneTime}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Partner"
@@ -170,7 +168,7 @@
 
             </StackPanel>
 
-            <!--#region Maybelist -->
+            <!--#region Maybelist--> 
             <customControls:LinedHeader Grid.Row="1">
               <customControls:LinedHeader.Header>
                 <TextBlock Text="Maybe">
@@ -223,16 +221,14 @@
                       SetIconVisible="False"
                       TypeLineVisible="False"
                       HoverPreviewEnabled="True"
-                      DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                      CountChangeCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardCountCommand, Mode=OneTime}"
-                      ChangePrintCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardPrintCommand, Mode=OneTime}"/>
+                      DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
                   </ListViewItem>
                 </DataTemplate>
               </cardlistview:AdvancedCardListView.ItemTemplate>
             </cardlistview:AdvancedCardListView>
             <!--#endregion-->
 
-            <!--#region Wishlist -->
+            <!--#region Wishlist--> 
             <customControls:LinedHeader Grid.Row="3">
               <customControls:LinedHeader.Header>
                 <TextBlock Text="Wishlist">
@@ -284,16 +280,14 @@
                       SetIconVisible="False"
                       TypeLineVisible="False"
                       HoverPreviewEnabled="True"
-                      DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                      CountChangeCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardCountCommand, Mode=OneTime}"
-                      ChangePrintCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardPrintCommand, Mode=OneTime}"/>
+                      DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
                   </ListViewItem>
                 </DataTemplate>
               </cardlistview:AdvancedCardListView.ItemTemplate>
             </cardlistview:AdvancedCardListView>
             <!--#endregion-->
 
-            <!--#region Removelist -->
+            <!--#region Removelist--> 
             <customControls:LinedHeader Grid.Row="5">
               <customControls:LinedHeader.Header>
                 <TextBlock Text="Remove">
@@ -345,9 +339,7 @@
                       SetIconVisible="False"
                       TypeLineVisible="False"
                       HoverPreviewEnabled="True"
-                      DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                      CountChangeCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardCountCommand, Mode=OneTime}"
-                      ChangePrintCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardPrintCommand, Mode=OneTime}"/>
+                      DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
                   </ListViewItem>
                 </DataTemplate>
               </cardlistview:AdvancedCardListView.ItemTemplate>
@@ -359,19 +351,24 @@
 
         </TabViewItem>
         <TabViewItem Header="Info" IsClosable="False">
-          <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="0 5 0 0" Orientation="Vertical" Spacing="5">
+          <ScrollViewer VerticalScrollBarVisibility="auto">
+            <StackPanel Orientation="Vertical" Spacing="5" Margin="0 5 0 0">
 
               <!--#region Side Buttons -->
-              <TextBlock>
-                <Run Text="Price:" />
-                <Run Text="{x:Bind helpers:Format.EuroToString(ViewModel.Price, 0), Mode=OneWay}" />
+              <TextBlock Margin="5">
+                <Run Text="Price:"/>
+                <Run Text="{x:Bind helpers:Format.EuroToString(ViewModel.Price, 0), Mode=OneWay}" FontWeight="Bold"/>
               </TextBlock>
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Content="Tokens" Command="{x:Bind ViewModel.ShowDeckTokensCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
-                <Button Content="EDHREC" Command="{x:Bind ViewModel.OpenEdhrecSearchWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
-                <Button Content="Playtest" Command="{x:Bind ViewModel.OpenDeckTestingWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
-              </StackPanel>
+              <Grid Margin="5" ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button HorizontalAlignment="Stretch" Grid.Column="0" Content="Tokens" Command="{x:Bind ViewModel.ShowDeckTokensCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+                <Button HorizontalAlignment="Stretch" Grid.Column="1" Content="EDHREC" Command="{x:Bind ViewModel.OpenEdhrecSearchWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+                <Button HorizontalAlignment="Stretch" Grid.Column="2" Content="Playtest" Command="{x:Bind ViewModel.OpenDeckTestingWindowCommand, Mode=OneTime}" Style="{StaticResource PrimaryButtonStyle}"/>
+              </Grid>
               <!--#endregion-->
 
               <!--#region Charts -->
@@ -567,6 +564,13 @@
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:CardGroupViewModel">
                   <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <StackPanel.Resources>
+                      <customControls:BindableCollectionView 
+                        x:Name="DeckCardsGroupCollectionSource" 
+                        Source="{x:Bind Cards, Mode=OneWay}"
+                        Filter="{Binding ElementName=Root, Path=CardFilter.ValidationPredicate, Mode=OneWay}"
+                        SortComparer="{Binding ElementName=Root, Path=CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
+                    </StackPanel.Resources>
                     <customControls:CustomExpander IsExpanded="True" HorizontalAlignment="Stretch">
                       <customControls:CustomExpander.Header>
                         <Grid HorizontalAlignment="Stretch">
@@ -601,56 +605,32 @@
                           </controls1:CardGroupViewGroupHeader>
                         </Grid>
                       </customControls:CustomExpander.Header>
-                      <customControls:CustomExpander.Content>
-                        <Grid 
-                          BorderBrush="{ThemeResource RegionColor}"
-                          Padding="10"
-                          BorderThickness="1 1 0 0">
-                          <cardlistview:DeckEditorGroupedCardItemsRepeater
-                            x:Name="DeckCardsGroupView"
-                            d:DataContext="{d:DesignInstance Type=viewmodels:ICardListViewModel}"
-                            DataContext="{x:Bind Mode=OneTime}"
-                            ItemsSource="{Binding ElementName=DeckCardsGroupCollectionSource, Path=View, Mode=OneTime}"
-                            Style="{StaticResource GridItemsRepeaterStyle}"
-                            Margin="0 0 0 10"
-                            MinHeight="200"
-                            SelectionMode="Single"
-                            AllowDrop="True"
-                            OnDropCopy="{x:Bind AddCardCommand, Mode=OneTime}"
-                            OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
-                            OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
-                            OnDropImport="{x:Bind ImportCardsCommand, Mode=OneTime}"
-                            LosingFocus="ListView_LosingFocus">
-                            <ItemsRepeater.Layout>
-                              <UniformGridLayout 
-                                MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
-                                ItemsStretch="Fill"/>
-                            </ItemsRepeater.Layout>
-                            <ItemsRepeater.KeyboardAccelerators>
-                              <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-                            </ItemsRepeater.KeyboardAccelerators>
-                            <ItemsRepeater.Resources>
-                              <customControls:BindableCollectionView 
-                                x:Name="DeckCardsGroupCollectionSource" 
-                                Source="{x:Bind Cards, Mode=OneTime}"
-                                Filter="{Binding ElementName=Root, Path=CardFilter.ValidationPredicate, Mode=OneWay}"
-                                SortComparer="{Binding ElementName=Root, Path=CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-                            </ItemsRepeater.Resources>
-                            <ItemsRepeater.ItemTemplate>
-                              <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                                <cardview:DeckEditorCardItemContainer
-                                  d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
-                                  Model="{x:Bind Mode=OneTime}"
-                                  CanDrag="True"
-                                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                                  CountChangeCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardCountCommand, Mode=OneTime}"
-                                  ChangePrintCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardPrintCommand, Mode=OneTime}"
-                                  OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneTime}"/>
-                              </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                          </cardlistview:DeckEditorGroupedCardItemsRepeater>
-                        </Grid>
-                      </customControls:CustomExpander.Content>
+                      <cardlistview:DeckEditorGroupedListViewContainer
+                        DataContext="{x:Bind Mode=OneTime}"
+                        ItemsSource="{Binding ElementName=DeckCardsGroupCollectionSource, Path=View, Mode=OneTime}"
+                        AllowDrop="True"
+                        OnDropCopy="{x:Bind AddCardCommand, Mode=OneTime}"
+                        OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
+                        OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
+                        OnDropImport="{x:Bind ImportCardsCommand, Mode=OneTime}">
+                        <cardlistview:DeckEditorListViewContainer.Layout>
+                          <UniformGridLayout
+                              MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
+                              ItemsStretch="Fill"/>
+                        </cardlistview:DeckEditorListViewContainer.Layout>
+                        <cardlistview:DeckEditorListViewContainer.ItemTemplate>
+                          <DataTemplate x:DataType="models:DeckEditorMTGCard">
+                            <customControls:DraggableItemContainer CanDrag="True">
+                              <cardview:AdvancedDeckEditorCardImageView
+                                d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
+                                Model="{x:Bind Mode=OneTime}"
+                                DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneWay}"
+                                OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneWay}">
+                              </cardview:AdvancedDeckEditorCardImageView>
+                            </customControls:DraggableItemContainer>
+                          </DataTemplate>
+                        </cardlistview:DeckEditorListViewContainer.ItemTemplate>
+                      </cardlistview:DeckEditorGroupedListViewContainer>
                     </customControls:CustomExpander>
                   </StackPanel>
                 </DataTemplate>
@@ -666,45 +646,39 @@
           x:Load="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Image, Mode=OneWay}"
           VerticalScrollBarVisibility="Auto" 
           Padding="10">
-          <cardlistview:DeckEditorCardItemsRepeater
-            x:Name="DeckCardsGridView"
+          <cardlistview:DeckEditorListViewContainer
             DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneTime}"
             ItemsSource="{x:Bind DeckCardsGridViewCollectionSource.View, Mode=OneTime}"
-            SelectionMode="Single"
             AllowDrop="True"
             OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
-            OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
             OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
             OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
-            LosingFocus="ListView_LosingFocus">
-            <ItemsRepeater.Layout>
+            OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}">
+            <cardlistview:DeckEditorListViewContainer.Layout>
               <UniformGridLayout
                 MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
                 ItemsStretch="Fill"/>
-            </ItemsRepeater.Layout>
-            <ItemsRepeater.Resources>
+            </cardlistview:DeckEditorListViewContainer.Layout>
+            <cardlistview:DeckEditorListViewContainer.Resources>
               <customControls:BindableCollectionView 
                 x:Name="DeckCardsGridViewCollectionSource" 
                 Source="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}"
                 Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
                 SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-            </ItemsRepeater.Resources>
-            <ItemsRepeater.KeyboardAccelerators>
-              <KeyboardAccelerator Key="Delete" Invoked="DeleteCardKeyboardAccelerator_Invoked"/>
-            </ItemsRepeater.KeyboardAccelerators>
-            <ItemsRepeater.ItemTemplate>
+            </cardlistview:DeckEditorListViewContainer.Resources>
+            <cardlistview:DeckEditorListViewContainer.ItemTemplate>
               <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                <cardview:DeckEditorCardItemContainer
-                  d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
-                  Model="{x:Bind Mode=OneTime}"
-                  CanDrag="True"
-                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                  CountChangeCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardCountCommand, Mode=OneTime}"
-                  ChangePrintCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardPrintCommand, Mode=OneTime}"
-                  OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneTime}"/>
+                <customControls:DraggableItemContainer CanDrag="True">
+                  <cardview:AdvancedDeckEditorCardImageView
+                    d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
+                    Model="{x:Bind Mode=OneTime}"
+                    DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneWay}"
+                    OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneWay}">
+                  </cardview:AdvancedDeckEditorCardImageView>
+                </customControls:DraggableItemContainer>
               </DataTemplate>
-            </ItemsRepeater.ItemTemplate>
-          </cardlistview:DeckEditorCardItemsRepeater>
+            </cardlistview:DeckEditorListViewContainer.ItemTemplate>
+          </cardlistview:DeckEditorListViewContainer>
         </ScrollViewer>
         <!--#endregion-->
 
@@ -742,9 +716,7 @@
                   DataContext="{Binding ElementName=DeckCardsListView, Path=DataContext, Mode=OneTime}"
                   Model="{x:Bind Mode=OneTime}" 
                   HoverPreviewEnabled="True"
-                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"
-                  CountChangeCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardCountCommand, Mode=OneTime}"
-                  ChangePrintCommand="{Binding ElementName=Root, Path=ViewModel.ChangeCardPrintCommand, Mode=OneTime}"/>
+                  DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
               </ListViewItem>
             </DataTemplate>
           </cardlistview:AdvancedCardListView.ItemTemplate>

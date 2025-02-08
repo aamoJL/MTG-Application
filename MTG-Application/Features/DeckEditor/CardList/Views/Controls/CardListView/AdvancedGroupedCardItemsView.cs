@@ -3,11 +3,13 @@ using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
+using System;
 using System.Collections;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
 
+[Obsolete("ItemsView is very unstable on version: 1.5.250108004. Use ListViewContainers instead.")]
 public partial class AdvancedGroupedCardItemsView : AdvancedCardItemsView
 {
   protected override void OnDragOver(DragEventArgs e)

@@ -14,6 +14,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView;
 
+[Obsolete("ItemsView is very unstable on version: 1.5.250108004. Use ListViewContainers instead.")]
 public partial class AdvancedCardItemsView : ItemsView
 {
   public static readonly DependencyProperty OnDropCopyProperty =

@@ -6,15 +6,16 @@ using System.Collections;
 
 namespace MTGApplication.General.Views.Controls;
 
-public partial class AdvancedItemsRepeater : ItemsRepeater
+public partial class SelectableItemsRepeater : ItemsRepeater
 {
   public static readonly DependencyProperty SelectionModeProperty =
-      DependencyProperty.Register(nameof(SelectionMode), typeof(ListViewSelectionMode), typeof(AdvancedItemsRepeater), new PropertyMetadata(ListViewSelectionMode.None));
+      DependencyProperty.Register(nameof(SelectionMode), typeof(ListViewSelectionMode), typeof(SelectableItemsRepeater), new PropertyMetadata(ListViewSelectionMode.None));
 
-  public AdvancedItemsRepeater() : base()
+  public SelectableItemsRepeater() : base()
   {
     ElementPrepared += AdvancedItemsRepeater_ElementPrepared;
     ElementClearing += AdvancedItemsRepeater_ElementClearing;
+    LosingFocus += SelectableItemsRepeater_LosingFocus;
 
     PointerClick.Clicked += Item_Clicked;
   }
@@ -24,6 +25,7 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
     get => (ListViewSelectionMode)GetValue(SelectionModeProperty);
     set => SetValue(SelectionModeProperty, value);
   }
+  public bool DeselectOnLosingFocus { get; set; } = false;
 
   public object? SelectedItem
   {
@@ -86,7 +88,10 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
   private void AdvancedItemsRepeater_ElementClearing(ItemsRepeater sender, ItemsRepeaterElementClearingEventArgs args)
   {
     if (args.Element == SelectedElement)
+    {
+      // TODO: select next item
       DeselectAll();
+    }
 
     args.Element.GotFocus -= Item_GotFocus;
     PointerClick.Unregister(args.Element);
@@ -111,6 +116,12 @@ public partial class AdvancedItemsRepeater : ItemsRepeater
 
   private void Item_Clicked(object? sender, PointerRoutedEventArgs e)
     => (sender as UIElement)?.Focus(FocusState.Pointer);
+
+  private void SelectableItemsRepeater_LosingFocus(UIElement sender, LosingFocusEventArgs args)
+  {
+    if (DeselectOnLosingFocus)
+      DeselectAll();
+  }
 
   /// <summary>
   /// Returns ItemContainer from element's visualtree if possible

@@ -12,6 +12,7 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -49,6 +50,9 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
         field.PropertyChanging -= Deck_PropertyChanging;
         field.PropertyChanged -= Deck_PropertyChanged;
         field.DeckCards.CollectionChanged -= DeckCards_CollectionChanged;
+        field.Maybelist.CollectionChanged -= CardList_CollectionChanged;
+        field.Wishlist.CollectionChanged -= CardList_CollectionChanged;
+        field.Removelist.CollectionChanged -= CardList_CollectionChanged;
 
         foreach (var item in field.DeckCards)
           item.PropertyChanged -= DeckCard_PropertyChanged;
@@ -61,9 +65,24 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
         field.PropertyChanging += Deck_PropertyChanging;
         field.PropertyChanged += Deck_PropertyChanged;
         field.DeckCards.CollectionChanged += DeckCards_CollectionChanged;
+        field.Maybelist.CollectionChanged += CardList_CollectionChanged;
+        field.Wishlist.CollectionChanged += CardList_CollectionChanged;
+        field.Removelist.CollectionChanged += CardList_CollectionChanged;
 
         foreach (var item in field.DeckCards)
           item.PropertyChanged += DeckCard_PropertyChanged;
+
+        AttachCommandsToCards([
+          .. field.DeckCards,
+          .. field.Maybelist,
+          .. field.Wishlist,
+          .. field.Removelist,
+          ]);
+
+        AttachCommandsToCards(new List<DeckEditorMTGCard?>([
+          field.Commander,
+          field.CommanderPartner
+          ]).OfType<DeckEditorMTGCard>());
       }
 
       DeckCardList.Cards = Deck.DeckCards;
@@ -145,8 +164,6 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   [NotNull] public IAsyncRelayCommand? ShowDeckTokensCommand => field ??= new ShowDeckTokens(this).Command;
   [NotNull] public IRelayCommand? OpenDeckTestingWindowCommand => field ??= new OpenDeckTestingWindow(this).Command;
   [NotNull] public IRelayCommand? OpenEdhrecSearchWindowCommand => field ??= new OpenEdhrecSearchWindow(this).Command;
-  [NotNull] public IRelayCommand<CardCountChangeArgs>? ChangeCardCountCommand => field ??= new ChangeCardCount(this).Command;
-  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCardPrintCommand => field ??= new ChangeCardPrint(this).Command;
 
   private void Deck_PropertyChanging(object? sender, System.ComponentModel.PropertyChangingEventArgs e)
   {
@@ -163,9 +180,15 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       or (nameof(DeckEditorMTGDeck.CommanderPartner)))
     {
       if (e.PropertyName == nameof(DeckEditorMTGDeck.Commander) && Deck.Commander != null)
+      {
         Deck.Commander.PropertyChanged += DeckCard_PropertyChanged;
+        Deck.Commander.ChangePrintCommand = new ChangeCardPrint(this).Command;
+      }
       else if (e.PropertyName == nameof(DeckEditorMTGDeck.CommanderPartner) && Deck.CommanderPartner != null)
+      {
         Deck.CommanderPartner.PropertyChanged += DeckCard_PropertyChanged;
+        Deck.CommanderPartner.ChangePrintCommand = new ChangeCardPrint(this).Command;
+      }
 
       OnPropertyChanged(nameof(Size));
       OnPropertyChanged(nameof(Price));
@@ -178,8 +201,16 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       OnPropertyChanged(nameof(Name));
   }
 
+  private void CardList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is IList newItems)
+      AttachCommandsToCards(newItems.OfType<DeckEditorMTGCard>());
+  }
+
   private void DeckCards_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
+    CardList_CollectionChanged(sender, e);
+
     if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is IList newItems)
     {
       foreach (var item in newItems.OfType<DeckEditorMTGCard>())
@@ -217,4 +248,13 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 
   private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     => HasUnsavedChanges = e.Action != NotifyCollectionChangedAction.Reset;
+
+  private void AttachCommandsToCards(IEnumerable<DeckEditorMTGCard> cards)
+  {
+    foreach (var item in cards)
+    {
+      item.ChangePrintCommand = new ChangeCardPrint(this).Command;
+      item.ChangeCountCommand = new ChangeCardCount(this).Command;
+    }
+  }
 }

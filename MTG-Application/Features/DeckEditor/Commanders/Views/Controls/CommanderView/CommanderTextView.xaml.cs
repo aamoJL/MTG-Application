@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor.Commanders.Views.Controls.CommanderView;
+
 public sealed partial class CommanderTextView : DeckEditorCardViewBase
 {
   public static readonly DependencyProperty PrefixTextProperty =
