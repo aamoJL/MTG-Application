@@ -71,7 +71,7 @@
               ItemsStretch="Fill"/>
           </ItemsView.Layout>
           <interactivity:Interaction.Behaviors>
-            <bindinghelpers:LoadMoreItemBehavior LoadingOffset="200" LoadCount="{x:Bind ViewModel.Cards.Collection.Count, Mode=OneWay}"/>
+            <bindinghelpers:ItemsViewIncrementalLoading LoadingOffset="200" LoadCount="{x:Bind ViewModel.Cards.Collection.Count, Mode=OneWay}"/>
           </interactivity:Interaction.Behaviors>
           <ItemsView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">

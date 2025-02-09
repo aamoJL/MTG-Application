@@ -17,7 +17,7 @@ namespace MTGApplication.General.Views.BindingHelpers;
 /// <summary>
 /// A behavior that makes <see cref="ItemsView"/> support <see cref="ISupportIncrementalLoading"/>.
 /// </summary>
-public class LoadMoreItemBehavior : Behavior<ItemsView>
+public class ItemsViewIncrementalLoading : Behavior<ItemsView>
 {
   /// <summary>
   /// Identifies the <see cref="LoadingOffset"/> property.
@@ -25,7 +25,7 @@ public class LoadMoreItemBehavior : Behavior<ItemsView>
   public static readonly DependencyProperty LoadingOffsetProperty = DependencyProperty.Register(
       nameof(LoadingOffset),
       typeof(double),
-      typeof(LoadMoreItemBehavior),
+      typeof(ItemsViewIncrementalLoading),
       new PropertyMetadata(100d));
 
   /// <summary>
@@ -43,7 +43,7 @@ public class LoadMoreItemBehavior : Behavior<ItemsView>
   public static readonly DependencyProperty IsActiveProperty = DependencyProperty.Register(
       nameof(IsActive),
       typeof(bool),
-      typeof(LoadMoreItemBehavior),
+      typeof(ItemsViewIncrementalLoading),
       new PropertyMetadata(true));
 
   /// <summary>
@@ -61,7 +61,7 @@ public class LoadMoreItemBehavior : Behavior<ItemsView>
   public static readonly DependencyProperty IsLoadingMoreProperty = DependencyProperty.Register(
       nameof(IsLoadingMore),
       typeof(bool),
-      typeof(LoadMoreItemBehavior),
+      typeof(ItemsViewIncrementalLoading),
       new PropertyMetadata(false));
 
   /// <summary>
@@ -79,7 +79,7 @@ public class LoadMoreItemBehavior : Behavior<ItemsView>
   public static readonly DependencyProperty LoadCountProperty = DependencyProperty.Register(
       nameof(LoadCount),
       typeof(int),
-      typeof(LoadMoreItemBehavior),
+      typeof(ItemsViewIncrementalLoading),
       new PropertyMetadata(20));
 
   /// <summary>
