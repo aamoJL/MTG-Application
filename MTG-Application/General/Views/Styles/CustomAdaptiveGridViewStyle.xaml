@@ -11,6 +11,5 @@
 
   <Style x:Name="GridItemsRepeaterStyle" TargetType="ItemsRepeater">
     <Setter Property="MinWidth" Value="100" />
-    <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
   </Style>
 </ResourceDictionary>

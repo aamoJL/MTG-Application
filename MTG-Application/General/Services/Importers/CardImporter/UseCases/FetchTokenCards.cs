@@ -12,12 +12,13 @@ public class FetchTokenCards(IMTGCardImporter importer) : UseCase<IEnumerable<MT
   /// /// <inheritdoc cref="FetchCardsWithImportString.Execute(string)" path="/exception"/>
   public override async Task<CardImportResult> Execute(IEnumerable<MTGCard> cards)
   {
-    var ids = string.Join(Environment.NewLine,
-      cards
-      .Where(x => x.Info.Tokens.Length > 0)
-      .DistinctBy(x => x.Info.OracleId)
-      .SelectMany(c => c.Info.Tokens.Select(t => t.ScryfallId.ToString())));
+    var ids = string.Join(Environment.NewLine, cards
+      .SelectMany(c => c.Info.Tokens)
+      .Select(t => t.ScryfallId)
+      .Distinct());
 
-    return await new FetchCardsWithImportString(importer).Execute(ids);
+    var result = await new FetchCardsWithImportString(importer).Execute(ids);
+
+    return result with { Found = [.. result.Found.DistinctBy(x => x.Info.OracleId).OrderBy(x => x.Info.Name)] };
   }
 }

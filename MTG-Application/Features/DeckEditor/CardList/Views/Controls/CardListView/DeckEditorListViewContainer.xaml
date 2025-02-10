@@ -15,7 +15,8 @@
       ItemTemplate="{x:Bind ItemTemplate, Mode=OneWay}"
       Layout="{x:Bind Layout, Mode=OneWay}"
       SelectionMode="Single"
-      DeselectOnLosingFocus="True">
+      DeselectOnLosingFocus="True"
+      VerticalCacheLength="100">
       <ItemsRepeater.KeyboardAccelerators>
         <KeyboardAccelerator Key="Delete" Invoked="KeyboardAccelerator_Invoked"/>
       </ItemsRepeater.KeyboardAccelerators>

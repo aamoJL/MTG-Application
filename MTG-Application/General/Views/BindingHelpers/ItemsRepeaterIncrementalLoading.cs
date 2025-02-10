@@ -88,7 +88,6 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
   private ItemsRepeater? ItemsRepeater => AssociatedObject;
   private ScrollViewer? ScrollViewer => field ??= AssociatedObject.FindAscendant<ScrollViewer>();
 
-  //private long _scrollViewOnPropertyChangedToken;
   private long _itemsSourceOnPropertyChangedToken;
 
   private INotifyCollectionChanged? _lastObservableCollection;

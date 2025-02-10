@@ -134,10 +134,7 @@ public partial class DeckEditorListViewContainer : UserControl
 
       itemsViewViewModel.RemoveCardCommand.Execute(selectedItem);
 
-      // Recalculate the index and focus the element in the index position if the element exists.
-      if ((index = Math.Clamp(index, -1, source.Count - 1)) >= 0)
-        if (source[index] is object nextItem)
-          air.SelectItem(nextItem);
+      args.Handled = true;
     }
   }
 }

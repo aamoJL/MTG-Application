@@ -608,6 +608,7 @@
                       <cardlistview:DeckEditorGroupedListViewContainer
                         DataContext="{x:Bind Mode=OneTime}"
                         ItemsSource="{Binding ElementName=DeckCardsGroupCollectionSource, Path=View, Mode=OneTime}"
+                        MinHeight="200"
                         AllowDrop="True"
                         OnDropCopy="{x:Bind AddCardCommand, Mode=OneTime}"
                         OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
