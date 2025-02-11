@@ -173,7 +173,10 @@
             <UniformGridLayout MinItemWidth="230" ItemsStretch="Fill"/>
           </ItemsRepeater.Layout>
           <interactivity:Interaction.Behaviors>
-            <helpers:ItemsRepeaterIncrementalLoading LoadingOffset="200" LoadCount="{x:Bind ViewModel.SelectedCardCollectionListViewModel.Cards.Count, Mode=OneWay}"/>
+            <helpers:ItemsRepeaterIncrementalLoading 
+              LoadingOffset="200" 
+              LoadCount="{x:Bind ViewModel.Importer.PageSize, Mode=OneTime}"
+              IsLoadingMore="{x:Bind ViewModel.SelectedCardCollectionListViewModel.Cards.IsLoading, Mode=OneWay}"/>
           </interactivity:Interaction.Behaviors>
           <ItemsRepeater.ItemTemplate>
             <DataTemplate x:DataType="models:CardCollectionMTGCard">

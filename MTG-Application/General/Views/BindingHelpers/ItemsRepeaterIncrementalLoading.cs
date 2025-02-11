@@ -111,19 +111,6 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
     _itemsSourceOnPropertyChangedToken = RegisterPropertyChangedCallback(ItemsRepeater.ItemsSourceProperty, ItemsSourceOnPropertyChanged);
   }
 
-  private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
-  {
-    AssociatedObject.Loaded -= AssociatedObject_Loaded;
-
-    if (ScrollViewer != null)
-    {
-      ScrollViewer.ViewChanged += TryRaiseLoadMoreRequested;
-
-      if (ItemsRepeater is not null)
-        ItemsRepeater.SizeChanged += TryRaiseLoadMoreRequested;
-    }
-  }
-
   /// <inheritdoc/>
   protected override void OnDetaching()
   {
@@ -135,6 +122,19 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
       ItemsRepeater.SizeChanged -= TryRaiseLoadMoreRequested;
     if (ScrollViewer is not null)
       ScrollViewer.ViewChanged -= TryRaiseLoadMoreRequested;
+  }
+
+  private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
+  {
+    AssociatedObject.Loaded -= AssociatedObject_Loaded;
+
+    if (ScrollViewer != null)
+    {
+      ScrollViewer.ViewChanged += TryRaiseLoadMoreRequested;
+
+      if (ItemsRepeater is not null)
+        ItemsRepeater.SizeChanged += TryRaiseLoadMoreRequested;
+    }
   }
 
   /// <summary>
@@ -155,7 +155,7 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
         ncc.CollectionChanged += TryRaiseLoadMoreRequested;
       }
 
-      // On the first load, the `ScrollViewer` is not yet initialized and can be given to `AdvancedItemsView_OnSizeChanged` to trigger.
+      // On the first load, the `ScrollViewer` is not yet initialized.
       if (ScrollViewer is not null)
         await TryRaiseLoadMoreRequestedAsync();
     }
@@ -174,6 +174,7 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
       return;
 
     var loadMore = true;
+
     // Load until a new item is loaded in
     while (loadMore)
     {
@@ -188,10 +189,13 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
            ScrollViewer.ScrollableWidth - LoadingOffset < ScrollViewer.HorizontalOffset))
       {
         IsLoadingMore = true;
+
         var before = GetItemsCount();
+
         if (LoadMoreRequested is not null && await LoadMoreRequested(AssociatedObject, EventArgs.Empty))
         {
           var after = GetItemsCount();
+
           // This can be set to the count of items in a row,
           // so that it can continue to load even if the count of items loaded is too small.
           // Generally, 20 items will be loaded at a time,
@@ -199,8 +203,8 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
           if (before + 10 <= after)
             loadMore = false;
         }
-        // No more items or ItemsSource is null
         else
+          // No more items or ItemsSource is null
           loadMore = false;
 
         IsLoadingMore = false;

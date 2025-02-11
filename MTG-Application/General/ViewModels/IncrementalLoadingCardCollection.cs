@@ -20,6 +20,10 @@ public partial class IncrementalLoadingCardCollection<TCard>(IncrementalCardSour
     Source.NextPage = nextPageUri;
     Source.Cards = cards;
 
+    // Collection needs to be cleared before refreshing, otherwise the collection
+    //  won't load new items sometimes.
+    Collection.Clear();
+
     await Collection.RefreshAsync();
   }
 }

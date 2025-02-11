@@ -11,9 +11,11 @@
   xmlns:models="using:MTGApplication.General.Models"
   xmlns:viewmodels="using:MTGApplication.Features.EdhrecSearch.ViewModels" 
   xmlns:sys="using:System" 
-  xmlns:customcontrols="using:MTGApplication.General.Views.Controls"
+  xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
+  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
   mc:Ignorable="d"
-  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
 
   <Grid>
     <controls:DockPanel 
@@ -32,7 +34,7 @@
                 SelectionChangedCommand="{x:Bind ViewModel.ChangeCommanderThemeCommand, Mode=OneTime}"
                 PlaceholderText="Select Theme..."
                 Width="200"
-                SelectedItem="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}">
+                Margin="-5 0 0 0">
                 <ComboBox.ItemTemplate>
                   <DataTemplate>
                     <TextBlock Text="{Binding Name, Mode=OneTime}"/>
@@ -60,34 +62,40 @@
       <!--#endregion-->
 
       <!--#region Card View -->
-      <Grid controls:DockPanel.Dock="Top">
-        <ItemsView
+      <ScrollViewer
+        controls:DockPanel.Dock="Top"
+        BorderThickness="1 1 0 0"
+        BorderBrush="{ThemeResource RegionColor}"
+        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <ItemsRepeater
           x:Name="SearchCardsImageView"
           DataContext="{x:Bind ViewModel, Mode=OneTime}"
           ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
-          Style="{StaticResource GridItemsViewStyle}"
-          BorderBrush="{ThemeResource RegionColor}"
-          SelectionMode="None">
-          <ItemsView.Layout>
+          Style="{StaticResource GridItemsRepeaterStyle}">
+          <ItemsRepeater.Layout>
             <UniformGridLayout
               MinItemWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"
               ItemsStretch="Fill"/>
-          </ItemsView.Layout>
-          <ItemsView.ItemTemplate>
+          </ItemsRepeater.Layout>
+          <interactivity:Interaction.Behaviors>
+            <bindinghelpers:ItemsRepeaterIncrementalLoading 
+              LoadingOffset="200"
+              LoadCount="{x:Bind ViewModel.Importer.PageSize, Mode=OneTime}"
+              IsLoadingMore="{x:Bind ViewModel.Cards.Collection.IsLoading, Mode=OneWay}"/>
+          </interactivity:Interaction.Behaviors>
+          <ItemsRepeater.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
-              <customcontrols:DraggableItemContainer CanDrag="True">
-                <cardview:CardSearchCardImageView
-                  d:DataContext="{d:DesignInstance Type=viewmodels:EdhrecSearchPageViewModel}"
-                  DataContext="{Binding ElementName=SearchCardsImageView, Path=DataContext, Mode=OneTime}"
-                  Model="{x:Bind Mode=OneWay}"
-                  ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
-              </customcontrols:DraggableItemContainer>
+              <cardview:CardSearchCardImageView
+                d:DataContext="{d:DesignInstance Type=viewmodels:EdhrecSearchPageViewModel}"
+                Model="{x:Bind Mode=OneWay}"
+                CanDrag="True"
+                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
             </DataTemplate>
-          </ItemsView.ItemTemplate>
-        </ItemsView>
-      </Grid>
+          </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+      </ScrollViewer>
       <!--#endregion-->
-      
+
     </controls:DockPanel>
   </Grid>
 </Page>

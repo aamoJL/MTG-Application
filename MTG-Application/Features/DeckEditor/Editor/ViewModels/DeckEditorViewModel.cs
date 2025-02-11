@@ -102,6 +102,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
       ShowDeckTokensCommand?.NotifyCanExecuteChanged();
       OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
       OpenEdhrecSearchWindowCommand?.NotifyCanExecuteChanged();
+      OpenEdhrecCommanderWebsiteCommand?.NotifyCanExecuteChanged();
     }
   }
 

@@ -13,18 +13,21 @@ public partial class DeckEditorViewModelTests
     [TestMethod]
     public async Task ChangePrint_ConfirmationShown()
     {
+      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
       var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
-      var viewmodel = new Mocker(_dependencies)
+      _ = new Mocker(_dependencies)
       {
+        Deck = new()
+        {
+          DeckCards = [card]
+        },
         Confirmers = new()
         {
           ChangeCardPrintConfirmer = confirmer
         }
       }.MockVM();
 
-      var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-
-      await viewmodel.ChangeCardPrintCommand.ExecuteAsync(card);
+      await card.ChangePrintCommand.ExecuteAsync(card);
 
       ConfirmationAssert.ConfirmationShown(confirmer);
     }
@@ -39,6 +42,10 @@ public partial class DeckEditorViewModelTests
 
       var viewmodel = new Mocker(_dependencies)
       {
+        Deck = new()
+        {
+          DeckCards = [card]
+        },
         Confirmers = new()
         {
           ChangeCardPrintConfirmer = new()
@@ -48,7 +55,7 @@ public partial class DeckEditorViewModelTests
         }
       }.MockVM();
 
-      await viewmodel.ChangeCardPrintCommand.ExecuteAsync(card);
+      await card.ChangePrintCommand.ExecuteAsync(card);
 
       Assert.AreEqual(newPrint.SetCode, card.Info.SetCode);
 

@@ -65,7 +65,7 @@
           Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
           <ItemsRepeater
             DataContext="{x:Bind ViewModel, Mode=OneTime}"
-            ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
+            ItemsSource="{Binding Cards.Collection, Mode=OneWay}"
             Style="{StaticResource GridItemsRepeaterStyle}">
             <ItemsRepeater.Layout>
               <UniformGridLayout
@@ -74,8 +74,9 @@
             </ItemsRepeater.Layout>
             <interactivity:Interaction.Behaviors>
               <bindinghelpers:ItemsRepeaterIncrementalLoading 
-                LoadingOffset="200" 
-                LoadCount="{x:Bind ViewModel.Cards.Collection.Count, Mode=OneWay}"/>
+                LoadingOffset="200"
+                LoadCount="{x:Bind ViewModel.Importer.PageSize, Mode=OneTime}"
+                IsLoadingMore="{x:Bind ViewModel.Cards.Collection.IsLoading, Mode=OneWay}"/>
             </interactivity:Interaction.Behaviors>
             <ItemsRepeater.ItemTemplate>
               <DataTemplate x:DataType="models:MTGCard">

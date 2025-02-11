@@ -16,7 +16,9 @@
         x:Name="GridViewItemImage" 
         Style="{StaticResource PlaceholderImageStyle}" 
         Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-        Opacity="{x:Bind OwnedToOpacity(Model.IsOwned), Mode=OneWay}">
+        Opacity="{x:Bind OwnedToOpacity(Model.IsOwned), Mode=OneWay}"
+        EnableLazyLoading="True"
+        LazyLoadingThreshold="400">
         <controls:ImageEx.ContextFlyout>
           <CommandBarFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
             <CommandBarFlyout.SecondaryCommands>
