@@ -93,12 +93,14 @@ public partial class SelectableItemsRepeater : ItemsRepeater
       SelectedElement = args.Element;
 
     args.Element.GettingFocus += Item_GettingFocus;
+    args.Element.GotFocus += Item_GotFocus;
     PointerClick.Register(args.Element);
   }
 
   private void OnElementClearing(ItemsRepeater sender, ItemsRepeaterElementClearingEventArgs args)
   {
     args.Element.GettingFocus -= Item_GettingFocus;
+    args.Element.GotFocus -= Item_GotFocus;
     PointerClick.Unregister(args.Element);
   }
 
@@ -144,8 +146,27 @@ public partial class SelectableItemsRepeater : ItemsRepeater
 
   private void Item_GettingFocus(UIElement sender, GettingFocusEventArgs args)
   {
-    if (sender != SelectedElement)
+    if (sender == SelectedElement)
+      return;
+
+    if (args.FocusState != FocusState.Keyboard)
       args.TryCancel();
+
+    // Change selected item on focus only if the focus changed using keyboard navigation
+    if (args.Direction
+      is not (FocusNavigationDirection.Up
+      or FocusNavigationDirection.Down
+      or FocusNavigationDirection.Left
+      or FocusNavigationDirection.Right))
+      args.TryCancel();
+  }
+
+  private void Item_GotFocus(object sender, RoutedEventArgs e)
+  {
+    if (sender is not UIElement element)
+      return;
+
+    SelectedElement = element;
   }
 
   private void Item_Clicked(object? sender, PointerRoutedEventArgs e)

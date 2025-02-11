@@ -147,7 +147,6 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       itemsViewViewModel.RemoveCardCommand.Execute(selectedItem);
 
       itemsView.Select(index < source.Count ? index : index - 1);
-
     }
 
     args.Handled = true;
