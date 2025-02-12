@@ -8,4 +8,8 @@
     <Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
     <Setter Property="BorderThickness" Value="1 1 0 0" />
   </Style>
+
+  <Style x:Name="GridItemsRepeaterStyle" TargetType="ItemsRepeater">
+    <Setter Property="MinWidth" Value="100" />
+  </Style>
 </ResourceDictionary>

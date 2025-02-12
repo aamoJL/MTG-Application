@@ -6,6 +6,7 @@ using MTGApplication.General.Views.Extensions;
 using System;
 
 namespace MTGApplication.General.Views.Dialogs.Controls;
+
 public sealed partial class GridViewDialog : ObjectDialog
 {
   public GridViewDialog(string title, object[] items, DataTemplate itemTemplate) : base(title)
@@ -14,8 +15,9 @@ public sealed partial class GridViewDialog : ObjectDialog
 
     Items = items;
     ItemTemplate = itemTemplate;
-
     SecondaryButtonText = string.Empty;
+
+    PointerExited += GridViewDialog_PointerExited;
   }
 
   public object[] Items { get; }
@@ -27,6 +29,8 @@ public sealed partial class GridViewDialog : ObjectDialog
   private ListViewSelectionMode SelectionMode => CanSelectItems ? ListViewSelectionMode.Single : ListViewSelectionMode.None;
 
   public Action<DragItemsStartingEventArgs>? OnItemDragStarting { get; set; }
+
+  private bool IsDraggingItem { get; set; } = false;
 
   protected override object? ProcessResult(ContentDialogResult result)
     => result switch
@@ -48,8 +52,16 @@ public sealed partial class GridViewDialog : ObjectDialog
 
   private void GridView_DragItemsStarting(object _, DragItemsStartingEventArgs e)
   {
-    Hide();
-
     OnItemDragStarting?.Invoke(e);
+
+    // Hiding the dialog here sometime causes Access Violation Exception to be thrown that can't be caught,
+    //  so the dragging needs to be tracked with the draggingItem variable and hide the dialog on pointerExited.
+    IsDraggingItem = true;
+  }
+
+  private void GridViewDialog_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if (IsDraggingItem)
+      Hide();
   }
 }

@@ -26,7 +26,7 @@
           <AppBarButton Command="{x:Bind DeleteButtonClick, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
         </CommandBarFlyout.PrimaryCommands>
         <CommandBarFlyout.SecondaryCommands>
-          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind ChangePrintCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind Model.ChangePrintCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
           <AppBarSeparator/>
           <AppBarElementContainer AllowFocusOnInteraction="True" RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}">
             <StackPanel Orientation="Horizontal">

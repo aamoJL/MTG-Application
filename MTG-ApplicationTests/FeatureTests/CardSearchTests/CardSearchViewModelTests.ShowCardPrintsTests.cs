@@ -15,7 +15,7 @@ public partial class CardSearchViewModelTests
     [TestMethod]
     public async Task ChangePrint_ConfirmationShown()
     {
-      var confirmer = new TestConfirmer<MTGCard, IEnumerable<MTGCard>>();
+      var confirmer = new TestDataOnlyConfirmer<IEnumerable<MTGCard>>();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
       var viewmodel = new CardSearchViewModel(new TestMTGCardImporter())
       {

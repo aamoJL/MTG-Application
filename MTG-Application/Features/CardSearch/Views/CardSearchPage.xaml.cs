@@ -6,6 +6,7 @@ using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
+using MTGApplication.General.Views.Styles.Templates;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -31,9 +32,9 @@ public sealed partial class CardSearchPage : Page
 
     ViewModel.Confirmers.ShowCardPrintsConfirmer.OnConfirm = async (msg) =>
     {
-      Application.Current.Resources.TryGetValue("MTGPrintGridViewItemTemplate", out var template);
+      Application.Current.Resources.TryGetValue(nameof(MTGPrintGridViewItemTemplate), out var template);
 
-      return (await DialogService.ShowAsync(XamlRoot, new GridViewDialog(
+      await DialogService.ShowAsync(XamlRoot, new GridViewDialog(
         title: msg.Title,
         items: msg.Data.ToArray(),
         itemTemplate: (DataTemplate)template)
@@ -41,15 +42,16 @@ public sealed partial class CardSearchPage : Page
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close",
         CanDragItems = true,
+        CanSelectItems = false,
         OnItemDragStarting = (e) =>
         {
-          if (e.Items[0] is MTGCard card)
+          if (e.Items.FirstOrDefault() is MTGCard card)
           {
             DragAndDrop<CardMoveArgs>.Item = new(card);
             e.Data.RequestedOperation = DataPackageOperation.Copy;
           }
         }
-      })) as MTGCard;
+      });
     };
 
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);

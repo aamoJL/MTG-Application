@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MTGApplication.General.Models;
 using System;
+using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Models;
 
@@ -27,6 +29,17 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCar
   } = LimitCount(count);
 
   [ObservableProperty] public partial string Group { get; set; } = string.Empty;
+
+  public IAsyncRelayCommand<DeckEditorMTGCard>? ChangePrintCommand
+  {
+    get;
+    set => SetProperty(ref field, value);
+  }
+  public IRelayCommand<CardCountChangeArgs>? ChangeCountCommand
+  {
+    get;
+    set => SetProperty(ref field, value);
+  }
 
   private static int LimitCount(int value) => Math.Max(1, value);
 }

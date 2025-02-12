@@ -26,10 +26,12 @@ public partial class DeckEditorCardTextView : DeckEditorCardViewBase
 
   private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs e)
   {
-    if (e.NewValue == Model.Count) return;
+    if (e.NewValue == Model.Count)
+      return;
 
     var args = new CardCountChangeArgs(Model, (int)e.NewValue);
 
-    if (CountChangeCommand?.CanExecute(args) is true) CountChangeCommand.Execute(args);
+    if (Model.ChangeCountCommand?.CanExecute(args) is true)
+      Model.ChangeCountCommand.Execute(args);
   }
 }

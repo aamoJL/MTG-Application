@@ -134,8 +134,6 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
         listview.SelectedIndex = index;
       }
-
-      args.Handled = true;
     }
     else if (args.Element is ItemsView itemsView)
     {
@@ -149,9 +147,9 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
       itemsViewViewModel.RemoveCardCommand.Execute(selectedItem);
 
       itemsView.Select(index < source.Count ? index : index - 1);
-
-      args.Handled = true;
     }
+
+    args.Handled = true;
   }
 
   private void ListView_LosingFocus(UIElement sender, LosingFocusEventArgs args)
@@ -165,8 +163,8 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         return;
 
       listview.DeselectAll();
-
-      args.Handled = true;
     }
+
+    args.Handled = true;
   }
 }

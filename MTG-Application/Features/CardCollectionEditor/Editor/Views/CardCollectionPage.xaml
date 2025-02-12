@@ -96,7 +96,7 @@
             <AppBarButton.Flyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                 <MenuFlyoutItem Text="New..." Command="{x:Bind ViewModel.NewListCommand, Mode=OneTime}" />
-                <MenuFlyoutItem Text="Edit..." Command="{x:Bind ViewModel.EditListCommand, Mode=OneTime}" />
+                <MenuFlyoutItem Text="Edit..." Command="{x:Bind ViewModel.EditListCommand, Mode=OneTime}" CommandParameter="{x:Bind ViewModel.SelectedCardCollectionListViewModel.CollectionList, Mode=OneWay}"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Import..." Command="{x:Bind ViewModel.SelectedCardCollectionListViewModel.ImportCardsCommand, Mode=OneTime}" />
                 <MenuFlyoutItem Text="Export..." Command="{x:Bind ViewModel.SelectedCardCollectionListViewModel.ExportCardsCommand, Mode=OneTime}" />
@@ -140,8 +140,16 @@
         </StackPanel>
 
         <!--#region Card View Information -->
-        <Grid HorizontalAlignment="Right" Padding="0 0 10 0">
-          <ToggleButton x:Name="SingleTapSelectionModeSwitch" Content="Single click" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 5 0 0" />
+        <Grid HorizontalAlignment="Right" Margin="0 5 5 0">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5">
+            <ToggleButton x:Name="SingleTapSelectionModeSwitch" ToolTipService.ToolTip="Single tap">
+              <FontIcon Glyph="&#xE815;" />
+            </ToggleButton>
+            <Button Command="{x:Bind SwitchWindowThemeCommand, Mode=OneTime}" ToolTipService.ToolTip="Switch theme">
+              <FontIcon Glyph="&#xE793;"/>
+            </Button>
+          </StackPanel>
+          
           <TextBlock VerticalAlignment="Bottom">
             <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.SelectedCardCollectionListViewModel.Cards.Count), Mode=OneWay}" />
             <Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.SelectedCardCollectionListViewModel.TotalCount), Mode=OneWay}" />
@@ -153,35 +161,35 @@
       <!--#endregion-->
 
       <!--#region Card View -->
-      <!--TODO: remove scrollviewer if itemsview's scrolling speed has been increased on update.-->
-      <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <ItemsView
+      <ScrollViewer 
+        VerticalScrollBarVisibility="Auto"
+        controls:DockPanel.Dock="Top">
+        <ItemsRepeater
           x:Name="ListCardImageView"
-          controls:DockPanel.Dock="Top"
           DataContext="{x:Bind ViewModel.SelectedCardCollectionListViewModel, Mode=OneWay}"
           ItemsSource="{Binding Cards, Mode=OneWay}"
-          Style="{StaticResource GridItemsViewStyle}"
-          SelectionMode="None">
-          <ItemsView.Layout>
+          Style="{StaticResource GridItemsRepeaterStyle}">
+          <ItemsRepeater.Layout>
             <UniformGridLayout MinItemWidth="230" ItemsStretch="Fill"/>
-          </ItemsView.Layout>
+          </ItemsRepeater.Layout>
           <interactivity:Interaction.Behaviors>
-            <helpers:LoadMoreItemBehavior LoadingOffset="200" LoadCount="{x:Bind ViewModel.SelectedCardCollectionListViewModel.Cards.Count, Mode=OneWay}"/>
+            <helpers:ItemsRepeaterIncrementalLoading 
+              LoadingOffset="200" 
+              LoadCount="{x:Bind ViewModel.Importer.PageSize, Mode=OneTime}"
+              IsLoadingMore="{x:Bind ViewModel.SelectedCardCollectionListViewModel.Cards.IsLoading, Mode=OneWay}"/>
           </interactivity:Interaction.Behaviors>
-          <ItemsView.ItemTemplate>
+          <ItemsRepeater.ItemTemplate>
             <DataTemplate x:DataType="models:CardCollectionMTGCard">
-              <ItemContainer>
-                <localControls:CardCollectionCardImageView
-                  d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
-                  DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
-                  Model="{x:Bind Mode=OneTime}"
-                  ShowPrintsCommand="{Binding ElementName=Root, Path=ViewModel.ShowCardPrintsCommand, Mode=OneTime}"
-                  SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
-                  OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
-              </ItemContainer>
+              <localControls:CardCollectionCardImageView
+                d:DataContext="{d:DesignInstance Type=listViewmodels:CardCollectionListViewModel}"
+                DataContext="{Binding ElementName=ListCardImageView, Path=DataContext, Mode=OneTime}"
+                Model="{x:Bind Mode=OneTime}"
+                ShowPrintsCommand="{Binding ElementName=Root, Path=ViewModel.ShowCardPrintsCommand, Mode=OneTime}"
+                SelectionMode="{Binding ElementName=SingleTapSelectionModeSwitch, Path=IsChecked, Converter={StaticResource BoolToSelectionModeConverter}}"
+                OnSwitchOwnershipCommand="{Binding SwitchCardOwnershipCommand, Mode=OneTime}"/>
             </DataTemplate>
-          </ItemsView.ItemTemplate>
-        </ItemsView>
+          </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
       </ScrollViewer>
       <!--#endregion-->
 

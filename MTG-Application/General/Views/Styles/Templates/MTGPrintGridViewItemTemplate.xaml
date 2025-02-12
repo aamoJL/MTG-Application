@@ -9,10 +9,11 @@
   xmlns:controls="using:MTGApplication.General.Views.Controls.ImageEx"
   mc:Ignorable="d">
 
-  <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
-
   <DataTemplate x:Key="MTGPrintGridViewItemTemplate" x:DataType="models:MTGCard">
     <StackPanel Orientation="Vertical" Padding="5" ToolTipService.ToolTip="{Binding Info.SetName}" Width="240">
+      <StackPanel.Resources>
+        <converters:FloatToEuroStringConverter x:Key="FloatToEuroStringConverter" />
+      </StackPanel.Resources>
       <controls:ImageEx Source="{Binding Info.FrontFace.ImageUri, Mode=OneWay}" Style="{StaticResource PlaceholderImageStyle}"/>
       <Grid HorizontalAlignment="Stretch" ColumnSpacing="20">
         <Grid.ColumnDefinitions>

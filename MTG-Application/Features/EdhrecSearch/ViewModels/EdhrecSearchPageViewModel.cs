@@ -9,7 +9,6 @@ namespace MTGApplication.Features.EdhrecSearch.ViewModels;
 public partial class EdhrecSearchPageViewModel(IMTGCardImporter importer) : CardSearchViewModel(importer)
 {
   public CommanderTheme[] CommanderThemes { get; set; } = [];
-  public CommanderTheme SelectedTheme { get; set; }
 
   [NotNull] public IAsyncRelayCommand<CommanderTheme>? ChangeCommanderThemeCommand => field ??= new ChangeCommanderTheme(this).Command;
 }

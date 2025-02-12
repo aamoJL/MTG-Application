@@ -17,10 +17,15 @@ public partial class DeckEditorViewModelTests
 
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel(count: oldValue);
 
-      var viewmodel = new Mocker(_dependencies).MockVM();
-      var args = new CardCountChangeArgs(card, newValue);
+      var viewmodel = new Mocker(_dependencies)
+      {
+        Deck = new()
+        {
+          DeckCards = [card]
+        }
+      }.MockVM();
 
-      viewmodel.ChangeCardCountCommand.Execute(args);
+      card.ChangeCountCommand.Execute(new CardCountChangeArgs(card, newValue));
 
       Assert.AreEqual(newValue, card.Count);
 

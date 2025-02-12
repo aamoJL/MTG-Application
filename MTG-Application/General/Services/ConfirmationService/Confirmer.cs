@@ -18,3 +18,16 @@ public class Confirmer<TReturn>
   public async Task<TReturn?> Confirm(Confirmation confirmation)
     => OnConfirm == null ? default : await OnConfirm.Invoke(confirmation);
 }
+
+public class DataOnlyConfirmer<TArgs>
+{
+  public virtual Func<Confirmation<TArgs>, Task>? OnConfirm { protected get; set; }
+
+  public async Task Confirm(Confirmation<TArgs> confirmation)
+  {
+    if (OnConfirm == null || confirmation == null)
+      return;
+
+    await OnConfirm.Invoke(confirmation);
+  }
+}

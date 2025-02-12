@@ -39,7 +39,6 @@ public class FilterableAndSortableCollectionView
 
         Sort();
 
-
         SourceWeakEventListener?.Detach();
 
         if (Source is INotifyCollectionChanged observableCollection)
@@ -126,7 +125,14 @@ public class FilterableAndSortableCollectionView
     }
   }
 
-  private void RemoveFromView(object item) => View.Remove(item);
+  private void RemoveFromView(object item)
+  {
+    try
+    {
+      View.Remove(item);
+    }
+    catch { }
+  }
 
   private void RemoveAtFromView(int index)
   {

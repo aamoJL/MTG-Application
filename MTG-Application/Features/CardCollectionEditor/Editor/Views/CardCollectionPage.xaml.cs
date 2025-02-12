@@ -1,8 +1,12 @@
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
 using MTGApplication.Features.CardCollection.Editor.ViewModels;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.AppWindows;
+using System.Windows.Input;
 
 namespace MTGApplication.Features.CardCollectionEditor.Editor.Views;
 
@@ -15,7 +19,7 @@ public sealed partial class CardCollectionPage : Page
     Loaded += CardCollectionPage_Loaded;
   }
 
-  private void CardCollectionPage_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+  private void CardCollectionPage_Loaded(object sender, RoutedEventArgs e)
   {
     Loaded -= CardCollectionPage_Loaded;
 
@@ -26,6 +30,10 @@ public sealed partial class CardCollectionPage : Page
   }
 
   public CardCollectionEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
+
+  private ICommand SwitchWindowThemeCommand { get; } = new RelayCommand(
+    execute: () => new ChangeWindowTheme(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark
+      ? ElementTheme.Light : ElementTheme.Dark).Execute());
 
   private async void NewCollectionKeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {
