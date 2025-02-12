@@ -62,16 +62,25 @@ public partial class EdhrecImporter
     try
     {
       var json = JsonNode.Parse(await NetworkService.GetJsonFromUrl(uri));
-      var themeNodes = json?["panels"]?["tribelinks"]?.AsArray();
+      var themeNodes = json?["panels"]?["taglinks"]?.AsArray();
 
-      var themes = themeNodes?.Select(x => (
-        x?["value"]?.GetValue<string>(),
-        GetApiUri(commander, partner, GetLeadingSlash().Replace(x?["href-suffix"]?.GetValue<string>() ?? string.Empty, string.Empty))))
-        .Where(x => x.Item1 != null && x.Item2 != string.Empty)
-        .Select(x => new CommanderTheme(x.Item1!, x.Item2))
-        .ToArray() ?? [];
+      /*
+       * taglinks object: 
+       * {
+       *  count: int,
+       *  slug: string  // uri-safe name
+       *  value: string // name
+       * }
+       */
 
-      return themes;
+      return themeNodes?
+        .Select(x => new
+        {
+          value = x?["value"]?.GetValue<string>(),
+          uri = x?["slug"]?.GetValue<string>() is string suffix ? GetApiUri(commander, partner, suffix) : null
+        })
+        .Where(x => !(string.IsNullOrEmpty(x.value) || string.IsNullOrEmpty(x.uri)))
+        .Select(x => new CommanderTheme(x.value!, x.uri!)).ToArray() ?? [];
     }
     catch { throw; }
   }

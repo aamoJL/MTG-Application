@@ -1,21 +1,21 @@
 ﻿using MTGApplication.Features.EdhrecSearch.ViewModels;
 using MTGApplication.General.Models;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 
 namespace MTGApplication.Features.EdhrecSearch.UseCases;
 
-public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewModelAsyncCommand<EdhrecSearchPageViewModel, CommanderTheme>(viewmodel)
+public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewModelAsyncCommand<EdhrecSearchPageViewModel, EdhrecImporter.CommanderTheme>(viewmodel)
 {
-  protected override async Task Execute(CommanderTheme theme)
+  protected override async Task Execute(EdhrecImporter.CommanderTheme theme)
   {
     try
     {
       var query = string.Join(Environment.NewLine,
-        await (Viewmodel as IWorker).DoWork(FetchNewCardNames(theme.Uri)));
+        await (Viewmodel as IWorker).DoWork(EdhrecImporter.FetchNewCardNames(theme.Uri)));
 
       var searchResult = await (Viewmodel as IWorker).DoWork(Viewmodel.Importer.ImportWithString(query));
 

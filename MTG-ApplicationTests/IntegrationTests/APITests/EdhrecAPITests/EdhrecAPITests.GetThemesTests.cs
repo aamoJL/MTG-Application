@@ -25,7 +25,7 @@ public partial class EdhrecAPITests
 
       var result = await EdhrecImporter.GetThemes(commander);
 
-      Assert.IsTrue(result.Length == 0);
+      Assert.AreEqual(0, result.Length);
     }
 
     [TestMethod]
