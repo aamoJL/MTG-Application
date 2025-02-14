@@ -62,7 +62,8 @@
           x:Load="{x:Bind CardImageViewCheck.IsChecked, Mode=OneWay}"
           BorderThickness="1 1 0 0"
           BorderBrush="{ThemeResource RegionColor}"
-          Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+          Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+          GettingFocus="SearchCardsImageView_GettingFocus">
           <ItemsRepeater
             DataContext="{x:Bind ViewModel, Mode=OneTime}"
             ItemsSource="{Binding Cards.Collection, Mode=OneWay}"

@@ -16,6 +16,7 @@
       Layout="{x:Bind Layout, Mode=OneWay}"
       SelectionMode="Single"
       DeselectOnLosingFocus="True"
+      CenterOnFocus="{x:Bind CenterOnFocus, Mode=OneWay}"
       VerticalCacheLength="100">
       <ItemsRepeater.KeyboardAccelerators>
         <KeyboardAccelerator Key="Delete" Invoked="KeyboardAccelerator_Invoked"/>

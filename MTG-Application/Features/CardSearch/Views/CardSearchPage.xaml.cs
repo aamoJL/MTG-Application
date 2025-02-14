@@ -56,4 +56,12 @@ public sealed partial class CardSearchPage : Page
 
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
+
+  private void SearchCardsImageView_GettingFocus(UIElement sender, Microsoft.UI.Xaml.Input.GettingFocusEventArgs args)
+  {
+    // Keep focus on search inputs, if the focused element is the search card list scrollviewer,
+    //  so the user does not need to click the search input again after dragging and dropping a card.
+    if (args.OldFocusedElement is TextBox)
+      args.TryCancel();
+  }
 }

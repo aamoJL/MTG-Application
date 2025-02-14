@@ -11,5 +11,6 @@
 
   <Style x:Key="MTGListViewItemContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
     <Setter Property="MinHeight" Value="25" />
+    <Setter Property="UseSystemFocusVisuals" Value="False" />
   </Style>
 </ResourceDictionary>

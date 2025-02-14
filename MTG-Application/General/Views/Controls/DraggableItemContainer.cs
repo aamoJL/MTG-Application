@@ -11,17 +11,20 @@ public partial class DraggableItemContainer : ItemContainer
 {
   public DraggableItemContainer()
   {
-    PointerPressed += DeckEditorCardImageViewItemContainer_PointerPressed;
-    DragStarting += DeckEditorCardImageViewItemContainer_DragStarting;
+    PointerPressed += OnPointerPressed;
+    DragStarting += OnDragStarting;
   }
 
   private PointerPoint? DragPointerPoint { get; set; }
 
-  private void DeckEditorCardImageViewItemContainer_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  private void OnPointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     => DragPointerPoint = e.GetCurrentPoint(Child);
 
-  private void DeckEditorCardImageViewItemContainer_DragStarting(UIElement sender, DragStartingEventArgs args)
+  private void OnDragStarting(UIElement sender, DragStartingEventArgs args)
   {
+    args.Cancel = true; // Cancel drag on this container...
+
+    // ...and start drag on the child element instead
     if (Child != null && DragPointerPoint != null)
       _ = Child.StartDragAsync(DragPointerPoint);
   }

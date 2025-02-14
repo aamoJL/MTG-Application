@@ -51,6 +51,8 @@ public class DragAndDrop<T>()
       eventArgs.DragUIOverride.Caption = CopyCaptionOverride;
 
     eventArgs.DragUIOverride.IsContentVisible = IsDropContentVisible;
+
+    eventArgs.Handled = true;
   }
 
   public virtual async Task Drop(DataPackageOperation operation, string data)

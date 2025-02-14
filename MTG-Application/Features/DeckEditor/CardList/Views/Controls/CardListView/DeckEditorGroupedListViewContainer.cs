@@ -14,6 +14,8 @@ public partial class DeckEditorGroupedListViewContainer : DeckEditorListViewCont
   {
     base.OnDragOver(sender, e);
 
+    e.Handled = true;
+
     if (DataContext is not CardGroupViewModel viewmodel
       || DragAndDrop<CardMoveArgs>.Item?.Card is not DeckEditorMTGCard item
       || e.AcceptedOperation == DataPackageOperation.None)

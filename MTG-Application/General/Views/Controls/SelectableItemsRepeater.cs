@@ -29,6 +29,7 @@ public partial class SelectableItemsRepeater : ItemsRepeater
     set => SetValue(SelectionModeProperty, value);
   }
   public bool DeselectOnLosingFocus { get; set; } = false;
+  public bool CenterOnFocus { get; set; } = false;
 
   public object? SelectedItem
   {
@@ -59,13 +60,17 @@ public partial class SelectableItemsRepeater : ItemsRepeater
 
       field = value;
 
-      field?.Focus(FocusState.Programmatic);
-
-      field?.StartBringIntoView(new()
-      {
-        AnimationDesired = true,
-        VerticalAlignmentRatio = .5f,
-      });
+      if (CenterOnFocus)
+        field?.StartBringIntoView(new()
+        {
+          AnimationDesired = true,
+          VerticalAlignmentRatio = .5f,
+        });
+      else
+        field?.StartBringIntoView(new()
+        {
+          AnimationDesired = true
+        });
 
       if (TryGetContainer(field) is ItemContainer newContainer)
         newContainer.IsSelected = true;
@@ -82,7 +87,10 @@ public partial class SelectableItemsRepeater : ItemsRepeater
       return;
 
     if (GetOrCreateElement(index) is UIElement element)
+    {
       SelectedElement = element;
+      SelectedElement.Focus(FocusState.Programmatic);
+    }
   }
 
   private void OnElementPrepared(ItemsRepeater sender, ItemsRepeaterElementPreparedEventArgs args)
@@ -93,14 +101,12 @@ public partial class SelectableItemsRepeater : ItemsRepeater
       SelectedElement = args.Element;
 
     args.Element.GettingFocus += Item_GettingFocus;
-    args.Element.GotFocus += Item_GotFocus;
     PointerClick.Register(args.Element);
   }
 
   private void OnElementClearing(ItemsRepeater sender, ItemsRepeaterElementClearingEventArgs args)
   {
     args.Element.GettingFocus -= Item_GettingFocus;
-    args.Element.GotFocus -= Item_GotFocus;
     PointerClick.Unregister(args.Element);
   }
 
@@ -147,7 +153,10 @@ public partial class SelectableItemsRepeater : ItemsRepeater
   private void Item_GettingFocus(UIElement sender, GettingFocusEventArgs args)
   {
     if (sender == SelectedElement)
+    {
+      args.Handled = true;
       return;
+    }
 
     if (args.FocusState != FocusState.Keyboard)
       args.TryCancel();
@@ -159,22 +168,28 @@ public partial class SelectableItemsRepeater : ItemsRepeater
       or FocusNavigationDirection.Left
       or FocusNavigationDirection.Right))
       args.TryCancel();
-  }
 
-  private void Item_GotFocus(object sender, RoutedEventArgs e)
-  {
-    if (sender is not UIElement element)
-      return;
-
-    SelectedElement = element;
+    if (!args.Cancel)
+      SelectedElement = sender;
   }
 
   private void Item_Clicked(object? sender, PointerRoutedEventArgs e)
   {
+    e.Handled = true;
+
     if (sender is not UIElement element)
       return;
 
-    SelectedElement = element;
+    if (SelectedElement == element)
+      return;
+
+    var properties = e.GetCurrentPoint(null).Properties;
+
+    if (properties.PointerUpdateKind == Microsoft.UI.Input.PointerUpdateKind.LeftButtonReleased)
+    {
+      SelectedElement = element;
+      SelectedElement.Focus(FocusState.Pointer);
+    }
   }
 
   /// <summary>

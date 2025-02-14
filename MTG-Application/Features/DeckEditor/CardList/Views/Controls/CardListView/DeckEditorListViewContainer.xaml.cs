@@ -64,6 +64,7 @@ public partial class DeckEditorListViewContainer : UserControl
     get => (Layout)GetValue(LayoutProperty);
     set => SetValue(LayoutProperty, value);
   }
+  public bool CenterOnFocus { get; set; } = false;
 
   [NotNull]
   protected DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
@@ -108,6 +109,8 @@ public partial class DeckEditorListViewContainer : UserControl
       return;
 
     DragAndDrop?.DragOver(e);
+
+    e.Handled = true;
   }
 
   protected virtual async void OnDrop(object sender, DragEventArgs e)
@@ -117,6 +120,8 @@ public partial class DeckEditorListViewContainer : UserControl
     await DragAndDrop.Drop(
       e.AcceptedOperation,
       e.DataView.Contains(StandardDataFormats.Text) ? await e.DataView.GetTextAsync() : string.Empty);
+
+    e.Handled = true;
 
     def.Complete();
   }
