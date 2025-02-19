@@ -32,7 +32,7 @@
             <AppBarButton Icon="ZoomIn" Label="Zoom" ToolTipService.ToolTip="Zoom">
               <AppBarButton.Flyout>
                 <Flyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <Slider x:Name="CardImageSizeSlider" Header="Card size" Value="240" Width="200" HorizontalAlignment="Left" Maximum="350" Minimum="140" SnapsTo="Ticks" TickFrequency="10" TickPlacement="Outside" />
+                  <controls1:CardWidthSlider x:Name="CardImageSizeSlider" Header="Card size" Width="200" HorizontalAlignment="Left" SnapsTo="Ticks" TickPlacement="Outside"/>
                 </Flyout>
               </AppBarButton.Flyout>
             </AppBarButton>

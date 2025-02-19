@@ -28,7 +28,9 @@
       <controls1:ImageEx 
         x:Name="ImageElement"
         Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
-        Style="{StaticResource PlaceholderImageStyle}"/>
+        Style="{StaticResource PlaceholderImageStyle}"
+        EnableLazyLoading="True"
+        LazyLoadingThreshold="400"/>
       <TextBlock Text="{x:Bind helpers:Format.EuroToString(Model.Info.Price), Mode=OneWay}" HorizontalAlignment="Center" FontSize="11"/>
     </StackPanel>
   </Grid>

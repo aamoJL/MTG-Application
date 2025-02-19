@@ -58,11 +58,21 @@ public static partial class AppConfig
   /// </summary>
   public partial class LocalAppSettings : ObservableObject
   {
-    // Application theme can only set on start, so the themeing needs to be done with ElementThemes
-    [ObservableProperty] public partial ElementTheme AppTheme { get; set; } = ElementTheme.Default;
+    private readonly static string _fileName = "settings.json";
+    private readonly static string _filePath = Path.Join(PathExtensions.GetAppDataPath(), _fileName);
 
-    private readonly static string fileName = "settings.json";
-    private readonly static string filePath = Path.Join(PathExtensions.GetAppDataPath(), fileName);
+    // Application theme can only set on start, so the themeing needs to be done with ElementThemes
+    public ElementTheme AppTheme
+    {
+      get;
+      set => SetProperty(ref field, value);
+    } = ElementTheme.Default;
+    // Default image width for images that has adjustable width, like deck editor grid views
+    public ushort DefaultCardImageWidth
+    {
+      get;
+      set => SetProperty(ref field, value);
+    } = 230;
 
     public LocalAppSettings() => PropertyChanged += (s, e) => Save();
 
@@ -73,7 +83,11 @@ public static partial class AppConfig
     {
       try
       {
-        File.WriteAllText(filePath, JsonSerializer.Serialize(new { AppTheme = AppTheme }));
+        File.WriteAllText(_filePath, JsonSerializer.Serialize(new
+        {
+          AppTheme = AppTheme,
+          DefaultCardImageWidth = DefaultCardImageWidth,
+        }));
       }
       catch { }
     }
@@ -85,15 +99,15 @@ public static partial class AppConfig
     {
       try
       {
-        if (JsonNode.Parse(File.ReadAllText(filePath)) is JsonNode json)
+        if (JsonNode.Parse(File.ReadAllText(_filePath)) is JsonNode json)
         {
-          var appTheme = json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default;
-          AppTheme = appTheme switch
+          AppTheme = (json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default) switch
           {
             1 => ElementTheme.Light,
             2 => ElementTheme.Dark,
             _ => ElementTheme.Default,
           };
+          DefaultCardImageWidth = json[nameof(DefaultCardImageWidth)]?.GetValue<ushort>() ?? DefaultCardImageWidth;
         }
       }
       catch { }
