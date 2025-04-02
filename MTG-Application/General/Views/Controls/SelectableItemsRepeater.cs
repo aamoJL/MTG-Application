@@ -77,6 +77,8 @@ public partial class SelectableItemsRepeater : ItemsRepeater
     }
   }
 
+  // Tapped event will cause the element to lose focus,
+  //  so the item tapping needs to be done with pointer press events
   protected PointerClick PointerClick { get; } = new();
 
   public void DeselectAll() => SelectedElement = null;

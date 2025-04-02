@@ -29,8 +29,8 @@ public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
   }
 
   public DeckTestingPageViewModel? ViewModel { get; set; }
-  public DeckTestingPointerEvents PointerEvents { get; } = new();
-  public DeckTestingDragAndDropEvents DragAndDropEvents { get; } = new();
+  public DeckTestingPointerEvents PointerEvents { get; } = new(); // Internal card drag & drop events
+  public DeckTestingDragAndDropEvents DragAndDropEvents { get; } = new(); // External card drop events
 
   public Visibility LibraryVisibility
   {

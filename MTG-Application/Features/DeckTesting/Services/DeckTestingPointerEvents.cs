@@ -87,7 +87,7 @@ public class DeckTestingPointerEvents
         // Add card to the canvas
         var cardElement = new DeckTestingBattlefieldCardView()
         {
-          Model = new(item.Info),
+          Model = new(item.Info) { IsToken = item.IsToken },
           Height = DragCardPreview.ImageY,
           Width = DragCardPreview.ImageX,
         };

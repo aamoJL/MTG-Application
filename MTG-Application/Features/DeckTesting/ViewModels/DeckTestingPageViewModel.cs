@@ -62,7 +62,7 @@ public partial class DeckTestingPageViewModel : ObservableObject
     try
     {
       var tokens = (await new FetchTokenCards(Importer).Execute(cards)).Found
-        .Select(x => new DeckTestingMTGCard(x.Info));
+        .Select(x => new DeckTestingMTGCard(x.Info) { IsToken = true });
 
       foreach (var item in tokens)
         Tokens.Add(item);
