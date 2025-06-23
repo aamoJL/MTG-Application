@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.ReversibleCommandService;
@@ -31,7 +30,6 @@ public partial class CardListViewModel(IMTGCardImporter importer, CardListConfir
   } = [];
 
   public IMTGCardImporter Importer { get; } = importer;
-  public DeckEditorMTGCardCopier CardCopier { get; } = new();
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();

@@ -30,6 +30,6 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
-    <Setter Property="IsCacheEnabled" Value="True"/>
+    <Setter Property="IsCacheEnabled" Value="False"/>
   </Style>
 </ResourceDictionary>

@@ -555,6 +555,11 @@
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}">
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:CardGroupViewModel">
                   <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
