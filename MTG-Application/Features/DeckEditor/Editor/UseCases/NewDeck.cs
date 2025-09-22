@@ -6,8 +6,10 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class NewDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class NewDeck(DeckEditorViewModel viewmodel) : AsyncCommand
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute()
     {
       if ((await new ConfirmUnsavedChanges(Viewmodel).ExecuteAsync(new())).Cancelled)

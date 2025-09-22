@@ -12,8 +12,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmDeleteList(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, MTGCardCollectionList>(viewmodel)
+  public class ConfirmDeleteList(CardCollectionEditorViewModel viewmodel) : AsyncCommand<MTGCardCollectionList>
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(MTGCardCollectionList? list) => list != null && Viewmodel.Collection.CollectionLists.Contains(list);
 
     protected override async Task Execute(MTGCardCollectionList? list)

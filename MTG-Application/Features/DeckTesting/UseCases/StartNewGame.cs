@@ -2,8 +2,10 @@
 using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.DeckTesting.UseCases;
-public class StartNewGame(DeckTestingPageViewModel viewmodel) : ViewModelCommand<DeckTestingPageViewModel>(viewmodel)
+public class StartNewGame(DeckTestingPageViewModel viewmodel) : SyncCommand
 {
+  public DeckTestingPageViewModel Viewmodel { get; } = viewmodel;
+
   protected override void Execute()
   {
     Viewmodel.Library.Clear();

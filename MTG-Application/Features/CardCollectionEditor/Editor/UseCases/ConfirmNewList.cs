@@ -12,8 +12,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmNewList(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
+  public class ConfirmNewList(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute()
     {
       if (await Viewmodel.Confirmers.CardCollectionConfirmers.NewCollectionListConfirmer.Confirm(CardCollectionConfirmers.GetNewCollectionListConfirmation())

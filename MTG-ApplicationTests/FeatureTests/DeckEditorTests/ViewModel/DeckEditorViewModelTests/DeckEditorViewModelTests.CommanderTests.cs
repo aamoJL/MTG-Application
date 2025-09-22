@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplicationTests.TestUtility.Mocker;
+﻿using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 

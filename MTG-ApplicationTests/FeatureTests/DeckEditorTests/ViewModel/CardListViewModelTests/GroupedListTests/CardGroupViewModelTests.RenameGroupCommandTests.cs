@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor.ViewModels;
+﻿using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
@@ -17,12 +16,8 @@ public partial class GroupedCardListViewModelTests
     {
       var key = "key";
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter())
-      {
-        Cards = [
-          DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: key),
-        ]
-      };
+        cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: key)],
+        importer: new TestMTGCardImporter());
 
       Assert.IsTrue(viewmodel.RenameGroupCommand.CanExecute(
         viewmodel.Groups.First(x => x.Key == key)));
@@ -33,12 +28,8 @@ public partial class GroupedCardListViewModelTests
     {
       var key = string.Empty;
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter())
-      {
-        Cards = [
-          DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: key),
-        ]
-      };
+        cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: key)],
+        importer: new TestMTGCardImporter());
 
       Assert.IsFalse(viewmodel.RenameGroupCommand.CanExecute(
         viewmodel.Groups.First(x => x.Key == key)));
@@ -49,15 +40,13 @@ public partial class GroupedCardListViewModelTests
     {
       var confirmer = new TestConfirmer<string, string>();
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        confirmers: new()
+        cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: "key")],
+        importer: new TestMTGCardImporter())
+      {
+        Confirmers = new()
         {
           RenameCardGroupConfirmer = confirmer
-        })
-      {
-        Cards = [
-          DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: "key"),
-        ],
+        }
       };
 
       await viewmodel.RenameGroupCommand.ExecuteAsync(viewmodel.Groups.First(x => x.Key != string.Empty));
@@ -73,17 +62,17 @@ public partial class GroupedCardListViewModelTests
 
       var confirmer = new TestConfirmer<ConfirmationResult>();
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        confirmers: new()
-        {
-          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
-          MergeCardGroupsConfirmer = confirmer
-        })
-      {
-        Cards = [
+        cards: [
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "1", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "2", group: newValue ),
         ],
+        importer: new TestMTGCardImporter())
+      {
+        Confirmers = new()
+        {
+          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
+          MergeCardGroupsConfirmer = confirmer
+        }
       };
 
       await viewmodel.RenameGroupCommand.ExecuteAsync(viewmodel.Groups.First(x => x.Key == oldValue));
@@ -98,15 +87,13 @@ public partial class GroupedCardListViewModelTests
       var newValue = "new";
 
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        confirmers: new()
+        cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: oldValue)],
+        importer: new TestMTGCardImporter())
+      {
+        Confirmers = new()
         {
           RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
-        })
-      {
-        Cards = [
-          DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: oldValue ),
-        ],
+        }
       };
 
       var group = viewmodel.Groups.First(x => x.Key == oldValue);
@@ -131,19 +118,19 @@ public partial class GroupedCardListViewModelTests
       var newValue = "new";
 
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        confirmers: new()
-        {
-          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
-        })
-      {
-        Cards = [
+        cards: [
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "1", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "2", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "3", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "4", group: string.Empty ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "5", group: string.Empty ),
         ],
+        importer: new TestMTGCardImporter())
+      {
+        Confirmers = new()
+        {
+          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
+        }
       };
 
       var group = viewmodel.Groups.First(x => x.Key == oldValue);
@@ -169,19 +156,19 @@ public partial class GroupedCardListViewModelTests
       var newValue = "new";
 
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        confirmers: new()
-        {
-          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
-        })
-      {
-        Cards = [
+        cards: [
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "1", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "2", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "3", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "4", group: string.Empty ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "5", group: string.Empty ),
         ],
+        importer: new TestMTGCardImporter())
+      {
+        Confirmers = new()
+        {
+          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
+        }
       };
 
       var group = viewmodel.Groups.First(x => x.Key == oldValue);
@@ -207,20 +194,20 @@ public partial class GroupedCardListViewModelTests
       var newValue = "new";
 
       var viewmodel = new GroupedCardListViewModel(
-        importer: new TestMTGCardImporter(),
-        confirmers: new()
-        {
-          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
-          MergeCardGroupsConfirmer = new() { OnConfirm = async _ => await Task.FromResult(ConfirmationResult.Yes) }
-        })
-      {
-        Cards = [
+        cards: [
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "1", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "2", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "3", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "4", group: newValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "5", group: newValue ),
         ],
+        importer: new TestMTGCardImporter())
+      {
+        Confirmers = new()
+        {
+          RenameCardGroupConfirmer = new() { OnConfirm = async _ => await Task.FromResult(newValue) },
+          MergeCardGroupsConfirmer = new() { OnConfirm = async _ => await Task.FromResult(ConfirmationResult.Yes) }
+        }
       };
 
       var oldGroup = viewmodel.Groups.First(x => x.Key == oldValue);

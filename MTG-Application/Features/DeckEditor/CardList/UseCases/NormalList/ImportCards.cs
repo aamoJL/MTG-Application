@@ -1,7 +1,6 @@
 ﻿using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.Editor.Services;
-using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService.UseCases;
@@ -18,11 +17,18 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class ImportCards(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, string>(viewmodel)
+  public class ImportCards(IList<DeckEditorMTGCard> cards, ReversibleCommandStack undoStack, CardListConfirmers confirmers, IWorker worker, IMTGCardImporter importer, Notifier notifier) : AsyncCommand<string>
   {
+    private IList<DeckEditorMTGCard> Cards { get; } = cards;
+    private ReversibleCommandStack UndoStack { get; } = undoStack;
+    private CardListConfirmers Confirmers { get; } = confirmers;
+    private IWorker Worker { get; } = worker;
+    private IMTGCardImporter Importer { get; } = importer;
+    private Notifier Notifier { get; } = notifier;
+
     protected override async Task Execute(string? data)
     {
-      data ??= await Viewmodel.Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
+      data ??= await Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));
 
       try
       {
@@ -31,7 +37,7 @@ public partial class CardListViewModelCommands
         if (data == string.Empty)
           return;
 
-        var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
+        var result = await Worker.DoWork(new DeckEditorCardImporter(Importer).Import(data));
 
         var newCards = new List<DeckEditorMTGCard>();
         var existingCards = new List<(DeckEditorMTGCard Card, int NewCount)>();
@@ -41,12 +47,12 @@ public partial class CardListViewModelCommands
         // Confirm imported cards, if already exists
         foreach (var card in result.Found)
         {
-          if (Viewmodel.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
+          if (Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
           {
             // Card exist in the list; confirm the import, unless the user skips confirmations
             if (!skipConflictConfirmation)
             {
-              (addConflictConfirmationResult, skipConflictConfirmation) = await Viewmodel.Confirmers.AddMultipleConflictConfirmer
+              (addConflictConfirmationResult, skipConflictConfirmation) = await Confirmers.AddMultipleConflictConfirmer
                 .Confirm(CardListConfirmers.GetAddMultipleConflictConfirmation(card.Info.Name));
             }
 
@@ -73,7 +79,7 @@ public partial class CardListViewModelCommands
           combinedCommand.Commands.Add(
             new ReversibleCollectionCommand<DeckEditorMTGCard>(newCards)
             {
-              ReversibleAction = new ReversibleAddCardsAction(Viewmodel.Cards),
+              ReversibleAction = new ReversibleAddCardsAction(Cards),
             });
         }
 
@@ -89,7 +95,7 @@ public partial class CardListViewModelCommands
 
         // Execute
         if (combinedCommand.Commands.Count != 0)
-          Viewmodel.UndoStack.PushAndExecute(combinedCommand);
+          UndoStack.PushAndExecute(combinedCommand);
 
         var importCount = newCards.Count + existingCards.Count;
         var skippedCount = result.Found.Length - importCount;
@@ -98,18 +104,18 @@ public partial class CardListViewModelCommands
         if (result.Source == CardImportResult.ImportSource.External)
         {
           if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
-            new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success,
+            new SendNotification(Notifier).Execute(new(NotificationType.Success,
               $"{importCount} cards imported successfully." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
           else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
-            new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Warning,
+            new SendNotification(Notifier).Execute(new(NotificationType.Warning,
               $"{importCount} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
           else if (result.NotFoundCount > 0) // None found
-            new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
+            new SendNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
         }
       }
       catch (Exception e)
       {
-        Viewmodel.Notifier.Notify(new(NotificationType.Error, $"Error: {e.Message}"));
+        Notifier.Notify(new(NotificationType.Error, $"Error: {e.Message}"));
       }
     }
   }

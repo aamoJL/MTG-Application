@@ -1,6 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
@@ -8,13 +7,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class ExportCards(CardListViewModel viewmodel) : ViewModelAsyncCommand<CardListViewModel, string>(viewmodel)
+  public class ExportCards(IList<DeckEditorMTGCard> cards, CardListConfirmers confirmers, Notifier notifier, ClipboardService clipboardService) : AsyncCommand<string>
   {
+    public IList<DeckEditorMTGCard> Cards { get; } = cards;
+    private CardListConfirmers Confirmers { get; } = confirmers;
+    private Notifier Notifier { get; } = notifier;
+    private ClipboardService ClipboardService { get; } = clipboardService;
+
     protected override bool CanExecute(string? byProperty) => byProperty is "Id" or "Name";
 
     protected override async Task Execute(string? byProperty)
@@ -22,13 +27,13 @@ public partial class CardListViewModelCommands
       if (!CanExecute(byProperty))
         return;
 
-      if (await Viewmodel.Confirmers.ExportConfirmer.Confirm(CardListConfirmers.GetExportConfirmation(GetExportString(Viewmodel.Cards, byProperty!)))
+      if (await Confirmers.ExportConfirmer.Confirm(CardListConfirmers.GetExportConfirmation(GetExportString(Cards, byProperty!)))
         is not string response || string.IsNullOrEmpty(response))
         return;
 
-      Viewmodel.ClipboardService.CopyToClipboard(response);
+      ClipboardService.CopyToClipboard(response);
 
-      new SendNotification(Viewmodel.Notifier).Execute(ClipboardService.CopiedNotification);
+      new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
     }
 
     private static string GetExportString(IEnumerable<DeckEditorMTGCard> cards, string byProperty)

@@ -12,8 +12,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardGroupViewModelCommands
 {
-  public class AddCardToGroup(CardGroupViewModel viewmodel) : ViewModelAsyncCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
+  public class AddCardToGroup(CardGroupViewModel viewmodel) : AsyncCommand<DeckEditorMTGCard>
   {
+    public CardGroupViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(DeckEditorMTGCard? card)
     {
       if (card == null)

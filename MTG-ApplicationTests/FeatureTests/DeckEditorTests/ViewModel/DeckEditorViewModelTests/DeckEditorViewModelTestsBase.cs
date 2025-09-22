@@ -27,12 +27,11 @@ public partial class DeckEditorViewModelTests
 
       public DeckEditorViewModel MockVM()
       {
-        return new(
-          dependencies.Importer,
-          confirmers: Confirmers,
-          notifier: Notifier)
+        return new(dependencies.Importer)
         {
           Deck = Deck,
+          Confirmers = Confirmers,
+          Notifier = Notifier,
           Repository = dependencies.Repository,
           HasUnsavedChanges = HasUnsavedChanges,
         };

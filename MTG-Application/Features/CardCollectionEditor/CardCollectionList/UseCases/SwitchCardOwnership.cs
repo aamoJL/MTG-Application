@@ -7,8 +7,10 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCas
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class SwitchCardOwnership(CardCollectionListViewModel viewmodel) : ViewModelCommand<CardCollectionListViewModel, CardCollectionMTGCard>(viewmodel)
+  public class SwitchCardOwnership(CardCollectionListViewModel viewmodel) : SyncCommand<CardCollectionMTGCard>
   {
+    public CardCollectionListViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(CardCollectionMTGCard? card) => card != null;
 
     protected override void Execute(CardCollectionMTGCard? card)

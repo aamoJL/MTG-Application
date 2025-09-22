@@ -11,6 +11,7 @@ using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Mode
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -30,20 +31,18 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     UndoStack.CollectionChanged += UndoStack_CollectionChanged;
   }
 
-  public DeckEditorViewModel(IMTGCardImporter importer, DeckEditorConfirmers? confirmers = null, Notifier? notifier = null) : this(importer)
-  {
-    Confirmers = confirmers ?? new();
-    Notifier = notifier ?? new();
-  }
-
-  [NotNull]
+  [NotNull, DisallowNull]
   public DeckEditorMTGDeck? Deck
   {
     get => field ??= Deck = new();
     set
     {
+      ArgumentNullException.ThrowIfNull(value);
+
       if (field == value)
         return;
+
+      var fieldWasNull = field == null;
 
       if (field != null)
       {
@@ -60,75 +59,92 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
 
       SetProperty(ref field, value);
 
-      if (field != null)
+      field.PropertyChanging += Deck_PropertyChanging;
+      field.PropertyChanged += Deck_PropertyChanged;
+      field.DeckCards.CollectionChanged += DeckCards_CollectionChanged;
+      field.Maybelist.CollectionChanged += CardList_CollectionChanged;
+      field.Wishlist.CollectionChanged += CardList_CollectionChanged;
+      field.Removelist.CollectionChanged += CardList_CollectionChanged;
+
+      foreach (var item in field.DeckCards)
+        item.PropertyChanged += DeckCard_PropertyChanged;
+
+      AttachCommandsToCards([
+        .. field.DeckCards,
+        .. field.Maybelist,
+        .. field.Wishlist,
+        .. field.Removelist,
+        ]);
+
+      AttachCommandsToCards(new List<DeckEditorMTGCard?>([
+        field.Commander,
+        field.CommanderPartner
+        ]).OfType<DeckEditorMTGCard>());
+
+      // Reset cardlist viewmodels
+      DeckCardList = null;
+      MaybeCardList = null;
+      WishCardList = null;
+      RemoveCardList = null;
+
+      // Reset commander viewmodels
+      Commander = null;
+      Partner = null;
+
+      if (!fieldWasNull) // don't init lazy properties if the deck was not already set
       {
-        field.PropertyChanging += Deck_PropertyChanging;
-        field.PropertyChanged += Deck_PropertyChanged;
-        field.DeckCards.CollectionChanged += DeckCards_CollectionChanged;
-        field.Maybelist.CollectionChanged += CardList_CollectionChanged;
-        field.Wishlist.CollectionChanged += CardList_CollectionChanged;
-        field.Removelist.CollectionChanged += CardList_CollectionChanged;
-
-        foreach (var item in field.DeckCards)
-          item.PropertyChanged += DeckCard_PropertyChanged;
-
-        AttachCommandsToCards([
-          .. field.DeckCards,
-          .. field.Maybelist,
-          .. field.Wishlist,
-          .. field.Removelist,
-          ]);
-
-        AttachCommandsToCards(new List<DeckEditorMTGCard?>([
-          field.Commander,
-          field.CommanderPartner
-          ]).OfType<DeckEditorMTGCard>());
+        DeleteDeckCommand?.NotifyCanExecuteChanged();
+        ShowDeckTokensCommand?.NotifyCanExecuteChanged();
+        OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
+        OpenEdhrecSearchWindowCommand?.NotifyCanExecuteChanged();
+        OpenEdhrecCommanderWebsiteCommand?.NotifyCanExecuteChanged();
       }
-
-      DeckCardList.Cards = Deck.DeckCards;
-      MaybeCardList.Cards = Deck.Maybelist;
-      WishCardList.Cards = Deck.Wishlist;
-      RemoveCardList.Cards = Deck.Removelist;
-
-      Commander.Card = Deck.Commander;
-      Partner.Card = Deck.CommanderPartner;
 
       OnPropertyChanged(nameof(Name));
       OnPropertyChanged(nameof(Size));
       OnPropertyChanged(nameof(Price));
-
-      SaveDeckCommand?.NotifyCanExecuteChanged();
-      DeleteDeckCommand?.NotifyCanExecuteChanged();
-      ShowDeckTokensCommand?.NotifyCanExecuteChanged();
-      OpenDeckTestingWindowCommand?.NotifyCanExecuteChanged();
-      OpenEdhrecSearchWindowCommand?.NotifyCanExecuteChanged();
-      OpenEdhrecCommanderWebsiteCommand?.NotifyCanExecuteChanged();
     }
   }
 
   public IMTGCardImporter Importer { get; }
-  public DeckEditorConfirmers Confirmers { get; } = new();
-  public Notifier Notifier { get; } = new();
   public ReversibleCommandStack UndoStack { get; } = new();
-
+  public DeckEditorConfirmers Confirmers { get; init; } = new();
+  public Notifier Notifier { get; init; } = new();
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
 
-  [NotNull] public GroupedCardListViewModel? DeckCardList => field ??= new DeckEditorCardListFactory(this).CreateGroupedCardListViewModel(Deck.DeckCards);
-  [NotNull] public CardListViewModel? MaybeCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Maybelist);
-  [NotNull] public CardListViewModel? WishCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Wishlist);
-  [NotNull] public CardListViewModel? RemoveCardList => field ??= new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Removelist);
+  [NotNull]
+  public GroupedCardListViewModel? DeckCardList
+  {
+    get => field ??= DeckCardList = new DeckEditorCardListFactory(this).CreateGroupedCardListViewModel(Deck.DeckCards);
+    private set => SetProperty(ref field, value);
+  }
+  [NotNull]
+  public CardListViewModel? MaybeCardList
+  {
+    get => field ??= MaybeCardList = new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Maybelist);
+    private set => SetProperty(ref field, value);
+  }
+  [NotNull]
+  public CardListViewModel? WishCardList
+  {
+    get => field ??= WishCardList = new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Wishlist);
+    private set => SetProperty(ref field, value);
+  }
+  [NotNull]
+  public CardListViewModel? RemoveCardList
+  {
+    get => field ??= RemoveCardList = new DeckEditorCardListFactory(this).CreateCardListViewModel(Deck.Removelist);
+    private set => SetProperty(ref field, value);
+  }
   [NotNull]
   public CommanderViewModel? Commander
   {
     get => field ??= Commander = new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.Commander);
     private set
     {
-      if (field != null)
-        return;
-
-      field = value;
-
-      Commander.PropertyChanged += CommanderViewModel_PropertyChanged;
+      field?.PropertyChanged -= CommanderViewModel_PropertyChanged;
+      SetProperty(ref field, value);
+      field?.PropertyChanged += CommanderViewModel_PropertyChanged;
     }
   }
   [NotNull]
@@ -137,12 +153,9 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     get => field ??= Partner = new DeckEditorCommanderFactory(this).CreateCommanderViewModel(Deck.CommanderPartner);
     private set
     {
-      if (field != null)
-        return;
-
-      field = value;
-
-      Partner.PropertyChanged += CommanderViewModel_PropertyChanged;
+      field?.PropertyChanged -= CommanderViewModel_PropertyChanged;
+      SetProperty(ref field, value);
+      field?.PropertyChanged += CommanderViewModel_PropertyChanged;
     }
   }
 

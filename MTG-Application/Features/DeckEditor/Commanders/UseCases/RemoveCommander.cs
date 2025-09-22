@@ -8,8 +8,10 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {
-  public class RemoveCommander(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+  public class RemoveCommander(CommanderViewModel viewmodel) : SyncCommand<DeckEditorMTGCard>
   {
+    public CommanderViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(DeckEditorMTGCard? param) => Viewmodel.Card != null;
 
     protected override void Execute(DeckEditorMTGCard? param)

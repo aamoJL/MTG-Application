@@ -8,8 +8,10 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class OpenEdhrecCommanderWebsite(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class OpenEdhrecCommanderWebsite(DeckEditorViewModel viewmodel) : AsyncCommand
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute() => Viewmodel.Commander.Card != null;
 
     protected override async Task Execute()

@@ -6,8 +6,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmNewCollection(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
+  public class ConfirmNewCollection(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute()
     {
       var unsavedArgs = new ISavable.ConfirmArgs();

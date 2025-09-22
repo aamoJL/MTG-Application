@@ -10,8 +10,10 @@ public partial class CardListViewModelCommands
 {
   public record CardCountChangeArgs(DeckEditorMTGCard Card, int Value);
 
-  public class ChangeCardCount(DeckEditorViewModel viewmodel) : ViewModelCommand<DeckEditorViewModel, CardCountChangeArgs>(viewmodel)
+  public class ChangeCardCount(DeckEditorViewModel viewmodel) : SyncCommand<CardCountChangeArgs>
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(CardCountChangeArgs? args)
       => args != null && args.Card.Count != args.Value && args.Value > 0;
 

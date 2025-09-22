@@ -10,8 +10,10 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {
-  public class ImportCommander(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, string>(viewmodel)
+  public class ImportCommander(CommanderViewModel viewmodel) : AsyncCommand<string>
   {
+    public CommanderViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(string? data)
     {
       try

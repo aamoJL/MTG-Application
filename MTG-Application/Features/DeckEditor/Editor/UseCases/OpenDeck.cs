@@ -14,8 +14,10 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class OpenDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, string>(viewmodel)
+  public class OpenDeck(DeckEditorViewModel viewmodel) : AsyncCommand<string>
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(string? name) => name != string.Empty;
 
     protected override async Task Execute(string? loadName)

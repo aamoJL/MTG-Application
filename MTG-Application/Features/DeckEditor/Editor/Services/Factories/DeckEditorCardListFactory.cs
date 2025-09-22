@@ -7,11 +7,9 @@ public class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
 {
   public CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
-    return new(
-      importer: viewmodel.Importer,
-      confirmers: viewmodel.Confirmers.CardListConfirmers)
+    return new(cards: cards, importer: viewmodel.Importer)
     {
-      Cards = cards,
+      Confirmers = viewmodel.Confirmers.CardListConfirmers,
       UndoStack = viewmodel.UndoStack,
       Worker = viewmodel,
       Notifier = viewmodel.Notifier
@@ -20,11 +18,9 @@ public class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
 
   public GroupedCardListViewModel CreateGroupedCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
   {
-    return new(
-      importer: viewmodel.Importer,
-      confirmers: viewmodel.Confirmers.CardListConfirmers)
+    return new(cards: cards, importer: viewmodel.Importer)
     {
-      Cards = cards,
+      Confirmers = viewmodel.Confirmers.CardListConfirmers,
       UndoStack = viewmodel.UndoStack,
       Worker = viewmodel,
       Notifier = viewmodel.Notifier,

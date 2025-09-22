@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.EdhrecSearch.UseCases;
 
-public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : ViewModelAsyncCommand<EdhrecSearchPageViewModel, EdhrecImporter.CommanderTheme>(viewmodel)
+public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : AsyncCommand<EdhrecImporter.CommanderTheme>
 {
+  public EdhrecSearchPageViewModel Viewmodel { get; } = viewmodel;
+
   protected override async Task Execute(EdhrecImporter.CommanderTheme theme)
   {
     try

@@ -8,8 +8,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmUnsavedChanges(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, ISavable.ConfirmArgs>(viewmodel)
+  public class ConfirmUnsavedChanges(CardCollectionEditorViewModel viewmodel) : AsyncCommand<ISavable.ConfirmArgs>
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(ISavable.ConfirmArgs? param) => param != null && !param.Cancelled && Viewmodel.HasUnsavedChanges;
 
     protected override async Task Execute(ISavable.ConfirmArgs? param)
@@ -29,7 +31,8 @@ public partial class CardCollectionEditorViewModelCommands
         case ConfirmationResult.Cancel:
           param!.Cancelled = true;
           return;
-      };
+      }
+      ;
     }
   }
 }

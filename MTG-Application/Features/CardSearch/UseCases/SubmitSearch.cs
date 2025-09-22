@@ -10,8 +10,10 @@ namespace MTGApplication.Features.CardSearch.UseCases;
 
 public partial class CardSearchViewModelCommands
 {
-  public class SubmitSearch(CardSearchViewModel viewmodel) : ViewModelAsyncCommand<CardSearchViewModel, string>(viewmodel)
+  public class SubmitSearch(CardSearchViewModel viewmodel) : AsyncCommand<string>
   {
+    public CardSearchViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(string? query)
     {
       try

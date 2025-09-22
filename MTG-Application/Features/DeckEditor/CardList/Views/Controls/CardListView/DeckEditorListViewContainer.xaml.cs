@@ -128,11 +128,11 @@ public partial class DeckEditorListViewContainer : UserControl
 
   private void KeyboardAccelerator_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
   {
-    if (args.Element is SelectableItemsRepeater air)
+    if (args.Element is SelectableItemsRepeater sir)
     {
-      if (air.SelectedItem is not DeckEditorMTGCard selectedItem
-        || air.DataContext is not ICardListViewModel itemsViewViewModel
-        || air.ItemsSource is not IList source
+      if (sir.SelectedItem is not DeckEditorMTGCard selectedItem
+        || sir.DataContext is not ICardListViewModel itemsViewViewModel
+        || sir.ItemsSource is not IList source
         || (source.IndexOf(selectedItem) is int index && index < 0)
         || itemsViewViewModel.RemoveCardCommand?.CanExecute(selectedItem) is not true)
         return;

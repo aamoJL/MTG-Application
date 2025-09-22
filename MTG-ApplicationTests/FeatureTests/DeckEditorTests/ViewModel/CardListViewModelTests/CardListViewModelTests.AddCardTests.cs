@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor.ViewModels;
+﻿using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
@@ -15,43 +14,43 @@ public partial class CardListViewModelTests
     [TestMethod]
     public void AddCard_CardAdded()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
 
       viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
-      Assert.AreEqual(1, viewmodel.Cards.Count);
+      Assert.HasCount(1, viewmodel.Cards);
     }
 
     [TestMethod]
     public void AddCard_Undo_CardRemoved()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
 
       viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
-      Assert.AreEqual(1, viewmodel.Cards.Count);
+      Assert.HasCount(1, viewmodel.Cards);
 
       viewmodel.UndoStack.Undo();
 
-      Assert.AreEqual(0, viewmodel.Cards.Count);
+      Assert.IsEmpty(viewmodel.Cards);
     }
 
     [TestMethod]
     public void AddCard_Redo_CardAddedAgain()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
 
       viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
-      Assert.AreEqual(1, viewmodel.Cards.Count);
+      Assert.HasCount(1, viewmodel.Cards);
 
       viewmodel.UndoStack.Undo();
 
-      Assert.AreEqual(0, viewmodel.Cards.Count);
+      Assert.IsEmpty(viewmodel.Cards);
 
       viewmodel.UndoStack.Redo();
 
-      Assert.AreEqual(1, viewmodel.Cards.Count);
+      Assert.HasCount(1, viewmodel.Cards);
     }
 
     [TestMethod]
@@ -59,12 +58,12 @@ public partial class CardListViewModelTests
     {
       var confirmer = new TestConfirmer<ConfirmationResult>();
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([card], new TestMTGCardImporter())
       {
-        AddSingleConflictConfirmer = confirmer
-      })
-      {
-        Cards = [card],
+        Confirmers = new()
+        {
+          AddSingleConflictConfirmer = confirmer
+        }
       };
 
       await viewmodel.AddCardCommand.ExecuteAsync(card);

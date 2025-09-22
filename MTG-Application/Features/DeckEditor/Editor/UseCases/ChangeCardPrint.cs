@@ -13,8 +13,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class ChangeCardPrint(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel, DeckEditorMTGCard>(viewmodel)
+  public class ChangeCardPrint(DeckEditorViewModel viewmodel) : AsyncCommand<DeckEditorMTGCard>
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(DeckEditorMTGCard? card) => card != null;
 
     protected override async Task Execute(DeckEditorMTGCard? card)

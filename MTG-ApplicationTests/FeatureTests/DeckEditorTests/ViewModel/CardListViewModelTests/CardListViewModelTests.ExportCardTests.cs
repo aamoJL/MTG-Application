@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
@@ -17,7 +16,7 @@ public partial class CardListViewModelTests
     [TestMethod("Should be able to execute with Name or Id parameters")]
     public void ValidParameter_CanExecute()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
 
       Assert.IsTrue(viewmodel.ExportCardsCommand.CanExecute("Name"));
       Assert.IsTrue(viewmodel.ExportCardsCommand.CanExecute("Id"));
@@ -26,7 +25,7 @@ public partial class CardListViewModelTests
     [TestMethod("Should not be able to execute if parameter is not Name or Id")]
     public void InvalidParameter_CanNotExecute()
     {
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter());
+      var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
 
       Assert.IsFalse(viewmodel.ExportCardsCommand.CanExecute("Invalid property name"));
     }
@@ -42,12 +41,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([.. cards], new TestMTGCardImporter())
       {
-        ExportConfirmer = confirmer
-      })
-      {
-        Cards = new(cards),
+        Confirmers = new()
+        {
+          ExportConfirmer = confirmer
+        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
@@ -66,12 +65,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([.. cards], new TestMTGCardImporter())
       {
-        ExportConfirmer = confirmer
-      })
-      {
-        Cards = new(cards),
+        Confirmers = new()
+        {
+          ExportConfirmer = confirmer
+        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Id");
@@ -91,12 +90,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([.. cards], new TestMTGCardImporter())
       {
-        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string>(default); } }
-      })
-      {
-        Cards = new(cards),
+        Confirmers = new()
+        {
+          ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string>(default); } }
+        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
@@ -116,12 +115,12 @@ public partial class CardListViewModelTests
       DeckEditorMTGCardMocker.CreateMTGCardModel(name: "Third", scryfallId: Guid.NewGuid()),
       };
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([.. cards], new TestMTGCardImporter())
       {
-        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string>(default); } }
-      })
-      {
-        Cards = new(cards),
+        Confirmers = new()
+        {
+          ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult<string>(default); } }
+        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Id");
@@ -142,13 +141,13 @@ public partial class CardListViewModelTests
       };
       var clipboard = new TestClipboardService();
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([.. cards], new TestMTGCardImporter())
       {
-        ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult(exportText); } }
-      })
-      {
-        Cards = new(cards),
-        ClipboardService = clipboard
+        ClipboardService = clipboard,
+        Confirmers = new()
+        {
+          ExportConfirmer = new() { OnConfirm = async (msg) => { exportText = msg.Data; return await Task.FromResult(exportText); } }
+        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Name");
@@ -168,14 +167,14 @@ public partial class CardListViewModelTests
       var clipboard = new TestClipboardService();
       var notifier = new TestNotifier();
 
-      var viewmodel = new CardListViewModel(new TestMTGCardImporter(), new()
+      var viewmodel = new CardListViewModel([.. cards], new TestMTGCardImporter())
       {
-        ExportConfirmer = new() { OnConfirm = async (msg) => { return await Task.FromResult(msg.Data); } }
-      })
-      {
-        Cards = new(cards),
         ClipboardService = clipboard,
-        Notifier = notifier
+        Notifier = notifier,
+        Confirmers = new()
+        {
+          ExportConfirmer = new() { OnConfirm = async (msg) => { return await Task.FromResult(msg.Data); } }
+        }
       };
 
       await viewmodel.ExportCardsCommand.ExecuteAsync("Name");

@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static MTGApplication.General.Services.NotificationService.NotificationService;
+﻿using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.TestUtility.Services;
 
@@ -10,21 +9,13 @@ public class NotificationException(Notification notification) : UnitTestAssertEx
 
 public class TestNotifier : Notifier
 {
-  public TestNotifier()
-    => OnNotify = (msg) => Notified = msg;
+  public TestNotifier() => OnNotify = (msg) => Notified = msg;
 
   public Notification Notified { get; private set; } = null;
 }
 
 public static class NotificationAssert
 {
-  [Obsolete("Use TestNotifier")]
-  public static async Task NotificationSent(NotificationType notificationType, Func<Task> task)
-  {
-    try { throw await Assert.ThrowsExceptionAsync<NotificationException>(task); }
-    catch (NotificationException e) { Assert.AreEqual(notificationType, e.Notification.NotificationType, "Notification type was wrong"); }
-  }
-
   public static void NotificationSent(NotificationType type, TestNotifier notifier)
   {
     if (notifier.Notified == null)

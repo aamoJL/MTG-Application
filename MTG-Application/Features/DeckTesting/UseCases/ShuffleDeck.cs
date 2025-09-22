@@ -4,8 +4,10 @@ using System;
 
 namespace MTGApplication.Features.DeckTesting.UseCases;
 
-public class ShuffleDeck(DeckTestingPageViewModel viewmodel) : ViewModelCommand<DeckTestingPageViewModel>(viewmodel)
+public class ShuffleDeck(DeckTestingPageViewModel viewmodel) : SyncCommand
 {
+  public DeckTestingPageViewModel Viewmodel { get; } = viewmodel;
+
   protected override void Execute()
   {
     var rng = new Random();

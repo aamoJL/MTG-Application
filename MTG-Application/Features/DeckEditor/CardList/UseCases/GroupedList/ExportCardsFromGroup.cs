@@ -13,8 +13,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardGroupViewModelCommands
 {
-  public class ExportCardsFromGroup(CardGroupViewModel viewmodel) : ViewModelAsyncCommand<CardGroupViewModel, string>(viewmodel)
+  public class ExportCardsFromGroup(CardGroupViewModel viewmodel) : AsyncCommand<string>
   {
+    public CardGroupViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(string? byProperty) => byProperty is "Id" or "Name";
 
     protected override async Task Execute(string? byProperty)

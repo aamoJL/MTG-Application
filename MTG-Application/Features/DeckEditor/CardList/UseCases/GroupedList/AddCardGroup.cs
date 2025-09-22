@@ -14,8 +14,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class GroupedCardListViewModelCommands
 {
-  public class AddCardGroup(GroupedCardListViewModel viewmodel) : ViewModelAsyncCommand<GroupedCardListViewModel, string>(viewmodel)
+  public class AddCardGroup(GroupedCardListViewModel viewmodel) : AsyncCommand<string>
   {
+    public GroupedCardListViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(string? key)
     {
       key ??= await Viewmodel.Confirmers.AddCardGroupConfirmer.Confirm(GroupedCardListConfirmers.GetAddCardGroupConfirmation());

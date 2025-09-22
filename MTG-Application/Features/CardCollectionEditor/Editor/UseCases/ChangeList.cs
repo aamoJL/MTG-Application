@@ -6,8 +6,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ChangeList(CardCollectionEditorViewModel viewmodel) : ViewModelCommand<CardCollectionEditorViewModel, MTGCardCollectionList>(viewmodel)
+  public class ChangeList(CardCollectionEditorViewModel viewmodel) : SyncCommand<MTGCardCollectionList>
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(MTGCardCollectionList? list)
       => list != null && Viewmodel.SelectedCardCollectionListViewModel.CollectionList != list && Viewmodel.Collection.CollectionLists.Contains(list);
 

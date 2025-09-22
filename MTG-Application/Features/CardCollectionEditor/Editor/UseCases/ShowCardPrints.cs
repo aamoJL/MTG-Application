@@ -11,8 +11,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ShowCardPrints(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, CardCollectionMTGCard>(viewmodel)
+  public class ShowCardPrints(CardCollectionEditorViewModel viewmodel) : AsyncCommand<CardCollectionMTGCard>
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(CardCollectionMTGCard? card)
     {
       try

@@ -11,8 +11,10 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class DeleteDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class DeleteDeck(DeckEditorViewModel viewmodel) : AsyncCommand
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.Name);
 
     protected override async Task Execute()

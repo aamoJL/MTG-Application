@@ -3,10 +3,19 @@ using MTGApplication.General.ViewModels;
 
 namespace MTGApplication.Features.DeckTesting.UseCases;
 
-public class DrawCard : ViewModelCommand<DeckTestingPageViewModel>
+public class DrawCard : SyncCommand
 {
-  public DrawCard(DeckTestingPageViewModel viewmodel) : base(viewmodel)
-    => viewmodel.Library.CollectionChanged += Library_CollectionChanged;
+  public DrawCard(DeckTestingPageViewModel viewmodel) => Viewmodel = viewmodel;
+
+  public DeckTestingPageViewModel Viewmodel
+  {
+    get;
+    private init
+    {
+      field = value;
+      field.Library.CollectionChanged += Library_CollectionChanged;
+    }
+  }
 
   protected override bool CanExecute() => Viewmodel.Library.Count > 0;
 

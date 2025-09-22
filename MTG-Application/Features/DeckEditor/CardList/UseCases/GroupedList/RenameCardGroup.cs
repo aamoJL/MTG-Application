@@ -12,8 +12,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class GroupedCardListViewModelCommands
 {
-  public class RenameCardGroup(GroupedCardListViewModel viewmodel) : ViewModelAsyncCommand<GroupedCardListViewModel, CardGroupViewModel>(viewmodel)
+  public class RenameCardGroup(GroupedCardListViewModel viewmodel) : AsyncCommand<CardGroupViewModel>
   {
+    public GroupedCardListViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(CardGroupViewModel? group) => !string.IsNullOrEmpty(group?.Key);
 
     protected override async Task Execute(CardGroupViewModel? group)

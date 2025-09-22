@@ -6,47 +6,29 @@ using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using static MTGApplication.Features.DeckEditor.CardList.UseCases.CardListViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 
-public partial class CardListViewModel(IMTGCardImporter importer, CardListConfirmers? confirmers = null) : ICardListViewModel, INotifyPropertyChanged, INotifyPropertyChanging
+public partial class CardListViewModel(ObservableCollection<DeckEditorMTGCard> cards, IMTGCardImporter importer) : ICardListViewModel
 {
-  public ObservableCollection<DeckEditorMTGCard> Cards
-  {
-    get;
-    set
-    {
-      if (field == value)
-        return;
-
-      PropertyChanging?.Invoke(this, new(nameof(Cards)));
-      field = value;
-      PropertyChanged?.Invoke(this, new(nameof(Cards)));
-    }
-  } = [];
-
+  public ObservableCollection<DeckEditorMTGCard> Cards { get; } = cards;
   public IMTGCardImporter Importer { get; } = importer;
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public IWorker Worker { get; init; } = IWorker.Default;
+  public CardListConfirmers Confirmers { get; init; } = new();
 
-  public virtual CardListConfirmers Confirmers { get; } = confirmers ??= new();
-
-  public event PropertyChangedEventHandler? PropertyChanged;
-  public event PropertyChangingEventHandler? PropertyChanging;
-
-  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? AddCardCommand => field ??= new AddCard(this).Command;
-  [NotNull] public IRelayCommand<DeckEditorMTGCard>? RemoveCardCommand => field ??= new RemoveCard(this).Command;
-  [NotNull] public IRelayCommand<DeckEditorMTGCard>? BeginMoveFromCommand => field ??= new MoveCard.BeginMoveFrom(this).Command;
-  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? BeginMoveToCommand => field ??= new MoveCard.BeginMoveTo(this).Command;
-  [NotNull] public IRelayCommand<DeckEditorMTGCard>? ExecuteMoveCommand => field ??= new MoveCard.ExecuteMove(this).Command;
-  [NotNull] public IRelayCommand? ClearCommand => field ??= new Clear(this).Command;
-  [NotNull] public IAsyncRelayCommand<string>? ImportCardsCommand => field ??= new ImportCards(this).Command;
-  [NotNull] public IAsyncRelayCommand<string>? ExportCardsCommand => field ??= new ExportCards(this).Command;
+  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? AddCardCommand => field ??= new AddCard(Cards, UndoStack, Confirmers).Command;
+  [NotNull] public IRelayCommand<DeckEditorMTGCard>? RemoveCardCommand => field ??= new RemoveCard(Cards, UndoStack).Command;
+  [NotNull] public IRelayCommand<DeckEditorMTGCard>? BeginMoveFromCommand => field ??= new MoveCard.BeginMoveFrom(Cards, UndoStack).Command;
+  [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? BeginMoveToCommand => field ??= new MoveCard.BeginMoveTo(Cards, UndoStack, Confirmers).Command;
+  [NotNull] public IRelayCommand<DeckEditorMTGCard>? ExecuteMoveCommand => field ??= new MoveCard.ExecuteMove(UndoStack).Command;
+  [NotNull] public IRelayCommand? ClearCommand => field ??= new Clear(Cards, UndoStack).Command;
+  [NotNull] public IAsyncRelayCommand<string>? ImportCardsCommand => field ??= new ImportCards(Cards, UndoStack, Confirmers, Worker, Importer, Notifier).Command;
+  [NotNull] public IAsyncRelayCommand<string>? ExportCardsCommand => field ??= new ExportCards(Cards, Confirmers, Notifier, ClipboardService).Command;
 }

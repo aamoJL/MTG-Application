@@ -12,20 +12,32 @@ public partial class DraggableItemContainer : ItemContainer
   public DraggableItemContainer()
   {
     PointerPressed += OnPointerPressed;
+    PointerReleased += DraggableItemContainer_PointerReleased;
     DragStarting += OnDragStarting;
+    PointerMoved += DraggableItemContainer_PointerMoved;
   }
 
   private PointerPoint? DragPointerPoint { get; set; }
 
   private void OnPointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    => DragPointerPoint = e.GetCurrentPoint(Child);
+  {
+    if (CanDrag)
+      DragPointerPoint = e.GetCurrentPoint(Child);
+  }
+
+  private void DraggableItemContainer_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    => DragPointerPoint = null;
 
   private void OnDragStarting(UIElement sender, DragStartingEventArgs args)
-  {
-    args.Cancel = true; // Cancel drag on this container...
+    => args.Cancel = true; // Cancel the default drag on this container
 
-    // ...and start drag on the child element instead
-    if (Child != null && DragPointerPoint != null)
-      _ = Child.StartDragAsync(DragPointerPoint);
+  private void DraggableItemContainer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+  {
+    if (DragPointerPoint != null && Child != null)
+    {
+      _ = Child.StartDragAsync(DragPointerPoint); // Start drag on the child element
+
+      DragPointerPoint = null;
+    }
   }
 }

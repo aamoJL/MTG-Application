@@ -11,8 +11,10 @@ public partial class CommanderViewModelCommands
 {
   public class MoveCard
   {
-    public class BeginMoveFrom(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+    public class BeginMoveFrom(CommanderViewModel viewmodel) : SyncCommand<DeckEditorMTGCard>
     {
+      public CommanderViewModel Viewmodel { get; } = viewmodel;
+
       protected override void Execute(DeckEditorMTGCard? _)
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
@@ -23,8 +25,10 @@ public partial class CommanderViewModelCommands
       }
     }
 
-    public class BeginMoveTo(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, DeckEditorMTGCard>(viewmodel)
+    public class BeginMoveTo(CommanderViewModel viewmodel) : AsyncCommand<DeckEditorMTGCard>
     {
+      public CommanderViewModel Viewmodel { get; } = viewmodel;
+
       protected override async Task Execute(DeckEditorMTGCard? card)
       {
         Viewmodel.UndoStack.ActiveCombinedCommand.Commands.Add(
@@ -37,8 +41,10 @@ public partial class CommanderViewModelCommands
       }
     }
 
-    public class ExecuteMove(CommanderViewModel viewmodel) : ViewModelCommand<CommanderViewModel>(viewmodel)
+    public class ExecuteMove(CommanderViewModel viewmodel) : SyncCommand
     {
+      public CommanderViewModel Viewmodel { get; } = viewmodel;
+
       protected override void Execute()
         => Viewmodel.UndoStack.PushAndExecuteActiveCombinedCommand();
     }

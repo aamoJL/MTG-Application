@@ -8,8 +8,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class GroupedCardListViewModelCommands
 {
-  public class RemoveCardFromGroup(CardGroupViewModel viewmodel) : ViewModelCommand<CardGroupViewModel, DeckEditorMTGCard>(viewmodel)
+  public class RemoveCardFromGroup(CardGroupViewModel viewmodel) : SyncCommand<DeckEditorMTGCard>
   {
+    public CardGroupViewModel Viewmodel { get; } = viewmodel;
+
     protected override void Execute(DeckEditorMTGCard? card)
     {
       if (card == null)

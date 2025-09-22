@@ -9,8 +9,10 @@ namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
 
 public partial class CommanderViewModelCommands
 {
-  public class ChangeCommander(CommanderViewModel viewmodel) : ViewModelAsyncCommand<CommanderViewModel, DeckEditorMTGCard?>(viewmodel)
+  public class ChangeCommander(CommanderViewModel viewmodel) : AsyncCommand<DeckEditorMTGCard?>
   {
+    public CommanderViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(DeckEditorMTGCard? card)
     {
       Viewmodel.UndoStack.PushAndExecute(

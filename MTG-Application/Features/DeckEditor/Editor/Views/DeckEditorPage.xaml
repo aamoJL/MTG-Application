@@ -137,32 +137,32 @@
               <commanderview:CommanderTextView
                 PrefixText="Commander: "
                 Model="{x:Bind ViewModel.Commander.Card, Mode=OneWay}"
-                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
-                DeleteButtonClick="{x:Bind ViewModel.Commander.RemoveCommanderCommand, Mode=OneTime}"
+                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneWay}"
+                DeleteButtonClick="{x:Bind ViewModel.Commander.RemoveCommanderCommand, Mode=OneWay}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Commander"
                 DragMoveCaptionText="Move to Commander"
-                OnDropCopy="{x:Bind ViewModel.Commander.ChangeCommanderCommand, Mode=OneTime}"
-                OnDropBeginMoveFrom="{x:Bind ViewModel.Commander.BeginMoveFromCommand, Mode=OneTime}"
-                OnDropBeginMoveTo="{x:Bind ViewModel.Commander.BeginMoveToCommand, Mode=OneTime}"
-                OnDropExecuteMove="{x:Bind ViewModel.Commander.ExecuteMoveCommand, Mode=OneTime}"
-                OnDropImport="{x:Bind ViewModel.Commander.ImportCommanderCommand, Mode=OneTime}"
+                OnDropCopy="{x:Bind ViewModel.Commander.ChangeCommanderCommand, Mode=OneWay}"
+                OnDropBeginMoveFrom="{x:Bind ViewModel.Commander.BeginMoveFromCommand, Mode=OneWay}"
+                OnDropBeginMoveTo="{x:Bind ViewModel.Commander.BeginMoveToCommand, Mode=OneWay}"
+                OnDropExecuteMove="{x:Bind ViewModel.Commander.ExecuteMoveCommand, Mode=OneWay}"
+                OnDropImport="{x:Bind ViewModel.Commander.ImportCommanderCommand, Mode=OneWay}"
                 HoverPreviewEnabled="True" />
               <commanderview:CommanderTextView
                 PrefixText="Partner: "
                 Model="{x:Bind ViewModel.Partner.Card, Mode=OneWay}"
-                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneTime}"
-                DeleteButtonClick="{x:Bind ViewModel.Partner.RemoveCommanderCommand, Mode=OneTime}"
+                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneWay}"
+                DeleteButtonClick="{x:Bind ViewModel.Partner.RemoveCommanderCommand, Mode=OneWay}"
                 CanDrag="True"
                 AllowDrop="True"
                 DragCopyCaptionText="Copy to Partner"
                 DragMoveCaptionText="Move to Partner"
-                OnDropCopy="{x:Bind ViewModel.Partner.ChangeCommanderCommand, Mode=OneTime}"
-                OnDropBeginMoveFrom="{x:Bind ViewModel.Partner.BeginMoveFromCommand, Mode=OneTime}"
-                OnDropBeginMoveTo="{x:Bind ViewModel.Partner.BeginMoveToCommand, Mode=OneTime}"
-                OnDropExecuteMove="{x:Bind ViewModel.Partner.ExecuteMoveCommand, Mode=OneTime}"
-                OnDropImport="{x:Bind ViewModel.Partner.ImportCommanderCommand, Mode=OneTime}"
+                OnDropCopy="{x:Bind ViewModel.Partner.ChangeCommanderCommand, Mode=OneWay}"
+                OnDropBeginMoveFrom="{x:Bind ViewModel.Partner.BeginMoveFromCommand, Mode=OneWay}"
+                OnDropBeginMoveTo="{x:Bind ViewModel.Partner.BeginMoveToCommand, Mode=OneWay}"
+                OnDropExecuteMove="{x:Bind ViewModel.Partner.ExecuteMoveCommand, Mode=OneWay}"
+                OnDropImport="{x:Bind ViewModel.Partner.ImportCommanderCommand, Mode=OneWay}"
                 HoverPreviewEnabled="True" />
               <!--#endregion-->
 
@@ -174,12 +174,12 @@
                 <TextBlock Text="Maybe">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..." />
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneWay}" Text="Import..." />
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name" />
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Name" Text="By Name" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Id" Text="By Id" />
                       </MenuFlyoutSubItem>
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed" />
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.MaybeCardList.ClearCommand, Mode=OneWay}" Text="Clear" Background="IndianRed" />
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -188,18 +188,18 @@
             <cardlistview:AdvancedCardListView
               x:Name="MaybeCardsListView"
               Grid.Row="2"
-              DataContext="{x:Bind ViewModel.MaybeCardList, Mode=OneTime}"
+              DataContext="{x:Bind ViewModel.MaybeCardList, Mode=OneWay}"
               ItemsSource="{x:Bind MaybeCardCollectionSource.View, Mode=OneTime}"
               Style="{ThemeResource MTGListViewStyle}"
               ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneTime}"
-              OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneTime}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneTime}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneTime}"
-              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneTime}"
+              OnDropCopy="{x:Bind ViewModel.MaybeCardList.AddCardCommand, Mode=OneWay}"
+              OnDropImport="{x:Bind ViewModel.MaybeCardList.ImportCardsCommand, Mode=OneWay}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.MaybeCardList.BeginMoveFromCommand, Mode=OneWay}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.MaybeCardList.BeginMoveToCommand, Mode=OneWay}"
+              OnDropExecuteMove="{x:Bind ViewModel.MaybeCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.Resources>
                 <customControls:BindableCollectionView 
@@ -232,12 +232,12 @@
                 <TextBlock Text="Wishlist">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneWay}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.WishCardList.ClearCommand, Mode=OneWay}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -253,11 +253,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneTime}"
-              OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneTime}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneTime}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneTime}"
-              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneTime}"
+              OnDropCopy="{x:Bind ViewModel.WishCardList.AddCardCommand, Mode=OneWay}"
+              OnDropImport="{x:Bind ViewModel.WishCardList.ImportCardsCommand, Mode=OneWay}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.WishCardList.BeginMoveFromCommand, Mode=OneWay}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.WishCardList.BeginMoveToCommand, Mode=OneWay}"
+              OnDropExecuteMove="{x:Bind ViewModel.WishCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.Resources>
                 <customControls:BindableCollectionView 
@@ -289,12 +289,12 @@
                 <TextBlock Text="Remove">
                   <TextBlock.ContextFlyout>
                     <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneWay}" Text="Import..."/>
                       <MenuFlyoutSubItem Text="Export...">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Name" Text="By Name"/>
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Id" Text="By Id"/>
                       </MenuFlyoutSubItem>
-                      <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
+                      <MenuFlyoutItem Command="{x:Bind ViewModel.RemoveCardList.ClearCommand, Mode=OneWay}" Text="Clear" Background="IndianRed"/>
                     </MenuFlyout>
                   </TextBlock.ContextFlyout>
                 </TextBlock>
@@ -310,11 +310,11 @@
               SelectionMode="Single"
               CanDragItems="True"
               AllowDrop="True"
-              OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneTime}"
-              OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneTime}"
-              OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneTime}"
-              OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneTime}"
-              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneTime}"
+              OnDropCopy="{x:Bind ViewModel.RemoveCardList.AddCardCommand, Mode=OneWay}"
+              OnDropImport="{x:Bind ViewModel.RemoveCardList.ImportCardsCommand, Mode=OneWay}"
+              OnDropBeginMoveFrom="{x:Bind ViewModel.RemoveCardList.BeginMoveFromCommand, Mode=OneWay}"
+              OnDropBeginMoveTo="{x:Bind ViewModel.RemoveCardList.BeginMoveToCommand, Mode=OneWay}"
+              OnDropExecuteMove="{x:Bind ViewModel.RemoveCardList.ExecuteMoveCommand, Mode=OneWay}"
               LosingFocus="ListView_LosingFocus">
               <cardlistview:AdvancedCardListView.Resources>
                 <customControls:BindableCollectionView 
@@ -515,7 +515,7 @@
 
             <!--#region Group View Controls -->
             <AppBarSeparator Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"/>
-            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneTime}" Icon="Add" Label="Add Group" />
+            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneWay}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
@@ -531,12 +531,12 @@
           <TextBlock Text="{x:Bind sys:String.Format('{0} cards', ViewModel.Size), Mode=OneWay}" HorizontalAlignment="Right"/>
           <StackPanel.ContextFlyout>
             <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-              <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}" Text="Import..."/>
+              <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}" Text="Import..."/>
               <MenuFlyoutSubItem Text="Export...">
-                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Name" Text="By Name"/>
-                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCardsCommand, Mode=OneTime}" CommandParameter="Id" Text="By Id"/>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Name" Text="By Name"/>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ExportCardsCommand, Mode=OneWay}" CommandParameter="Id" Text="By Id"/>
               </MenuFlyoutSubItem>
-              <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ClearCommand, Mode=OneTime}" Text="Clear" Background="IndianRed"/>
+              <MenuFlyoutItem Command="{x:Bind ViewModel.DeckCardList.ClearCommand, Mode=OneWay}" Text="Clear" Background="IndianRed"/>
             </MenuFlyout>
           </StackPanel.ContextFlyout>
         </StackPanel>
@@ -648,14 +648,14 @@
           VerticalScrollBarVisibility="Auto" 
           Padding="10">
           <cardlistview:DeckEditorListViewContainer
-            DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneTime}"
+            DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
             ItemsSource="{x:Bind DeckCardsGridViewCollectionSource.View, Mode=OneTime}"
             CenterOnFocus="True"
             AllowDrop="True"
-            OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
-            OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
-            OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
-            OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}">
+            OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
+            OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
+            OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
+            OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}">
             <cardlistview:DeckEditorListViewContainer.Layout>
               <UniformGridLayout
                 MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
@@ -688,17 +688,17 @@
         <cardlistview:AdvancedCardListView
           x:Name="DeckCardsListView"
           Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Text, Mode=OneWay}"
-          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneTime}"
+          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneTime}"
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"
           AllowDrop="True"
-          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneTime}"
-          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneTime}"
-          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneTime}"
-          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneTime}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneTime}"
+          OnDropCopy="{x:Bind ViewModel.DeckCardList.AddCardCommand, Mode=OneWay}"
+          OnDropImport="{x:Bind ViewModel.DeckCardList.ImportCardsCommand, Mode=OneWay}"
+          OnDropBeginMoveFrom="{x:Bind ViewModel.DeckCardList.BeginMoveFromCommand, Mode=OneWay}"
+          OnDropBeginMoveTo="{x:Bind ViewModel.DeckCardList.BeginMoveToCommand, Mode=OneWay}"
+          OnDropExecuteMove="{x:Bind ViewModel.DeckCardList.ExecuteMoveCommand, Mode=OneWay}"
           LosingFocus="ListView_LosingFocus">
           <ListView.Resources>
             <customControls:BindableCollectionView 

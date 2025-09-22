@@ -12,8 +12,10 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCas
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class EditList(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel, MTGCardCollectionList>(viewmodel)
+  public class EditList(CardCollectionEditorViewModel viewmodel) : AsyncCommand<MTGCardCollectionList>
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute(MTGCardCollectionList? list) => !string.IsNullOrEmpty(list?.Name);
 
     protected override async Task Execute(MTGCardCollectionList? list)

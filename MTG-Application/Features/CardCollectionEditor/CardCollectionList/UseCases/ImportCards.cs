@@ -11,8 +11,10 @@ namespace MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCas
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ImportCards(CardCollectionListViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionListViewModel>(viewmodel)
+  public class ImportCards(CardCollectionListViewModel viewmodel) : AsyncCommand
   {
+    public CardCollectionListViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.Name);
 
     protected override async Task Execute()

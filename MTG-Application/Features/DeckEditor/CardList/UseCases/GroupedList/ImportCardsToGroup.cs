@@ -18,8 +18,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardGroupViewModelCommands
 {
-  public class ImportCardsToGroup(CardGroupViewModel viewmodel) : ViewModelAsyncCommand<CardGroupViewModel, string>(viewmodel)
+  public class ImportCardsToGroup(CardGroupViewModel viewmodel) : AsyncCommand<string>
   {
+    public CardGroupViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(string? data)
     {
       data ??= await Viewmodel.Confirmers.ImportConfirmer.Confirm(CardListConfirmers.GetImportConfirmation(string.Empty));

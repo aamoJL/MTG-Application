@@ -45,19 +45,8 @@ public partial class CardGroupViewModel : ObservableObject, ICardListViewModel
   public ObservableCollection<DeckEditorMTGCard> Source
   {
     get;
-    private set
+    private init
     {
-      if (field == value)
-        return;
-
-      if (field is ObservableCollection<DeckEditorMTGCard> old)
-      {
-        SourceWeakEventListener?.Detach();
-
-        foreach (var item in old)
-          item.PropertyChanged -= SourceItem_PropertyChanged;
-      }
-
       SetProperty(ref field, value);
 
       if (Source is INotifyCollectionChanged observableSource)
@@ -74,8 +63,6 @@ public partial class CardGroupViewModel : ObservableObject, ICardListViewModel
 
         observableSource.CollectionChanged += SourceWeakEventListener.OnEvent!;
       }
-
-      Cards.Clear();
 
       foreach (var item in Source)
       {

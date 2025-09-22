@@ -12,8 +12,10 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class SaveDeck(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class SaveDeck(DeckEditorViewModel viewmodel) : AsyncCommand
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute()
     {
       var oldName = Viewmodel.Name;

@@ -9,8 +9,10 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardGroupViewModelCommands
 {
-  public class ClearCardGroup(CardGroupViewModel viewmodel) : ViewModelCommand<CardGroupViewModel>(viewmodel)
+  public class ClearCardGroup(CardGroupViewModel viewmodel) : SyncCommand
   {
+    public CardGroupViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute() => Viewmodel.Cards.Any();
 
     protected override void Execute()

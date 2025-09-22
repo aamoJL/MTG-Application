@@ -148,6 +148,8 @@ public sealed partial class DragCardPreview : UserControl, INotifyPropertyChange
     {
       Coordinates = new((float)pointerPosition.X, (float)pointerPosition.Y)
     });
+
+    e.Handled = true;
   }
 
   private void CardDragArgs_Started() => Visibility = Visibility.Visible;

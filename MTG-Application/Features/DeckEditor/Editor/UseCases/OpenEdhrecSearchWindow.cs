@@ -9,9 +9,11 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class OpenEdhrecSearchWindow(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class OpenEdhrecSearchWindow(DeckEditorViewModel viewmodel) : AsyncCommand
   {
-    private static readonly int _countLimit = 5;
+    private static readonly int _themeCountLimit = 5;
+
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
 
     protected override bool CanExecute() => Viewmodel.Commander.Card != null;
 
@@ -24,7 +26,7 @@ public partial class DeckEditorViewModelCommands
       {
         var themes = (await EdhrecImporter.GetThemes(
           commander: Viewmodel.Commander.Card!.Info.Name,
-          partner: Viewmodel.Partner.Card?.Info.Name)).Take(_countLimit).ToArray();
+          partner: Viewmodel.Partner.Card?.Info.Name)).Take(_themeCountLimit).ToArray();
 
         new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow(themes).Activate();
       }

@@ -12,8 +12,10 @@ namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
 public partial class DeckEditorViewModelCommands
 {
-  public class ShowDeckTokens(DeckEditorViewModel viewmodel) : ViewModelAsyncCommand<DeckEditorViewModel>(viewmodel)
+  public class ShowDeckTokens(DeckEditorViewModel viewmodel) : AsyncCommand
   {
+    public DeckEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute() => Viewmodel.Commander.Card != null || Viewmodel.DeckCardList.Cards.Count != 0;
 
     protected override async Task Execute()

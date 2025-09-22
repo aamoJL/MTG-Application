@@ -12,8 +12,10 @@ namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ConfirmDeleteCollection(CardCollectionEditorViewModel viewmodel) : ViewModelAsyncCommand<CardCollectionEditorViewModel>(viewmodel)
+  public class ConfirmDeleteCollection(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
+    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
+
     protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.CollectionName);
 
     protected override async Task Execute()

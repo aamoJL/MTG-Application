@@ -10,8 +10,10 @@ namespace MTGApplication.Features.CardSearch.UseCases;
 
 public partial class CardSearchViewModelCommands
 {
-  public class ShowCardPrints(CardSearchViewModel viewmodel) : ViewModelAsyncCommand<CardSearchViewModel, MTGCard>(viewmodel)
+  public class ShowCardPrints(CardSearchViewModel viewmodel) : AsyncCommand<MTGCard>
   {
+    public CardSearchViewModel Viewmodel { get; } = viewmodel;
+
     protected override async Task Execute(MTGCard? card)
     {
       try
