@@ -19,7 +19,7 @@ public class FilterableAndSortableCollectionView
     {
       if (field != value)
       {
-        if (Source is INotifyCollectionChanged observable)
+        if (field is INotifyCollectionChanged observable)
           foreach (var item in Source.OfType<INotifyPropertyChanged>())
             item.PropertyChanged -= SourceItem_PropertyChanged;
 
@@ -27,9 +27,9 @@ public class FilterableAndSortableCollectionView
 
         View.Clear();
 
-        Source ??= Array.Empty<object>();
+        field ??= Array.Empty<object>();
 
-        foreach (var item in Source)
+        foreach (var item in field)
         {
           AddToView(item, sort: false);
 
@@ -41,7 +41,7 @@ public class FilterableAndSortableCollectionView
 
         SourceWeakEventListener?.Detach();
 
-        if (Source is INotifyCollectionChanged observableCollection)
+        if (field is INotifyCollectionChanged observableCollection)
         {
           SourceWeakEventListener = new(this)
           {
@@ -96,8 +96,7 @@ public class FilterableAndSortableCollectionView
     }
 
     foreach (var item in Source)
-      if (!View.Contains(item))
-        AddToView(item);
+      AddToView(item);
   }
 
   private void Sort()
@@ -114,30 +113,44 @@ public class FilterableAndSortableCollectionView
       View.Add(item);
   }
 
-  private void AddToView(object item, bool sort = true)
+  private bool AddToView(object item, bool sort = true)
   {
+    if (View.Contains(item))
+      return false;
+
     if (Filter == null || Filter(item))
     {
-      if (SortComparer != null && sort)
+      if (sort && SortComparer != null)
         View.Insert(View.FindPosition(item, SortComparer), item);
       else
         View.Add(item);
+
+      return true;
     }
+    return false;
   }
 
-  private void RemoveFromView(object item)
+  private bool RemoveFromView(object item)
   {
     try
     {
-      View.Remove(item);
+      return View.Remove(item);
     }
     catch { }
+
+    return false;
   }
 
-  private void RemoveAtFromView(int index)
+  private bool RemoveAtFromView(int index)
   {
-    if (index >= 0 && index < View.Count)
+    try
+    {
       View.RemoveAt(index);
+      return true;
+    }
+    catch { }
+
+    return false;
   }
 
   private void Source_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -171,24 +184,20 @@ public class FilterableAndSortableCollectionView
     if (item == null || !Source.Contains(item))
       return;
 
-    var sorted = false;
-    var index = View.IndexOf(item);
-
-    if (Filter != null)
+    if (AddToView(item, sort: true))
+      return;
+    else if (Filter?.Invoke(item) == false)
     {
-      if (Filter(item) && index == -1)
-      {
-        AddToView(item);
-        sorted = true;
-      }
-      else if (!Filter(item) && index != -1)
-      {
-        RemoveAtFromView(index);
-        sorted = true;
-      }
+      RemoveFromView(item);
+      return;
     }
 
-    if (SortComparer != null && !sorted)
+    var index = View.IndexOf(item);
+
+    if (index == -1)
+      return;
+
+    if (SortComparer != null)
     {
       if ((index - 1 >= 0 && SortComparer.Compare(item, View[index - 1]) < 0))
       {
