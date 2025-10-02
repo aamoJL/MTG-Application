@@ -90,7 +90,7 @@
 
     <controls:DockPanel
       LastChildFill="True"
-      Padding="0 0 10 10"
+      Margin="0 0 10 10"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
       <!--#region Sidebar -->
