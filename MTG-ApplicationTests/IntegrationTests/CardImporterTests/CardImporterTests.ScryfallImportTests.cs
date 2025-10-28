@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.Editor.Services;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 
@@ -55,7 +54,7 @@ public partial class CardImporterTests
       var result = await importer.Import(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
-      Assert.AreEqual(1, result.Found.Length);
+      Assert.HasCount(1, result.Found);
       Assert.AreEqual(new Guid("80fc51aa-64ca-4236-8cdb-670533b75f59"), result.Found[0].Info.ScryfallId);
     }
 
@@ -68,7 +67,7 @@ public partial class CardImporterTests
       var result = await importer.Import(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
-      Assert.AreEqual(1, result.Found.Length);
+      Assert.HasCount(1, result.Found);
       Assert.AreEqual("Decimator of the Provinces", result.Found[0].Info.Name);
     }
 
@@ -82,7 +81,7 @@ public partial class CardImporterTests
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual(1, result.NotFoundCount);
-      Assert.AreEqual(0, result.Found.Length);
+      Assert.IsEmpty(result.Found);
     }
   }
 }

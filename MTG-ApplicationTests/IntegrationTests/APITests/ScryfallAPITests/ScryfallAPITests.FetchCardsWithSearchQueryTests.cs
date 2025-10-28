@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Services.API.CardAPI;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.ScryfallAPITests;
 public partial class ScryfallAPITests
@@ -15,7 +14,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportCardsWithSearchQuery(query);
 
-      Assert.AreEqual(0, result.Found.Length);
+      Assert.IsEmpty(result.Found);
     }
 
     [TestMethod]
@@ -26,7 +25,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportCardsWithSearchQuery(query);
 
-      Assert.IsTrue(result.Found.Length > 0);
+      Assert.IsNotEmpty(result.Found);
       Assert.AreEqual(api.Name, result.Found[0].Info.ImporterName);
     }
 
@@ -38,7 +37,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportCardsWithSearchQuery(query);
 
-      Assert.IsTrue(result.Found.Length > 0);
+      Assert.IsNotEmpty(result.Found);
     }
   }
 }

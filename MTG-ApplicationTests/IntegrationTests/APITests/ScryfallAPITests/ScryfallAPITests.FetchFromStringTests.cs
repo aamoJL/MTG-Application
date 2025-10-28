@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Services.API.CardAPI;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.ScryfallAPITests;
 public partial class ScryfallAPITests
@@ -24,7 +23,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithString(importString);
 
-      Assert.AreEqual(7, result.Found.Length);
+      Assert.HasCount(7, result.Found);
       Assert.AreEqual(11, result.Found.Sum(x => x.Count));
     }
 
@@ -36,7 +35,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithString(importString);
 
-      Assert.AreEqual(0, result.Found.Length);
+      Assert.IsEmpty(result.Found);
       Assert.AreEqual(0, result.NotFoundCount);
     }
 
@@ -51,11 +50,11 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithString(importString);
 
-      Assert.AreEqual(0, result.Found.Length);
+      Assert.IsEmpty(result.Found);
       Assert.AreEqual(3, result.NotFoundCount);
     }
 
-    [TestMethod("Result should have found all valid items and not found count should be same as invalid item count" +
+    [TestMethod(DisplayName = "Result should have found all valid items and not found count should be same as invalid item count" +
       "when fetching with partially invalid string")]
     public async Task Fetch_WithPartiallyInvalidString_SomeFoundSomeNotFound()
     {
@@ -67,7 +66,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithString(importString);
 
-      Assert.AreEqual(1, result.Found.Length);
+      Assert.HasCount(1, result.Found);
       Assert.AreEqual(2, result.NotFoundCount);
     }
   }

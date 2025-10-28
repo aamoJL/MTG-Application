@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Services.Importers.CardImporter;
+﻿using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.EdhrecAPITests;
 public partial class EdhrecAPITests
@@ -14,7 +13,7 @@ public partial class EdhrecAPITests
 
       var result = await EdhrecImporter.GetThemes(commander);
 
-      Assert.IsTrue(result.Length > 1);
+      Assert.IsGreaterThan(1, result.Length);
       Assert.IsNotNull(result.FirstOrDefault(x => x.Name == "Infect"));
     }
 
@@ -25,7 +24,7 @@ public partial class EdhrecAPITests
 
       var result = await EdhrecImporter.GetThemes(commander);
 
-      Assert.AreEqual(0, result.Length);
+      Assert.IsEmpty(result);
     }
 
     [TestMethod]

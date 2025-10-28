@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.Services.API.CardAPI;
+﻿using MTGApplication.General.Services.API.CardAPI;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.ScryfallAPITests;
 public partial class ScryfallAPITests
@@ -13,7 +12,7 @@ public partial class ScryfallAPITests
       var api = new ScryfallAPI();
       var uri = string.Empty;
 
-      await Assert.ThrowsExceptionAsync<UriFormatException>(() => api.ImportWithUri(uri));
+      await Assert.ThrowsAsync<UriFormatException>(() => api.ImportWithUri(uri));
     }
 
     [TestMethod]
@@ -24,8 +23,8 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithUri(uri);
 
-      Assert.IsTrue(result.TotalCount > 0);
-      Assert.IsTrue(result.Found.Length > 0);
+      Assert.IsGreaterThan(0, result.TotalCount);
+      Assert.IsNotEmpty(result.Found);
     }
 
     [TestMethod]
@@ -36,9 +35,9 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithUri(uri);
 
-      Assert.AreEqual(api.PageSize, result.Found.Length);
-      Assert.IsTrue(result.TotalCount > api.PageSize);
-      Assert.IsTrue(result.NextPageUri != string.Empty);
+      Assert.HasCount(api.PageSize, result.Found);
+      Assert.IsGreaterThan(api.PageSize, result.TotalCount);
+      Assert.AreNotEqual(string.Empty, result.NextPageUri);
     }
 
     [TestMethod]
@@ -49,8 +48,8 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithUri(uri, fetchAll: true);
 
-      Assert.AreEqual(result.TotalCount, result.Found.Length);
-      Assert.IsTrue(result.TotalCount > api.PageSize);
+      Assert.HasCount(result.TotalCount, result.Found);
+      Assert.IsGreaterThan(api.PageSize, result.TotalCount);
       Assert.AreEqual(string.Empty, result.NextPageUri);
     }
   }

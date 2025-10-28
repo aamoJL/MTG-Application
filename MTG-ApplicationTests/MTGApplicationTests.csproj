@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
     <RootNamespace>MTGApplicationTests</RootNamespace>
@@ -15,17 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
-    <EmbeddedResource Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
-    <None Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
-    <Page Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.11.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.11.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.0.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.0.1" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
@@ -43,9 +35,5 @@
     <Content Update="Assets\ScryfallAPIDeckSample.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PRIResource Remove="GeneralTests\ServiceTests\IOServiceTests\**" />
   </ItemGroup>
 </Project>

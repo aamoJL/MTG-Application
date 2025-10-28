@@ -89,6 +89,7 @@ public partial class CardCollectionListViewModel : ObservableObject
   [NotNull] public IAsyncRelayCommand? ExportCardsCommand => field ??= new ExportCards(this).Command;
   [NotNull] public IRelayCommand<CardCollectionMTGCard>? SwitchCardOwnershipCommand => field ??= new SwitchCardOwnership(this).Command;
 
+  // TODO: remove this, it is used only in unit tests
   public async Task WaitForCardUpdate()
   {
     if (FetchingCardsTask != null)

@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTGApplication.General.ViewModels;
+﻿using MTGApplication.General.ViewModels;
 using System.ComponentModel;
 
 namespace MTGApplicationTests.TestUtility.ViewModel;

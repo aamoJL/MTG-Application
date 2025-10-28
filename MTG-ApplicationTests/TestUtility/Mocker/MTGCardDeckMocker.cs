@@ -6,7 +6,6 @@ public static class MTGCardDeckMocker
 {
   public static DeckEditorMTGDeck Mock(string name, bool includeCommander = true, bool includePartner = false)
   {
-#pragma warning disable CS8601 // Possible null reference assignment.
     return new()
     {
       Name = name,
@@ -17,6 +16,5 @@ public static class MTGCardDeckMocker
       Maybelist = [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First")],
       Removelist = [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "First")]
     };
-#pragma warning restore CS8601 // Possible null reference assignment.
   }
 }

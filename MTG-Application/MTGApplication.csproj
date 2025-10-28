@@ -117,15 +117,15 @@
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.250402" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-rc4.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />

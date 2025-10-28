@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
+
 public class FetchCardsWithSearchQuery(IMTGCardImporter importer) : UseCase<string, Task<CardImportResult>>
 {
   /// <exception cref="InvalidOperationException"></exception>

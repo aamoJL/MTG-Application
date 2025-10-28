@@ -25,14 +25,6 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
     Loaded += DeckEditorPage_Loaded;
   }
 
-  private void DeckEditorPage_Loaded(object _, RoutedEventArgs e)
-  {
-    Loaded -= DeckEditorPage_Loaded;
-
-    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, root: XamlRoot);
-    NotificationService.RegisterNotifications(ViewModel.Notifier, this);
-  }
-
   public DeckEditorViewModel ViewModel { get; } = new(App.MTGCardImporter);
 
   public CardFilters CardFilter { get; } = new();
@@ -57,6 +49,14 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     if (Enum.TryParse<CardViewType>(type, out var result))
       DeckCardsViewType = result;
+  }
+
+  private void DeckEditorPage_Loaded(object _, RoutedEventArgs e)
+  {
+    Loaded -= DeckEditorPage_Loaded;
+
+    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, root: XamlRoot);
+    NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
