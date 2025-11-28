@@ -102,8 +102,7 @@
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"
-          DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}"
-          DragItemsCompleted="{x:Bind CardDragAndDrop.DragCompleted, Mode=OneTime}">
+          DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}">
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardTextView 

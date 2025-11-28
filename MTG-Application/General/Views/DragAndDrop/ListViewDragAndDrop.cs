@@ -10,7 +10,7 @@ public class ListViewDragAndDrop<TItem>(Func<TItem, CardMoveArgs> itemToArgsConv
 {
   public void DragStarting(object _, DragItemsStartingEventArgs e)
   {
-    OnDragStarting(itemToArgsConverter((TItem)e.Items[0]), out var requestedOperation);
+    OnInternalDragStarting(itemToArgsConverter((TItem)e.Items[0]), out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }
@@ -23,6 +23,4 @@ public class ListViewDragAndDrop<TItem>(Func<TItem, CardMoveArgs> itemToArgsConv
 
     def.Complete();
   }
-
-  public void DragCompleted(ListViewBase _, DragItemsCompletedEventArgs __) => DropCompleted();
 }

@@ -2,17 +2,16 @@
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardView;
 
 public partial class AdvancedDeckEditorCardImageView : DeckEditorCardImageView
 {
   public AdvancedDeckEditorCardImageView()
-  {
-    DragStarting += ImageView_DragStarting;
-    DropCompleted += ImageView_DropCompleted;
-  }
+    => DragStarting += ImageView_DragStarting;
 
+  [NotNull]
   protected DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
   {
     OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute(item.Card as DeckEditorMTGCard ?? new DeckEditorMTGCard(item.Card.Info, item.Count)),
@@ -22,7 +21,7 @@ public partial class AdvancedDeckEditorCardImageView : DeckEditorCardImageView
   {
     var deferral = args.GetDeferral();
 
-    DragAndDrop!.OnDragStarting(new CardMoveArgs(Model, Model.Count), out var operation);
+    DragAndDrop.OnInternalDragStarting(new CardMoveArgs(Model, Model.Count), out var operation);
 
     // Set the drag UI to the image element of the dragged element
     args.DragUI.SetContentFromSoftwareBitmap(await GetDragUI(ImageElement), args.GetPosition(ImageElement));
@@ -30,7 +29,4 @@ public partial class AdvancedDeckEditorCardImageView : DeckEditorCardImageView
 
     deferral.Complete();
   }
-
-  private void ImageView_DropCompleted(UIElement sender, DropCompletedEventArgs args)
-    => DragAndDrop!.DropCompleted();
 }

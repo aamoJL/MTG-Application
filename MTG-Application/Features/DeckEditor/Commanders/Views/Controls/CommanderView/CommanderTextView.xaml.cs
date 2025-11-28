@@ -35,7 +35,6 @@ public sealed partial class CommanderTextView : DeckEditorCardViewBase
     InitializeComponent();
 
     DragStarting += DragAndDrop!.DragStarting;
-    DropCompleted += DragAndDrop.DropCompleted;
     DragOver += DragAndDrop.DragOver;
     Drop += DragAndDrop.Drop;
   }

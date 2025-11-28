@@ -65,13 +65,14 @@
       <ScrollViewer
         controls:DockPanel.Dock="Top"
         BorderThickness="1 1 0 0"
+        VerticalScrollBarVisibility="Auto"
         BorderBrush="{ThemeResource RegionColor}"
-        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+        Padding="5 0 25 15">
         <ItemsRepeater
           x:Name="SearchCardsImageView"
           DataContext="{x:Bind ViewModel, Mode=OneTime}"
-          ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
-          Style="{StaticResource GridItemsRepeaterStyle}">
+          ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}">
           <ItemsRepeater.Layout>
             <UniformGridLayout
               MinItemWidth="{x:Bind CardImageSizeSlider.Value, Mode=OneWay}"

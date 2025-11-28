@@ -9,7 +9,6 @@ using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using MTGApplication.General.Views.Styles.Templates;
 using System.Linq;
-using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 
 namespace MTGApplication.Features.EdhrecSearch.Views;
@@ -32,19 +31,21 @@ public sealed partial class EdhrecSearchPage : Page
 
       await DialogService.ShowAsync(XamlRoot, new GridViewDialog(
         title: msg.Title,
-        items: msg.Data.ToArray(),
+        items: [.. msg.Data],
         itemTemplate: (DataTemplate)template)
       {
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close",
         CanDragItems = true,
         CanSelectItems = false,
-        OnItemDragStarting = (e) =>
+        OnItemDragStarting = (args) =>
         {
-          if (e.Items.FirstOrDefault() is MTGCard card)
+          if (args.Items.FirstOrDefault() is MTGCard card)
           {
-            DragAndDrop<CardMoveArgs>.Item = new(card);
-            e.Data.RequestedOperation = DataPackageOperation.Copy;
+            var dragAndDrop = new DragAndDrop<CardMoveArgs>() { AcceptMove = false };
+
+            dragAndDrop.OnInternalDragStarting(new CardMoveArgs(card), out var operation);
+            args.Data.RequestedOperation = operation;
           }
         }
       });

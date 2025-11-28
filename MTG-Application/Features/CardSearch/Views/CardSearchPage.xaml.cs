@@ -8,7 +8,6 @@ using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using MTGApplication.General.Views.Styles.Templates;
 using System.Linq;
-using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.CardSearch.Views;
 public sealed partial class CardSearchPage : Page
@@ -36,19 +35,19 @@ public sealed partial class CardSearchPage : Page
 
       await DialogService.ShowAsync(XamlRoot, new GridViewDialog(
         title: msg.Title,
-        items: msg.Data.ToArray(),
+        items: [.. msg.Data],
         itemTemplate: (DataTemplate)template)
       {
         PrimaryButtonText = string.Empty,
         CloseButtonText = "Close",
         CanDragItems = true,
         CanSelectItems = false,
-        OnItemDragStarting = (e) =>
+        OnItemDragStarting = (args) =>
         {
-          if (e.Items.FirstOrDefault() is MTGCard card)
+          if (args.Items.FirstOrDefault() is MTGCard card)
           {
-            DragAndDrop<CardMoveArgs>.Item = new(card);
-            e.Data.RequestedOperation = DataPackageOperation.Copy;
+            CardDragAndDrop.OnInternalDragStarting(new CardMoveArgs(card), out var operation);
+            args.Data.RequestedOperation = operation;
           }
         }
       });

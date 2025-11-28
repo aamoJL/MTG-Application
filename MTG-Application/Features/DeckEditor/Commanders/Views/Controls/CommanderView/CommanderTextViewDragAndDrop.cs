@@ -15,7 +15,7 @@ public class CommanderTextViewDragAndDrop() : DragAndDrop<CardMoveArgs>()
     if ((sender as BasicCardView<DeckEditorMTGCard>)?.Model is not DeckEditorMTGCard item)
       return;
 
-    OnDragStarting(new(item, item.Count), out var requestedOperation);
+    OnInternalDragStarting(new(item, item.Count), out var requestedOperation);
 
     e.Data.RequestedOperation = requestedOperation;
   }
@@ -30,8 +30,6 @@ public class CommanderTextViewDragAndDrop() : DragAndDrop<CardMoveArgs>()
 
     def.Complete();
   }
-
-  public void DropCompleted(UIElement _, DropCompletedEventArgs args) => DropCompleted();
 
   public override void DragOver(DragEventArgs eventArgs)
   {

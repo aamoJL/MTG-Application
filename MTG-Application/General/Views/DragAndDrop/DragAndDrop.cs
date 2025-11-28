@@ -8,8 +8,8 @@ namespace MTGApplication.General.Views.DragAndDrop;
 
 public class DragAndDrop<T>()
 {
-  public static DragAndDrop<T>? DragOrigin { get; set; }
-  public static T? Item { get; set; }
+  public static DragAndDrop<T>? DragOrigin { get; private set; }
+  public static T? Item { get; private set; }
 
   public bool AcceptMove { get; set; } = true;
   public string CopyCaptionOverride { get; set; } = string.Empty;
@@ -22,7 +22,7 @@ public class DragAndDrop<T>()
   public Action<T>? OnExecuteMove { get; set; }
   public Func<string, Task>? OnExternalImport { get; set; }
 
-  public virtual void OnDragStarting(T item, out DataPackageOperation requestedOperation)
+  public virtual void OnInternalDragStarting(T item, out DataPackageOperation requestedOperation)
   {
     if (item == null)
       requestedOperation = DataPackageOperation.None;
@@ -57,21 +57,25 @@ public class DragAndDrop<T>()
 
   public virtual async Task Drop(DataPackageOperation operation, string data)
   {
-    if (DragOrigin == this
-      || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
-        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move))
-      return; // don't drop on the origin and only allow copy and move operations
-
-    if (Item == null)
+    if (data != string.Empty)
+    {
       await OnExternalDrop(operation, data);
+    }
     else
+    {
+      if (Item == null || DragOrigin == this
+        || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
+          || (operation & DataPackageOperation.Move) == DataPackageOperation.Move))
+      {
+        return; // don't drop on the origin and only allow copy and move operations
+      }
+
       await OnInternalDrop(operation, Item);
+    }
   }
 
   protected virtual async Task OnInternalDrop(DataPackageOperation operation, T item)
   {
-    if (item == null) return;
-
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
     {
       if (OnCopy != null)
@@ -94,11 +98,5 @@ public class DragAndDrop<T>()
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
       if (OnExternalImport != null)
         await OnExternalImport.Invoke(data);
-  }
-
-  public virtual void DropCompleted()
-  {
-    Item = default;
-    DragOrigin = null;
   }
 }

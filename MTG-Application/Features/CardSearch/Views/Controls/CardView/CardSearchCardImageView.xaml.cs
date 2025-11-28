@@ -1,5 +1,6 @@
 using MTGApplication.General.Models;
 using MTGApplication.General.Views.DragAndDrop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MTGApplication.Features.CardSearch.Views.Controls.CardView;
 public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
@@ -9,9 +10,9 @@ public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
     InitializeComponent();
 
     DragStarting += ImageView_DragStarting;
-    DropCompleted += ImageView_DropCompleted;
   }
 
+  [NotNull]
   private DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
   {
     AcceptMove = false,
@@ -21,7 +22,7 @@ public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
   {
     var deferral = args.GetDeferral();
 
-    DragAndDrop!.OnDragStarting(new CardMoveArgs(Model, 1), out var operation);
+    DragAndDrop.OnInternalDragStarting(new CardMoveArgs(Model, 1), out var operation);
 
     // Set the drag UI to the image element of the dragged element
     args.DragUI.SetContentFromSoftwareBitmap(await GetDragUI(ImageElement), args.GetPosition(ImageElement));
@@ -29,7 +30,4 @@ public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
 
     deferral.Complete();
   }
-
-  private void ImageView_DropCompleted(Microsoft.UI.Xaml.UIElement sender, Microsoft.UI.Xaml.DropCompletedEventArgs args)
-    => DragAndDrop?.DropCompleted();
 }

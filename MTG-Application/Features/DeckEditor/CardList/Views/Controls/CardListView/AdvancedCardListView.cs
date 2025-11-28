@@ -23,7 +23,6 @@ public partial class AdvancedCardListView : ListView
     };
 
     DragItemsStarting += DragAndDrop.DragStarting;
-    DragItemsCompleted += DragAndDrop.DragCompleted;
   }
 
   private ListViewDragAndDrop<DeckEditorMTGCard> DragAndDrop { get; }
