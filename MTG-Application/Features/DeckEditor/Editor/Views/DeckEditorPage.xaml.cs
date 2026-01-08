@@ -14,6 +14,7 @@ using System.Collections;
 using System.ComponentModel;
 
 namespace MTGApplication.Features.DeckEditor.Views;
+
 public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 {
   public enum CardViewType { Group, Image, Text }
@@ -151,6 +152,10 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
     args.Handled = true;
   }
+
+  private void FilterKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
+    // Event can't be set as handled here because the filter flyout would not be opened
+    => (args.Element as FrameworkElement)?.Focus(FocusState.Programmatic);
 
   private void ListView_LosingFocus(UIElement sender, LosingFocusEventArgs args)
   {

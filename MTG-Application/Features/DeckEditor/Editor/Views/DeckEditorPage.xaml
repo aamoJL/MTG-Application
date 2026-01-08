@@ -484,7 +484,7 @@
             <!--#region Filter -->
             <AppBarButton x:Name="DeckFilterAppBarButton" Icon="Filter" Label="Filter" AllowFocusOnInteraction="True">
               <AppBarButton.KeyboardAccelerators>
-                <KeyboardAccelerator Key="F" Modifiers="Control"/>
+                <KeyboardAccelerator Key="F" Modifiers="Control" Invoked="FilterKeyboardAccelerator_Invoked"/>
               </AppBarButton.KeyboardAccelerators>
               <AppBarButton.Flyout>
                 <Flyout AreOpenCloseAnimationsEnabled="False">
