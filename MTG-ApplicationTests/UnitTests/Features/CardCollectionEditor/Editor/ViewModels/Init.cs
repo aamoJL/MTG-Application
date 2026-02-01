@@ -11,16 +11,16 @@ public class Init : CardCollectionEditorViewModelTestBase
   }
 
   [TestMethod]
-  public void Collection()
+  public async Task Collection()
   {
     Assert.AreEqual(string.Empty, new Mocker(_dependencies).MockVM().CollectionName);
-    Assert.AreEqual(_savedCollection, new Mocker(_dependencies).MockVM(_savedCollection).Collection);
+    Assert.AreEqual(_savedCollection, (await new Mocker(_dependencies).MockVM(_savedCollection)).Collection);
   }
 
   [TestMethod]
-  public void SelectedList()
+  public async Task SelectedList()
   {
     Assert.AreEqual(string.Empty, new Mocker(_dependencies).MockVM().SelectedCardCollectionListViewModel.Name);
-    Assert.AreEqual(_savedCollection.CollectionLists.First(), new Mocker(_dependencies).MockVM(_savedCollection).SelectedCardCollectionListViewModel.CollectionList);
+    Assert.AreEqual(_savedCollection.CollectionLists.First(), (await new Mocker(_dependencies).MockVM(_savedCollection)).SelectedCardCollectionListViewModel.CollectionList);
   }
 }

@@ -2,44 +2,46 @@
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
-using MTGApplicationTests.UnitTests.Features.CardCollectionEditor.Editor.ViewModels;
+using MTGApplicationTests.UnitTests.Features.CardCollectionEditor.CardCollectionList.ViewModels;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.UnitTests.Features.CardCollectionEditor.CardCollectionList.UseCases;
 
 [TestClass]
-public class EditList : CardCollectionEditorViewModelTestBase
+public class EditList : CardCollectionListViewModelTestBase
 {
-  public void InvalidState_CanNotExecute()
+  public async Task InvalidState_CanNotExecute()
   {
-    var viewmodel = new Mocker(_dependencies).MockVM();
+    var viewmodel = await new Mocker(_dependencies).MockVM();
+
+    viewmodel.Name = string.Empty;
 
     Assert.IsFalse(viewmodel.EditListCommand.CanExecute(null));
   }
 
-  public void ValidState_CanExecute()
+  public async Task ValidState_CanExecute()
   {
-    var viewmodel = new Mocker(_dependencies).MockVM(_savedCollection);
+    var viewmodel = await new Mocker(_dependencies).MockVM();
 
-    Assert.IsTrue(viewmodel.EditListCommand.CanExecute(viewmodel.SelectedCardCollectionListViewModel.CollectionList));
+    viewmodel.Name = "Name";
+
+    Assert.IsTrue(viewmodel.EditListCommand.CanExecute(null));
   }
 
   [TestMethod]
   public async Task EditList_EditConfirmationShown()
   {
     var confirmer = new TestConfirmer<(string, string)?, (string, string)>();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
-        {
-          EditCollectionListConfirmer = confirmer,
-        }
+        EditCollectionListConfirmer = confirmer,
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -49,21 +51,19 @@ public class EditList : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task EditList_Cancel_NoChanges()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult<(string, string)?>(null)
-          }
+          OnConfirm = async msg => await Task.FromResult<(string, string)?>(null)
         }
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
     var query = list.SearchQuery;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
@@ -76,21 +76,19 @@ public class EditList : CardCollectionEditorViewModelTestBase
   {
     var name = "New Name";
     var query = "New Query";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, query))
-          }
+          OnConfirm = async msg => await Task.FromResult((name, query))
         }
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -102,21 +100,19 @@ public class EditList : CardCollectionEditorViewModelTestBase
   {
     var name = "New Name";
     var query = "New Query";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, query))
-          }
+          OnConfirm = async msg => await Task.FromResult((name, query))
         }
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -128,80 +124,47 @@ public class EditList : CardCollectionEditorViewModelTestBase
   {
     var name = "New Name";
     var query = "New Query";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, query))
-          }
+          OnConfirm = async msg => await Task.FromResult((name, query))
         }
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
-    Assert.AreEqual(0, viewmodel.SelectedCardCollectionListViewModel.TotalCount);
+    Assert.AreEqual(0, viewmodel.TotalCount);
 
     _dependencies.Importer.ExpectedCards = [new(MTGCardInfoMocker.MockInfo(name: "Card"))];
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
-    await viewmodel.SelectedCardCollectionListViewModel.WaitForCardUpdate();
-
-    Assert.AreEqual(1, viewmodel.SelectedCardCollectionListViewModel.TotalCount);
-  }
-
-  [TestMethod]
-  public async Task EditList_Success_HasUnsavedChanges()
-  {
-    var name = "New Name";
-    var query = "New Query";
-    var viewmodel = new Mocker(_dependencies)
-    {
-
-      Confirmers = new()
-      {
-        CardCollectionListConfirmers = new()
-        {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, query))
-          }
-        }
-      }
-    }.MockVM(_savedCollection);
-
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
-
-    await viewmodel.EditListCommand.ExecuteAsync(list);
-
-    Assert.IsTrue(viewmodel.HasUnsavedChanges);
+    Assert.AreEqual(1, viewmodel.TotalCount);
   }
 
   [TestMethod]
   public async Task EditList_NoName_ErrorNotificationShown()
   {
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((string.Empty, "New Query"))
-          }
+          OnConfirm = async msg => await Task.FromResult((string.Empty, "New Query"))
         }
       },
       Notifier = notifier
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -212,22 +175,20 @@ public class EditList : CardCollectionEditorViewModelTestBase
   public async Task EditList_NoQuery_ErrorNotificationShown()
   {
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(("New Name", string.Empty))
-          }
+          OnConfirm = async msg => await Task.FromResult(("New Name", string.Empty))
         }
       },
       Notifier = notifier
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -237,26 +198,24 @@ public class EditList : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task EditList_Exists_ErrorNotificationShown()
   {
-    var name = _savedCollection.CollectionLists[1].Name;
+    var name = _savedList.Name;
 
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = new() { Name = "Name" },
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, "New Query"))
-          }
+          OnConfirm = async msg => await Task.FromResult((name, "New Query"))
         }
       },
       Notifier = notifier,
-    }.MockVM(_savedCollection);
+      NameValidator = (name) => false
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -266,27 +225,22 @@ public class EditList : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task EditList_SameName_NoErrorNotificationShown()
   {
-    var list = _savedCollection.CollectionLists.First();
-
-    var name = list.Name;
+    var name = _savedList.Name;
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, "New Query"))
-          }
+          OnConfirm = async msg => await Task.FromResult((name, "New Query"))
         }
       },
       Notifier = notifier
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    await viewmodel.EditListCommand.ExecuteAsync(list);
+    await viewmodel.EditListCommand.ExecuteAsync(null);
 
     NotificationAssert.NotificationNotSent(NotificationType.Error, notifier);
   }
@@ -295,23 +249,20 @@ public class EditList : CardCollectionEditorViewModelTestBase
   public async Task EditList_Success_SuccessNotificationShown()
   {
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
-          }
+          OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
         }
       },
       Notifier = notifier
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -322,24 +273,20 @@ public class EditList : CardCollectionEditorViewModelTestBase
   public async Task EditList_Conflict_ConflictConfirmationShown()
   {
     var confirmer = new TestConfirmer<ConfirmationResult>();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
-          },
-          EditCollectionListQueryConflictConfirmer = confirmer,
-
-        }
+          OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+        },
+        EditCollectionListQueryConflictConfirmer = confirmer,
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -349,29 +296,25 @@ public class EditList : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task EditList_Conflict_Cancel_NoChanges()
   {
-    var list = _savedCollection.CollectionLists.First();
+    var list = _savedList;
 
     var oldName = list.Name;
     var oldQuery = list.SearchQuery;
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
-          },
-          EditCollectionListQueryConflictConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel)
-          },
-
-        }
+          OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+        },
+        EditCollectionListQueryConflictConfirmer = new()
+        {
+          OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Cancel)
+        },
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -384,27 +327,23 @@ public class EditList : CardCollectionEditorViewModelTestBase
   {
     var name = "New Name";
     var query = "New Query";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult((name, query))
-          },
-          EditCollectionListQueryConflictConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
-          },
-
-        }
+          OnConfirm = async msg => await Task.FromResult((name, query))
+        },
+        EditCollectionListQueryConflictConfirmer = new()
+        {
+          OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
+        },
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
-    var list = viewmodel.SelectedCardCollectionListViewModel.CollectionList;
+    var list = viewmodel.CollectionList;
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
@@ -415,7 +354,7 @@ public class EditList : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task EditList_Conflict_Accept_OwnedCardsChanged()
   {
-    var list = _savedCollection.CollectionLists.First();
+    var list = _savedList;
 
     var expectedCards = new CardImportResult.Card[]
     {
@@ -425,33 +364,30 @@ public class EditList : CardCollectionEditorViewModelTestBase
 
     _dependencies.Importer.ExpectedCards = expectedCards;
 
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
-
+      Model = _savedList,
       Confirmers = new()
       {
-        CardCollectionListConfirmers = new()
+        EditCollectionListConfirmer = new()
         {
-          EditCollectionListConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
-          },
-          EditCollectionListQueryConflictConfirmer = new()
-          {
-            OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
-          },
-        }
+          OnConfirm = async msg => await Task.FromResult(("New Name", "New Query"))
+        },
+        EditCollectionListQueryConflictConfirmer = new()
+        {
+          OnConfirm = async msg => await Task.FromResult(ConfirmationResult.Yes)
+        },
       }
-    }.MockVM(_savedCollection);
+    }.MockVM();
 
     CollectionAssert.AreNotEquivalent(
       new Guid[] { expectedCards.First().Info.ScryfallId },
-      viewmodel.SelectedCardCollectionListViewModel.CollectionList.Cards.Select(x => x.Info.ScryfallId).ToArray());
+      viewmodel.CollectionList.Cards.Select(x => x.Info.ScryfallId).ToArray());
 
     await viewmodel.EditListCommand.ExecuteAsync(list);
 
     CollectionAssert.AreEquivalent(
       new Guid[] { expectedCards.First().Info.ScryfallId },
-      viewmodel.SelectedCardCollectionListViewModel.CollectionList.Cards.Select(x => x.Info.ScryfallId).ToArray());
+      viewmodel.CollectionList.Cards.Select(x => x.Info.ScryfallId).ToArray());
   }
 }

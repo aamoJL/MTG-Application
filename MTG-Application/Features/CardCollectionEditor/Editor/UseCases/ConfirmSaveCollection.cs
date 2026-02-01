@@ -15,22 +15,20 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmSaveCollection(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
     protected override async Task Execute()
     {
-      var oldName = Viewmodel.CollectionName;
+      var oldName = viewmodel.CollectionName;
       var overrideOld = false;
-      var saveName = await Viewmodel.Confirmers.CardCollectionConfirmers.SaveCollectionConfirmer.Confirm(
+      var saveName = await viewmodel.Confirmers.CardCollectionConfirmers.SaveCollectionConfirmer.Confirm(
         CardCollectionConfirmers.GetSaveCollectionConfirmation(oldName));
 
       if (string.IsNullOrEmpty(saveName))
         return;
 
       // Override confirmation
-      if (saveName != oldName && await new CardCollectionDTOExists(Viewmodel.Repository).Execute(saveName))
+      if (saveName != oldName && await new CardCollectionDTOExists(viewmodel.Repository).Execute(saveName))
       {
-        if ((await Viewmodel.Confirmers.CardCollectionConfirmers.OverrideCollectionConfirmer
+        if ((await viewmodel.Confirmers.CardCollectionConfirmers.OverrideCollectionConfirmer
           .Confirm(CardCollectionConfirmers.GetOverrideCollectionConfirmation(saveName))
           is ConfirmationResult.Yes))
         {
@@ -40,30 +38,41 @@ public partial class CardCollectionEditorViewModelCommands
           return; // Cancel
       }
 
-      var dto = CardCollectionToDTOConverter.Convert(Viewmodel.Collection);
-
-      if (await (Viewmodel as IWorker).DoWork(SaveCollectionDTO(dto, saveName, overrideOld)))
+      try
       {
-        Viewmodel.CollectionName = saveName;
-        Viewmodel.HasUnsavedChanges = false;
+        var dto = CardCollectionToDTOConverter.Convert(viewmodel.Collection);
 
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionSuccess);
+        await viewmodel.Worker.DoWork(Save(dto, saveName, overrideOld));
+
+        new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionSuccess);
       }
-      else
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionError);
+      catch
+      {
+        new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.SaveCollectionError);
+      }
+    }
+
+    private async Task Save(MTGCardCollectionDTO dto, string saveName, bool overrideOld = false)
+    {
+      if (await SaveCollectionDTO(dto, saveName, overrideOld))
+      {
+        viewmodel.CollectionName = saveName;
+        viewmodel.HasUnsavedChanges = false;
+      }
+      else throw new();
     }
 
     private async Task<bool> SaveCollectionDTO(MTGCardCollectionDTO dto, string saveName, bool overrideOld = false)
     {
       var oldName = dto.Name;
 
-      if (oldName != saveName && await new CardCollectionDTOExists(Viewmodel.Repository).Execute(saveName) && !overrideOld)
+      if (oldName != saveName && await new CardCollectionDTOExists(viewmodel.Repository).Execute(saveName) && !overrideOld)
         return false; // Cancel because overriding is not enabled
 
-      if (await new AddOrUpdateCardCollectionDTO(Viewmodel.Repository).Execute((dto, saveName)) is bool wasSaved && wasSaved is true)
+      if (await new AddOrUpdateCardCollectionDTO(viewmodel.Repository).Execute((dto, saveName)) is bool wasSaved && wasSaved is true)
       {
-        if (!string.IsNullOrEmpty(oldName) && oldName != saveName && await new CardCollectionDTOExists(Viewmodel.Repository).Execute(oldName))
-          await new DeleteCardCollectionDTO(Viewmodel.Repository).Execute(oldName);
+        if (!string.IsNullOrEmpty(oldName) && oldName != saveName && await new CardCollectionDTOExists(viewmodel.Repository).Execute(oldName))
+          await new DeleteCardCollectionDTO(viewmodel.Repository).Execute(oldName);
       }
 
       return wasSaved;

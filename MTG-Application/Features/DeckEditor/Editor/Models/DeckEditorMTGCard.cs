@@ -29,6 +29,7 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCar
   } = LimitCount(count);
 
   [ObservableProperty] public partial string Group { get; set; } = string.Empty;
+  [ObservableProperty] public partial CardTag? CardTag { get; set; } = null;
 
   public IAsyncRelayCommand<DeckEditorMTGCard>? ChangePrintCommand
   {
@@ -36,6 +37,11 @@ public partial class DeckEditorMTGCard(MTGCardInfo info, int count = 1) : MTGCar
     set => SetProperty(ref field, value);
   }
   public IRelayCommand<CardCountChangeArgs>? ChangeCountCommand
+  {
+    get;
+    set => SetProperty(ref field, value);
+  }
+  public IRelayCommand<CardTagChangeArgs>? ChangeCardTagCommand
   {
     get;
     set => SetProperty(ref field, value);

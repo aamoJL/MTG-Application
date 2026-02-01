@@ -250,6 +250,6 @@ public class OpenDeck : DeckEditorViewModelTestBase,
       }
     }.MockVM();
 
-    await WorkerAssert.IsBusy(viewmodel, () => viewmodel.OpenDeckCommand.ExecuteAsync(null));
+    await WorkerAssert.IsBusy(viewmodel.Worker, () => viewmodel.OpenDeckCommand.ExecuteAsync(null));
   }
 }

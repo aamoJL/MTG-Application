@@ -8,21 +8,19 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmNewCollection(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
     protected override async Task Execute()
     {
       var unsavedArgs = new ISavable.ConfirmArgs();
 
-      if (Viewmodel.ConfirmUnsavedChangesCommand != null)
-        await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
+      if (viewmodel.ConfirmUnsavedChangesCommand != null)
+        await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
 
       if (unsavedArgs.Cancelled)
         return;
 
-      Viewmodel.Collection = new();
-
-      Viewmodel.HasUnsavedChanges = false;
+      await viewmodel.Worker.DoWork(New());
     }
+
+    private async Task New() => await viewmodel.ChangeCollection(new());
   }
 }

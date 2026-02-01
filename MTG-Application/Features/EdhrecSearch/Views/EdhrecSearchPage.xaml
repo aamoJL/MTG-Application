@@ -51,7 +51,7 @@
               </AppBarButton.Flyout>
             </AppBarButton>
           </CommandBar>
-          <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}"/>
+          <ProgressRing IsActive="{x:Bind ViewModel.Worker.IsBusy, Mode=OneWay}"/>
         </StackPanel>
         <TextBlock 
           HorizontalAlignment="Right"

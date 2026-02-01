@@ -29,27 +29,19 @@ public class CardCollectionListViewModelTestBase
     public Notifier Notifier { get; set; } = new();
     public Func<string, bool> ExistsValidator { get; init; } = (name) => false;
     public ClipboardService ClipboardService { get; set; } = new();
+    public Func<string, bool> NameValidator { get; set; } = (name) => true;
 
     public async Task<CardCollectionListViewModel> MockVM()
     {
-      var loading = true;
       var viewmodel = new CardCollectionListViewModel(dependencies.Importer)
       {
-        CollectionList = Model,
         Notifier = Notifier,
         Confirmers = Confirmers,
-        ClipboardService = ClipboardService
+        ClipboardService = ClipboardService,
+        NameValidator = NameValidator,
       };
 
-      viewmodel.Cards.OnEndLoading = () =>
-      {
-        loading = false;
-      };
-
-      await viewmodel.WaitForCardUpdate();
-
-      while (loading)
-        await Task.Yield();
+      await viewmodel.ChangeCollectionList(Model);
 
       return viewmodel;
     }

@@ -3,6 +3,7 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplicationTests.IntegrationTests.CardImporterTests;
+
 public partial class CardImporterTests
 {
   [TestClass]

@@ -22,7 +22,8 @@ using static MTGApplication.Features.DeckEditor.Editor.UseCases.DeckEditorViewMo
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
-public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
+
+public partial class DeckEditorViewModel : ObservableObject, ISavable
 {
   public DeckEditorViewModel(IMTGCardImporter importer)
   {
@@ -111,6 +112,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
   public DeckEditorConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
+  public Worker Worker { get; set; } = new();
 
   [NotNull]
   public GroupedCardListViewModel? DeckCardList
@@ -159,7 +161,6 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     }
   }
 
-  [ObservableProperty] public partial bool IsBusy { get; set; }
   [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
 
   public string Name
@@ -269,6 +270,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable, IWorker
     {
       item.ChangePrintCommand = new ChangeCardPrint(this).Command;
       item.ChangeCountCommand = new ChangeCardCount(this).Command;
+      item.ChangeCardTagCommand = new ChangeCardTag(this).Command;
     }
   }
 }

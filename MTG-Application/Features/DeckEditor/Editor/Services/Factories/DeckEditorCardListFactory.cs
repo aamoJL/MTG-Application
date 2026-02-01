@@ -3,6 +3,7 @@ using MTGApplication.Features.DeckEditor.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services.Factories;
+
 public class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
 {
   public CardListViewModel CreateCardListViewModel(ObservableCollection<DeckEditorMTGCard> cards)
@@ -11,7 +12,7 @@ public class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
     {
       Confirmers = viewmodel.Confirmers.CardListConfirmers,
       UndoStack = viewmodel.UndoStack,
-      Worker = viewmodel,
+      Worker = viewmodel.Worker,
       Notifier = viewmodel.Notifier
     };
   }
@@ -22,7 +23,7 @@ public class DeckEditorCardListFactory(DeckEditorViewModel viewmodel)
     {
       Confirmers = viewmodel.Confirmers.CardListConfirmers,
       UndoStack = viewmodel.UndoStack,
-      Worker = viewmodel,
+      Worker = viewmodel.Worker,
       Notifier = viewmodel.Notifier,
     };
   }

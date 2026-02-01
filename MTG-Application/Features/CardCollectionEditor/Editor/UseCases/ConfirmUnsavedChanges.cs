@@ -10,23 +10,21 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmUnsavedChanges(CardCollectionEditorViewModel viewmodel) : AsyncCommand<ISavable.ConfirmArgs>
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
-    protected override bool CanExecute(ISavable.ConfirmArgs? param) => param != null && !param.Cancelled && Viewmodel.HasUnsavedChanges;
+    protected override bool CanExecute(ISavable.ConfirmArgs? param) => param != null && !param.Cancelled && viewmodel.HasUnsavedChanges;
 
     protected override async Task Execute(ISavable.ConfirmArgs? param)
     {
       if (!CanExecute(param))
         return;
 
-      switch (await Viewmodel.Confirmers.CardCollectionConfirmers.SaveUnsavedChangesConfirmer
-        .Confirm(CardCollectionConfirmers.GetSaveUnsavedChangesConfirmation(Viewmodel.CollectionName)))
+      switch (await viewmodel.Confirmers.CardCollectionConfirmers.SaveUnsavedChangesConfirmer
+        .Confirm(CardCollectionConfirmers.GetSaveUnsavedChangesConfirmation(viewmodel.CollectionName)))
       {
         case ConfirmationResult.Yes:
-          if (Viewmodel.SaveCollectionCommand?.CanExecute(null) is true)
-            await Viewmodel.SaveCollectionCommand.ExecuteAsync(null);
+          if (viewmodel.SaveCollectionCommand?.CanExecute(null) is true)
+            await viewmodel.SaveCollectionCommand.ExecuteAsync(null);
 
-          param!.Cancelled = Viewmodel.HasUnsavedChanges;
+          param!.Cancelled = viewmodel.HasUnsavedChanges;
           return;
         case ConfirmationResult.Cancel:
           param!.Cancelled = true;

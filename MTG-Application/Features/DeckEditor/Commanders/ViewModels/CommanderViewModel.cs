@@ -23,7 +23,7 @@ public partial class CommanderViewModel(IMTGCardImporter importer) : ObservableO
   public CommanderConfirmers Confirmers { get; init; } = new();
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
-  public IWorker Worker { get; init; } = IWorker.Default;
+  public Worker Worker { get; init; } = new();
 
   [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? ChangeCommanderCommand => field ??= new ChangeCommander(this).Command;
   [NotNull] public IRelayCommand<DeckEditorMTGCard>? RemoveCommanderCommand => field ??= new RemoveCommander(this).Command;

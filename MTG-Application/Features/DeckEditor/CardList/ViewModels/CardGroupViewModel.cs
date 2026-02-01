@@ -38,7 +38,7 @@ public partial class CardGroupViewModel : ObservableObject, ICardListViewModel
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
-  public IWorker Worker { get; init; } = IWorker.Default;
+  public Worker Worker { get; init; } = new();
 
   public int Count => Cards.Sum(x => x.Count);
 

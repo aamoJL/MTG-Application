@@ -7,17 +7,17 @@ namespace MTGApplicationTests.UnitTests.Features.CardCollectionEditor.Editor.Use
 public class ChangeList : CardCollectionEditorViewModelTestBase
 {
   [TestMethod(DisplayName = "Should be able to execute if the list is null, or the collection contains the list and the list is not the same as the selected list")]
-  public void ValidParameter_CanExecute()
+  public async Task ValidParameter_CanExecute()
   {
-    var viewmodel = new Mocker(_dependencies).MockVM(_savedCollection);
+    var viewmodel = await new Mocker(_dependencies).MockVM(_savedCollection);
 
     Assert.IsTrue(viewmodel.ChangeListCommand.CanExecute(_savedCollection.CollectionLists[1]));
   }
 
   [TestMethod(DisplayName = "Should not be able to execute if the collection does not contain the list or the list is the same as the selected list")]
-  public void InvalidParameter_CanNotExecute()
+  public async Task InvalidParameter_CanNotExecute()
   {
-    var viewmodel = new Mocker(_dependencies).MockVM(_savedCollection);
+    var viewmodel = await new Mocker(_dependencies).MockVM(_savedCollection);
 
     Assert.IsFalse(viewmodel.ChangeListCommand.CanExecute(null));
     Assert.IsFalse(viewmodel.ChangeListCommand.CanExecute(new MTGCardCollectionList()));
@@ -25,9 +25,9 @@ public class ChangeList : CardCollectionEditorViewModelTestBase
   }
 
   [TestMethod]
-  public void SelectList_ListSelected()
+  public async Task SelectList_ListSelected()
   {
-    var viewmodel = new Mocker(_dependencies).MockVM(_savedCollection);
+    var viewmodel = await new Mocker(_dependencies).MockVM(_savedCollection);
 
     viewmodel.ChangeListCommand.Execute(_savedCollection.CollectionLists[1]);
 

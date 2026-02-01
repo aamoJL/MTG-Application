@@ -2,6 +2,7 @@
 using MTGApplication.Features.CardCollectionEditor.CardCollection.Services;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.General.Models;
+using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Linq;
@@ -13,21 +14,19 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ShowCardPrints(CardCollectionEditorViewModel viewmodel) : AsyncCommand<CardCollectionMTGCard>
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
     protected override async Task Execute(CardCollectionMTGCard? card)
     {
       try
       {
         ArgumentNullException.ThrowIfNull(card);
 
-        var prints = (await (Viewmodel as IWorker).DoWork(Viewmodel.Importer.ImportWithUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
+        var prints = (await viewmodel.Worker.DoWork(viewmodel.Importer.ImportWithUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found;
 
-        await Viewmodel.Confirmers.CardCollectionConfirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionConfirmers.GetShowCardPrintsConfirmation(prints.Select(x => new MTGCard(x.Info))));
+        await viewmodel.Confirmers.CardCollectionConfirmers.ShowCardPrintsConfirmer.Confirm(CardCollectionConfirmers.GetShowCardPrintsConfirmation(prints.Select(x => new MTGCard(x.Info))));
       }
       catch (Exception e)
       {
-        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+        new SendNotification(viewmodel.Notifier).Execute(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
       }
     }
   }

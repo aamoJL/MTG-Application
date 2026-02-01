@@ -89,7 +89,7 @@ public class NewList : CardCollectionEditorViewModelTestBase
   {
     var list = _savedCollection.CollectionLists[0];
     var newQuery = "New Query";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -211,7 +211,7 @@ public class NewList : CardCollectionEditorViewModelTestBase
   {
     var list = _savedCollection.CollectionLists[0];
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {

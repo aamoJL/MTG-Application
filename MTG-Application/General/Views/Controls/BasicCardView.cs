@@ -199,6 +199,8 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
     PropertyChanged?.Invoke(this, new(propertyName));
   }
 
+  protected void RaisePropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new(propertyName));
+
   protected static async Task<SoftwareBitmap> GetDragUI(UIElement uiElement)
   {
     var renderTargetBitmap = new RenderTargetBitmap();

@@ -116,7 +116,7 @@ public class OpenCollection : CardCollectionEditorViewModelTestBase, IUnsavedCha
   [TestMethod]
   public async Task Open_Cancel_NoChanges()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {

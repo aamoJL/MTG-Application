@@ -13,7 +13,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_SaveConfirmationShown()
   {
     var confirmer = new TestConfirmer<string, string>();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -32,7 +32,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task Save_Cancel_NotSaved()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -51,7 +51,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task Save_WithEmptyName_NotSaved()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -71,7 +71,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_NewName_Saved()
   {
     var collection = new CardCollectionEditorCardCollection() { Name = "New", CollectionLists = [new()] };
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -91,7 +91,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task Save_SameName_NoOverrideConfirmationShown()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -110,7 +110,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_Override_OverrideConfirmationShown()
   {
     var confirmer = new TestConfirmer<ConfirmationResult>();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -131,7 +131,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_Override_Cancel_NotSaved()
   {
     var collection = new CardCollectionEditorCardCollection() { Name = "New", CollectionLists = [new()] };
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -151,7 +151,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task Save_Override_Accept_Overridden()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -173,7 +173,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_Renamed_OldDeleted()
   {
     var newName = "New";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -194,7 +194,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_Renamed_NameChanged()
   {
     var newName = "New";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       Confirmers = new()
       {
@@ -213,7 +213,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   [TestMethod]
   public async Task Save_Success_NoUnsavedChanges()
   {
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       HasUnsavedChanges = true,
       Confirmers = new()
@@ -234,7 +234,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_Success_SuccessNotificationSent()
   {
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       HasUnsavedChanges = true,
       Confirmers = new()
@@ -258,7 +258,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
     _dependencies.Repository.UpdateFailure = true;
 
     var notifier = new TestNotifier();
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       HasUnsavedChanges = true,
       Confirmers = new()
@@ -280,7 +280,7 @@ public class SaveCollection : CardCollectionEditorViewModelTestBase
   public async Task Save_SaveEmpty_Success()
   {
     var newName = "Name";
-    var viewmodel = new Mocker(_dependencies)
+    var viewmodel = await new Mocker(_dependencies)
     {
       HasUnsavedChanges = true,
       Confirmers = new()

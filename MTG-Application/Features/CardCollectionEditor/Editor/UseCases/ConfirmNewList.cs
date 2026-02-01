@@ -14,29 +14,37 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmNewList(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
     protected override async Task Execute()
     {
-      if (await Viewmodel.Confirmers.CardCollectionConfirmers.NewCollectionListConfirmer.Confirm(CardCollectionConfirmers.GetNewCollectionListConfirmation())
+      if (await viewmodel.Confirmers.CardCollectionConfirmers.NewCollectionListConfirmer.Confirm(CardCollectionConfirmers.GetNewCollectionListConfirmation())
       is not (string name, string query))
         return;
 
-      if (string.IsNullOrEmpty(name))
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListNameError);
-      else if (string.IsNullOrEmpty(query))
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListQueryError);
-      else if (Viewmodel.Collection.CollectionLists.FirstOrDefault(x => x.Name == name) is not null)
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListExistsError);
-      else
+      var errorNotification =
+        string.IsNullOrEmpty(name) ? CardCollectionNotifications.NewListNameError :
+        string.IsNullOrEmpty(query) ? CardCollectionNotifications.NewListQueryError :
+        viewmodel.CollectionLists.FirstOrDefault(x => x.Name == name) is not null ? CardCollectionNotifications.NewListExistsError : null;
+
+      if (errorNotification != null)
       {
-        var newList = new MTGCardCollectionList() { Name = name, SearchQuery = query };
-
-        Viewmodel.Collection.CollectionLists.Add(newList);
-        Viewmodel.HasUnsavedChanges = true;
-
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.NewListSuccess);
+        new SendNotification(viewmodel.Notifier).Execute(errorNotification);
+        return;
       }
+
+      try
+      {
+        await viewmodel.Worker.DoWork(AddNewList(name, query));
+        new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.NewListSuccess);
+      }
+      catch { }
+    }
+
+    private async Task AddNewList(string name, string query)
+    {
+      var newList = new MTGCardCollectionList() { Name = name, SearchQuery = query };
+
+      viewmodel.CollectionLists.Add(newList);
+      await viewmodel.SelectedCardCollectionListViewModel.ChangeCollectionList(newList);
     }
   }
 }

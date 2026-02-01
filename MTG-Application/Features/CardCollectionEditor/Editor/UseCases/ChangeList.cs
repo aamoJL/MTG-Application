@@ -1,24 +1,23 @@
 ﻿using MTGApplication.Features.CardCollection.Editor.ViewModels;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Models;
 using MTGApplication.General.ViewModels;
+using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardCollection.Editor.UseCases;
 
 public partial class CardCollectionEditorViewModelCommands
 {
-  public class ChangeList(CardCollectionEditorViewModel viewmodel) : SyncCommand<MTGCardCollectionList>
+  public class ChangeList(CardCollectionEditorViewModel viewmodel) : AsyncCommand<MTGCardCollectionList>
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
     protected override bool CanExecute(MTGCardCollectionList? list)
-      => list != null && Viewmodel.SelectedCardCollectionListViewModel.CollectionList != list && Viewmodel.Collection.CollectionLists.Contains(list);
+      => list != null && viewmodel.SelectedCardCollectionListViewModel.CollectionList != list && viewmodel.Collection.CollectionLists.Contains(list);
 
-    protected override void Execute(MTGCardCollectionList? list)
+    protected override async Task Execute(MTGCardCollectionList? list)
     {
-      if (!CanExecute(list))
-        return;
+      if (!CanExecute(list)) return;
+      if (list == null) return;
 
-      Viewmodel.SelectedCardCollectionListViewModel.CollectionList = list!;
+      await viewmodel.SelectedCardCollectionListViewModel.ChangeCollectionList(list);
     }
   }
 }

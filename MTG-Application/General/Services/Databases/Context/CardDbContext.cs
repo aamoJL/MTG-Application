@@ -3,7 +3,8 @@ using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepos
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 
-// Add-migration {name}-001 -OutputDir "General/Services/Databases/Migrations"
+// Add migration using Package Manager Console:
+//  Add-migration {name}-001 -OutputDir "General/Services/Databases/Migrations"
 
 namespace MTGApplication.General.Services.Databases.Context;
 

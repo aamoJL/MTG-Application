@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.CardSearch.Models;
 using MTGApplication.Features.CardSearch.Services;
 using MTGApplication.Features.CardSearch.Views;
@@ -14,14 +13,13 @@ namespace MTGApplication.Features.CardSearch.ViewModels;
 /// <summary>
 /// ViewModel for <see cref="CardSearchPage"/>
 /// </summary>
-public partial class CardSearchViewModel(IMTGCardImporter importer) : ViewModelBase, IWorker
+public partial class CardSearchViewModel(IMTGCardImporter importer) : ViewModelBase
 {
   public IMTGCardImporter Importer { get; } = importer;
   public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new CardSearchIncrementalCardSource(importer));
   public CardSearchConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
-
-  [ObservableProperty] public partial bool IsBusy { get; set; }
+  public Worker Worker { get; set; } = new();
 
   [NotNull] public IAsyncRelayCommand? SubmitSearchCommand => field ??= new SubmitSearch(this).Command;
   [NotNull] public IAsyncRelayCommand<MTGCard>? ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;

@@ -13,9 +13,11 @@
 
   <cardview:DeckEditorCardViewBase.Resources>
     <converters:BooleanToStarOrAutoConverter x:Key="BooleanToStarOrAutoConverter"/>
+    <converters:ToStringToBoolConverter x:Key="ToStringToBoolConverter"/>
+    <converters:EnumToVisibilityConverter Invert="True" x:Key="EnumToVisibilityConverter"/>
   </cardview:DeckEditorCardViewBase.Resources>
 
-  <Grid Background="Transparent">
+  <Grid x:Name="ContainerElement" Background="Transparent">
     <Grid.ContextFlyout>
       <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
         <CommandBarFlyout.PrimaryCommands>
@@ -27,6 +29,17 @@
         </CommandBarFlyout.PrimaryCommands>
         <CommandBarFlyout.SecondaryCommands>
           <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind Model.ChangePrintCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+          <AppBarButton Visibility="{x:Bind TagVisible, Mode=OneWay}" Label="Tag" Icon="{ui:SymbolIcon Symbol=Tag}">
+            <AppBarButton.Flyout>
+              <MenuFlyout AreOpenCloseAnimationsEnabled="False">
+                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Add, Mode=OneWay}" Text="Add" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="Add"/>
+                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Delete, Mode=OneWay}" Text="Delete" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="Delete"/>
+                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Move, Mode=OneWay}" Text="Move" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="Move"/>
+                <MenuFlyoutSeparator Visibility="{x:Bind Model.CardTag, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Null}, Mode=OneWay}"/>
+                <MenuFlyoutItem Text="Clear" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="{x:Null}" Background="{ThemeResource SystemFillColorCriticalBrush}" Visibility="{x:Bind Model.CardTag, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Null}, Mode=OneWay}"/>
+              </MenuFlyout>
+            </AppBarButton.Flyout>
+          </AppBarButton>
           <AppBarSeparator/>
           <AppBarElementContainer AllowFocusOnInteraction="True" RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}">
             <StackPanel Orientation="Horizontal">
@@ -49,6 +62,26 @@
       </Grid.ColumnDefinitions>
       <Grid Grid.Column="0">
         <StackPanel Orientation="Horizontal" Spacing="5">
+          <Grid Visibility="{x:Bind TagVisible, Mode=OneWay}" Width="25">
+            <Grid 
+              x:Name="AddTagElement" x:Load="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Add, Mode=OneWay}" 
+              Background="{ThemeResource SystemFillColorSuccessBrush}"
+              HorizontalAlignment="Stretch">
+              <FontIcon Glyph="&#xE710;" FontSize="14" Foreground="Black" HorizontalAlignment="Center"/>
+            </Grid>
+            <Grid 
+              x:Name="DeleteTagElement" x:Load="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Delete, Mode=OneWay}" 
+              Background="{ThemeResource SystemFillColorCriticalBrush}"
+              HorizontalAlignment="Stretch">
+              <FontIcon Glyph="&#xE711;" FontSize="14" Foreground="Black" HorizontalAlignment="Center"/>
+            </Grid>
+            <Grid 
+              x:Name="MoveTagElement" x:Load="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Move, Mode=OneWay}" 
+              Background="{ThemeResource SystemFillColorCautionBrush}"
+              HorizontalAlignment="Stretch">
+              <FontIcon Glyph="&#xE895;" FontSize="14" Foreground="Black" HorizontalAlignment="Center"/>
+            </Grid>
+          </Grid>
           <TextBlock Width="16" TextAlignment="Right" VerticalAlignment="Center" Text="{x:Bind Model.Count, Mode=OneWay}"/>
           <Image Width="20" Margin="5 0 5 0" Visibility="{x:Bind SetIconVisible, Mode=OneWay}" Grid.Column="1" Source="{x:Bind Model.Info.SetIconUri, Mode=OneWay}"/>
         </StackPanel>

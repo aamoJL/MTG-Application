@@ -44,7 +44,7 @@ public class DTOToDeckEditorDeckConverter(IMTGCardImporter importer)
         Name = dto.Name,
         Commander = commander != null ? new DeckEditorMTGCard(commander.Info, commander.Count) : null,
         CommanderPartner = partner != null ? new DeckEditorMTGCard(partner.Info, partner.Count) : null,
-        DeckCards = [.. deckCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count) { Group = x.Group })],
+        DeckCards = [.. deckCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count) { Group = x.Group, CardTag = x.CardTag })],
         Wishlist = [.. wishCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],
         Maybelist = [.. maybeCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],
         Removelist = [.. removeCards.Select(x => new DeckEditorMTGCard(x.Info, x.Count))],

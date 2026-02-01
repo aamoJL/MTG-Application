@@ -12,19 +12,21 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckSelection.ViewModels;
 
-public partial class DeckSelectionViewModel : ObservableObject, IWorker
+public partial class DeckSelectionViewModel : ObservableObject
 {
   public DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer)
   {
     Importer = importer;
     Repository = repository;
 
-    DeckFetchingTask = (this as IWorker).DoWork(UpdateDecks());
+    // TODO: change to async
+    DeckFetchingTask = Worker.DoWork(UpdateDecks());
   }
 
   public IRepository<MTGCardDeckDTO> Repository { get; }
   public IMTGCardImporter Importer { get; }
   public Notifier Notifier { get; init; } = new();
+  public Worker Worker { get; set; } = new();
 
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];
 

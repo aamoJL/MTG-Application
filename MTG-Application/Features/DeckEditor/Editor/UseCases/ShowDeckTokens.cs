@@ -30,7 +30,7 @@ public partial class DeckEditorViewModelCommands
 
       try
       {
-        var tokens = (await (Viewmodel as IWorker).DoWork(new FetchTokenCards(Viewmodel.Importer).Execute(cards))).Found
+        var tokens = (await Viewmodel.Worker.DoWork(new FetchTokenCards(Viewmodel.Importer).Execute(cards))).Found
           .Select(x => new MTGCard(x.Info));
 
         await Viewmodel.Confirmers.ShowTokensConfirmer.Confirm(DeckEditorConfirmers.GetShowTokensConfirmation(tokens));

@@ -7,7 +7,7 @@ public class IsBusyException : UnitTestAssertException { }
 
 public static class WorkerAssert
 {
-  public static async Task IsBusy(IWorker worker, Func<Task> task)
+  public static async Task IsBusy(Worker worker, Func<Task> task)
   {
     var wasBusy = worker.IsBusy;
 
@@ -16,7 +16,7 @@ public static class WorkerAssert
 
     propertyNotifier.PropertyChanged += (s, e) =>
     {
-      if (e.PropertyName == nameof(IWorker.IsBusy) && s is IWorker worker)
+      if (e.PropertyName == nameof(Worker.IsBusy) && s is Worker worker)
         wasBusy = wasBusy || worker.IsBusy;
     };
 

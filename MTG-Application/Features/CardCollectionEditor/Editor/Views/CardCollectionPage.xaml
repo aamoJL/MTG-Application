@@ -96,12 +96,12 @@
             <AppBarButton.Flyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
                 <MenuFlyoutItem Text="New..." Command="{x:Bind ViewModel.NewListCommand, Mode=OneTime}" />
-                <MenuFlyoutItem Text="Edit..." Command="{x:Bind ViewModel.EditListCommand, Mode=OneTime}" CommandParameter="{x:Bind ViewModel.SelectedCardCollectionListViewModel.CollectionList, Mode=OneWay}"/>
+                <MenuFlyoutItem Text="Edit..." Command="{x:Bind ViewModel.SelectedCardCollectionListViewModel.EditListCommand, Mode=OneTime}"/>
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Import..." Command="{x:Bind ViewModel.SelectedCardCollectionListViewModel.ImportCardsCommand, Mode=OneTime}" />
                 <MenuFlyoutItem Text="Export..." Command="{x:Bind ViewModel.SelectedCardCollectionListViewModel.ExportCardsCommand, Mode=OneTime}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="Delete List" Command="{x:Bind ViewModel.DeleteListCommand, Mode=OneTime}" CommandParameter="{x:Bind ViewModel.SelectedCardCollectionListViewModel.CollectionList, Mode=OneWay}" Background="IndianRed" />
+                <MenuFlyoutItem Text="Delete List" Command="{x:Bind ViewModel.DeleteSelectedListCommand, Mode=OneTime}" Background="IndianRed" />
               </MenuFlyout>
             </AppBarButton.Flyout>
           </AppBarButton>
@@ -109,7 +109,7 @@
 
           <!--#region List Selector-->
           <customControls:ComboBoxWithCommands
-            ItemsSource="{x:Bind ViewModel.Collection.CollectionLists, Mode=OneWay}"
+            ItemsSource="{x:Bind ViewModel.CollectionLists, Mode=OneWay}"
             SelectedItem="{x:Bind ViewModel.SelectedCardCollectionListViewModel.CollectionList, Mode=OneWay}"
             SelectionChangedCommand="{x:Bind ViewModel.ChangeListCommand, Mode=OneTime}"
             VerticalAlignment="Center"
@@ -136,7 +136,7 @@
           </StackPanel>
           <!--#endregion-->
 
-          <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" Margin="10 0 0 0" />
+          <ProgressRing IsActive="{x:Bind ViewModel.Worker.IsBusy, Mode=OneWay}" Margin="10 0 0 0" />
         </StackPanel>
 
         <!--#region Card View Information -->
@@ -151,7 +151,7 @@
           </StackPanel>
           
           <TextBlock VerticalAlignment="Bottom">
-            <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.SelectedCardCollectionListViewModel.Cards.Count), Mode=OneWay}" />
+            <Run Text="{x:Bind sys:String.Format('{0} /', ViewModel.SelectedCardCollectionListViewModel.QueryCards.Collection.Count), Mode=OneWay}" />
             <Run Text="{x:Bind sys:String.Format('{0} cards loaded', ViewModel.SelectedCardCollectionListViewModel.TotalCount), Mode=OneWay}" />
           </TextBlock>
         </Grid>
@@ -167,7 +167,7 @@
         <ItemsRepeater
           x:Name="ListCardImageView"
           DataContext="{x:Bind ViewModel.SelectedCardCollectionListViewModel, Mode=OneWay}"
-          ItemsSource="{Binding Cards, Mode=OneWay}"
+          ItemsSource="{Binding QueryCards.Collection, Mode=OneWay}"
           Style="{StaticResource GridItemsRepeaterStyle}">
           <ItemsRepeater.Layout>
             <UniformGridLayout MinItemWidth="230" ItemsStretch="Fill"/>
@@ -176,7 +176,7 @@
             <helpers:ItemsRepeaterIncrementalLoading 
               LoadingOffset="200" 
               LoadCount="{x:Bind ViewModel.Importer.PageSize, Mode=OneTime}"
-              IsLoadingMore="{x:Bind ViewModel.SelectedCardCollectionListViewModel.Cards.IsLoading, Mode=OneWay}"/>
+              IsLoadingMore="{x:Bind ViewModel.SelectedCardCollectionListViewModel.QueryCards.Collection.IsLoading, Mode=OneWay}"/>
           </interactivity:Interaction.Behaviors>
           <ItemsRepeater.ItemTemplate>
             <DataTemplate x:DataType="models:CardCollectionMTGCard">

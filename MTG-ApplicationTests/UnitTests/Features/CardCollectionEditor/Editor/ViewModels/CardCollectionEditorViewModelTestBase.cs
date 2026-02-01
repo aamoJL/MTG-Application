@@ -39,16 +39,25 @@ public class CardCollectionEditorViewModelTestBase
     public CardCollectionEditorConfirmers Confirmers { get; internal set; } = new();
     public Notifier Notifier { get; internal set; } = new();
 
-    public CardCollectionEditorViewModel MockVM(CardCollectionEditorCardCollection collection = null)
+    public CardCollectionEditorViewModel MockVM()
     {
-      return new(dependencies.Importer)
+      return new CardCollectionEditorViewModel(dependencies.Importer)
       {
-        Collection = collection ?? new(),
         Repository = dependencies.Repository,
         Confirmers = Confirmers,
         Notifier = Notifier,
         HasUnsavedChanges = HasUnsavedChanges,
       };
+
+    }
+
+    public async Task<CardCollectionEditorViewModel> MockVM(CardCollectionEditorCardCollection collection)
+    {
+      var vm = MockVM();
+
+      await vm.ChangeCollection(collection);
+
+      return vm;
     }
   }
 }

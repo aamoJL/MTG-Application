@@ -13,7 +13,7 @@ public class CardCollectionNotifications
   public static Notification SaveCollectionError => new(NotificationType.Error, "Error. Could not save the collection.");
 
   public static Notification DeleteCollectionSuccess => new(NotificationType.Success, "The list was deleted successfully.");
-  public static Notification DeletecollectionError => new(NotificationType.Error, "Error. Could not delete the list.");
+  public static Notification DeleteCollectionError => new(NotificationType.Error, "Error. Could not delete the list.");
 
   public static Notification NewListSuccess => new(NotificationType.Success, "The list was added to the collection successfully.");
   public static Notification NewListNameError => new(NotificationType.Error, "Error. Name can't be empty.");

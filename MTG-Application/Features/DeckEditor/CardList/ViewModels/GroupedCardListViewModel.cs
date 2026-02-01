@@ -47,7 +47,7 @@ public partial class GroupedCardListViewModel : IGroupedCardListViewModel
   public ClipboardService ClipboardService { get; init; } = new();
   public GroupedCardListConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
-  public IWorker Worker { get; init; } = IWorker.Default;
+  public Worker Worker { get; init; } = new();
 
   [NotNull] public IAsyncRelayCommand? AddGroupCommand => field ??= new AddCardGroup(this).Command;
   [NotNull] public IRelayCommand<CardGroupViewModel>? RemoveGroupCommand => field ??= new RemoveCardGroup(this).Command;

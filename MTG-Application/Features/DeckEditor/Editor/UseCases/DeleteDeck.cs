@@ -25,7 +25,7 @@ public partial class DeckEditorViewModelCommands
         is not ConfirmationResult.Yes)
         return; // Cancel
 
-      if (await (Viewmodel as IWorker).DoWork(new DeleteDeckDTO(Viewmodel.Repository).Execute(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck))))
+      if (await Viewmodel.Worker.DoWork(new DeleteDeckDTO(Viewmodel.Repository).Execute(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck))))
       {
         Viewmodel.Deck = new();
         Viewmodel.UndoStack.Clear();

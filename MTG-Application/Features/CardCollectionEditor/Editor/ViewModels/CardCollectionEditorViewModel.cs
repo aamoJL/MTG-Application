@@ -11,23 +11,24 @@ using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepos
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.ViewModels;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using static MTGApplication.Features.CardCollection.Editor.UseCases.CardCollectionEditorViewModelCommands;
-using static MTGApplication.Features.CardCollectionEditor.CardCollectionList.UseCases.CardCollectionEditorViewModelCommands;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.CardCollection.Editor.ViewModels;
 
-public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : ObservableObject, ISavable, IWorker
+public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : ObservableObject, ISavable
 {
   [NotNull]
   public CardCollectionEditorCardCollection? Collection
   {
     get => field ??= Collection = new();
-    set
+    private set
     {
       if (field == value)
         return;
@@ -38,7 +39,7 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
 
       if (field != null)
       {
-        field.PropertyChanged -= CardCollection_PropertyChanged;
+        field.PropertyChanged -= CardCollectionEditorViewModel_PropertyChanged;
         field.CollectionLists.CollectionChanged -= CollectionLists_CollectionChanged;
 
         foreach (var list in field.CollectionLists)
@@ -55,7 +56,7 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
 
       if (field != null)
       {
-        field.PropertyChanged += CardCollection_PropertyChanged;
+        field.PropertyChanged += CardCollectionEditorViewModel_PropertyChanged;
         field.CollectionLists.CollectionChanged += CollectionLists_CollectionChanged;
 
         foreach (var list in field.CollectionLists)
@@ -68,29 +69,33 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
         }
       }
 
-      SelectedCardCollectionListViewModel.CollectionList = Collection.CollectionLists.FirstOrDefault() ?? new();
-
       if (nameChanged)
         OnPropertyChanged(nameof(CollectionName));
+
+      OnPropertyChanged(nameof(CollectionLists));
     }
   }
 
   public IMTGCardImporter Importer { get; } = importer;
-
   public CardCollectionEditorConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public IRepository<MTGCardCollectionDTO> Repository { get; init; } = new CardCollectionDTORepository();
   public ClipboardService ClipboardService { get; init; } = new();
+  public Worker Worker { get; set; } = new();
 
   [NotNull] public CardCollectionListViewModel? SelectedCardCollectionListViewModel => field ??= new CardCollectionFactory(this).CreateCardCollectionListViewModel();
 
   public string CollectionName
   {
     get => Collection.Name;
-    set => Collection.Name = value;
+    set
+    {
+      Collection.Name = value;
+      OnPropertyChanged();
+    }
   }
+  public ObservableCollection<MTGCardCollectionList> CollectionLists => Collection.CollectionLists;
 
-  [ObservableProperty] public partial bool IsBusy { get; set; }
   [ObservableProperty] public partial bool HasUnsavedChanges { get; set; }
 
   [NotNull] public IAsyncRelayCommand<ISavable.ConfirmArgs>? ConfirmUnsavedChangesCommand => field ??= new ConfirmUnsavedChanges(this).Command;
@@ -99,15 +104,26 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
   [NotNull] public IAsyncRelayCommand? SaveCollectionCommand => field ??= new ConfirmSaveCollection(this).Command;
   [NotNull] public IAsyncRelayCommand? DeleteCollectionCommand => field ??= new ConfirmDeleteCollection(this).Command;
   [NotNull] public IAsyncRelayCommand? NewListCommand => field ??= new ConfirmNewList(this).Command;
-  [NotNull] public IAsyncRelayCommand<MTGCardCollectionList>? DeleteListCommand => field ??= new ConfirmDeleteList(this).Command;
-  [NotNull] public IRelayCommand<MTGCardCollectionList>? ChangeListCommand => field ??= new ChangeList(this).Command;
-  [NotNull] public IAsyncRelayCommand<MTGCardCollectionList>? EditListCommand => field ??= new EditList(this).Command;
+  [NotNull] public IAsyncRelayCommand? DeleteSelectedListCommand => field ??= new ConfirmDeleteList(this).Command;
+  [NotNull] public IAsyncRelayCommand<MTGCardCollectionList>? ChangeListCommand => field ??= new ChangeList(this).Command;
   [NotNull] public IAsyncRelayCommand<CardCollectionMTGCard>? ShowCardPrintsCommand => field ??= new ShowCardPrints(this).Command;
 
-  private void CardCollection_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+  public async Task ChangeCollection(CardCollectionEditorCardCollection collection)
   {
-    if (e.PropertyName == nameof(CardCollectionEditorCardCollection.Name))
-      OnPropertyChanged(nameof(CollectionName));
+    Collection = collection;
+
+    await SelectedCardCollectionListViewModel.ChangeCollectionList(Collection.CollectionLists.FirstOrDefault() ?? new());
+
+    HasUnsavedChanges = false;
+  }
+
+  private void CardCollectionEditorViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+  {
+    switch (e.PropertyName)
+    {
+      case nameof(CardCollectionEditorCardCollection.Name): OnPropertyChanged(nameof(CollectionName)); break;
+      default: break;
+    }
   }
 
   private void CollectionLists_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -122,8 +138,6 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
         foreach (var card in item.Cards)
           card.PropertyChanged += CollectionListCardsItem_PropertyChanged;
       }
-
-      SelectedCardCollectionListViewModel.CollectionList = e.NewItems.OfType<MTGCardCollectionList>().LastOrDefault() ?? new();
     }
     else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
     {
@@ -134,11 +148,10 @@ public partial class CardCollectionEditorViewModel(IMTGCardImporter importer) : 
 
         foreach (var card in item.Cards)
           card.PropertyChanged -= CollectionListCardsItem_PropertyChanged;
-
-        if (SelectedCardCollectionListViewModel.CollectionList == item)
-          SelectedCardCollectionListViewModel.CollectionList = Collection.CollectionLists.FirstOrDefault() ?? new();
       }
     }
+
+    HasUnsavedChanges = true;
   }
 
   private void CollectionList_PropertyChanged(object? sender, PropertyChangedEventArgs e)

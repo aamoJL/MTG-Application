@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+﻿using MTGApplication.General.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 
 namespace MTGApplicationTests.TestUtility.Mocker;
 
@@ -11,7 +12,8 @@ public static class MTGCardDTOMocker
     Guid? oracleId = null,
     string setCode = null,
     string collectorNumber = null,
-    string group = "")
+    string group = "",
+    CardTag? cardTag = null)
   {
     return new(
         scryfallId: scryfallId ?? new("4f8dc511-e307-4412-bb79-375a6077312d"),
@@ -20,6 +22,7 @@ public static class MTGCardDTOMocker
         collectorNumber: collectorNumber ?? "1",
         name: name,
         count: count,
-        group: group);
+        group: group,
+        tag: cardTag);
   }
 }

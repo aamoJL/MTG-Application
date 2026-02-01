@@ -17,9 +17,9 @@ public class ChangeCommanderTheme(EdhrecSearchPageViewModel viewmodel) : AsyncCo
     try
     {
       var query = string.Join(Environment.NewLine,
-        await (Viewmodel as IWorker).DoWork(EdhrecImporter.FetchNewCardNames(theme.Uri)));
+        await Viewmodel.Worker.DoWork(EdhrecImporter.FetchNewCardNames(theme.Uri)));
 
-      var searchResult = await (Viewmodel as IWorker).DoWork(Viewmodel.Importer.ImportWithString(query));
+      var searchResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithString(query));
 
       await Viewmodel.Cards.SetCollection(
           cards: [.. searchResult.Found.Select(x => new MTGCard(x.Info))],

@@ -17,39 +17,38 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ConfirmOpenCollection(CardCollectionEditorViewModel viewmodel) : AsyncCommand
   {
-    public CardCollectionEditorViewModel Viewmodel { get; } = viewmodel;
-
     protected override async Task Execute()
     {
       var unsavedArgs = new ISavable.ConfirmArgs();
 
-      if (Viewmodel.ConfirmUnsavedChangesCommand != null)
-        await Viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
+      if (viewmodel.ConfirmUnsavedChangesCommand != null)
+        await viewmodel.ConfirmUnsavedChangesCommand.ExecuteAsync(unsavedArgs);
 
       if (unsavedArgs.Cancelled)
         return;
 
-      if (await Viewmodel.Confirmers.CardCollectionConfirmers.LoadCollectionConfirmer.Confirm(
-        CardCollectionConfirmers.GetLoadCollectionConfirmation((await Viewmodel.Repository.Get(setIncludes: (set) => { })).Select(x => x.Name).OrderBy(x => x)))
+      if (await viewmodel.Confirmers.CardCollectionConfirmers.LoadCollectionConfirmer.Confirm(
+        CardCollectionConfirmers.GetLoadCollectionConfirmation((await viewmodel.Repository.Get(setIncludes: (set) => { })).Select(x => x.Name).OrderBy(x => x)))
         is not string loadName)
         return;
 
       try
       {
-        if (await (Viewmodel as IWorker).DoWork(LoadCollection(loadName)) is CardCollectionEditorCardCollection loadedCollection)
-        {
-          Viewmodel.Collection = loadedCollection;
-          Viewmodel.HasUnsavedChanges = false;
-
-          new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
-        }
-        else
-          throw new InvalidOperationException("Collection was not found");
+        await viewmodel.Worker.DoWork(Open(loadName));
+        new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionSuccess);
       }
       catch
       {
-        new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
+        new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.OpenCollectionError);
       }
+    }
+
+    private async Task Open(string loadName)
+    {
+      if (await LoadCollection(loadName) is CardCollectionEditorCardCollection loadedCollection)
+        await viewmodel.ChangeCollection(loadedCollection);
+      else
+        throw new();
     }
 
     /// <exception cref="InvalidOperationException"></exception>
@@ -57,14 +56,10 @@ public partial class CardCollectionEditorViewModelCommands
     /// <exception cref="UriFormatException"></exception>
     private async Task<CardCollectionEditorCardCollection?> LoadCollection(string loadName)
     {
-      try
-      {
-        if (await new GetCardCollectionDTO(Viewmodel.Repository).Execute(loadName) is MTGCardCollectionDTO dto)
-          return await new DTOToCardCollectionConverter(Viewmodel.Importer).Convert(dto);
-        else
-          return null;
-      }
-      catch { throw; }
+      if (await new GetCardCollectionDTO(viewmodel.Repository).Execute(loadName) is MTGCardCollectionDTO dto)
+        return await new DTOToCardCollectionConverter(viewmodel.Importer).Convert(dto);
+      else
+        return null;
     }
   }
 }

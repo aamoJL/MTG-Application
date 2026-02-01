@@ -22,7 +22,8 @@
   xmlns:viewmodels="using:MTGApplication.Features.DeckEditor.ViewModels" 
   xmlns:converters="using:MTGApplication.Features.DeckEditor.Editor.Views.Converters" 
   xmlns:controls1="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls" 
-  xmlns:collections="using:CommunityToolkit.WinUI.Collections"
+  xmlns:collections="using:CommunityToolkit.WinUI.Collections" 
+  xmlns:converters1="using:MTGApplication.General.Views.BindingHelpers.Converters"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
@@ -30,8 +31,8 @@
   <Page.Resources>
     <converters:StringOrDefaultConverter x:Key="StringOrDefaultConverter"/>
     <converters:CardColorGroupToBoolConverter x:Key="CardColorGroupToBoolConverter"/>
-    <converters:ToStringToBoolConverter x:Key="ToStringToBoolConverter"/>
-    <converters:ToStringToVisibilityConverter x:Key="ToStringToVisibilityConverter"/>
+    <converters1:ToStringToBoolConverter x:Key="ToStringToBoolConverter"/>
+    <converters1:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
   </Page.Resources>
   
   <!--#region Keyboard Accelerators -->
@@ -219,6 +220,7 @@
                     Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
+                    TagVisible="false"
                     HoverPreviewEnabled="True"
                     DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
                 </DataTemplate>
@@ -276,6 +278,7 @@
                     Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
+                    TagVisible="false"
                     HoverPreviewEnabled="True"
                     DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
                 </DataTemplate>
@@ -333,6 +336,7 @@
                     Model="{x:Bind Mode=OneTime}"
                     SetIconVisible="False"
                     TypeLineVisible="False"
+                    TagVisible="false"
                     HoverPreviewEnabled="True"
                     DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneTime}"/>
                 </DataTemplate>
@@ -514,12 +518,12 @@
             <!--#endregion-->
 
             <!--#region Group View Controls -->
-            <AppBarSeparator Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"/>
-            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneWay}" Icon="Add" Label="Add Group" />
+            <AppBarSeparator Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"/>
+            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneWay}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
-              <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" Margin="5 0 5 0"/>
+              <ProgressRing IsActive="{x:Bind ViewModel.Worker.IsBusy, Mode=OneWay}" Margin="5 0 5 0"/>
             </AppBarElementContainer>
           </CommandBar>
         </StackPanel>
@@ -551,7 +555,7 @@
         <!--#region Group View -->
         <Grid 
           x:Name="DeckCardsGroupViews"
-          Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"
+          Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}">
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
@@ -644,7 +648,7 @@
         <!--#region Grid View -->
         <ScrollViewer
           x:Name="DeckCardsGridViewScrollViewer"
-          Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Image, Mode=OneWay}"
+          Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Image, Mode=OneWay}"
           VerticalScrollBarVisibility="Auto" 
           Padding="10">
           <cardlistview:DeckEditorListViewContainer
@@ -687,7 +691,7 @@
         <!--#region List View -->
         <cardlistview:AdvancedCardListView
           x:Name="DeckCardsListView"
-          Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource ToStringToVisibilityConverter}, ConverterParameter=Text, Mode=OneWay}"
+          Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Text, Mode=OneWay}"
           DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}"
           ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneTime}"
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"

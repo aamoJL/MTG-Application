@@ -100,35 +100,35 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
       return false;
 
     db.ChangeTracker.AutoDetectChangesEnabled = true;
+
     // Remove unused cards from the database
     List<MTGCardDTO> missingDeckCards = [];
     List<MTGCardDTO> missingWishlistCards = [];
     List<MTGCardDTO> missingMaybelistCards = [];
     List<MTGCardDTO> missingRemovelistCards = [];
 
-    var missingCardsTasks = new List<Task>()
+    await Task.WhenAll(new List<Task>()
       {
         Task.Run(() => missingDeckCards.AddRange(existingDeck.DeckCards.Where(existingCard => !item.DeckCards.Any(itemCard => itemCard.Compare(existingCard))))),
         Task.Run(() => missingWishlistCards.AddRange(existingDeck.WishlistCards.Where(existingCard => !item.WishlistCards.Any(itemCard => itemCard.Compare(existingCard))))),
         Task.Run(() => missingMaybelistCards.AddRange(existingDeck.MaybelistCards.Where(existingCard => !item.MaybelistCards.Any(itemCard => itemCard.Compare(existingCard))))),
         Task.Run(() => missingRemovelistCards.AddRange(existingDeck.RemovelistCards.Where(existingCard => !item.RemovelistCards.Any(itemCard => itemCard.Compare(existingCard))))),
-      };
+      });
 
-    await Task.WhenAll(missingCardsTasks);
-
-    db.RemoveRange(missingDeckCards);
-    db.RemoveRange(missingWishlistCards);
-    db.RemoveRange(missingMaybelistCards);
-    db.RemoveRange(missingRemovelistCards);
+    db.RemoveRange([.. missingDeckCards, .. missingWishlistCards, .. missingMaybelistCards, .. missingRemovelistCards]);
 
     // Add new cards to the deckDTO
-    var updateCardsTasks = new List<Task>()
+    await Task.WhenAll(new List<Task>()
       {
         Task.Run(() =>
         {
           foreach (var card in item.DeckCards)
           {
-            if (existingDeck.DeckCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            if(existingDeck.DeckCards.FindIndex(x => x.Compare(card)) is var i && i >= 0)
+            {
+              var existingCard = existingDeck.DeckCards[i];
+              existingDeck.DeckCards[i] = card with {Id = existingCard.Id};
+            }
             else { existingDeck.DeckCards.Add(card); }
           }
         }),
@@ -136,7 +136,11 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
         {
           foreach (var card in item.MaybelistCards)
           {
-            if (existingDeck.MaybelistCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            if(existingDeck.MaybelistCards.FindIndex(x => x.Compare(card)) is var i && i >= 0)
+            {
+              var existingCard = existingDeck.MaybelistCards[i];
+              existingDeck.MaybelistCards[i] = card with {Id = existingCard.Id};
+            }
             else { existingDeck.MaybelistCards.Add(card); }
           }
         }),
@@ -144,7 +148,11 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
         {
           foreach (var card in item.WishlistCards)
           {
-            if (existingDeck.WishlistCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            if(existingDeck.WishlistCards.FindIndex(x => x.Compare(card)) is var i && i >= 0)
+            {
+              var existingCard = existingDeck.WishlistCards[i];
+              existingDeck.WishlistCards[i] = card with {Id = existingCard.Id};
+            }
             else { existingDeck.WishlistCards.Add(card); }
           }
         }),
@@ -152,13 +160,15 @@ public class DeckDTORepository(CardDbContextFactory? dbContextFactory = null) : 
         {
           foreach (var card in item.RemovelistCards)
           {
-            if (existingDeck.RemovelistCards.FirstOrDefault(x => x.Compare(card)) is MTGCardDTO cdto) { cdto.Count = card.Count; }
+            if(existingDeck.RemovelistCards.FindIndex(x => x.Compare(card)) is var i && i >= 0)
+            {
+              var existingCard = existingDeck.RemovelistCards[i];
+              existingDeck.RemovelistCards[i] = card with {Id = existingCard.Id};
+            }
             else { existingDeck.RemovelistCards.Add(card); }
           }
         })
-      };
-
-    await Task.WhenAll(updateCardsTasks);
+      });
 
     // Remove old commander and add new one if the commander changed
     if ((existingDeck.Commander != null || item.Commander != null) && existingDeck.Commander?.Compare(item.Commander) is not true)

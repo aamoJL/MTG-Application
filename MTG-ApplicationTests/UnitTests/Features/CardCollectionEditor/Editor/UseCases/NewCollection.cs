@@ -95,7 +95,7 @@ public class NewCollection : CardCollectionEditorViewModelTestBase
   [TestMethod(DisplayName = "Collection should be changed to a new collection when executed successfully")]
   public async Task New_Success_Reset()
   {
-    var viewmodel = new Mocker(_dependencies).MockVM(collection: new()
+    var viewmodel = await new Mocker(_dependencies).MockVM(collection: new()
     {
       Name = "Collection",
       CollectionLists = [new() { Name = "List" }]

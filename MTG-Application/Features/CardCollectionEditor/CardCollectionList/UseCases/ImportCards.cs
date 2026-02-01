@@ -2,6 +2,7 @@
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.Services;
 using MTGApplication.Features.CardCollectionEditor.CardCollectionList.ViewModels;
 using MTGApplication.Features.CardCollectionEditor.Editor.Services;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Linq;
@@ -13,46 +14,58 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class ImportCards(CardCollectionListViewModel viewmodel) : AsyncCommand
   {
-    public CardCollectionListViewModel Viewmodel { get; } = viewmodel;
+    protected record ImportResult(CardImportResult Result, int AddedCount);
 
-    protected override bool CanExecute() => !string.IsNullOrEmpty(Viewmodel.Name);
+    protected override bool CanExecute() => !string.IsNullOrEmpty(viewmodel.Name);
 
     protected override async Task Execute()
     {
       if (!CanExecute()) return;
 
-      if (await Viewmodel.Confirmers.ImportCardsConfirmer.Confirm(
+      if (await viewmodel.Confirmers.ImportCardsConfirmer.Confirm(
         CardCollectionListConfirmers.GetImportCardsConfirmation())
         is not string importText || string.IsNullOrEmpty(importText))
         return;
 
       try
       {
-        // Fetch imported cards and add the cards that are included in the query but not in the owned cards
-        var importResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithString(importText));
-        var queryResult = await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportCardsWithSearchQuery(Viewmodel.Query, pagination: false));
+        var importResult = await viewmodel.Worker.DoWork(Import(importText));
 
-        var addedCards = importResult.Found.Select(f => new CardCollectionMTGCard(f.Info))
-          .IntersectBy(queryResult.Found.Select(c => c.Info.ScryfallId), f => f.Info.ScryfallId)
-          .ExceptBy(Viewmodel.CollectionList.Cards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
-          .DistinctBy(x => x.Info.ScryfallId)
-          .ToList();
-
-        foreach (var card in addedCards)
-          Viewmodel.CollectionList.Cards.Add(new(card.Info));
-
-        if (importResult.Found.Length == 0)
-          new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsError);
+        if (importResult.Result.Found.Length == 0)
+          new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsError);
         else
-          new SendNotification(Viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsSuccessOrWarning(
-            added: addedCards.Count,
-            skipped: importResult.Found.Length - addedCards.Count,
-            notFound: importResult.NotFoundCount));
+          new SendNotification(viewmodel.Notifier).Execute(CardCollectionNotifications.ImportCardsSuccessOrWarning(
+            added: importResult.AddedCount,
+            skipped: importResult.Result.Found.Length - importResult.AddedCount,
+            notFound: importResult.Result.NotFoundCount));
       }
       catch (System.Exception e)
       {
-        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+        viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
       }
+    }
+
+    private async Task<ImportResult> Import(string importText)
+    {
+      // Fetch imported cards and add the cards that are included in the query but not in the owned cards
+      var importTask = Task.Run(() => viewmodel.Importer.ImportWithString(importText));
+      var queryTask = Task.Run(() => viewmodel.Importer.ImportCardsWithSearchQuery(viewmodel.Query, pagination: false));
+
+      await Task.WhenAll(importTask, queryTask);
+
+      if (importTask.IsFaulted) throw importTask.Exception;
+      if (queryTask.IsFaulted) throw queryTask.Exception;
+
+      var addedCards = importTask.Result.Found.Select(f => new CardCollectionMTGCard(f.Info))
+        .IntersectBy(queryTask.Result.Found.Select(c => c.Info.ScryfallId), f => f.Info.ScryfallId)
+        .ExceptBy(viewmodel.Cards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
+        .DistinctBy(x => x.Info.ScryfallId)
+        .ToList();
+
+      foreach (var card in addedCards)
+        viewmodel.Cards.Add(new(card.Info));
+
+      return new(importTask.Result, addedCards.Count);
     }
   }
 }

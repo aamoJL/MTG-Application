@@ -10,7 +10,7 @@ public partial class ScryfallAPI
   /// Scryfall collection fetch identifier object.
   /// Scryfall documentation: <see href="https://scryfall.com/docs/api/cards/collection"/>
   /// </summary>
-  public readonly struct ScryfallIdentifier
+  public record ScryfallIdentifier
   {
     public enum IdentifierSchema { ID, ILLUSTRATION_ID, NAME, NAME_SET, COLLECTORNUMBER_SET }
 
@@ -24,6 +24,7 @@ public partial class ScryfallAPI
       Name = card.Name;
       CardCount = card.Count;
       CardGroup = card.Group;
+      CardTag = card.Tag;
       SetCode = card.SetCode;
       CollectorNumber = card.CollectorNumber;
     }
@@ -31,10 +32,11 @@ public partial class ScryfallAPI
     public Guid ScryfallId { get; init; } = Guid.Empty;
     public int CardCount { get; init; } = 1;
     public string CardGroup { get; init; } = string.Empty;
+    public CardTag? CardTag { get; init; } = null;
     public string Name { get; init; } = string.Empty;
-    public Guid IllustrationId { get; init; } = Guid.Empty;
     public string SetCode { get; init; } = string.Empty;
     public string CollectorNumber { get; init; } = string.Empty;
+    public Guid IllustrationId { get; init; } = Guid.Empty;
     public IdentifierSchema PreferedSchema { get; init; } = IdentifierSchema.ID;
 
     /// <summary>

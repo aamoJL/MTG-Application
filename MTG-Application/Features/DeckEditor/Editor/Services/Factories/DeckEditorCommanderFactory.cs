@@ -14,7 +14,7 @@ public class DeckEditorCommanderFactory(DeckEditorViewModel viewmodel)
       Confirmers = viewmodel.Confirmers.CommanderConfirmers,
       UndoStack = viewmodel.UndoStack,
       Notifier = viewmodel.Notifier,
-      Worker = viewmodel
+      Worker = viewmodel.Worker
     };
   }
 }

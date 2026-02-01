@@ -57,7 +57,7 @@ public class SubmitSearch
     var query = "Black Lotus";
     var search = new CardSearchViewModel(_dependensies.Importer);
 
-    await WorkerAssert.IsBusy(search, () => search.SubmitSearchCommand.ExecuteAsync(query));
+    await WorkerAssert.IsBusy(search.Worker, () => search.SubmitSearchCommand.ExecuteAsync(query));
   }
 
   [TestMethod]

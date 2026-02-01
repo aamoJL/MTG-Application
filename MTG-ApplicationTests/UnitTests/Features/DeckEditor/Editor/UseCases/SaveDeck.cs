@@ -280,7 +280,7 @@ public class SaveDeck : DeckEditorViewModelTestBase, ISaveCommandTests, IWorkerT
       }
     }.MockVM();
 
-    await WorkerAssert.IsBusy(viewmodel, () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
+    await WorkerAssert.IsBusy(viewmodel.Worker, () => viewmodel.SaveDeckCommand.ExecuteAsync(null));
   }
 
   [TestMethod]

@@ -17,12 +17,12 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class ImportCards(IList<DeckEditorMTGCard> cards, ReversibleCommandStack undoStack, CardListConfirmers confirmers, IWorker worker, IMTGCardImporter importer, Notifier notifier) : AsyncCommand<string>
+  public class ImportCards(IList<DeckEditorMTGCard> cards, ReversibleCommandStack undoStack, CardListConfirmers confirmers, Worker worker, IMTGCardImporter importer, Notifier notifier) : AsyncCommand<string>
   {
     private IList<DeckEditorMTGCard> Cards { get; } = cards;
     private ReversibleCommandStack UndoStack { get; } = undoStack;
     private CardListConfirmers Confirmers { get; } = confirmers;
-    private IWorker Worker { get; } = worker;
+    private Worker Worker { get; } = worker;
     private IMTGCardImporter Importer { get; } = importer;
     private Notifier Notifier { get; } = notifier;
 

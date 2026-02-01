@@ -30,7 +30,7 @@ public partial class DeckEditorViewModelCommands
 
       loadName ??= await Viewmodel.Confirmers.LoadDeckConfirmer
         .Confirm(DeckEditorConfirmers.GetLoadDeckConfirmation(
-          (await (Viewmodel as IWorker).DoWork(Viewmodel.Repository.Get((set) => { }))).Select(x => x.Name).ToArray()));
+          (await Viewmodel.Worker.DoWork(Viewmodel.Repository.Get((set) => { }))).Select(x => x.Name).ToArray()));
 
       if (string.IsNullOrEmpty(loadName))
         return;
@@ -40,7 +40,7 @@ public partial class DeckEditorViewModelCommands
         if (await new GetDeckDTO(Viewmodel.Repository).Execute(loadName) is not MTGCardDeckDTO dto)
           throw new InvalidOperationException("Deck was not found");
 
-        if (await (Viewmodel as IWorker).DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer).Convert(dto)) is DeckEditorMTGDeck deck)
+        if (await Viewmodel.Worker.DoWork(new DTOToDeckEditorDeckConverter(Viewmodel.Importer).Convert(dto)) is DeckEditorMTGDeck deck)
         {
           Viewmodel.Deck = deck;
           Viewmodel.UndoStack.Clear();

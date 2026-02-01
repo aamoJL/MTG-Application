@@ -26,7 +26,7 @@ public partial class CardListViewModelCommands
 
       try
       {
-        var prints = (await (Viewmodel as IWorker).DoWork(Viewmodel.Importer.ImportWithUri(pageUri: card!.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
+        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithUri(pageUri: card!.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => x.Info);
 
         if (await Viewmodel.Confirmers.ChangeCardPrintConfirmer.Confirm(DeckEditorConfirmers.GetChangeCardPrintConfirmation(prints.Select(x => new MTGCard(x)))) is MTGCard selection)
         {

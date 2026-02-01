@@ -9,8 +9,6 @@ public partial class CardCollectionEditorViewModelCommands
 {
   public class SwitchCardOwnership(CardCollectionListViewModel viewmodel) : SyncCommand<CardCollectionMTGCard>
   {
-    public CardCollectionListViewModel Viewmodel { get; } = viewmodel;
-
     protected override bool CanExecute(CardCollectionMTGCard? card) => card != null;
 
     protected override void Execute(CardCollectionMTGCard? card)
@@ -18,10 +16,10 @@ public partial class CardCollectionEditorViewModelCommands
       if (!CanExecute(card))
         return;
 
-      if (Viewmodel.CollectionList.Cards.FirstOrDefault(x => x.Info.ScryfallId == card!.Info.ScryfallId) is CardCollectionMTGCard existingCard)
-        Viewmodel.CollectionList.Cards.Remove(existingCard);
+      if (viewmodel.Cards.FirstOrDefault(x => x.Info.ScryfallId == card!.Info.ScryfallId) is CardCollectionMTGCard existingCard)
+        viewmodel.Cards.Remove(existingCard);
       else
-        Viewmodel.CollectionList.Cards.Add(card!);
+        viewmodel.Cards.Add(card!);
     }
   }
 }

@@ -20,7 +20,7 @@ public partial class CardListViewModel(ObservableCollection<DeckEditorMTGCard> c
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public ClipboardService ClipboardService { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
-  public IWorker Worker { get; init; } = IWorker.Default;
+  public Worker Worker { get; init; } = new();
   public CardListConfirmers Confirmers { get; init; } = new();
 
   [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? AddCardCommand => field ??= new AddCard(Cards, UndoStack, Confirmers).Command;

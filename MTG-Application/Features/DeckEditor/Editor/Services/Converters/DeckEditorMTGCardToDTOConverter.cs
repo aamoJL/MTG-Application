@@ -14,6 +14,7 @@ public class DeckEditorMTGCardToDTOConverter
       oracleId: card.Info.OracleId,
       setCode: card.Info.SetCode,
       collectorNumber: card.Info.CollectorNumber,
-      group: card.Group);
+      group: card.Group,
+      tag: card.CardTag);
   }
 }

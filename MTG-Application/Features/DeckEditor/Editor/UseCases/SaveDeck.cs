@@ -36,7 +36,7 @@ public partial class DeckEditorViewModelCommands
         }
       }
 
-      if (await (Viewmodel as IWorker).DoWork(SaveDTO(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck), saveName, overrideOld)) is true)
+      if (await Viewmodel.Worker.DoWork(SaveDTO(DeckEditorMTGDeckToDTOConverter.Convert(Viewmodel.Deck), saveName, overrideOld)) is true)
       {
         Viewmodel.Name = saveName;
         Viewmodel.HasUnsavedChanges = false;

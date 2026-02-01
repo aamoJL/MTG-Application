@@ -12,9 +12,9 @@ public class DeckEditorMTGDeckToDTOConverter
       name: deck.Name,
       commander: deck.Commander != null ? DeckEditorMTGCardToDTOConverter.Convert(deck.Commander) : null,
       partner: deck.CommanderPartner != null ? DeckEditorMTGCardToDTOConverter.Convert(deck.CommanderPartner) : null,
-      deckCards: deck.DeckCards.Select(DeckEditorMTGCardToDTOConverter.Convert).ToList(),
-      wishlistCards: deck.Wishlist.Select(DeckEditorMTGCardToDTOConverter.Convert).ToList(),
-      maybelistCards: deck.Maybelist.Select(DeckEditorMTGCardToDTOConverter.Convert).ToList(),
-      removelistCards: deck.Removelist.Select(DeckEditorMTGCardToDTOConverter.Convert).ToList());
+      deckCards: [.. deck.DeckCards.Select(DeckEditorMTGCardToDTOConverter.Convert)],
+      wishlistCards: [.. deck.Wishlist.Select(DeckEditorMTGCardToDTOConverter.Convert)],
+      maybelistCards: [.. deck.Maybelist.Select(DeckEditorMTGCardToDTOConverter.Convert)],
+      removelistCards: [.. deck.Removelist.Select(DeckEditorMTGCardToDTOConverter.Convert)]);
   }
 }

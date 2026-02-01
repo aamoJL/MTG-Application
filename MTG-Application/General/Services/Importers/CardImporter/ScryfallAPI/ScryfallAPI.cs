@@ -296,8 +296,13 @@ public partial class ScryfallAPI : IMTGCardImporter
             {
               if (item != null && GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
               {
-                var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo));
-                fetchedCards.Add(new(Info: cardInfo, Count: identifier.CardCount, Group: identifier.CardGroup));
+                var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo)) ?? new();
+
+                fetchedCards.Add(new(Info: cardInfo, Count: identifier.CardCount)
+                {
+                  Group = identifier.CardGroup,
+                  CardTag = identifier.CardTag,
+                });
               }
             }
           }

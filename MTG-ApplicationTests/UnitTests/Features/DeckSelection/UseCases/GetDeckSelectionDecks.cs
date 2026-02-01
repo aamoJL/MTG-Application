@@ -56,6 +56,6 @@ public class GetDeckSelectionDecks
 
     var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await WorkerAssert.IsBusy(vm, vm.WaitForDeckUpdate);
+    await WorkerAssert.IsBusy(vm.Worker, vm.WaitForDeckUpdate);
   }
 }
