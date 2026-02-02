@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 
-public class AddOrUpdateDeckDTO(IRepository<MTGCardDeckDTO> repository) : UseCase<(MTGCardDeckDTO deck, string saveName), Task<bool>>
+public class AddOrUpdateDeckDTO(IRepository<MTGCardDeckDTO> repository) : UseCaseFunc<(MTGCardDeckDTO deck, string saveName), Task<bool>>
 {
   public override async Task<bool> Execute((MTGCardDeckDTO deck, string saveName) args)
   {

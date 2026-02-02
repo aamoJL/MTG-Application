@@ -1,7 +1,6 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Services.NotificationService;
 using System;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
@@ -55,7 +54,6 @@ public partial class ThemedWindow : Window
     if ((sender as FrameworkElement)?.XamlRoot != Content.XamlRoot)
       return;
 
-    //InAppNotification.RequestedTheme = ElementTheme.Light;
     InAppNotification.Show(new()
     {
       Title = e.Message,
@@ -101,7 +99,7 @@ public partial class ThemedWindow : Window
   private void OnClose()
   {
     AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
-    NotificationService.OnShow -= NotificationService_OnShow;
+    OnShow -= NotificationService_OnShow;
     Closed -= ThemedWindow_Closed;
     Content = null;
   }

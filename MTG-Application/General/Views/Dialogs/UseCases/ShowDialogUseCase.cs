@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Views.Dialogs.UseCases;
 
-public abstract class ShowDialogUseCase<TReturn>(XamlRoot root) : UseCase<(string title, string message), Task<TReturn>>
+public abstract class ShowDialogUseCase<TReturn>(XamlRoot root) : UseCaseFunc<(string title, string message), Task<TReturn>>
 {
   public XamlRoot Root { get; } = root;
 
@@ -18,7 +18,7 @@ public abstract class ShowDialogUseCase<TReturn>(XamlRoot root) : UseCase<(strin
   protected abstract Task<TReturn> ShowDialog(string title, string message);
 }
 
-public abstract class ShowDialogUseCase<TReturn, TData>(XamlRoot root) : UseCase<(string title, string message, TData data), Task<TReturn>>
+public abstract class ShowDialogUseCase<TReturn, TData>(XamlRoot root) : UseCaseFunc<(string title, string message, TData data), Task<TReturn>>
 {
   public XamlRoot Root { get; } = root;
 

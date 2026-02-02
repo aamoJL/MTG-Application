@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.General.Views.Dialogs;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.Dialogs.UseCases;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
-public class DeckEditorViewDialogs : IViewDialogs<DeckEditorConfirmers>
+public class DeckEditorViewDialogs
 {
   public static void RegisterConfirmDialogs(DeckEditorConfirmers confirmers, XamlRoot root)
   {

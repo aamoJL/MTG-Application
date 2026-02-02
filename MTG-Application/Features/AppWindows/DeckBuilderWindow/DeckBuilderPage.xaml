@@ -5,10 +5,12 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:local="using:MTGApplication.Features.AppWindows.DeckBuilderWindow" 
   xmlns:controls="using:CommunityToolkit.WinUI.Controls"
   xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views" 
-  xmlns:customcontrols="using:MTGApplication.General.Views.Controls"
+  xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
   mc:Ignorable="d"
+  d:DataContext="{d:DesignInstance Type=local:DeckBuilderPage}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -43,13 +45,13 @@
 
           <!--#region Deck View Tabs -->
           <TabView
-            TabItemsSource="{x:Bind TabViewItems, Mode=OneTime}"
+            x:Name="DeckBuilderTabView"
+            TabItemsSource="{x:Bind DeckBuilderTabs, Mode=OneTime}"
             IsAddTabButtonVisible="True" 
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" 
             CloseButtonOverlayMode="Auto"
-            AddTabButtonClick="TabView_AddTabButtonClick"
-            TabCloseRequested="TabView_TabCloseRequested"
+            AddTabButtonCommand="{x:Bind AddDeckBuilderTabCommand, Mode=OneTime}"
             CanReorderTabs="True"/>
           <!--#endregion-->
 

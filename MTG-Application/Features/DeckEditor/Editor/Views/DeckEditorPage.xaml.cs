@@ -56,7 +56,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     Loaded -= DeckEditorPage_Loaded;
 
-    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, root: XamlRoot);
+    DeckEditorViewDialogs.RegisterConfirmDialogs(ViewModel.Confirmers, XamlRoot);
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
   }
 

@@ -2,9 +2,14 @@
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class UseCase
+public abstract class UseCaseAction
 {
   public abstract void Execute();
+}
+
+public abstract class UseCaseAction<TArg>
+{
+  public abstract void Execute(TArg arg);
 }
 
 public abstract class UseCase<TResponse>
@@ -12,7 +17,7 @@ public abstract class UseCase<TResponse>
   public abstract TResponse Execute();
 }
 
-public abstract class UseCase<TArg, TReturn>
+public abstract class UseCaseFunc<TArg, TReturn>
 {
   public abstract TReturn Execute(TArg arg);
 }

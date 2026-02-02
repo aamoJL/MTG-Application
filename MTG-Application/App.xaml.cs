@@ -36,8 +36,8 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    new DeckBuilderWindow().Activate();
-
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
+
+    new DeckBuilderWindow().Activate();
   }
 }

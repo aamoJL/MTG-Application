@@ -7,7 +7,7 @@ using static MTGApplication.General.Services.API.CardAPI.ScryfallAPI.ScryfallIde
 
 namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
 
-public class ScryfallIdentifiersToJsonConverter : UseCase<ScryfallIdentifier[], string>
+public class ScryfallIdentifiersToJsonConverter : UseCaseFunc<ScryfallIdentifier[], string>
 {
   public override string Execute(ScryfallIdentifier[] identifiers)
     => GetJson(identifiers);

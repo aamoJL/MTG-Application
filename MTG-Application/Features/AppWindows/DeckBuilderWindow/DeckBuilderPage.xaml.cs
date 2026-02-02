@@ -3,7 +3,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
-using MTGApplication.General.ViewModels;
+using MTGApplication.General.Views.AppWindows;
+using MTGApplication.General.Views.AppWindows.UseCases;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -11,53 +13,77 @@ namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
 
 public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 {
-  public DeckBuilderPage() => InitializeComponent();
+  public DeckBuilderPage()
+  {
+    InitializeComponent();
 
-  public ObservableCollection<DeckSelectionAndEditorTabViewItem> TabViewItems { get; } = [new CreateNewDeckViewTabItem().Execute()];
+    WindowClosing.Closing += WindowClosing_Closing;
+    WindowClosing.Closed += WindowClosing_Closed;
 
-  public bool IsSearchPaneOpen { get => field; set { field = value; PropertyChanged?.Invoke(this, new(nameof(IsSearchPaneOpen))); } } = false;
+    AddDeckBuilderTab();
+  }
+
+  public ObservableCollection<DeckBuilderTabItem> DeckBuilderTabs = [];
+  public bool IsSearchPaneOpen
+  {
+    get => field;
+    set
+    {
+      field = value;
+      PropertyChanged?.Invoke(this, new(nameof(IsSearchPaneOpen)));
+    }
+  }
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
-  [RelayCommand] public void SwitchSearchPanel() => IsSearchPaneOpen = !IsSearchPaneOpen;
-
-  [RelayCommand] public void OpenCardCollectionWindow() => new OpenMTGCardCollectionWindow().Execute();
+  public Action OpenCardCollectionWindow_UC { private get => field ??= new OpenMTGCardCollectionWindow().Execute; set; }
+  public Action<ElementTheme> ChangeAppTheme_UC { private get => field ??= new ChangeWindowTheme().Execute; set; }
 
   [RelayCommand]
-  public void SwitchWindowTheme()
+  private void SwitchSearchPanel() => IsSearchPaneOpen = !IsSearchPaneOpen;
+
+  [RelayCommand]
+  private void AddDeckBuilderTab()
   {
-    new ChangeWindowTheme(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark
-      ? ElementTheme.Light : ElementTheme.Dark).Execute();
+    var newTab = new DeckBuilderTabItem()
+    {
+      OnClose = RemoveTab
+    };
+    DeckBuilderTabs.Add(newTab);
+    DeckBuilderTabView.SelectedItem = newTab;
   }
 
-  private async void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
+  [RelayCommand]
+  private void OpenCardCollectionWindow() => OpenCardCollectionWindow_UC();
+
+  [RelayCommand]
+  private void SwitchWindowTheme() => ChangeAppTheme_UC(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark);
+
+  private void WindowClosing_Closing(object? sender, WindowClosing.ClosingEventArgs e)
   {
-    if (args.Item is not DeckSelectionAndEditorTabViewItem item)
-      return;
+    if (e.Root != XamlRoot) return;
 
-    var unsavedArgs = new ISavable.ConfirmArgs();
+    foreach (var tabItem in DeckBuilderTabs)
+      e.Tasks.Add(tabItem.RequestClose);
+  }
 
-    await item.RequestClosure(unsavedArgs);
+  private void WindowClosing_Closed(object? sender, WindowClosing.ClosedEventArgs e)
+  {
+    if (e.Root != XamlRoot) return;
 
-    if (unsavedArgs.Cancelled)
-      return;
+    WindowClosing.Closing -= WindowClosing_Closing;
+    WindowClosing.Closed -= WindowClosing_Closed;
+  }
 
+  private void RemoveTab(DeckBuilderTabItem tabItem)
+  {
     // Workaround - removing tabview will throw an exception if list item has focus on the tab.
     Focus(FocusState.Programmatic);
 
-    TabViewItems.Remove(item);
+    DeckBuilderTabs.Remove(tabItem);
 
     // Create new tab if there are no tabs
-    if (TabViewItems.Count == 0)
-      AddNewTab(sender);
-  }
-
-  private void TabView_AddTabButtonClick(TabView sender, object args) => AddNewTab(sender);
-
-  private void AddNewTab(TabView tabView)
-  {
-    var newTab = new CreateNewDeckViewTabItem().Execute();
-    TabViewItems.Add(newTab);
-    tabView.SelectedItem = newTab;
+    if (DeckBuilderTabs.Count == 0)
+      AddDeckBuilderTab();
   }
 }

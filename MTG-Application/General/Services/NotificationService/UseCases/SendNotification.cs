@@ -3,7 +3,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.General.Services.NotificationService.UseCases;
 
-public class SendNotification(Notifier notifier) : UseCase<Notification, bool>
+public class SendNotification(Notifier notifier) : UseCaseFunc<Notification, bool>
 {
   public override bool Execute(Notification notification)
   {
