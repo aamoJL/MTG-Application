@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using MTGApplication.Features.DeckEditor.Editor.UseCases;
@@ -46,10 +45,10 @@ public sealed partial class DeckBuilderTabItem : TabViewItem
     switch (e.Content)
     {
       case DeckSelectionPage selectionPage:
-        selectionPage.DeckSelectedCommand = new RelayCommand<string>((selectedDeck) =>
+        selectionPage.ViewModel.SelectDeck_UC = (selectedDeck) =>
         {
           ContentFrame.Navigate(typeof(DeckEditorPage), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
-        });
+        };
         break;
       case DeckEditorPage deckEditorPage:
         TabHeader?.Text = !string.IsNullOrEmpty(deckEditorPage.ViewModel.Name) ? deckEditorPage.ViewModel.Name : DefaultNewDeckTabHeaderText;
