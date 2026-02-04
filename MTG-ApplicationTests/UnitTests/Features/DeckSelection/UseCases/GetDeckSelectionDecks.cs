@@ -14,10 +14,10 @@ public class GetDeckSelectionDecks
   public async Task LoadDecks_DeckItemsPopulated()
   {
     var itemCount = 3;
-    _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(itemCount).ToArray());
+    _dependensies.ContextFactory.Populate([.. MTGCardDeckDTOMocker.MockList(itemCount)]);
     var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await vm.WaitForDeckUpdate();
+    await vm.RefreshDecksCommand.ExecuteAsync(null);
 
     Assert.HasCount(itemCount, vm.DeckItems, "Item counts does not match");
   }
@@ -25,10 +25,10 @@ public class GetDeckSelectionDecks
   [TestMethod(DisplayName = "Deck items should have names when loaded")]
   public async Task LoadDecks_DeckItemsHasNames()
   {
-    _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
+    _dependensies.ContextFactory.Populate([.. MTGCardDeckDTOMocker.MockList(3)]);
     var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await vm.WaitForDeckUpdate();
+    await vm.RefreshDecksCommand.ExecuteAsync(null);
 
     foreach (var item in vm.DeckItems)
       Assert.IsFalse(string.IsNullOrEmpty(item.Title), "Deck should have a name");
@@ -37,11 +37,11 @@ public class GetDeckSelectionDecks
   [TestMethod(DisplayName = "Deck items should have image URI when loaded if deck has an image")]
   public async Task LoadDecks_DeckItemsHasImageUris()
   {
-    _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
+    _dependensies.ContextFactory.Populate([.. MTGCardDeckDTOMocker.MockList(3)]);
 
     var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await vm.WaitForDeckUpdate();
+    await vm.RefreshDecksCommand.ExecuteAsync(null);
 
     foreach (var item in vm.DeckItems)
       Assert.IsFalse(string.IsNullOrEmpty(item.ImageUri), "Deck should have an image URI");
@@ -50,12 +50,12 @@ public class GetDeckSelectionDecks
   [TestMethod(DisplayName = "ViewModel should be busy when loading decks")]
   public async Task LoadDecks_IsBusy()
   {
-    _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
+    _dependensies.ContextFactory.Populate([.. MTGCardDeckDTOMocker.MockList(3)]);
 
     _dependensies.Importer.Delay = TimeSpan.FromMilliseconds(50);
 
     var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
-    await WorkerAssert.IsBusy(vm.Worker, vm.WaitForDeckUpdate);
+    await WorkerAssert.IsBusy(vm.Worker, () => vm.RefreshDecksCommand.ExecuteAsync(null));
   }
 }

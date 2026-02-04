@@ -1,27 +1,30 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Linq;
-using System.Windows.Input;
 
 namespace MTGApplication.General.Views.Controls;
+
 public partial class ComboBoxWithCommands : ComboBox
 {
   public static readonly DependencyProperty SelectionChangedCommandProperty =
-      DependencyProperty.Register(nameof(SelectionChangedCommand), typeof(ICommand), typeof(ComboBoxWithCommands), new PropertyMetadata(default(ICommand)));
+      DependencyProperty.Register(nameof(SelectionChangedCommand), typeof(IAsyncRelayCommand), typeof(ComboBoxWithCommands), new PropertyMetadata(null));
 
   public ComboBoxWithCommands() : base()
     => SelectionChanged += ComboBox_SelectionChanged;
 
-  public ICommand SelectionChangedCommand
+  public IAsyncRelayCommand? SelectionChangedCommand
   {
-    get => (ICommand)GetValue(SelectionChangedCommandProperty);
+    get => (IAsyncRelayCommand)GetValue(SelectionChangedCommandProperty);
     set => SetValue(SelectionChangedCommandProperty, value);
   }
 
-  private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+  private void ComboBox_SelectionChanged(object _, SelectionChangedEventArgs e)
   {
     if (e.AddedItems.FirstOrDefault() is object item)
-      if (SelectionChangedCommand?.CanExecute(item) is true)
-        SelectionChangedCommand.Execute(item);
+    {
+      SelectionChangedCommand?.Cancel();
+      SelectionChangedCommand?.Execute(item);
+    }
   }
 }

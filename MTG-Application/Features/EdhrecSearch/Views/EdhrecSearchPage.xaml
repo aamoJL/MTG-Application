@@ -13,8 +13,9 @@
   xmlns:sys="using:System" 
   xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
   xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" 
-  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+  xmlns:interactivity="using:Microsoft.Xaml.Interactivity" 
   mc:Ignorable="d"
+  d:DataContext="{d:DesignInstance Type=viewmodels:EdhrecSearchPageViewModel}"
   Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
 
   <Grid>
@@ -31,7 +32,7 @@
             <AppBarElementContainer VerticalAlignment="Center">
               <customcontrols:ComboBoxWithCommands 
                 ItemsSource="{x:Bind ViewModel.CommanderThemes, Mode=OneWay}" 
-                SelectionChangedCommand="{x:Bind ViewModel.ChangeCommanderThemeCommand, Mode=OneTime}"
+                SelectionChangedCommand="{x:Bind ViewModel.SelectCommanderThemeCommand, Mode=OneTime}"
                 PlaceholderText="Select Theme..."
                 Width="200"
                 Margin="-5 0 0 0">

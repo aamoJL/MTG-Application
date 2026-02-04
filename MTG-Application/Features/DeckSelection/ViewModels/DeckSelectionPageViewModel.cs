@@ -30,11 +30,13 @@ public partial class DeckSelectionPageViewModel(IRepository<MTGCardDeckDTO> repo
   private void SelectDeck(DeckSelectionDeck item) => SelectDeck_UC(item?.Title ?? string.Empty);
 
   [RelayCommand]
-  private async Task UpdateDecks()
+  private async Task RefreshDecks()
   {
     try
     {
       var decks = await Worker.DoWork(FetchDecks_UC());
+
+      DeckItems.Clear();
 
       foreach (var deck in decks)
         DeckItems.Add(deck);

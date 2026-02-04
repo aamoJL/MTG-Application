@@ -1,8 +1,6 @@
 ﻿using MTGApplication.Features.CardSearch.ViewModels;
-using MTGApplication.General.Models;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
-using MTGApplicationTests.TestUtility.Services;
 
 namespace MTGApplicationTests.UnitTests.Features.CardSearch.UseCases;
 
@@ -12,18 +10,15 @@ public class ShowCardPrints
   [TestMethod]
   public async Task ChangePrint_ConfirmationShown()
   {
-    var confirmer = new TestDataOnlyConfirmer<IEnumerable<MTGCard>>();
+    var confirmed = false;
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
     var viewmodel = new CardSearchPageViewModel(new TestMTGCardImporter())
     {
-      Confirmers = new()
-      {
-        ShowCardPrintsConfirmer = confirmer
-      }
+      ConfirmCardPrints_UC = async (_) => { confirmed = true; },
     };
 
     await viewmodel.ShowCardPrintsCommand.ExecuteAsync(card);
 
-    ConfirmationAssert.ConfirmationShown(confirmer);
+    Assert.IsTrue(confirmed);
   }
 }

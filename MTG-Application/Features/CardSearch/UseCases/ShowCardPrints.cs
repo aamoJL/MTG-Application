@@ -5,19 +5,25 @@ using MTGApplication.General.ViewModels;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using MTGApplication.General.Views.Styles.Templates;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardSearch.UseCases;
 
-public class ShowCardPrints(XamlRoot xamlRoot, ListViewDragAndDrop<MTGCard> cardDragAndDrop) : UseCaseFunc<Confirmation<IEnumerable<MTGCard>>, Task>
+public class ShowCardPrints(XamlRoot xamlRoot) : UseCaseFunc<Confirmation<IEnumerable<MTGCard>>, Task>
 {
   public XamlRoot XamlRoot { get; } = xamlRoot;
-  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = cardDragAndDrop;
+  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new(itemToArgsConverter: (item) => new(item))
+  {
+    AcceptMove = false
+  };
 
   public override async Task Execute(Confirmation<IEnumerable<MTGCard>> msg)
   {
+    ArgumentNullException.ThrowIfNull(XamlRoot);
+
     Application.Current.Resources.TryGetValue(nameof(MTGPrintGridViewItemTemplate), out var template);
 
     await DialogService.ShowAsync(XamlRoot, new GridViewDialog(

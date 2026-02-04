@@ -23,7 +23,7 @@ public sealed partial class DeckSelectionPage : Page
 
     NotificationService.RegisterNotifications(ViewModel.Notifier, this);
 
-    if (ViewModel.UpdateDecksCommand.CanExecute(null))
-      _ = ViewModel.UpdateDecksCommand.ExecuteAsync(null);
+    if (ViewModel.RefreshDecksCommand.CanExecute(null))
+      _ = ViewModel.RefreshDecksCommand.ExecuteAsync(null);
   }
 }

@@ -15,7 +15,7 @@ public sealed partial class CardSearchPage : Page
   public CardSearchPageViewModel ViewModel => field ??= new(App.MTGCardImporter)
   {
     Notifier = Notifier,
-    ConfirmCardPrints_UC = new ShowCardPrints(XamlRoot, CardDragAndDrop).Execute,
+    ConfirmCardPrints_UC = async (msg) => await new ShowCardPrints(XamlRoot).Execute(msg),
   };
   public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new(itemToArgsConverter: (item) => new(item))
   {
