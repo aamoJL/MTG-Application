@@ -14,7 +14,7 @@ public class ShowCardPrints
   {
     var confirmer = new TestDataOnlyConfirmer<IEnumerable<MTGCard>>();
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
-    var viewmodel = new CardSearchViewModel(new TestMTGCardImporter())
+    var viewmodel = new CardSearchPageViewModel(new TestMTGCardImporter())
     {
       Confirmers = new()
       {

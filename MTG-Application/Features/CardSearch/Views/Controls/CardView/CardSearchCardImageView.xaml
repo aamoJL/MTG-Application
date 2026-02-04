@@ -9,7 +9,8 @@
   xmlns:controls="using:CommunityToolkit.WinUI.Controls"
   xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
-  xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx"
+  xmlns:controls1="using:MTGApplication.General.Views.Controls.ImageEx" 
+  d:DataContext="{d:DesignInstance Type=cardview:CardSearchCardImageView}"
   mc:Ignorable="d">
 
   <Grid Background="Transparent" Padding="5">

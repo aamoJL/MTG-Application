@@ -15,7 +15,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckSelection.ViewModels;
 
-public partial class DeckSelectionViewModel(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer) : ObservableObject
+public partial class DeckSelectionPageViewModel(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer) : ObservableObject
 {
   public IRepository<MTGCardDeckDTO> Repository { get; } = repository;
   public IMTGCardImporter Importer { get; } = importer;

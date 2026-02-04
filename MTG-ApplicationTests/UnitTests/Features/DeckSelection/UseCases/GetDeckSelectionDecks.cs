@@ -15,7 +15,7 @@ public class GetDeckSelectionDecks
   {
     var itemCount = 3;
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(itemCount).ToArray());
-    var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
+    var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
     await vm.WaitForDeckUpdate();
 
@@ -26,7 +26,7 @@ public class GetDeckSelectionDecks
   public async Task LoadDecks_DeckItemsHasNames()
   {
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
-    var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
+    var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
     await vm.WaitForDeckUpdate();
 
@@ -39,7 +39,7 @@ public class GetDeckSelectionDecks
   {
     _dependensies.ContextFactory.Populate(MTGCardDeckDTOMocker.MockList(3).ToArray());
 
-    var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
+    var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
     await vm.WaitForDeckUpdate();
 
@@ -54,7 +54,7 @@ public class GetDeckSelectionDecks
 
     _dependensies.Importer.Delay = TimeSpan.FromMilliseconds(50);
 
-    var vm = new DeckSelectionViewModel(_dependensies.Repository, _dependensies.Importer);
+    var vm = new DeckSelectionPageViewModel(_dependensies.Repository, _dependensies.Importer);
 
     await WorkerAssert.IsBusy(vm.Worker, vm.WaitForDeckUpdate);
   }

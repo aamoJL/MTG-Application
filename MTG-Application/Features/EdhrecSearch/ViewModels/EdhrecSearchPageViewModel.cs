@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 
 namespace MTGApplication.Features.EdhrecSearch.ViewModels;
-public partial class EdhrecSearchPageViewModel(IMTGCardImporter importer) : CardSearchViewModel(importer)
+public partial class EdhrecSearchPageViewModel(IMTGCardImporter importer) : CardSearchPageViewModel(importer)
 {
   public CommanderTheme[] CommanderThemes { get; set; } = [];
 

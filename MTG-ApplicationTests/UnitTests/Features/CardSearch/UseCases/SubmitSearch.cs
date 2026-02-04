@@ -18,7 +18,7 @@ public class SubmitSearch
     var query = "Black Lotus";
     _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
 
-    var search = new CardSearchViewModel(_dependensies.Importer);
+    var search = new CardSearchPageViewModel(_dependensies.Importer);
 
     await search.SubmitSearchCommand.ExecuteAsync(query);
 
@@ -30,7 +30,7 @@ public class SubmitSearch
   {
     var query = string.Empty;
     _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
-    var search = new CardSearchViewModel(_dependensies.Importer);
+    var search = new CardSearchPageViewModel(_dependensies.Importer);
 
     await search.SubmitSearchCommand.ExecuteAsync(query);
 
@@ -42,7 +42,7 @@ public class SubmitSearch
   {
     var query = "Black Lotus";
     _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
-    var search = new CardSearchViewModel(_dependensies.Importer);
+    var search = new CardSearchPageViewModel(_dependensies.Importer);
 
     await search.SubmitSearchCommand.ExecuteAsync(query);
     await search.Cards.Collection.LoadMoreItemsAsync((uint)search.Cards.TotalCardCount);
@@ -55,7 +55,7 @@ public class SubmitSearch
   public async Task SearchCards_WithValidQuery_IsWorking()
   {
     var query = "Black Lotus";
-    var search = new CardSearchViewModel(_dependensies.Importer);
+    var search = new CardSearchPageViewModel(_dependensies.Importer);
 
     await WorkerAssert.IsBusy(search.Worker, () => search.SubmitSearchCommand.ExecuteAsync(query));
   }
@@ -67,7 +67,7 @@ public class SubmitSearch
     _dependensies.Importer.ExpectedCards = [new CardImportResult.Card(MTGCardInfoMocker.MockInfo(name: query))];
     _dependensies.Importer.Exception = new HttpRequestException();
 
-    var search = new CardSearchViewModel(_dependensies.Importer);
+    var search = new CardSearchPageViewModel(_dependensies.Importer);
 
     await search.SubmitSearchCommand.ExecuteAsync(query);
 
@@ -82,7 +82,7 @@ public class SubmitSearch
     _dependensies.Importer.Exception = new HttpRequestException();
 
     var notifier = new TestNotifier();
-    var search = new CardSearchViewModel(_dependensies.Importer) { Notifier = notifier };
+    var search = new CardSearchPageViewModel(_dependensies.Importer) { Notifier = notifier };
 
     await search.SubmitSearchCommand.ExecuteAsync(query);
 

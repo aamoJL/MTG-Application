@@ -36,7 +36,7 @@ public sealed partial class DeckBuilderTabItem : TabViewItem
     if (ContentFrame.Content is DeckEditorPage editorPage && editorPage.ViewModel.HasUnsavedChanges)
     {
       IsSelected = true;
-      await new ConfirmUnsavedChanges(editorPage.ViewModel).ExecuteAsync(args);
+      await new ConfirmUnsavedChanges(editorPage.ViewModel).Execute(args);
     }
   }
 

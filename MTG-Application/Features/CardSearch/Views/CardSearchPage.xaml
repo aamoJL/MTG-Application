@@ -14,15 +14,16 @@
   xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels" 
   xmlns:controls1="using:MTGApplication.General.Views.Controls" 
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity" 
-  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers"
+  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" 
   mc:Ignorable="d"
+  d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid Margin="10">
     <controls:DockPanel Grid.Column="0" LastChildFill="True" Background="Transparent">
 
       <!--#region Search Input -->
-      <searchinputcontrol:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" Submit="{x:Bind ViewModel.SubmitSearchCommand}" />
+      <searchinputcontrol:ScryfallCardSearchInputControl controls:DockPanel.Dock="Top" SubmitCommand="{x:Bind ViewModel.SubmitSearchCommand, Mode=OneTime}" />
       <!--#endregion-->
 
       <!--#region Commandbar -->
@@ -82,7 +83,7 @@
             <ItemsRepeater.ItemTemplate>
               <DataTemplate x:DataType="models:MTGCard">
                 <customControls:CardSearchCardImageView
-                  d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
+                  d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
                   Model="{x:Bind Mode=OneWay}"
                   CanDrag="True"
                   ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
@@ -106,7 +107,7 @@
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="models:MTGCard">
               <customControls:CardSearchCardTextView 
-                d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchViewModel}"
+                d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
                 DataContext="{Binding ElementName=SearchCardsTextView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneWay}"
                 ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"

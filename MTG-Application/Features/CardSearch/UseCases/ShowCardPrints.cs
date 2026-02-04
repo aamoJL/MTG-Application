@@ -1,33 +1,42 @@
-﻿using MTGApplication.Features.CardSearch.Services;
-using MTGApplication.Features.CardSearch.ViewModels;
+﻿using Microsoft.UI.Xaml;
 using MTGApplication.General.Models;
+using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.ViewModels;
-using System;
+using MTGApplication.General.Views.Dialogs.Controls;
+using MTGApplication.General.Views.DragAndDrop;
+using MTGApplication.General.Views.Styles.Templates;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardSearch.UseCases;
 
-public partial class CardSearchViewModelCommands
+public class ShowCardPrints(XamlRoot xamlRoot, ListViewDragAndDrop<MTGCard> cardDragAndDrop) : UseCaseFunc<Confirmation<IEnumerable<MTGCard>>, Task>
 {
-  public class ShowCardPrints(CardSearchViewModel viewmodel) : AsyncCommand<MTGCard>
+  public XamlRoot XamlRoot { get; } = xamlRoot;
+  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = cardDragAndDrop;
+
+  public override async Task Execute(Confirmation<IEnumerable<MTGCard>> msg)
   {
-    public CardSearchViewModel Viewmodel { get; } = viewmodel;
+    Application.Current.Resources.TryGetValue(nameof(MTGPrintGridViewItemTemplate), out var template);
 
-    protected override async Task Execute(MTGCard? card)
+    await DialogService.ShowAsync(XamlRoot, new GridViewDialog(
+      title: msg.Title,
+      items: [.. msg.Data],
+      itemTemplate: (DataTemplate)template)
     {
-      try
+      PrimaryButtonText = string.Empty,
+      CloseButtonText = "Close",
+      CanDragItems = true,
+      CanSelectItems = false,
+      OnItemDragStarting = (args) =>
       {
-        ArgumentNullException.ThrowIfNull(card);
-
-        var prints = (await Viewmodel.Worker.DoWork(Viewmodel.Importer.ImportWithUri(pageUri: card.Info.PrintSearchUri, paperOnly: true, fetchAll: true))).Found.Select(x => new MTGCard(x.Info));
-
-        await Viewmodel.Confirmers.ShowCardPrintsConfirmer.Confirm(CardSearchConfirmers.GetShowCardPrintsConfirmation(prints));
+        if (args.Items.FirstOrDefault() is MTGCard card)
+        {
+          CardDragAndDrop.OnInternalDragStarting(new CardMoveArgs(card), out var operation);
+          args.Data.RequestedOperation = operation;
+        }
       }
-      catch (Exception e)
-      {
-        Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
-      }
-    }
+    });
   }
 }

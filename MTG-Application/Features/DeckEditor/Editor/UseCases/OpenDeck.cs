@@ -25,7 +25,7 @@ public partial class DeckEditorViewModelCommands
       if (!CanExecute(loadName))
         return;
 
-      if ((await new ConfirmUnsavedChanges(Viewmodel).ExecuteAsync(new())).Cancelled)
+      if ((await new ConfirmUnsavedChanges(Viewmodel).Execute(new())).Cancelled)
         return;
 
       loadName ??= await Viewmodel.Confirmers.LoadDeckConfirmer

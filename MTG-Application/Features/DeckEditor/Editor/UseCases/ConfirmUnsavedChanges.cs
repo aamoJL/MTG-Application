@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
 
-public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : AsyncUseCase<ISavable.ConfirmArgs, ISavable.ConfirmArgs>
+public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : UseCaseFunc<ISavable.ConfirmArgs, Task<ISavable.ConfirmArgs>>
 {
   /// <returns><paramref name="param"/></returns>
-  public override async Task<ISavable.ConfirmArgs> ExecuteAsync(ISavable.ConfirmArgs param)
+  public override async Task<ISavable.ConfirmArgs> Execute(ISavable.ConfirmArgs param)
   {
     if (param.Cancelled || !viewmodel.HasUnsavedChanges)
       return param;
 
-    switch (await viewmodel.Confirmers.SaveUnsavedChangesConfirmer
-      .Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(viewmodel.Name)))
+    switch (await viewmodel.Confirmers.SaveUnsavedChangesConfirmer.Confirm(DeckEditorConfirmers.GetSaveUnsavedChangesConfirmation(viewmodel.Name)))
     {
       case ConfirmationResult.Yes:
         await viewmodel.SaveDeckCommand.ExecuteAsync(null);
@@ -24,7 +23,7 @@ public class ConfirmUnsavedChanges(DeckEditorViewModel viewmodel) : AsyncUseCase
       case ConfirmationResult.Cancel:
         param!.Cancelled = true;
         break;
-    };
+    }
 
     return param;
   }

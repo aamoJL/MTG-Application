@@ -52,6 +52,10 @@ public partial class Worker : INotifyPropertyChanged
     });
   }
 
+  public async Task DoWork(Func<Task> task) => await DoWork(task());
+
+  public async Task<T> DoWork<T>(Func<Task<T>> task) => await DoWork(task());
+
   private async Task Run(Task task, Action<Task> onFinished)
   {
     try

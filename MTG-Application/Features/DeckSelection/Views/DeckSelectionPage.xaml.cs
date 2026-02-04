@@ -15,7 +15,7 @@ public sealed partial class DeckSelectionPage : Page
     Loaded += MTGDeckSelectorView_Loaded;
   }
 
-  public DeckSelectionViewModel ViewModel { get; set; } = new(new DeckDTORepository(new()), App.MTGCardImporter);
+  public DeckSelectionPageViewModel ViewModel { get; set; } = new(new DeckDTORepository(new()), App.MTGCardImporter);
 
   private void MTGDeckSelectorView_Loaded(object sender, RoutedEventArgs e)
   {

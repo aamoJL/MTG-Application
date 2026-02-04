@@ -14,7 +14,7 @@ using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplication.Features.DeckSelection.UseCases;
 
-public class GetDeckSelectionDecks(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer) : UseCase<Task<IEnumerable<DeckSelectionDeck>>>
+public class GetDeckSelectionDecks(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer) : UseCaseFunc<Task<IEnumerable<DeckSelectionDeck>>>
 {
   /// <exception cref="Exception"></exception>
   public override async Task<IEnumerable<DeckSelectionDeck>> Execute()

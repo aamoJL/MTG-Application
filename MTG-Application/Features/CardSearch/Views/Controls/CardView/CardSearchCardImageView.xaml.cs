@@ -3,6 +3,7 @@ using MTGApplication.General.Views.DragAndDrop;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MTGApplication.Features.CardSearch.Views.Controls.CardView;
+
 public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
 {
   public CardSearchCardImageView()
@@ -18,7 +19,7 @@ public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
     AcceptMove = false,
   };
 
-  private async void ImageView_DragStarting(Microsoft.UI.Xaml.UIElement sender, Microsoft.UI.Xaml.DragStartingEventArgs args)
+  private async void ImageView_DragStarting(Microsoft.UI.Xaml.UIElement _, Microsoft.UI.Xaml.DragStartingEventArgs args)
   {
     var deferral = args.GetDeferral();
 

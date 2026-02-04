@@ -6,9 +6,16 @@ public static partial class NotificationService
 {
   public class Notifier
   {
+    // TODO: remove
+    [Obsolete("Use event")]
     public Action<Notification>? OnNotify { private get; set; }
+    public event EventHandler<Notification>? OnNotifyEvent;
 
     public void Notify(Notification notification)
-      => OnNotify?.Invoke(notification);
+    {
+      // TODO: remove
+      OnNotify?.Invoke(notification);
+      OnNotifyEvent?.Invoke(this, notification);
+    }
   }
 }
