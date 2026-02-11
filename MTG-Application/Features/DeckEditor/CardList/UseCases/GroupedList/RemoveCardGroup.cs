@@ -28,10 +28,10 @@ public partial class GroupedCardListViewModelCommands
             ReversibleAction = new ReversibleRemoveGroupAction(Viewmodel)
           });
 
-        new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group removed successfully."));
+        new ShowNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group removed successfully."));
       }
       else
-        new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, "Group was not found."));
+        new ShowNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, "Group was not found."));
     }
   }
 }

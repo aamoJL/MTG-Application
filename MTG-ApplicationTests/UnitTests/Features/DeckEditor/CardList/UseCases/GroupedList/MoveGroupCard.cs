@@ -20,7 +20,7 @@ public partial class MoveGroupCard
       {
         card
       };
-      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
       viewmodel.BeginMoveFromCommand.Execute(card);
       viewmodel.ExecuteMoveCommand.Execute(card);
@@ -45,8 +45,8 @@ public partial class MoveGroupCard
       {
         card
       };
-      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
-      var target = new CardGroupViewModel("second", source, new TestMTGCardImporter());
+      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
+      var target = new CardGroupViewModel("second", source, new TestMTGCardImporter_old());
 
       viewmodel.BeginMoveFromCommand.Execute(card);
       await target.BeginMoveToCommand.ExecuteAsync(card);
@@ -73,7 +73,7 @@ public partial class MoveGroupCard
       var groupKey = "first";
       var card = DeckEditorMTGCardMocker.CreateMTGCardModel(group: string.Empty);
       var source = new ObservableCollection<DeckEditorMTGCard>();
-      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
       await viewmodel.BeginMoveToCommand.ExecuteAsync(card);
       viewmodel.ExecuteMoveCommand.Execute(card);
@@ -98,8 +98,8 @@ public partial class MoveGroupCard
       {
         card
       };
-      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
-      var origin = new CardGroupViewModel(string.Empty, source, new TestMTGCardImporter());
+      var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
+      var origin = new CardGroupViewModel(string.Empty, source, new TestMTGCardImporter_old());
 
       origin.BeginMoveFromCommand.Execute(card);
       await viewmodel.BeginMoveToCommand.ExecuteAsync(card);

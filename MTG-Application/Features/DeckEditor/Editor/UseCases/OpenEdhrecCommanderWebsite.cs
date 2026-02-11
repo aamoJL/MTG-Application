@@ -19,7 +19,7 @@ public partial class DeckEditorViewModelCommands
       if (!CanExecute())
         return;
 
-      await NetworkService.OpenUri(
+      await NetworkIO.OpenUri(
         EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Commander.Card!, Viewmodel.Partner.Card));
     }
   }

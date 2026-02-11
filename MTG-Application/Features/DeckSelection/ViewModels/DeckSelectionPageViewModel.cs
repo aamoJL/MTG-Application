@@ -43,7 +43,7 @@ public partial class DeckSelectionPageViewModel(IRepository<MTGCardDeckDTO> repo
     }
     catch (Exception e)
     {
-      new SendNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 }

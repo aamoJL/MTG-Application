@@ -45,8 +45,8 @@
 
           <!--#region Deck View Tabs -->
           <TabView
-            x:Name="DeckBuilderTabView"
             TabItemsSource="{x:Bind DeckBuilderTabs, Mode=OneTime}"
+            SelectedItem="{x:Bind SelectedTab, Mode=TwoWay}"
             IsAddTabButtonVisible="True" 
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" 

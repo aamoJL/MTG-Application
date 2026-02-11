@@ -16,7 +16,7 @@ public class ImportCardsToGroup
   public async Task Import_ConfirmationShown()
   {
     var confirmer = new TestConfirmer<string, string>();
-    var viewmodel = new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter())
+    var viewmodel = new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -39,7 +39,7 @@ public class ImportCardsToGroup
         new(MTGCardInfoMocker.MockInfo(name: "2")),
         new(MTGCardInfoMocker.MockInfo(name: "3")),
     };
-    var viewmodel = new CardGroupViewModel("Key", source, new TestMTGCardImporter()
+    var viewmodel = new CardGroupViewModel("Key", source, new TestMTGCardImporter_old()
     {
       ExpectedCards = cards
     })
@@ -81,7 +81,7 @@ public class ImportCardsToGroup
         new(MTGCardInfoMocker.MockInfo(name: "3")),
     };
     var source = new ObservableCollection<DeckEditorMTGCard>(cards.Select(x => new DeckEditorMTGCard(x.Info)));
-    var viewmodel = new CardGroupViewModel("Key", source, new TestMTGCardImporter()
+    var viewmodel = new CardGroupViewModel("Key", source, new TestMTGCardImporter_old()
     {
       ExpectedCards = cards
     })
@@ -108,7 +108,7 @@ public class ImportCardsToGroup
         new(MTGCardInfoMocker.MockInfo(name: "3")),
     };
     var source = new ObservableCollection<DeckEditorMTGCard>(cards.Select(x => new DeckEditorMTGCard(x.Info)));
-    var viewmodel = new CardGroupViewModel("Key", source, new TestMTGCardImporter()
+    var viewmodel = new CardGroupViewModel("Key", source, new TestMTGCardImporter_old()
     {
       ExpectedCards = cards
     })

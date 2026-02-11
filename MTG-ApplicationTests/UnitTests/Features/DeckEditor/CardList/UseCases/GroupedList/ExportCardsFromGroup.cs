@@ -9,7 +9,7 @@ public class ExportCardsFromGroup
   [TestMethod]
   public async Task Export()
   {
-    var viewmodel = new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter_old());
 
     await Assert.ThrowsAsync<NotImplementedException>(() => viewmodel.ExportCardsCommand.ExecuteAsync(null));
   }

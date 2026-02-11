@@ -23,7 +23,7 @@ public class ClearCardGroup
         DeckEditorMTGCardMocker.CreateMTGCardModel(name: "6", group: string.Empty),
     };
     var source = new ObservableCollection<DeckEditorMTGCard>(cards);
-    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
     viewmodel.ClearCommand.Execute(null);
 

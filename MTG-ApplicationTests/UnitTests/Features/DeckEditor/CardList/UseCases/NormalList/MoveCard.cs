@@ -13,7 +13,7 @@ public class MoveCard
   [TestMethod(DisplayName = "Command should be added to the combined command when starting the move to action")]
   public void Move_BeginTo_CommandAdded()
   {
-    var target = new CardListViewModel([], new TestMTGCardImporter());
+    var target = new CardListViewModel([], new TestMTGCardImporter_old());
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
     target.BeginMoveToCommand.Execute(card);
@@ -24,7 +24,7 @@ public class MoveCard
   [TestMethod(DisplayName = "Command should be added to the combined command when starting the move from action")]
   public void Move_From_CommandAdded()
   {
-    var origin = new CardListViewModel([], new TestMTGCardImporter());
+    var origin = new CardListViewModel([], new TestMTGCardImporter_old());
 
     origin.BeginMoveFromCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
@@ -34,8 +34,8 @@ public class MoveCard
   [TestMethod(DisplayName = "Card should change list when executing move command")]
   public void Move_Execute_CardChangesList()
   {
-    var target = new CardListViewModel([], new TestMTGCardImporter());
-    var origin = new CardListViewModel([], new TestMTGCardImporter());
+    var target = new CardListViewModel([], new TestMTGCardImporter_old());
+    var origin = new CardListViewModel([], new TestMTGCardImporter_old());
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
     origin.AddCardCommand.Execute(card);
@@ -55,8 +55,8 @@ public class MoveCard
   public void Move_Undo_CardInOriginalList()
   {
     var undoStack = new ReversibleCommandStack();
-    var target = new CardListViewModel([], new TestMTGCardImporter()) { UndoStack = undoStack };
-    var origin = new CardListViewModel([], new TestMTGCardImporter()) { UndoStack = undoStack };
+    var target = new CardListViewModel([], new TestMTGCardImporter_old()) { UndoStack = undoStack };
+    var origin = new CardListViewModel([], new TestMTGCardImporter_old()) { UndoStack = undoStack };
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
     origin.AddCardCommand.Execute(card);
@@ -74,8 +74,8 @@ public class MoveCard
   public void Move_Redo_CardChangedListAgain()
   {
     var undoStack = new ReversibleCommandStack();
-    var target = new CardListViewModel([], new TestMTGCardImporter()) { UndoStack = undoStack };
-    var origin = new CardListViewModel([], new TestMTGCardImporter()) { UndoStack = undoStack };
+    var target = new CardListViewModel([], new TestMTGCardImporter_old()) { UndoStack = undoStack };
+    var origin = new CardListViewModel([], new TestMTGCardImporter_old()) { UndoStack = undoStack };
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
 
     origin.AddCardCommand.Execute(card);
@@ -95,7 +95,7 @@ public class MoveCard
   {
     var confirmer = new TestConfirmer<ConfirmationResult>();
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-    var target = new CardListViewModel([card], new TestMTGCardImporter())
+    var target = new CardListViewModel([card], new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -114,7 +114,7 @@ public class MoveCard
     var undoStack = new ReversibleCommandStack();
     var originCard = DeckEditorMTGCardMocker.CreateMTGCardModel();
     var targetCard = DeckEditorMTGCardMocker.CreateMTGCardModel();
-    var target = new CardListViewModel([targetCard], new TestMTGCardImporter())
+    var target = new CardListViewModel([targetCard], new TestMTGCardImporter_old())
     {
       UndoStack = undoStack,
       Confirmers = new()
@@ -125,7 +125,7 @@ public class MoveCard
         }
       }
     };
-    var origin = new CardListViewModel([originCard], new TestMTGCardImporter())
+    var origin = new CardListViewModel([originCard], new TestMTGCardImporter_old())
     {
       UndoStack = undoStack,
     };

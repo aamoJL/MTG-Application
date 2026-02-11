@@ -9,9 +9,13 @@ public class NotificationException(Notification notification) : UnitTestAssertEx
 
 public class TestNotifier : Notifier
 {
-  public TestNotifier() => OnNotify = (msg) => Notified = msg;
+  public TestNotifier()
+    => OnNotifyEvent += TestNotifier_OnNotifyEvent;
 
   public Notification Notified { get; private set; } = null;
+
+  private void TestNotifier_OnNotifyEvent(object sender, Notification e)
+    => Notified = e;
 }
 
 public static class NotificationAssert

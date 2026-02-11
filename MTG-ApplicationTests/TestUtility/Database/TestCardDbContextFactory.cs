@@ -4,7 +4,7 @@ using MTGApplication.General.Services.Databases.Context;
 
 namespace MTGApplicationTests.TestUtility.Database;
 
-public class TestCardDbContextFactory : CardDbContextFactory, IDisposable
+public partial class TestCardDbContextFactory : CardDbContextFactory, IDisposable
 {
   private const string _inMemoryConnectionString = "Filename=:memory:";
   private readonly SqliteConnection _connection;

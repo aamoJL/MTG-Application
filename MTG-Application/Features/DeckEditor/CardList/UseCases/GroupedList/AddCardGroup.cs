@@ -27,7 +27,7 @@ public partial class GroupedCardListViewModelCommands
 
       if (Viewmodel.Groups.Any(x => x.Key == key))
       {
-        new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, "Group already exists."));
+        new ShowNotification(Viewmodel.Notifier).Execute(new(NotificationType.Error, "Group already exists."));
         return;
       }
 
@@ -37,7 +37,7 @@ public partial class GroupedCardListViewModelCommands
           ReversibleAction = new ReversibleAddGroupAction(Viewmodel)
         });
 
-      new SendNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group added successfully."));
+      new ShowNotification(Viewmodel.Notifier).Execute(new(NotificationType.Success, "Group added successfully."));
     }
   }
 }

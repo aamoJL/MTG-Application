@@ -2,8 +2,8 @@
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.CardList.Services.Factories;
 using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Collections;
@@ -44,7 +44,7 @@ public partial class GroupedCardListViewModel : IGroupedCardListViewModel
   public IMTGCardImporter Importer { get; }
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
-  public ClipboardService ClipboardService { get; init; } = new();
+  public ClipboardExporter ClipboardService { get; init; } = new();
   public GroupedCardListConfirmers Confirmers { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public Worker Worker { get; init; } = new();

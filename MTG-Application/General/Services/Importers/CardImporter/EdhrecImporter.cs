@@ -61,7 +61,7 @@ public partial class EdhrecImporter
 
     try
     {
-      var json = JsonNode.Parse(await NetworkService.GetJsonFromUrl(uri));
+      var json = JsonNode.Parse(await NetworkIO.GetJsonFromUrl(uri));
       var themeNodes = json?["panels"]?["taglinks"]?.AsArray();
 
       /*
@@ -93,7 +93,7 @@ public partial class EdhrecImporter
   {
     try
     {
-      var jsonString = await NetworkService.GetJsonFromUrl(uri);
+      var jsonString = await NetworkIO.GetJsonFromUrl(uri);
       var json = JsonNode.Parse(jsonString);
 
       var names = json?["container"]?["json_dict"]?["cardlists"]?.AsArray()

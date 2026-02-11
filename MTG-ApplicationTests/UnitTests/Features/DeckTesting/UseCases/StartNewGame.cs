@@ -8,7 +8,7 @@ namespace MTGApplicationTests.UnitTests.Features.DeckTesting.UseCases;
 [TestClass]
 public class StartNewGame
 {
-  private readonly TestMTGCardImporter _importer = new();
+  private readonly TestMTGCardImporter_old _importer = new();
 
   [TestMethod]
   public void StartNewGame_LibraryResetMinusSeven()

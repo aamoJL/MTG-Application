@@ -1,6 +1,6 @@
 ﻿using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.General.Services.IOServices;
+using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -13,12 +13,12 @@ namespace MTGApplication.Features.DeckEditor.CardList.UseCases;
 
 public partial class CardListViewModelCommands
 {
-  public class ExportCards(IList<DeckEditorMTGCard> cards, CardListConfirmers confirmers, Notifier notifier, ClipboardService clipboardService) : AsyncCommand<string>
+  public class ExportCards(IList<DeckEditorMTGCard> cards, CardListConfirmers confirmers, Notifier notifier, IExporter<string> exporter) : AsyncCommand<string>
   {
     public IList<DeckEditorMTGCard> Cards { get; } = cards;
     private CardListConfirmers Confirmers { get; } = confirmers;
     private Notifier Notifier { get; } = notifier;
-    private ClipboardService ClipboardService { get; } = clipboardService;
+    private IExporter<string> Exporter { get; } = exporter;
 
     protected override bool CanExecute(string? byProperty) => byProperty is "Id" or "Name";
 
@@ -31,9 +31,9 @@ public partial class CardListViewModelCommands
         is not string response || string.IsNullOrEmpty(response))
         return;
 
-      ClipboardService.CopyToClipboard(response);
+      await Exporter.Export(response);
 
-      new SendNotification(Notifier).Execute(ClipboardService.CopiedNotification);
+      new ShowNotification(Notifier).Execute(Exporter.SuccessNotification);
     }
 
     private static string GetExportString(IEnumerable<DeckEditorMTGCard> cards, string byProperty)

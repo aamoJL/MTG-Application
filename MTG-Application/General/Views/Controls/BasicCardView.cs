@@ -17,8 +17,7 @@ namespace MTGApplication.General.Views.Controls;
 public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropertyChanged where TCard : MTGCard
 {
   public static readonly DependencyProperty ModelProperty =
-      DependencyProperty.Register(nameof(Model), typeof(TCard), typeof(BasicCardView<TCard>),
-        new PropertyMetadata(default(TCard), OnModelPropertyChangedCallback));
+      DependencyProperty.Register(nameof(Model), typeof(TCard), typeof(BasicCardView<TCard>), new PropertyMetadata(default(TCard), OnModelPropertyChangedCallback));
 
   public static readonly DependencyProperty HoverPreviewEnabledProperty =
       DependencyProperty.Register(nameof(HoverPreviewEnabled), typeof(bool), typeof(BasicCardView<TCard>), new PropertyMetadata(false));
@@ -98,7 +97,7 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
   protected async Task OpenAPIWebsite()
   {
     if (CanExecuteOpenAPIWebsite())
-      await NetworkService.OpenUri(Model!.Info.APIWebsiteUri);
+      await NetworkIO.OpenUri(Model!.Info.APIWebsiteUri);
   }
 
   /// <summary>
@@ -108,7 +107,7 @@ public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropert
   protected async Task OpenCardmarketWebsite()
   {
     if (CanExecuteOpenCardmarketWebsite())
-      await NetworkService.OpenUri(Model!.Info.CardMarketUri);
+      await NetworkIO.OpenUri(Model!.Info.CardMarketUri);
   }
 
   protected bool CanExecuteSwitchFaceImage() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);

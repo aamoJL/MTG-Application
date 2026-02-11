@@ -12,25 +12,25 @@ public class RemoveCardGroup
   [TestMethod]
   public void RemoveCardGroup_EmptyOrNullKey_CanNotExecute()
   {
-    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter());
+    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter_old());
 
-    Assert.IsFalse(viewmodel.RemoveGroupCommand.CanExecute(new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter())));
+    Assert.IsFalse(viewmodel.RemoveGroupCommand.CanExecute(new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter_old())));
     Assert.IsFalse(viewmodel.RemoveGroupCommand.CanExecute(null));
   }
 
   [TestMethod]
   public void RemoveCardGroup_HasKey_CanExecute()
   {
-    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter());
+    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter_old());
 
-    Assert.IsTrue(viewmodel.RemoveGroupCommand.CanExecute(new CardGroupViewModel("key", [], new TestMTGCardImporter())));
+    Assert.IsTrue(viewmodel.RemoveGroupCommand.CanExecute(new CardGroupViewModel("key", [], new TestMTGCardImporter_old())));
   }
 
   [TestMethod]
   public void RemoveCardGroup_Exists_GroupRemoved()
   {
     var name = "New Group";
-    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter());
+    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter_old());
 
     var group = new GroupedCardListCardGroupFactory(viewmodel).CreateCardGroup(name);
     viewmodel.Groups.Add(group);
@@ -46,7 +46,7 @@ public class RemoveCardGroup
   {
     var name = "New Group";
     var notifier = new TestNotifier();
-    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter())
+    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter_old())
     {
       Notifier = notifier
     };
@@ -63,13 +63,13 @@ public class RemoveCardGroup
   public void RemoveCardGroup_DoesNotExist_NoChanges()
   {
     var name = "New Group";
-    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter());
+    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter_old());
 
     viewmodel.Groups.Add(new GroupedCardListCardGroupFactory(viewmodel).CreateCardGroup(name));
 
     var initCount = viewmodel.Groups.Count;
 
-    viewmodel.RemoveGroupCommand.Execute(new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter()));
+    viewmodel.RemoveGroupCommand.Execute(new CardGroupViewModel(string.Empty, [], new TestMTGCardImporter_old()));
 
     Assert.HasCount(initCount, viewmodel.Groups);
     Assert.IsTrue(viewmodel.Groups.Any(x => x.Key == name));
@@ -79,12 +79,12 @@ public class RemoveCardGroup
   public void RemoveCardGroup_DoesNotExist_ErrorNotificationSent()
   {
     var notifier = new TestNotifier();
-    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter())
+    var viewmodel = new GroupedCardListViewModel([], importer: new TestMTGCardImporter_old())
     {
       Notifier = notifier
     };
 
-    viewmodel.RemoveGroupCommand.Execute(new CardGroupViewModel("key", [], new TestMTGCardImporter()));
+    viewmodel.RemoveGroupCommand.Execute(new CardGroupViewModel("key", [], new TestMTGCardImporter_old()));
 
     NotificationAssert.NotificationSent(MTGApplication.General.Services.NotificationService.NotificationService.NotificationType.Error, notifier);
   }
@@ -99,7 +99,7 @@ public class RemoveCardGroup
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: name),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "C", group: name),
       ],
-      importer: new TestMTGCardImporter());
+      importer: new TestMTGCardImporter_old());
 
     var initCount = viewmodel.Cards.Count;
 

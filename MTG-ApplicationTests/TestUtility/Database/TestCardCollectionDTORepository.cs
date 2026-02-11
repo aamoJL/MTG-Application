@@ -7,7 +7,7 @@ namespace MTGApplicationTests.TestUtility.Database;
 
 public partial class TestCardCollectionDTORepository : CardCollectionDTORepository, IDisposable
 {
-  public TestCardCollectionDTORepository(TestCardDbContextFactory ctxFactory) : base(ctxFactory)
+  public TestCardCollectionDTORepository() : base(new TestCardDbContextFactory())
     => AppConfig.Initialize();
 
   public bool AddFailure { get; set; }
@@ -15,6 +15,8 @@ public partial class TestCardCollectionDTORepository : CardCollectionDTOReposito
   public bool ExistsFailure { get; set; }
   public bool GetFailure { get; set; }
   public bool DeleteFailure { get; set; }
+
+  public TestCardDbContextFactory ContextFactory => DbContextFactory as TestCardDbContextFactory;
 
   public void Dispose() => GC.SuppressFinalize(this);
 

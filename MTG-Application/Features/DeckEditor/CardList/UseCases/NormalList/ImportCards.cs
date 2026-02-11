@@ -104,13 +104,13 @@ public partial class CardListViewModelCommands
         if (result.Source == CardImportResult.ImportSource.External)
         {
           if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
-            new SendNotification(Notifier).Execute(new(NotificationType.Success,
+            new ShowNotification(Notifier).Execute(new(NotificationType.Success,
               $"{importCount} cards imported successfully." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
           else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
-            new SendNotification(Notifier).Execute(new(NotificationType.Warning,
+            new ShowNotification(Notifier).Execute(new(NotificationType.Warning,
               $"{importCount} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
           else if (result.NotFoundCount > 0) // None found
-            new SendNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
+            new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
         }
       }
       catch (Exception e)

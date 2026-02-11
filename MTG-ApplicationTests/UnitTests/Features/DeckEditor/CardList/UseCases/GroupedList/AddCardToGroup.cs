@@ -14,7 +14,7 @@ public class AddCardToGroup
   {
     var groupKey = "first";
     var source = new ObservableCollection<DeckEditorMTGCard>();
-    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel(group: groupKey);
     await viewmodel.AddCardCommand.ExecuteAsync(card);
@@ -35,7 +35,7 @@ public class AddCardToGroup
   {
     var groupKey = "first";
     var source = new ObservableCollection<DeckEditorMTGCard>();
-    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel(group: "second");
     await viewmodel.AddCardCommand.ExecuteAsync(card);
@@ -60,7 +60,7 @@ public class AddCardToGroup
     var groupKey = "first";
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel(group: groupKey);
     var source = new ObservableCollection<DeckEditorMTGCard>() { card };
-    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
     var copy = DeckEditorMTGCardMocker.CreateMTGCardModel(group: groupKey);
     await viewmodel.AddCardCommand.ExecuteAsync(copy);
@@ -91,7 +91,7 @@ public class AddCardToGroup
       {
         card
       };
-    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
     await viewmodel.AddCardCommand.ExecuteAsync(card);
 

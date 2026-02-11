@@ -25,7 +25,7 @@ public class DeckEditorMTGDeckToDTOConverterTests
       DeckCards = new(cards),
     };
 
-    var result = await new DTOToDeckEditorDeckConverter(new TestMTGCardImporter()
+    var result = await new DTOToDeckEditorDeckConverter(new TestMTGCardImporter_old()
     {
       ExpectedCards = cards.Select(x => new CardImportResult.Card(x.Info, x.Count)).ToArray()
     }).Convert(DeckEditorMTGDeckToDTOConverter.Convert(deck));

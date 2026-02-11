@@ -55,7 +55,7 @@ public partial class ScryfallAPI : IMTGCardImporter
     {
       try
       {
-        if (await NetworkService.GetJsonFromUrl(currentPage) is not string data || string.IsNullOrEmpty(data))
+        if (await NetworkIO.GetJsonFromUrl(currentPage) is not string data || string.IsNullOrEmpty(data))
           break;
 
         if (JsonNode.Parse(data) is not JsonNode rootNode)
@@ -286,7 +286,7 @@ public partial class ScryfallAPI : IMTGCardImporter
       try
       {
         // Fetch and covert the JSON to card objects
-        if (JsonNode.Parse(await NetworkService.PostJsonFromUrl(COLLECTION_URL, identifiersJson)) is JsonNode rootNode)
+        if (JsonNode.Parse(await NetworkIO.PostJsonFromUrl(COLLECTION_URL, identifiersJson)) is JsonNode rootNode)
         {
           notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
 

@@ -10,7 +10,7 @@ public class Clear
   [TestMethod]
   public void Clear_Empty_CanNotExecute()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
 
     Assert.IsFalse(viewmodel.ClearCommand.CanExecute(null));
   }
@@ -18,7 +18,7 @@ public class Clear
   [TestMethod]
   public void Clear_HasCards_CanExecute()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
     viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
     Assert.IsTrue(viewmodel.ClearCommand.CanExecute(null));
@@ -27,7 +27,7 @@ public class Clear
   [TestMethod]
   public void Clear_Execute_HasNoCards()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
     viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
     Assert.IsTrue(viewmodel.Cards.Any());
@@ -40,7 +40,7 @@ public class Clear
   [TestMethod]
   public void Clear_Undo_HasCards()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
     viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
     viewmodel.ClearCommand.Execute(null);
@@ -52,7 +52,7 @@ public class Clear
   [TestMethod]
   public void Clear_Redo_HasNoCardsAgain()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
     viewmodel.Cards.Add(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
     viewmodel.ClearCommand.Execute(null);

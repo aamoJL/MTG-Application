@@ -6,12 +6,10 @@ public class CardCollectionRepositoryDependencies
 {
   public CardCollectionRepositoryDependencies()
   {
-    ContextFactory = new();
-    Repository = new TestCardCollectionDTORepository(ContextFactory);
-    Importer = new TestMTGCardImporter();
+    Repository = new TestCardCollectionDTORepository();
+    Importer = new TestMTGCardImporter_old();
   }
 
-  public TestCardDbContextFactory ContextFactory { get; }
   public TestCardCollectionDTORepository Repository { get; }
-  public TestMTGCardImporter Importer { get; }
+  public TestMTGCardImporter_old Importer { get; }
 }

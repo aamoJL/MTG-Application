@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.CardSearch.Models;
 using MTGApplication.Features.CardSearch.UseCases;
 using MTGApplication.Features.CardSearch.Views;
 using MTGApplication.General.Models;
@@ -24,7 +23,11 @@ public partial class CardSearchPageViewModel(IMTGCardImporter importer) : ViewMo
   public IMTGCardImporter Importer { get; } = importer;
   public Notifier Notifier { get; init; } = new();
   public Worker Worker { get; set; } = new();
-  public IncrementalLoadingCardCollection<MTGCard> Cards { get; } = new(new CardSearchIncrementalCardSource(importer));
+  public IncrementalLoadingCardCollection<MTGCard> Cards
+  {
+    get => field ??= Cards = CreateQueryCollection([], string.Empty, 0);
+    private set => SetProperty(ref field, value);
+  }
 
   public Func<string, CancellationToken, Task<CardImportResult>> FetchCardsWithQuery_UC { private get => field ??= new FetchCards(Importer).Execute; set; }
   public Func<MTGCardInfo, Task<IEnumerable<MTGCard>>> FetchCardPrints_UC { private get => field ??= new FetchCardPrints(Importer).Execute; set; }
@@ -42,7 +45,7 @@ public partial class CardSearchPageViewModel(IMTGCardImporter importer) : ViewMo
     }
     catch (Exception e)
     {
-      new SendNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
 
@@ -57,16 +60,32 @@ public partial class CardSearchPageViewModel(IMTGCardImporter importer) : ViewMo
 
         token.ThrowIfCancellationRequested();
 
-        await Cards.SetCollection(
-            cards: [.. result.Found.Select(x => new MTGCard(x.Info))],
-            nextPageUri: result.NextPageUri,
-            totalCount: result.TotalCount);
+        Cards = CreateQueryCollection(
+          cards: [.. result.Found.Select(x => new MTGCard(x.Info))],
+          nextPage: result.NextPageUri,
+          totalCount: result.TotalCount);
       });
     }
     catch (OperationCanceledException) { }
     catch (Exception e)
     {
-      new SendNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
     }
+  }
+
+  private IncrementalLoadingCardCollection<MTGCard> CreateQueryCollection(IEnumerable<MTGCard> cards, string nextPage, int totalCount)
+  {
+    var source = new IncrementalCardSource<MTGCard>()
+    {
+      Cards = [.. cards],
+      NextPage = nextPage,
+      Converter = (item) => new(item.Info),
+      OnError = (e) => { new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message)); },
+    };
+
+    return new(source)
+    {
+      TotalCardCount = totalCount,
+    };
   }
 }

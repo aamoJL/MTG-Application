@@ -41,10 +41,10 @@ public partial class DeckEditorViewModelCommands
         Viewmodel.Name = saveName;
         Viewmodel.HasUnsavedChanges = false;
 
-        new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.SaveSuccess);
+        new ShowNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.SaveSuccess);
       }
       else
-        new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.SaveError);
+        new ShowNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.SaveError);
     }
 
     private async Task<bool> SaveDTO(MTGCardDeckDTO dto, string saveName, bool overrideOld = false)

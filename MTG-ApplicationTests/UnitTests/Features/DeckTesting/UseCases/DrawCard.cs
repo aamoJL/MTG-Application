@@ -9,7 +9,7 @@ namespace MTGApplicationTests.UnitTests.Features.DeckTesting.UseCases;
 [TestClass]
 public class DrawCard : ICanExecuteCommandTests
 {
-  private readonly TestMTGCardImporter _importer = new();
+  private readonly TestMTGCardImporter_old _importer = new();
 
   [TestMethod(DisplayName = "Should not be able to execute if the library has no cards")]
   public void InvalidState_CanNotExecute()

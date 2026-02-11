@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System.Collections.ObjectModel;
@@ -18,7 +18,7 @@ public partial class CardListViewModel(ObservableCollection<DeckEditorMTGCard> c
   public IMTGCardImporter Importer { get; } = importer;
 
   public ReversibleCommandStack UndoStack { get; init; } = new();
-  public ClipboardService ClipboardService { get; init; } = new();
+  public ClipboardExporter ClipboardService { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
   public Worker Worker { get; init; } = new();
   public CardListConfirmers Confirmers { get; init; } = new();

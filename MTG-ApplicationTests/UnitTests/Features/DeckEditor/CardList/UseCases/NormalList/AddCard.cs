@@ -12,7 +12,7 @@ public class AddCard
   [TestMethod]
   public void AddCard_CardAdded()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
 
     viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
@@ -22,7 +22,7 @@ public class AddCard
   [TestMethod]
   public void AddCard_Undo_CardRemoved()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
 
     viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
@@ -36,7 +36,7 @@ public class AddCard
   [TestMethod]
   public void AddCard_Redo_CardAddedAgain()
   {
-    var viewmodel = new CardListViewModel([], new TestMTGCardImporter());
+    var viewmodel = new CardListViewModel([], new TestMTGCardImporter_old());
 
     viewmodel.AddCardCommand.Execute(DeckEditorMTGCardMocker.CreateMTGCardModel());
 
@@ -56,7 +56,7 @@ public class AddCard
   {
     var confirmer = new TestConfirmer<ConfirmationResult>();
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel();
-    var viewmodel = new CardListViewModel([card], new TestMTGCardImporter())
+    var viewmodel = new CardListViewModel([card], new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {

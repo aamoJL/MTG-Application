@@ -9,9 +9,6 @@ public partial class Worker : INotifyPropertyChanged
 {
   public Worker() => Tasks.CollectionChanged += Tasks_CollectionChanged;
 
-  private void Tasks_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    => PropertyChanged?.Invoke(this, new(nameof(IsBusy)));
-
   public bool IsBusy => Tasks.Count != 0;
 
   protected ObservableCollection<Task> Tasks { get; set; } = [];
@@ -87,4 +84,7 @@ public partial class Worker : INotifyPropertyChanged
       onFinished(task);
     }
   }
+
+  private void Tasks_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    => PropertyChanged?.Invoke(this, new(nameof(IsBusy)));
 }

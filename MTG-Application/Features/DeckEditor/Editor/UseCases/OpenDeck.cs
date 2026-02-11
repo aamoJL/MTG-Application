@@ -46,12 +46,12 @@ public partial class DeckEditorViewModelCommands
           Viewmodel.UndoStack.Clear();
           Viewmodel.HasUnsavedChanges = false;
 
-          new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.LoadSuccess);
+          new ShowNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.LoadSuccess);
         }
       }
       catch
       {
-        new SendNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.LoadError);
+        new ShowNotification(Viewmodel.Notifier).Execute(DeckEditorNotifications.LoadError);
       }
     }
   }

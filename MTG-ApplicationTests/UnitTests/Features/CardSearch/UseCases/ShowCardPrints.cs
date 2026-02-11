@@ -12,7 +12,7 @@ public class ShowCardPrints
   {
     var confirmed = false;
     var card = DeckEditorMTGCardMocker.CreateMTGCardModel(setCode: "abc");
-    var viewmodel = new CardSearchPageViewModel(new TestMTGCardImporter())
+    var viewmodel = new CardSearchPageViewModel(new TestMTGCardImporter_old())
     {
       ConfirmCardPrints_UC = async (_) => { confirmed = true; },
     };

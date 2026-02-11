@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.WinUI.Collections;
-using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,28 +8,34 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public abstract class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(), IIncrementalSource<TCard> where TCard : MTGCard
+public class IncrementalCardSource<TCard>() : object(), IIncrementalSource<TCard>
 {
   public List<TCard> Cards { get; set; } = [];
   public string NextPage { get; set; } = string.Empty;
-  public int PageSize => importer.PageSize;
+  public Func<CardImportResult.Card, TCard> Converter { private get => field ?? throw new NotImplementedException(); init; }
+
+  public Func<string, Task<CardImportResult>> FetchWithUri { private get => field ?? throw new NotImplementedException(); init; }
+  public Action<Exception> OnError { get; set; } = (_) => { };
 
   public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
   {
-    if (!string.IsNullOrEmpty(NextPage))
+    var startIndex = pageIndex * pageSize;
+
+    if (!string.IsNullOrEmpty(NextPage) && startIndex >= Cards.Count)
     {
       // Load next page
       try
       {
-        var result = await importer.ImportWithUri(NextPage);
+        var result = await FetchWithUri(NextPage);
         NextPage = result.NextPageUri;
-        Cards.AddRange(result.Found.Select(ConvertToCardType));
+        Cards.AddRange(result.Found.Select(Converter));
       }
-      catch { }
+      catch (Exception e)
+      {
+        OnError?.Invoke(e);
+      }
     }
 
-    return (from card in Cards select card).Skip(pageIndex * pageSize).Take(pageSize);
+    return (from card in Cards select card).Skip(startIndex).Take(pageSize);
   }
-
-  protected abstract TCard ConvertToCardType(CardImportResult.Card card);
 }

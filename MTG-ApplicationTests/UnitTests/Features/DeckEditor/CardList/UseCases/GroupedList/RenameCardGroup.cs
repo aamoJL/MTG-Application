@@ -15,7 +15,7 @@ public class RenameCardGroup
     var key = "key";
     var viewmodel = new GroupedCardListViewModel(
       cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: key)],
-      importer: new TestMTGCardImporter());
+      importer: new TestMTGCardImporter_old());
 
     Assert.IsTrue(viewmodel.RenameGroupCommand.CanExecute(
       viewmodel.Groups.First(x => x.Key == key)));
@@ -27,7 +27,7 @@ public class RenameCardGroup
     var key = string.Empty;
     var viewmodel = new GroupedCardListViewModel(
       cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: key)],
-      importer: new TestMTGCardImporter());
+      importer: new TestMTGCardImporter_old());
 
     Assert.IsFalse(viewmodel.RenameGroupCommand.CanExecute(
       viewmodel.Groups.First(x => x.Key == key)));
@@ -39,7 +39,7 @@ public class RenameCardGroup
     var confirmer = new TestConfirmer<string, string>();
     var viewmodel = new GroupedCardListViewModel(
       cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: "key")],
-      importer: new TestMTGCardImporter())
+      importer: new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -64,7 +64,7 @@ public class RenameCardGroup
         DeckEditorMTGCardMocker.CreateMTGCardModel(name: "1", group: oldValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "2", group: newValue ),
       ],
-      importer: new TestMTGCardImporter())
+      importer: new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -86,7 +86,7 @@ public class RenameCardGroup
 
     var viewmodel = new GroupedCardListViewModel(
       cards: [DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B", group: oldValue)],
-      importer: new TestMTGCardImporter())
+      importer: new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -123,7 +123,7 @@ public class RenameCardGroup
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "4", group: string.Empty ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "5", group: string.Empty ),
       ],
-      importer: new TestMTGCardImporter())
+      importer: new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -161,7 +161,7 @@ public class RenameCardGroup
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "4", group: string.Empty ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "5", group: string.Empty ),
       ],
-      importer: new TestMTGCardImporter())
+      importer: new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {
@@ -199,7 +199,7 @@ public class RenameCardGroup
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "4", group: newValue ),
           DeckEditorMTGCardMocker.CreateMTGCardModel(name: "5", group: newValue ),
       ],
-      importer: new TestMTGCardImporter())
+      importer: new TestMTGCardImporter_old())
     {
       Confirmers = new()
       {

@@ -7,5 +7,5 @@ public interface ISavable
     public bool Cancelled = false;
   }
 
-  public bool HasUnsavedChanges { get; set; }
+  public bool HasUnsavedChanges { get; }
 }

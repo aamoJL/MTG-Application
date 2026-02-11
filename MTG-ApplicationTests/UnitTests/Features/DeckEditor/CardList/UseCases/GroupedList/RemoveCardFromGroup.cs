@@ -18,7 +18,7 @@ public class RemoveCardFromGroup
       {
         card
       };
-    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter());
+    var viewmodel = new CardGroupViewModel(groupKey, source, new TestMTGCardImporter_old());
 
     viewmodel.RemoveCardCommand.Execute(card);
 

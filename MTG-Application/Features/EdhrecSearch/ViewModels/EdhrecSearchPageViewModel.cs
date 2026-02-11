@@ -44,7 +44,7 @@ public partial class EdhrecSearchPageViewModel(IMTGCardImporter importer) : Card
     catch (OperationCanceledException) { }
     catch (Exception e)
     {
-      new SendNotification(Notifier).Execute(new(NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(Notifier).Execute(new(NotificationService.NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 }

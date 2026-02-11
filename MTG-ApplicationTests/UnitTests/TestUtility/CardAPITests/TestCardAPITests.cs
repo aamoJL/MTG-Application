@@ -11,7 +11,7 @@ public class TestCardAPITests
   [TestMethod]
   public async Task FetchCardsTest()
   {
-    var api = new TestMTGCardImporter();
+    var api = new TestMTGCardImporter_old();
     Assert.IsEmpty((await api.ImportCardsWithSearchQuery(string.Empty)).Found);
     Assert.IsEmpty((await api.ImportCardsWithSearchQuery("params")).Found);
 
@@ -26,7 +26,7 @@ public class TestCardAPITests
   [TestMethod]
   public async Task FetchFromDTOsTest()
   {
-    var api = new TestMTGCardImporter();
+    var api = new TestMTGCardImporter_old();
     var expectedCards = new List<CardImportResult.Card>
     {
       new(MTGCardInfoMocker.MockInfo()),
@@ -52,7 +52,7 @@ public class TestCardAPITests
   [TestMethod]
   public async Task FetchFromStringTest()
   {
-    var api = new TestMTGCardImporter();
+    var api = new TestMTGCardImporter_old();
     var cards = new List<CardImportResult.Card>
     {
       new(MTGCardInfoMocker.MockInfo()),

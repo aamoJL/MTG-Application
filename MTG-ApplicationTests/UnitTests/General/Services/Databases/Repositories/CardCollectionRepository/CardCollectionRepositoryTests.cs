@@ -14,7 +14,7 @@ public class CardCollectionRepositoryTests
     new("List 2", "Query 2", [MTGCardDTOMocker.Mock("Card")]),
   ]);
 
-  public CardCollectionRepositoryTests() => _dependencies.ContextFactory.Populate(_savedCollection);
+  public CardCollectionRepositoryTests() => _dependencies.Repository.ContextFactory.Populate(_savedCollection);
 
   [TestMethod]
   public async Task Add()

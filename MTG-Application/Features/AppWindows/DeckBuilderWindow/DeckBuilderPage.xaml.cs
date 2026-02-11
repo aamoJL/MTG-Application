@@ -24,6 +24,18 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
   }
 
   public ObservableCollection<DeckBuilderTabItem> DeckBuilderTabs = [];
+  public DeckBuilderTabItem? SelectedTab
+  {
+    get;
+    set
+    {
+      if (field != value)
+      {
+        field = value;
+        PropertyChanged?.Invoke(this, new(nameof(SelectedTab)));
+      }
+    }
+  }
   public bool IsSearchPaneOpen
   {
     get => field;
@@ -36,8 +48,8 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
-  public Action OpenCardCollectionWindow_UC { private get => field ??= new OpenMTGCardCollectionWindow().Execute; set; }
-  public Action<ElementTheme> ChangeAppTheme_UC { private get => field ??= new ChangeWindowTheme().Execute; set; }
+  private Action OpenCardCollectionWindow_UC { get; } = new OpenMTGCardCollectionWindow().Execute;
+  private Action<ElementTheme> ChangeAppTheme_UC { get; } = new ChangeWindowTheme().Execute;
 
   [RelayCommand]
   private void SwitchSearchPanel() => IsSearchPaneOpen = !IsSearchPaneOpen;
@@ -50,7 +62,7 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
       OnClose = RemoveTab
     };
     DeckBuilderTabs.Add(newTab);
-    DeckBuilderTabView.SelectedItem = newTab;
+    SelectedTab = newTab;
   }
 
   [RelayCommand]

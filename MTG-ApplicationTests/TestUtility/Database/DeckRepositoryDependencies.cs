@@ -8,10 +8,10 @@ public class DeckRepositoryDependencies
   {
     ContextFactory = new();
     Repository = new TestDeckDTORepository(ContextFactory);
-    Importer = new TestMTGCardImporter();
+    Importer = new TestMTGCardImporter_old();
   }
 
   public TestCardDbContextFactory ContextFactory { get; }
   public TestDeckDTORepository Repository { get; }
-  public TestMTGCardImporter Importer { get; }
+  public TestMTGCardImporter_old Importer { get; }
 }

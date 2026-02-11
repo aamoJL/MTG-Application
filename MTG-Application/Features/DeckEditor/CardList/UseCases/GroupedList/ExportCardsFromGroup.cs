@@ -1,7 +1,7 @@
 ﻿using MTGApplication.Features.DeckEditor.CardList.Services;
 using MTGApplication.Features.DeckEditor.Editor.Models;
 using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.Services.IOServices;
+using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -30,7 +30,7 @@ public partial class CardGroupViewModelCommands
 
       Viewmodel.ClipboardService.CopyToClipboard(response);
 
-      new SendNotification(Viewmodel.Notifier).Execute(ClipboardService.CopiedNotification);
+      new ShowNotification(Viewmodel.Notifier).Execute(new ClipboardExporter().SuccessNotification);
     }
 
     private static string GetExportString(IEnumerable<DeckEditorMTGCard> cards, string byProperty)
