@@ -7,6 +7,8 @@ namespace MTGApplication.General.Models;
 /// <inheritdoc cref="Stack{T}"/>
 public class ObservableStack<T> : Stack<T>, INotifyCollectionChanged
 {
+  public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
   /// <inheritdoc cref="Stack{T}.Clear"/>
   public new void Clear()
   {
@@ -45,6 +47,4 @@ public class ObservableStack<T> : Stack<T>, INotifyCollectionChanged
 
     return false;
   }
-
-  public event NotifyCollectionChangedEventHandler? CollectionChanged;
 }

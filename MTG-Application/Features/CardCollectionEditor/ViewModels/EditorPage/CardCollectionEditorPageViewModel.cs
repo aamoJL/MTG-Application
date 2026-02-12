@@ -65,7 +65,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
   [RelayCommand]
   private async Task NewCollection()
   {
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     if (CollectionViewModel.SaveStatus.HasUnsavedChanges)
       await CollectionViewModel.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
@@ -81,7 +81,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
   {
     try
     {
-      var saveArgs = new ISavable.ConfirmArgs();
+      var saveArgs = new SaveStatus.ConfirmArgs();
 
       await CollectionViewModel.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 

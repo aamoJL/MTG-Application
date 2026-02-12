@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.ViewModels;
 
-public class IncrementalCardSource<TCard>() : object(), IIncrementalSource<TCard>
+public class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(), IIncrementalSource<TCard>
 {
   public List<TCard> Cards { get; set; } = [];
+  public IMTGCardImporter Importer { get; } = importer;
   public string NextPage { get; set; } = string.Empty;
-  public Func<CardImportResult.Card, TCard> Converter { private get => field ?? throw new NotImplementedException(); init; }
+  public required Func<CardImportResult.Card, TCard> Converter { private get; init; }
 
-  public Func<string, Task<CardImportResult>> FetchWithUri { private get => field ?? throw new NotImplementedException(); init; }
   public Action<Exception> OnError { get; set; } = (_) => { };
 
   public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ public class IncrementalCardSource<TCard>() : object(), IIncrementalSource<TCard
       // Load next page
       try
       {
-        var result = await FetchWithUri(NextPage);
+        var result = await Importer.ImportWithUri(NextPage);
         NextPage = result.NextPageUri;
         Cards.AddRange(result.Found.Select(Converter));
       }

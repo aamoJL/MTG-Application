@@ -30,7 +30,7 @@ public sealed partial class DeckBuilderTabItem : TabViewItem
   public TabHeader? TabHeader => Header as TabHeader;
   public Action<DeckBuilderTabItem>? OnClose;
 
-  public async Task RequestClose(ISavable.ConfirmArgs args)
+  public async Task RequestClose(SaveStatus.ConfirmArgs args)
   {
     // TODO: change to datacontext
     if (ContentFrame.Content is DeckEditorPage editorPage && editorPage.ViewModel.HasUnsavedChanges)
@@ -74,7 +74,7 @@ public sealed partial class DeckBuilderTabItem : TabViewItem
 
   private async void DeckBuilderTabItem_CloseRequested(TabViewItem sender, TabViewTabCloseRequestedEventArgs args)
   {
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await RequestClose(saveArgs);
 

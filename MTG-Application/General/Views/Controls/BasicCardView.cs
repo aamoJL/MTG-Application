@@ -14,6 +14,7 @@ using Windows.Graphics.Imaging;
 
 namespace MTGApplication.General.Views.Controls;
 
+[Obsolete]
 public abstract partial class BasicCardView<TCard> : UserControl, INotifyPropertyChanged where TCard : MTGCard
 {
   public static readonly DependencyProperty ModelProperty =

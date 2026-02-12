@@ -22,7 +22,6 @@ public sealed partial class CardCollectionEditorPage : Page
 
     WindowClosing.Closing += WindowClosing_Closing;
     WindowClosing.Closed += WindowClosing_Closed;
-    Notifier.OnNotifyEvent += Notifier_OnNotifyEvent;
   }
 
   public CardCollectionEditorPageViewModel ViewModel
@@ -89,7 +88,17 @@ public sealed partial class CardCollectionEditorPage : Page
     };
   }
 
-  private Notifier Notifier { get; } = new();
+  private Notifier Notifier
+  {
+    get => field ??= Notifier = new();
+    set
+    {
+      if (field == value) return;
+      field?.OnNotifyEvent -= Notifier_OnNotifyEvent;
+      field = value;
+      field?.OnNotifyEvent += Notifier_OnNotifyEvent;
+    }
+  }
 
   [RelayCommand]
   private void SwitchWindowTheme() => new ChangeWindowTheme().Execute(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark);

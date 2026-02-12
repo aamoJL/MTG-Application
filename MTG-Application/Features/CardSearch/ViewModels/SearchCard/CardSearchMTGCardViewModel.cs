@@ -1,6 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.CardCollectionEditor.UseCases;
+﻿using CommunityToolkit.Mvvm.Input;
+using MTGApplication.Features.CardSearch.UseCases;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
@@ -10,38 +9,34 @@ using System;
 using System.Threading.Tasks;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionCard;
+namespace MTGApplication.Features.CardSearch.ViewModels.SearchCard;
 
-public partial class CardCollectionMTGCardViewModel(MTGCard card) : ViewModelBase
+public partial class CardSearchMTGCardViewModel(MTGCard card) : ViewModelBase
 {
-  public Worker Worker { private get; init; } = new();
+  public Worker Worker { get; init; } = new();
   public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
   public Notifier Notifier { private get; init; } = new();
   public INetworkService NetworkService { private get; init; } = new NetworkService();
-  public CollectionCardConfirmers Confirmers { private get; init; } = new();
+  public SearchCardConfirmers Confirmers { private get; init; } = new();
 
   public MTGCardInfo Info => Model.Info;
-  [ObservableProperty] public partial bool IsOwned { get; set; }
 
   private MTGCard Model { get; } = card;
 
   [RelayCommand]
-  private async Task ShowPrints()
+  private async Task ShowCardPrints()
   {
     try
     {
-      var prints = (await Worker.DoWork(new FetchCardPrints(Importer).Execute(Model.Info.PrintSearchUri)));
+      var prints = await Worker.DoWork(new FetchCardPrints(Importer).Execute(Model.Info.PrintSearchUri));
 
-      await Confirmers.ConfirmCardPrints(Confirmations.GetShowCardPrintsConfirmation(prints));
+      await Confirmers.ConfirmCardPrints(new(Title: "Card prints", Message: string.Empty, Data: prints));
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
-
-  [RelayCommand]
-  private void SwitchOwnership() => IsOwned = !IsOwned;
 
   [RelayCommand]
   private async Task OpenAPIWebsite()

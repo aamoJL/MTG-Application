@@ -65,7 +65,7 @@ public partial class CardCollectionViewModel : ViewModelBase
   }
 
   [RelayCommand]
-  private async Task SaveUnsavedChanges(ISavable.ConfirmArgs? args)
+  private async Task SaveUnsavedChanges(SaveStatus.ConfirmArgs? args)
   {
     if (args == null || args.Cancelled || !SaveStatus.HasUnsavedChanges) return;
 

@@ -17,11 +17,11 @@
     <Grid.ContextFlyout>
       <CommandBarFlyout Placement="RightEdgeAlignedTop" AreOpenCloseAnimationsEnabled="False">
         <CommandBarFlyout.SecondaryCommands>
-          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" Label="Flip"/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind SwitchFaceImageCommand, Mode=OneWay}" Icon="sync" Label="Flip"/>
           <AppBarSeparator />
           <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind ShowPrintsCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
-          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.Info.ImporterName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}"/>
-          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" Label="{x:Bind Model.Info.ImporterName, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}"/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" Label="Cardmarket" ToolTipService.ToolTip="Cardmarket"/>
         </CommandBarFlyout.SecondaryCommands>
       </CommandBarFlyout>
     </Grid.ContextFlyout>

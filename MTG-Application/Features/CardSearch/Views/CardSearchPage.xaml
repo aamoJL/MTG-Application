@@ -14,7 +14,7 @@
   xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels" 
   xmlns:controls1="using:MTGApplication.General.Views.Controls" 
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity" 
-  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" xmlns:searchcard="using:MTGApplication.Features.CardSearch.ViewModels.SearchCard"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -51,12 +51,13 @@
         <TextBlock
           HorizontalAlignment="Right"
           VerticalAlignment="Bottom"
-          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1} cards', ViewModel.Cards.Collection.Count, ViewModel.Cards.TotalCardCount), Mode=OneWay}">
+          Text="{x:Bind sys:String.Format(x:Null, '{0} / {1} cards', ViewModel.QueryCards.Collection.Count, ViewModel.QueryCards.TotalCardCount), Mode=OneWay}">
         </TextBlock>
       </Grid>
       <!--#endregion-->
 
       <Grid controls:DockPanel.Dock="Top">
+        
         <!--#region Grid View -->
         <ScrollViewer
           x:Name="SearchCardsImageView"
@@ -66,8 +67,7 @@
           Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
           GettingFocus="SearchCardsImageView_GettingFocus">
           <ItemsRepeater
-            DataContext="{x:Bind ViewModel, Mode=OneTime}"
-            ItemsSource="{Binding Cards.Collection, Mode=OneWay}"
+            ItemsSource="{x:Bind ViewModel.QueryCards.Collection, Mode=OneWay}"
             Style="{StaticResource GridItemsRepeaterStyle}">
             <ItemsRepeater.Layout>
               <UniformGridLayout
@@ -77,16 +77,16 @@
             <interactivity:Interaction.Behaviors>
               <bindinghelpers:ItemsRepeaterIncrementalLoading 
                 LoadingOffset="200"
-                LoadCount="{x:Bind ViewModel.Importer.PageSize, Mode=OneTime}"
-                IsLoadingMore="{x:Bind ViewModel.Cards.Collection.IsLoading, Mode=OneWay}"/>
+                IsLoadingMore="{x:Bind ViewModel.QueryCards.Collection.IsLoading, Mode=OneWay}"/>
             </interactivity:Interaction.Behaviors>
             <ItemsRepeater.ItemTemplate>
-              <DataTemplate x:DataType="models:MTGCard">
+              <DataTemplate x:DataType="searchcard:CardSearchMTGCardViewModel">
                 <customControls:CardSearchCardImageView
-                  d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
-                  Model="{x:Bind Mode=OneWay}"
-                  CanDrag="True"
-                  ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"/>
+                  Model="{x:Bind Mode=OneTime}"
+                  ShowPrintsCommand="{x:Bind ShowCardPrintsCommand, Mode=OneTime}"
+                  OpenAPIWebsiteCommand="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}"
+                  OpenCardmarketWebsiteCommand="{x:Bind OpenCardMarketWebsiteCommand, Mode=OneTime}"
+                  CanDrag="True"/>
               </DataTemplate>
             </ItemsRepeater.ItemTemplate>
           </ItemsRepeater>
@@ -97,25 +97,24 @@
         <ListView
           x:Name="SearchCardsTextView"
           x:Load="{x:Bind CardTextViewCheck.IsChecked, Mode=OneWay}"
-          DataContext="{x:Bind ViewModel}"
-          ItemsSource="{x:Bind ViewModel.Cards.Collection, Mode=OneWay}"
+          ItemsSource="{x:Bind ViewModel.QueryCards.Collection, Mode=OneWay}"
           Style="{ThemeResource MTGListViewStyle}"
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"
           DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}">
           <ListView.ItemTemplate>
-            <DataTemplate x:DataType="models:MTGCard">
+            <DataTemplate x:DataType="searchcard:CardSearchMTGCardViewModel">
               <customControls:CardSearchCardTextView 
-                d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
-                DataContext="{Binding ElementName=SearchCardsTextView, Path=DataContext, Mode=OneTime}"
                 Model="{x:Bind Mode=OneWay}"
-                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
-                HoverPreviewEnabled="True"/>
+                ShowPrintsCommand="{x:Bind ShowCardPrintsCommand, Mode=OneTime}"
+                OpenAPIWebsiteCommand="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}"
+                OpenCardmarketWebsiteCommand="{x:Bind OpenCardMarketWebsiteCommand, Mode=OneTime}"/>
             </DataTemplate>
           </ListView.ItemTemplate>
         </ListView>
         <!--#endregion-->
+        
       </Grid>
 
     </controls:DockPanel>

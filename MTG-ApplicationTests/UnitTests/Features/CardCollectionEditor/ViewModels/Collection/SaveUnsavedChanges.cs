@@ -16,7 +16,7 @@ public class SaveUnsavedChanges
     var factory = new TestCollectionViewModelFactory();
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -34,7 +34,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs() { Cancelled = true };
+    var saveArgs = new SaveStatus.ConfirmArgs() { Cancelled = true };
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -71,7 +71,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -93,7 +93,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -116,7 +116,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -144,7 +144,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -172,7 +172,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -194,7 +194,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
@@ -216,7 +216,7 @@ public class SaveUnsavedChanges
     };
     var vm = factory.Build(model);
 
-    var saveArgs = new ISavable.ConfirmArgs();
+    var saveArgs = new SaveStatus.ConfirmArgs();
 
     await vm.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 

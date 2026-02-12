@@ -1,6 +1,7 @@
 ﻿using MTGApplication.General.Services.API.CardAPI;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.ScryfallAPITests;
+
 public partial class ScryfallAPITests
 {
   [TestClass]
@@ -35,8 +36,7 @@ public partial class ScryfallAPITests
 
       var result = await api.ImportWithUri(uri);
 
-      Assert.HasCount(api.PageSize, result.Found);
-      Assert.IsGreaterThan(api.PageSize, result.TotalCount);
+      Assert.IsGreaterThan(result.Found.Length, result.TotalCount);
       Assert.AreNotEqual(string.Empty, result.NextPageUri);
     }
 
@@ -49,7 +49,6 @@ public partial class ScryfallAPITests
       var result = await api.ImportWithUri(uri, fetchAll: true);
 
       Assert.HasCount(result.TotalCount, result.Found);
-      Assert.IsGreaterThan(api.PageSize, result.TotalCount);
       Assert.AreEqual(string.Empty, result.NextPageUri);
     }
   }

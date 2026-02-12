@@ -226,7 +226,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
     {
       await Worker.DoWork(async () =>
       {
-        if ((await new FetchCardsWithQuery(Importer).Execute(Query)) is not CardImportResult fetchResult)
+        if ((await new FetchCardsWithQuery(Importer) { Pagination = true }.Execute(Query)) is not CardImportResult fetchResult)
           return;
 
         QueryCards = CreateQueryCollection(
@@ -243,7 +243,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
 
   private IncrementalLoadingCardCollection<CardCollectionMTGCardViewModel> CreateQueryCollection(IEnumerable<CardCollectionMTGCardViewModel> cards, string nextPage, int totalCount)
   {
-    var source = new IncrementalCardSource<CardCollectionMTGCardViewModel>()
+    var source = new IncrementalCardSource<CardCollectionMTGCardViewModel>(Importer)
     {
       Cards = [.. cards],
       NextPage = nextPage,

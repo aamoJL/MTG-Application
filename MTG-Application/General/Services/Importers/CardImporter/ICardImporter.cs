@@ -13,11 +13,6 @@ public partial interface ICardImporter
   public string Name { get; }
 
   /// <summary>
-  /// How many cards the API returns in one query
-  /// </summary>
-  public int PageSize { get; }
-
-  /// <summary>
   /// Fetch cards from the API using API search query
   /// </summary>
   public Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true);

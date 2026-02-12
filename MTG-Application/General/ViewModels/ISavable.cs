@@ -1,11 +1,10 @@
-﻿namespace MTGApplication.General.ViewModels;
+﻿using System;
 
+namespace MTGApplication.General.ViewModels;
+
+// TODO: remove
+[Obsolete]
 public interface ISavable
 {
-  public class ConfirmArgs()
-  {
-    public bool Cancelled = false;
-  }
-
   public bool HasUnsavedChanges { get; }
 }

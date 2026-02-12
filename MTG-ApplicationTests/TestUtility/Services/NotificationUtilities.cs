@@ -37,7 +37,7 @@ public static class NotificationAssert
   }
 
   public static void NotificationNotSent(NotificationType type, TestNotifier notifier)
-    => Assert.AreNotEqual(notifier.Notified.NotificationType, type, $"Should not have been {notifier.Notified.NotificationType}");
+    => Assert.AreNotEqual(notifier.Notified?.NotificationType, type, $"Should not have been {notifier.Notified?.NotificationType}");
 
   public static void NotificationNotSent(TestNotifier notifier)
     => Assert.IsNull(notifier.Notified, "Notification should not have been sent");

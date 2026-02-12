@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardSearch.UseCases;
 
-public class FetchCardPrints(IMTGCardImporter importer) : UseCaseFunc<MTGCardInfo, Task<IEnumerable<MTGCard>>>
+public class FetchCardPrints(IMTGCardImporter importer) : UseCaseFunc<string, Task<IEnumerable<MTGCard>>>
 {
   public IMTGCardImporter Importer { get; private set; } = importer;
 
-  public override async Task<IEnumerable<MTGCard>> Execute(MTGCardInfo info)
+  public override async Task<IEnumerable<MTGCard>> Execute(string uri)
   {
-    return (await Importer.ImportWithUri(pageUri: info.PrintSearchUri, paperOnly: true, fetchAll: true))
-        .Found.Select(x => new MTGCard(x.Info));
+    return (await Importer.ImportWithUri(pageUri: uri, paperOnly: true, fetchAll: true)).Found
+      .Select(x => new MTGCard(x.Info));
   }
 }

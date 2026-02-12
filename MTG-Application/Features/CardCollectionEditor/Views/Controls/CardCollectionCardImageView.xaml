@@ -11,10 +11,9 @@
   d:DataContext="{d:DesignInstance Type=localControls:CardCollectionCardImageView}"
   mc:Ignorable="d">
 
-  <StackPanel x:Name="GridViewItem" Background="Transparent" Orientation="Vertical" Padding="5">
+  <StackPanel Background="Transparent" Orientation="Vertical" Padding="5">
     <Grid>
-      <controls:ImageEx 
-        x:Name="GridViewItemImage" 
+      <controls:ImageEx
         Style="{StaticResource PlaceholderImageStyle}" 
         Source="{x:Bind SelectedFaceUri, Mode=OneWay}" 
         Opacity="{x:Bind OwnedToOpacity(Model.IsOwned), Mode=OneWay}"

@@ -32,7 +32,6 @@ public partial class ScryfallAPI : IMTGCardImporter
   private static int MaxFetchIdentifierCount => 75;
 
   public string Name => "Scryfall";
-  public int PageSize => 175;
 
   public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {

@@ -297,7 +297,7 @@ public class SaveDeck : DeckEditorViewModelTestBase, ISaveCommandTests, IWorkerT
       },
     }.MockVM();
 
-    var args = new ISavable.ConfirmArgs();
+    var args = new SaveStatus.ConfirmArgs();
     await viewmodel.SaveDeckCommand.ExecuteAsync(args);
 
     Assert.IsFalse(args.Cancelled);
