@@ -9,9 +9,9 @@
   xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:models="using:MTGApplication.Features.DeckSelection.Models" 
   xmlns:localcontrols="using:MTGApplication.Features.DeckSelection.Views.Controls" 
-  xmlns:viewmodels="using:MTGApplication.Features.DeckSelection.ViewModels" 
+  xmlns:selectionpage="using:MTGApplication.Features.DeckSelection.ViewModels.SelectionPage"
   mc:Ignorable="d"
-  d:DataContext="{d:DesignInstance Type=viewmodels:DeckSelectionPageViewModel}"
+  d:DataContext="{d:DesignInstance Type=selectionpage:DeckSelectionPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid Padding="10 10 10 10">
@@ -27,15 +27,13 @@
         Margin="5 0 5 10"
         FontWeight="SemiBold"
         FontSize="24"
-        Content="+ Add new deck"
         Style="{StaticResource PrimaryButtonStyle}"
-        Command="{x:Bind ViewModel.SelectDeckCommand, Mode=OneWay}" CommandParameter="{x:Null}"/>
-      <GridView 
+        Command="{x:Bind ViewModel.NewDeckCommand, Mode=OneTime}">+ Add new deck</Button>
+      <GridView
         Grid.Row="1"
-        ItemsSource="{x:Bind ViewModel.DeckItems, Mode=OneWay}" 
+        ItemsSource="{x:Bind ViewModel.DeckItems, Mode=OneTime}" 
         IsItemClickEnabled="True"
-        SelectionMode="Single"
-        ui:ListViewExtensions.Command="{x:Bind ViewModel.SelectDeckCommand, Mode=OneWay}">
+        ui:ListViewExtensions.Command="{x:Bind ViewModel.SelectDeckCommand, Mode=OneTime}">
         <GridView.ItemTemplate>
           <DataTemplate x:DataType="models:DeckSelectionDeck">
             <localcontrols:DeckSelectionDeckView />

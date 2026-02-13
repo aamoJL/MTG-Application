@@ -25,7 +25,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NullReferenceException();
+    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
 
     return Result;
   }
@@ -35,7 +35,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NullReferenceException();
+    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
 
     return Result;
   }
@@ -45,7 +45,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NullReferenceException();
+    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
 
     return Result;
   }
@@ -55,7 +55,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NullReferenceException();
+    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
 
     return Result;
   }

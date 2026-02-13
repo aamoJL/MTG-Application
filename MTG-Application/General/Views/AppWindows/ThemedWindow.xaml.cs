@@ -1,8 +1,8 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MTGApplication.General.Services.NotificationService;
 using System;
-using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.General.Views.AppWindows;
 
@@ -23,7 +23,7 @@ public partial class ThemedWindow : Window
 
     Closed += ThemedWindow_Closed;
     AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
-    OnShow += NotificationService_OnShow;
+    NotificationService.OnShow += NotificationService_OnShow;
 
     if (Content is FrameworkElement element)
       element.RequestedTheme = AppConfig.LocalSettings.AppTheme;
@@ -49,7 +49,7 @@ public partial class ThemedWindow : Window
 
   public bool Navigate(Type pageType, object? parameters = null) => MainFrame.Navigate(pageType, parameters);
 
-  private void NotificationService_OnShow(object? sender, Notification e)
+  private void NotificationService_OnShow(object? sender, NotificationService.Notification e)
   {
     if ((sender as FrameworkElement)?.XamlRoot != Content.XamlRoot)
       return;
@@ -59,13 +59,13 @@ public partial class ThemedWindow : Window
       Title = e.Message,
       Severity = e.NotificationType switch
       {
-        NotificationType.Error => InfoBarSeverity.Error,
-        NotificationType.Warning => InfoBarSeverity.Warning,
-        NotificationType.Success => InfoBarSeverity.Success,
+        NotificationService.NotificationType.Error => InfoBarSeverity.Error,
+        NotificationService.NotificationType.Warning => InfoBarSeverity.Warning,
+        NotificationService.NotificationType.Success => InfoBarSeverity.Success,
         _ => InfoBarSeverity.Informational,
       },
       IsIconVisible = false,
-      Duration = TimeSpan.FromMilliseconds(NotificationDuration),
+      Duration = TimeSpan.FromMilliseconds(NotificationService.NotificationDuration),
     });
   }
 
@@ -99,7 +99,7 @@ public partial class ThemedWindow : Window
   private void OnClose()
   {
     AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
-    OnShow -= NotificationService_OnShow;
+    NotificationService.OnShow -= NotificationService_OnShow;
     Closed -= ThemedWindow_Closed;
     Content = null;
   }

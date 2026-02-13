@@ -45,9 +45,9 @@ public sealed partial class DeckBuilderTabItem : TabViewItem
     switch (e.Content)
     {
       case DeckSelectionPage selectionPage:
-        selectionPage.ViewModel.SelectDeck_UC = (selectedDeck) =>
+        selectionPage.OnDeckSelected = (selectedDeck) =>
         {
-          ContentFrame.Navigate(typeof(DeckEditorPage), selectedDeck ?? "", new SuppressNavigationTransitionInfo());
+          ContentFrame.Navigate(typeof(DeckEditorPage), selectedDeck.Name, new SuppressNavigationTransitionInfo());
         };
         break;
       case DeckEditorPage deckEditorPage:

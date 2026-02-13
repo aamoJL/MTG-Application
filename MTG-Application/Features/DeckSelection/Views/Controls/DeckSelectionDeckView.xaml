@@ -44,19 +44,19 @@
     </Grid>
     <Grid Margin="15 0 0 15" VerticalAlignment="Bottom" CornerRadius="0 2 2 0">
       <Grid Margin="40 0 0 0" Padding="20 5 10 5" Background="{ThemeResource SystemAccentColorLight3}">
-        <TextBlock Text="{Binding Title, Mode=OneTime}" TextAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        <TextBlock Text="{Binding Name, Mode=OneTime}" TextAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
       </Grid>
       <Grid Background="{ThemeResource SystemAccentColorLight2}" Width="40" HorizontalAlignment="Left" CornerRadius="2 0 0 2">
         <Grid.RenderTransform>
           <SkewTransform AngleX="30"/>
         </Grid.RenderTransform>
         <controls:UniformGrid Margin="5 10 5 10" Rows="1" HorizontalAlignment="Center" Width="30">
-          <Rectangle Fill="#A0F9FAF4" Visibility="{Binding WhiteVisibility, Mode=OneTime}"/>
-          <Rectangle Fill="#A00E68AB" Visibility="{Binding BlueVisibility, Mode=OneTime}"/>
-          <Rectangle Fill="#A0150B00" Visibility="{Binding BlackVisibility, Mode=OneTime}"/>
-          <Rectangle Fill="#A0D3202A" Visibility="{Binding RedVisibility, Mode=OneTime}"/>
-          <Rectangle Fill="#A000733E" Visibility="{Binding GreenVisibility, Mode=OneTime}"/>
-          <Rectangle Fill="DimGray" Visibility="{Binding ColorlessVisibility, Mode=OneTime}"/>
+          <Rectangle Fill="#A0F9FAF4" Visibility="{x:Bind WhiteVisibility, Mode=OneWay}"/>
+          <Rectangle Fill="#A00E68AB" Visibility="{x:Bind BlueVisibility, Mode=OneWay}"/>
+          <Rectangle Fill="#A0150B00" Visibility="{x:Bind BlackVisibility, Mode=OneWay}"/>
+          <Rectangle Fill="#A0D3202A" Visibility="{x:Bind RedVisibility, Mode=OneWay}"/>
+          <Rectangle Fill="#A000733E" Visibility="{x:Bind GreenVisibility, Mode=OneWay}"/>
+          <Rectangle Fill="DimGray" Visibility="{x:Bind ColorlessVisibility, Mode=OneWay}"/>
         </controls:UniformGrid>
       </Grid>
     </Grid>
