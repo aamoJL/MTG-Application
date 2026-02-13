@@ -5,6 +5,7 @@ using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.IntegrationTests.CardImporterTests;
+
 public partial class CardImporterTests
 {
   [TestClass]
@@ -13,7 +14,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_Serialized_CardFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
       var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(), Count: 5);
 
       JsonExtensions.TrySerializeObject(card, out var json);

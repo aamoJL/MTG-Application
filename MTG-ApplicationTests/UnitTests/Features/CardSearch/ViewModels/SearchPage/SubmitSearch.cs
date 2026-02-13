@@ -20,7 +20,6 @@ public class SubmitSearch
     };
     var vm = factory.Build();
 
-    // First, set the collection to have cards
     await vm.SubmitSearchCommand.ExecuteAsync("query");
 
     Assert.AreEqual(1, vm.QueryCards.TotalCardCount);

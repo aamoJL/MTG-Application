@@ -33,6 +33,7 @@ public partial class CardGroupViewModel : ObservableObject, ICardListViewModel
   [ObservableProperty] public partial string Key { get; set; }
   public ObservableCollection<DeckEditorMTGCard> Cards { get; } = [];
   public IMTGCardImporter Importer { get; }
+  public IEdhrecImporter EdhrecImporter { get; internal set; } = new EdhrecImporter();
 
   public GroupedCardListConfirmers Confirmers { get; init; } = new();
   public ReversibleCommandStack UndoStack { get; init; } = new();

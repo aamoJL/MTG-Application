@@ -20,7 +20,7 @@ public partial class CommanderViewModelCommands
       {
         data ??= string.Empty;
 
-        var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
+        var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer, Viewmodel.EdhrecImporter).Import(data));
 
         if (result.Found.Length == 0)
           new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportError);

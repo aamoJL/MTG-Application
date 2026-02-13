@@ -18,7 +18,7 @@ public class Properties
   }
 
   [TestMethod]
-  public void Change_Model_Name()
+  public void Set_Model_Name_PropertyChanged()
   {
     var model = new MTGCardCollection()
     {
@@ -27,7 +27,11 @@ public class Properties
     var vm = new TestCollectionViewModelFactory().Build(model);
 
     var changed = false;
-    vm.PropertyChanged += (_, _) => { changed = true; };
+    vm.PropertyChanged += (_, e) =>
+    {
+      if (e.PropertyName == nameof(vm.CollectionName))
+        changed = true;
+    };
 
     model.Name = "Name";
 
@@ -35,7 +39,7 @@ public class Properties
   }
 
   [TestMethod]
-  public void Change_CollectionName_DeleteCollectionCommandCanExecuteChanged()
+  public void Set_Model_Name_DeleteCollectionCommandCanExecuteChanged()
   {
     var model = new MTGCardCollection()
     {

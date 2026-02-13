@@ -24,6 +24,7 @@ public partial class CardListViewModelCommands
     private CardListConfirmers Confirmers { get; } = confirmers;
     private Worker Worker { get; } = worker;
     private IMTGCardImporter Importer { get; } = importer;
+    private IEdhrecImporter EdhrecImporter { get; set; } = new EdhrecImporter();
     private Notifier Notifier { get; } = notifier;
 
     protected override async Task Execute(string? data)
@@ -37,7 +38,7 @@ public partial class CardListViewModelCommands
         if (data == string.Empty)
           return;
 
-        var result = await Worker.DoWork(new DeckEditorCardImporter(Importer).Import(data));
+        var result = await Worker.DoWork(new DeckEditorCardImporter(Importer, EdhrecImporter).Import(data));
 
         var newCards = new List<DeckEditorMTGCard>();
         var existingCards = new List<(DeckEditorMTGCard Card, int NewCount)>();

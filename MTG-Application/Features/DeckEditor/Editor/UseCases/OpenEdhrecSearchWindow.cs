@@ -1,8 +1,6 @@
 ﻿using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.ViewModels;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.UseCases;
@@ -24,11 +22,11 @@ public partial class DeckEditorViewModelCommands
 
       try
       {
-        var themes = (await EdhrecImporter.GetThemes(
-          commander: Viewmodel.Commander.Card!.Info.Name,
-          partner: Viewmodel.Partner.Card?.Info.Name)).Take(_themeCountLimit).ToArray();
+        //var themes = (await EdhrecImporter.GetThemes(
+        //  commander: Viewmodel.Commander.Card!.Info.Name,
+        //  partner: Viewmodel.Partner.Card?.Info.Name)).Take(_themeCountLimit).ToArray();
 
-        new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow(themes).Activate();
+        //new AppWindows.EdhrecSearchWindow.EdhrecSearchWindow(themes).Activate();
       }
       catch (Exception e)
       {

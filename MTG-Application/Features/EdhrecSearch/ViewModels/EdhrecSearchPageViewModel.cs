@@ -2,7 +2,6 @@
 using MTGApplication.Features.CardSearch.ViewModels.SearchCard;
 using MTGApplication.Features.EdhrecSearch.UseCases;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -10,17 +9,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.EdhrecSearch.ViewModels;
 
 public partial class EdhrecSearchPageViewModel : ViewModelBase
 {
-  public Worker Worker { get; set; } = new();
-  public IMTGCardImporter Importer { get; } = App.MTGCardImporter;
-  public Notifier Notifier { get; init; } = new();
-  public CardSearchMTGCardViewModel.SearchCardConfirmers CardConfirmers { get; init; } = new();
+  public Worker Worker { get; init; } = new();
+  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
+  public IEdhrecImporter EdhrecImporter { private get; init; } = new EdhrecImporter();
+  public Notifier Notifier { private get; init; } = new();
+  public CardSearchMTGCardViewModel.SearchCardConfirmers CardConfirmers { private get; init; } = new();
 
   public CommanderTheme[] CommanderThemes { get; set; } = [];
   public IncrementalLoadingCardCollection<CardSearchMTGCardViewModel> QueryCards
@@ -49,7 +48,7 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
           nextPage: string.Empty,
           totalCount: 0);
 
-        var searchResult = await new FetchCards(Importer).Execute(theme);
+        var searchResult = await new FetchCardsByTheme(Importer, EdhrecImporter).Execute(theme);
 
         token.ThrowIfCancellationRequested();
 
@@ -62,7 +61,7 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
     catch (OperationCanceledException) { }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 

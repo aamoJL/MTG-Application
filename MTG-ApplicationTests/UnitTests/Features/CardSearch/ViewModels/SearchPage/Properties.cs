@@ -12,4 +12,22 @@ public class Properties
     Assert.HasCount(0, vm.QueryCards.Collection);
     Assert.AreEqual(0, vm.QueryCards.TotalCardCount);
   }
+
+  [TestMethod]
+  public async Task Set_QueryCards_PropertyChanged()
+  {
+    var factory = new TestSearchPageViewModelFactory();
+    var vm = factory.Build();
+
+    var changed = false;
+    vm.PropertyChanged += (_, e) =>
+    {
+      if (e.PropertyName == nameof(vm.QueryCards))
+        changed = true;
+    };
+
+    await vm.SubmitSearchCommand.ExecuteAsync("query");
+
+    Assert.IsTrue(changed);
+  }
 }

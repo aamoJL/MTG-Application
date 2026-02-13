@@ -1,6 +1,4 @@
 ﻿using MTGApplication.Features.DeckEditor.ViewModels;
-using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
@@ -19,8 +17,8 @@ public partial class DeckEditorViewModelCommands
       if (!CanExecute())
         return;
 
-      await NetworkIO.OpenUri(
-        EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Commander.Card!, Viewmodel.Partner.Card));
+      //await NetworkIO.OpenUri(
+      //  EdhrecImporter.GetCommanderWebsiteUri(Viewmodel.Commander.Card!, Viewmodel.Partner.Card));
     }
   }
 }

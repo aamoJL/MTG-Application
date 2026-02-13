@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckEditor.Editor.Services;
 
-public class DeckEditorCardImporter(IMTGCardImporter importer)
+public class DeckEditorCardImporter(IMTGCardImporter importer, IEdhrecImporter edhrecImporter)
 {
   /// <exception cref="System.InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
@@ -34,7 +34,7 @@ public class DeckEditorCardImporter(IMTGCardImporter importer)
   {
     try
     {
-      _ = EdhrecImporter.TryParseCardNameFromEdhrecUri(data, out var name);
+      _ = edhrecImporter.TryParseCardNameFromEdhrecUri(data, out var name);
 
       return name != null ? await new FetchCardsWithImportString(importer).Execute(name) : null;
     }

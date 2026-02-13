@@ -2,17 +2,17 @@
 using MTGApplication.General.ViewModels;
 using System;
 using System.Threading.Tasks;
-using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 
 namespace MTGApplication.Features.EdhrecSearch.UseCases;
 
-public class FetchCards(IMTGCardImporter Importer) : UseCaseFunc<CommanderTheme, Task<CardImportResult>>
+public class FetchCardsByTheme(IMTGCardImporter Importer, IEdhrecImporter edhrecImporter) : UseCaseFunc<CommanderTheme, Task<CardImportResult>>
 {
   public IMTGCardImporter Importer { get; } = Importer;
+  public IEdhrecImporter EdhrecImporter { get; } = edhrecImporter;
 
   public override async Task<CardImportResult> Execute(CommanderTheme theme)
   {
-    var query = string.Join(Environment.NewLine, await FetchNewCardNames(theme.Uri));
+    var query = string.Join(Environment.NewLine, await EdhrecImporter.FetchNewCardNames(theme.Uri));
 
     return await Importer.ImportWithString(query);
   }

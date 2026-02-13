@@ -33,7 +33,7 @@ public partial class CardGroupViewModelCommands
         if (data == string.Empty)
           return;
 
-        var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer).Import(data));
+        var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer, Viewmodel.EdhrecImporter).Import(data));
 
         var newCards = new List<DeckEditorMTGCard>();
         var existingCards = new List<(DeckEditorMTGCard Card, int NewCount)>();

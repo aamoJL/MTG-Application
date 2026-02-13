@@ -20,6 +20,7 @@ public partial class CommanderViewModel(IMTGCardImporter importer) : ObservableO
   }
 
   public IMTGCardImporter Importer { get; } = importer;
+  public IEdhrecImporter EdhrecImporter { get; set; } = new EdhrecImporter();
   public CommanderConfirmers Confirmers { get; init; } = new();
   public ReversibleCommandStack UndoStack { get; init; } = new();
   public Notifier Notifier { get; init; } = new();
@@ -31,5 +32,6 @@ public partial class CommanderViewModel(IMTGCardImporter importer) : ObservableO
   [NotNull] public IAsyncRelayCommand<DeckEditorMTGCard>? BeginMoveToCommand => field ??= new MoveCard.BeginMoveTo(this).Command;
   [NotNull] public IRelayCommand? ExecuteMoveCommand => field ??= new MoveCard.ExecuteMove(this).Command;
   [NotNull] public IAsyncRelayCommand<string>? ImportCommanderCommand => field ??= new ImportCommander(this).Command;
+
 }
 

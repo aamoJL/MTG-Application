@@ -4,12 +4,12 @@ using Microsoft.UI.Xaml.Navigation;
 using MTGApplication.Features.EdhrecSearch.ViewModels;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Views.Dialogs.Controls;
 using MTGApplication.General.Views.DragAndDrop;
 using MTGApplication.General.Views.Styles.Templates;
 using System;
 using System.Linq;
-using static MTGApplication.General.Services.Importers.CardImporter.EdhrecImporter;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.EdhrecSearch.Views;
