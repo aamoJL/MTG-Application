@@ -2,7 +2,7 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
-using MTGApplication.Features.AppWindows.DeckBuilderWindow;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow.Views;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Importers.CardImporter;

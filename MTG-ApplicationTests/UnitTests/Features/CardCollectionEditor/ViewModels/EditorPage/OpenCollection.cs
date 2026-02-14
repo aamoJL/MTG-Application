@@ -46,6 +46,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])
@@ -130,6 +131,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])
@@ -156,6 +158,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])
@@ -182,6 +185,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])
@@ -208,6 +212,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])

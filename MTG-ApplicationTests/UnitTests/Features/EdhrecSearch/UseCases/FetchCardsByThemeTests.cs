@@ -18,13 +18,16 @@ public class FetchCardsByThemeTests
       new(MTGCardInfoMocker.MockInfo()),
       new(MTGCardInfoMocker.MockInfo()),
     };
-    var result = await new FetchCardsByTheme(new TestMTGCardImporter()
+    var importer = new TestMTGCardImporter()
     {
       Result = TestMTGCardImporter.Success(cards)
-    }, new TestEdhrecImporter()
+    };
+    var edhRecImporter = new TestEdhrecImporter()
     {
       CardNames = ["Name"]
-    }).Execute(new("Theme", "Uri"));
+    };
+
+    var result = await new FetchCardsByTheme(importer, edhRecImporter).Execute(new("Theme", "Uri"));
 
     CollectionAssert.AreEqual(cards, result.Found);
   }

@@ -100,8 +100,11 @@ public partial class CardCollectionViewModel : ViewModelBase
 
       var saveName = await Confirmers.ConfirmCollectionSave(Confirmations.GetSaveCollectionConfirmation(oldName));
 
-      if (string.IsNullOrEmpty(saveName))
+      if (saveName == null)
         return;
+
+      if (saveName == string.Empty)
+        throw new InvalidOperationException("Invalid name");
 
       // Override confirmation
       if (saveName != oldName && await new CardCollectionDTOExists(Repository).Execute(saveName))

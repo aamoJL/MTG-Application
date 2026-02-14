@@ -54,6 +54,7 @@ public class DeleteList
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmListDelete = (_) => throw new()

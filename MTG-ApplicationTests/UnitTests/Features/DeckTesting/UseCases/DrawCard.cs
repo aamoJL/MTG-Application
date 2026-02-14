@@ -2,12 +2,11 @@
 using MTGApplication.Features.DeckTesting.ViewModels;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckTesting.UseCases;
 
 [TestClass]
-public class DrawCard : ICanExecuteCommandTests
+public class DrawCard
 {
   private readonly TestMTGCardImporter_old _importer = new();
 

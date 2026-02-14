@@ -19,6 +19,7 @@ public class ExportCards
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmCardExport = async data =>
@@ -92,6 +93,7 @@ public class ExportCards
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmCardExport = async data =>
@@ -117,6 +119,7 @@ public class ExportCards
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmCardExport = async data => await Task.FromResult("Export text")
@@ -139,6 +142,7 @@ public class ExportCards
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmCardExport = async _ => throw new()

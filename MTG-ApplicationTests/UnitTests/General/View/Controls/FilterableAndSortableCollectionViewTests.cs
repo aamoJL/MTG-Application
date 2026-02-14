@@ -150,16 +150,16 @@ public class FilterableAndSortableCollectionViewTests
 
     var expected = new int[] { 1, 2, 3, 4 };
 
-    CollectionAssert.AreEqual(expected, view.View.Select(x => (x as ObservableTestObject).Value).ToArray());
+    CollectionAssert.AreEqual(expected, view.View.Select(x => (x as ObservableTestObject)?.Value).ToArray());
 
     source[1].Value = 5; // was 1
     expected = [2, 3, 4, 5];
 
-    CollectionAssert.AreEqual(expected, view.View.Select(x => (x as ObservableTestObject).Value).ToArray());
+    CollectionAssert.AreEqual(expected, view.View.Select(x => (x as ObservableTestObject)?.Value).ToArray());
 
     source[2].Value = 1; // was 4
     expected = [1, 2, 3, 5];
 
-    CollectionAssert.AreEqual(expected, view.View.Select(x => (x as ObservableTestObject).Value).ToArray());
+    CollectionAssert.AreEqual(expected, view.View.Select(x => (x as ObservableTestObject)?.Value).ToArray());
   }
 }

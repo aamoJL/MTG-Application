@@ -12,7 +12,7 @@ public class FetchCardCollectionTests
   public async Task Fetch_Success_Return_Value()
   {
     var actual = await new FetchCardCollection(
-      repository: new SimpleTestCardCollectionRepository()
+      repository: new TestRepository<MTGCardCollectionDTO>()
       {
         GetResult = async (_) => await Task.FromResult<MTGCardCollectionDTO>(new("Collection", []))
       },
@@ -27,9 +27,9 @@ public class FetchCardCollectionTests
   public async Task Fetch_Failure_Throw_Error()
   {
     await Assert.ThrowsExactlyAsync<KeyNotFoundException>(() => new FetchCardCollection(
-      repository: new SimpleTestCardCollectionRepository()
+      repository: new TestRepository<MTGCardCollectionDTO>()
       {
-        GetResult = async (_) => await Task.FromResult<MTGCardCollectionDTO>(null)
+        GetResult = async (_) => await Task.FromResult<MTGCardCollectionDTO?>(null)
       },
       importer: new TestMTGCardImporter()
       ).Execute("Name"));

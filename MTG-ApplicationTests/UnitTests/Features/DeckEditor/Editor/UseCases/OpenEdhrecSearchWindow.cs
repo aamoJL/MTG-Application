@@ -1,11 +1,10 @@
 ﻿using MTGApplicationTests.TestUtility.Mocker;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.ViewModels;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.UseCases;
 
 [TestClass]
-public class OpenEdhrecSearchWindow : DeckEditorViewModelTestBase, ICanExecuteCommandTests
+public class OpenEdhrecSearchWindow : DeckEditorViewModelTestBase
 {
   [TestMethod(DisplayName = "Should be able to execute if the deck has a commander")]
   public void ValidState_CanExecute()

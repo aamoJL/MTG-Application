@@ -1,7 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace MTGApplication.Features.AppWindows.DeckBuilderWindow.Controls;
+namespace MTGApplication.Features.AppWindows.DeckBuilderWindow.Views.Controls;
+
 public sealed partial class TabHeader : UserControl
 {
   public static readonly DependencyProperty TextProperty =

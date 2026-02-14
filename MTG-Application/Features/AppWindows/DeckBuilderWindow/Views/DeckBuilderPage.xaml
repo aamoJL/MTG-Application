@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-  x:Class="MTGApplication.Features.AppWindows.DeckBuilderWindow.DeckBuilderPage"
+  x:Class="MTGApplication.Features.AppWindows.DeckBuilderWindow.Views.DeckBuilderPage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,6 +9,7 @@
   xmlns:controls="using:CommunityToolkit.WinUI.Controls"
   xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views" 
   xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
+  xmlns:controls1="using:MTGApplication.Features.AppWindows.DeckBuilderWindow.Views.Controls"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=local:DeckBuilderPage}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -47,12 +48,24 @@
           <TabView
             TabItemsSource="{x:Bind DeckBuilderTabs, Mode=OneTime}"
             SelectedItem="{x:Bind SelectedTab, Mode=TwoWay}"
-            IsAddTabButtonVisible="True" 
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" 
+            IsAddTabButtonVisible="True"
             CloseButtonOverlayMode="Auto"
             AddTabButtonCommand="{x:Bind AddDeckBuilderTabCommand, Mode=OneTime}"
-            CanReorderTabs="True"/>
+            CanReorderTabs="True">
+            <TabView.TabItemTemplate>
+              <DataTemplate x:DataType="local:DeckBuilderTabViewModel">
+                <controls1:DeckBuilderTabItem>
+                  <TabViewItem.HeaderTemplate>
+                    <DataTemplate x:DataType="local:DeckBuilderTabViewModel">
+                      <controls1:TabHeader Text="{x:Bind HeaderText, Mode=OneWay}" UnsavedIndicator="{x:Bind SaveStatus.HasUnsavedChanges, Mode=OneWay}"/>
+                    </DataTemplate>
+                  </TabViewItem.HeaderTemplate>
+                </controls1:DeckBuilderTabItem>
+              </DataTemplate>
+            </TabView.TabItemTemplate>
+          </TabView>
           <!--#endregion-->
 
           <!--#region Corner Buttons -->

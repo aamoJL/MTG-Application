@@ -10,7 +10,7 @@ public class SaveCardCollectionTests
   [TestMethod]
   public async Task Save_Success_Returns_True()
   {
-    var result = await new SaveCardCollection(new SimpleTestCardCollectionRepository()
+    var result = await new SaveCardCollection(new TestRepository<MTGCardCollectionDTO>()
     {
       AddResult = (_) => Task.FromResult(true),
       ExistsResult = (_) => Task.FromResult(false),
@@ -22,7 +22,7 @@ public class SaveCardCollectionTests
   [TestMethod]
   public async Task Save_Exists_NoOverride_Returns_False()
   {
-    var result = await new SaveCardCollection(new SimpleTestCardCollectionRepository()
+    var result = await new SaveCardCollection(new TestRepository<MTGCardCollectionDTO>()
     {
       AddResult = (_) => Task.FromResult(true),
       ExistsResult = (_) => Task.FromResult(true),
@@ -34,7 +34,7 @@ public class SaveCardCollectionTests
   [TestMethod]
   public async Task Save_Exists_Override_Returns_True()
   {
-    var result = await new SaveCardCollection(new SimpleTestCardCollectionRepository()
+    var result = await new SaveCardCollection(new TestRepository<MTGCardCollectionDTO>()
     {
       AddResult = (_) => Task.FromResult(true),
       ExistsResult = (_) => Task.FromResult(true),
@@ -46,7 +46,7 @@ public class SaveCardCollectionTests
   [TestMethod]
   public async Task Save_Failed_Returns_False()
   {
-    var result = await new SaveCardCollection(new SimpleTestCardCollectionRepository()
+    var result = await new SaveCardCollection(new TestRepository<MTGCardCollectionDTO>()
     {
       AddResult = (_) => Task.FromResult(false),
       ExistsResult = (_) => Task.FromResult(false),
@@ -59,7 +59,7 @@ public class SaveCardCollectionTests
   public async Task Save_Success_Old_Deleted()
   {
     var deleted = false;
-    var result = await new SaveCardCollection(new SimpleTestCardCollectionRepository()
+    var result = await new SaveCardCollection(new TestRepository<MTGCardCollectionDTO>()
     {
       ExistsResult = async (name) =>
       {
@@ -67,7 +67,7 @@ public class SaveCardCollectionTests
         else return await Task.FromResult(false);
       },
       AddResult = (_) => Task.FromResult(true),
-      GetResult = (_) => Task.FromResult(new MTGCardCollectionDTO("Name", [])),
+      GetResult = (_) => Task.FromResult<MTGCardCollectionDTO?>(new MTGCardCollectionDTO("Name", [])),
       DeleteResult = async (_) =>
       {
         deleted = true;

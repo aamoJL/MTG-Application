@@ -41,7 +41,10 @@ public class DeleteCollection
     {
       Name = string.Empty
     };
-    var factory = new TestCollectionViewModelFactory();
+    var factory = new TestCollectionViewModelFactory()
+    {
+      Notifier = new(),
+    };
     var vm = factory.Build(model);
 
     await vm.DeleteCollectionCommand.ExecuteAsync(null);
@@ -82,6 +85,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(true)
@@ -108,6 +112,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(true)
@@ -134,6 +139,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(false)
@@ -159,6 +165,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(false)

@@ -1,14 +1,12 @@
 ﻿using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.ViewModels;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.UseCases;
 
 [TestClass]
-public class NewDeck : DeckEditorViewModelTestBase,
-  IUnsavedChangesCheckTests, INewCommandTests
+public class NewDeck : DeckEditorViewModelTestBase
 {
   [TestMethod(DisplayName = "Unsaved changes confirmation should be shown when setting new deck if there are unsaved changes")]
   public async Task Execute_HasUnsavedChanges_UnsavedChangesConfirmationShown()

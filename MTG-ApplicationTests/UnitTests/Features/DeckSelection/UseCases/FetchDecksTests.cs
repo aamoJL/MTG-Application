@@ -20,7 +20,7 @@ public class FetchDecksTests
       new("Deck 2"),
       new("Deck 3"),
     };
-    var result = await new FetchDecks(new SimpleTestRepository<MTGCardDeckDTO>()
+    var result = await new FetchDecks(new TestRepository<MTGCardDeckDTO>()
     {
       GetAllResult = () => Task.FromResult<IEnumerable<MTGCardDeckDTO>>(decks)
     }, new TestMTGCardImporter()
@@ -40,7 +40,7 @@ public class FetchDecksTests
       new("Deck 1"),
       new("Deck 2"),
     };
-    var result = await new FetchDecks(new SimpleTestRepository<MTGCardDeckDTO>()
+    var result = await new FetchDecks(new TestRepository<MTGCardDeckDTO>()
     {
       GetAllResult = () => Task.FromResult<IEnumerable<MTGCardDeckDTO>>(decks)
     }, new TestMTGCardImporter()
@@ -65,7 +65,7 @@ public class FetchDecksTests
     {
       new(name: "Deck 1", commander: MTGCardDTOMocker.Mock(name: "Commander", scryfallId: commanderId)),
     };
-    var result = await new FetchDecks(new SimpleTestRepository<MTGCardDeckDTO>()
+    var result = await new FetchDecks(new TestRepository<MTGCardDeckDTO>()
     {
       GetAllResult = () => Task.FromResult<IEnumerable<MTGCardDeckDTO>>(decks)
     }, new TestMTGCardImporter()
@@ -92,7 +92,7 @@ public class FetchDecksTests
         commander: MTGCardDTOMocker.Mock(name: "Commander", scryfallId: commanderId),
         partner: MTGCardDTOMocker.Mock(name: "Partner", scryfallId: partnerId)),
     };
-    var result = await new FetchDecks(new SimpleTestRepository<MTGCardDeckDTO>()
+    var result = await new FetchDecks(new TestRepository<MTGCardDeckDTO>()
     {
       GetAllResult = () => Task.FromResult<IEnumerable<MTGCardDeckDTO>>(decks)
     }, new TestMTGCardImporter()

@@ -11,7 +11,7 @@ public static partial class NotificationService
     public Action<Notification>? OnNotify { private get; set; }
     public event EventHandler<Notification>? OnNotifyEvent;
 
-    public void Notify(Notification notification)
+    public virtual void Notify(Notification notification)
     {
       // TODO: remove
       OnNotify?.Invoke(notification);

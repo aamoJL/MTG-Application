@@ -37,6 +37,7 @@ public class OpenCardMarketWebsite
     var model = new MTGCard(MTGCardInfoMocker.MockInfo());
     var factory = new TestSearchCardViewModelFactory()
     {
+      Notifier = new(),
       NetworkService = new()
       {
         OpenAction = async (uri) => throw new()

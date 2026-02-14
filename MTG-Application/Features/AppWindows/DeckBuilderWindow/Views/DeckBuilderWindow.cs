@@ -1,6 +1,6 @@
 ﻿using MTGApplication.General.Views.AppWindows;
 
-namespace MTGApplication.Features.AppWindows.DeckBuilderWindow;
+namespace MTGApplication.Features.AppWindows.DeckBuilderWindow.Views;
 
 public partial class DeckBuilderWindow : ThemedWindow
 {

@@ -3,14 +3,13 @@ using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using MTGApplicationTests.TestUtility.ViewModel;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.ViewModels;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.UseCases;
 
 [TestClass]
-public class SaveDeck : DeckEditorViewModelTestBase, ISaveCommandTests, IWorkerTests
+public class SaveDeck : DeckEditorViewModelTestBase
 {
   [TestMethod(DisplayName = "Should show save confirmation when saving the deck")]
   public async Task Save_SaveConfirmationShown()

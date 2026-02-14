@@ -120,9 +120,9 @@ public partial class CardCollectionListViewModel : ViewModelBase
 
         Model.SearchQuery = newQuery;
         Model.Name = newName;
-      });
 
-      new ShowNotification(Notifier).Execute(Notifications.EditListSuccess);
+        new ShowNotification(Notifier).Execute(Notifications.EditListSuccess);
+      });
     }
     catch (Exception e)
     {

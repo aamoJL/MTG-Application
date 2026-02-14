@@ -125,11 +125,12 @@ public class SaveUnsavedChanges
   }
 
   [TestMethod]
-  public async Task Save_Save_IsNotDirty()
+  public async Task Save_Success_IsNotDirty()
   {
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -158,6 +159,7 @@ public class SaveUnsavedChanges
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -186,6 +188,7 @@ public class SaveUnsavedChanges
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {
@@ -203,11 +206,12 @@ public class SaveUnsavedChanges
   }
 
   [TestMethod]
-  public async Task IsDirty_Exception_NotificationShown()
+  public async Task Save_Exception_NotificationShown()
   {
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {

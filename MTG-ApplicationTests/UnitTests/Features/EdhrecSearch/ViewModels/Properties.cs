@@ -1,4 +1,6 @@
-﻿namespace MTGApplicationTests.UnitTests.Features.EdhrecSearch.ViewModels;
+﻿using MTGApplicationTests.TestUtility.Importers;
+
+namespace MTGApplicationTests.UnitTests.Features.EdhrecSearch.ViewModels;
 
 [TestClass]
 public class Properties
@@ -34,9 +36,19 @@ public class Properties
   }
 
   [TestMethod]
-  public void Set_QueryCards_PropertyChanged()
+  public async Task Set_QueryCards_PropertyChanged()
   {
-    var factory = new TestEDHSearchPageViewModelFactory();
+    var factory = new TestEDHSearchPageViewModelFactory()
+    {
+      EdhrecImporter = new()
+      {
+        CardNames = ["Name"]
+      },
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success([])
+      }
+    };
     var vm = factory.Build();
 
     var changed = false;
@@ -46,7 +58,7 @@ public class Properties
         changed = true;
     };
 
-    vm.SelectCommanderThemeCommand.Execute(new());
+    await vm.SelectCommanderThemeCommand.ExecuteAsync(new());
 
     Assert.IsTrue(changed);
   }

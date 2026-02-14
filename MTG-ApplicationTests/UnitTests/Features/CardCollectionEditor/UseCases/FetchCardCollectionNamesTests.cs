@@ -19,7 +19,7 @@ public class FetchCardCollectionNamesTests
       new(name: "8", []),
     };
 
-    var actual = await new FetchCardCollectionNames(new SimpleTestCardCollectionRepository()
+    var actual = await new FetchCardCollectionNames(new TestRepository<MTGCardCollectionDTO>()
     {
       GetAllResult = async () => [.. await Task.FromResult(items)]
     }).Execute();

@@ -71,6 +71,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>((string.Empty, "query"))
@@ -93,6 +94,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>(("New", string.Empty))
@@ -114,6 +116,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>(("New", "query"))
@@ -137,6 +140,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -159,6 +163,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = CardImportResult.Empty()
@@ -215,6 +220,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([.. cards.Take(3).Select(x => new CardImportResult.Card(x.Info))])
@@ -262,6 +268,7 @@ public class EditList
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = CardImportResult.Empty()
@@ -285,6 +292,7 @@ public class EditList
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => throw new()

@@ -31,7 +31,10 @@ public class Refresh
   public async Task Refresh_Exception_NotificationShown()
   {
     var model = new MTGCardCollectionList();
-    var factory = new TestCollectionListViewModelFactory();
+    var factory = new TestCollectionListViewModelFactory()
+    {
+      Notifier = new(),
+    };
     var vm = factory.Build(model);
 
     await vm.RefreshCommand.ExecuteAsync(null);

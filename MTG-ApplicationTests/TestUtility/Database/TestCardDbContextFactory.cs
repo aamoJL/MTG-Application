@@ -4,12 +4,12 @@ using MTGApplication.General.Services.Databases.Context;
 
 namespace MTGApplicationTests.TestUtility.Database;
 
-public partial class TestCardDbContextFactory : CardDbContextFactory, IDisposable
+public partial class InMemoryCardDbContextFactory : CardDbContextFactory, IDisposable
 {
   private const string _inMemoryConnectionString = "Filename=:memory:";
   private readonly SqliteConnection _connection;
 
-  public TestCardDbContextFactory()
+  public InMemoryCardDbContextFactory()
   {
     _connection = new SqliteConnection(_inMemoryConnectionString);
     _connection.Open();

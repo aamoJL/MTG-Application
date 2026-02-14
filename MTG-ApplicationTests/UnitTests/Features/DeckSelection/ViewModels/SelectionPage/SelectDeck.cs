@@ -27,6 +27,7 @@ public class SelectDeck
   {
     var factory = new TestDeckSelectionPageViewModelFactory()
     {
+      Notifier = new(),
       OnDeckSelected = deck => throw new()
     };
     var vm = factory.Build();

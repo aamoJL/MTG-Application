@@ -23,7 +23,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor.ViewModels;
 
-public partial class DeckEditorViewModel : ObservableObject, ISavable
+public partial class DeckEditorViewModel : ViewModelBase, ISavable
 {
   public DeckEditorViewModel(IMTGCardImporter importer)
   {
@@ -113,6 +113,7 @@ public partial class DeckEditorViewModel : ObservableObject, ISavable
   public Notifier Notifier { get; init; } = new();
   public IRepository<MTGCardDeckDTO> Repository { get; init; } = new DeckDTORepository();
   public Worker Worker { get; set; } = new();
+  public SaveStatus SaveStatus { get; init; } = new();
 
   [NotNull]
   public GroupedCardListViewModel? DeckCardList

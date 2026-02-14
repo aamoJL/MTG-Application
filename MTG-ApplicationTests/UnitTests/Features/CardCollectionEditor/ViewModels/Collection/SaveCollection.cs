@@ -51,11 +51,12 @@ public class SaveCollection
   }
 
   [TestMethod]
-  public async Task Save_InvalidName_Cancelled()
+  public async Task Save_InvalidName_IsDirty()
   {
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {
@@ -75,6 +76,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -103,6 +105,7 @@ public class SaveCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -152,6 +155,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -178,6 +182,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -202,6 +207,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -226,6 +232,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {

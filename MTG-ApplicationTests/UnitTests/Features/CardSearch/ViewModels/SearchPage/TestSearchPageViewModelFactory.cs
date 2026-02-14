@@ -10,7 +10,7 @@ public class TestSearchPageViewModelFactory
 {
   public Worker Worker { get; set; } = new();
   public TestMTGCardImporter Importer { get; set; } = new();
-  public TestNotifier Notifier { get; set; } = new();
+  public TestNotifier Notifier { get; set; } = new NotImplementedNotifier();
   public SearchCardConfirmers CardConfirmers { get; set; } = new();
 
   public CardSearchPageViewModel Build()

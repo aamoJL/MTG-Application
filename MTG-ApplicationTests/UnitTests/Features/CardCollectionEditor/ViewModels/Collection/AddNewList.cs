@@ -31,6 +31,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>((string.Empty, "query"))
@@ -50,6 +51,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", string.Empty))
@@ -72,6 +74,7 @@ public class AddNewList
     };
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -91,6 +94,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -111,6 +115,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -129,6 +134,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -147,6 +153,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -165,6 +172,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -183,6 +191,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
+      Notifier = new(),
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => throw new()

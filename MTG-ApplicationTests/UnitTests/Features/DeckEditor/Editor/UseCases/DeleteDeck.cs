@@ -1,13 +1,12 @@
 ﻿using MTGApplication.General.Services.ConfirmationService;
 using MTGApplicationTests.TestUtility.Services;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 using MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.ViewModels;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.UseCases;
 
 [TestClass]
-public class DeleteDeck : DeckEditorViewModelTestBase, ICanExecuteCommandTests, IDeleteCommandTests
+public class DeleteDeck : DeckEditorViewModelTestBase
 {
   [TestMethod(DisplayName = "Should be able to execute if the deck has a name")]
   public void ValidState_CanExecute()

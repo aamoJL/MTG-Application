@@ -42,6 +42,7 @@ public class ShowPrints
     var model = new MTGCard(MTGCardInfoMocker.MockInfo());
     var factory = new TestCollectionCardViewModelFactory()
     {
+      Notifier = new(),
       CardConfirmers = new()
       {
         ConfirmCardPrints = (data) => throw new()

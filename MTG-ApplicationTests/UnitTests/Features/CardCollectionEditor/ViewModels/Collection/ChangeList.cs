@@ -37,7 +37,10 @@ public class ChangeList
         new(){Name = "Name 3"},
       ]
     };
-    var factory = new TestCollectionViewModelFactory();
+    var factory = new TestCollectionViewModelFactory()
+    {
+      Notifier = new(),
+    };
     var vm = factory.Build(model);
 
     await vm.ChangeListCommand.ExecuteAsync(vm.CollectionListViewModels[1]);

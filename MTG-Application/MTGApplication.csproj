@@ -52,7 +52,7 @@
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
-    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Views\Controls\TabHeader.xaml" />
     <None Remove="Features\CardCollectionEditor\Views\Controls\CollectionListContentDialog.xaml" />
     <None Remove="Features\DeckEditor\CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
     <None Remove="Features\DeckEditor\CardList\Views\Controls\CardListView\AdvancedAdaptiveCardGridViewStyle.xaml" />
@@ -216,6 +216,7 @@
     <PRIResource Remove="Windows\**" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\AppWindows\DeckBuilderWindow\VIews\" />
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
     <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
   </ItemGroup>
@@ -230,16 +231,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckBuilderTabItem.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -9,13 +9,16 @@ public class NotificationException(Notification notification) : UnitTestAssertEx
 
 public class TestNotifier : Notifier
 {
-  public TestNotifier()
-    => OnNotifyEvent += TestNotifier_OnNotifyEvent;
+  public virtual Notification? Notified { get; protected set; } = null;
 
-  public Notification Notified { get; private set; } = null;
+  public override void Notify(Notification notification)
+    => Notified = notification;
+}
 
-  private void TestNotifier_OnNotifyEvent(object sender, Notification e)
-    => Notified = e;
+public class NotImplementedNotifier : TestNotifier
+{
+  public override void Notify(Notification notification)
+    => Assert.Fail($"Notification sent: {notification.Message}");
 }
 
 public static class NotificationAssert

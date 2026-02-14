@@ -3,42 +3,50 @@ using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
-namespace MTGApplicationTests.UnitTests.Features.CardSearch.ViewModels.SearchPage;
+namespace MTGApplicationTests.UnitTests.Features.EdhrecSearch.ViewModels;
 
 [TestClass]
-public class SubmitSearch
+public class SelectCommanderTheme
 {
   [TestMethod]
-  public async Task Submit_QueryCardsChanged()
+  public async Task Select_QueryCardsChanged()
   {
-    var factory = new TestSearchPageViewModelFactory()
+    var factory = new TestEDHSearchPageViewModelFactory()
     {
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([new(MTGCardInfoMocker.MockInfo())]),
+      },
+      EdhrecImporter = new()
+      {
+        CardNames = ["Name"]
       }
     };
     var vm = factory.Build();
 
-    await vm.SubmitSearchCommand.ExecuteAsync("query");
+    await vm.SelectCommanderThemeCommand.ExecuteAsync(new());
 
     Assert.AreEqual(1, vm.QueryCards.TotalCardCount);
   }
 
   [TestMethod]
-  public async Task Submit_QueryCards_ClearedBeforeFetch()
+  public async Task Select_QueryCards_ClearedBeforeFetch()
   {
-    var factory = new TestSearchPageViewModelFactory()
+    var factory = new TestEDHSearchPageViewModelFactory()
     {
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([new(MTGCardInfoMocker.MockInfo())]),
+      },
+      EdhrecImporter = new()
+      {
+        CardNames = ["Name"]
       }
     };
     var vm = factory.Build();
 
     // First, set the collection to have cards
-    await vm.SubmitSearchCommand.ExecuteAsync("query");
+    await vm.SelectCommanderThemeCommand.ExecuteAsync(new());
 
     Assert.AreEqual(1, vm.QueryCards.TotalCardCount);
 
@@ -53,26 +61,30 @@ public class SubmitSearch
     };
 
     // Second, submit again to know if the collection will be cleared
-    await vm.SubmitSearchCommand.ExecuteAsync("query");
+    await vm.SelectCommanderThemeCommand.ExecuteAsync(new());
 
     Assert.IsTrue(cleared);
   }
 
   [TestMethod]
-  public async Task Submit_Cancelled_QueryCardsNotChanged()
+  public async Task Select_Cancelled_QueryCardsNotChanged()
   {
-    var factory = new TestSearchPageViewModelFactory()
+    var factory = new TestEDHSearchPageViewModelFactory()
     {
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([new(MTGCardInfoMocker.MockInfo())]),
         CancellationTokenSource = new()
+      },
+      EdhrecImporter = new()
+      {
+        CardNames = ["Name"]
       }
     };
     var vm = factory.Build();
 
-    var task = vm.SubmitSearchCommand.ExecuteAsync("query");
-    vm.SubmitSearchCommand.Cancel();
+    var task = vm.SelectCommanderThemeCommand.ExecuteAsync(new());
+    vm.SelectCommanderThemeCommand.Cancel();
     factory.Importer.CancellationTokenSource.Cancel();
     await task;
 
@@ -80,20 +92,24 @@ public class SubmitSearch
   }
 
   [TestMethod]
-  public async Task Submit_Cancelled_Return()
+  public async Task Select_Cancelled_Return()
   {
-    var factory = new TestSearchPageViewModelFactory()
+    var factory = new TestEDHSearchPageViewModelFactory()
     {
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([]),
         CancellationTokenSource = new()
+      },
+      EdhrecImporter = new()
+      {
+        CardNames = ["Name"]
       }
     };
     var vm = factory.Build();
 
-    var task = vm.SubmitSearchCommand.ExecuteAsync("query");
-    vm.SubmitSearchCommand.Cancel();
+    var task = vm.SelectCommanderThemeCommand.ExecuteAsync(new());
+    vm.SelectCommanderThemeCommand.Cancel();
     factory.Importer.CancellationTokenSource.Cancel();
     await task;
 
@@ -101,19 +117,19 @@ public class SubmitSearch
   }
 
   [TestMethod]
-  public async Task Submit_Exception_NotificationShown()
+  public async Task Select_Exception_NotificationShown()
   {
-    var factory = new TestSearchPageViewModelFactory()
+    var factory = new TestEDHSearchPageViewModelFactory()
     {
       Notifier = new(),
       Importer = new()
       {
         Result = null
-      }
+      },
     };
     var vm = factory.Build();
 
-    await vm.SubmitSearchCommand.ExecuteAsync("query");
+    await vm.SelectCommanderThemeCommand.ExecuteAsync(new());
 
     NotificationAssert.NotificationSent(NotificationType.Error, factory.Notifier);
   }

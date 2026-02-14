@@ -1,10 +1,9 @@
-﻿using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
-using MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.ViewModels;
+﻿using MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.ViewModels;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.Editor.UseCases;
 
 [TestClass]
-public class OpenDeckTestingWindow : DeckEditorViewModelTestBase, ICanExecuteCommandTests
+public class OpenDeckTestingWindow : DeckEditorViewModelTestBase
 {
   [TestMethod(DisplayName = "Should be able to execute if the deck has cards")]
   public void ValidState_CanExecute()

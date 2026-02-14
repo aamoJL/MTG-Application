@@ -11,9 +11,9 @@ namespace MTGApplicationTests.UnitTests.Features.DeckSelection.ViewModels.Select
 public class TestDeckSelectionPageViewModelFactory
 {
   public Worker Worker { get; set; } = new();
-  public SimpleTestRepository<MTGCardDeckDTO> Repository { get; set; } = new();
+  public TestRepository<MTGCardDeckDTO> Repository { get; set; } = new();
   public TestMTGCardImporter Importer { get; set; } = new();
-  public TestNotifier Notifier { get; set; } = new();
+  public TestNotifier Notifier { get; set; } = new NotImplementedNotifier();
   public Action<DeckSelectionDeck> OnDeckSelected { get; set; } = null;
 
   public DeckSelectionPageViewModel Build()

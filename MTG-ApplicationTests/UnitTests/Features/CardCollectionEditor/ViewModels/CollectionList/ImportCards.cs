@@ -60,6 +60,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([new(MTGCardInfoMocker.MockInfo())])
@@ -103,6 +104,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Partial([new(MTGCardInfoMocker.MockInfo())])
@@ -128,6 +130,7 @@ public class ImportCards
     };
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([
@@ -153,6 +156,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Failure()
@@ -175,6 +179,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([new(MTGCardInfoMocker.MockInfo())])
@@ -197,6 +202,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       Importer = new()
       {
         Result = TestMTGCardImporter.Partial([new(MTGCardInfoMocker.MockInfo())])
@@ -219,6 +225,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
+      Notifier = new(),
       CollectionListConfirmers = new()
       {
         ConfirmCardImport = _ => throw new()

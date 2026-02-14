@@ -15,7 +15,7 @@ public class TestCollectionListViewModelFactory
   public TestStringExporter Exporter { get; set; } = new();
   public CollectionListConfirmers CollectionListConfirmers { get; set; } = new();
   public TestMTGCardImporter Importer { get; set; } = new();
-  public TestNotifier Notifier { get; set; } = new();
+  public TestNotifier Notifier { get; set; } = new NotImplementedNotifier();
   public Func<MTGCardCollectionList, Task> OnListDelete { get; set; } = (_) => throw new NotImplementedException();
   public bool? NameValidator { get => field ?? throw new NotImplementedException(); set; }
 

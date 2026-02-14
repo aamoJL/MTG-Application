@@ -8,7 +8,7 @@ public partial class TestStringExporter : IExporter<string>
   public NotificationService.Notification SuccessNotification => new(NotificationService.NotificationType.Success, "Success");
 
   public bool? Response { get; set; } = null;
-  public string Result { get; private set; } = null;
+  public string? Result { get; private set; } = null;
 
   public async Task<bool> Export(string data)
   {

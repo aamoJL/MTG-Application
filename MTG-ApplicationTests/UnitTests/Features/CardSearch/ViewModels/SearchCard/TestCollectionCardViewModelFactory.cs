@@ -12,7 +12,7 @@ public class TestSearchCardViewModelFactory
   public Worker Worker { get; set; } = new();
   public SearchCardConfirmers CardConfirmers { get; set; } = new();
   public TestMTGCardImporter Importer { get; set; } = new();
-  public TestNotifier Notifier { get; set; } = new();
+  public TestNotifier Notifier { get; set; } = new NotImplementedNotifier();
   public TestNetworkService NetworkService { get; set; } = new();
 
   public CardSearchMTGCardViewModel Build(MTGCard card)

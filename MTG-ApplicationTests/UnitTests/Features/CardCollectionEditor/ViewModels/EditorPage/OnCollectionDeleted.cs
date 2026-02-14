@@ -11,6 +11,7 @@ public class OnCollectionDeleted
   {
     var factory = new TestEditorPageViewModelFactory()
     {
+      Notifier = new(),
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(true)

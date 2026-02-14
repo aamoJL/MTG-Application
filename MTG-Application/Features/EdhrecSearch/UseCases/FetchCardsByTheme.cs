@@ -12,7 +12,8 @@ public class FetchCardsByTheme(IMTGCardImporter Importer, IEdhrecImporter edhrec
 
   public override async Task<CardImportResult> Execute(CommanderTheme theme)
   {
-    var query = string.Join(Environment.NewLine, await EdhrecImporter.FetchNewCardNames(theme.Uri));
+    var names = await EdhrecImporter.FetchNewCardNames(theme.Uri);
+    var query = string.Join(Environment.NewLine, names);
 
     return await Importer.ImportWithString(query);
   }

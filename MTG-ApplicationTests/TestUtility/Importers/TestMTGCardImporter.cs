@@ -12,20 +12,20 @@ public class TestMTGCardImporter : IMTGCardImporter
 
   public string Name => throw new NotImplementedException();
 
-  public CardImportResult Result { get; init; } = null;
+  public CardImportResult? Result { get; init; } = null;
   /// <summary>
   /// <para>If set, import tasks will halt for 5 seconds, or when this source's token has been cancelled.</para>
   /// <para>Use this to unit test cancellable commands.</para>
   /// <para>Cancelling this token will NOT throw <see cref="OperationCanceledException"/></para>
   /// </summary>
-  public CancellationTokenSource CancellationTokenSource { get; init; } = null;
+  public CancellationTokenSource? CancellationTokenSource { get; init; } = null;
 
   public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
   {
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
+    if (Result == null) throw new NotImplementedException($"ImportCardsWithSearchQuery {nameof(Result)}");
 
     return Result;
   }
@@ -35,7 +35,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
+    if (Result == null) throw new NotImplementedException($"ImportWithDTOs {nameof(Result)}");
 
     return Result;
   }
@@ -45,7 +45,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
+    if (Result == null) throw new NotImplementedException($"ImportWithString {nameof(Result)}");
 
     return Result;
   }
@@ -55,7 +55,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
 
-    if (Result == null) throw new NotImplementedException($"Importer {nameof(Result)}");
+    if (Result == null) throw new NotImplementedException($"ImportWithUri {nameof(Result)}");
 
     return Result;
   }

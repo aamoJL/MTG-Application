@@ -1,4 +1,6 @@
-﻿namespace MTGApplicationTests.UnitTests.Features.CardSearch.ViewModels.SearchPage;
+﻿using MTGApplicationTests.TestUtility.Importers;
+
+namespace MTGApplicationTests.UnitTests.Features.CardSearch.ViewModels.SearchPage;
 
 [TestClass]
 public class Properties
@@ -16,7 +18,13 @@ public class Properties
   [TestMethod]
   public async Task Set_QueryCards_PropertyChanged()
   {
-    var factory = new TestSearchPageViewModelFactory();
+    var factory = new TestSearchPageViewModelFactory()
+    {
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success([])
+      }
+    };
     var vm = factory.Build();
 
     var changed = false;
