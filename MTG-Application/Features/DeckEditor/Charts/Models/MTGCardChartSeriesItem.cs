@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 

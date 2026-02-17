@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
@@ -14,12 +14,14 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_Serialized_CardFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
-      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo(), Count: 5);
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
+      var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo()) { Count = 5 };
 
       JsonExtensions.TrySerializeObject(card, out var json);
 
-      var result = await importer.Import(json);
+      Assert.IsNotNull(json);
+
+      var result = await importer.Execute(json);
 
       Assert.AreEqual(CardImportResult.ImportSource.Internal, result.Source);
       Assert.AreEqual((card.Info.Name, card.Count),

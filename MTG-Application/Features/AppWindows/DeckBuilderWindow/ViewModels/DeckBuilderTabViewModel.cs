@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.Editor.UseCases;
-using MTGApplication.Features.DeckEditor.ViewModels;
+using MTGApplication.Features.DeckEditor.ViewModels.EditorPage;
 using MTGApplication.General.ViewModels;
 using System;
 using System.ComponentModel;
@@ -19,13 +18,13 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
     get
     {
       if (EditorViewModel == null) return DefaultDeckSelectionTabHeaderText;
-      if (EditorViewModel.Name == string.Empty) return DefaultNewDeckTabHeaderText;
-      else return EditorViewModel.Name;
+      if (EditorViewModel.DeckName == string.Empty) return DefaultNewDeckTabHeaderText;
+      else return EditorViewModel.DeckName;
     }
   }
   [ObservableProperty] public partial SaveStatus SaveStatus { get; private set; } = new();
 
-  private DeckEditorViewModel? EditorViewModel
+  private DeckEditorPageViewModel? EditorViewModel
   {
     get;
     set
@@ -43,10 +42,10 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
   private async Task RequestClose(SaveStatus.ConfirmArgs args)
   {
     // TODO: change to ISavable
-    if (EditorViewModel is DeckEditorViewModel editorVM && editorVM.HasUnsavedChanges)
+    if (EditorViewModel is DeckEditorPageViewModel editorVM && editorVM.DeckViewModel.SaveStatus.HasUnsavedChanges)
     {
       OnRequestSelection?.Invoke(this);
-      await new ConfirmUnsavedChanges(editorVM).Execute(args);
+      await editorVM.DeckViewModel.SaveUnsavedChangesCommand.ExecuteAsync(args);
     }
   }
 
@@ -65,15 +64,15 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
   }
 
   [RelayCommand]
-  private void ChangeViewModel(DeckEditorViewModel editor)
+  private void ChangeViewModel(DeckEditorPageViewModel editor)
   {
     EditorViewModel = editor;
-    SaveStatus = editor?.SaveStatus ?? new();
+    SaveStatus = editor?.DeckViewModel.SaveStatus ?? new();
   }
 
   private void EditorViewModel_PropertyChanged(object? _, PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(DeckEditorViewModel.Name))
+    if (e.PropertyName == nameof(DeckEditorPageViewModel.DeckName))
       OnPropertyChanged(nameof(HeaderText));
   }
 }

@@ -50,7 +50,7 @@ public class MTGCardInfoMocker
       tokens: tokens ?? [],
       oracleId: oracleId ?? Guid.NewGuid(),
       importerName: "Mocker",
-      colorIdentity: (frontFace ?? MockFace()).Colors);
+      colorIdentity: [.. (frontFace ?? MockFace()).Colors]);
   }
 
   public static CardFace MockFace(
@@ -61,7 +61,7 @@ public class MTGCardInfoMocker
     string oracleText = "")
   {
     return new CardFace(
-      colors: colors ?? [ColorTypes.W],
+      colors: [.. colors ?? [ColorTypes.W]],
       name: name,
       imageUri: imageUri,
       illustrationId: illustrationId ?? Guid.Parse("a35ceece-124c-41aa-b9f1-ef95f7d20228"),

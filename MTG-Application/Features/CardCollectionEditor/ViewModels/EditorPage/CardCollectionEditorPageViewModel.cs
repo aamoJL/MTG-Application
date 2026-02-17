@@ -33,13 +33,11 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
     {
       var nameChanged = field?.CollectionName != value?.CollectionName;
 
-      if (field != null)
-        field.PropertyChanged -= CollectionViewModel_PropertyChanged;
-
+      field?.PropertyChanged -= CollectionViewModel_PropertyChanged;
+      
       SetProperty(ref field, value);
-
-      if (field != null)
-        field.PropertyChanged += CollectionViewModel_PropertyChanged;
+      
+      field?.PropertyChanged += CollectionViewModel_PropertyChanged;
 
       // Visual state trigger will not work if the OnPropertyChanged(nameof(CollectionName))
       //  is called when the old name was the same as the new name.
@@ -86,7 +84,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
       await CollectionViewModel.SaveUnsavedChangesCommand.ExecuteAsync(saveArgs);
 
       if (saveArgs.Cancelled)
-        return;
+        return; // Cancel
 
       var collectionNames = await Worker.DoWork(new FetchCardCollectionNames(Repository).Execute);
 
@@ -125,9 +123,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
   {
     switch (e.PropertyName)
     {
-      case nameof(CardCollectionViewModel.CollectionName):
-        OnPropertyChanged(nameof(CollectionName));
-        break;
+      case nameof(CardCollectionViewModel.CollectionName): OnPropertyChanged(nameof(CollectionName)); break;
     }
   }
 }

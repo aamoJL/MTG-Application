@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardSearch.ViewModels.SearchCard;
-using MTGApplication.General.Models;
 using System.ComponentModel;
 using System.Windows.Input;
 
@@ -21,6 +20,16 @@ public partial class CardSearchCardViewBase : UserControl, INotifyPropertyChange
 
   public static readonly DependencyProperty OpenCardmarketWebsiteCommandProperty =
       DependencyProperty.Register(nameof(OpenCardmarketWebsiteCommand), typeof(ICommand), typeof(CardSearchCardViewBase), new PropertyMetadata(null));
+
+  public CardSearchCardViewBase()
+  {
+    Loaded += (_, _) =>
+    {
+      RequestedTheme = AppConfig.LocalSettings.AppTheme;
+      AppConfig.LocalSettings.PropertyChanged += AppSettings_PropertyChanged;
+    };
+    Unloaded += (_, _) => { AppConfig.LocalSettings.PropertyChanged -= AppSettings_PropertyChanged; };
+  }
 
   public CardSearchMTGCardViewModel Model
   {
@@ -107,7 +116,7 @@ public partial class CardSearchCardViewBase : UserControl, INotifyPropertyChange
 
   private void Model_PropertyChanged(object? _, PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(MTGCard.Info))
+    if (e.PropertyName == nameof(Model.Info))
       SelectedFaceUri = Model?.Info.FrontFace.ImageUri ?? string.Empty;
   }
 }

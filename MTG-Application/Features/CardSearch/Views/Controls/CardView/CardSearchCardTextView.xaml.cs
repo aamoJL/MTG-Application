@@ -6,7 +6,7 @@ namespace MTGApplication.Features.CardSearch.Views.Controls.CardView;
 
 public sealed partial class CardSearchCardTextView : CardSearchCardViewBase
 {
-  public CardSearchCardTextView() => InitializeComponent();
+  public CardSearchCardTextView() : base() => InitializeComponent();
 
   protected override void OnPointerMoved(PointerRoutedEventArgs e)
   {

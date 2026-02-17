@@ -54,9 +54,9 @@
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Views\Controls\TabHeader.xaml" />
     <None Remove="Features\CardCollectionEditor\Views\Controls\CollectionListContentDialog.xaml" />
-    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
-    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardListView\AdvancedAdaptiveCardGridViewStyle.xaml" />
-    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardListView\DeckEditorListViewContainer.xaml" />
+    <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
+    <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardListView\AdvancedAdaptiveCardGridViewStyle.xaml" />
+    <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardListView\DeckEditorListViewContainer.xaml" />
     <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckSelection\Views\Controls\DeckSelectionDeckView.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
@@ -218,7 +218,8 @@
   <ItemGroup>
     <Folder Include="Features\AppWindows\DeckBuilderWindow\VIews\" />
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
-    <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
+    <Folder Include="Features\DeckEditor\Views\Controls\CardListView\" />
+    <Folder Include="Features\DeckEditor\_Commanders\Views\Controls\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">

@@ -3,7 +3,7 @@ using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MTGApplication.Features.DeckEditor.Charts.Models;
-using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Models;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
@@ -11,6 +11,7 @@ using System.Linq;
 using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplication.Features.DeckEditor.Charts.Views.Controls.CardTypeDistributionChart;
+
 public sealed partial class CardTypeDistributionChart : MTGCardChart
 {
   public CardTypeDistributionChart() : base() => InitializeComponent();

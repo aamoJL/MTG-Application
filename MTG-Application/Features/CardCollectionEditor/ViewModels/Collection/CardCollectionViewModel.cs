@@ -46,7 +46,7 @@ public partial class CardCollectionViewModel : ViewModelBase
     private set => SetProperty(ref field, value);
   }
 
-  public Func<Task>? OnDeleted { get; set; }
+  public Func<Task>? OnDeleted { get; init; }
 
   private MTGCardCollection Model { get; }
   private CardCollectionListViewModel.Factory ListViewModelFactory
@@ -109,12 +109,11 @@ public partial class CardCollectionViewModel : ViewModelBase
       // Override confirmation
       if (saveName != oldName && await new CardCollectionDTOExists(Repository).Execute(saveName))
       {
-        if (await Confirmers.ConfirmCollectionSaveOverride(Confirmations.GetOverrideCollectionConfirmation(saveName))
-          is ConfirmationResult.Yes)
+        switch (await Confirmers.ConfirmCollectionSaveOverride(Confirmations.GetOverrideCollectionConfirmation(saveName)))
         {
-          overrideOld = true;
+          case ConfirmationResult.Yes: overrideOld = true; break;
+          default: return; // Cancel
         }
-        else return; // Cancel
       }
 
       if (await Worker.DoWork(new SaveCardCollection(Repository).Execute(Model, saveName, overrideOld)))
@@ -125,7 +124,7 @@ public partial class CardCollectionViewModel : ViewModelBase
         new ShowNotification(Notifier).Execute(Notifications.SaveCollectionSuccess);
       }
       else
-        throw new(Notifications.SaveCollectionError.Message);
+        new ShowNotification(Notifier).Execute(Notifications.SaveCollectionError);
     }
     catch (Exception e)
     {
@@ -141,10 +140,10 @@ public partial class CardCollectionViewModel : ViewModelBase
       if (!CanDelete())
         throw new ArgumentException("Name should not be empty", nameof(CollectionName));
 
-      if (await Confirmers.ConfirmCollectionDelete(Confirmations.GetDeleteCollectionConfirmation(CollectionName))
-        is not ConfirmationResult.Yes)
+      switch (await Confirmers.ConfirmCollectionDelete(Confirmations.GetDeleteCollectionConfirmation(CollectionName)))
       {
-        return; // Cancel
+        case ConfirmationResult.Yes: break;
+        default: return; // Cancel
       }
 
       if (await Worker.DoWork(new DeleteCardCollection(Repository).Execute(Model)))

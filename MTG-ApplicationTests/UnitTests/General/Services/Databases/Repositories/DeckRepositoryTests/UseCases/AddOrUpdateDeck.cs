@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services.Converters;
-using MTGApplication.Features.DeckEditor.Models;
+﻿using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Models.Converters;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplicationTests.TestUtility.Database;

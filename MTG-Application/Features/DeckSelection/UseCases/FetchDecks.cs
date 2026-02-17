@@ -44,11 +44,11 @@ public class FetchDecks(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter
   {
     List<ColorTypes> colors = [];
 
-    if (dto.Commander != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.ColorIdentity is ColorTypes[] commanderColors)
+    if (dto.Commander != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.Commander?.ScryfallId)?.Info.ColorIdentity is IList<ColorTypes> commanderColors)
     {
       colors.AddRange(commanderColors);
 
-      if (dto.CommanderPartner != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.CommanderPartner?.ScryfallId)?.Info.ColorIdentity is ColorTypes[] partnerColors)
+      if (dto.CommanderPartner != null && commanders.FirstOrDefault(c => c.Info.ScryfallId == dto.CommanderPartner?.ScryfallId)?.Info.ColorIdentity is IList<ColorTypes> partnerColors)
         colors.AddRange(partnerColors);
 
       if (colors.Count == 0)

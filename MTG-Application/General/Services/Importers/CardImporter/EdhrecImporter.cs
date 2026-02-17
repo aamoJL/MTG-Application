@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.IOServices;
 using System;

@@ -24,7 +24,7 @@ public class SaveCardCollection(IRepository<MTGCardCollectionDTO> repository) : 
       return false; // Cancel because was not saved
 
     if (!string.IsNullOrEmpty(oldName) && oldName != name && await new CardCollectionDTOExists(Repository).Execute(oldName))
-      await new DeleteCardCollectionDTO(Repository).Execute(oldName); // Delete old deck if it was renamed
+      await new DeleteCardCollectionDTO(Repository).Execute(oldName); // Delete old collection if it was renamed
 
     return true;
   }

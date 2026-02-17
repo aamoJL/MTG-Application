@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 
@@ -12,7 +12,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithValidIds_CardsFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var idListString = string.Join(Environment.NewLine,
       [
         "d9b1ed43-ee6c-43a2-ba94-5bf71c63e070",
@@ -21,7 +21,7 @@ public partial class CardImporterTests
         "8ad44884-ae0d-40ae-87a9-bad043d4e9ad"
       ]);
 
-      var result = await importer.Import(idListString);
+      var result = await importer.Execute(idListString);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual(idListString, string.Join(Environment.NewLine,
@@ -31,7 +31,7 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithInvalidIds_NoCardsFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var idListString = string.Join(Environment.NewLine,
       [
         "xxxxxxx-ee6c-43a2-ba94-5bf71c63e070",
@@ -40,7 +40,7 @@ public partial class CardImporterTests
         "xxxxxxx-ae0d-40ae-87a9-bad043d4e9ad"
       ]);
 
-      var result = await importer.Import(idListString);
+      var result = await importer.Execute(idListString);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual(4, result.NotFoundCount);
@@ -49,10 +49,10 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithIdUri_CardFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var uri = "https://cards.scryfall.io/large/front/8/0/80fc51aa-64ca-4236-8cdb-670533b75f59.jpg?1736467426";
 
-      var result = await importer.Import(uri);
+      var result = await importer.Execute(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.HasCount(1, result.Found);
@@ -62,10 +62,10 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithNameUri_CardFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var uri = "https://scryfall.com/card/inr/2/decimator-of-the-provinces";
 
-      var result = await importer.Import(uri);
+      var result = await importer.Execute(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.HasCount(1, result.Found);
@@ -75,10 +75,10 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithInvalidUri_CardNotFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI(), new EdhrecImporter());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var uri = "https://scryfall.com/xxxxxx/inr/2/xxxxxxxx-xx";
 
-      var result = await importer.Import(uri);
+      var result = await importer.Execute(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual(1, result.NotFoundCount);

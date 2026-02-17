@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplicationTests.TestUtility.Importers;
@@ -7,7 +7,7 @@ public class TestEdhrecImporter : IEdhrecImporter
 {
   public string[]? CardNames { get; init; } = null;
   public CommanderTheme[]? CommanderThemes { get; init; } = null;
-  public bool? ParseResult { get; init; } = null;
+  public string? ParseResult { get; init; } = null;
   public string? CommanderWebsiteUri { get; init; } = null;
 
   public async Task<string[]> FetchNewCardNames(string _)
@@ -29,13 +29,13 @@ public class TestEdhrecImporter : IEdhrecImporter
     return await Task.FromResult(CommanderThemes);
   }
 
-  public bool TryParseCardNameFromEdhrecUri(string uri, out string? name)
+  public bool TryParseCardNameFromEdhrecUri(string uri, out string name)
   {
-    if (!ParseResult.HasValue)
+    if (ParseResult == null)
       throw new NotImplementedException($"TryParseCardNameFromEdhrecUri: {nameof(ParseResult)}");
 
-    name = ParseResult == true ? "Name" : null;
+    name = string.IsNullOrEmpty(ParseResult) ? "Name" : string.Empty;
 
-    return ParseResult.Value;
+    return !string.IsNullOrEmpty(ParseResult);
   }
 }

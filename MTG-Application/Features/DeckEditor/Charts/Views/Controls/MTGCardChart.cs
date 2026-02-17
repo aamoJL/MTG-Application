@@ -1,7 +1,7 @@
 ﻿using LiveChartsCore;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Models;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.DeckEditor.Charts.Views.Controls;

@@ -153,11 +153,10 @@ public partial class CardCollectionListViewModel : ViewModelBase
   {
     try
     {
-      if (await Confirmers.ConfirmCardImport(Confirmations.GetImportCardsConfirmation())
-          is not string importText || string.IsNullOrEmpty(importText))
-      {
+      var importText = await Confirmers.ConfirmCardImport(Confirmations.GetImportCardsConfirmation());
+
+      if (string.IsNullOrEmpty(importText))
         return; // Cancel
-      }
 
       var (importResult, newCards) = await Worker.DoWork(async () =>
       {

@@ -1,5 +1,6 @@
 ﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.Importers.CardImporter.CardImportResult;
 
 namespace MTGApplicationTests.TestUtility.Importers;
@@ -7,6 +8,7 @@ namespace MTGApplicationTests.TestUtility.Importers;
 public class TestMTGCardImporter : IMTGCardImporter
 {
   public static CardImportResult Success(Card[] cards) => new(cards, 0, cards.Length, ImportSource.External);
+  public static CardImportResult Success() => new([new(MTGCardInfoMocker.MockInfo())], 0, 1, ImportSource.External);
   public static CardImportResult Failure() => new([], 5, 0, ImportSource.External);
   public static CardImportResult Partial(Card[] cards) => new(cards, 5, cards.Length + 5, ImportSource.External);
 

@@ -5,7 +5,7 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MTGApplication.Features.DeckEditor.Charts.Models;
 using MTGApplication.Features.DeckEditor.Charts.Views.Controls;
-using MTGApplication.Features.DeckEditor.Editor.Models;
+using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Extensions;
 using SkiaSharp;
 using System;
@@ -14,6 +14,7 @@ using System.Linq;
 using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplication.Features.DeckEditor;
+
 public sealed partial class ManaCurveChart : MTGCardChart
 {
   public ManaCurveChart() : base() => InitializeComponent();
@@ -43,7 +44,7 @@ public sealed partial class ManaCurveChart : MTGCardChart
       return;
 
     // Cards with multiple colors will be shown as a Multicolored
-    var color = card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0];
+    var color = card.Info.Colors.Count > 1 ? ColorTypes.M : card.Info.Colors[0];
 
     // Find series or create a new one
     var series = Series.FirstOrDefault(x => x.Name == color.GetFullName()) ?? AddNewSeries(color);
@@ -67,7 +68,7 @@ public sealed partial class ManaCurveChart : MTGCardChart
   protected override void RemoveFromSeries(DeckEditorMTGCard card)
   {
     // Cards with multiple colors will be shown as a Multicolored
-    var color = card.Info.Colors.Length > 1 ? ColorTypes.M : card.Info.Colors[0];
+    var color = card.Info.Colors.Count > 1 ? ColorTypes.M : card.Info.Colors[0];
 
     // Find value item
     if (Series.FirstOrDefault(x => x.Name == color.GetFullName()) is ISeries series
