@@ -12,7 +12,7 @@ public class ShowPrints
   [TestMethod]
   public async Task Show_PrintsShown()
   {
-    IEnumerable<MTGCard> prints = null;
+    IEnumerable<MTGCard>? prints = null;
     var model = new MTGCard(MTGCardInfoMocker.MockInfo());
     var factory = new TestCollectionCardViewModelFactory()
     {
@@ -33,7 +33,7 @@ public class ShowPrints
 
     await vm.ShowPrintsCommand.ExecuteAsync(null);
 
-    Assert.AreEqual(3, prints.Count());
+    Assert.AreEqual(3, prints?.Count());
   }
 
   [TestMethod]

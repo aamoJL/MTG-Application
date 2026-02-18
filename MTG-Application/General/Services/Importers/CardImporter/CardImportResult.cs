@@ -15,15 +15,15 @@ public record CardImportResult(
 
   public record Card
   {
+    [JsonConstructor]
+    public Card(MTGCardInfo Info) => this.Info = Info;
+
     [Obsolete]
     public Card(MTGCardInfo Info, int Count = 1)
     {
       this.Info = Info;
       this.Count = Count;
     }
-
-    [JsonConstructor]
-    public Card(MTGCardInfo Info) => this.Info = Info;
 
     // TODO: change so the result is only cardinfo
 

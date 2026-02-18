@@ -32,9 +32,9 @@ public partial class DeckViewModel : ViewModelBase
   public DeckViewModel(DeckEditorMTGDeck deck)
   {
     Model = deck;
+    UndoStack = new();
 
     Model.PropertyChanged += Model_PropertyChanged;
-    UndoStack.CollectionChanged += UndoStack_CollectionChanged;
   }
 
   public SaveStatus SaveStatus { get; init; } = new();
@@ -45,7 +45,16 @@ public partial class DeckViewModel : ViewModelBase
   public IExporter<string> Exporter { private get; init; } = new ClipboardExporter();
   public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
   public INetworkService NetworkService { private get; init; } = new NetworkService();
-  public ReversibleCommandStack UndoStack { get; init; } = new();
+  public ReversibleCommandStack UndoStack
+  {
+    get;
+    init
+    {
+      field?.CollectionChanged -= UndoStack_CollectionChanged;
+      SetProperty(ref field, value);
+      field.CollectionChanged += UndoStack_CollectionChanged;
+    }
+  }
   public Notifier Notifier { private get; init; } = new();
   public DeckConfirmers Confirmers { private get; init; } = new();
 
@@ -221,7 +230,6 @@ public partial class DeckViewModel : ViewModelBase
     }
   }
 
-  // TODO: move to commanderviewmodel?
   [RelayCommand(CanExecute = nameof(CanOpenEdhrecSearchWindow))]
   private async Task OpenEdhrecSearchWindow()
   {

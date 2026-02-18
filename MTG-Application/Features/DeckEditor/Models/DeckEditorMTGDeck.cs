@@ -12,11 +12,7 @@ namespace MTGApplication.Features.DeckEditor.Models;
 /// </summary>
 public partial class DeckEditorMTGDeck : INotifyPropertyChanged, INotifyPropertyChanging
 {
-  public DeckEditorMTGDeck()
-  {
-    PropertyChanged += Deck_PropertyChanged;
-    DeckCards.CollectionChanged += DeckCards_CollectionChanged;
-  }
+  public DeckEditorMTGDeck() => PropertyChanged += Deck_PropertyChanged;
 
   public string Name
   {
@@ -44,10 +40,46 @@ public partial class DeckEditorMTGDeck : INotifyPropertyChanged, INotifyProperty
     }
   }
 
-  public ObservableCollection<DeckEditorMTGCard> DeckCards { get; set; } = [];
-  public ObservableCollection<DeckEditorMTGCard> Wishlist { get; set; } = [];
-  public ObservableCollection<DeckEditorMTGCard> Maybelist { get; set; } = [];
-  public ObservableCollection<DeckEditorMTGCard> Removelist { get; set; } = [];
+  public ObservableCollection<DeckEditorMTGCard> DeckCards
+  {
+    get => field ??= DeckCards = [];
+    set
+    {
+      field?.CollectionChanged -= DeckCards_CollectionChanged;
+      SetProperty(ref field, value);
+      field?.CollectionChanged += DeckCards_CollectionChanged;
+    }
+  }
+  public ObservableCollection<DeckEditorMTGCard> Wishlist
+  {
+    get => field ??= Wishlist = [];
+    set
+    {
+      field?.CollectionChanged -= DeckCards_CollectionChanged;
+      SetProperty(ref field, value);
+      field?.CollectionChanged += DeckCards_CollectionChanged;
+    }
+  }
+  public ObservableCollection<DeckEditorMTGCard> Maybelist
+  {
+    get => field ??= Maybelist = [];
+    set
+    {
+      field?.CollectionChanged -= DeckCards_CollectionChanged;
+      SetProperty(ref field, value);
+      field?.CollectionChanged += DeckCards_CollectionChanged;
+    }
+  }
+  public ObservableCollection<DeckEditorMTGCard> Removelist
+  {
+    get => field ??= Removelist = [];
+    set
+    {
+      field?.CollectionChanged -= DeckCards_CollectionChanged;
+      SetProperty(ref field, value);
+      field?.CollectionChanged += DeckCards_CollectionChanged;
+    }
+  }
 
   public int DeckSize => DeckCards.Sum(x => x.Count) + (Commander != null ? 1 : 0) + (CommanderPartner != null ? 1 : 0);
   public double DeckPrice => DeckCards.Sum(x => x.Info.Price * x.Count) + (Commander?.Info.Price ?? 0) + (CommanderPartner?.Info.Price ?? 0);
@@ -59,6 +91,7 @@ public partial class DeckEditorMTGDeck : INotifyPropertyChanged, INotifyProperty
   {
     switch (e.PropertyName)
     {
+      case nameof(DeckCards):
       case nameof(CommanderPartner):
       case nameof(Commander):
         PropertyChanged?.Invoke(this, new(nameof(DeckSize)));
