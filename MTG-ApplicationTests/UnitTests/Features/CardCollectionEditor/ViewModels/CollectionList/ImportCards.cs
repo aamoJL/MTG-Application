@@ -22,7 +22,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult<string>(null)
+        ConfirmCardImport = _ => Task.FromResult<string?>(null)
       }
     };
     var vm = factory.Build(model);
@@ -44,7 +44,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult(string.Empty)
+        ConfirmCardImport = _ => Task.FromResult<string?>(string.Empty)
       }
     };
     var vm = factory.Build(model);
@@ -67,7 +67,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -88,7 +88,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -111,7 +111,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -140,7 +140,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -156,14 +156,14 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Importer = new()
       {
         Result = TestMTGCardImporter.Failure()
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -186,7 +186,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -209,7 +209,7 @@ public class ImportCards
       },
       CollectionListConfirmers = new()
       {
-        ConfirmCardImport = _ => Task.FromResult("query")
+        ConfirmCardImport = _ => Task.FromResult<string?>("query")
       }
     };
     var vm = factory.Build(model);
@@ -225,7 +225,7 @@ public class ImportCards
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionListConfirmers = new()
       {
         ConfirmCardImport = _ => throw new()

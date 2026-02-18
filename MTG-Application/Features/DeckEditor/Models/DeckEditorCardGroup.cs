@@ -27,9 +27,9 @@ public partial class DeckEditorCardGroup : ObservableObject
   private ObservableCollection<DeckEditorMTGCard> GroupedCards { get; } = [];
   private ObservableCollection<DeckEditorMTGCard> Source { get; }
 
-  public void Add(DeckEditorMTGCard item) => Source.Add(item);
+  public void AddToSource(DeckEditorMTGCard item) => Source.Add(item);
 
-  public void Remove(DeckEditorMTGCard item) => Source.Remove(item);
+  public void RemoveFromSource(DeckEditorMTGCard item) => Source.Remove(item);
 
   public DeckEditorMTGCard? GetFromSource(Func<DeckEditorMTGCard, bool> predicate) => Source.FirstOrDefault(predicate);
 

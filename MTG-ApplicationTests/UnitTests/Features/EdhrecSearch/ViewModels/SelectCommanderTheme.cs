@@ -121,7 +121,7 @@ public class SelectCommanderTheme
   {
     var factory = new TestEDHSearchPageViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Importer = new()
       {
         Result = null

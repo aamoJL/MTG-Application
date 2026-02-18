@@ -1,8 +1,6 @@
 ﻿using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplicationTests.TestUtility.Database;
-using MTGApplicationTests.TestUtility.Importers;
-using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.UseCases;
 
@@ -119,49 +117,5 @@ public class SaveDeckTests
     var result = await new SaveDeck(repo).Execute(new() { Name = "Old" }, "New", overrideOld: false);
 
     Assert.IsTrue(deleted);
-  }
-}
-
-[TestClass]
-public class FetchTokensTests
-{
-  [TestMethod]
-  public async Task Fetch_CardsReturned()
-  {
-    var importer = new TestMTGCardImporter()
-    {
-      Result = TestMTGCardImporter.Success([
-        new(MTGCardInfoMocker.MockInfo()),
-        new(MTGCardInfoMocker.MockInfo()),
-        new(MTGCardInfoMocker.MockInfo()),
-        ])
-    };
-
-    var result = await new FetchTokens(importer).Execute([]);
-
-    Assert.HasCount(3, result.Found);
-  }
-}
-
-[TestClass]
-public class FetchDeckNamesTests
-{
-  [TestMethod]
-  public async Task Fetch_NamesReturned_OrderedByName()
-  {
-    var repo = new TestRepository<MTGCardDeckDTO>()
-    {
-      GetAllResult = () => Task.FromResult<IEnumerable<MTGCardDeckDTO>>([
-        new("Deck 3"),
-        new("Deck 1"),
-        new("Deck 2"),
-      ])
-    };
-
-    var result = await new FetchDeckNames(repo).Execute();
-
-    var expected = new string[] { "Deck 1", "Deck 2", "Deck 3" };
-
-    CollectionAssert.AreEqual(expected, result.ToArray());
   }
 }

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.UseCases;
+using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.API.CardAPI;
@@ -16,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using static MTGApplication.Features.DeckEditor.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 using static MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList.GroupedDeckCardListViewModel;
 using static MTGApplication.Features.DeckEditor.ViewModels.DeckCardList.DeckCardListViewModel;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
@@ -208,7 +208,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
     UndoStack.ActiveCombinedCommand.Commands.Add(
       new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
       {
-        ReversibleAction = new ReversibleRemoveCardsFromGroupAction(Model)
+        ReversibleAction = new ReversibleRemoveCardsFromGroupSourceAction(Model)
       });
   }
 

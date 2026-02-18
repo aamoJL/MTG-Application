@@ -111,7 +111,7 @@ public class SaveUnsavedChanges
       CollectionConfirmers = new()
       {
         ConfirmUnsavedChanges = (_) => Task.FromResult(ConfirmationResult.Yes),
-        ConfirmCollectionSave = (_) => Task.FromResult<string>(null),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>(null),
       }
     };
     var vm = factory.Build(model);
@@ -140,7 +140,7 @@ public class SaveUnsavedChanges
       CollectionConfirmers = new()
       {
         ConfirmUnsavedChanges = (_) => Task.FromResult(ConfirmationResult.Yes),
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
       }
     };
     var vm = factory.Build(model);
@@ -159,7 +159,7 @@ public class SaveUnsavedChanges
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -169,7 +169,7 @@ public class SaveUnsavedChanges
       CollectionConfirmers = new()
       {
         ConfirmUnsavedChanges = (_) => Task.FromResult(ConfirmationResult.Yes),
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
       }
     };
     var vm = factory.Build(model);
@@ -188,7 +188,7 @@ public class SaveUnsavedChanges
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {
@@ -211,7 +211,7 @@ public class SaveUnsavedChanges
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {

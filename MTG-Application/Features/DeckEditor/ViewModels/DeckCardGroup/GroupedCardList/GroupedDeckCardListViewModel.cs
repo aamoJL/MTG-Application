@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
 using MTGApplication.General.Extensions;
@@ -10,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using static MTGApplication.Features.DeckEditor.UseCases.ReversibleActions.CardListViewModelReversibleActions;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList;

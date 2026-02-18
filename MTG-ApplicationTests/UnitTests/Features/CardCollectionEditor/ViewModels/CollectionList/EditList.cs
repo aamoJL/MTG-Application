@@ -71,7 +71,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>((string.Empty, "query"))
@@ -94,7 +94,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>(("New", string.Empty))
@@ -116,7 +116,7 @@ public class EditList
     };
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => Task.FromResult<(string, string)?>(("New", "query"))
@@ -292,7 +292,7 @@ public class EditList
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionListConfirmers = new()
       {
         ConfirmEditList = (_) => throw new()

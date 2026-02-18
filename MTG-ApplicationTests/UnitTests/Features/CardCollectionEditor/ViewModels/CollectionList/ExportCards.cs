@@ -142,7 +142,7 @@ public class ExportCards
     };
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionListConfirmers = new()
       {
         ConfirmCardExport = async _ => throw new()

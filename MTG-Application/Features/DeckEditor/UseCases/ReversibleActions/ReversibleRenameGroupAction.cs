@@ -3,28 +3,25 @@ using MTGApplication.General.Services.ReversibleCommandService;
 
 namespace MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 
-public partial class CardListViewModelReversibleActions
+public class ReversibleRenameGroupAction : ReversibleAction<(DeckEditorCardGroup Group, string Key)>
 {
-  public class ReversibleRenameGroupAction : ReversibleAction<(DeckEditorCardGroup Group, string Key)>
+  private DeckEditorMTGCard[]? AffectedCards { get; set; }
+
+  protected override void ActionMethod((DeckEditorCardGroup Group, string Key) param)
   {
-    private DeckEditorMTGCard[]? AffectedCards { get; set; }
+    var (group, key) = param;
 
-    protected override void ActionMethod((DeckEditorCardGroup Group, string Key) param)
-    {
-      var (group, key) = param;
+    if (string.IsNullOrEmpty(key) || key == group.GroupKey)
+      return;
 
-      if (string.IsNullOrEmpty(key) || key == group.GroupKey)
-        return;
+    AffectedCards ??= [.. group.Cards];
 
-      group.GroupKey = key;
+    group.GroupKey = key;
 
-      AffectedCards ??= [.. group.Cards];
-
-      foreach (var card in AffectedCards)
-        card.Group = key;
-    }
-
-    protected override void ReverseActionMethod((DeckEditorCardGroup Group, string Key) param)
-      => ActionMethod(param);
+    foreach (var card in AffectedCards)
+      card.Group = key;
   }
+
+  protected override void ReverseActionMethod((DeckEditorCardGroup Group, string Key) param)
+    => ActionMethod(param);
 }

@@ -40,6 +40,10 @@ public class ChangeList
     var factory = new TestCollectionViewModelFactory()
     {
       Notifier = new(),
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success()
+      },
     };
     var vm = factory.Build(model);
 

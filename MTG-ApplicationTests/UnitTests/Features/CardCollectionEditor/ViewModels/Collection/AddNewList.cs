@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.General.Services.NotificationService;
+using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Services;
 
 namespace MTGApplicationTests.UnitTests.Features.CardCollectionEditor.ViewModels.Collection;
@@ -31,7 +32,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>((string.Empty, "query"))
@@ -51,7 +52,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", string.Empty))
@@ -74,7 +75,7 @@ public class AddNewList
     };
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -95,6 +96,10 @@ public class AddNewList
     var factory = new TestCollectionViewModelFactory()
     {
       Notifier = new(),
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success()
+      },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -116,6 +121,10 @@ public class AddNewList
     var factory = new TestCollectionViewModelFactory()
     {
       Notifier = new(),
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success()
+      },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -135,6 +144,10 @@ public class AddNewList
     var factory = new TestCollectionViewModelFactory()
     {
       Notifier = new(),
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success()
+      },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -154,6 +167,10 @@ public class AddNewList
     var factory = new TestCollectionViewModelFactory()
     {
       Notifier = new(),
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success()
+      },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -163,7 +180,7 @@ public class AddNewList
 
     await vm.AddNewListCommand.ExecuteAsync(null);
 
-    Assert.AreEqual("Name", vm.ListViewModel.Name);
+    Assert.AreEqual("Name", vm.ListViewModel?.Name);
   }
 
   [TestMethod]
@@ -173,6 +190,10 @@ public class AddNewList
     var factory = new TestCollectionViewModelFactory()
     {
       Notifier = new(),
+      Importer = new()
+      {
+        Result = TestMTGCardImporter.Success()
+      },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => Task.FromResult<(string, string)?>(("Name", "query"))
@@ -191,7 +212,7 @@ public class AddNewList
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       CollectionConfirmers = new()
       {
         ConfirmAddNewList = (_) => throw new()

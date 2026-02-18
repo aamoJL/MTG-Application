@@ -10,7 +10,7 @@ public class SelectDeck
   [TestMethod]
   public void Select_DeckSelected()
   {
-    string selected = null;
+    string? selected = null;
     var factory = new TestDeckSelectionPageViewModelFactory()
     {
       OnDeckSelected = deck => selected = deck.Name
@@ -27,7 +27,7 @@ public class SelectDeck
   {
     var factory = new TestDeckSelectionPageViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       OnDeckSelected = deck => throw new()
     };
     var vm = factory.Build();

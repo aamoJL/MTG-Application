@@ -21,11 +21,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult("Name"),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>("Name"),
         CollectionConfirmers = new()
         {
           ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.Cancel)
@@ -54,11 +54,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult("Name"),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>("Name"),
         CollectionConfirmers = new()
         {
           ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.No)
@@ -86,11 +86,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult<string>(null),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>(null),
       }
     };
     var vm = factory.Build();
@@ -112,11 +112,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult(string.Empty),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>(string.Empty),
       }
     };
     var vm = factory.Build();
@@ -139,11 +139,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult("Name"),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>("Name"),
       }
     };
     var vm = factory.Build();
@@ -166,11 +166,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult("Name"),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>("Name"),
       }
     };
     var vm = factory.Build();
@@ -185,7 +185,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])
@@ -193,11 +193,11 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(null)
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(null)
       },
       EditorPageConfirmers = new()
       {
-        ConfirmCollectionOpen = _ => Task.FromResult("Name"),
+        ConfirmCollectionOpen = _ => Task.FromResult<string?>("Name"),
       }
     };
     var vm = factory.Build();
@@ -212,7 +212,7 @@ public class OpenCollection
   {
     var factory = new TestEditorPageViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Importer = new()
       {
         Result = TestMTGCardImporter.Success([])
@@ -220,7 +220,7 @@ public class OpenCollection
       Repository = new()
       {
         GetAllResult = () => Task.FromResult<IEnumerable<MTGCardCollectionDTO>>([]),
-        GetResult = _ => Task.FromResult<MTGCardCollectionDTO>(new("Name", []))
+        GetResult = _ => Task.FromResult<MTGCardCollectionDTO?>(new("Name", []))
       },
       EditorPageConfirmers = new()
       {

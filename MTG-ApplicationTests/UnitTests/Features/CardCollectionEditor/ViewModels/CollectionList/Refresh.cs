@@ -33,7 +33,7 @@ public class Refresh
     var model = new MTGCardCollectionList();
     var factory = new TestCollectionListViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
     };
     var vm = factory.Build(model);
 

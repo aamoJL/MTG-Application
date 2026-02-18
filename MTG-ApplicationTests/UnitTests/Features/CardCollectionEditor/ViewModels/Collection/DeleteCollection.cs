@@ -43,7 +43,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
     };
     var vm = factory.Build(model);
 
@@ -139,7 +139,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(false)
@@ -165,7 +165,7 @@ public class DeleteCollection
     };
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Repository = new()
       {
         DeleteResult = (_) => Task.FromResult(false)

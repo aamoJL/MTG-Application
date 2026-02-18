@@ -105,7 +105,7 @@ public class SubmitSearch
   {
     var factory = new TestSearchPageViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Importer = new()
       {
         Result = null

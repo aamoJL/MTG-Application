@@ -21,7 +21,7 @@ public class SaveCollection
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = async (data) => { name = data.Data; return await Task.FromResult<string>(null); },
+        ConfirmCollectionSave = async (data) => { name = data.Data; return await Task.FromResult<string?>(null); },
       }
     };
     var vm = factory.Build(model);
@@ -40,7 +40,7 @@ public class SaveCollection
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult<string>(null),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>(null),
       }
     };
     var vm = factory.Build(model);
@@ -56,11 +56,11 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult(string.Empty),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>(string.Empty),
       }
     };
     var vm = factory.Build(model);
@@ -85,7 +85,7 @@ public class SaveCollection
       },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
       }
     };
     var vm = factory.Build(model);
@@ -114,7 +114,7 @@ public class SaveCollection
       },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult("Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("Name"),
       }
     };
     var vm = factory.Build(model);
@@ -138,7 +138,7 @@ public class SaveCollection
       },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
         ConfirmCollectionSaveOverride = (_) => Task.FromResult(ConfirmationResult.Cancel)
       }
     };
@@ -164,7 +164,7 @@ public class SaveCollection
       },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
         ConfirmCollectionSaveOverride = (_) => Task.FromResult(ConfirmationResult.Yes)
       }
     };
@@ -191,7 +191,7 @@ public class SaveCollection
       },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
       }
     };
     var vm = factory.Build(model);
@@ -207,7 +207,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       SaveStatus = new() { HasUnsavedChanges = true },
       Repository = new()
       {
@@ -216,7 +216,7 @@ public class SaveCollection
       },
       CollectionConfirmers = new()
       {
-        ConfirmCollectionSave = (_) => Task.FromResult("New Name"),
+        ConfirmCollectionSave = (_) => Task.FromResult<string?>("New Name"),
       }
     };
     var vm = factory.Build(model);
@@ -232,7 +232,7 @@ public class SaveCollection
     var model = new MTGCardCollection();
     var factory = new TestCollectionViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       SaveStatus = new() { HasUnsavedChanges = true },
       CollectionConfirmers = new()
       {

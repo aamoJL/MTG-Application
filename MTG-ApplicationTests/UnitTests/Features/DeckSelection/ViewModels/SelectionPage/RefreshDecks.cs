@@ -42,7 +42,7 @@ public class RefreshDecks
   {
     var factory = new TestDeckSelectionPageViewModelFactory()
     {
-      Notifier = new(),
+      Notifier = new() { ThrowOnError = false },
       Repository = new()
       {
         GetAllResult = () => throw new()

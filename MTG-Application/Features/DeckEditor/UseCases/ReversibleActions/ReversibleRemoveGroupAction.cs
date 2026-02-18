@@ -5,33 +5,30 @@ using System.Collections.Generic;
 
 namespace MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 
-public partial class CardListViewModelReversibleActions
+public class ReversibleRemoveGroupAction(IList<DeckEditorCardGroup> collection) : ReversibleAction<DeckEditorCardGroup>
 {
-  public class ReversibleRemoveGroupAction(IList<DeckEditorCardGroup> collection) : ReversibleAction<DeckEditorCardGroup>
+  private DeckEditorMTGCard[] AffectedCards { get; set; } = [];
+
+  protected override void ActionMethod(DeckEditorCardGroup group)
   {
-    private DeckEditorMTGCard[] AffectedCards { get; set; } = [];
+    if (group == null) return;
 
-    protected override void ActionMethod(DeckEditorCardGroup group)
-    {
-      if (group == null) return;
+    AffectedCards = [.. group.Cards];
 
-      AffectedCards = [.. group.Cards];
+    // Move cards to default group
+    foreach (var card in AffectedCards)
+      new ReversibleCardGroupChangeAction().Action((card, string.Empty));
 
-      // Move cards to default group
-      foreach (var card in AffectedCards)
-        new ReversibleCardGroupChangeAction().Action?.Invoke((card, string.Empty));
+    if (collection.TryFindIndex(x => x.GroupKey == group.GroupKey, out var index))
+      collection.RemoveAt(index);
+  }
 
-      if (collection.TryFindIndex(x => x.GroupKey == group.GroupKey, out var index))
-        collection.RemoveAt(index);
-    }
+  protected override void ReverseActionMethod(DeckEditorCardGroup group)
+  {
+    new ReversibleAddGroupAction(collection).Action(group);
 
-    protected override void ReverseActionMethod(DeckEditorCardGroup group)
-    {
-      new ReversibleAddGroupAction(collection).Action?.Invoke(group);
-
-      // Move old cards back
-      foreach (var card in AffectedCards)
-        new ReversibleCardGroupChangeAction().Action?.Invoke((card, group.GroupKey));
-    }
+    // Move old cards back
+    foreach (var card in AffectedCards)
+      new ReversibleCardGroupChangeAction().Action((card, group.GroupKey));
   }
 }

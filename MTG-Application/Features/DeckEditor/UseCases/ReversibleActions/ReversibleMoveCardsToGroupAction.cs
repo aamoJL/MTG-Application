@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 
-public class ReversibleAddCardsToGroupAction(DeckEditorCardGroup group) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
+public class ReversibleMoveCardsToGroupAction(DeckEditorCardGroup group) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
 {
   private readonly List<string> _oldGroups = [];
 
@@ -18,14 +18,13 @@ public class ReversibleAddCardsToGroupAction(DeckEditorCardGroup group) : Revers
 
     foreach (var card in cards)
     {
-      if (group.GetFromSource(x => x.Info.Name == card.Info.Name) is not null)
-        throw new InvalidOperationException("Card is already in the source");
-      else
+      if (group.GetFromSource(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard sourceCard)
       {
         _oldGroups.Add(card.Group);
-        group.AddToSource(card);
         card.Group = group.GroupKey;
       }
+      else
+        throw new InvalidOperationException("Card is not in the same source");
     }
   }
 
@@ -37,7 +36,6 @@ public class ReversibleAddCardsToGroupAction(DeckEditorCardGroup group) : Revers
 
     foreach (var card in cards)
     {
-      group.RemoveFromSource(card);
       card.Group = _oldGroups[i];
       i++;
     }

@@ -96,7 +96,7 @@ public partial class EdhrecImporter : IEdhrecImporter
   /// <param name="data">EDHREC card Uri</param>
   /// <param name="name">Parsed card name</param>
   /// <returns><see langword="true"/> if the <paramref name="data"/> was successfully parsed; otherwise, <see langword="false"/></returns>
-  public bool TryParseCardNameFromEdhrecUri(string data, out string? name)
+  public bool TryParseCardNameFromEdhrecUri(string data, out string name)
   {
     if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == WEBSITE_HOST)
       name = uri.Segments[^1]; // Name is the last segment of the Uri

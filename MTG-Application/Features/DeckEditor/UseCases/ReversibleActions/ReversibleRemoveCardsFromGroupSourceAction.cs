@@ -5,19 +5,20 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 
-public class ReversibleAddCardsAction(IList<DeckEditorMTGCard> collection) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
+public class ReversibleRemoveCardsFromGroupSourceAction(DeckEditorCardGroup group) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
 {
   protected override void ActionMethod(IEnumerable<DeckEditorMTGCard> cards)
   {
     foreach (var card in cards)
     {
-      if (collection.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
-        existingCard.Count += card.Count;
-      else
-        collection.Add(card);
+      if (group.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
+      {
+        existingCard.Group = string.Empty;
+        group.RemoveFromSource(existingCard);
+      }
     }
   }
 
   protected override void ReverseActionMethod(IEnumerable<DeckEditorMTGCard> cards)
-    => new ReversibleRemoveCardsAction(collection).Action.Invoke(cards);
+    => new ReversibleAddCardsToGroupAction(group).Action(cards);
 }
