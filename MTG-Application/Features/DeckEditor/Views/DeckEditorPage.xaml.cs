@@ -225,43 +225,4 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
     args.Handled = true;
   }
-
-  // ------- TODO: DeckEditorPage
-
-  private void DeleteCardKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
-  {
-    //if (args.Element is ListViewBase listview)
-    //{
-    //  if (listview.DataContext is not ICardListViewModel listViewViewModel
-    //    || (listview.SelectedIndex is int index && index < 0)
-    //    || listview.SelectedItem is not DeckEditorMTGCard selectedCard
-    //    || listViewViewModel.RemoveCardCommand?.CanExecute(selectedCard) is not true)
-    //    return;
-
-    //  listViewViewModel.RemoveCardCommand.Execute(selectedCard);
-
-    //  // Recalculate the index and focus the element in the index position if the element exists.
-    //  if ((index = Math.Clamp(index, -1, listview.Items.Count - 1)) >= 0)
-    //  {
-    //    (listview.ContainerFromIndex(index) as UIElement)?.Focus(FocusState.Programmatic);
-
-    //    listview.SelectedIndex = index;
-    //  }
-    //}
-    //else if (args.Element is ItemsView itemsView)
-    //{
-    //  if (itemsView.SelectedItem is not DeckEditorMTGCard selectedItem
-    //    || itemsView.DataContext is not ICardListViewModel itemsViewViewModel
-    //    || itemsView.ItemsSource is not IList source
-    //    || (source.IndexOf(selectedItem) is int index && index < 0)
-    //    || itemsViewViewModel.RemoveCardCommand?.CanExecute(selectedItem) is not true)
-    //    return;
-
-    //  itemsViewViewModel.RemoveCardCommand.Execute(selectedItem);
-
-    //  itemsView.Select(index < source.Count ? index : index - 1);
-    //}
-
-    args.Handled = true;
-  }
 }

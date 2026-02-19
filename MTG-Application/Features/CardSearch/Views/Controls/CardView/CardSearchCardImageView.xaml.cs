@@ -13,7 +13,7 @@ public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
     DragStarting += ImageView_DragStarting;
   }
 
-  private DragAndDrop<CardMoveArgs> DragAndDrop => field ??= new()
+  private DragAndDrop<MTGCard> DragAndDrop => field ??= new()
   {
     AcceptMove = false,
   };
@@ -22,7 +22,7 @@ public sealed partial class CardSearchCardImageView : CardSearchCardViewBase
   {
     var deferral = args.GetDeferral();
 
-    DragAndDrop.OnInternalDragStarting(new CardMoveArgs(new(Model.Info), 1), out var operation);
+    DragAndDrop.OnInternalDragStarting(new(Model.Info), out var operation);
 
     // Set the drag UI to the image element of the dragged element
     args.DragUI.SetContentFromSoftwareBitmap(await DragAndDropHelpers.GetDragUI(ImageElement), args.GetPosition(ImageElement));

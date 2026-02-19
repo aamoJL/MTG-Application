@@ -9,7 +9,8 @@
   xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:helpers="using:MTGApplication.General.Views.BindingHelpers" 
   xmlns:converters="using:MTGApplication.General.Views.BindingHelpers.Converters"
-  d:DataContext="{d:DesignInstance Type=cardview:DeckEditorCardTextView}"
+  xmlns:models="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCard"
+  d:DataContext="{d:DesignInstance Type=models:DeckCardViewModel}"
   mc:Ignorable="d">
 
   <cardview:DeckEditorCardViewBase.Resources>
@@ -22,22 +23,22 @@
     <Grid.ContextFlyout>
       <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
         <CommandBarFlyout.PrimaryCommands>
-          <AppBarButton Command="{x:Bind SwitchFaceImageCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind SwitchFaceImageClickCommand, Mode=OneTime}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
           <AppBarSeparator />
-          <AppBarButton Command="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}" IsCompact="True"/>
-          <AppBarButton Command="{x:Bind OpenCardmarketWebsiteCommand, Mode=OneTime}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
-          <AppBarButton Command="{x:Bind DeleteButtonClick, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
+          <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}" IsCompact="True"/>
+          <AppBarButton Command="{Binding OpenCardMarketWebsiteCommand, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind DeleteClickCommand, Mode=OneTime}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
         </CommandBarFlyout.PrimaryCommands>
         <CommandBarFlyout.SecondaryCommands>
-          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{x:Bind Model.ChangePrintCommand, Mode=OneWay}" CommandParameter="{x:Bind Model, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{Binding ChangePrintCommand, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
           <AppBarButton Visibility="{x:Bind TagVisible, Mode=OneWay}" Label="Tag" Icon="{ui:SymbolIcon Symbol=Tag}">
             <AppBarButton.Flyout>
               <MenuFlyout AreOpenCloseAnimationsEnabled="False">
-                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Add, Mode=OneWay}" Text="Add" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="Add"/>
-                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Delete, Mode=OneWay}" Text="Delete" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="Delete"/>
-                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Move, Mode=OneWay}" Text="Move" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="Move"/>
+                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Add, Mode=OneWay}" Text="Add" Command="{x:Bind ChangeTagClickCommand, Mode=OneTime}" CommandParameter="Add"/>
+                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Delete, Mode=OneWay}" Text="Delete" Command="{x:Bind ChangeTagClickCommand, Mode=OneTime}" CommandParameter="Delete"/>
+                <RadioMenuFlyoutItem GroupName="TagGroup" IsChecked="{x:Bind Model.CardTag, Converter={StaticResource ToStringToBoolConverter}, ConverterParameter=Move, Mode=OneWay}" Text="Move" Command="{x:Bind ChangeTagClickCommand, Mode=OneTime}" CommandParameter="Move"/>
                 <MenuFlyoutSeparator Visibility="{x:Bind Model.CardTag, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Null}, Mode=OneWay}"/>
-                <MenuFlyoutItem Text="Clear" Command="{x:Bind ChangeCardTagCommand, Mode=OneWay}" CommandParameter="{x:Null}" Background="{ThemeResource SystemFillColorCriticalBrush}" Visibility="{x:Bind Model.CardTag, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Null}, Mode=OneWay}"/>
+                <MenuFlyoutItem Text="Clear" Command="{x:Bind ChangeTagClickCommand, Mode=OneTime}" CommandParameter="{x:Null}" Background="{ThemeResource SystemFillColorCriticalBrush}" Visibility="{x:Bind Model.CardTag, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Null}, Mode=OneWay}"/>
               </MenuFlyout>
             </AppBarButton.Flyout>
           </AppBarButton>

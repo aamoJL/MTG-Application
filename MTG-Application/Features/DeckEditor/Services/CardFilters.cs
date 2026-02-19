@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
 using System;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -36,7 +36,7 @@ public partial class CardFilters : ObservableObject
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial double Cmc { get; set; } = double.NaN;
 
-  public Predicate<object> ValidationPredicate => (item) => CardValidation(item as DeckEditorMTGCard);
+  public Predicate<object> ValidationPredicate => (item) => CardValidation(item as DeckCardViewModel);
 
   /// <summary>
   /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value
@@ -47,7 +47,7 @@ public partial class CardFilters : ObservableObject
   /// <summary>
   /// returns <see langword="true"/> if the given <paramref name="card"/> is valid with the selected filters
   /// </summary>
-  public bool CardValidation(DeckEditorMTGCard? card)
+  public bool CardValidation(DeckCardViewModel? card)
   {
     if (card == null)
       return false;

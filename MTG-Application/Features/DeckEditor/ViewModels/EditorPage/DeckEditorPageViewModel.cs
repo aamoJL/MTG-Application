@@ -85,7 +85,7 @@ public partial class DeckEditorPageViewModel : ViewModelBase
       if (string.IsNullOrEmpty(loadName))
         return; // Cancel
 
-      if (await new FetchDeck(Repository, Importer).Execute(loadName) is DeckEditorMTGDeck deck)
+      if (await Worker.DoWork(new FetchDeck(Repository, Importer).Execute(loadName)) is DeckEditorMTGDeck deck)
       {
         await ChangeDeck(deck);
 

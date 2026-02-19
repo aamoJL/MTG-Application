@@ -9,8 +9,6 @@ using MTGApplication.General.Views.DragAndDrop;
 using System;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor.Views.Controls.CardListView;
@@ -67,13 +65,13 @@ public partial class DeckEditorListViewContainer : UserControl
   public bool CenterOnFocus { get; set; } = false;
 
   [NotNull]
-  protected DragAndDrop<CardMoveArgs>? DragAndDrop => field ??= new()
+  protected DragAndDrop<MTGCard>? DragAndDrop => field ??= new()
   {
-    OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info) { Count = item.Count }) ?? Task.CompletedTask),
-    OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
-    OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info) { Count = item.Count }) ?? Task.CompletedTask),
-    OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info) { Count = item.Count }),
-    OnExecuteMove = (item) => OnDropExecuteMove?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info) { Count = item.Count })
+    //OnCopy = async (item) => await (OnDropCopy?.ExecuteAsync(new DeckEditorMTGCard(item.Card.Info) { Count = item.Count }) ?? Task.CompletedTask),
+    //OnExternalImport = async (data) => await (OnDropImport?.ExecuteAsync(data) ?? Task.CompletedTask),
+    //OnBeginMoveTo = async (item) => await (OnDropBeginMoveTo?.ExecuteAsync((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info) { Count = item.Count }) ?? Task.CompletedTask),
+    //OnBeginMoveFrom = (item) => OnDropBeginMoveFrom?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info) { Count = item.Count }),
+    //OnExecuteMove = (item) => OnDropExecuteMove?.Execute((item.Card as DeckEditorMTGCard) ?? new DeckEditorMTGCard(item.Card.Info) { Count = item.Count })
   };
 
   public IAsyncRelayCommand OnDropCopy
@@ -104,9 +102,9 @@ public partial class DeckEditorListViewContainer : UserControl
 
   protected virtual void OnDragOver(object sender, DragEventArgs e)
   {
-    if (ItemsSource is IList source
-      && source.Cast<object>().Contains(DragAndDrop<CardMoveArgs>.Item?.Card))
-      return;
+    //if (ItemsSource is IList source
+    //  && source.Cast<object>().Contains(DragAndDrop<CardMoveArgs>.Item?.Card))
+    //  return;
 
     DragAndDrop?.DragOver(e);
 

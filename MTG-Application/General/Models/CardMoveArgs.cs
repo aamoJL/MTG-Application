@@ -1,3 +1,6 @@
-﻿namespace MTGApplication.General.Models;
+﻿using System;
 
-public record CardMoveArgs(MTGCard Card, int Count = 1);
+namespace MTGApplication.General.Models;
+
+[Obsolete]
+public record CardMoveArgs(MTGCard Card);

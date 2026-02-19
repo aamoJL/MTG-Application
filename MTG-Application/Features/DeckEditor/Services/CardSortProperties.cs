@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.WinUI.Collections;
-using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
 using System;
 using System.Collections.Generic;
 using static MTGApplication.Features.DeckEditor.Services.CardSortProperties;
@@ -27,8 +27,8 @@ public record CardSortProperties(
 
       foreach (var property in properties)
       {
-        var cx = GetComparable(x as DeckEditorMTGCard, property);
-        var cy = GetComparable(y as DeckEditorMTGCard, property);
+        var cx = GetComparable(x as DeckCardViewModel, property);
+        var cy = GetComparable(y as DeckCardViewModel, property);
 
         result = cx == cy ? 0 : cx == null ? -1 : cy == null ? +1 : cx.CompareTo(cy);
 
@@ -42,7 +42,7 @@ public record CardSortProperties(
       return result;
     }
 
-    private static IComparable? GetComparable(DeckEditorMTGCard? card, MTGSortProperty sortProperty)
+    private static IComparable? GetComparable(DeckCardViewModel? card, MTGSortProperty sortProperty)
     {
       return sortProperty switch
       {

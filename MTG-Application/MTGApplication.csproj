@@ -218,7 +218,6 @@
   <ItemGroup>
     <Folder Include="Features\AppWindows\DeckBuilderWindow\VIews\" />
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
-    <Folder Include="Features\DeckEditor\Views\Controls\CardListView\" />
     <Folder Include="Features\DeckEditor\_Commanders\Views\Controls\" />
   </ItemGroup>
   <ItemGroup>

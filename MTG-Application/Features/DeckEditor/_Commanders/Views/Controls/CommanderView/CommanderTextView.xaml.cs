@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
+using MTGApplication.Features.DeckEditor._Commanders.Views.Controls.CommanderView;
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.Views.Controls.CardView;
 using System.Threading.Tasks;

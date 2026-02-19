@@ -45,13 +45,11 @@ public partial class BindableCollectionView : DependencyObject
 
   private static void OnDependencyPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
   {
-    var collectionView = sender as BindableCollectionView;
+    if (sender is not BindableCollectionView collectionView)
+      return;
 
-    if (e.Property == SourceProperty)
-      collectionView?.OnSourceChanged();
-    else if (e.Property == FilterProperty)
-      collectionView?.OnFilterChanged();
-    else if (e.Property == SortComparerProperty)
-      collectionView?.OnSortComparerChanged();
+    if (e.Property == SourceProperty) collectionView.OnSourceChanged();
+    else if (e.Property == FilterProperty) collectionView.OnFilterChanged();
+    else if (e.Property == SortComparerProperty) collectionView.OnSortComparerChanged();
   }
 }

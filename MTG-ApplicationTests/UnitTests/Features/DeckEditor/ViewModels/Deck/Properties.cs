@@ -1,4 +1,7 @@
-﻿using MTGApplicationTests.TestUtility.Mocker;
+﻿using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
+using MTGApplication.General.Services.ReversibleCommandService;
+using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.ViewModel;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.ViewModels.Deck;
@@ -184,5 +187,19 @@ public class Properties
       factory.Model.CommanderPartner = null;
     });
     Assert.AreEqual(0, vm.DeckPrice);
+  }
+
+  [TestMethod]
+  public void Change_UndoStack_SaveStateChanged()
+  {
+    var factory = new TestDeckViewModelFactory();
+    var vm = factory.Build();
+
+    vm.UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>([new(MTGCardInfoMocker.MockInfo())])
+    {
+      ReversibleAction = new ReversibleAddCardsAction([])
+    });
+
+    Assert.IsTrue(vm.SaveStatus.HasUnsavedChanges);
   }
 }

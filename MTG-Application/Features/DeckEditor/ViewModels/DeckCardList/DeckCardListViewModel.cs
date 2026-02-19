@@ -52,9 +52,10 @@ public partial class DeckCardListViewModel
     Notifier = Notifier,
     NetworkService = NetworkService,
     Confirmers = Confirmers.CardConfirmers,
-    OnCardDelete = OnCardDelete,
+    OnCardDelete = RemoveCard,
   };
 
+  // TODO: test
   [RelayCommand]
   protected async Task AddCard(DeckEditorMTGCard? card)
   {
@@ -62,21 +63,27 @@ public partial class DeckCardListViewModel
     {
       ArgumentNullException.ThrowIfNull(card);
 
-      if (Model.FirstOrDefault(x => x.Info.Name == card.Info.Name) != null)
+      if (Model.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard listCard)
       {
         // Conflict confirmation
         switch (await Confirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
         {
-          case ConfirmationResult.Yes: break;
+          case ConfirmationResult.Yes:
+            UndoStack.PushAndExecute(new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(listCard, listCard.Count, listCard.Count + card.Count)
+            {
+              ReversibleAction = new ReversibleCardCountChangeAction()
+            });
+            break;
           default: return; // Cancel
         }
       }
-
-      UndoStack.PushAndExecute(
-        new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+      else
+      {
+        UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
         {
           ReversibleAction = new ReversibleAddCardsAction(Model)
         });
+      }
     }
     catch (Exception e)
     {
@@ -84,6 +91,7 @@ public partial class DeckCardListViewModel
     }
   }
 
+  // TODO: test
   [RelayCommand]
   protected void RemoveCard(DeckEditorMTGCard? card)
   {
@@ -103,6 +111,7 @@ public partial class DeckCardListViewModel
     }
   }
 
+  // TODO: test
   [RelayCommand]
   protected void BeginMoveFrom(DeckEditorMTGCard? card)
   {
@@ -115,6 +124,7 @@ public partial class DeckCardListViewModel
       });
   }
 
+  // TODO: test
   [RelayCommand]
   protected async Task BeginMoveTo(DeckEditorMTGCard? card)
   {
@@ -143,9 +153,11 @@ public partial class DeckCardListViewModel
         });
   }
 
+  // TODO: test
   [RelayCommand]
   protected void ExecuteMove() => UndoStack.PushAndExecuteActiveCombinedCommand();
 
+  // TODO: test
   [RelayCommand(CanExecute = nameof(CanClear))]
   protected void Clear()
   {
@@ -158,6 +170,7 @@ public partial class DeckCardListViewModel
       });
   }
 
+  // TODO: test
   [RelayCommand]
   protected async Task ImportCards(string? data)
   {
@@ -191,13 +204,13 @@ public partial class DeckCardListViewModel
           {
             // Change existing card
             if (existingCards.FirstOrDefault(x => x.Card == existingCard) is (DeckEditorMTGCard, int) listItem)
-              listItem.NewCount += card.Count;
+              listItem.NewCount += card.Count; // existing card already in list, change count
             else
               existingCards.Add((existingCard, existingCard.Count + card.Count));
           }
         }
         else if (newCards.FindIndex(x => x.Info.Name == card.Info.Name) is int index && index >= 0)
-          newCards[index].Count += card.Count; // Already added new card; change count
+          newCards[index].Count += card.Count; // Already added new card, change count
         else
           newCards.Add(new(card.Info) { Count = card.Count }); // add new card
       }
@@ -250,6 +263,7 @@ public partial class DeckCardListViewModel
     }
   }
 
+  // TODO: test
   [RelayCommand]
   protected async Task ExportCards(string? exportProperty)
   {
@@ -267,7 +281,7 @@ public partial class DeckCardListViewModel
       if (string.IsNullOrEmpty(response))
         return; // Cancel
 
-      new ExportText(Exporter).Execute(response);
+      await new ExportText(Exporter).Execute(response);
 
       new ShowNotification(Notifier).Execute(Exporter.SuccessNotification);
     }
@@ -278,8 +292,6 @@ public partial class DeckCardListViewModel
   }
 
   protected bool CanClear() => Model.Any();
-
-  protected void OnCardDelete(DeckEditorMTGCard card) => Model.Remove(card);
 
   protected virtual void Model_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {

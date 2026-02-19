@@ -40,7 +40,7 @@ public sealed partial class CardSearchPage : Page
           {
             if (args.Items.FirstOrDefault() is MTGCard card)
             {
-              new DragAndDrop<CardMoveArgs>() { AcceptMove = false }.OnInternalDragStarting(new CardMoveArgs(card), out var operation);
+              new DragAndDrop<MTGCard>() { AcceptMove = false }.OnInternalDragStarting(card, out var operation);
 
               args.Data.RequestedOperation = operation;
             }
@@ -49,7 +49,7 @@ public sealed partial class CardSearchPage : Page
       },
     },
   };
-  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new(itemToArgsConverter: (item) => new(item))
+  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new()
   {
     AcceptMove = false
   };

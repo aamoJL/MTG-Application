@@ -2,28 +2,14 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
+using MTGApplication.General.Models;
+using System;
 using System.ComponentModel;
-using System.Windows.Input;
 
 namespace MTGApplication.Features.DeckEditor.Views.Controls.CardView;
 
 public partial class DeckEditorCardViewBase : UserControl, INotifyPropertyChanged
 {
-  public static readonly DependencyProperty ModelProperty =
-      DependencyProperty.Register(nameof(Model), typeof(DeckCardViewModel), typeof(DeckEditorCardViewBase), new PropertyMetadata(null, OnModelPropertyChangedCallback));
-
-  public static readonly DependencyProperty ShowPrintsCommandProperty =
-      DependencyProperty.Register(nameof(ShowPrintsCommand), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(null));
-
-  public static readonly DependencyProperty OpenAPIWebsiteCommandProperty =
-      DependencyProperty.Register(nameof(OpenAPIWebsiteCommand), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(null));
-
-  public static readonly DependencyProperty OpenCardmarketWebsiteCommandProperty =
-      DependencyProperty.Register(nameof(OpenCardmarketWebsiteCommand), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(null));
-
-  public static readonly DependencyProperty DeleteButtonClickProperty =
-      DependencyProperty.Register(nameof(DeleteButtonClick), typeof(ICommand), typeof(DeckEditorCardViewBase), new PropertyMetadata(default(ICommand)));
-
   public static readonly DependencyProperty TagVisibleProperty =
       DependencyProperty.Register(nameof(TagVisible), typeof(bool), typeof(DeckEditorCardViewBase), new PropertyMetadata(true));
 
@@ -35,38 +21,16 @@ public partial class DeckEditorCardViewBase : UserControl, INotifyPropertyChange
       AppConfig.LocalSettings.PropertyChanged += AppSettings_PropertyChanged;
     };
     Unloaded += (_, _) => { AppConfig.LocalSettings.PropertyChanged -= AppSettings_PropertyChanged; };
+
+    DataContextChanged += DeckEditorCardViewBase_DataContextChanged;
   }
 
-  public DeckCardViewModel Model
-  {
-    get => (DeckCardViewModel)GetValue(ModelProperty);
-    set => SetValue(ModelProperty, value);
-  }
-  public ICommand ShowPrintsCommand
-  {
-    get => (ICommand)GetValue(ShowPrintsCommandProperty);
-    set => SetValue(ShowPrintsCommandProperty, value);
-  }
-  public ICommand OpenAPIWebsiteCommand
-  {
-    get => (ICommand)GetValue(OpenAPIWebsiteCommandProperty);
-    set => SetValue(OpenAPIWebsiteCommandProperty, value);
-  }
-  public ICommand OpenCardmarketWebsiteCommand
-  {
-    get => (ICommand)GetValue(OpenCardmarketWebsiteCommandProperty);
-    set => SetValue(OpenCardmarketWebsiteCommandProperty, value);
-  }
-  public ICommand? DeleteButtonClick
-  {
-    get => (ICommand)GetValue(DeleteButtonClickProperty);
-    set => SetValue(DeleteButtonClickProperty, value);
-  }
   public bool? TagVisible
   {
     get => (bool)GetValue(TagVisibleProperty);
     set => SetValue(TagVisibleProperty, value);
   }
+  protected DeckCardViewModel? Model => DataContext as DeckCardViewModel;
 
   public string SelectedFaceUri
   {
@@ -83,8 +47,17 @@ public partial class DeckEditorCardViewBase : UserControl, INotifyPropertyChange
 
   public event PropertyChangedEventHandler? PropertyChanged;
 
+  protected DeckCardViewModel? _oldDataContext = null;
+
+  [RelayCommand]
+  protected virtual void DeleteClick()
+  {
+    if (Model?.DeleteCardCommand?.CanExecute(null) is true)
+      Model.DeleteCardCommand.Execute(null);
+  }
+
   [RelayCommand(CanExecute = nameof(CanExecuteSwitchFaceImage))]
-  private void SwitchFaceImage()
+  private void SwitchFaceImageClick()
   {
     if (!CanExecuteSwitchFaceImage()) return;
 
@@ -92,6 +65,21 @@ public partial class DeckEditorCardViewBase : UserControl, INotifyPropertyChange
       ? Model.Info.BackFace?.ImageUri
       : Model?.Info.FrontFace.ImageUri)
       ?? string.Empty;
+  }
+
+  [RelayCommand]
+  protected virtual void ChangeTagClick(string? tag)
+  {
+    CardTag? cardTag = null;
+
+    if (tag != null && Enum.TryParse(tag, out CardTag parsedTag))
+      cardTag = parsedTag;
+
+    if (Model?.CardTag == cardTag)
+      return;
+
+    if (Model?.ChangeTagCommand?.CanExecute(cardTag) is true)
+      Model.ChangeTagCommand.Execute(cardTag);
   }
 
   private void AppSettings_PropertyChanged(object? _, PropertyChangedEventArgs e)
@@ -105,34 +93,37 @@ public partial class DeckEditorCardViewBase : UserControl, INotifyPropertyChange
 
   private bool CanExecuteSwitchFaceImage() => !string.IsNullOrEmpty(Model?.Info.BackFace?.ImageUri);
 
-  private static void OnModelPropertyChangedCallback(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+  private void DeckEditorCardViewBase_DataContextChanged(FrameworkElement _, DataContextChangedEventArgs e)
   {
-    if (sender is not DeckEditorCardViewBase view) return;
-    if (!e.Property.Equals(ModelProperty)) return;
+    if (_oldDataContext != null)
+      _oldDataContext.PropertyChanged -= DataContext_PropertyChanged;
 
-    if (e.OldValue is DeckCardViewModel oldValue)
-      view.Model_Changing(oldValue);
+    if (e.NewValue == null) return;
+    if (e.NewValue is not DeckCardViewModel vm)
+      throw new InvalidOperationException($"DataContext needs to be {nameof(DeckCardViewModel)}");
 
-    if (e.NewValue is DeckCardViewModel newValue)
-      view.Model_Changed(newValue);
+    _oldDataContext = vm;
+
+    vm.PropertyChanged += DataContext_PropertyChanged;
+
+    SelectedFaceUri = vm.Info.FrontFace.ImageUri ?? string.Empty;
+
+    PropertyChanged?.Invoke(this, new(nameof(Model)));
+    SwitchFaceImageClickCommand.NotifyCanExecuteChanged();
   }
 
-  private void Model_Changing(DeckCardViewModel oldValue)
-    => oldValue.PropertyChanged -= Model_PropertyChanged;
-
-  private void Model_Changed(DeckCardViewModel newValue)
-  {
-    SelectedFaceUri = newValue?.Info.FrontFace.ImageUri ?? string.Empty;
-
-    if (newValue != null)
-      newValue.PropertyChanged += Model_PropertyChanged;
-
-    SwitchFaceImageCommand.NotifyCanExecuteChanged();
-  }
-
-  private void Model_PropertyChanged(object? _, PropertyChangedEventArgs e)
+  private void DataContext_PropertyChanged(object? _, PropertyChangedEventArgs e)
   {
     if (e.PropertyName == nameof(Model.Info))
       SelectedFaceUri = Model?.Info.FrontFace.ImageUri ?? string.Empty;
+  }
+
+  protected virtual void NumberBox_ValueChanged(NumberBox _, NumberBoxValueChangedEventArgs e)
+  {
+    if (e.NewValue == Model?.Count)
+      return;
+
+    if (Model?.ChangeCountCommand?.CanExecute((int)e.NewValue) is true)
+      Model.ChangeCountCommand.Execute((int)e.NewValue);
   }
 }

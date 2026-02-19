@@ -1,13 +1,15 @@
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MTGApplication.General.Models;
-using System;
+using Microsoft.UI.Xaml.Input;
+using MTGApplication.General.Views.Controls;
 
 namespace MTGApplication.Features.DeckEditor.Views.Controls.CardView;
 
 public partial class DeckEditorCardTextView : DeckEditorCardViewBase
 {
+  public static readonly DependencyProperty HoverPreviewEnabledProperty =
+      DependencyProperty.Register(nameof(HoverPreviewEnabled), typeof(bool), typeof(DeckEditorCardTextView), new PropertyMetadata(false));
+
   public static readonly DependencyProperty SetIconVisibleProperty =
       DependencyProperty.Register(nameof(SetIconVisible), typeof(bool), typeof(DeckEditorCardTextView), new PropertyMetadata(true));
 
@@ -16,6 +18,11 @@ public partial class DeckEditorCardTextView : DeckEditorCardViewBase
 
   public DeckEditorCardTextView() : base() => InitializeComponent();
 
+  public bool HoverPreviewEnabled
+  {
+    get => (bool)GetValue(HoverPreviewEnabledProperty);
+    set => SetValue(HoverPreviewEnabledProperty, value);
+  }
   public bool SetIconVisible
   {
     get => (bool)GetValue(SetIconVisibleProperty);
@@ -27,29 +34,49 @@ public partial class DeckEditorCardTextView : DeckEditorCardViewBase
     set => SetValue(TypeLineVisibleProperty, value);
   }
 
-  [RelayCommand]
-  private void ChangeCardTag(string? tag)
+  protected override void DeleteClick()
   {
     ContainerElement.ContextFlyout?.Hide();
 
-    CardTag? cardTag = null;
-
-    if (tag != null && Enum.TryParse(tag, out CardTag parsedTag))
-      cardTag = parsedTag;
-
-    if (Model.CardTag == cardTag)
-      return;
-
-    if (Model.ChangeTagCommand?.CanExecute(cardTag) is true)
-      Model.ChangeTagCommand.Execute(cardTag);
+    base.DeleteClick();
   }
 
-  private void NumberBox_ValueChanged(NumberBox _, NumberBoxValueChangedEventArgs e)
+  protected override void ChangeTagClick(string? tag)
   {
-    if (e.NewValue == Model.Count)
-      return;
+    ContainerElement.ContextFlyout?.Hide();
 
-    if (Model.ChangeCountCommand?.CanExecute((int)e.NewValue) is true)
-      Model.ChangeCountCommand.Execute((int)e.NewValue);
+    base.ChangeTagClick(tag);
   }
+
+  protected override void OnPointerMoved(PointerRoutedEventArgs e)
+  {
+    base.OnPointerMoved(e);
+
+    if (!HoverPreviewEnabled) return;
+
+    HoverPreviewUpdate(this, e);
+  }
+
+  protected override void OnPointerExited(PointerRoutedEventArgs e)
+  {
+    base.OnPointerExited(e);
+
+    if (!HoverPreviewEnabled) return;
+
+    CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
+  }
+
+  protected virtual void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
+  {
+    var point = e.GetCurrentPoint(null).Position;
+
+    CardPreview.Change(this, new(XamlRoot)
+    {
+      Uri = SelectedFaceUri,
+      Coordinates = new((float)point.X, (float)point.Y)
+    });
+  }
+
+  protected override void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs e)
+    => base.NumberBox_ValueChanged(sender, e);
 }

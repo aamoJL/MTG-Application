@@ -2,11 +2,10 @@
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
-using MTGApplication.Features.DeckEditor.Views;
+using MTGApplication.Features.AppWindows.DeckBuilderWindow.Views;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Views.AppWindows;
 
 namespace MTGApplication;
 
@@ -39,10 +38,6 @@ public partial class App : Application
 
     LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
 
-    //new DeckBuilderWindow().Activate();
-    // TODO: change back
-    var win = new ThemedWindow();
-    win.Navigate(typeof(DeckEditorPage));
-    win.Activate();
+    new DeckBuilderWindow().Activate();
   }
 }

@@ -6,10 +6,17 @@ using Windows.ApplicationModel.DataTransfer.DragDrop;
 
 namespace MTGApplication.General.Views.DragAndDrop;
 
-public class DragAndDrop<T>()
+public class DragAndDrop<T> where T : class
 {
-  public static DragAndDrop<T>? DragOrigin { get; private set; }
-  public static T? Item { get; private set; }
+  public class ActiveDragArgs(DragAndDrop<T> origin)
+  {
+    public DragAndDrop<T> Origin { get; } = origin;
+    public T? Item { get; init; } = null;
+  }
+
+  private static readonly DragDropModifiers _moveModifier = DragDropModifiers.Shift;
+
+  public static ActiveDragArgs? ActiveDrag { get; set; } = null;
 
   public bool AcceptMove { get; set; } = true;
   public string CopyCaptionOverride { get; set; } = string.Empty;
@@ -31,20 +38,22 @@ public class DragAndDrop<T>()
     else
       requestedOperation = DataPackageOperation.Copy;
 
-    Item = item;
-    DragOrigin = this;
+    ActiveDrag = new(this) { Item = item };
   }
 
   public virtual void DragOver(DragEventArgs eventArgs)
   {
     // Block dropping if the origin is the same or the item is invalid
-    if (DragOrigin == this || (!eventArgs.DataView.Contains(StandardDataFormats.Text) && Item == null))
-      return;
+    if (ActiveDrag?.Origin == this) return;
+    if (!eventArgs.DataView.Contains(StandardDataFormats.Text) && ActiveDrag?.Item is null) return;
 
     // Change operation to 'Move' if the shift key is down and move is an accepted operation.
-    eventArgs.AcceptedOperation = (eventArgs.Modifiers & DragDropModifiers.Shift) == DragDropModifiers.Shift && DragOrigin?.AcceptMove is true && Item != null
+    eventArgs.AcceptedOperation = (eventArgs.Modifiers & _moveModifier) == _moveModifier
+      && ActiveDrag?.Origin.AcceptMove is true
+      && ActiveDrag?.Item is not null
       ? DataPackageOperation.Move : DataPackageOperation.Copy;
 
+    // Change UI Caption
     if (eventArgs.AcceptedOperation == DataPackageOperation.Move && !string.IsNullOrEmpty(MoveCaptionOverride))
       eventArgs.DragUIOverride.Caption = MoveCaptionOverride;
     else if (eventArgs.AcceptedOperation == DataPackageOperation.Copy && !string.IsNullOrEmpty(CopyCaptionOverride))
@@ -55,22 +64,20 @@ public class DragAndDrop<T>()
     eventArgs.Handled = true;
   }
 
-  public virtual async Task Drop(DataPackageOperation operation, string data)
+  public virtual async Task Drop(DataPackageOperation operation, string? data)
   {
-    if (data != string.Empty)
-    {
+    if (!string.IsNullOrEmpty(data))
       await OnExternalDrop(operation, data);
-    }
     else
     {
-      if (Item == null || DragOrigin == this
-        || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
-          || (operation & DataPackageOperation.Move) == DataPackageOperation.Move))
-      {
+      if (ActiveDrag is null
+        || ActiveDrag.Item is null
+        || ActiveDrag.Origin == this
+        || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move)
         return; // don't drop on the origin and only allow copy and move operations
-      }
 
-      await OnInternalDrop(operation, Item);
+      await OnInternalDrop(operation, ActiveDrag.Item);
     }
   }
 
@@ -83,20 +90,22 @@ public class DragAndDrop<T>()
     }
     else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
     {
-      DragOrigin?.OnBeginMoveFrom?.Invoke(item);
+      ActiveDrag?.Origin.OnBeginMoveFrom?.Invoke(item);
 
       if (OnBeginMoveTo != null)
         await OnBeginMoveTo.Invoke(item);
 
       OnExecuteMove?.Invoke(item);
-      DragOrigin?.OnExecuteMove?.Invoke(item);
+      ActiveDrag?.Origin?.OnExecuteMove?.Invoke(item);
     }
   }
 
   protected virtual async Task OnExternalDrop(DataPackageOperation operation, string data)
   {
     if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+    {
       if (OnExternalImport != null)
         await OnExternalImport.Invoke(data);
+    }
   }
 }

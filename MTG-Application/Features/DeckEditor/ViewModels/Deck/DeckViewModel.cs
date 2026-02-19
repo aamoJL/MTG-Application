@@ -277,5 +277,5 @@ public partial class DeckViewModel : ViewModelBase
   }
 
   private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    => SaveStatus.HasUnsavedChanges = e.Action != NotifyCollectionChangedAction.Reset;
+    => SaveStatus.HasUnsavedChanges = true;
 }
