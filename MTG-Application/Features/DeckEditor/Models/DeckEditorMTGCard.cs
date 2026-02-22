@@ -27,4 +27,6 @@ public partial class DeckEditorMTGCard(MTGCardInfo info) : MTGCard(info)
   } = 1;
   [ObservableProperty] public partial string Group { get; set; } = string.Empty;
   [ObservableProperty] public partial CardTag? CardTag { get; set; } = null;
+
+  public DeckEditorMTGCard Copy() => (DeckEditorMTGCard)MemberwiseClone();
 }

@@ -6,6 +6,7 @@ using Windows.ApplicationModel.DataTransfer.DragDrop;
 
 namespace MTGApplication.General.Views.DragAndDrop;
 
+[Obsolete]
 public class DragAndDrop<T> where T : class
 {
   public class ActiveDragArgs(DragAndDrop<T> origin)
@@ -28,6 +29,7 @@ public class DragAndDrop<T> where T : class
   public Action<T>? OnBeginMoveFrom { get; set; }
   public Action<T>? OnExecuteMove { get; set; }
   public Func<string, Task>? OnExternalImport { get; set; }
+  public Action<Exception>? OnError { get; set; }
 
   public virtual void OnInternalDragStarting(T item, out DataPackageOperation requestedOperation)
   {
@@ -73,8 +75,8 @@ public class DragAndDrop<T> where T : class
       if (ActiveDrag is null
         || ActiveDrag.Item is null
         || ActiveDrag.Origin == this
-        || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
-        || (operation & DataPackageOperation.Move) == DataPackageOperation.Move)
+        || !((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy
+          || (operation & DataPackageOperation.Move) == DataPackageOperation.Move))
         return; // don't drop on the origin and only allow copy and move operations
 
       await OnInternalDrop(operation, ActiveDrag.Item);
@@ -83,29 +85,43 @@ public class DragAndDrop<T> where T : class
 
   protected virtual async Task OnInternalDrop(DataPackageOperation operation, T item)
   {
-    if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+    try
     {
-      if (OnCopy != null)
-        await OnCopy.Invoke(item);
+      if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+      {
+        if (OnCopy != null)
+          await OnCopy.Invoke(item);
+      }
+      else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
+      {
+        ActiveDrag?.Origin.OnBeginMoveFrom?.Invoke(item);
+
+        if (OnBeginMoveTo != null)
+          await OnBeginMoveTo.Invoke(item);
+
+        OnExecuteMove?.Invoke(item);
+        ActiveDrag?.Origin?.OnExecuteMove?.Invoke(item);
+      }
     }
-    else if ((operation & DataPackageOperation.Move) == DataPackageOperation.Move)
+    catch (Exception e)
     {
-      ActiveDrag?.Origin.OnBeginMoveFrom?.Invoke(item);
-
-      if (OnBeginMoveTo != null)
-        await OnBeginMoveTo.Invoke(item);
-
-      OnExecuteMove?.Invoke(item);
-      ActiveDrag?.Origin?.OnExecuteMove?.Invoke(item);
+      OnError?.Invoke(e);
     }
   }
 
   protected virtual async Task OnExternalDrop(DataPackageOperation operation, string data)
   {
-    if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+    try
     {
-      if (OnExternalImport != null)
-        await OnExternalImport.Invoke(data);
+      if ((operation & DataPackageOperation.Copy) == DataPackageOperation.Copy)
+      {
+        if (OnExternalImport != null)
+          await OnExternalImport.Invoke(data);
+      }
+    }
+    catch (Exception e)
+    {
+      OnError?.Invoke(e);
     }
   }
 }

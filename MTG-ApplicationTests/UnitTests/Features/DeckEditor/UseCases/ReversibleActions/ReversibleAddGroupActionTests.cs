@@ -75,6 +75,8 @@ public class ReversibleAddGroupActionTests
     action.Action(added);
     action.ReverseAction(added);
     action.Action(added);
+    action.ReverseAction(added);
+    action.Action(added);
 
     CollectionAssert.Contains(groups, added);
     Assert.AreEqual(groups[1], added); // Alphabetical order, empty last

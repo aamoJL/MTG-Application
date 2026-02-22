@@ -61,4 +61,17 @@ public static class IEnumerableExtensions
 
     return indices.Length != 0;
   }
+
+  public static int[] FindItemIndices<T>(this IList<T> self, IList<T> items, Func<T, T, bool> predicate)
+  {
+    var indices = Enumerable.Repeat(-1, items.Count).ToArray();
+
+    for (var i = 0; i < items.Count; i++)
+    {
+      self.TryFindIndex(s => predicate(s, items[i]), out var foundIndex);
+      indices[i] = foundIndex;
+    }
+
+    return indices;
+  }
 }

@@ -60,12 +60,14 @@ public class ReversibleAddCardsActionTests
     action.Action([added]);
     action.ReverseAction([added]);
     action.Action([added]);
+    action.ReverseAction([added]);
+    action.Action([added]);
 
     CollectionAssert.Contains(collection, added);
   }
 
   [TestMethod]
-  public void IncreaseCount()
+  public void AddCards_Exists_ExceptionThrown()
   {
     var collection = new List<DeckEditorMTGCard>()
     {
@@ -77,50 +79,7 @@ public class ReversibleAddCardsActionTests
     var action = new ReversibleAddCardsAction(collection);
 
     DeckEditorMTGCard added = new(MTGCardInfoMocker.MockInfo(name: "1"));
-    action.Action([added]);
 
-    Assert.HasCount(3, collection);
-    Assert.AreEqual(2, collection.First().Count);
-  }
-
-  [TestMethod]
-  public void IncreaseCount_Undo()
-  {
-    var collection = new List<DeckEditorMTGCard>()
-    {
-      new(MTGCardInfoMocker.MockInfo(name: "1")),
-      new(MTGCardInfoMocker.MockInfo(name: "2")),
-      new(MTGCardInfoMocker.MockInfo(name: "3")),
-    };
-
-    var action = new ReversibleAddCardsAction(collection);
-
-    DeckEditorMTGCard added = new(MTGCardInfoMocker.MockInfo(name: "1"));
-    action.Action([added]);
-    action.ReverseAction([added]);
-
-    Assert.HasCount(3, collection);
-    Assert.AreEqual(1, collection.First().Count);
-  }
-
-  [TestMethod]
-  public void IncreaseCount_Redo()
-  {
-    var collection = new List<DeckEditorMTGCard>()
-    {
-      new(MTGCardInfoMocker.MockInfo(name: "1")),
-      new(MTGCardInfoMocker.MockInfo(name: "2")),
-      new(MTGCardInfoMocker.MockInfo(name: "3")),
-    };
-
-    var action = new ReversibleAddCardsAction(collection);
-
-    DeckEditorMTGCard added = new(MTGCardInfoMocker.MockInfo(name: "1"));
-    action.Action([added]);
-    action.ReverseAction([added]);
-    action.Action([added]);
-
-    Assert.HasCount(3, collection);
-    Assert.AreEqual(2, collection.First().Count);
+    Assert.Throws<InvalidOperationException>(() => action.Action([added]));
   }
 }

@@ -42,6 +42,8 @@ public class ReversibleCardGroupChangeActionTests
     action.Action((card, "key"));
     action.ReverseAction((card, string.Empty));
     action.Action((card, "key"));
+    action.ReverseAction((card, string.Empty));
+    action.Action((card, "key"));
 
     Assert.AreEqual("key", card.Group);
   }

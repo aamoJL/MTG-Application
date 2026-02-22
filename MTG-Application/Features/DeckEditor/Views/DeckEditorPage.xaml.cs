@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -210,19 +209,4 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   private void FilterKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)
     // Event can't be set as handled here because the filter flyout would not be opened
     => (args.Element as FrameworkElement)?.Focus(FocusState.Programmatic);
-
-  private void ListView_LosingFocus(UIElement sender, LosingFocusEventArgs args)
-  {
-    // Deselect list selection if the list loses focus
-    //    so the delete keyboard accelerator does not delete item in the list
-    if (sender is ListViewBase listview)
-    {
-      if (args.NewFocusedElement is ListViewItem item && listview.Items.Contains(item.Content))
-        return;
-
-      listview.DeselectAll();
-    }
-
-    args.Handled = true;
-  }
 }

@@ -5,11 +5,12 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.General.Views.DragAndDrop;
 
-public class ListViewDragAndDrop<TItem> : DragAndDrop<TItem> where TItem : class
+[Obsolete]
+public class ListViewDragAndDrop<TList, TItem>(Func<TList, TItem> itemConverter) : DragAndDrop<TItem> where TItem : class
 {
   public void DragStarting(object _, DragItemsStartingEventArgs e)
   {
-    if (e.Items[0] is not TItem item)
+    if (e.Items[0] is not TList listItem || itemConverter(listItem) is not TItem item)
       throw new InvalidOperationException("Drag does not have any items");
 
     OnInternalDragStarting(item, out var requestedOperation);

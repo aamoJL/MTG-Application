@@ -16,16 +16,14 @@ public class ReversibleAddCardsToGroupAction(DeckEditorCardGroup group) : Revers
 
     _oldGroups.Clear();
 
+    if (cards.Any(group.SourceContains))
+      throw new InvalidOperationException("Card is already in the source");
+
     foreach (var card in cards)
     {
-      if (group.GetFromSource(x => x.Info.Name == card.Info.Name) is not null)
-        throw new InvalidOperationException("Card is already in the source");
-      else
-      {
-        _oldGroups.Add(card.Group);
-        group.AddToSource(card);
-        card.Group = group.GroupKey;
-      }
+      _oldGroups.Add(card.Group);
+      group.AddToSource(card);
+      card.Group = group.GroupKey;
     }
   }
 

@@ -54,6 +54,8 @@ public class ReversibleRenameGroupActionTests
     action.Action((group, "New"));
     action.ReverseAction((group, "Old"));
     action.Action((group, "New"));
+    action.ReverseAction((group, "Old"));
+    action.Action((group, "New"));
 
     Assert.AreEqual("New", group.GroupKey);
     Assert.HasCount(3, group.Cards);

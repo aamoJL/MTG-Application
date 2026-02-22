@@ -55,9 +55,8 @@ public partial class DeckCardListViewModel
     OnCardDelete = RemoveCard,
   };
 
-  // TODO: test
   [RelayCommand]
-  protected async Task AddCard(DeckEditorMTGCard? card)
+  protected virtual async Task AddCard(DeckEditorMTGCard? card)
   {
     try
     {
@@ -91,7 +90,6 @@ public partial class DeckCardListViewModel
     }
   }
 
-  // TODO: test
   [RelayCommand]
   protected void RemoveCard(DeckEditorMTGCard? card)
   {
@@ -111,7 +109,6 @@ public partial class DeckCardListViewModel
     }
   }
 
-  // TODO: test
   [RelayCommand]
   protected void BeginMoveFrom(DeckEditorMTGCard? card)
   {
@@ -124,9 +121,8 @@ public partial class DeckCardListViewModel
       });
   }
 
-  // TODO: test
   [RelayCommand]
-  protected async Task BeginMoveTo(DeckEditorMTGCard? card)
+  protected virtual async Task BeginMoveTo(DeckEditorMTGCard? card)
   {
     ArgumentNullException.ThrowIfNull(card);
 
@@ -153,11 +149,9 @@ public partial class DeckCardListViewModel
         });
   }
 
-  // TODO: test
   [RelayCommand]
   protected void ExecuteMove() => UndoStack.PushAndExecuteActiveCombinedCommand();
 
-  // TODO: test
   [RelayCommand(CanExecute = nameof(CanClear))]
   protected void Clear()
   {
@@ -170,7 +164,6 @@ public partial class DeckCardListViewModel
       });
   }
 
-  // TODO: test
   [RelayCommand]
   protected async Task ImportCards(string? data)
   {
@@ -263,7 +256,6 @@ public partial class DeckCardListViewModel
     }
   }
 
-  // TODO: test
   [RelayCommand]
   protected async Task ExportCards(string? exportProperty)
   {
@@ -296,7 +288,10 @@ public partial class DeckCardListViewModel
   protected virtual void Model_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
     foreach (var item in e.AddedItems<DeckEditorMTGCard>())
-      CardViewModels.Add(CardViewModelFactory.Build(item));
+    {
+      if (!CardViewModels.Any(x => x.Info == item.Info))
+        CardViewModels.Add(CardViewModelFactory.Build(item));
+    }
     foreach (var item in e.RemovedItems<DeckEditorMTGCard>())
     {
       if (CardViewModels.TryFindIndex(x => x.Info == item.Info, out var index))

@@ -62,6 +62,8 @@ public class ReversibleMoveCardsToGroupActionTests
     action.Action([moved]);
     action.ReverseAction([moved]);
     action.Action([moved]);
+    action.ReverseAction([moved]);
+    action.Action([moved]);
 
     CollectionAssert.Contains(source, moved);
     CollectionAssert.Contains(group.Cards, moved);

@@ -46,6 +46,8 @@ public class ReversibleCardTagChangeActionTests
     action.Action((card, changed));
     action.ReverseAction((card, tag));
     action.Action((card, changed));
+    action.ReverseAction((card, tag));
+    action.Action((card, changed));
 
     Assert.AreEqual(changed, card.CardTag);
   }

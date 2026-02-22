@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 
+[Obsolete]
 public class ReversibleMoveCardsToGroupAction(DeckEditorCardGroup group) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
 {
   private readonly List<string> _oldGroups = [];

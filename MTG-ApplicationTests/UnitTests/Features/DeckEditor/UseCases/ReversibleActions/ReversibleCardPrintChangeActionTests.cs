@@ -45,6 +45,8 @@ public class ReversibleCardPrintChangeActionTests
     action.Action((card, changed));
     action.ReverseAction((card, info));
     action.Action((card, changed));
+    action.ReverseAction((card, info));
+    action.Action((card, changed));
 
     Assert.AreEqual(changed, card.Info);
   }

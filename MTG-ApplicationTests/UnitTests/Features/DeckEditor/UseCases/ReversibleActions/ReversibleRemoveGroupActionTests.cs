@@ -82,6 +82,8 @@ public class ReversibleRemoveGroupActionTests
     action.Action(removed);
     action.ReverseAction(removed);
     action.Action(removed);
+    action.ReverseAction(removed);
+    action.Action(removed);
 
     Assert.HasCount(2, groups);
     Assert.HasCount(0, removed.Cards);

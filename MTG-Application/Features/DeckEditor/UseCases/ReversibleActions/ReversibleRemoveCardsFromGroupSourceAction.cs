@@ -1,5 +1,7 @@
 ﻿using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.ReversibleCommandService;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,13 +11,16 @@ public class ReversibleRemoveCardsFromGroupSourceAction(DeckEditorCardGroup grou
 {
   protected override void ActionMethod(IEnumerable<DeckEditorMTGCard> cards)
   {
-    foreach (var card in cards)
+    var indices = group.Cards.FindItemIndices([.. cards], (x, y) => x.Info == y.Info);
+
+    if (indices.Any(x => x == -1))
+      throw new InvalidOperationException("Cards are not in the collection");
+
+    foreach (var i in indices)
     {
-      if (group.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
-      {
-        existingCard.Group = string.Empty;
-        group.RemoveFromSource(existingCard);
-      }
+      var card = group.Cards[i];
+      card.Group = string.Empty;
+      group.RemoveFromSource(card);
     }
   }
 

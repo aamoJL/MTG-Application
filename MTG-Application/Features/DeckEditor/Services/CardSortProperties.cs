@@ -23,12 +23,15 @@ public record CardSortProperties(
   {
     public int Compare(object? x, object? y)
     {
+      if (x is not DeckCardViewModel vmX || y is not DeckCardViewModel vmY)
+        throw new InvalidOperationException($"Compared types are not {typeof(DeckCardViewModel)}");
+
       var result = 1;
 
       foreach (var property in properties)
       {
-        var cx = GetComparable(x as DeckCardViewModel, property);
-        var cy = GetComparable(y as DeckCardViewModel, property);
+        var cx = GetComparable(vmX, property);
+        var cy = GetComparable(vmY, property);
 
         result = cx == cy ? 0 : cx == null ? -1 : cy == null ? +1 : cx.CompareTo(cy);
 
@@ -42,18 +45,18 @@ public record CardSortProperties(
       return result;
     }
 
-    private static IComparable? GetComparable(DeckCardViewModel? card, MTGSortProperty sortProperty)
+    private static IComparable? GetComparable(DeckCardViewModel card, MTGSortProperty sortProperty)
     {
       return sortProperty switch
       {
-        MTGSortProperty.CMC => card?.Info.CMC,
-        MTGSortProperty.Name => card?.Info.Name,
-        MTGSortProperty.Rarity => card?.Info.RarityType,
+        MTGSortProperty.CMC => card.Info.CMC,
+        MTGSortProperty.Name => card.Info.Name,
+        MTGSortProperty.Rarity => card.Info.RarityType,
         MTGSortProperty.Color => card == null ? null : (card.Info.Colors.Count > 1 ? ColorTypes.M : card.Info.Colors[0]),
-        MTGSortProperty.Set => card?.Info.SetCode,
-        MTGSortProperty.Count => card?.Count,
-        MTGSortProperty.Price => card?.Info.Price,
-        MTGSortProperty.SpellType => card?.Info.SpellTypes[0],
+        MTGSortProperty.Set => card.Info.SetCode,
+        MTGSortProperty.Count => card.Count,
+        MTGSortProperty.Price => card.Info.Price,
+        MTGSortProperty.SpellType => card.Info.SpellTypes[0],
         _ => null
       };
     }

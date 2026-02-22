@@ -63,14 +63,14 @@ public partial class DeckViewModel : ViewModelBase
   public double DeckPrice => Model.DeckPrice;
 
   public GroupedDeckCardListViewModel DeckCardListViewModel => field ??= GroupedListViewModelFactory.Build(Model.DeckCards);
-  public DeckCardListViewModel MaybelistViewModel => field ??= ListViewModelFactory.Build(Model.Maybelist);
-  public DeckCardListViewModel WishlistViewModel => field ??= ListViewModelFactory.Build(Model.Wishlist);
-  public DeckCardListViewModel RemovelistViewModel => field ??= ListViewModelFactory.Build(Model.Removelist);
+  public SideCardListViewModel MaybelistViewModel => field ??= SideListViewModelFactory.Build(Model.Maybelist);
+  public SideCardListViewModel WishlistViewModel => field ??= SideListViewModelFactory.Build(Model.Wishlist);
+  public SideCardListViewModel RemovelistViewModel => field ??= SideListViewModelFactory.Build(Model.Removelist);
 
   public Func<Task> OnDeleted { get => field ?? throw new NotImplementedException(nameof(OnDeleted)); set; }
 
   private DeckEditorMTGDeck Model { get; }
-  private DeckCardListViewModel.Factory ListViewModelFactory => field ??= new()
+  private SideCardListViewModel.Factory SideListViewModelFactory => field ??= new SideCardListViewModel.Factory()
   {
     Worker = Worker,
     Importer = Importer,

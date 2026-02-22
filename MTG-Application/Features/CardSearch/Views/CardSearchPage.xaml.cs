@@ -49,7 +49,7 @@ public sealed partial class CardSearchPage : Page
       },
     },
   };
-  public ListViewDragAndDrop<MTGCard> CardDragAndDrop { get; } = new()
+  public ListViewDragAndDrop<MTGCard, MTGCard> CardDragAndDrop { get; } = new(x => x)
   {
     AcceptMove = false
   };

@@ -42,6 +42,8 @@ public class ReversibleCardCountChangeActionTests
     action.Action((card, 2));
     action.ReverseAction((card, 1));
     action.Action((card, 2));
+    action.ReverseAction((card, 1));
+    action.Action((card, 2));
 
     Assert.AreEqual(2, card.Count);
   }

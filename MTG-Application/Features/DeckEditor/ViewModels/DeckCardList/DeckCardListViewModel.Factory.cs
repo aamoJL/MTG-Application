@@ -12,7 +12,7 @@ namespace MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
 
 public partial class DeckCardListViewModel
 {
-  public class Factory
+  public abstract class Factory<T> where T : DeckCardListViewModel
   {
     public required Worker Worker { protected get; init; }
     public required ReversibleCommandStack UndoStack { protected get; init; }
@@ -24,7 +24,12 @@ public partial class DeckCardListViewModel
     public required INetworkService NetworkService { protected get; init; }
     public required CardListConfirmers ListConfirmers { protected get; init; }
 
-    public DeckCardListViewModel Build(ObservableCollection<DeckEditorMTGCard> list)
+    public abstract T Build(ObservableCollection<DeckEditorMTGCard> list);
+  }
+
+  public class Factory : Factory<DeckCardListViewModel>
+  {
+    public override DeckCardListViewModel Build(ObservableCollection<DeckEditorMTGCard> list)
     {
       return new(list)
       {
