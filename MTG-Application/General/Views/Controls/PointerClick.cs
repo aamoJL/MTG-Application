@@ -39,7 +39,5 @@ public class PointerClick
       Clicked?.Invoke(sender, e);
 
     PressedElement = null;
-
-    e.Handled = true;
   }
 }

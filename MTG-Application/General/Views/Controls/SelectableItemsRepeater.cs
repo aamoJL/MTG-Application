@@ -1,8 +1,9 @@
-using CommunityToolkit.WinUI;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using System;
 using System.Collections;
 
 namespace MTGApplication.General.Views.Controls;
@@ -16,11 +17,10 @@ public partial class SelectableItemsRepeater : ItemsRepeater
   {
     ElementPrepared += OnElementPrepared;
     ElementClearing += OnElementClearing;
+    ElementIndexChanged += OnElementIndexChanged;
     LosingFocus += OnLosingFocus;
 
     PointerClick.Clicked += Item_Clicked;
-
-    RegisterPropertyChangedCallback(ItemsSourceProperty, ItemsSourceOnPropertyChanged);
   }
 
   public ListViewSelectionMode SelectionMode
@@ -30,173 +30,140 @@ public partial class SelectableItemsRepeater : ItemsRepeater
   }
   public bool DeselectOnLosingFocus { get; set; } = false;
   public bool CenterOnFocus { get; set; } = false;
+  public bool CanDragItems { get; set; } = false;
 
-  public object? SelectedItem
-  {
-    get
-    {
-      if (SelectedElement == null)
-        return null;
-
-      var index = GetElementIndex(SelectedElement);
-
-      if (index == -1)
-        return null;
-
-      return (ItemsSource as IList)?[index];
-    }
-  }
-
-  protected UIElement? SelectedElement
+  public object? SelectedItem => SelectedIndex >= 0 ? ItemsSourceView.GetAt(SelectedIndex) : null;
+  public int SelectedIndex => SelectedElement?.SelectionIndex ?? -1;
+  public ISelectable? SelectedElement
   {
     get;
-    set
+    private set
     {
-      if (field == value || SelectionMode == ListViewSelectionMode.None)
-        return;
+      if (field == value) return;
 
-      if (TryGetContainer(field) is ItemContainer oldContainer)
-        oldContainer.IsSelected = false;
+      if (field is ISelectable oldElement)
+        oldElement.IsSelected = false;
 
       field = value;
 
-      if (CenterOnFocus)
-        field?.StartBringIntoView(new()
-        {
-          AnimationDesired = true,
-          VerticalAlignmentRatio = .5f,
-        });
-      else
-        field?.StartBringIntoView(new()
-        {
-          AnimationDesired = true
-        });
-
-      if (TryGetContainer(field) is ItemContainer newContainer)
-        newContainer.IsSelected = true;
+      if (field is ISelectable newElement)
+        newElement.IsSelected = true;
     }
-  }
+  } = null;
 
   // Tapped event will cause the element to lose focus,
   //  so the item tapping needs to be done with pointer press events
+  // TODO: try tapped event with the refactored code
   protected PointerClick PointerClick { get; } = new();
 
-  public void DeselectAll() => SelectedElement = null;
-
-  public void SelectItem(object item)
-  {
-    if (ItemsSourceView.IndexOf(item) is int index && index == -1)
-      return;
-
-    if (GetOrCreateElement(index) is UIElement element)
-    {
-      SelectedElement = element;
-      SelectedElement.Focus(FocusState.Programmatic);
-    }
-  }
+  public event EventHandler<DragStartingEventArgs>? DragItemsStarting;
 
   private void OnElementPrepared(ItemsRepeater sender, ItemsRepeaterElementPreparedEventArgs args)
   {
-    // Select the prepared item if it has focus
-    //  For example, if the user redo remove command, the item will have focus
-    if (args.Element.FindDescendantOrSelf<UIElement>(x => x.FocusState != FocusState.Unfocused) is not null)
-      SelectedElement = args.Element;
+    if (args.Element is ISelectable selectable)
+    {
+      selectable.SelectionIndex = args.Index;
 
-    args.Element.GettingFocus += Item_GettingFocus;
-    PointerClick.Register(args.Element);
+      PointerClick.Register(args.Element);
+
+      args.Element.GettingFocus += Item_GettingFocus;
+
+      if (selectable.SelectionIndex == SelectedIndex)
+        SelectedElement = selectable;
+    }
+
+    if (CanDragItems)
+    {
+      args.Element.DragStarting += Item_DragStarting;
+      args.Element.CanDrag = true;
+    }
+  }
+
+  private void OnElementIndexChanged(ItemsRepeater sender, ItemsRepeaterElementIndexChangedEventArgs args)
+  {
+    if (args.Element is ISelectable selectable)
+    {
+      selectable.SelectionIndex = args.NewIndex;
+
+      if (selectable.SelectionIndex == SelectedIndex)
+      {
+        SelectedElement = selectable;
+
+        // Deleting element using a flyout will not focus the next element, so the focus needs to be changed here
+        if (selectable is UIElement { FocusState: FocusState.Unfocused } element)
+          element.Focus(FocusState.Programmatic);
+      }
+    }
   }
 
   private void OnElementClearing(ItemsRepeater sender, ItemsRepeaterElementClearingEventArgs args)
   {
-    args.Element.GettingFocus -= Item_GettingFocus;
-    PointerClick.Unregister(args.Element);
-  }
-
-  private void OnLosingFocus(UIElement sender, LosingFocusEventArgs args)
-  {
-    if (DeselectOnLosingFocus)
+    if (args.Element is ISelectable selectable)
     {
-      if (args.NewFocusedElement is Popup)
-        args.Handled = true; // New focused element is the selected item's flyout
-      else if (args.NewFocusedElement is UIElement newElement && GetElementIndex(newElement) != -1)
-        args.Handled = true; // New focused element is in this repeater
-      else
-        DeselectAll();
-    }
-  }
-
-  private void ItemsSourceOnPropertyChanged(DependencyObject sender, DependencyProperty dp)
-  {
-    if (ItemsSourceView != null)
-    {
-      ItemsSourceView.CollectionChanged -= ItemsSourceView_CollectionChanged;
-      ItemsSourceView.CollectionChanged += ItemsSourceView_CollectionChanged;
-    }
-  }
-
-  private void ItemsSourceView_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-  {
-    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems != null)
-    {
-      if (SelectedElement != null && GetElementIndex(SelectedElement) == -1)
+      if (SelectedElement == selectable)
       {
-        var index = e.OldStartingIndex < ItemsSourceView.Count
-          ? e.OldStartingIndex
-          : e.OldStartingIndex - 1;
+        // Change selection to previous element if possible
+        var index = selectable.SelectionIndex - 1;
 
-        if (index > -1 && (ItemsSource as IList)?[index] is object next)
-          SelectItem(next);
-        else
-          DeselectAll();
+        SelectedElement = index != -1 ? GetOrCreateElement(index) as ISelectable : null;
       }
+
+      selectable.SelectionIndex = -1;
+
+      PointerClick.Unregister(args.Element);
+
+      args.Element.GettingFocus -= Item_GettingFocus;
+    }
+
+    if (CanDragItems)
+      args.Element.DragStarting -= Item_DragStarting;
+  }
+
+  private void OnLosingFocus(UIElement _, LosingFocusEventArgs args)
+  {
+    if (args.NewFocusedElement is Popup or null)
+      args.TryCancel();
+    else if (args.NewFocusedElement is not FrameworkElement { DataContext: object item } || (ItemsSource as IList)?.IndexOf(item) is not int)
+    {
+      // Deselect element if the focus is outside of the repeater
+      if (DeselectOnLosingFocus)
+        SelectedElement = null;
     }
   }
 
   private void Item_GettingFocus(UIElement sender, GettingFocusEventArgs args)
   {
-    if (sender == SelectedElement)
+    if (sender is not ISelectable selectable)
     {
-      args.Handled = true;
+      args.TryCancel();
       return;
     }
 
-    if (args.FocusState != FocusState.Keyboard)
-      args.TryCancel();
+    if (args.FocusState == FocusState.Pointer && selectable == SelectedElement)
+      return; // Item click will use this
 
-    // Change selected item on focus only if the focus changed using keyboard navigation
-    if (args.Direction
-      is not (FocusNavigationDirection.Up
-      or FocusNavigationDirection.Down
-      or FocusNavigationDirection.Left
-      or FocusNavigationDirection.Right))
-      args.TryCancel();
-
-    if (!args.Cancel)
-      SelectedElement = sender;
+    if (args.FocusState == FocusState.Keyboard && args.Direction != FocusNavigationDirection.None)
+      SelectedElement = selectable; // Keyboard navigation will use this
+    else if (SelectedElement is UIElement selectionElement && selectable != SelectedElement)
+    {
+      // For some reason, the focus will go to the first element in the repeater when deleting the focused element.
+      //  This will try to change the focus back to the right element
+      args.TrySetNewFocusedElement(selectionElement);
+    }
   }
 
   private void Item_Clicked(object? sender, PointerRoutedEventArgs e)
   {
-    e.Handled = true;
+    if (sender is not ISelectable selectable) return;
 
-    if (sender is not UIElement element)
-      return;
-
-    if (SelectedElement == element)
-      return;
-
-    var properties = e.GetCurrentPoint(null).Properties;
-
-    if (properties.PointerUpdateKind == Microsoft.UI.Input.PointerUpdateKind.LeftButtonReleased)
+    if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased)
     {
-      SelectedElement = element;
-      SelectedElement.Focus(FocusState.Pointer);
+      SelectedElement = selectable;
+      // The element needs to be focused for the keyboard navigation to work
+      (selectable as UIElement)?.Focus(FocusState.Pointer);
     }
   }
 
-  /// <summary>
-  /// Returns ItemContainer from element's visualtree if possible
-  /// </summary>
-  private ItemContainer? TryGetContainer(UIElement? element)
-    => element?.FindDescendantOrSelf<ItemContainer>();
+  private void Item_DragStarting(UIElement sender, DragStartingEventArgs args)
+    => DragItemsStarting?.Invoke((sender as FrameworkElement)?.DataContext, args);
 }

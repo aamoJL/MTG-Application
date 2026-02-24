@@ -125,7 +125,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(DeckCardsViewType)));
       }
     }
-  } = CardViewType.Group;
+  } = CardViewType.Image;
 
   public NotificationService.Notifier Notifier
   {

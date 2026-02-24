@@ -70,7 +70,7 @@ public partial class DeckViewModel : ViewModelBase
   public Func<Task> OnDeleted { get => field ?? throw new NotImplementedException(nameof(OnDeleted)); set; }
 
   private DeckEditorMTGDeck Model { get; }
-  private SideCardListViewModel.Factory SideListViewModelFactory => field ??= new SideCardListViewModel.Factory()
+  private SideCardListViewModel.Factory SideListViewModelFactory => field ??= new()
   {
     Worker = Worker,
     Importer = Importer,

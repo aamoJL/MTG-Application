@@ -10,8 +10,9 @@
   xmlns:cardsearch="using:MTGApplication.Features.CardSearch.Views" 
   xmlns:customcontrols="using:MTGApplication.General.Views.Controls" 
   xmlns:controls1="using:MTGApplication.Features.AppWindows.DeckBuilderWindow.Views.Controls"
+  xmlns:views="using:MTGApplication.Features.AppWindows.DeckBuilderWindow.Views"
   mc:Ignorable="d"
-  d:DataContext="{d:DesignInstance Type=local:DeckBuilderPage}"
+  d:DataContext="{d:DesignInstance Type=views:DeckBuilderPage}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

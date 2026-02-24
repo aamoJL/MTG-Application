@@ -19,19 +19,44 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
 {
   public GroupedDeckCardListViewModel(ObservableCollection<DeckEditorMTGCard> list) : base(list)
   {
-    Groups.CollectionChanged += Groups_CollectionChanged;
-
     // empty key will be the last group
     var groups = new List<string>([.. Model.Select(c => c.Group)
       .Where(g => g != string.Empty).Order(), string.Empty]).Distinct();
 
     foreach (var item in groups)
       Groups.Add(new(item, Model));
+
+    Groups.CollectionChanged += Groups_CollectionChanged;
   }
 
-  public ObservableCollection<DeckCardGroupViewModel> GroupViewModels { get; } = [];
+  public ObservableCollection<DeckCardGroupViewModel> GroupViewModels
+  {
+    get => field ??= GroupViewModels = [.. Groups.Select(GroupViewModelFactory.Build)];
+    private set
+    {
+      field = value;
+
+      foreach (var item in field)
+        item.PropertyChanged += Group_PropertyChanged;
+    }
+  }
 
   public GroupedCardListConfirmers GroupedListConfirmers { private get; init; } = new();
+
+  private ObservableCollection<DeckEditorCardGroup> Groups { get; } = [];
+  private DeckCardGroupViewModel.Factory GroupViewModelFactory => field ??= new()
+  {
+    Worker = Worker,
+    Importer = Importer,
+    EdhrecImporter = EdhrecImporter,
+    Notifier = Notifier,
+    UndoStack = UndoStack,
+    ListConfirmers = Confirmers,
+    GroupConfirmers = GroupedListConfirmers.GroupConfirmers,
+    CardFactory = CardViewModelFactory,
+    NameValidator = key => !Groups.Any(x => x.GroupKey == key),
+    OnGroupDelete = OnDeleteGroup,
+  };
 
   [RelayCommand]
   private async Task AddGroup()
@@ -64,21 +89,6 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
     }
   }
 
-  private ObservableCollection<DeckEditorCardGroup> Groups { get; } = [];
-  private DeckCardGroupViewModel.Factory GroupViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    EdhrecImporter = EdhrecImporter,
-    Notifier = Notifier,
-    UndoStack = UndoStack,
-    ListConfirmers = Confirmers,
-    GroupConfirmers = GroupedListConfirmers.GroupConfirmers,
-    CardFactory = CardViewModelFactory,
-    NameValidator = key => !Groups.Any(x => x.GroupKey == key),
-    OnGroupDelete = OnDeleteGroup,
-  };
-
   private void OnDeleteGroup(DeckEditorCardGroup group)
   {
     UndoStack.PushAndExecute(
@@ -92,20 +102,20 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
   {
     foreach (var item in e.AddedItems<DeckEditorCardGroup>())
     {
-      item.PropertyChanged += GroupItem_PropertyChanged;
+      item.PropertyChanged += Group_PropertyChanged;
 
       GroupViewModels.Add(GroupViewModelFactory.Build(item));
     }
     foreach (var item in e.RemovedItems<DeckEditorCardGroup>())
     {
-      item.PropertyChanged -= GroupItem_PropertyChanged;
+      item.PropertyChanged -= Group_PropertyChanged;
 
       if (GroupViewModels.TryFindIndex(vm => vm.GroupKey == item.GroupKey, out var i))
         GroupViewModels.RemoveAt(i);
     }
   }
 
-  private void GroupItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+  private void Group_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     if (sender is not DeckEditorCardGroup group)
       return;

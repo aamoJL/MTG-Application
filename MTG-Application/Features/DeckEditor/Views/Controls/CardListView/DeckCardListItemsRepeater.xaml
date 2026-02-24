@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+  xmlns:controls="using:MTGApplication.General.Views.Controls"
+  x:Class="MTGApplication.Features.DeckEditor.Views.Controls.CardListView.DeckCardListItemsRepeater"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:MTGApplication.Features.DeckEditor.Views.Controls.CardListView"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d">
+
+  <Grid Background="Transparent">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+      <controls:SelectableItemsRepeater
+        x:Name="Repeater"
+        ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
+        ItemTemplate="{x:Bind ItemTemplate, Mode=OneWay}"
+        Layout="{x:Bind Layout, Mode=OneWay}"
+        DeselectOnLosingFocus="True"
+        CenterOnFocus="False"
+        SelectionMode="Single"
+        CanDragItems="{x:Bind CanDragItems, Mode=OneWay}"
+        VerticalCacheLength="100">
+      </controls:SelectableItemsRepeater>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

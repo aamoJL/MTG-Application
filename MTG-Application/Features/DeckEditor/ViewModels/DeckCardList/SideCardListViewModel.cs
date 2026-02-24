@@ -8,7 +8,6 @@ public partial class SideCardListViewModel(ObservableCollection<DeckEditorMTGCar
 {
   private class CardCopyFactory
   {
-    // TODO: test
     public DeckEditorMTGCard Copy(DeckEditorMTGCard card)
     {
       var model = card.Copy();
@@ -21,7 +20,6 @@ public partial class SideCardListViewModel(ObservableCollection<DeckEditorMTGCar
 
   private CardCopyFactory CopyFactory { get; } = new();
 
-  // TODO: test
   protected override Task AddCard(DeckEditorMTGCard? card)
   {
     if (card != null)
@@ -30,7 +28,6 @@ public partial class SideCardListViewModel(ObservableCollection<DeckEditorMTGCar
     return base.AddCard(card);
   }
 
-  // TODO: test
   protected override Task BeginMoveTo(DeckEditorMTGCard? card)
   {
     if (card != null)

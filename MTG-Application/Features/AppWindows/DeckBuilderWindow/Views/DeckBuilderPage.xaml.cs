@@ -18,14 +18,12 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 
     WindowClosing.Closing += WindowClosing_Closing;
     WindowClosing.Closed += WindowClosing_Closed;
-
-    AddDeckBuilderTab();
   }
 
-  public ObservableCollection<DeckBuilderTabViewModel> DeckBuilderTabs { get; } = [];
+  public ObservableCollection<DeckBuilderTabViewModel> DeckBuilderTabs => field ??= [BuildTab()];
   public DeckBuilderTabViewModel? SelectedTab
   {
-    get;
+    get => field ??= DeckBuilderTabs.FirstOrDefault();
     set
     {
       if (field != value)
@@ -53,18 +51,7 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
   [RelayCommand]
   private void AddDeckBuilderTab()
   {
-    var newTab = new DeckBuilderTabViewModel()
-    {
-      OnRequestSelection = tab => SelectedTab = tab,
-      OnClose = tab =>
-      {
-        RemoveTab(tab);
-
-        // Create new tab if there are no tabs
-        if (DeckBuilderTabs.Count == 0)
-          AddDeckBuilderTab();
-      }
-    };
+    var newTab = BuildTab();
     DeckBuilderTabs.Add(newTab);
     SelectedTab = newTab;
   }
@@ -101,5 +88,21 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 
     DeckBuilderTabs.Remove(tabItem);
     tabItem.ChangeViewModelCommand.Execute(null);
+  }
+
+  private DeckBuilderTabViewModel BuildTab()
+  {
+    return new DeckBuilderTabViewModel()
+    {
+      OnRequestSelection = tab => SelectedTab = tab,
+      OnClose = tab =>
+      {
+        RemoveTab(tab);
+
+        // Create new tab if there are no tabs
+        if (DeckBuilderTabs.Count == 0)
+          AddDeckBuilderTab();
+      }
+    };
   }
 }

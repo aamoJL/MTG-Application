@@ -2,11 +2,11 @@
 
 namespace MTGApplication.Features.DeckEditor.Views.Controls.CardListView;
 
-public partial class DeckEditorGroupedListViewContainer : DeckEditorListViewContainer
+public partial class DeckEditorGroupedListViewContainer : DeckCardListItemsRepeater
 {
-  protected override void OnDragOver(object sender, DragEventArgs e)
+  protected override void OnDragOver(DragEventArgs e)
   {
-    base.OnDragOver(sender, e);
+    base.OnDragOver(e);
 
     //e.Handled = true;
 

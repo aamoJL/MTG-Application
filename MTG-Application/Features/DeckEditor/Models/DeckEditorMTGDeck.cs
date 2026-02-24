@@ -45,9 +45,23 @@ public partial class DeckEditorMTGDeck : INotifyPropertyChanged, INotifyProperty
     get => field ??= DeckCards = [];
     set
     {
-      field?.CollectionChanged -= DeckCards_CollectionChanged;
+      if (field != null)
+      {
+        field.CollectionChanged -= DeckCards_CollectionChanged;
+
+        foreach (var item in field)
+          item.PropertyChanged -= DeckCard_PropertyChanged;
+      }
+
       SetProperty(ref field, value);
-      field?.CollectionChanged += DeckCards_CollectionChanged;
+
+      if (field != null)
+      {
+        field.CollectionChanged += DeckCards_CollectionChanged;
+
+        foreach (var item in field)
+          item.PropertyChanged += DeckCard_PropertyChanged;
+      }
     }
   }
   public ObservableCollection<DeckEditorMTGCard> Wishlist

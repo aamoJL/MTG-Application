@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -9,69 +8,109 @@ using MTGApplication.General.Models;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.DragAndDrop;
 using System;
-using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace MTGApplication.Features.DeckEditor.Views.Controls.CardListView;
 
-public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
+public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMoveOrigin
 {
-  public DeckCardListView()
+  public static readonly DependencyProperty ItemsSourceProperty =
+      DependencyProperty.Register(nameof(ItemsSource), typeof(object), typeof(DeckCardListItemsRepeater), new PropertyMetadata(null));
+
+  public static readonly DependencyProperty ItemTemplateProperty =
+      DependencyProperty.Register(nameof(ItemsSource), typeof(object), typeof(DeckCardListItemsRepeater), new PropertyMetadata(null));
+
+  public static readonly DependencyProperty LayoutProperty =
+      DependencyProperty.Register(nameof(Layout), typeof(Layout), typeof(DeckCardListItemsRepeater), new PropertyMetadata(null));
+
+  public static readonly DependencyProperty OnDropCopyProperty =
+      DependencyProperty.Register(nameof(OnDropCopy), typeof(IAsyncRelayCommand<DeckEditorMTGCard>), typeof(DeckCardListItemsRepeater), new PropertyMetadata(default));
+
+  public static readonly DependencyProperty OnDropImportProperty =
+      DependencyProperty.Register(nameof(OnDropImport), typeof(IAsyncRelayCommand<string>), typeof(DeckCardListItemsRepeater), new PropertyMetadata(default));
+
+  public static readonly DependencyProperty OnDropBeginMoveFromProperty =
+      DependencyProperty.Register(nameof(OnDropBeginMoveFrom), typeof(IRelayCommand<DeckEditorMTGCard>), typeof(DeckCardListItemsRepeater), new PropertyMetadata(default));
+
+  public static readonly DependencyProperty OnDropBeginMoveToProperty =
+      DependencyProperty.Register(nameof(OnDropBeginMoveTo), typeof(IAsyncRelayCommand<DeckEditorMTGCard>), typeof(DeckCardListItemsRepeater), new PropertyMetadata(default));
+
+  public static readonly DependencyProperty OnDropExecuteMoveProperty =
+      DependencyProperty.Register(nameof(OnDropExecuteMove), typeof(IRelayCommand), typeof(DeckCardListItemsRepeater), new PropertyMetadata(default));
+
+  public DeckCardListItemsRepeater()
   {
-    DragItemsStarting += ListView_DragItemsStarting;
-    LosingFocus += ListView_LosingFocus;
+    InitializeComponent();
 
     var deleteAccelerator = new KeyboardAccelerator() { Key = Windows.System.VirtualKey.Delete };
     deleteAccelerator.Invoked += DeleteAccelerator_Invoked;
     KeyboardAccelerators.Add(deleteAccelerator);
+
+    Repeater.DragItemsStarting += ItemsRepeater_DragItemsStarting;
   }
 
-  public IAsyncRelayCommand<DeckEditorMTGCard>? OnDropCopy { get; set; }
-  public IAsyncRelayCommand<string>? OnDropImport { get; set; }
-  public IRelayCommand<DeckEditorMTGCard>? OnDropBeginMoveFrom { get; set; }
-  public IAsyncRelayCommand<DeckEditorMTGCard>? OnDropBeginMoveTo { get; set; }
-  public IRelayCommand? OnDropExecuteMove { get; set; }
+  public object ItemsSource
+  {
+    get => GetValue(ItemsSourceProperty);
+    set => SetValue(ItemsSourceProperty, value);
+  }
+  public object ItemTemplate
+  {
+    get => GetValue(ItemTemplateProperty);
+    set => SetValue(ItemTemplateProperty, value);
+  }
+  public Layout Layout
+  {
+    get => (Layout)GetValue(LayoutProperty);
+    set => SetValue(LayoutProperty, value);
+  }
+  public bool CanDragItems { get; set; } = false;
+
+  public IAsyncRelayCommand<DeckEditorMTGCard> OnDropCopy
+  {
+    get => (IAsyncRelayCommand<DeckEditorMTGCard>)GetValue(OnDropCopyProperty);
+    set => SetValue(OnDropCopyProperty, value);
+  }
+  public IAsyncRelayCommand<string> OnDropImport
+  {
+    get => (IAsyncRelayCommand<string>)GetValue(OnDropImportProperty);
+    set => SetValue(OnDropImportProperty, value);
+  }
+  public IRelayCommand<DeckEditorMTGCard> OnDropBeginMoveFrom
+  {
+    get => (IRelayCommand<DeckEditorMTGCard>)GetValue(OnDropBeginMoveFromProperty);
+    set => SetValue(OnDropBeginMoveFromProperty, value);
+  }
+  public IAsyncRelayCommand<DeckEditorMTGCard> OnDropBeginMoveTo
+  {
+    get => (IAsyncRelayCommand<DeckEditorMTGCard>)GetValue(OnDropBeginMoveToProperty);
+    set => SetValue(OnDropBeginMoveToProperty, value);
+  }
+  public IRelayCommand OnDropExecuteMove
+  {
+    get => (IRelayCommand)GetValue(OnDropExecuteMoveProperty);
+    set => SetValue(OnDropExecuteMoveProperty, value);
+  }
   public IRelayCommand<DeckEditorMTGCard>? OnDeleteAcceleratorInvoked { get; set; }
 
   private void DeleteAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs e)
   {
-    if (SelectedItem is not DeckCardViewModel selection)
+    if (Repeater.SelectedItem is not DeckCardViewModel selection)
       return;
 
     var item = selection.CopyModel();
 
     if (OnDeleteAcceleratorInvoked?.CanExecute(item) == true)
     {
-      var index = SelectedIndex;
-
       OnDeleteAcceleratorInvoked.Execute(item);
-
-      // Recalculate the index and focus the element in the index position if the element exists.
-      if ((index = Math.Clamp(index, -1, Items.Count - 1)) >= 0)
-      {
-        (ContainerFromIndex(index) as UIElement)?.Focus(FocusState.Programmatic);
-        SelectedIndex = index;
-      }
 
       e.Handled = true;
     }
   }
 
-  private void ListView_LosingFocus(UIElement sender, LosingFocusEventArgs args)
+  private void ItemsRepeater_DragItemsStarting(object? item, DragStartingEventArgs e)
   {
-    // Deselect list selection if the list loses focus
-    //    so the delete keyboard accelerator does not delete item in the list
-    if (args.NewFocusedElement is ListViewItem item && Items.Contains(item.Content))
-      return;
-
-    this.DeselectAll();
-
-    args.Handled = true;
-  }
-
-  private void ListView_DragItemsStarting(object _, DragItemsStartingEventArgs e)
-  {
-    if (e.Items.FirstOrDefault() is not DeckCardViewModel dragItem)
+    if (item is not DeckCardViewModel dragItem)
     {
       NotificationService.RaiseNotification(this, new(NotificationService.NotificationType.Error, "No items to drag"));
       e.Cancel = true;
