@@ -10,6 +10,6 @@ public partial class DeckCardViewModel
 {
   public class CardConfirmers
   {
-    public Func<Confirmation<IEnumerable<MTGCard>>, Task<MTGCard?>> ConfirmCardPrints { get => field ?? throw new NotImplementedException(); set; }
+    public Func<Confirmation<IEnumerable<MTGCard>>, Task<MTGCard?>> ConfirmCardPrints { get => field ?? throw new NotImplementedException(nameof(ConfirmCardPrints)); set; }
   }
 }

@@ -36,7 +36,7 @@ public partial class DeckCardViewModel : ViewModelBase
   public string Group => Model.Group;
   public CardTag? CardTag => Model.CardTag;
 
-  public Action<DeckEditorMTGCard>? OnDelete { get; init; }
+  public Action<DeckEditorMTGCard>? OnDelete { get => field ?? throw new NotImplementedException(); init; }
 
   private DeckEditorMTGCard Model { get; }
 
@@ -127,7 +127,6 @@ public partial class DeckCardViewModel : ViewModelBase
     }
   }
 
-  // TODO: test
   public DeckEditorMTGCard CopyModel() => Model.Copy();
 
   private void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
