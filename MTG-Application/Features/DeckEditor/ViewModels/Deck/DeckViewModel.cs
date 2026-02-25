@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Services;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
@@ -56,6 +57,8 @@ public partial class DeckViewModel : ViewModelBase
     }
   }
   public Notifier Notifier { private get; init; } = new();
+  public CardFilters CardFilter { get; } = new();
+  public CardSorter CardSorter { get; } = new();
   public DeckConfirmers Confirmers { private get; init; } = new();
 
   public string DeckName => Model.Name;
@@ -80,6 +83,8 @@ public partial class DeckViewModel : ViewModelBase
     NetworkService = NetworkService,
     UndoStack = UndoStack,
     Notifier = Notifier,
+    CardFilter = CardFilter,
+    CardSorter = CardSorter,
     ListConfirmers = Confirmers.ListConfirmers,
   };
   private GroupedDeckCardListViewModel.Factory GroupedListViewModelFactory => field ??= new()
@@ -92,6 +97,8 @@ public partial class DeckViewModel : ViewModelBase
     NetworkService = NetworkService,
     UndoStack = UndoStack,
     Notifier = Notifier,
+    CardFilter = CardFilter,
+    CardSorter = CardSorter,
     ListConfirmers = Confirmers.ListConfirmers,
     GroupConfirmers = Confirmers.GroupListConfirmers
   };

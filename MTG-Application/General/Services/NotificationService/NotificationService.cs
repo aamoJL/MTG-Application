@@ -13,10 +13,6 @@ public static partial class NotificationService
 
   public static event EventHandler<Notification>? OnShow;
 
-  [Obsolete("Use event")]
-  public static void RegisterNotifications(Notifier notifier, object sender)
-    => notifier.OnNotify = (arg) => RaiseNotification(sender, arg);
-
   /// <summary>
   /// Raises UI notification
   /// </summary>

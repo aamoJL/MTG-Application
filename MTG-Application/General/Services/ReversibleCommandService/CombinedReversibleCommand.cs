@@ -16,8 +16,8 @@ public class CombinedReversibleCommand : IReversibleCommand
 
   public void Undo()
   {
-    foreach (var command in Commands)
-      command.Undo();
+    for (var i = Commands.Count - 1; i >= 0; i--)
+      Commands[i].Undo();
   }
 
   public void Cancel() => Canceled = true;

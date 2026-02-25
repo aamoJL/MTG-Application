@@ -21,6 +21,8 @@ public partial class GroupedDeckCardListViewModel
         Confirmers = ListConfirmers,
         EdhrecImporter = EdhrecImporter,
         Exporter = Exporter,
+        CardFilter = CardFilter,
+        CardSorter = CardSorter,
         GroupedListConfirmers = GroupConfirmers,
       };
     }

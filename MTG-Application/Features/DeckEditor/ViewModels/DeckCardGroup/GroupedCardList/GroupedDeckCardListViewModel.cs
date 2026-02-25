@@ -31,14 +31,7 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
 
   public ObservableCollection<DeckCardGroupViewModel> GroupViewModels
   {
-    get => field ??= GroupViewModels = [.. Groups.Select(GroupViewModelFactory.Build)];
-    private set
-    {
-      field = value;
-
-      foreach (var item in field)
-        item.PropertyChanged += Group_PropertyChanged;
-    }
+    get => field ??= GroupViewModels = [.. Groups.Select(GroupViewModelFactory.Build)]; private set;
   }
 
   public GroupedCardListConfirmers GroupedListConfirmers { private get; init; } = new();
@@ -51,11 +44,13 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
     EdhrecImporter = EdhrecImporter,
     Notifier = Notifier,
     UndoStack = UndoStack,
+    CardFilter = CardFilter,
+    CardSorter = CardSorter,
     ListConfirmers = Confirmers,
     GroupConfirmers = GroupedListConfirmers.GroupConfirmers,
     CardFactory = CardViewModelFactory,
-    NameValidator = key => !Groups.Any(x => x.GroupKey == key),
     OnGroupDelete = OnDeleteGroup,
+    OnGroupRename = OnGroupRename,
   };
 
   [RelayCommand]
@@ -80,8 +75,6 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
         {
           ReversibleAction = new ReversibleAddGroupAction(Groups)
         });
-
-      new ShowNotification(Notifier).Execute(new(NotificationType.Success, "Group added successfully."));
     }
     catch (Exception e)
     {
@@ -98,34 +91,49 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
       });
   }
 
+  private void OnGroupRename(DeckEditorCardGroup group, string newKey)
+  {
+    if (Groups.Any(x => x.GroupKey == newKey))
+    {
+      new ShowNotification(Notifier).Execute(new(NotificationType.Error, "Group already exists"));
+      return;
+    }
+
+    var addNewGroup = new ReversibleCommand<DeckEditorCardGroup>(new(newKey, Model))
+    {
+      ReversibleAction = new ReversibleAddGroupAction(Groups)
+    };
+    var regroupCards = new ReversibleCommand<(IEnumerable<DeckEditorMTGCard> Cards, string NewKey)>(new([.. group.Cards], newKey))
+    {
+      ReversibleAction = new ReversibleCardCollectionGroupsChangeAction()
+    };
+    var removeOldGroup = new ReversibleCommand<DeckEditorCardGroup>(group)
+    {
+      ReversibleAction = new ReversibleRemoveGroupAction(Groups)
+    };
+
+    UndoStack.PushAndExecute(new CombinedReversibleCommand()
+    {
+      Commands = [addNewGroup, regroupCards, removeOldGroup]
+    });
+  }
+
+  protected override DeckEditorMTGCard TransformCardModel(DeckEditorMTGCard card) => card.Copy();
+
   private void Groups_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
     foreach (var item in e.AddedItems<DeckEditorCardGroup>())
     {
-      item.PropertyChanged += Group_PropertyChanged;
-
-      GroupViewModels.Add(GroupViewModelFactory.Build(item));
+      if (!GroupViewModels.Any(x => x.GroupKey == item.GroupKey))
+      {
+        if (Groups.TryFindIndex(x => x.GroupKey == item.GroupKey, out var i))
+          GroupViewModels.Insert(i, GroupViewModelFactory.Build(item));
+      }
     }
     foreach (var item in e.RemovedItems<DeckEditorCardGroup>())
     {
-      item.PropertyChanged -= Group_PropertyChanged;
-
       if (GroupViewModels.TryFindIndex(vm => vm.GroupKey == item.GroupKey, out var i))
         GroupViewModels.RemoveAt(i);
-    }
-  }
-
-  private void Group_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (sender is not DeckEditorCardGroup group)
-      return;
-
-    switch (e.PropertyName)
-    {
-      case nameof(DeckEditorCardGroup.GroupKey):
-        if (GroupViewModels.TryFindIndices(vm => vm.GroupKey == group.GroupKey, out var indices) && indices.Length > 1)
-          GroupViewModels.RemoveAt(indices.First());
-        break;
     }
   }
 }

@@ -76,7 +76,7 @@ public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMove
     get => (IAsyncRelayCommand<string>)GetValue(OnDropImportProperty);
     set => SetValue(OnDropImportProperty, value);
   }
-  public IRelayCommand<DeckEditorMTGCard> OnDropBeginMoveFrom
+  public IRelayCommand<DeckEditorMTGCard>? OnDropBeginMoveFrom
   {
     get => (IRelayCommand<DeckEditorMTGCard>)GetValue(OnDropBeginMoveFromProperty);
     set => SetValue(OnDropBeginMoveFromProperty, value);
@@ -86,24 +86,20 @@ public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMove
     get => (IAsyncRelayCommand<DeckEditorMTGCard>)GetValue(OnDropBeginMoveToProperty);
     set => SetValue(OnDropBeginMoveToProperty, value);
   }
-  public IRelayCommand OnDropExecuteMove
+  public IRelayCommand? OnDropExecuteMove
   {
     get => (IRelayCommand)GetValue(OnDropExecuteMoveProperty);
     set => SetValue(OnDropExecuteMoveProperty, value);
   }
-  public IRelayCommand<DeckEditorMTGCard>? OnDeleteAcceleratorInvoked { get; set; }
 
   private void DeleteAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs e)
   {
     if (Repeater.SelectedItem is not DeckCardViewModel selection)
       return;
 
-    var item = selection.CopyModel();
-
-    if (OnDeleteAcceleratorInvoked?.CanExecute(item) == true)
+    if (selection.DeleteCardCommand.CanExecute(null))
     {
-      OnDeleteAcceleratorInvoked.Execute(item);
-
+      selection.DeleteCardCommand.Execute(null);
       e.Handled = true;
     }
   }
@@ -118,25 +114,14 @@ public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMove
     }
 
     e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-    e.Data.Properties.Add(nameof(CardDragArgs), new CardDragArgs(dragItem.CopyModel(), origin: this));
+    e.Data.Properties.Add(nameof(CardDragArgs), new CardDragArgs(dragItem.GetModel(), origin: this));
   }
 
   protected override void OnDragEnter(DragEventArgs e)
   {
     e.Handled = true;
 
-    // Block dropping if the origin is the same or the item is invalid
-    if (e.DataView.Properties.TryGetValue(nameof(CardDragArgs), out var prop) && prop is CardDragArgs args)
-    {
-      if (args.Origin.Equals(this)) e.AcceptedOperation = DataPackageOperation.None;
-      else if (args.Item is DeckEditorMTGCard) e.AcceptedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-      else if (args.Item is MTGCard) e.AcceptedOperation = DataPackageOperation.Copy;
-    }
-    else if (e.DataView.Contains(StandardDataFormats.Text))
-    {
-      e.AcceptedOperation = DataPackageOperation.Copy;
-      e.DragUIOverride.Caption = "Import";
-    }
+    SetDragEventArgs(e);
   }
 
   protected override void OnDragOver(DragEventArgs e)
@@ -146,14 +131,7 @@ public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMove
     if (e.AcceptedOperation == DataPackageOperation.None)
       return;
 
-    // Change operation to 'Move' if the move modifier is down and move is an accepted operation.
-    if ((e.AllowedOperations & DataPackageOperation.Move) == DataPackageOperation.Move
-      && (e.Modifiers & CardDragArgs.MoveModifier) == CardDragArgs.MoveModifier)
-    {
-      e.AcceptedOperation = DataPackageOperation.Move;
-    }
-    else
-      e.AcceptedOperation = DataPackageOperation.Copy;
+    SetDragEventArgs(e);
   }
 
   protected override async void OnDrop(DragEventArgs e)
@@ -204,5 +182,27 @@ public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMove
     }
 
     def.Complete();
+  }
+
+  protected virtual void SetDragEventArgs(DragEventArgs e)
+  {
+    if (e.DataView.Properties.TryGetValue(nameof(CardDragArgs), out var prop) && prop is CardDragArgs args)
+    {
+      // Block dropping if the origin is the same or the item is invalid
+      if (args.Origin.Equals(this)) e.AcceptedOperation = DataPackageOperation.None;
+      else if (args.Item is DeckEditorMTGCard)
+      {
+        if ((e.Modifiers & CardDragArgs.MoveModifier) == CardDragArgs.MoveModifier)
+          e.AcceptedOperation = DataPackageOperation.Move;
+        else
+          e.AcceptedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
+      }
+      else if (args.Item is MTGCard) e.AcceptedOperation = DataPackageOperation.Copy;
+    }
+    else if (e.DataView.Contains(StandardDataFormats.Text))
+    {
+      e.AcceptedOperation = DataPackageOperation.Copy;
+      e.DragUIOverride.Caption = "Import";
+    }
   }
 }

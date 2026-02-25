@@ -1,13 +1,26 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Collections;
+using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
+using MTGApplication.General.Views.Controls;
 using System;
+using System.Collections.Generic;
 
 namespace MTGApplication.Features.DeckEditor.Services;
 
-public partial class CardSorter : ObservableObject
+public partial class CardSorter : ObservableObject, IValueSorter<DeckCardViewModel>
 {
-  [ObservableProperty] public partial CardSortProperties SortProperties { get; set; } = new();
+  public CardSortProperties SortProperties
+  {
+    get;
+    private set
+    {
+      field = value;
+      OnPropertyChanged(nameof(Comparer));
+    }
+  } = new();
+
+  public IComparer<DeckCardViewModel> Comparer => SortProperties.Comparer;
 
   [RelayCommand]
   private void ChangeSortDirection(string direction)

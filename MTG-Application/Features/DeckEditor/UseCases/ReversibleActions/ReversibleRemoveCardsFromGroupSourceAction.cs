@@ -16,14 +16,15 @@ public class ReversibleRemoveCardsFromGroupSourceAction(DeckEditorCardGroup grou
     if (indices.Any(x => x == -1))
       throw new InvalidOperationException("Cards are not in the collection");
 
-    foreach (var i in indices)
+    var groupCards = indices.Select(i => group.Cards[i]);
+
+    foreach (var card in groupCards)
     {
-      var card = group.Cards[i];
       card.Group = string.Empty;
       group.RemoveFromSource(card);
     }
   }
 
   protected override void ReverseActionMethod(IEnumerable<DeckEditorMTGCard> cards)
-    => new ReversibleAddCardsToGroupAction(group).Action(cards);
+    => new ReversibleAddCardsToGroupSourceAction(group).Action(cards);
 }

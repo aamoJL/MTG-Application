@@ -16,7 +16,7 @@ public class ReversibleAddCardsToGroupActionTests
     ];
     var group = new DeckEditorCardGroup("key", source);
 
-    var action = new ReversibleAddCardsToGroupAction(group);
+    var action = new ReversibleAddCardsToGroupSourceAction(group);
 
     var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "2")) { Group = "old" };
     action.Action([added]);
@@ -34,7 +34,7 @@ public class ReversibleAddCardsToGroupActionTests
     ];
     var group = new DeckEditorCardGroup("key", source);
 
-    var action = new ReversibleAddCardsToGroupAction(group);
+    var action = new ReversibleAddCardsToGroupSourceAction(group);
 
     var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "2")) { Group = "old" };
     action.Action([added]);
@@ -53,7 +53,7 @@ public class ReversibleAddCardsToGroupActionTests
     ];
     var group = new DeckEditorCardGroup("key", source);
 
-    var action = new ReversibleAddCardsToGroupAction(group);
+    var action = new ReversibleAddCardsToGroupSourceAction(group);
 
     var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "2")) { Group = "old" };
     action.Action([added]);
@@ -75,7 +75,7 @@ public class ReversibleAddCardsToGroupActionTests
     ];
     var group = new DeckEditorCardGroup("key", source);
 
-    var action = new ReversibleAddCardsToGroupAction(group);
+    var action = new ReversibleAddCardsToGroupSourceAction(group);
 
     var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "1")) { Group = "old" };
 

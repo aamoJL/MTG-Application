@@ -20,12 +20,5 @@ public partial class GroupedDeckCardListViewModel
         Message: string.Empty,
         Data: oldName);
     }
-
-    public static Confirmation GetMergeCardGroupsConfirmation(string groupKey)
-    {
-      return new(
-        Title: $"Group '{groupKey}' already exists.",
-        Message: "Would you like to merge the groups?");
-    }
   }
 }

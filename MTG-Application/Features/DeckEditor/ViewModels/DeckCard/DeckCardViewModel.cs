@@ -127,7 +127,7 @@ public partial class DeckCardViewModel : ViewModelBase
     }
   }
 
-  public DeckEditorMTGCard CopyModel() => Model.Copy();
+  public DeckEditorMTGCard GetModel() => Model;
 
   private void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
   {

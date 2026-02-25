@@ -54,6 +54,7 @@
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
     <None Remove="Features\AppWindows\DeckBuilderWindow\Views\Controls\TabHeader.xaml" />
     <None Remove="Features\CardCollectionEditor\Views\Controls\CollectionListContentDialog.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\CardGroupViewExpander.xaml" />
     <None Remove="Features\DeckEditor\Views\Controls\CardListView\DeckCardListItemsRepeater.xaml" />
     <None Remove="Features\DeckEditor\Views\Controls\CardView\DeckCardImageViewContainer.xaml" />
     <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
@@ -300,6 +301,9 @@
     <None Update="appsettings - Template.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <Page Update="Features\DeckEditor\Views\Controls\CardGroupViewExpander.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Features\DeckEditor\Views\Controls\CardView\DeckCardImageViewContainer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

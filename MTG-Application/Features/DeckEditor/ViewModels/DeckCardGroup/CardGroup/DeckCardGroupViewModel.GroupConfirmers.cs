@@ -8,7 +8,6 @@ public partial class DeckCardGroupViewModel
 {
   public class GroupConfirmers
   {
-    public Func<Confirmation<string>, Task<string?>> ConfirmRenameGroup { get => field ?? throw new NotImplementedException(); set; }
-    public Func<Confirmation, Task<ConfirmationResult>> ConfirmMergeGroups { get => field ?? throw new NotImplementedException(); set; }
+    public Func<Confirmation<string>, Task<string?>> ConfirmRenameGroup { get => field ?? throw new NotImplementedException(nameof(ConfirmRenameGroup)); set; }
   }
 }

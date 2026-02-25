@@ -20,6 +20,7 @@ public partial class DeckEditorPageViewModel : ViewModelBase
   public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
   public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
   public Notifier Notifier { private get; init; } = new();
+  public SaveStatus SaveStatus { get; } = new();
   public EditorPageConfirmers Confirmers { private get; init; } = new();
 
   public string DeckName => DeckViewModel.DeckName;
@@ -49,6 +50,7 @@ public partial class DeckEditorPageViewModel : ViewModelBase
     Repository = Repository,
     Importer = Importer,
     Notifier = Notifier,
+    SaveStatus = SaveStatus,
     DeckConfirmers = Confirmers.DeckConfirmers,
     OnDeleted = OnDeckDeleted
   };

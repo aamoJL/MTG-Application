@@ -18,6 +18,8 @@ public partial class SideCardListViewModel
         Exporter = Exporter,
         UndoStack = UndoStack,
         Notifier = Notifier,
+        CardSorter = CardSorter,
+        CardFilter = CardFilter,
         NetworkService = NetworkService,
         Confirmers = ListConfirmers,
       };

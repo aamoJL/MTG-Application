@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 
-public class ReversibleAddCardsToGroupAction(DeckEditorCardGroup group) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
+public class ReversibleAddCardsToGroupSourceAction(DeckEditorCardGroup group) : ReversibleAction<IEnumerable<DeckEditorMTGCard>>
 {
   private readonly List<string> _oldGroups = [];
 
@@ -16,7 +16,7 @@ public class ReversibleAddCardsToGroupAction(DeckEditorCardGroup group) : Revers
 
     _oldGroups.Clear();
 
-    if (cards.Any(group.SourceContains))
+    if (cards.Any(x => group.SourceContains(x.Info.Name)))
       throw new InvalidOperationException("Card is already in the source");
 
     foreach (var card in cards)

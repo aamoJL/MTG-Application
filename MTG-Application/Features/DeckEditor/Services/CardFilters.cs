@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
+using MTGApplication.General.Views.Controls;
 using System;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -9,7 +10,7 @@ namespace MTGApplication.Features.DeckEditor.Services;
 /// <summary>
 /// Class that has properties to filter MTG card lists
 /// </summary>
-public partial class CardFilters : ObservableObject
+public partial class CardFilters : ObservableObject, IValueFilter<DeckCardViewModel>
 {
   public enum ColorGroups { All, Mono, Multi }
 
@@ -36,7 +37,7 @@ public partial class CardFilters : ObservableObject
   [ObservableProperty, NotifyPropertyChangedFor(nameof(FiltersApplied), nameof(ValidationPredicate))]
   public partial double Cmc { get; set; } = double.NaN;
 
-  public Predicate<object> ValidationPredicate => (item) => CardValidation(item as DeckCardViewModel);
+  public Predicate<DeckCardViewModel> ValidationPredicate => CardValidation;
 
   /// <summary>
   /// Returns <see langword="true"/> if any of the filter properties has been changed from the default value

@@ -19,8 +19,7 @@
         DeselectOnLosingFocus="True"
         CenterOnFocus="False"
         SelectionMode="Single"
-        CanDragItems="{x:Bind CanDragItems, Mode=OneWay}"
-        VerticalCacheLength="100">
+        CanDragItems="{x:Bind CanDragItems, Mode=OneWay}">
       </controls:SelectableItemsRepeater>
     </ScrollViewer>
   </Grid>

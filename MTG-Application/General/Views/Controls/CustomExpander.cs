@@ -7,11 +7,7 @@ public partial class CustomExpander : Expander
 {
   public CustomExpander()
   {
-    RegisterPropertyChangedCallback(IsExpandedProperty, (d, e) =>
-    {
-      var state = IsExpanded ? "ExpandDown" : "CollapseUp";
-      VisualStateManager.GoToState(this, state, true);
-    });
+    RegisterPropertyChangedCallback(IsExpandedProperty, IsExpandedChangedCallback);
 
     Loaded += CustomExpander_Loaded;
   }
@@ -32,5 +28,11 @@ public partial class CustomExpander : Expander
       };
       header.PointerExited += (_, _) => PointerPressing = false;
     }
+  }
+
+  protected virtual void IsExpandedChangedCallback(DependencyObject _, DependencyProperty __)
+  {
+    var state = IsExpanded ? "ExpandDown" : "CollapseUp";
+    VisualStateManager.GoToState(this, state, true);
   }
 }

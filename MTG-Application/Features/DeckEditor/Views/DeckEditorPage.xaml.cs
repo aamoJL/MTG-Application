@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
-using MTGApplication.Features.DeckEditor.Services;
 using MTGApplication.Features.DeckEditor.ViewModels.EditorPage;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
@@ -95,10 +94,6 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
           GroupConfirmers = new()
           {
-            ConfirmMergeGroups = async msg => await DialogService.ShowAsync(XamlRoot, new TwoButtonConfirmationDialog(msg.Title, msg.Message)
-            {
-              PrimaryButtonText = "Merge"
-            }),
             ConfirmRenameGroup = async msg => await DialogService.ShowAsync(XamlRoot, new TextBoxDialog(msg.Title)
             {
               InvalidInputCharacters = Path.GetInvalidFileNameChars(),
@@ -112,8 +107,6 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
     }
   };
 
-  public CardFilters CardFilter { get; } = new();
-  public CardSorter CardSorter { get; } = new();
   public CardViewType DeckCardsViewType
   {
     get;
@@ -125,7 +118,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(DeckCardsViewType)));
       }
     }
-  } = CardViewType.Image;
+  } = CardViewType.Group;
 
   public NotificationService.Notifier Notifier
   {
@@ -186,8 +179,8 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
   {
     args.Handled = true;
 
-    if (CardFilter.ResetCommand.CanExecute(null))
-      CardFilter.ResetCommand.Execute(null);
+    if (ViewModel.DeckViewModel.CardFilter.ResetCommand.CanExecute(null))
+      ViewModel.DeckViewModel.CardFilter.ResetCommand.Execute(null);
   }
 
   private void UndoKeyboardAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs args)

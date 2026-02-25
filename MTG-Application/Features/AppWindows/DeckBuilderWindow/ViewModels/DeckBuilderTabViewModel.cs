@@ -64,7 +64,7 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
   }
 
   [RelayCommand]
-  private void ChangeViewModel(DeckEditorPageViewModel editor)
+  private void ChangeViewModel(DeckEditorPageViewModel? editor)
   {
     EditorViewModel = editor;
     SaveStatus = editor?.DeckViewModel.SaveStatus ?? new();

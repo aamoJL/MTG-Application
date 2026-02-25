@@ -31,20 +31,17 @@ public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
   public IRelayCommand<DeckEditorMTGCard>? OnDropBeginMoveFrom { get; set; }
   public IAsyncRelayCommand<DeckEditorMTGCard>? OnDropBeginMoveTo { get; set; }
   public IRelayCommand? OnDropExecuteMove { get; set; }
-  public IRelayCommand<DeckEditorMTGCard>? OnDeleteAcceleratorInvoked { get; set; }
 
   private void DeleteAccelerator_Invoked(KeyboardAccelerator _, KeyboardAcceleratorInvokedEventArgs e)
   {
     if (SelectedItem is not DeckCardViewModel selection)
       return;
 
-    var item = selection.CopyModel();
-
-    if (OnDeleteAcceleratorInvoked?.CanExecute(item) == true)
+    if (selection.DeleteCardCommand.CanExecute(null))
     {
       var index = SelectedIndex;
 
-      OnDeleteAcceleratorInvoked.Execute(item);
+      selection.DeleteCardCommand.Execute(selection);
 
       // Recalculate the index and focus the element in the index position if the element exists.
       if ((index = Math.Clamp(index, -1, Items.Count - 1)) >= 0)
@@ -79,7 +76,7 @@ public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
     }
 
     e.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-    e.Data.Properties.Add(nameof(CardDragArgs), new CardDragArgs(dragItem.CopyModel(), origin: this));
+    e.Data.Properties.Add(nameof(CardDragArgs), new CardDragArgs(dragItem.GetModel(), origin: this));
   }
 
   protected override void OnDragEnter(DragEventArgs e)

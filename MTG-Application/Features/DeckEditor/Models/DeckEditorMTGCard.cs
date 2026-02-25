@@ -28,5 +28,13 @@ public partial class DeckEditorMTGCard(MTGCardInfo info) : MTGCard(info)
   [ObservableProperty] public partial string Group { get; set; } = string.Empty;
   [ObservableProperty] public partial CardTag? CardTag { get; set; } = null;
 
-  public DeckEditorMTGCard Copy() => (DeckEditorMTGCard)MemberwiseClone();
+  public DeckEditorMTGCard Copy()
+  {
+    return new(Info)
+    {
+      Count = Count,
+      Group = Group,
+      CardTag = CardTag
+    };
+  }
 }

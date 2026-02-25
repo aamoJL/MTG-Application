@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Services;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
@@ -13,6 +14,7 @@ using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
+using MTGApplication.General.Views.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,7 +24,7 @@ using static MTGApplication.General.Services.NotificationService.NotificationSer
 
 namespace MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
 
-public partial class DeckCardListViewModel
+public partial class DeckCardListViewModel : ViewModelBase
 {
   public DeckCardListViewModel(ObservableCollection<DeckEditorMTGCard> list)
   {
@@ -39,9 +41,12 @@ public partial class DeckCardListViewModel
   public ReversibleCommandStack UndoStack { protected get; init; } = new();
   public Notifier Notifier { protected get; init; } = new();
   public INetworkService NetworkService { protected get; init; } = new NetworkService();
+  public CardFilters CardFilter { get; init; } = new();
+  public CardSorter CardSorter { get; init; } = new();
   public CardListConfirmers Confirmers { protected get; init; } = new();
 
   public ObservableCollection<DeckCardViewModel> CardViewModels => field ??= new(Model.Select(CardViewModelFactory.Build));
+  public FilterableAndSortableCollectionView<DeckCardViewModel> SortedAndFilteredView => field ??= new(CardViewModels, CardFilter, CardSorter);
 
   protected ObservableCollection<DeckEditorMTGCard> Model { get; }
   protected DeckCardViewModel.Factory CardViewModelFactory => field ??= new()
@@ -78,7 +83,7 @@ public partial class DeckCardListViewModel
       }
       else
       {
-        UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+        UndoStack.PushAndExecute(new ReversibleCollectionCommand<DeckEditorMTGCard>(TransformCardModel(card))
         {
           ReversibleAction = new ReversibleAddCardsAction(Model)
         });
@@ -143,7 +148,7 @@ public partial class DeckCardListViewModel
     }
     else
       UndoStack.ActiveCombinedCommand.Commands.Add(
-        new ReversibleCollectionCommand<DeckEditorMTGCard>(card)
+        new ReversibleCollectionCommand<DeckEditorMTGCard>(TransformCardModel(card))
         {
           ReversibleAction = new ReversibleAddCardsAction(Model)
         });
@@ -284,6 +289,14 @@ public partial class DeckCardListViewModel
   }
 
   protected bool CanClear() => Model.Any();
+
+  protected virtual DeckEditorMTGCard TransformCardModel(DeckEditorMTGCard card)
+  {
+    var model = card.Copy();
+    model.Group = string.Empty;
+
+    return model;
+  }
 
   protected virtual void Model_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {

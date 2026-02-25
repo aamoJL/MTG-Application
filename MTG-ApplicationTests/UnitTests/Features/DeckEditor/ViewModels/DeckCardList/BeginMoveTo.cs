@@ -23,12 +23,12 @@ public class BeginMoveTo
     var factory = new TestDeckCardListViewModelFactory();
     var vm = factory.Build();
 
-    var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo());
+    var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "Card"));
     await vm.BeginMoveToCommand.ExecuteAsync(added);
 
     factory.UndoStack.PushAndExecuteActiveCombinedCommand();
 
-    CollectionAssert.Contains(factory.Model, added);
+    Assert.AreEqual("Card", factory.Model.First().Info.Name);
   }
 
   [TestMethod]
@@ -37,13 +37,13 @@ public class BeginMoveTo
     var factory = new TestDeckCardListViewModelFactory();
     var vm = factory.Build();
 
-    var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo());
+    var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "Card"));
     await vm.BeginMoveToCommand.ExecuteAsync(added);
 
     factory.UndoStack.PushAndExecuteActiveCombinedCommand();
     factory.UndoStack.Undo();
 
-    CollectionAssert.DoesNotContain(factory.Model, added);
+    Assert.HasCount(0, factory.Model);
   }
 
   [TestMethod]
@@ -52,14 +52,14 @@ public class BeginMoveTo
     var factory = new TestDeckCardListViewModelFactory();
     var vm = factory.Build();
 
-    var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo());
+    var added = new DeckEditorMTGCard(MTGCardInfoMocker.MockInfo(name: "Card"));
     await vm.BeginMoveToCommand.ExecuteAsync(added);
 
     factory.UndoStack.PushAndExecuteActiveCombinedCommand();
     factory.UndoStack.Undo();
     factory.UndoStack.Redo();
 
-    CollectionAssert.Contains(factory.Model, added);
+    Assert.AreEqual("Card", factory.Model.First().Info.Name);
   }
 
   [TestMethod]

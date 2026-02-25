@@ -105,7 +105,7 @@ public partial class SelectableItemsRepeater : ItemsRepeater
         // Change selection to previous element if possible
         var index = selectable.SelectionIndex - 1;
 
-        SelectedElement = index != -1 ? GetOrCreateElement(index) as ISelectable : null;
+        SelectedElement = index != -1 ? TryGetElement(index) as ISelectable : null;
       }
 
       selectable.SelectionIndex = -1;
@@ -123,7 +123,7 @@ public partial class SelectableItemsRepeater : ItemsRepeater
   {
     if (args.NewFocusedElement is Popup or null)
       args.TryCancel();
-    else if (args.NewFocusedElement is not FrameworkElement { DataContext: object item } || (ItemsSource as IList)?.IndexOf(item) is not int)
+    else if (args.NewFocusedElement is not FrameworkElement { DataContext: object item } || !((ItemsSource as IList)?.IndexOf(item) >= 0))
     {
       // Deselect element if the focus is outside of the repeater
       if (DeselectOnLosingFocus)

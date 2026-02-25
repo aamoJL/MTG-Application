@@ -9,7 +9,7 @@ public partial class GroupedDeckCardListViewModel
 {
   public class GroupedCardListConfirmers
   {
-    public Func<Confirmation, Task<string?>> ConfirmAddGroup { get => field ?? throw new NotImplementedException(); set; }
+    public Func<Confirmation, Task<string?>> ConfirmAddGroup { get => field ?? throw new NotImplementedException(nameof(ConfirmAddGroup)); set; }
 
     public DeckCardGroupViewModel.GroupConfirmers GroupConfirmers { get; init; } = new();
   }

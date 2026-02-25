@@ -16,14 +16,15 @@
   xmlns:editorpage="using:MTGApplication.Features.DeckEditor.ViewModels.EditorPage"
   xmlns:cardview="using:MTGApplication.Features.DeckEditor.Views.Controls.CardView" 
   xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.Views.Controls.CardListView" 
-  xmlns:deckcard="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCard"
+  xmlns:deckcard="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCard" 
+  xmlns:cardgroup="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup" 
+  xmlns:controls1="using:MTGApplication.Features.DeckEditor.Views.Controls"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=editorpage:DeckEditorPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
   KeyboardAcceleratorPlacementMode="Hidden">
 
   <Page.Resources>
-    <converters:StringOrDefaultConverter x:Key="StringOrDefaultConverter"/>
     <converters:CardColorGroupToBoolConverter x:Key="CardColorGroupToBoolConverter"/>
     <converters1:ToStringToBoolConverter x:Key="ToStringToBoolConverter"/>
     <converters1:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
@@ -73,7 +74,7 @@
       <VisualStateGroup x:Name="DeckFilterAppBarButtonState">
         <VisualState>
           <VisualState.StateTriggers>
-            <ui:IsEqualStateTrigger Value="{x:Bind CardFilter.FiltersApplied, Mode=OneWay}" To="True"/>
+            <ui:IsEqualStateTrigger Value="{x:Bind ViewModel.DeckViewModel.CardFilter.FiltersApplied, Mode=OneWay}" To="True"/>
           </VisualState.StateTriggers>
           <VisualState.Setters>
             <Setter Target="DeckFilterAppBarButton.Style" Value="{StaticResource PrimaryAppBarButtonStyle}"/>
@@ -182,7 +183,7 @@
             </customControls:LinedHeader>
             <cardlistview:DeckCardListView
               Grid.Row="2"
-              ItemsSource="{x:Bind MaybeCardCollectionSource.View, Mode=OneWay}"
+              ItemsSource="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.SortedAndFilteredView.View, Mode=OneWay}"
               Style="{ThemeResource MTGListViewStyle}"
               ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
@@ -192,15 +193,7 @@
               OnDropImport="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.ExecuteMoveCommand, Mode=OneWay}"
-              OnDeleteAcceleratorInvoked="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.RemoveCardCommand, Mode=OneWay}">
-              <cardlistview:DeckCardListView.Resources>
-                <customControls:BindableCollectionView 
-                  x:Name="MaybeCardCollectionSource" 
-                  Source="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.CardViewModels, Mode=OneWay}"
-                  Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
-                  SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-              </cardlistview:DeckCardListView.Resources>
+              OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.MaybelistViewModel.ExecuteMoveCommand, Mode=OneWay}">
               <cardlistview:DeckCardListView.ItemTemplate>
                 <DataTemplate x:DataType="deckcard:DeckCardViewModel">
                   <cardview:DeckEditorCardTextView
@@ -232,7 +225,7 @@
             </customControls:LinedHeader>
             <cardlistview:DeckCardListView
               Grid.Row="4"
-              ItemsSource="{x:Bind WishCardCollectionSource.View, Mode=OneWay}"
+              ItemsSource="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.SortedAndFilteredView.View, Mode=OneWay}"
               Style="{ThemeResource MTGListViewStyle}"
               ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
@@ -242,15 +235,7 @@
               OnDropImport="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.ExecuteMoveCommand, Mode=OneWay}"
-              OnDeleteAcceleratorInvoked="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.RemoveCardCommand, Mode=OneWay}">
-              <cardlistview:DeckCardListView.Resources>
-                <customControls:BindableCollectionView 
-                  x:Name="WishCardCollectionSource" 
-                  Source="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.CardViewModels, Mode=OneWay}"
-                  Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
-                  SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-              </cardlistview:DeckCardListView.Resources>
+              OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.WishlistViewModel.ExecuteMoveCommand, Mode=OneWay}">
               <cardlistview:DeckCardListView.ItemTemplate>
                 <DataTemplate x:DataType="deckcard:DeckCardViewModel">
                   <cardview:DeckEditorCardTextView
@@ -282,7 +267,7 @@
             </customControls:LinedHeader>
             <cardlistview:DeckCardListView
               Grid.Row="6"
-              ItemsSource="{x:Bind RemoveCardCollectionSource.View, Mode=OneWay}"
+              ItemsSource="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.SortedAndFilteredView.View, Mode=OneWay}"
               Style="{ThemeResource MTGListViewStyle}"
               ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
               SelectionMode="Single"
@@ -292,15 +277,7 @@
               OnDropImport="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.ImportCardsCommand, Mode=OneWay}"
               OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.BeginMoveFromCommand, Mode=OneWay}"
               OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.BeginMoveToCommand, Mode=OneWay}"
-              OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.ExecuteMoveCommand, Mode=OneWay}"
-              OnDeleteAcceleratorInvoked="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.RemoveCardCommand, Mode=OneWay}">
-              <cardlistview:DeckCardListView.Resources>
-                <customControls:BindableCollectionView 
-                  x:Name="RemoveCardCollectionSource" 
-                  Source="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.CardViewModels, Mode=OneWay}"
-                  Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
-                  SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-              </cardlistview:DeckCardListView.Resources>
+              OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.RemovelistViewModel.ExecuteMoveCommand, Mode=OneWay}">
               <cardlistview:DeckCardListView.ItemTemplate>
                 <DataTemplate x:DataType="deckcard:DeckCardViewModel">
                   <cardview:DeckEditorCardTextView
@@ -429,26 +406,26 @@
             <AppBarButton Icon="Sort" Label="Sort" AutomationProperties.Name="Order">
               <AppBarButton.Flyout>
                 <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSortDirectionCommand, Mode=OneTime}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSortDirectionCommand, Mode=OneTime}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSortDirectionCommand, Mode=OneWay}" CommandParameter="Ascending" Text="Ascending" GroupName="DirectionGroup" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSortDirectionCommand, Mode=OneWay}" CommandParameter="Descending" Text="Descending" GroupName="DirectionGroup" />
                   <MenuFlyoutSeparator/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="SpellType" Text="Type" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangePrimarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="CMC" Text="CMC" GroupName="PrimaryDeckSortProperty" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="Name"  Text="Name" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="Color" Text="Color" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="SpellType" Text="Type" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="Rarity" Text="Rarity" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="Set" Text="Set" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="Count" Text="Count" GroupName="PrimaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangePrimarySortPropertyCommand, Mode=OneWay}" CommandParameter="Price" Text="Price" GroupName="PrimaryDeckSortProperty"/>
                   <MenuFlyoutSeparator />
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Color" Text="Color" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="SpellType" Text="Type" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Rarity" Text="Rarity" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Set" Text="Set" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Count" Text="Count" GroupName="SecondaryDeckSortProperty"/>
-                  <RadioMenuFlyoutItem Command="{x:Bind CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneTime}" CommandParameter="Price" Text="Price" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="CMC" Text="CMC" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="Name"  Text="Name" GroupName="SecondaryDeckSortProperty" IsChecked="True"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="Color" Text="Color" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="SpellType" Text="Type" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="Rarity" Text="Rarity" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="Set" Text="Set" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="Count" Text="Count" GroupName="SecondaryDeckSortProperty"/>
+                  <RadioMenuFlyoutItem Command="{x:Bind ViewModel.DeckViewModel.CardSorter.ChangeSecondarySortPropertyCommand, Mode=OneWay}" CommandParameter="Price" Text="Price" GroupName="SecondaryDeckSortProperty"/>
                 </MenuFlyout>
               </AppBarButton.Flyout>
             </AppBarButton>
@@ -462,24 +439,24 @@
               <AppBarButton.Flyout>
                 <Flyout AreOpenCloseAnimationsEnabled="False">
                   <StackPanel Orientation="Vertical" Spacing="10">
-                    <TextBox Text="{x:Bind CardFilter.NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter name..."/>
-                    <TextBox Text="{x:Bind CardFilter.TypeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter type..."/>
-                    <TextBox Text="{x:Bind CardFilter.OracleText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter oracle text..."/>
-                    <NumberBox PlaceholderText="Filter CMC..." SpinButtonPlacementMode="Hidden" Value="{x:Bind CardFilter.Cmc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Text="{x:Bind ViewModel.DeckViewModel.CardFilter.NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter name..."/>
+                    <TextBox Text="{x:Bind ViewModel.DeckViewModel.CardFilter.TypeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter type..."/>
+                    <TextBox Text="{x:Bind ViewModel.DeckViewModel.CardFilter.OracleText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Filter oracle text..."/>
+                    <NumberBox PlaceholderText="Filter CMC..." SpinButtonPlacementMode="Hidden" Value="{x:Bind ViewModel.DeckViewModel.CardFilter.Cmc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Orientation="Horizontal" Spacing="5">
-                      <ToggleButton Content="W" ToolTipService.ToolTip="White" IsChecked="{x:Bind CardFilter.White, Mode=TwoWay}"/>
-                      <ToggleButton Content="U" ToolTipService.ToolTip="Blue" IsChecked="{x:Bind CardFilter.Blue, Mode=TwoWay}"/>
-                      <ToggleButton Content="B" ToolTipService.ToolTip="Black" IsChecked="{x:Bind CardFilter.Black, Mode=TwoWay}"/>
-                      <ToggleButton Content="R" ToolTipService.ToolTip="Red" IsChecked="{x:Bind CardFilter.Red, Mode=TwoWay}"/>
-                      <ToggleButton Content="G" ToolTipService.ToolTip="Green" IsChecked="{x:Bind CardFilter.Green, Mode=TwoWay}"/>
-                      <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind CardFilter.Colorless, Mode=TwoWay}"/>
+                      <ToggleButton Content="W" ToolTipService.ToolTip="White" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.White, Mode=TwoWay}"/>
+                      <ToggleButton Content="U" ToolTipService.ToolTip="Blue" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.Blue, Mode=TwoWay}"/>
+                      <ToggleButton Content="B" ToolTipService.ToolTip="Black" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.Black, Mode=TwoWay}"/>
+                      <ToggleButton Content="R" ToolTipService.ToolTip="Red" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.Red, Mode=TwoWay}"/>
+                      <ToggleButton Content="G" ToolTipService.ToolTip="Green" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.Green, Mode=TwoWay}"/>
+                      <ToggleButton Content="C" ToolTipService.ToolTip="Colorless" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.Colorless, Mode=TwoWay}"/>
                     </StackPanel>
                     <RadioButtons Header="Color group" MaxColumns="3" SelectedIndex="0">
-                      <RadioButton Content="All" GroupName="ColorGroup" IsChecked="{x:Bind CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=All, Mode=OneWay}" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="All"/>
-                      <RadioButton Content="Mono" GroupName="ColorGroup" IsChecked="{x:Bind CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=Mono, Mode=OneWay}" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Mono"/>
-                      <RadioButton Content="Multi" GroupName="ColorGroup" IsChecked="{x:Bind CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=Multi, Mode=OneWay}" Command="{x:Bind CardFilter.ChangeColorGroupCommand, Mode=OneTime}" CommandParameter="Multi"/>
+                      <RadioButton Content="All" GroupName="ColorGroup" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=All, Mode=OneWay}" Command="{x:Bind ViewModel.DeckViewModel.CardFilter.ChangeColorGroupCommand, Mode=OneWay}" CommandParameter="All"/>
+                      <RadioButton Content="Mono" GroupName="ColorGroup" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=Mono, Mode=OneWay}" Command="{x:Bind ViewModel.DeckViewModel.CardFilter.ChangeColorGroupCommand, Mode=OneWay}" CommandParameter="Mono"/>
+                      <RadioButton Content="Multi" GroupName="ColorGroup" IsChecked="{x:Bind ViewModel.DeckViewModel.CardFilter.ColorGroup, Converter={StaticResource CardColorGroupToBoolConverter}, ConverterParameter=Multi, Mode=OneWay}" Command="{x:Bind ViewModel.DeckViewModel.CardFilter.ChangeColorGroupCommand, Mode=OneWay}" CommandParameter="Multi"/>
                     </RadioButtons>
-                    <Button Content="Reset filters" Command="{x:Bind CardFilter.ResetCommand, Mode=OneTime}"/>
+                    <Button Content="Reset filters" Command="{x:Bind ViewModel.DeckViewModel.CardFilter.ResetCommand, Mode=OneWay}"/>
                   </StackPanel>
                 </Flyout>
               </AppBarButton.Flyout>
@@ -487,8 +464,8 @@
             <!--#endregion-->
 
             <!--#region Group View Controls -->
-            <!--<AppBarSeparator Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"/>
-            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckCardList.AddGroupCommand, Mode=OneWay}" Icon="Add" Label="Add Group" />-->
+            <AppBarSeparator Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"/>
+            <AppBarButton Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}" Command="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.AddGroupCommand, Mode=OneWay}" Icon="Add" Label="Add Group" />
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
@@ -520,119 +497,63 @@
 
       <!--#region Deck Card Views -->
       <Grid controls:DockPanel.Dock="Top">
-        <Grid.Resources>
-          <customControls:BindableCollectionView 
-            x:Name="DeckCardsListViewCollectionSource" 
-            Source="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.CardViewModels, Mode=OneWay}"
-            Filter="{x:Bind CardFilter.ValidationPredicate, Mode=OneWay}"
-            SortComparer="{x:Bind CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-        </Grid.Resources>
-
+        
         <!--#region Group View -->
-        <!--<Grid 
-          x:Name="DeckCardsGroupViews"
+        <ScrollViewer
           Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Group, Mode=OneWay}"
-          DataContext="{x:Bind ViewModel.DeckCardList, Mode=OneWay}">
-          <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Groups, Mode=OneWay}" Margin="10">
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <StackPanel/>
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="viewmodels:CardGroupViewModel">
-                  <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-                    <StackPanel.Resources>
-                      <customControls:BindableCollectionView 
-                        x:Name="DeckCardsGroupCollectionSource"
-                        Source="{x:Bind Cards, Mode=OneWay}"
-                        Filter="{Binding ElementName=Root, Path=CardFilter.ValidationPredicate, Mode=OneWay}"
-                        SortComparer="{Binding ElementName=Root, Path=CardSorter.SortProperties.Comparer, Mode=OneWay}"/>
-                    </StackPanel.Resources>
-                    <customControls:CustomExpander IsExpanded="True" HorizontalAlignment="Stretch">
-                      <customControls:CustomExpander.Header>
-                        <Grid HorizontalAlignment="Stretch">
-                          <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" MaxWidth="600"/>
-                          </Grid.ColumnDefinitions>
-                          <controls1:CardGroupViewGroupHeader
-                            ui:FrameworkElementExtensions.AncestorType="customControls:CustomExpander"
-                            Grid.Column="0"
-                            IsExpanded="{Binding (ui:FrameworkElementExtensions.Ancestor).IsExpanded, RelativeSource={RelativeSource Mode=Self}, Mode=OneWay}"
-                            PrimaryHeader="{x:Bind Key, Mode=OneWay, Converter={StaticResource StringOrDefaultConverter}, ConverterParameter='Other'}" 
-                            SecondaryHeader="{x:Bind Count, Mode=OneWay}" 
-                            Margin="0 0 0 5">
-                            <controls1:CardGroupViewGroupHeader.ContextFlyout>
-                              <MenuFlyout AreOpenCloseAnimationsEnabled="False" Placement="Bottom">
-                                <MenuFlyoutItem 
-                                  d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
-                                  DataContext="{Binding ElementName=DeckCardsGroupViews, Path=DataContext, Mode=OneTime}"
-                                  Command="{Binding RenameGroupCommand, Mode=OneTime}"
-                                  CommandParameter="{x:Bind Mode=OneTime}"
-                                  Text="Rename"/>
-                                <MenuFlyoutSeparator/>
-                                <MenuFlyoutItem
-                                  d:DataContext="{d:DesignInstance Type=viewmodels:GroupedCardListViewModel}"
-                                  DataContext="{Binding ElementName=DeckCardsGroupViews, Path=DataContext, Mode=OneTime}"
-                                  Command="{Binding RemoveGroupCommand, Mode=OneTime}" 
-                                  CommandParameter="{x:Bind Mode=OneTime}"
-                                  Text="Remove"
-                                  Background="IndianRed"/>
-                              </MenuFlyout>
-                            </controls1:CardGroupViewGroupHeader.ContextFlyout>
-                          </controls1:CardGroupViewGroupHeader>
-                        </Grid>
-                      </customControls:CustomExpander.Header>
-                      <cardlistview:DeckEditorGroupedListViewContainer
-                        DataContext="{x:Bind Mode=OneTime}"
-                        ItemsSource="{Binding ElementName=DeckCardsGroupCollectionSource, Path=View, Mode=OneTime}"
-                        MinHeight="200"
-                        Margin="0 0 0 5"
-                        AllowDrop="True"
-                        OnDropCopy="{x:Bind AddCardCommand, Mode=OneTime}"
-                        OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneTime}"
-                        OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneTime}"
-                        OnDropImport="{x:Bind ImportCardsCommand, Mode=OneTime}">
-                        <cardlistview:DeckEditorListViewContainer.Layout>
-                          <UniformGridLayout
-                            MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
-                            ItemsStretch="Fill"/>
-                        </cardlistview:DeckEditorListViewContainer.Layout>
-                        <cardlistview:DeckEditorListViewContainer.ItemTemplate>
-                          <DataTemplate x:DataType="models:DeckEditorMTGCard">
-                            <customControls:DraggableItemContainer CanDrag="True" UseSystemFocusVisuals="False">
-                              <cardview:AdvancedDeckEditorCardImageView
-                                d:DataContext="{d:DesignInstance Type=viewmodels:CardListViewModel}"
-                                Model="{x:Bind Mode=OneTime}"
-                                DeleteButtonClick="{Binding RemoveCardCommand, Mode=OneWay}"
-                                OnDropBeginMoveFrom="{Binding BeginMoveFromCommand, Mode=OneWay}">
-                              </cardview:AdvancedDeckEditorCardImageView>
-                            </customControls:DraggableItemContainer>
-                          </DataTemplate>
-                        </cardlistview:DeckEditorListViewContainer.ItemTemplate>
-                      </cardlistview:DeckEditorGroupedListViewContainer>
-                    </customControls:CustomExpander>
-                  </StackPanel>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </ScrollViewer>
-        </Grid>-->
+          VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.GroupViewModels, Mode=OneWay}" Margin="10">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <!--Group template-->
+              <DataTemplate x:DataType="cardgroup:DeckCardGroupViewModel">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                  <controls1:CardGroupViewExpander IsExpanded="True" HorizontalAlignment="Stretch">
+                    <cardlistview:GroupedDeckCardListItemsRepeater
+                      MinHeight="200"
+                      Margin="0 0 0 5"
+                      ItemsSource="{x:Bind SortedAndFilteredView.View, Mode=OneWay}"
+                      AllowDrop="True"
+                      CanDragItems="True"
+                      OnDropCopy="{x:Bind AddCardCommand, Mode=OneWay}"
+                      OnDropImport="{x:Bind ImportCardsCommand, Mode=OneWay}"
+                      OnDropBeginMoveFrom="{x:Bind BeginMoveFromCommand, Mode=OneWay}"
+                      OnDropBeginMoveTo="{x:Bind BeginMoveToCommand, Mode=OneWay}"
+                      OnDropExecuteMove="{x:Bind ExecuteMoveCommand, Mode=OneWay}">
+                      <cardlistview:GroupedDeckCardListItemsRepeater.Layout>
+                        <UniformGridLayout
+                          MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
+                          ItemsStretch="Fill"/>
+                      </cardlistview:GroupedDeckCardListItemsRepeater.Layout>
+                      <cardlistview:GroupedDeckCardListItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="deckcard:DeckCardViewModel">
+                          <cardview:DeckCardImageViewContainer />
+                        </DataTemplate>
+                      </cardlistview:GroupedDeckCardListItemsRepeater.ItemTemplate>
+                    </cardlistview:GroupedDeckCardListItemsRepeater>
+                  </controls1:CardGroupViewExpander>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
         <!--#endregion-->
 
         <!--#region Grid View -->
         <cardlistview:DeckCardListItemsRepeater
           Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Image, Mode=OneWay}"
-          ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneTime}"
+          ItemsSource="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.SortedAndFilteredView.View, Mode=OneWay}"
           AllowDrop="True"
           CanDragItems="True"
           OnDropCopy="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.AddCardCommand, Mode=OneWay}"
           OnDropImport="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.ImportCardsCommand, Mode=OneWay}"
           OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.BeginMoveFromCommand, Mode=OneWay}"
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.ExecuteMoveCommand, Mode=OneWay}"
-          OnDeleteAcceleratorInvoked="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.RemoveCardCommand, Mode=OneWay}">
+          OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.ExecuteMoveCommand, Mode=OneWay}">
           <cardlistview:DeckCardListItemsRepeater.Layout>
             <UniformGridLayout
               MinItemWidth="{Binding ElementName=CardViewImageSizeSlider, Path=Value, Mode=OneWay}"
@@ -648,7 +569,7 @@
 
         <!--#region List View -->
         <cardlistview:DeckCardListView
-          ItemsSource="{x:Bind DeckCardsListViewCollectionSource.View, Mode=OneTime}"
+          ItemsSource="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.SortedAndFilteredView.View, Mode=OneWay}"
           Visibility="{x:Bind DeckCardsViewType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Text, Mode=OneWay}"
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
@@ -658,8 +579,7 @@
           OnDropImport="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.ImportCardsCommand, Mode=OneWay}"
           OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.BeginMoveFromCommand, Mode=OneWay}"
           OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.BeginMoveToCommand, Mode=OneWay}"
-          OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.ExecuteMoveCommand, Mode=OneWay}"
-          OnDeleteAcceleratorInvoked="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.RemoveCardCommand, Mode=OneWay}">
+          OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.DeckCardListViewModel.ExecuteMoveCommand, Mode=OneWay}">
           <cardlistview:DeckCardListView.ItemTemplate>
             <DataTemplate x:DataType="deckcard:DeckCardViewModel">
               <cardview:DeckEditorCardTextView HoverPreviewEnabled="True" />

@@ -6,10 +6,6 @@ namespace MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionList
 
 public partial class CardCollectionListViewModel
 {
-  public CardCollectionListViewModel()
-  {
-  }
-
   public static class Notifications
   {
     public static Notification EditListSuccess => new(NotificationType.Success, "The list was changed successfully.");

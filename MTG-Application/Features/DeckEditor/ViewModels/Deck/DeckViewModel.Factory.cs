@@ -19,6 +19,7 @@ public partial class DeckViewModel
     public required IMTGCardImporter Importer { private get; init; }
     public required DeckConfirmers DeckConfirmers { private get; init; }
     public required Func<Task> OnDeleted { private get; init; }
+    public required SaveStatus SaveStatus { get; init; }
 
     public DeckViewModel Build(DeckEditorMTGDeck deck)
     {
@@ -28,6 +29,7 @@ public partial class DeckViewModel
         Notifier = Notifier,
         Repository = Repository,
         Importer = Importer,
+        SaveStatus = SaveStatus,
         Confirmers = DeckConfirmers,
         OnDeleted = OnDeleted,
       };

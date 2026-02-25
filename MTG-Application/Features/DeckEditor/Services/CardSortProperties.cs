@@ -17,7 +17,7 @@ public record CardSortProperties(
 {
   public enum MTGSortProperty { CMC, Name, Rarity, Color, Set, Count, Price, SpellType }
 
-  public IComparer<object> Comparer => new MTGCardPropertyComparer([PrimarySortProperty, SecondarySortProperty], SortDirection);
+  public IComparer<DeckCardViewModel> Comparer => new MTGCardPropertyComparer([PrimarySortProperty, SecondarySortProperty], SortDirection);
 
   public class MTGCardPropertyComparer(IEnumerable<MTGSortProperty> properties, SortDirection direction) : IComparer<object>
   {

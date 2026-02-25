@@ -33,7 +33,9 @@ public partial class DeckEditorCardGroup : ObservableObject
 
   public DeckEditorMTGCard? GetFromSource(Func<DeckEditorMTGCard, bool> predicate) => Source.FirstOrDefault(predicate);
 
-  public bool SourceContains(DeckEditorMTGCard card) => Source.Any(x => x.Info.Name == card.Info.Name);
+  public bool SourceContains(DeckEditorMTGCard card) => Source.Contains(card);
+
+  public bool SourceContains(string name) => Source.Any(x => x.Info.Name == name);
 
   private void Group_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
   {

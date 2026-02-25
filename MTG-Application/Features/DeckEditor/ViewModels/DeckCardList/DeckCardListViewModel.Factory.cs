@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Services;
 using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI;
@@ -22,6 +23,8 @@ public partial class DeckCardListViewModel
     public required IScryfallImporter ScryfallImporter { protected get; init; }
     public required IExporter<string> Exporter { protected get; init; }
     public required INetworkService NetworkService { protected get; init; }
+    public required CardFilters CardFilter { get; init; } = new();
+    public required CardSorter CardSorter { get; init; } = new();
     public required CardListConfirmers ListConfirmers { protected get; init; }
 
     public abstract T Build(ObservableCollection<DeckEditorMTGCard> list);
@@ -41,6 +44,8 @@ public partial class DeckCardListViewModel
         UndoStack = UndoStack,
         Notifier = Notifier,
         NetworkService = NetworkService,
+        CardFilter = CardFilter,
+        CardSorter = CardSorter,
         Confirmers = ListConfirmers,
       };
     }

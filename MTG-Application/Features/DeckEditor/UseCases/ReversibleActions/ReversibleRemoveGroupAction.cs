@@ -17,7 +17,7 @@ public class ReversibleRemoveGroupAction(IList<DeckEditorCardGroup> collection) 
 
     // Move cards to default group
     foreach (var card in AffectedCards)
-      new ReversibleCardGroupChangeAction().Action((card, string.Empty));
+      card.Group = string.Empty;
 
     if (collection.TryFindIndex(x => x.GroupKey == group.GroupKey, out var index))
       collection.RemoveAt(index);
@@ -29,6 +29,6 @@ public class ReversibleRemoveGroupAction(IList<DeckEditorCardGroup> collection) 
 
     // Move old cards back
     foreach (var card in AffectedCards)
-      new ReversibleCardGroupChangeAction().Action((card, group.GroupKey));
+      card.Group = group.GroupKey;
   }
 }
