@@ -4,6 +4,7 @@ using MTGApplication.Features.DeckEditor.Services;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
+using MTGApplication.Features.DeckEditor.ViewModels.DeckCommanders;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.API.CardAPI;
@@ -65,6 +66,8 @@ public partial class DeckViewModel : ViewModelBase
   public int DeckSize => Model.DeckSize;
   public double DeckPrice => Model.DeckPrice;
 
+  public DeckCommandersViewModel CommandersViewModel => field ??= CommandersViewModelFactory.Build(Model);
+
   public GroupedDeckCardListViewModel DeckCardListViewModel => field ??= GroupedListViewModelFactory.Build(Model.DeckCards);
   public SideCardListViewModel MaybelistViewModel => field ??= SideListViewModelFactory.Build(Model.Maybelist);
   public SideCardListViewModel WishlistViewModel => field ??= SideListViewModelFactory.Build(Model.Wishlist);
@@ -101,6 +104,17 @@ public partial class DeckViewModel : ViewModelBase
     CardSorter = CardSorter,
     ListConfirmers = Confirmers.ListConfirmers,
     GroupConfirmers = Confirmers.GroupListConfirmers
+  };
+  private DeckCommandersViewModel.Factory CommandersViewModelFactory => field ??= new()
+  {
+    Worker = Worker,
+    Importer = Importer,
+    EdhrecImporter = EdhrecImporter,
+    ScryfallImporter = ScryfallImporter,
+    NetworkService = NetworkService,
+    UndoStack = UndoStack,
+    Notifier = Notifier,
+    Confirmers = Confirmers.ListConfirmers.CardConfirmers
   };
 
   [RelayCommand]
@@ -256,15 +270,6 @@ public partial class DeckViewModel : ViewModelBase
     {
       new ShowNotification(Notifier).Execute((new(NotificationType.Error, $"Error: {e.Message}")));
     }
-  }
-
-  // TODO: move to commanderviewmodel?
-  [RelayCommand]
-  private async Task OpenEdhrecCommanderWebsite()
-  {
-    if (Model.Commander == null) return;
-
-    await NetworkIO.OpenUri(new EdhrecImporter().GetCommanderWebsiteUri(Model.Commander, Model.CommanderPartner));
   }
 
   private bool CanDelete() => !string.IsNullOrEmpty(DeckName);

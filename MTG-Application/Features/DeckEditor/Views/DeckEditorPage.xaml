@@ -18,7 +18,8 @@
   xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.Views.Controls.CardListView" 
   xmlns:deckcard="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCard" 
   xmlns:cardgroup="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup" 
-  xmlns:controls1="using:MTGApplication.Features.DeckEditor.Views.Controls"
+  xmlns:controls1="using:MTGApplication.Features.DeckEditor.Views.Controls" 
+  xmlns:commanderview="using:MTGApplication.Features.DeckEditor.Views.Controls.CommanderView"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=editorpage:DeckEditorPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -129,39 +130,31 @@
 
             <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
 
-              <!--#region Commander / Partner--> 
-              <!--<commanderview:CommanderTextView
-                PrefixText="Commander: "
-                Model="{x:Bind ViewModel.Commander.Card, Mode=OneWay}"
-                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneWay}"
-                DeleteButtonClick="{x:Bind ViewModel.Commander.RemoveCommanderCommand, Mode=OneWay}"
+              <!--#region Commander / Partner-->
+              <commanderview:CommanderTextView 
+                DataContext="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Commander, Mode=OneWay}"
+                CommanderType="Commander"
                 CanDrag="True"
                 AllowDrop="True"
-                DragCopyCaptionText="Copy to Commander"
-                DragMoveCaptionText="Move to Commander"
-                OnDropCopy="{x:Bind ViewModel.Commander.ChangeCommanderCommand, Mode=OneWay}"
-                OnDropBeginMoveFrom="{x:Bind ViewModel.Commander.BeginMoveFromCommand, Mode=OneWay}"
-                OnDropBeginMoveTo="{x:Bind ViewModel.Commander.BeginMoveToCommand, Mode=OneWay}"
-                OnDropExecuteMove="{x:Bind ViewModel.Commander.ExecuteMoveCommand, Mode=OneWay}"
-                OnDropImport="{x:Bind ViewModel.Commander.ImportCommanderCommand, Mode=OneWay}"
-                HoverPreviewEnabled="True" />-->
-              <!--<commanderview:CommanderTextView
-                PrefixText="Partner: "
-                Model="{x:Bind ViewModel.Partner.Card, Mode=OneWay}"
-                EdhrecButtonClick="{x:Bind ViewModel.OpenEdhrecCommanderWebsiteCommand, Mode=OneWay}"
-                DeleteButtonClick="{x:Bind ViewModel.Partner.RemoveCommanderCommand, Mode=OneWay}"
+                HoverPreviewEnabled="True"
+                EdhrecButtonClick="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.OpenEdhrecWebsiteCommand, Mode=OneWay}"
+                OnDropCopy="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Commander.ChangeCardCommand, Mode=OneWay}"
+                OnDropImport="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Commander.ImportCardCommand, Mode=OneWay}"
+                OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Commander.BeginMoveFromCommand, Mode=OneWay}"
+                OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Commander.BeginMoveToCommand, Mode=OneWay}"
+                OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Commander.ExecuteMoveCommand, Mode=OneWay}"/>
+              <commanderview:CommanderTextView 
+                DataContext="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Partner, Mode=OneWay}"
+                CommanderType="Partner"
                 CanDrag="True"
                 AllowDrop="True"
-                DragCopyCaptionText="Copy to Partner"
-                DragMoveCaptionText="Move to Partner"
-                OnDropCopy="{x:Bind ViewModel.Partner.ChangeCommanderCommand, Mode=OneWay}"
-                OnDropBeginMoveFrom="{x:Bind ViewModel.Partner.BeginMoveFromCommand, Mode=OneWay}"
-                OnDropBeginMoveTo="{x:Bind ViewModel.Partner.BeginMoveToCommand, Mode=OneWay}"
-                OnDropExecuteMove="{x:Bind ViewModel.Partner.ExecuteMoveCommand, Mode=OneWay}"
-                OnDropImport="{x:Bind ViewModel.Partner.ImportCommanderCommand, Mode=OneWay}"
-                HoverPreviewEnabled="True" />-->
-              <!--#endregion-->
-
+                HoverPreviewEnabled="True"
+                EdhrecButtonClick="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.OpenEdhrecWebsiteCommand, Mode=OneWay}"
+                OnDropCopy="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Partner.ChangeCardCommand, Mode=OneWay}"
+                OnDropImport="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Partner.ImportCardCommand, Mode=OneWay}"
+                OnDropBeginMoveFrom="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Partner.BeginMoveFromCommand, Mode=OneWay}"
+                OnDropBeginMoveTo="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Partner.BeginMoveToCommand, Mode=OneWay}"
+                OnDropExecuteMove="{x:Bind ViewModel.DeckViewModel.CommandersViewModel.Partner.ExecuteMoveCommand, Mode=OneWay}"/>
             </StackPanel>
 
             <!--#region Maybelist-->

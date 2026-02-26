@@ -1,44 +1,40 @@
-﻿using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
-using MTGApplication.General.ViewModels;
-using System.Threading.Tasks;
+﻿namespace MTGApplication.Features.DeckEditor._Commanders.UseCases;
 
-namespace MTGApplication.Features.DeckEditor.Commanders.UseCases;
+//public partial class CommanderViewModelCommands
+//{
+//  public class ImportCommander(CommanderViewModel viewmodel) : AsyncCommand<string>
+//  {
+//    public CommanderViewModel Viewmodel { get; } = viewmodel;
 
-public partial class CommanderViewModelCommands
-{
-  public class ImportCommander(CommanderViewModel viewmodel) : AsyncCommand<string>
-  {
-    public CommanderViewModel Viewmodel { get; } = viewmodel;
+//    protected override async Task Execute(string? data)
+//    {
+//      //try
+//      //{
+//      //  data ??= string.Empty;
 
-    protected override async Task Execute(string? data)
-    {
-      //try
-      //{
-      //  data ??= string.Empty;
+//      //  var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer, Viewmodel.EdhrecImporter).Import(data));
 
-      //  var result = await Viewmodel.Worker.DoWork(new DeckEditorCardImporter(Viewmodel.Importer, Viewmodel.EdhrecImporter).Import(data));
+//      //  if (result.Found.Length == 0)
+//      //    new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportError);
+//      //  else if (!result.Found[0].Info.TypeLine.Contains("Legendary", System.StringComparison.OrdinalIgnoreCase))
+//      //    new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportNotLegendaryError);
+//      //  else
+//      //  {
+//      //    // Only legendary cards are allowed to be commanders
+//      //    var card = new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count);
 
-      //  if (result.Found.Length == 0)
-      //    new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportError);
-      //  else if (!result.Found[0].Info.TypeLine.Contains("Legendary", System.StringComparison.OrdinalIgnoreCase))
-      //    new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportNotLegendaryError);
-      //  else
-      //  {
-      //    // Only legendary cards are allowed to be commanders
-      //    var card = new DeckEditorMTGCard(result.Found[0].Info, result.Found[0].Count);
+//      //    if (Viewmodel.ChangeCommanderCommand != null && Viewmodel.ChangeCommanderCommand.CanExecute(card))
+//      //    {
+//      //      await Viewmodel.ChangeCommanderCommand.ExecuteAsync(card);
 
-      //    if (Viewmodel.ChangeCommanderCommand != null && Viewmodel.ChangeCommanderCommand.CanExecute(card))
-      //    {
-      //      await Viewmodel.ChangeCommanderCommand.ExecuteAsync(card);
-
-      //      new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
-      //    }
-      //  }
-      //}
-      //catch (System.Exception e)
-      //{
-      //  Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
-      //}
-    }
-  }
-}
+//      //      new ShowNotification(Viewmodel.Notifier).Execute(CommanderNotifications.ImportSuccess);
+//      //    }
+//      //  }
+//      //}
+//      //catch (System.Exception e)
+//      //{
+//      //  Viewmodel.Notifier.Notify(new(General.Services.NotificationService.NotificationService.NotificationType.Error, $"Error: {e.Message}"));
+//      //}
+//    }
+//  }
+//}

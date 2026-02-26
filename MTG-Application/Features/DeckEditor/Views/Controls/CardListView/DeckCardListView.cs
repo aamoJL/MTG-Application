@@ -83,18 +83,7 @@ public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
   {
     e.Handled = true;
 
-    // Block dropping if the origin is the same or the item is invalid
-    if (e.DataView.Properties.TryGetValue(nameof(CardDragArgs), out var prop) && prop is CardDragArgs args)
-    {
-      if (args.Origin.Equals(this)) e.AcceptedOperation = DataPackageOperation.None;
-      else if (args.Item is DeckEditorMTGCard) e.AcceptedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
-      else if (args.Item is MTGCard) e.AcceptedOperation = DataPackageOperation.Copy;
-    }
-    else if (e.DataView.Contains(StandardDataFormats.Text))
-    {
-      e.AcceptedOperation = DataPackageOperation.Copy;
-      e.DragUIOverride.Caption = "Import";
-    }
+    SetDragEventArgs(e);
   }
 
   protected override void OnDragOver(DragEventArgs e)
@@ -104,14 +93,7 @@ public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
     if (e.AcceptedOperation == DataPackageOperation.None)
       return;
 
-    // Change operation to 'Move' if the move modifier is down and move is an accepted operation.
-    if ((e.AllowedOperations & DataPackageOperation.Move) == DataPackageOperation.Move
-      && (e.Modifiers & CardDragArgs.MoveModifier) == CardDragArgs.MoveModifier)
-    {
-      e.AcceptedOperation = DataPackageOperation.Move;
-    }
-    else
-      e.AcceptedOperation = DataPackageOperation.Copy;
+    SetDragEventArgs(e);
   }
 
   protected override async void OnDrop(DragEventArgs e)
@@ -123,7 +105,7 @@ public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
     e.DataView.Properties.TryGetValue(nameof(CardDragArgs), out var prop);
     var args = prop as CardDragArgs;
 
-    if ((e.AcceptedOperation & DataPackageOperation.Move) == DataPackageOperation.Move)
+    if (e.AcceptedOperation == DataPackageOperation.Move)
     {
       // Move
       if (args?.Item is DeckEditorMTGCard editorCard)
@@ -162,5 +144,27 @@ public partial class DeckCardListView : ListView, CardDragArgs.IMoveOrigin
     }
 
     def.Complete();
+  }
+
+  protected void SetDragEventArgs(DragEventArgs e)
+  {
+    if (e.DataView.Properties.TryGetValue(nameof(CardDragArgs), out var prop) && prop is CardDragArgs args)
+    {
+      // Block dropping if the origin is the same or the item is invalid
+      if (args.Origin.Equals(this)) e.AcceptedOperation = DataPackageOperation.None;
+      else if (args.Item is DeckEditorMTGCard)
+      {
+        if ((e.Modifiers & CardDragArgs.MoveModifier) == CardDragArgs.MoveModifier)
+          e.AcceptedOperation = DataPackageOperation.Move;
+        else
+          e.AcceptedOperation = DataPackageOperation.Copy | DataPackageOperation.Move;
+      }
+      else if (args.Item is MTGCard) e.AcceptedOperation = DataPackageOperation.Copy;
+    }
+    else if (e.DataView.Contains(StandardDataFormats.Text))
+    {
+      e.AcceptedOperation = DataPackageOperation.Copy;
+      e.DragUIOverride.Caption = "Import";
+    }
   }
 }

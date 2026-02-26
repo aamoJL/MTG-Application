@@ -143,7 +143,7 @@ public partial class DeckCardListItemsRepeater : UserControl, CardDragArgs.IMove
     e.DataView.Properties.TryGetValue(nameof(CardDragArgs), out var prop);
     var args = prop as CardDragArgs;
 
-    if ((e.AcceptedOperation & DataPackageOperation.Move) == DataPackageOperation.Move)
+    if (e.AcceptedOperation == DataPackageOperation.Move)
     {
       // Move
       if (args?.Item is DeckEditorMTGCard editorCard)

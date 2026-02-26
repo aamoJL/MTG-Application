@@ -66,7 +66,7 @@ public partial class DeckEditorCardTextView : DeckEditorCardViewBase
     CardPreview.Change(this, new(XamlRoot) { Uri = string.Empty });
   }
 
-  protected virtual void HoverPreviewUpdate(FrameworkElement sender, PointerRoutedEventArgs e)
+  protected virtual void HoverPreviewUpdate(FrameworkElement _, PointerRoutedEventArgs e)
   {
     var point = e.GetCurrentPoint(null).Position;
 

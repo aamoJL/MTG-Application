@@ -1,22 +1,13 @@
-﻿using MTGApplication.Features.DeckEditor.Commanders.ViewModels;
-using MTGApplication.Features.DeckEditor.Models;
-using MTGApplication.General.ViewModels;
+﻿namespace MTGApplication.Features.DeckEditor._Commanders.UseCases.ReversibleActions;
 
-namespace MTGApplication.Features.DeckEditor.Commanders.UseCases.ReversibleActions;
+//public partial class CommanderViewModelReversibleActions
+//{
+//  public class ReversibleChangeCommanderAction(DeckEditorMTGDeck deck) : ReversibleAction<DeckEditorMTGCard?>
+//  {
+//    protected override void ActionMethod(DeckEditorMTGCard? card)
+//      => ChangeCommander(card);
 
-public partial class CommanderViewModelReversibleActions
-{
-  public class ReversibleChangeCommanderAction(CommanderViewModel viewmodel) : ViewModelReversibleAction<CommanderViewModel, DeckEditorMTGCard?>(viewmodel)
-  {
-    protected override void ActionMethod(DeckEditorMTGCard? card)
-      => ChangeCommander(card);
-
-    protected override void ReverseActionMethod(DeckEditorMTGCard? card)
-      => ChangeCommander(card);
-
-    private void ChangeCommander(DeckEditorMTGCard? card)
-    {
-      //Viewmodel.Card = card;
-    }
-  }
-}
+//    protected override void ReverseActionMethod(DeckEditorMTGCard? card)
+//      => ChangeCommander(card);
+//  }
+//}

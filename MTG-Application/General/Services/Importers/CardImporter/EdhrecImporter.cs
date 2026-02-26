@@ -37,7 +37,7 @@ public partial class EdhrecImporter : IEdhrecImporter
     catch { throw; }
   }
 
-  public string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard? partner, string themeSuffix = "")
+  public static string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard? partner, string themeSuffix = "")
   {
     if (commander == null)
       return string.Empty;

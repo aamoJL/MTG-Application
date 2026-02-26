@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+  x:Class="MTGApplication.Features.DeckEditor.Views.Controls.CommanderView.CommanderTextView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="using:System"
+  xmlns:local="using:MTGApplication.Features.DeckEditor.Views.Controls.CommanderView"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:commander="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCommanders"
+  xmlns:ui="using:CommunityToolkit.WinUI" 
+  d:DataContext="{d:DesignInstance Type=commander:CommanderViewModelBase}"
+  mc:Ignorable="d">
+
+  <TextBlock TextTrimming="CharacterEllipsis">
+    <TextBlock.ContextFlyout>
+      <CommandBarFlyout AlwaysExpanded="True" Placement="RightEdgeAlignedTop">
+        <CommandBarFlyout.PrimaryCommands>
+          <AppBarButton Command="{x:Bind SwitchFaceImageClickCommand, Mode=OneWay}" Icon="sync" ToolTipService.ToolTip="Flip" IsCompact="True"/>
+          <AppBarSeparator />
+          <AppBarButton Command="{Binding OpenAPIWebsiteCommand, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/scryfallIcon.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="{x:Bind Model.Info.ImporterName, Mode=OneWay}" IsCompact="True"/>
+          <AppBarButton Command="{Binding OpenCardMarketWebsiteCommand, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/CardmarketLogo.png', ShowAsMonochrome=True}" ToolTipService.ToolTip="Cardmarket" IsCompact="True"/>
+          <AppBarButton Command="{x:Bind EdhrecButtonClick, Mode=OneWay}" Icon="{ui:BitmapIcon Source='/Assets/EDHREC.png', ShowAsMonochrome=true}" ToolTipService.ToolTip="EDHREC" IsCompact="True"/>
+          <AppBarButton Command="{Binding DeleteCardCommand, Mode=OneWay}" Background="IndianRed" Icon="delete" ToolTipService.ToolTip="Delete" IsCompact="True"/>
+        </CommandBarFlyout.PrimaryCommands>
+        <CommandBarFlyout.SecondaryCommands>
+          <AppBarButton RequestedTheme="{x:Bind RequestedTheme, Mode=OneWay}" Command="{Binding ChangePrintCommand, Mode=OneWay}" Icon="BrowsePhotos" Label="Show prints..."/>
+        </CommandBarFlyout.SecondaryCommands>
+      </CommandBarFlyout>
+    </TextBlock.ContextFlyout>
+    <Run Text="{x:Bind sys:String.Format('{0}:', CommanderType), Mode=OneWay}"/>
+    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold"/>
+  </TextBlock>
+</UserControl>
