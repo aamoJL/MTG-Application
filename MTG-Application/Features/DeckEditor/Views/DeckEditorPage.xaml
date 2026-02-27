@@ -19,7 +19,8 @@
   xmlns:deckcard="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCard" 
   xmlns:cardgroup="using:MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup" 
   xmlns:controls1="using:MTGApplication.Features.DeckEditor.Views.Controls" 
-  xmlns:commanderview="using:MTGApplication.Features.DeckEditor.Views.Controls.CommanderView"
+  xmlns:commanderview="using:MTGApplication.Features.DeckEditor.Views.Controls.CommanderView" 
+  xmlns:controls2="using:MTGApplication.Features.DeckEditor.Views.Charts.Views.Controls"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=editorpage:DeckEditorPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -309,24 +310,24 @@
               <!--#endregion-->
 
               <!--#region Charts -->
-              <!--<customControls:LinedHeader>
+              <customControls:LinedHeader>
                 <customControls:LinedHeader.Header>
                   <TextBlock Text="Mana Curve"/>
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
-              <deckeditor:ManaCurveChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <controls2:ManaCurveChart Cards="{x:Bind ViewModel.DeckViewModel.ReadOnlyDeckCards, Mode=OneWay}" Height="250"/>
               <customControls:LinedHeader>
                 <customControls:LinedHeader.Header>
                   <TextBlock Text="Type Distribution"/>
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
-              <cardtypedistributionchart:CardTypeDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>
+              <controls2:CardTypeDistributionChart Cards="{x:Bind ViewModel.DeckViewModel.ReadOnlyDeckCards, Mode=OneWay}" Height="250"/>
               <customControls:LinedHeader>
                 <customControls:LinedHeader.Header>
                   <TextBlock Text="Mana Distribution"/>
                 </customControls:LinedHeader.Header>
               </customControls:LinedHeader>
-              <colordistributionchart:ManaDistributionChart Cards="{x:Bind ViewModel.DeckCardList.Cards, Mode=OneWay}" Height="250"/>-->
+              <controls2:ManaDistributionChart Cards="{x:Bind ViewModel.DeckViewModel.ReadOnlyDeckCards, Mode=OneWay}" Height="250"/>
               <!--#endregion Charts-->
 
             </StackPanel>
@@ -462,7 +463,7 @@
             <!--#endregion-->
 
             <AppBarElementContainer VerticalAlignment="Center">
-              <ProgressRing IsActive="{x:Bind ViewModel.Worker.IsBusy, Mode=OneWay}" Margin="5 0 5 0"/>
+              <ProgressRing IsActive="{x:Bind ViewModel.EditorDependencies.Worker.IsBusy, Mode=OneWay}" Margin="5 0 5 0"/>
             </AppBarElementContainer>
           </CommandBar>
         </StackPanel>

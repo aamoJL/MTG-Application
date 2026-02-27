@@ -9,11 +9,14 @@
   mc:Ignorable="d"
   Style="{StaticResource DefaultContentDialogStyle}">
 
-  <TextBox 
-    Header="{x:Bind InputHeader, Mode=OneTime}"
-    IsSpellCheckEnabled="{x:Bind IsSpellCheckEnabled, Mode=OneTime}"
-    PlaceholderText="{x:Bind InputPlaceholderText, Mode=OneTime}"
-    Text="{x:Bind InputText, Mode=TwoWay}"
-    SelectionStart="{x:Bind InputText.Length, Mode=OneTime}"
-    TextChanging="TextBox_TextChanging"/>
+  <StackPanel Orientation="Vertical" Spacing="5">
+    <TextBox 
+      Header="{x:Bind InputHeader, Mode=OneTime}"
+      IsSpellCheckEnabled="{x:Bind IsSpellCheckEnabled, Mode=OneTime}"
+      PlaceholderText="{x:Bind InputPlaceholderText, Mode=OneTime}"
+      Text="{x:Bind InputText, Mode=TwoWay}"
+      SelectionStart="{x:Bind InputText.Length, Mode=OneTime}"
+      TextChanging="TextBox_TextChanging"/>
+    <TextBlock Visibility="{x:Bind ErrorVisibility, Mode=OneWay}" Text="{x:Bind ErrorMessage, Mode=OneWay}" Foreground="IndianRed" FontSize="12" Margin="3 0 0 0"/>
+  </StackPanel>
 </local:StringDialog>

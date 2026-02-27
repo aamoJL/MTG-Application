@@ -2,14 +2,14 @@ using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using MTGApplication.Features.DeckEditor.Charts.Models;
 using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Views.Charts.Models;
 using MTGApplication.General.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using static MTGApplication.General.Models.MTGCardInfo;
 
-namespace MTGApplication.Features.DeckEditor.Charts.Views.Controls.ColorDistributionChart;
+namespace MTGApplication.Features.DeckEditor.Views.Charts.Views.Controls;
 
 public sealed partial class ManaDistributionChart : MTGCardChart
 {

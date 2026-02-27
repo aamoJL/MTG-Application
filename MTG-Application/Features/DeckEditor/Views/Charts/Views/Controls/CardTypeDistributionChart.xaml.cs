@@ -2,15 +2,15 @@ using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using MTGApplication.Features.DeckEditor.Charts.Models;
 using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.Views.Charts.Models;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static MTGApplication.General.Models.MTGCardInfo;
 
-namespace MTGApplication.Features.DeckEditor.Charts.Views.Controls.CardTypeDistributionChart;
+namespace MTGApplication.Features.DeckEditor.Views.Charts.Views.Controls;
 
 public sealed partial class CardTypeDistributionChart : MTGCardChart
 {

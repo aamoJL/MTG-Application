@@ -2,10 +2,6 @@
 using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.ViewModels.Deck;
-using MTGApplication.General.Services.Databases.Repositories;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
-using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -16,17 +12,12 @@ namespace MTGApplication.Features.DeckEditor.ViewModels.EditorPage;
 
 public partial class DeckEditorPageViewModel : ViewModelBase
 {
-  public Worker Worker { get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
-  public Notifier Notifier { private get; init; } = new();
-  public SaveStatus SaveStatus { get; } = new();
-  public EditorPageConfirmers Confirmers { private get; init; } = new();
+  public DeckEditorDependencies EditorDependencies { get; init; } = new();
 
   public string DeckName => DeckViewModel.DeckName;
   public DeckViewModel DeckViewModel
   {
-    get => field ??= DeckViewModel = DeckViewModelFactory.Build(new());
+    get => field ??= DeckViewModel = CreateDeckViewModel(new());
     private set
     {
       var nameChanged = field?.DeckName != value?.DeckName;
@@ -41,19 +32,10 @@ public partial class DeckEditorPageViewModel : ViewModelBase
       //  is called when the old name was the same as the new name.
       if (nameChanged)
         OnPropertyChanged(nameof(DeckName));
+
+      OnPropertyChanged(nameof(SaveStatus));
     }
   }
-
-  private DeckViewModel.Factory DeckViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Repository = Repository,
-    Importer = Importer,
-    Notifier = Notifier,
-    SaveStatus = SaveStatus,
-    DeckConfirmers = Confirmers.DeckConfirmers,
-    OnDeleted = OnDeckDeleted
-  };
 
   [RelayCommand]
   private async Task NewDeck()
@@ -81,24 +63,24 @@ public partial class DeckEditorPageViewModel : ViewModelBase
       if (saveArgs.Cancelled)
         return; // Cancel
 
-      var loadName = name ?? await Confirmers.ConfirmDeckOpen(Confirmations.GetOpenDeckConfirmation(
-        await Worker.DoWork(new FetchDeckNames(Repository).Execute())));
+      var loadName = name ?? await EditorDependencies.PageConfirmers.ConfirmDeckOpen(Confirmations.GetOpenDeckConfirmation(
+        await EditorDependencies.Worker.DoWork(new FetchDeckNames(EditorDependencies.Repository).Execute())));
 
       if (string.IsNullOrEmpty(loadName))
         return; // Cancel
 
-      if (await Worker.DoWork(new FetchDeck(Repository, Importer).Execute(loadName)) is DeckEditorMTGDeck deck)
+      if (await EditorDependencies.Worker.DoWork(new FetchDeck(EditorDependencies.Repository, EditorDependencies.Importer).Execute(loadName)) is DeckEditorMTGDeck deck)
       {
         await ChangeDeck(deck);
 
-        new ShowNotification(Notifier).Execute(Notifications.LoadSuccess);
+        new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.LoadSuccess);
       }
       else
-        new ShowNotification(Notifier).Execute(Notifications.LoadError);
+        new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.LoadError);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
 
@@ -106,7 +88,7 @@ public partial class DeckEditorPageViewModel : ViewModelBase
   {
     ArgumentNullException.ThrowIfNull(deck);
 
-    DeckViewModel = DeckViewModelFactory.Build(deck);
+    DeckViewModel = CreateDeckViewModel(deck);
   }
 
   private async Task OnDeckDeleted() => await ChangeDeck(new());
@@ -118,4 +100,10 @@ public partial class DeckEditorPageViewModel : ViewModelBase
       case nameof(DeckViewModel.DeckName): OnPropertyChanged(nameof(DeckName)); break;
     }
   }
+
+  private DeckViewModel CreateDeckViewModel(DeckEditorMTGDeck deck) => new(deck)
+  {
+    EditorDependencies = EditorDependencies,
+    OnDeleted = OnDeckDeleted,
+  };
 }

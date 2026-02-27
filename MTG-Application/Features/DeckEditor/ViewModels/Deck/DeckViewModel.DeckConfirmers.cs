@@ -1,6 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList;
-using MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
-using MTGApplication.General.Models;
+﻿using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using System;
 using System.Collections.Generic;
@@ -17,8 +15,5 @@ public partial class DeckViewModel
     public Func<Confirmation, Task<ConfirmationResult>> ConfirmDeckSaveOverride { get => field ?? throw new NotImplementedException(nameof(ConfirmDeckSaveOverride)); set; }
     public Func<Confirmation, Task<ConfirmationResult>> ConfirmDeckDelete { get => field ?? throw new NotImplementedException(nameof(ConfirmDeckDelete)); set; }
     public Func<Confirmation<IEnumerable<MTGCard>>, Task> ConfirmDeckTokens { get => field ?? throw new NotImplementedException(nameof(ConfirmDeckTokens)); set; }
-
-    public DeckCardListViewModel.CardListConfirmers ListConfirmers { get; init; } = new();
-    public GroupedDeckCardListViewModel.GroupedCardListConfirmers GroupListConfirmers { get; init; } = new();
   }
 }

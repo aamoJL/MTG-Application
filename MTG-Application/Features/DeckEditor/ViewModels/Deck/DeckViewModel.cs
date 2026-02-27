@@ -7,21 +7,15 @@ using MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCommanders;
 using MTGApplication.Features.DeckTesting.Models;
 using MTGApplication.General.Models;
-using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.General.Services.Databases.Repositories;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
-using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,14 +33,8 @@ public partial class DeckViewModel : ViewModelBase
     Model.PropertyChanged += Model_PropertyChanged;
   }
 
+  public required DeckEditorDependencies EditorDependencies { get; init; }
   public SaveStatus SaveStatus { get; init; } = new();
-  public Worker Worker { get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public IEdhrecImporter EdhrecImporter { private get; init; } = new EdhrecImporter();
-  public IScryfallImporter ScryfallImporter { private get; init; } = new ScryfallAPI();
-  public IExporter<string> Exporter { private get; init; } = new ClipboardExporter();
-  public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
-  public INetworkService NetworkService { private get; init; } = new NetworkService();
   public ReversibleCommandStack UndoStack
   {
     get;
@@ -57,65 +45,23 @@ public partial class DeckViewModel : ViewModelBase
       field.CollectionChanged += UndoStack_CollectionChanged;
     }
   }
-  public Notifier Notifier { private get; init; } = new();
   public CardFilters CardFilter { get; } = new();
   public CardSorter CardSorter { get; } = new();
-  public DeckConfirmers Confirmers { private get; init; } = new();
 
   public string DeckName => Model.Name;
   public int DeckSize => Model.DeckSize;
   public double DeckPrice => Model.DeckPrice;
+  public ReadOnlyObservableCollection<DeckEditorMTGCard> ReadOnlyDeckCards => field ??= new(Model.DeckCards);
 
-  public DeckCommandersViewModel CommandersViewModel => field ??= CommandersViewModelFactory.Build(Model);
+  public DeckCommandersViewModel CommandersViewModel => field ??= CreateDeckCommandersViewModel(Model);
+  public GroupedDeckCardListViewModel DeckCardListViewModel => field ??= CreateGroupedDeckCardListViewModel(Model.DeckCards);
+  public SideCardListViewModel MaybelistViewModel => field ??= CreateSideCardListViewModel(Model.Maybelist);
+  public SideCardListViewModel WishlistViewModel => field ??= CreateSideCardListViewModel(Model.Wishlist);
+  public SideCardListViewModel RemovelistViewModel => field ??= CreateSideCardListViewModel(Model.Removelist);
 
-  public GroupedDeckCardListViewModel DeckCardListViewModel => field ??= GroupedListViewModelFactory.Build(Model.DeckCards);
-  public SideCardListViewModel MaybelistViewModel => field ??= SideListViewModelFactory.Build(Model.Maybelist);
-  public SideCardListViewModel WishlistViewModel => field ??= SideListViewModelFactory.Build(Model.Wishlist);
-  public SideCardListViewModel RemovelistViewModel => field ??= SideListViewModelFactory.Build(Model.Removelist);
-
-  public Func<Task> OnDeleted { get => field ?? throw new NotImplementedException(nameof(OnDeleted)); set; }
+  public required Func<Task> OnDeleted { get; set; }
 
   private DeckEditorMTGDeck Model { get; }
-  private SideCardListViewModel.Factory SideListViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    EdhrecImporter = EdhrecImporter,
-    ScryfallImporter = ScryfallImporter,
-    Exporter = Exporter,
-    NetworkService = NetworkService,
-    UndoStack = UndoStack,
-    Notifier = Notifier,
-    CardFilter = CardFilter,
-    CardSorter = CardSorter,
-    ListConfirmers = Confirmers.ListConfirmers,
-  };
-  private GroupedDeckCardListViewModel.Factory GroupedListViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    EdhrecImporter = EdhrecImporter,
-    ScryfallImporter = ScryfallImporter,
-    Exporter = Exporter,
-    NetworkService = NetworkService,
-    UndoStack = UndoStack,
-    Notifier = Notifier,
-    CardFilter = CardFilter,
-    CardSorter = CardSorter,
-    ListConfirmers = Confirmers.ListConfirmers,
-    GroupConfirmers = Confirmers.GroupListConfirmers
-  };
-  private DeckCommandersViewModel.Factory CommandersViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    EdhrecImporter = EdhrecImporter,
-    ScryfallImporter = ScryfallImporter,
-    NetworkService = NetworkService,
-    UndoStack = UndoStack,
-    Notifier = Notifier,
-    Confirmers = Confirmers.ListConfirmers.CardConfirmers
-  };
 
   [RelayCommand]
   private async Task SaveUnsavedChanges(SaveStatus.ConfirmArgs? args)
@@ -124,7 +70,7 @@ public partial class DeckViewModel : ViewModelBase
 
     try
     {
-      switch (await Confirmers.ConfirmUnsavedChanges(Confirmations.GetSaveUnsavedChangesConfirmation(DeckName)))
+      switch (await EditorDependencies.DeckConfirmers.ConfirmUnsavedChanges(Confirmations.GetSaveUnsavedChangesConfirmation(DeckName)))
       {
         case ConfirmationResult.Yes:
           await SaveDeck();
@@ -139,7 +85,7 @@ public partial class DeckViewModel : ViewModelBase
     {
       args.Cancelled = true;
 
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -151,7 +97,7 @@ public partial class DeckViewModel : ViewModelBase
       var oldName = DeckName;
       var overrideOld = false;
 
-      var saveName = await Confirmers.ConfirmDeckSave(Confirmations.GetSaveDeckConfirmation(oldName));
+      var saveName = await EditorDependencies.DeckConfirmers.ConfirmDeckSave(Confirmations.GetSaveDeckConfirmation(oldName));
 
       if (saveName == null)
         return; // Cancel
@@ -160,28 +106,28 @@ public partial class DeckViewModel : ViewModelBase
         throw new InvalidOperationException("Invalid name");
 
       // Override confirmation
-      if (saveName != oldName && await new DeckDTOExists(Repository).Execute(saveName))
+      if (saveName != oldName && await new DeckDTOExists(EditorDependencies.Repository).Execute(saveName))
       {
-        switch (await Confirmers.ConfirmDeckSaveOverride(Confirmations.GetOverrideDeckConfirmation(saveName)))
+        switch (await EditorDependencies.DeckConfirmers.ConfirmDeckSaveOverride(Confirmations.GetOverrideDeckConfirmation(saveName)))
         {
           case ConfirmationResult.Yes: overrideOld = true; break;
           default: return; // Cancel
         }
       }
 
-      if (await Worker.DoWork(new SaveDeck(Repository).Execute(Model, saveName, overrideOld)))
+      if (await EditorDependencies.Worker.DoWork(new SaveDeck(EditorDependencies.Repository).Execute(Model, saveName, overrideOld)))
       {
         Model.Name = saveName;
         SaveStatus.HasUnsavedChanges = false;
 
-        new ShowNotification(Notifier).Execute(Notifications.SaveSuccess);
+        new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.SaveSuccess);
       }
       else
-        new ShowNotification(Notifier).Execute(Notifications.SaveError);
+        new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.SaveError);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -193,24 +139,24 @@ public partial class DeckViewModel : ViewModelBase
       if (!CanDelete())
         throw new ArgumentException("Name should not be empty", nameof(DeckName));
 
-      switch (await Confirmers.ConfirmDeckDelete(Confirmations.GetDeleteDeckConfirmation(DeckName)))
+      switch (await EditorDependencies.DeckConfirmers.ConfirmDeckDelete(Confirmations.GetDeleteDeckConfirmation(DeckName)))
       {
         case ConfirmationResult.Yes: break;
         default: return; // Cancel
       }
 
-      if (await Worker.DoWork(new DeleteDeck(Repository).Execute(Model)))
+      if (await EditorDependencies.Worker.DoWork(new DeleteDeck(EditorDependencies.Repository).Execute(Model)))
       {
         await OnDeleted();
 
-        new ShowNotification(Notifier).Execute(Notifications.DeleteSuccess);
+        new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.DeleteSuccess);
       }
       else
-        new ShowNotification(Notifier).Execute(Notifications.DeleteError);
+        new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.DeleteError);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -220,13 +166,13 @@ public partial class DeckViewModel : ViewModelBase
     try
     {
       var cards = new List<MTGCard?>([.. Model.DeckCards, Model.Commander, Model.CommanderPartner]).OfType<MTGCard>();
-      var tokens = (await Worker.DoWork(new FetchTokens(Importer).Execute(cards))).Found.Select(x => new MTGCard(x.Info));
+      var tokens = (await EditorDependencies.Worker.DoWork(new FetchTokens(EditorDependencies.Importer).Execute(cards))).Found.Select(x => new MTGCard(x.Info));
 
-      await Confirmers.ConfirmDeckTokens(Confirmations.GetShowTokensConfirmation(tokens));
+      await EditorDependencies.DeckConfirmers.ConfirmDeckTokens(Confirmations.GetShowTokensConfirmation(tokens));
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -247,7 +193,7 @@ public partial class DeckViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -268,7 +214,7 @@ public partial class DeckViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute((new(NotificationType.Error, $"Error: {e.Message}")));
+      new ShowNotification(EditorDependencies.Notifier).Execute((new(NotificationType.Error, $"Error: {e.Message}")));
     }
   }
 
@@ -290,4 +236,26 @@ public partial class DeckViewModel : ViewModelBase
 
   private void UndoStack_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     => SaveStatus.HasUnsavedChanges = true;
+
+  private SideCardListViewModel CreateSideCardListViewModel(ObservableCollection<DeckEditorMTGCard> source) => new(source)
+  {
+    EditorDependencies = EditorDependencies,
+    UndoStack = UndoStack,
+    CardFilter = CardFilter,
+    CardSorter = CardSorter,
+  };
+
+  private GroupedDeckCardListViewModel CreateGroupedDeckCardListViewModel(ObservableCollection<DeckEditorMTGCard> source) => new(source)
+  {
+    EditorDependencies = EditorDependencies,
+    UndoStack = UndoStack,
+    CardFilter = CardFilter,
+    CardSorter = CardSorter,
+  };
+
+  private DeckCommandersViewModel CreateDeckCommandersViewModel(DeckEditorMTGDeck deck) => new(deck)
+  {
+    EditorDependencies = EditorDependencies,
+    UndoStack = UndoStack,
+  };
 }

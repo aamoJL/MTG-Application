@@ -3,8 +3,6 @@ using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.General.Models;
-using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -23,12 +21,8 @@ public partial class DeckCardViewModel : ViewModelBase
     Model.PropertyChanged += Model_PropertyChanged;
   }
 
-  public Worker Worker { get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public ReversibleCommandStack UndoStack { private get; init; } = new();
-  public Notifier Notifier { private get; init; } = new();
-  public INetworkService NetworkService { private get; init; } = new NetworkService();
-  public CardConfirmers Confirmers { private get; init; } = new();
+  public required DeckEditorDependencies EditorDependencies { get; init; }
+  public required ReversibleCommandStack UndoStack { private get; init; } = new();
 
   public string Name => Model.Info.Name;
   public MTGCardInfo Info => Model.Info;
@@ -36,7 +30,7 @@ public partial class DeckCardViewModel : ViewModelBase
   public string Group => Model.Group;
   public CardTag? CardTag => Model.CardTag;
 
-  public Action<DeckEditorMTGCard>? OnDelete { get => field ?? throw new NotImplementedException(); init; }
+  public required Action<DeckEditorMTGCard>? OnDelete { private get; init; }
 
   private DeckEditorMTGCard Model { get; }
 
@@ -58,9 +52,9 @@ public partial class DeckCardViewModel : ViewModelBase
   {
     try
     {
-      var prints = (await Worker.DoWork(new FetchCardPrints(Importer).Execute(Model))).Found.Select(x => new MTGCard(x.Info));
+      var prints = (await EditorDependencies.Worker.DoWork(new FetchCardPrints(EditorDependencies.Importer).Execute(Model))).Found.Select(x => new MTGCard(x.Info));
 
-      if (await Confirmers.ConfirmCardPrints(Confirmations.GetChangeCardPrintConfirmation(prints)) is not MTGCard selection)
+      if (await EditorDependencies.CardConfirmers.ConfirmCardPrints(Confirmations.GetChangeCardPrintConfirmation(prints)) is not MTGCard selection)
         return; // Cancel
 
       if (selection.Info.ScryfallId == Model.Info.ScryfallId)
@@ -74,7 +68,7 @@ public partial class DeckCardViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -97,7 +91,7 @@ public partial class DeckCardViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -106,11 +100,11 @@ public partial class DeckCardViewModel : ViewModelBase
   {
     try
     {
-      await NetworkService.OpenUri(Model.Info.APIWebsiteUri);
+      await EditorDependencies.NetworkService.OpenUri(Model.Info.APIWebsiteUri);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -119,11 +113,11 @@ public partial class DeckCardViewModel : ViewModelBase
   {
     try
     {
-      await NetworkService.OpenUri(Model.Info.CardMarketUri);
+      await EditorDependencies.NetworkService.OpenUri(Model.Info.CardMarketUri);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 

@@ -14,6 +14,6 @@ public class ShowSaveDialog(XamlRoot root) : ShowDialogUseCase<string?, string>(
       InvalidInputCharacters = Path.GetInvalidFileNameChars(),
       InputText = data,
       PrimaryButtonText = "Save",
-      InputValidation = input => !string.IsNullOrEmpty(input)
+      InputErrorValidation = input => !string.IsNullOrEmpty(input) ? null : string.Empty
     });
 }

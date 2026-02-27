@@ -5,12 +5,8 @@ using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
 using MTGApplication.General.Extensions;
-using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
-using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -33,32 +29,15 @@ public partial class DeckCardListViewModel : ViewModelBase
     Model.CollectionChanged += Model_CollectionChanged;
   }
 
-  public Worker Worker { get; init; } = new();
-  public IMTGCardImporter Importer { protected get; init; } = App.MTGCardImporter;
-  public IEdhrecImporter EdhrecImporter { protected get; init; } = new EdhrecImporter();
-  public IScryfallImporter ScryfallImporter { protected get; init; } = new ScryfallAPI();
-  public IExporter<string> Exporter { protected get; init; } = new ClipboardExporter();
-  public ReversibleCommandStack UndoStack { protected get; init; } = new();
-  public Notifier Notifier { protected get; init; } = new();
-  public INetworkService NetworkService { protected get; init; } = new NetworkService();
-  public CardFilters CardFilter { get; init; } = new();
-  public CardSorter CardSorter { get; init; } = new();
-  public CardListConfirmers Confirmers { protected get; init; } = new();
+  public required DeckEditorDependencies EditorDependencies { get; init; }
+  public required ReversibleCommandStack UndoStack { protected get; init; }
+  public required CardFilters CardFilter { get; init; }
+  public required CardSorter CardSorter { get; init; }
 
-  public ObservableCollection<DeckCardViewModel> CardViewModels => field ??= new(Model.Select(CardViewModelFactory.Build));
+  public ObservableCollection<DeckCardViewModel> CardViewModels => field ??= new(Model.Select(CreateDeckCardViewModel));
   public FilterableAndSortableCollectionView<DeckCardViewModel> SortedAndFilteredView => field ??= new(CardViewModels, CardFilter, CardSorter);
 
   protected ObservableCollection<DeckEditorMTGCard> Model { get; }
-  protected DeckCardViewModel.Factory CardViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    UndoStack = UndoStack,
-    Notifier = Notifier,
-    NetworkService = NetworkService,
-    Confirmers = Confirmers.CardConfirmers,
-    OnCardDelete = RemoveCard,
-  };
 
   [RelayCommand]
   protected virtual async Task AddCard(DeckEditorMTGCard? card)
@@ -70,7 +49,7 @@ public partial class DeckCardListViewModel : ViewModelBase
       if (Model.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard listCard)
       {
         // Conflict confirmation
-        switch (await Confirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
+        switch (await EditorDependencies.ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
         {
           case ConfirmationResult.Yes:
             UndoStack.PushAndExecute(new ReversiblePropertyChangeCommand<DeckEditorMTGCard, int>(listCard, listCard.Count, listCard.Count + card.Count)
@@ -91,7 +70,7 @@ public partial class DeckCardListViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -110,7 +89,7 @@ public partial class DeckCardListViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -134,7 +113,7 @@ public partial class DeckCardListViewModel : ViewModelBase
     if (Model.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
     {
       // Conflict confirmation
-      switch (await Confirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
+      switch (await EditorDependencies.ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
       {
         case ConfirmationResult.Yes:
           UndoStack.ActiveCombinedCommand.Commands.Add(
@@ -174,12 +153,12 @@ public partial class DeckCardListViewModel : ViewModelBase
   {
     try
     {
-      data ??= await Confirmers.ConfirmImport(Confirmations.GetImportConfirmation());
+      data ??= await EditorDependencies.ListConfirmers.ConfirmImport(Confirmations.GetImportConfirmation());
 
       if (string.IsNullOrEmpty(data))
         return; // Cancel
 
-      var result = await Worker.DoWork(new ImportCards(Importer, EdhrecImporter, ScryfallImporter).Execute(data));
+      var result = await EditorDependencies.Worker.DoWork(new ImportCards(EditorDependencies.Importer, EditorDependencies.EdhrecImporter, EditorDependencies.ScryfallImporter).Execute(data));
 
       var newCards = new List<DeckEditorMTGCard>();
       var existingCards = new List<(DeckEditorMTGCard Card, int NewCount)>();
@@ -195,7 +174,7 @@ public partial class DeckCardListViewModel : ViewModelBase
           if (!skipConflictConfirmation)
           {
             (addConflictConfirmationResult, skipConflictConfirmation)
-              = await Confirmers.ConfirmAddMultipleConflict(Confirmations.GetAddMultipleConflictConfirmation(card.Info.Name));
+              = await EditorDependencies.ListConfirmers.ConfirmAddMultipleConflict(Confirmations.GetAddMultipleConflictConfirmation(card.Info.Name));
           }
 
           if (addConflictConfirmationResult == ConfirmationResult.Yes)
@@ -246,18 +225,18 @@ public partial class DeckCardListViewModel : ViewModelBase
       if (result.Source == CardImportResult.ImportSource.External)
       {
         if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
-          new ShowNotification(Notifier).Execute(new(NotificationType.Success,
+          new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Success,
             $"{importCount} cards imported successfully." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
         else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
-          new ShowNotification(Notifier).Execute(new(NotificationType.Warning,
+          new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Warning,
             $"{importCount} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
         else if (result.NotFoundCount > 0) // None found
-          new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
+          new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
       }
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -273,18 +252,18 @@ public partial class DeckCardListViewModel : ViewModelBase
         _ => throw new ArgumentException("Invalid export property"),
       };
 
-      var response = await Confirmers.ConfirmExport(Confirmations.GetExportConfirmation(exportText));
+      var response = await EditorDependencies.ListConfirmers.ConfirmExport(Confirmations.GetExportConfirmation(exportText));
 
       if (string.IsNullOrEmpty(response))
         return; // Cancel
 
-      await new ExportText(Exporter).Execute(response);
+      await new ExportText(EditorDependencies.Exporter).Execute(response);
 
-      new ShowNotification(Notifier).Execute(Exporter.SuccessNotification);
+      new ShowNotification(EditorDependencies.Notifier).Execute(EditorDependencies.Exporter.SuccessNotification);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -303,7 +282,7 @@ public partial class DeckCardListViewModel : ViewModelBase
     foreach (var item in e.AddedItems<DeckEditorMTGCard>())
     {
       if (!CardViewModels.Any(x => x.Info == item.Info))
-        CardViewModels.Add(CardViewModelFactory.Build(item));
+        CardViewModels.Add(CreateDeckCardViewModel(item));
     }
     foreach (var item in e.RemovedItems<DeckEditorMTGCard>())
     {
@@ -311,4 +290,11 @@ public partial class DeckCardListViewModel : ViewModelBase
         CardViewModels.RemoveAt(index);
     }
   }
+
+  protected DeckCardViewModel CreateDeckCardViewModel(DeckEditorMTGCard card) => new(card)
+  {
+    EditorDependencies = EditorDependencies,
+    UndoStack = UndoStack,
+    OnDelete = RemoveCard,
+  };
 }

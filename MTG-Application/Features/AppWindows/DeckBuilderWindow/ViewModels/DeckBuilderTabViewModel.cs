@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckEditor.ViewModels.EditorPage;
 using MTGApplication.General.ViewModels;
@@ -22,7 +21,7 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
       else return EditorViewModel.DeckName;
     }
   }
-  [ObservableProperty] public partial SaveStatus SaveStatus { get; private set; } = new();
+  public SaveStatus SaveStatus => EditorViewModel?.DeckViewModel.SaveStatus ?? new();
 
   private DeckEditorPageViewModel? EditorViewModel
   {
@@ -32,6 +31,8 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
       field?.PropertyChanged -= EditorViewModel_PropertyChanged;
       field = value;
       field?.PropertyChanged += EditorViewModel_PropertyChanged;
+
+      OnPropertyChanged(nameof(SaveStatus));
     }
   }
 
@@ -41,7 +42,6 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
   [RelayCommand]
   private async Task RequestClose(SaveStatus.ConfirmArgs args)
   {
-    // TODO: change to ISavable
     if (EditorViewModel is DeckEditorPageViewModel editorVM && editorVM.DeckViewModel.SaveStatus.HasUnsavedChanges)
     {
       OnRequestSelection?.Invoke(this);
@@ -64,15 +64,16 @@ public partial class DeckBuilderTabViewModel : ViewModelBase
   }
 
   [RelayCommand]
-  private void ChangeViewModel(DeckEditorPageViewModel? editor)
-  {
-    EditorViewModel = editor;
-    SaveStatus = editor?.DeckViewModel.SaveStatus ?? new();
-  }
+  private void ChangeViewModel(DeckEditorPageViewModel? editor) => EditorViewModel = editor;
+
+  private void SaveStatus_PropertyChanged(object? sender, PropertyChangedEventArgs e) => throw new NotImplementedException();
 
   private void EditorViewModel_PropertyChanged(object? _, PropertyChangedEventArgs e)
   {
-    if (e.PropertyName == nameof(DeckEditorPageViewModel.DeckName))
-      OnPropertyChanged(nameof(HeaderText));
+    switch (e.PropertyName)
+    {
+      case nameof(DeckEditorPageViewModel.DeckName): OnPropertyChanged(nameof(HeaderText)); break;
+      case nameof(DeckEditorPageViewModel.DeckViewModel): OnPropertyChanged(nameof(SaveStatus)); break;
+    }
   }
 }

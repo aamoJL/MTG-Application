@@ -1,5 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup;
-using MTGApplication.General.Services.ConfirmationService;
+﻿using MTGApplication.General.Services.ConfirmationService;
 using System;
 using System.Threading.Tasks;
 
@@ -9,8 +8,6 @@ public partial class GroupedDeckCardListViewModel
 {
   public class GroupedCardListConfirmers
   {
-    public Func<Confirmation, Task<string?>> ConfirmAddGroup { get => field ?? throw new NotImplementedException(nameof(ConfirmAddGroup)); set; }
-
-    public DeckCardGroupViewModel.GroupConfirmers GroupConfirmers { get; init; } = new();
+    public Func<Confirmation<string[]>, Task<string?>> ConfirmAddGroup { get => field ?? throw new NotImplementedException(nameof(ConfirmAddGroup)); set; }
   }
 }

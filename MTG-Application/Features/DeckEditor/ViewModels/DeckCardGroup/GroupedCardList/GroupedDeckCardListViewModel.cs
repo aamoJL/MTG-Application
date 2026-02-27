@@ -31,42 +31,26 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
 
   public ObservableCollection<DeckCardGroupViewModel> GroupViewModels
   {
-    get => field ??= GroupViewModels = [.. Groups.Select(GroupViewModelFactory.Build)]; private set;
+    get => field ??= GroupViewModels = [.. Groups.Select(CreateDeckCardGroupViewModel)];
+    private set;
   }
 
-  public GroupedCardListConfirmers GroupedListConfirmers { private get; init; } = new();
-
   private ObservableCollection<DeckEditorCardGroup> Groups { get; } = [];
-  private DeckCardGroupViewModel.Factory GroupViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    EdhrecImporter = EdhrecImporter,
-    Notifier = Notifier,
-    UndoStack = UndoStack,
-    CardFilter = CardFilter,
-    CardSorter = CardSorter,
-    ListConfirmers = Confirmers,
-    GroupConfirmers = GroupedListConfirmers.GroupConfirmers,
-    CardFactory = CardViewModelFactory,
-    OnGroupDelete = OnDeleteGroup,
-    OnGroupRename = OnGroupRename,
-  };
 
   [RelayCommand]
   private async Task AddGroup()
   {
     try
     {
-      var groupName = await GroupedListConfirmers.ConfirmAddGroup(GroupConfirmations.GetAddCardGroupConfirmation());
+      var invalidNames = Groups.Select(x => x.GroupKey).ToArray();
+      var groupName = await EditorDependencies.GroupListConfirmers.ConfirmAddGroup(GroupConfirmations.GetAddCardGroupConfirmation(invalidNames));
 
       if (string.IsNullOrEmpty(groupName))
         return;
 
-      if (GroupViewModels.Any(x => x.GroupKey == groupName))
+      if (invalidNames.Contains(groupName))
       {
-        // TODO: add validation to confirmation?
-        new ShowNotification(Notifier).Execute(new(NotificationType.Error, "Group already exists."));
+        new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, "Group already exists."));
         return;
       }
 
@@ -78,7 +62,7 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
 
@@ -91,14 +75,8 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
       });
   }
 
-  private void OnGroupRename(DeckEditorCardGroup group, string newKey)
+  private IReversibleCommand[] OnGroupRename(DeckEditorCardGroup group, string newKey)
   {
-    if (Groups.Any(x => x.GroupKey == newKey))
-    {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, "Group already exists"));
-      return;
-    }
-
     var addNewGroup = new ReversibleCommand<DeckEditorCardGroup>(new(newKey, Model))
     {
       ReversibleAction = new ReversibleAddGroupAction(Groups)
@@ -112,10 +90,7 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
       ReversibleAction = new ReversibleRemoveGroupAction(Groups)
     };
 
-    UndoStack.PushAndExecute(new CombinedReversibleCommand()
-    {
-      Commands = [addNewGroup, regroupCards, removeOldGroup]
-    });
+    return [addNewGroup, regroupCards, removeOldGroup];
   }
 
   protected override DeckEditorMTGCard TransformCardModel(DeckEditorMTGCard card) => card.Copy();
@@ -127,7 +102,7 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
       if (!GroupViewModels.Any(x => x.GroupKey == item.GroupKey))
       {
         if (Groups.TryFindIndex(x => x.GroupKey == item.GroupKey, out var i))
-          GroupViewModels.Insert(i, GroupViewModelFactory.Build(item));
+          GroupViewModels.Insert(i, CreateDeckCardGroupViewModel(item));
       }
     }
     foreach (var item in e.RemovedItems<DeckEditorCardGroup>())
@@ -136,4 +111,15 @@ public partial class GroupedDeckCardListViewModel : DeckCardListViewModel
         GroupViewModels.RemoveAt(i);
     }
   }
+
+  private DeckCardGroupViewModel CreateDeckCardGroupViewModel(DeckEditorCardGroup group) => new(group)
+  {
+    EditorDependencies = EditorDependencies,
+    UndoStack = UndoStack,
+    CardFilter = CardFilter,
+    CardSorter = CardSorter,
+    GetInvalidNames = () => [.. Groups.Select(x => x.GroupKey)],
+    OnDelete = OnDeleteGroup,
+    OnRename = OnGroupRename,
+  };
 }

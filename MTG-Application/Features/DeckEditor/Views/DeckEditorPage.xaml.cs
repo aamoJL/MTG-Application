@@ -24,11 +24,13 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 
   public DeckEditorPageViewModel ViewModel => field ??= new()
   {
-    Notifier = Notifier,
-    Confirmers = new()
+    EditorDependencies = new()
     {
-      ConfirmDeckOpen = async msg => await new ShowOpenDialog(XamlRoot).Execute((msg.Title, msg.Message, [.. msg.Data])),
-
+      Notifier = Notifier,
+      PageConfirmers = new()
+      {
+        ConfirmDeckOpen = async msg => await new ShowOpenDialog(XamlRoot).Execute((msg.Title, msg.Message, [.. msg.Data])),
+      },
       DeckConfirmers = new()
       {
         ConfirmUnsavedChanges = async msg => await new ShowUnsavedChangesDialog(XamlRoot).Execute((msg.Title, msg.Message)),
@@ -49,29 +51,29 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
             CanSelectItems = false,
           });
         },
-
-        ListConfirmers = new()
+      },
+      ListConfirmers = new()
+      {
+        ConfirmAddSingleConflict = async (msg) => await DialogService.ShowAsync(XamlRoot, new TwoButtonConfirmationDialog(msg.Title, msg.Message)),
+        ConfirmAddMultipleConflict = async (msg) => await DialogService.ShowAsync(XamlRoot, new CheckBoxDialog(msg.Title, msg.Message)
         {
-          ConfirmAddSingleConflict = async (msg) => await DialogService.ShowAsync(XamlRoot, new TwoButtonConfirmationDialog(msg.Title, msg.Message)),
-          ConfirmAddMultipleConflict = async (msg) => await DialogService.ShowAsync(XamlRoot, new CheckBoxDialog(msg.Title, msg.Message)
-          {
-            InputText = "Same for all cards.",
-            CloseButtonText = "No",
-          }),
-          ConfirmImport = async msg => await DialogService.ShowAsync(XamlRoot, new TextAreaDialog(msg.Title)
-          {
-            InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
-            PrimaryButtonText = "Import",
-          }),
-          ConfirmExport = async msg => await DialogService.ShowAsync(XamlRoot, new TextAreaDialog(msg.Title)
-          {
-            InputText = msg.Data,
-            PrimaryButtonText = "Copy to Clipboard",
-          }),
-
-          CardConfirmers = new()
-          {
-            ConfirmCardPrints = async (msg) =>
+          InputText = "Same for all cards.",
+          CloseButtonText = "No",
+        }),
+        ConfirmImport = async msg => await DialogService.ShowAsync(XamlRoot, new TextAreaDialog(msg.Title)
+        {
+          InputPlaceholderText = "Example:\n2 Black Lotus\nMox Ruby\nbd8fa327-dd41-4737-8f19-2cf5eb1f7cdd",
+          PrimaryButtonText = "Import",
+        }),
+        ConfirmExport = async msg => await DialogService.ShowAsync(XamlRoot, new TextAreaDialog(msg.Title)
+        {
+          InputText = msg.Data,
+          PrimaryButtonText = "Copy to Clipboard",
+        }),
+      },
+      CardConfirmers = new()
+      {
+        ConfirmCardPrints = async (msg) =>
             {
               Application.Current.Resources.TryGetValue(nameof(MTGPrintGridViewItemTemplate), out var template);
 
@@ -80,31 +82,35 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
                 items: [.. msg.Data],
                 itemTemplate: (DataTemplate)template))) as MTGCard;
             },
-          }
-        },
-
-        GroupListConfirmers = new()
+      },
+      GroupListConfirmers = new()
+      {
+        ConfirmAddGroup = async msg => await DialogService.ShowAsync(XamlRoot, new TextBoxDialog(msg.Title)
         {
-          ConfirmAddGroup = async msg => await DialogService.ShowAsync(XamlRoot, new TextBoxDialog(msg.Title)
+          InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+          PrimaryButtonText = "Add",
+          InputErrorValidation = input =>
           {
-            InvalidInputCharacters = Path.GetInvalidFileNameChars(),
-            PrimaryButtonText = "Add",
-            InputValidation = input => !string.IsNullOrEmpty(input)
-          }),
-
-          GroupConfirmers = new()
-          {
-            ConfirmRenameGroup = async msg => await DialogService.ShowAsync(XamlRoot, new TextBoxDialog(msg.Title)
-            {
-              InvalidInputCharacters = Path.GetInvalidFileNameChars(),
-              InputText = msg.Data,
-              PrimaryButtonText = "Rename",
-              InputValidation = input => !string.IsNullOrEmpty(input)
-            }),
+            if (string.IsNullOrEmpty(input)) return string.Empty;
+            else return !msg.Data.Contains(input) ? null : "Group already exists";
           }
-        }
+        }),
+      },
+      GroupConfirmers = new()
+      {
+        ConfirmRenameGroup = async msg => await DialogService.ShowAsync(XamlRoot, new TextBoxDialog(msg.Title)
+        {
+          InvalidInputCharacters = Path.GetInvalidFileNameChars(),
+          InputText = msg.Data.OldKey,
+          PrimaryButtonText = "Rename",
+          InputErrorValidation = input =>
+          {
+            if (string.IsNullOrEmpty(input) || input == msg.Data.OldKey) return string.Empty;
+            else return !msg.Data.InvalidNames.Contains(input) ? null : "Group already exists";
+          }
+        }),
       }
-    }
+    },
   };
 
   public CardViewType DeckCardsViewType

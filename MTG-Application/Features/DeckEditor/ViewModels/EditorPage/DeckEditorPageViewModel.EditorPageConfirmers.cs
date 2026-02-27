@@ -1,5 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels.Deck;
-using MTGApplication.General.Services.ConfirmationService;
+﻿using MTGApplication.General.Services.ConfirmationService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,7 +10,5 @@ public partial class DeckEditorPageViewModel
   public class EditorPageConfirmers
   {
     public Func<Confirmation<IEnumerable<string>>, Task<string?>> ConfirmDeckOpen { get => field ?? throw new NotImplementedException(nameof(ConfirmDeckOpen)); set; }
-
-    public DeckViewModel.DeckConfirmers DeckConfirmers { get; init; } = new();
   }
 }

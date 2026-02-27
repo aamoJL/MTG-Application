@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -37,22 +38,24 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
 
   public string Name => "Scryfall";
 
-  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true, CancellationToken? cancellationToken = null)
   {
     if (string.IsNullOrEmpty(searchParams))
       return CardImportResult.Empty();
 
-    try
-    {
-      return await ImportWithUri(GetSearchUri(searchParams), fetchAll: !pagination);
-    }
-    catch { throw; }
+    var result = await ImportWithUri(GetSearchUri(searchParams), fetchAll: !pagination, cancellationToken: cancellationToken);
+
+    cancellationToken?.ThrowIfCancellationRequested();
+
+    return result;
   }
 
-  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null)
   {
     var pageResults = new List<CardImportResult>();
     var currentPage = pageUri;
+
+    cancellationToken?.ThrowIfCancellationRequested();
 
     do
     {
@@ -72,7 +75,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
         currentPage = nextPage;
       }
       catch { throw; }
-    } while (fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
+    } while (cancellationToken?.IsCancellationRequested != true && fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
 
     return pageResults.Count switch
     {

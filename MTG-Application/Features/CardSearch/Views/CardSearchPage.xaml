@@ -11,12 +11,11 @@
   xmlns:models="using:MTGApplication.General.Models" 
   xmlns:customControls="using:MTGApplication.Features.CardSearch.Views.Controls.CardView" 
   xmlns:searchinputcontrol="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl" 
-  xmlns:viewmodels="using:MTGApplication.Features.CardSearch.ViewModels" 
   xmlns:controls1="using:MTGApplication.General.Views.Controls" 
   xmlns:interactivity="using:Microsoft.Xaml.Interactivity" 
-  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" xmlns:searchcard="using:MTGApplication.Features.CardSearch.ViewModels.SearchCard"
+  xmlns:bindinghelpers="using:MTGApplication.General.Views.BindingHelpers" 
+  xmlns:searchcard="using:MTGApplication.Features.CardSearch.ViewModels.SearchCard"
   mc:Ignorable="d"
-  d:DataContext="{d:DesignInstance Type=viewmodels:CardSearchPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid Margin="10">
@@ -102,7 +101,7 @@
           ItemContainerStyle="{StaticResource MTGListViewItemContainerStyle}"
           SelectionMode="Single"
           CanDragItems="True"
-          DragItemsStarting="{x:Bind CardDragAndDrop.DragStarting, Mode=OneTime}">
+          DragItemsStarting="TextView_DragItemsStarting">
           <ListView.ItemTemplate>
             <DataTemplate x:DataType="searchcard:CardSearchMTGCardViewModel">
               <customControls:CardSearchCardTextView 

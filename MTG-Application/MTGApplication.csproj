@@ -61,7 +61,7 @@
     <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
     <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardListView\AdvancedAdaptiveCardGridViewStyle.xaml" />
     <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardListView\DeckEditorListViewContainer.xaml" />
-    <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
+    <None Remove="Features\DeckEditor\Views\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckSelection\Views\Controls\DeckSelectionDeckView.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml" />

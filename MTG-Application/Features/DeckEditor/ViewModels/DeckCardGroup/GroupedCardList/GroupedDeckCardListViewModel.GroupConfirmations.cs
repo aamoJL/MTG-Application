@@ -6,19 +6,20 @@ public partial class GroupedDeckCardListViewModel
 {
   public static class GroupConfirmations
   {
-    public static Confirmation GetAddCardGroupConfirmation()
+    public static Confirmation<string[]> GetAddCardGroupConfirmation(string[] invalidNames)
     {
       return new(
         Title: "Add new group",
-        Message: string.Empty);
+        Message: string.Empty,
+        Data: invalidNames);
     }
 
-    public static Confirmation<string> GetRenameCardGroupConfirmation(string oldName)
+    public static Confirmation<(string oldKey, string[] InvalidNames)> GetRenameCardGroupConfirmation(string oldName, string[] invalidNames)
     {
       return new(
         Title: "Rename group",
         Message: string.Empty,
-        Data: oldName);
+        Data: (oldName, invalidNames));
     }
   }
 }

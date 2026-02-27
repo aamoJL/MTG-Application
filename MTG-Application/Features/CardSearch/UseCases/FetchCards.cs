@@ -11,5 +11,5 @@ public class FetchCards(IMTGCardImporter importer) : UseCaseFunc<string, Task<Ca
   public CancellationToken? CancellationToken { get; init; } = null;
 
   public override async Task<CardImportResult> Execute(string query)
-    => await Importer.ImportCardsWithSearchQuery(query, pagination: true); // TODO: cancellation token
+    => await Importer.ImportCardsWithSearchQuery(query, pagination: true, CancellationToken);
 }

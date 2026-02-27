@@ -5,10 +5,8 @@ using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
 using MTGApplication.General.Extensions;
-using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -39,24 +37,19 @@ public partial class DeckCardGroupViewModel : ViewModelBase
       item.PropertyChanged += ModelCard_PropertyChanged;
   }
 
-  public Worker Worker { private get; init; } = new();
-  public IMTGCardImporter Importer { protected get; init; } = App.MTGCardImporter;
-  public IEdhrecImporter EdhrecImporter { protected get; init; } = new EdhrecImporter();
-  public IScryfallImporter ScryfallImporter { protected get; init; } = new ScryfallAPI();
-  public ReversibleCommandStack UndoStack { private get; init; } = new();
-  public Notifier Notifier { private get; init; } = new();
-  public CardFilters CardFilter { private get; init; } = new();
-  public CardSorter CardSorter { private get; init; } = new();
-  public GroupConfirmers Confirmers { private get; init; } = new();
-  public CardListConfirmers ListConfirmers { private get; init; } = new();
-  public required DeckCardViewModel.Factory CardViewModelFactory { private get; init; }
+  public required DeckEditorDependencies EditorDependencies { get; init; }
+  public required ReversibleCommandStack UndoStack { private get; init; }
+  public required CardFilters CardFilter { private get; init; }
+  public required CardSorter CardSorter { private get; init; }
+
   public string GroupKey => Model.GroupKey;
   public int Size => Model.Cards.Sum(x => x.Count);
-  public ObservableCollection<DeckCardViewModel> CardViewModels => field ??= [.. Model.Cards.Select(CardViewModelFactory.Build)];
+  public ObservableCollection<DeckCardViewModel> CardViewModels => field ??= [.. Model.Cards.Select(CreateDeckCardViewModel)];
   public FilterableAndSortableCollectionView<DeckCardViewModel> SortedAndFilteredView => field ??= new(CardViewModels, CardFilter, CardSorter);
 
-  public Action<DeckEditorCardGroup> OnDelete { private get => field ?? throw new NotImplementedException(); init; }
-  public Action<DeckEditorCardGroup, string> OnRename { private get => field ?? throw new NotImplementedException(); init; }
+  public required Func<string[]> GetInvalidNames { get; init; }
+  public required Action<DeckEditorCardGroup> OnDelete { private get; init; }
+  public required Func<DeckEditorCardGroup, string, IReversibleCommand[]> OnRename { private get; init; }
 
   private DeckEditorCardGroup Model { get; }
 
@@ -70,7 +63,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
       if (Model.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard existingCard)
       {
         // Confirm change on existing card
-        switch (await ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
+        switch (await EditorDependencies.ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
         {
           case ConfirmationResult.Yes: break;
           default: return; // Cancel
@@ -100,7 +93,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
 
@@ -119,7 +112,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -128,12 +121,12 @@ public partial class DeckCardGroupViewModel : ViewModelBase
   {
     try
     {
-      data ??= await ListConfirmers.ConfirmImport(Confirmations.GetImportConfirmation());
+      data ??= await EditorDependencies.ListConfirmers.ConfirmImport(Confirmations.GetImportConfirmation());
 
       if (string.IsNullOrEmpty(data))
         return; // Cancel
 
-      var result = await Worker.DoWork(new ImportCards(Importer, EdhrecImporter, ScryfallImporter).Execute(data));
+      var result = await EditorDependencies.Worker.DoWork(new ImportCards(EditorDependencies.Importer, EditorDependencies.EdhrecImporter, EditorDependencies.ScryfallImporter).Execute(data));
 
       var newCards = new List<DeckEditorMTGCard>();
       var existingCards = new List<(DeckEditorMTGCard Card, int NewCount)>();
@@ -149,7 +142,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
           if (!skipConflictConfirmation)
           {
             (addConflictConfirmationResult, skipConflictConfirmation)
-              = await ListConfirmers.ConfirmAddMultipleConflict(Confirmations.GetAddMultipleConflictConfirmation(card.Info.Name));
+              = await EditorDependencies.ListConfirmers.ConfirmAddMultipleConflict(Confirmations.GetAddMultipleConflictConfirmation(card.Info.Name));
           }
 
           if (addConflictConfirmationResult == ConfirmationResult.Yes)
@@ -213,18 +206,18 @@ public partial class DeckCardGroupViewModel : ViewModelBase
       if (result.Source == CardImportResult.ImportSource.External)
       {
         if (result.Found.Length != 0 && result.NotFoundCount == 0) // All found
-          new ShowNotification(Notifier).Execute(new(NotificationType.Success,
+          new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Success,
             $"{importCount} cards imported successfully." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
         else if (result.Found.Length != 0 && result.NotFoundCount > 0) // Some found
-          new ShowNotification(Notifier).Execute(new(NotificationType.Warning,
+          new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Warning,
             $"{importCount} / {result.NotFoundCount + result.Found.Length} cards imported successfully.{Environment.NewLine}{result.NotFoundCount} cards were not found." + (skippedCount > 0 ? $" ({skippedCount} cards skipped) " : "")));
         else if (result.NotFoundCount > 0) // None found
-          new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
+          new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error. No cards were imported."));
       }
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -266,7 +259,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
     else if (Model.Cards.FirstOrDefault(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard groupCard)
     {
       // Similar card is in the group
-      switch (await ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
+      switch (await EditorDependencies.ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
       {
         case ConfirmationResult.Yes:
           combinedCommands.Add(
@@ -281,7 +274,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
     else if (Model.GetFromSource(x => x.Info.Name == card.Info.Name) is DeckEditorMTGCard sourceCard)
     {
       // Similar card is in the same source, but not in the group
-      switch (await ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
+      switch (await EditorDependencies.ListConfirmers.ConfirmAddSingleConflict(Confirmations.GetAddSingleConflictConfirmation(card.Info.Name)))
       {
         case ConfirmationResult.Yes:
           combinedCommands.Add(new CombinedReversibleCommand()
@@ -325,7 +318,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
 
@@ -337,16 +330,21 @@ public partial class DeckCardGroupViewModel : ViewModelBase
       if (!CanRenameGroup())
         throw new InvalidOperationException("Can't rename the default group");
 
-      var newKey = await Confirmers.ConfirmRenameGroup(GroupConfirmations.GetRenameCardGroupConfirmation(GroupKey));
+      var invalidNames = GetInvalidNames();
+      var newKey = await EditorDependencies.GroupConfirmers.ConfirmRenameGroup(GroupConfirmations.GetRenameCardGroupConfirmation(GroupKey, invalidNames));
 
       if (string.IsNullOrEmpty(newKey)) return; // Cancel
       if (newKey == GroupKey) return; // Cancel, same key
+      if (invalidNames.Contains(newKey)) throw new InvalidOperationException("Group name is invalid");
 
-      OnRename(Model, newKey);
+      UndoStack.PushAndExecute(new CombinedReversibleCommand()
+      {
+        Commands = [.. OnRename(Model, newKey)]
+      });
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, e.Message));
     }
   }
 
@@ -371,7 +369,7 @@ public partial class DeckCardGroupViewModel : ViewModelBase
       item.PropertyChanged += ModelCard_PropertyChanged;
 
       if (!CardViewModels.Any(vm => vm.Info == item.Info))
-        CardViewModels.Add(CardViewModelFactory.Build(item));
+        CardViewModels.Add(CreateDeckCardViewModel(item));
     }
     foreach (var item in e.RemovedItems<DeckEditorMTGCard>())
     {
@@ -393,4 +391,11 @@ public partial class DeckCardGroupViewModel : ViewModelBase
   }
 
   protected virtual DeckEditorMTGCard TransformCardModel(DeckEditorMTGCard card) => card.Copy();
+
+  private DeckCardViewModel CreateDeckCardViewModel(DeckEditorMTGCard card) => new(card)
+  {
+    EditorDependencies = EditorDependencies,
+    UndoStack = UndoStack,
+    OnDelete = RemoveCard
+  };
 }

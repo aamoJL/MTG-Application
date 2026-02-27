@@ -3,10 +3,7 @@ using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.Features.DeckEditor.UseCases.ReversibleActions;
 using MTGApplication.General.Models;
-using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI;
-using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -29,14 +26,8 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     Source.PropertyChanged += Source_PropertyChanged;
   }
 
-  public Worker Worker { get; init; } = new();
-  public ReversibleCommandStack UndoStack { get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public IEdhrecImporter EdhrecImporter { private get; init; } = new EdhrecImporter();
-  public IScryfallImporter ScryfallImporter { private get; init; } = new ScryfallAPI();
-  public Notifier Notifier { private get; init; } = new();
-  public INetworkService NetworkService { private get; init; } = new NetworkService();
-  public CardConfirmers Confirmers { private get; init; } = new();
+  public required DeckEditorDependencies EditorDependencies { get; init; }
+  public required ReversibleCommandStack UndoStack { get; init; } = new();
 
   public MTGCardInfo? Info => Model?.Info;
   public string Name => Model?.Info.Name ?? string.Empty;
@@ -68,7 +59,7 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -86,7 +77,7 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -98,7 +89,7 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     {
       ArgumentNullException.ThrowIfNull(data);
 
-      var result = await Worker.DoWork(new ImportCards(Importer, EdhrecImporter, ScryfallImporter).Execute(data));
+      var result = await EditorDependencies.Worker.DoWork(new ImportCards(EditorDependencies.Importer, EditorDependencies.EdhrecImporter, EditorDependencies.ScryfallImporter).Execute(data));
 
       if (result.Found.Length > 1) throw new InvalidOperationException("Can't set multiple commanders");
       if (result.Found.FirstOrDefault() is not CardImportResult.Card card) throw new InvalidOperationException("No cards found");
@@ -116,11 +107,11 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
           }
         });
 
-      new ShowNotification(Notifier).Execute(new(NotificationType.Success, "Commander imported successfully."));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Success, "Commander imported successfully."));
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -165,9 +156,9 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
       if (Model == null)
         throw new InvalidOperationException("No card found");
 
-      var prints = (await Worker.DoWork(new FetchCardPrints(Importer).Execute(Model))).Found.Select(x => new MTGCard(x.Info));
+      var prints = (await EditorDependencies.Worker.DoWork(new FetchCardPrints(EditorDependencies.Importer).Execute(Model))).Found.Select(x => new MTGCard(x.Info));
 
-      if (await Confirmers.ConfirmCardPrints(Confirmations.GetChangeCardPrintConfirmation(prints)) is not MTGCard selection)
+      if (await EditorDependencies.CardConfirmers.ConfirmCardPrints(Confirmations.GetChangeCardPrintConfirmation(prints)) is not MTGCard selection)
         return; // Cancel
 
       if (selection.Info.ScryfallId == Model.Info.ScryfallId)
@@ -181,7 +172,7 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -194,11 +185,11 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
       if (Model == null)
         throw new InvalidOperationException("No Commander found");
 
-      await NetworkService.OpenUri(Model.Info.APIWebsiteUri);
+      await EditorDependencies.NetworkService.OpenUri(Model.Info.APIWebsiteUri);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
 
@@ -211,13 +202,15 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
       if (Model == null)
         throw new InvalidOperationException("No Commander found");
 
-      await NetworkService.OpenUri(Model.Info.CardMarketUri);
+      await EditorDependencies.NetworkService.OpenUri(Model.Info.CardMarketUri);
     }
     catch (Exception e)
     {
-      new ShowNotification(Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
+      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
     }
   }
+
+  public DeckEditorMTGCard? GetModel() => Model;
 
   protected bool CanOpenCardWebsite() => Model != null;
 
@@ -242,6 +235,4 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
         break;
     }
   }
-
-  public DeckEditorMTGCard? GetModel() => Model;
 }

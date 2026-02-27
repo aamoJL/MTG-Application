@@ -3,7 +3,7 @@ using MTGApplication.Features.DeckEditor.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace MTGApplication.Features.DeckEditor.Charts.Models;
+namespace MTGApplication.Features.DeckEditor.Views.Charts.Models;
 
 public partial class MTGCardChartSeriesItem : ObservableObject
 {
