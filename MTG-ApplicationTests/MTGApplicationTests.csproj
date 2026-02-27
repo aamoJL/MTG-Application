@@ -32,4 +32,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UnitTests\Features\DeckEditor\ViewModels\DeckCommanders\" />
+  </ItemGroup>
 </Project>

@@ -23,12 +23,9 @@ public class OnDeckDeleted
       {
         Result = TestMTGCardImporter.Success()
       },
-      Confirmers = new()
+      DeckConfirmers = new()
       {
-        DeckConfirmers = new()
-        {
-          ConfirmDeckDelete = _ => Task.FromResult(ConfirmationResult.Yes)
-        }
+        ConfirmDeckDelete = _ => Task.FromResult(ConfirmationResult.Yes)
       }
     };
     var vm = factory.Build();

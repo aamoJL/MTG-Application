@@ -47,12 +47,9 @@ public class NewDeck
       {
         Result = TestMTGCardImporter.Success()
       },
-      Confirmers = new()
+      DeckConfirmers = new()
       {
-        DeckConfirmers = new()
-        {
-          ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.No)
-        }
+        ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.No)
       }
     };
     var vm = factory.Build();
@@ -81,12 +78,9 @@ public class NewDeck
       {
         Result = TestMTGCardImporter.Success()
       },
-      Confirmers = new()
+      DeckConfirmers = new()
       {
-        DeckConfirmers = new()
-        {
-          ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.Cancel)
-        }
+        ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.Cancel)
       }
     };
     var vm = factory.Build();

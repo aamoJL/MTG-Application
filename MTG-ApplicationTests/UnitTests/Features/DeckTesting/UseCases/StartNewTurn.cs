@@ -8,7 +8,7 @@ namespace MTGApplicationTests.UnitTests.Features.DeckTesting.UseCases;
 [TestClass]
 public class StartNewTurn
 {
-  private readonly TestMTGCardImporter_old _importer = new();
+  private readonly TestMTGCardImporter _importer = new();
 
   [TestMethod]
   public void StartNewTurn_TurnCountPlusOne()

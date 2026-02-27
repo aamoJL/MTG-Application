@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels.EditorPage;
+﻿using MTGApplication.Features.DeckEditor.ViewModels.Deck;
+using MTGApplication.Features.DeckEditor.ViewModels.EditorPage;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.ViewModels;
 using MTGApplicationTests.TestUtility.Database;
@@ -14,16 +15,21 @@ public class TestDeckEditorPageViewModelFactory
   public TestRepository<MTGCardDeckDTO> Repository { get; set; } = new();
   public TestNotifier Notifier { get; set; } = new NotImplementedNotifier();
   public DeckEditorPageViewModel.EditorPageConfirmers Confirmers { get; set; } = new();
+  public DeckViewModel.DeckConfirmers DeckConfirmers { get; set; } = new();
 
   public DeckEditorPageViewModel Build()
   {
     return new()
     {
-      Worker = Worker,
-      Importer = Importer,
-      Repository = Repository,
-      Notifier = Notifier,
-      Confirmers = Confirmers,
+      EditorDependencies = new()
+      {
+        Worker = Worker,
+        Importer = Importer,
+        Repository = Repository,
+        Notifier = Notifier,
+        PageConfirmers = Confirmers,
+        DeckConfirmers = DeckConfirmers
+      },
     };
   }
 }

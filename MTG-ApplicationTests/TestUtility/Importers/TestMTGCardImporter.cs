@@ -14,7 +14,7 @@ public class TestMTGCardImporter : IMTGCardImporter
 
   public string Name => throw new NotImplementedException();
 
-  public CardImportResult? Result { get; init; } = null;
+  public CardImportResult? Result { get; set; } = null;
   /// <summary>
   /// <para>If set, import tasks will halt for 5 seconds, or when this source's token has been cancelled.</para>
   /// <para>Use this to unit test cancellable commands.</para>
@@ -22,7 +22,7 @@ public class TestMTGCardImporter : IMTGCardImporter
   /// </summary>
   public CancellationTokenSource? CancellationTokenSource { get; init; } = null;
 
-  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true, CancellationToken? cancellationToken = null)
   {
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
@@ -52,7 +52,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     return Result;
   }
 
-  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null)
   {
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);

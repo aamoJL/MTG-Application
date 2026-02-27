@@ -27,15 +27,20 @@ public class TestDeckCardListViewModelFactory
   {
     return new(Model)
     {
-      Worker = Worker,
-      Importer = Importer,
-      EdhrecImporter = EdhrecImporter,
-      ScryfallImporter = ScryfallImporter,
-      Exporter = Exporter,
+      EditorDependencies = new()
+      {
+        Worker = Worker,
+        Importer = Importer,
+        EdhrecImporter = EdhrecImporter,
+        ScryfallImporter = ScryfallImporter,
+        Exporter = Exporter,
+        Notifier = Notifier,
+        NetworkService = NetworkService,
+        ListConfirmers = Confirmers,
+      },
       UndoStack = UndoStack,
-      Notifier = Notifier,
-      NetworkService = NetworkService,
-      Confirmers = Confirmers,
+      CardFilter = new(),
+      CardSorter = new(),
     };
   }
 }

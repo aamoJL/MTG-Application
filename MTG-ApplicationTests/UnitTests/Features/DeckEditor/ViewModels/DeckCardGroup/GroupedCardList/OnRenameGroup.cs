@@ -17,12 +17,9 @@ public class OnRenameGroup
         new(MTGCardInfoMocker.MockInfo()){Group = "5"},
         new(MTGCardInfoMocker.MockInfo()){Group = string.Empty},
       ],
-      GroupedListConfirmers = new()
+      GroupConfirmers = new()
       {
-        GroupConfirmers = new()
-        {
-          ConfirmRenameGroup = async _ => await Task.FromResult("4")
-        }
+        ConfirmRenameGroup = async _ => await Task.FromResult("4")
       }
     };
     var vm = factory.Build();
@@ -51,12 +48,9 @@ public class OnRenameGroup
         new(MTGCardInfoMocker.MockInfo()){Group = "5"},
         new(MTGCardInfoMocker.MockInfo()){Group = string.Empty},
       ],
-      GroupedListConfirmers = new()
+      GroupConfirmers = new()
       {
-        GroupConfirmers = new()
-        {
-          ConfirmRenameGroup = async _ => await Task.FromResult("4")
-        }
+        ConfirmRenameGroup = async _ => await Task.FromResult("4")
       }
     };
     var vm = factory.Build();
@@ -86,12 +80,9 @@ public class OnRenameGroup
         new(MTGCardInfoMocker.MockInfo()){Group = "5"},
         new(MTGCardInfoMocker.MockInfo()){Group = string.Empty},
       ],
-      GroupedListConfirmers = new()
+      GroupConfirmers = new()
       {
-        GroupConfirmers = new()
-        {
-          ConfirmRenameGroup = async _ => await Task.FromResult("4")
-        }
+        ConfirmRenameGroup = async _ => await Task.FromResult("4")
       }
     };
     var vm = factory.Build();

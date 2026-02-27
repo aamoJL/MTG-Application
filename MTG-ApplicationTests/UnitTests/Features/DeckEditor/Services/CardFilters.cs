@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Features.DeckEditor.Services;
 using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.UnitTests.Features.DeckEditor.ViewModels.DeckCard;
 using static MTGApplication.General.Models.MTGCardInfo;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckEditor.Services;
@@ -82,28 +83,30 @@ public class CardFiltersTests
   [TestMethod]
   public void CardValidation()
   {
-    Assert.IsTrue(new CardFilters().CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel())));
-    Assert.IsFalse(new CardFilters() { NameText = "A" }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B"))));
-    Assert.IsFalse(new CardFilters() { TypeText = "A" }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(typeLine: "B"))));
-    Assert.IsFalse(new CardFilters() { OracleText = "A" }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    var factory = new TestDeckCardViewModelFactory();
+
+    Assert.IsTrue(new CardFilters().CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel())));
+    Assert.IsFalse(new CardFilters() { NameText = "A" }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(name: "B"))));
+    Assert.IsFalse(new CardFilters() { TypeText = "A" }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(typeLine: "B"))));
+    Assert.IsFalse(new CardFilters() { OracleText = "A" }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(oracleText: "B")))));
-    Assert.IsFalse(new CardFilters() { White = false }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { White = false }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.W])))));
-    Assert.IsFalse(new CardFilters() { Blue = false }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { Blue = false }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.U])))));
-    Assert.IsFalse(new CardFilters() { Black = false }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { Black = false }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.B])))));
-    Assert.IsFalse(new CardFilters() { Red = false }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { Red = false }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.R])))));
-    Assert.IsFalse(new CardFilters() { Green = false }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { Green = false }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.G])))));
-    Assert.IsFalse(new CardFilters() { Colorless = false }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { Colorless = false }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.C])))));
-    Assert.IsTrue(new CardFilters() { ColorGroup = CardFilters.ColorGroups.All }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsTrue(new CardFilters() { ColorGroup = CardFilters.ColorGroups.All }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.U])))));
-    Assert.IsFalse(new CardFilters() { ColorGroup = CardFilters.ColorGroups.Multi }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { ColorGroup = CardFilters.ColorGroups.Multi }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.U])))));
-    Assert.IsFalse(new CardFilters() { ColorGroup = CardFilters.ColorGroups.Mono }.CardValidation(new(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
+    Assert.IsFalse(new CardFilters() { ColorGroup = CardFilters.ColorGroups.Mono }.CardValidation(factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(frontFace:
       DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.W, ColorTypes.U])))));
   }
 }

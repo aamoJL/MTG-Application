@@ -1,5 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
-using MTGApplicationTests.TestUtility.Mocker;
+﻿using MTGApplicationTests.TestUtility.Mocker;
+using MTGApplicationTests.UnitTests.Features.DeckEditor.ViewModels.DeckCard;
 using static MTGApplication.Features.DeckEditor.Services.CardSortProperties;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -11,7 +11,9 @@ public class CardSortProperties
   [TestMethod]
   public void Compare()
   {
-    var card1 = new DeckCardViewModel(DeckEditorMTGCardMocker.CreateMTGCardModel(
+    var factory = new TestDeckCardViewModelFactory();
+
+    var card1 = factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(
       name: "A",
       cmc: 1,
       rarity: RarityTypes.Common,
@@ -20,7 +22,7 @@ public class CardSortProperties
       price: 1,
       typeLine: SpellType.Land.ToString(),
       frontFace: DeckEditorMTGCardMocker.CreateCardFace(colors: [ColorTypes.W])));
-    var card2 = new DeckCardViewModel(DeckEditorMTGCardMocker.CreateMTGCardModel(
+    var card2 = factory.Build(DeckEditorMTGCardMocker.CreateMTGCardModel(
       name: "B",
       cmc: 2,
       rarity: RarityTypes.Rare,

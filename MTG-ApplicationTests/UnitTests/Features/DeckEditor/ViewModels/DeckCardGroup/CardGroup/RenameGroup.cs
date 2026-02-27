@@ -35,7 +35,11 @@ public class RenameGroup
       {
         ConfirmRenameGroup = async _ => await Task.FromResult("Changed")
       },
-      OnGroupRename = (_, _) => onRenameCalled = true
+      OnGroupRename = (_, _) =>
+      {
+        onRenameCalled = true;
+        return [];
+      }
     };
     var vm = factory.Build();
 

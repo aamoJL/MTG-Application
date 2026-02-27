@@ -31,17 +31,20 @@ public class TestDeckViewModelFactory
   {
     return new(Model)
     {
+      EditorDependencies = new()
+      {
+        Worker = Worker,
+        Importer = Importer,
+        EdhrecImporter = EdhrecImporter,
+        ScryfallImporter = ScryfallImporter,
+        Exporter = Exporter,
+        Repository = Repository,
+        NetworkService = NetworkService,
+        Notifier = Notifier,
+        DeckConfirmers = Confirmers
+      },
       SaveStatus = SaveStatus,
-      Worker = Worker,
-      Importer = Importer,
-      EdhrecImporter = EdhrecImporter,
-      ScryfallImporter = ScryfallImporter,
-      Exporter = Exporter,
-      Repository = Repository,
-      NetworkService = NetworkService,
       UndoStack = UndoStack,
-      Notifier = Notifier,
-      Confirmers = Confirmers,
       OnDeleted = OnDeckDeleted,
     };
   }

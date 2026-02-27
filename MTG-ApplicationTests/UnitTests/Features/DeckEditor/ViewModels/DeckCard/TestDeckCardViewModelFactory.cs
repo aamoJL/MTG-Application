@@ -24,12 +24,34 @@ public class TestDeckCardViewModelFactory
   {
     return new(Model)
     {
-      Worker = Worker,
-      Importer = Importer,
+      EditorDependencies = new()
+      {
+        Worker = Worker,
+        Importer = Importer,
+        Notifier = Notifier,
+        NetworkService = NetworkService,
+        CardConfirmers = Confirmers,
+      },
       UndoStack = UndoStack,
-      Notifier = Notifier,
-      NetworkService = NetworkService,
-      Confirmers = Confirmers,
+      OnDelete = OnCardDelete,
+    };
+  }
+
+  public DeckCardViewModel Build(DeckEditorMTGCard model)
+  {
+    Model = model;
+
+    return new(model)
+    {
+      EditorDependencies = new()
+      {
+        Worker = Worker,
+        Importer = Importer,
+        Notifier = Notifier,
+        NetworkService = NetworkService,
+        CardConfirmers = Confirmers,
+      },
+      UndoStack = UndoStack,
       OnDelete = OnCardDelete,
     };
   }

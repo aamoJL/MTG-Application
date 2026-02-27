@@ -25,32 +25,28 @@ public class TestDeckCardGroupViewModelFactory
   public TestNetworkService NetworkService { get; set; } = new();
   public Action<DeckEditorMTGCard> OnCardDelete { get; set; } = _ => throw new NotImplementedException("OnCardDelete");
   public Action<DeckEditorCardGroup> OnGroupDelete { get; set; } = _ => throw new NotImplementedException("OnGroupDelete");
-  public Action<DeckEditorCardGroup, string> OnGroupRename { get; set; } = (_, _) => throw new NotImplementedException("OnGroupDelete");
+  public Func<DeckEditorCardGroup, string, IReversibleCommand[]> OnGroupRename { get; set; } = (_, _) => throw new NotImplementedException("OnGroupDelete");
 
   public DeckCardGroupViewModel Build()
   {
     return new(Model)
     {
-      Worker = Worker,
-      Importer = Importer,
-      EdhrecImporter = EdhrecImporter,
-      ScryfallImporter = ScryfallImporter,
-      UndoStack = UndoStack,
-      Notifier = Notifier,
-      Confirmers = Confirmers,
-      ListConfirmers = ListConfirmers,
-      OnDelete = OnGroupDelete,
-      OnRename = OnGroupRename,
-      CardViewModelFactory = new()
+      EditorDependencies = new()
       {
         Worker = Worker,
-        UndoStack = UndoStack,
-        Notifier = Notifier,
         Importer = Importer,
-        NetworkService = NetworkService,
-        Confirmers = CardConfirmers,
-        OnCardDelete = OnCardDelete
-      }
+        EdhrecImporter = EdhrecImporter,
+        ScryfallImporter = ScryfallImporter,
+        Notifier = Notifier,
+        GroupConfirmers = Confirmers,
+        ListConfirmers = ListConfirmers,
+      },
+      UndoStack = UndoStack,
+      OnDelete = OnGroupDelete,
+      OnRename = OnGroupRename,
+      CardFilter = new(),
+      CardSorter = new(),
+      GetInvalidNames = () => [],
     };
   }
 }

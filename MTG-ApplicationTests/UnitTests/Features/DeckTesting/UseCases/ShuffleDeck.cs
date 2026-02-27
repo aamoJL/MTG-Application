@@ -8,7 +8,7 @@ namespace MTGApplicationTests.UnitTests.Features.DeckTesting.UseCases;
 [TestClass]
 public class ShuffleDeck
 {
-  private readonly TestMTGCardImporter_old _importer = new();
+  private readonly TestMTGCardImporter _importer = new();
 
   [TestMethod]
   public void ShuffleDeck_LibraryShuffled()

@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.DeckEditor.Models;
+using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList;
 using MTGApplication.General.Services.ReversibleCommandService;
 using MTGApplication.General.ViewModels;
@@ -23,21 +24,28 @@ public class TestGroupedDeckCardListViewModelFactory
   public TestNetworkService NetworkService { get; init; } = new();
   public CardListConfirmers Confirmers { get; init; } = new();
   public GroupedDeckCardListViewModel.GroupedCardListConfirmers GroupedListConfirmers { get; set; } = new();
+  public DeckCardGroupViewModel.GroupConfirmers GroupConfirmers { get; set; } = new();
 
   public GroupedDeckCardListViewModel Build()
   {
     return new(Model)
     {
-      Worker = Worker,
-      Importer = Importer,
-      EdhrecImporter = EdhrecImporter,
-      ScryfallImporter = ScryfallImporter,
-      Exporter = Exporter,
+      EditorDependencies = new()
+      {
+        Worker = Worker,
+        Importer = Importer,
+        EdhrecImporter = EdhrecImporter,
+        ScryfallImporter = ScryfallImporter,
+        Exporter = Exporter,
+        Notifier = Notifier,
+        NetworkService = NetworkService,
+        ListConfirmers = Confirmers,
+        GroupListConfirmers = GroupedListConfirmers,
+        GroupConfirmers = GroupConfirmers,
+      },
       UndoStack = UndoStack,
-      Notifier = Notifier,
-      NetworkService = NetworkService,
-      Confirmers = Confirmers,
-      GroupedListConfirmers = GroupedListConfirmers
+      CardFilter = new(),
+      CardSorter = new(),
     };
   }
 }

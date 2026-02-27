@@ -15,12 +15,9 @@ public class OpenDeck
     var factory = new TestDeckEditorPageViewModelFactory()
     {
       Notifier = new(),
-      Confirmers = new()
+      DeckConfirmers = new()
       {
-        DeckConfirmers = new()
-        {
-          ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.Cancel)
-        }
+        ConfirmUnsavedChanges = _ => Task.FromResult(ConfirmationResult.Cancel)
       }
     };
     var vm = factory.Build();

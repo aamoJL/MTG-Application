@@ -55,12 +55,9 @@ public class Properties
         ExistsResult = _ => Task.FromResult(false),
         AddResult = _ => Task.FromResult(true),
       },
-      Confirmers = new()
+      DeckConfirmers = new()
       {
-        DeckConfirmers = new()
-        {
-          ConfirmDeckSave = _ => Task.FromResult<string?>("Deck")
-        }
+        ConfirmDeckSave = _ => Task.FromResult<string?>("Deck")
       }
     };
     var vm = factory.Build();
