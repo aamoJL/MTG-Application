@@ -40,7 +40,6 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     ReverseAction = y => Model = y
   };
 
-  // TODO: unit test
   [RelayCommand]
   protected async Task ChangeCard(DeckEditorMTGCard? card)
   {
@@ -63,25 +62,16 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
   }
 
-  // TODO: unit test
   [RelayCommand(CanExecute = nameof(CanDelete))]
-  private async Task DeleteCard()
+  private void DeleteCard()
   {
-    try
-    {
-      UndoStack.PushAndExecute(
-        new ReversibleValueChangeCommand<DeckEditorMTGCard?>(null, oldValue: Model)
-        {
-          ReversibleAction = ChangeCommanderAction
-        });
-    }
-    catch (Exception e)
-    {
-      new ShowNotification(EditorDependencies.Notifier).Execute(new(NotificationType.Error, $"Error: {e.Message}"));
-    }
+    UndoStack.PushAndExecute(
+      new ReversibleValueChangeCommand<DeckEditorMTGCard?>(null, oldValue: Model)
+      {
+        ReversibleAction = ChangeCommanderAction
+      });
   }
 
-  // TODO: unit test
   [RelayCommand]
   private async Task ImportCard(string? data)
   {
@@ -115,11 +105,13 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
   }
 
-  // TODO: unit test
   [RelayCommand]
   protected void BeginMoveFrom(DeckEditorMTGCard? card)
   {
     ArgumentNullException.ThrowIfNull(card);
+
+    if (card != Model)
+      throw new InvalidOperationException("Card is not the commander");
 
     UndoStack.ActiveCombinedCommand.Commands.Add(
       new ReversibleValueChangeCommand<DeckEditorMTGCard?>(null, oldValue: Model)
@@ -128,7 +120,6 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
       });
   }
 
-  // TODO: unit test
   [RelayCommand]
   protected async Task BeginMoveTo(DeckEditorMTGCard? card)
   {
@@ -143,18 +134,16 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
       });
   }
 
-  // TODO: unit test
   [RelayCommand]
   protected void ExecuteMove() => UndoStack.PushAndExecuteActiveCombinedCommand();
 
-  // TODO: unit test
   [RelayCommand(CanExecute = nameof(CanChangePrint))]
   private async Task ChangePrint()
   {
     try
     {
       if (Model == null)
-        throw new InvalidOperationException("No card found");
+        throw new InvalidOperationException("Commander is not set");
 
       var prints = (await EditorDependencies.Worker.DoWork(new FetchCardPrints(EditorDependencies.Importer).Execute(Model))).Found.Select(x => new MTGCard(x.Info));
 
@@ -176,7 +165,6 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
   }
 
-  // TODO: unit test
   [RelayCommand(CanExecute = nameof(CanOpenCardWebsite))]
   private async Task OpenAPIWebsite()
   {
@@ -193,7 +181,6 @@ public abstract partial class CommanderViewModelBase : ViewModelBase
     }
   }
 
-  // TODO: unit test
   [RelayCommand(CanExecute = nameof(CanOpenCardWebsite))]
   private async Task OpenCardMarketWebsite()
   {

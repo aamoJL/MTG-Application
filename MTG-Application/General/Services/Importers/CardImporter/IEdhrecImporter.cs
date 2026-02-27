@@ -6,5 +6,5 @@ public interface IEdhrecImporter
 {
   public Task<string[]> FetchNewCardNames(string uri);
   public Task<CommanderTheme[]> GetThemes(string commander, string? partner = null);
-  public bool TryParseCardNameFromEdhrecUri(string uri, out string? name);
+  public bool TryParseCardNameFromEdhrecUri(string uri, out string name);
 }
