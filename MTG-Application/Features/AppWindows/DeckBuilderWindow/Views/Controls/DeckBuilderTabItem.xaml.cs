@@ -17,12 +17,17 @@ public sealed partial class DeckBuilderTabItem : TabViewItem
     ContentFrame.Navigated += Frame_Navigated;
   }
 
+  private DeckBuilderTabViewModel? _vm = null;
+
   private void DeckBuilderTabItem_DataContextChanged(FrameworkElement _, DataContextChangedEventArgs __)
   {
     ContentFrame.BackStack.Clear();
 
-    if (DataContext is not DeckBuilderTabViewModel)
-      return;
+    // Prevents the view to navigate to the page multiple times
+    if (DataContext is not DeckBuilderTabViewModel vm) return;
+    if (_vm == vm) return;
+
+    _vm = vm;
 
     ContentFrame.Navigate(typeof(DeckSelectionPage), null, new SuppressNavigationTransitionInfo());
   }

@@ -121,7 +121,7 @@ public class DeleteCollection
       {
         ConfirmCollectionDelete = (_) => Task.FromResult(ConfirmationResult.Yes)
       },
-      OnCollectionDeleted = null
+      OnCollectionDeleted = async () => await Task.CompletedTask
     };
     var vm = factory.Build(model);
 

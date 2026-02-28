@@ -132,9 +132,13 @@ public record MTGCardInfo
       if (!colors.Contains(color)) { colors.Add(color); }
 
     if (backFace?.Colors is IList<ColorTypes> backColors)
+    {
       foreach (var color in backColors)
+      {
         if (!colors.Contains(color))
           colors.Add(color);
+      }
+    }
 
     return [.. colors];
   }

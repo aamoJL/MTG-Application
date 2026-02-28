@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.CardSearch.ViewModels.SearchCard;
 using MTGApplication.Features.EdhrecSearch.UseCases;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -19,6 +21,7 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
   public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
   public IEdhrecImporter EdhrecImporter { private get; init; } = new EdhrecImporter();
   public Notifier Notifier { private get; init; } = new();
+  public NetworkService NetworkService { get; init; } = new();
   public CardSearchMTGCardViewModel.SearchCardConfirmers CardConfirmers { private get; init; } = new();
 
   public CommanderTheme[] CommanderThemes { get; set; } = [];
@@ -27,14 +30,6 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
     get => field ??= QueryCards = CreateQueryCollection([], string.Empty, 0);
     protected set => SetProperty(ref field, value);
   }
-
-  protected CardSearchMTGCardViewModel.Factory CardViewModelFactory => field ??= new()
-  {
-    Worker = Worker,
-    Importer = Importer,
-    Notifier = Notifier,
-    CardConfirmers = CardConfirmers
-  };
 
   [RelayCommand]
   private async Task SelectCommanderTheme(CommanderTheme theme, CancellationToken token)
@@ -53,7 +48,7 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
         token.ThrowIfCancellationRequested();
 
         QueryCards = CreateQueryCollection(
-            cards: [.. searchResult.Found.Select(x => CardViewModelFactory.Build(new(x.Info)))],
+            cards: [.. searchResult.Found.Select(x => CreateCardViewModel(new(x.Info)))],
             nextPage: searchResult.NextPageUri,
             totalCount: searchResult.TotalCount);
       });
@@ -71,7 +66,7 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
     {
       Cards = [.. cards],
       NextPage = nextPage,
-      Converter = (item) => CardViewModelFactory.Build(new(item.Info)),
+      Converter = (item) => CreateCardViewModel(new(item.Info)),
       OnError = (e) => new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message)),
     };
 
@@ -80,4 +75,13 @@ public partial class EdhrecSearchPageViewModel : ViewModelBase
       TotalCardCount = totalCount,
     };
   }
+
+  protected CardSearchMTGCardViewModel CreateCardViewModel(MTGCard model) => new(model)
+  {
+    Worker = Worker,
+    Importer = Importer,
+    Notifier = Notifier,
+    Confirmers = CardConfirmers,
+    NetworkService = NetworkService,
+  };
 }

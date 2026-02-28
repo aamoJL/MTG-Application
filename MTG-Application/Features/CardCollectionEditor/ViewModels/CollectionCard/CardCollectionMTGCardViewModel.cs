@@ -14,11 +14,11 @@ namespace MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionCard
 
 public partial class CardCollectionMTGCardViewModel(MTGCard card) : ViewModelBase
 {
-  public Worker Worker { private get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public Notifier Notifier { private get; init; } = new();
-  public INetworkService NetworkService { private get; init; } = new NetworkService();
-  public CollectionCardConfirmers Confirmers { private get; init; } = new();
+  public required Worker Worker { private get; init; }
+  public required IMTGCardImporter Importer { private get; init; }
+  public required Notifier Notifier { private get; init; }
+  public required INetworkService NetworkService { private get; init; }
+  public required CollectionCardConfirmers Confirmers { private get; init; }
 
   public MTGCardInfo Info => Model.Info;
   [ObservableProperty] public partial bool IsOwned { get; set; }

@@ -86,7 +86,7 @@
             <DataTemplate x:DataType="searchcard:CardSearchMTGCardViewModel">
               <cardview:CardSearchCardImageView
                 Model="{x:Bind Mode=OneTime}"
-                ShowPrintsCommand="{Binding ShowCardPrintsCommand, Mode=OneTime}"
+                ShowPrintsCommand="{x:Bind ShowCardPrintsCommand, Mode=OneTime}"
                 OpenAPIWebsiteCommand="{x:Bind OpenAPIWebsiteCommand, Mode=OneTime}"
                 OpenCardmarketWebsiteCommand="{x:Bind OpenCardMarketWebsiteCommand, Mode=OneTime}"
                 CanDrag="True"/>

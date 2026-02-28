@@ -13,11 +13,11 @@ namespace MTGApplication.Features.CardSearch.ViewModels.SearchCard;
 
 public partial class CardSearchMTGCardViewModel(MTGCard card) : ViewModelBase
 {
-  public Worker Worker { get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public Notifier Notifier { private get; init; } = new();
-  public INetworkService NetworkService { private get; init; } = new NetworkService();
-  public SearchCardConfirmers Confirmers { private get; init; } = new();
+  public required Worker Worker { get; init; } = new();
+  public required IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
+  public required Notifier Notifier { private get; init; } = new();
+  public required INetworkService NetworkService { private get; init; } = new NetworkService();
+  public required SearchCardConfirmers Confirmers { private get; init; } = new();
 
   public MTGCardInfo Info => Model.Info;
 

@@ -19,6 +19,7 @@ public class TestCollectionViewModelFactory
   public TestRepository<MTGCardCollectionDTO> Repository { get; set; } = new();
   public TestStringExporter Exporter { get; set; } = new();
   public TestMTGCardImporter Importer { get; set; } = new();
+  public TestNetworkService NetworkService { get; set; } = new();
   public Func<Task> OnCollectionDeleted { get; set; } = () => throw new NotImplementedException();
 
   public CardCollectionViewModel Build(MTGCardCollection collection)
@@ -32,6 +33,7 @@ public class TestCollectionViewModelFactory
       Repository = Repository,
       Exporter = Exporter,
       Importer = Importer,
+      NetworkService = NetworkService,
       OnDeleted = OnCollectionDeleted,
     };
   }

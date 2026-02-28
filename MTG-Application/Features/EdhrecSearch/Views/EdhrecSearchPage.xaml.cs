@@ -10,6 +10,7 @@ using MTGApplication.General.Views.DragAndDrop;
 using MTGApplication.General.Views.Styles.Templates;
 using System;
 using System.Linq;
+using Windows.ApplicationModel.DataTransfer;
 using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.EdhrecSearch.Views;
@@ -38,14 +39,17 @@ public sealed partial class EdhrecSearchPage : Page
           CloseButtonText = "Close",
           CanDragItems = true,
           CanSelectItems = false,
-          OnItemDragStarting = (args) =>
+          OnItemDragStarting = (e) =>
           {
-            if (args.Items.FirstOrDefault() is MTGCard card)
+            if (e.Items.FirstOrDefault() is not MTGCard dragItem)
             {
-              new DragAndDrop<CardMoveArgs>() { AcceptMove = false }.OnInternalDragStarting(new CardMoveArgs(card), out var operation);
-
-              args.Data.RequestedOperation = operation;
+              RaiseNotification(this, new(NotificationType.Error, "No items to drag"));
+              e.Cancel = true;
+              return;
             }
+
+            e.Data.RequestedOperation = DataPackageOperation.Copy;
+            e.Data.Properties.Add(nameof(CardDragArgs), new CardDragArgs(dragItem, origin: this));
           }
         });
       },

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace MTGApplication.General.Models;
 
+/// <summary>
+/// List for record classes to enable equality check
+/// </summary>
 public class ValueEqualityList<T> : List<T>
 {
   public override bool Equals(object? obj)

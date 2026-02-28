@@ -16,6 +16,7 @@ public class TestCollectionListViewModelFactory
   public CollectionListConfirmers CollectionListConfirmers { get; set; } = new();
   public TestMTGCardImporter Importer { get; set; } = new();
   public TestNotifier Notifier { get; set; } = new NotImplementedNotifier();
+  public TestNetworkService NetworkService { get; set; } = new();
   public Func<MTGCardCollectionList, Task> OnListDelete { get; set; } = (_) => throw new NotImplementedException();
   public bool? NameValidator { get => field ?? throw new NotImplementedException(); set; }
 
@@ -29,7 +30,8 @@ public class TestCollectionListViewModelFactory
       Confirmers = CollectionListConfirmers,
       Importer = Importer,
       Notifier = Notifier,
-      NameValidator = (_) => (bool)NameValidator,
+      NetworkService = NetworkService,
+      NameValidator = (_) => NameValidator ?? throw new NotImplementedException(),
       OnDelete = OnListDelete
     };
   }

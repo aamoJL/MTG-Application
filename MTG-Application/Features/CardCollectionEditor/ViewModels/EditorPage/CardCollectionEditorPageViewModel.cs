@@ -7,6 +7,7 @@ using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepos
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -23,20 +24,21 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
   public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
   public Notifier Notifier { private get; init; } = new();
   public IExporter<string> Exporter { private get; init; } = new ClipboardExporter();
+  public INetworkService NetworkService { get; init; } = new NetworkService();
   public CollectionEditorPageConfirmers Confirmers { private get; init; } = new();
 
   public string CollectionName => CollectionViewModel.CollectionName;
   public CardCollectionViewModel CollectionViewModel
   {
-    get => field ??= CollectionViewModel = CollectionViewModelFactory.Build(new());
+    get => field ??= CollectionViewModel = CreateCollectionViewModel(new());
     private set
     {
       var nameChanged = field?.CollectionName != value?.CollectionName;
 
       field?.PropertyChanged -= CollectionViewModel_PropertyChanged;
-      
+
       SetProperty(ref field, value);
-      
+
       field?.PropertyChanged += CollectionViewModel_PropertyChanged;
 
       // Visual state trigger will not work if the OnPropertyChanged(nameof(CollectionName))
@@ -44,20 +46,6 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
       if (nameChanged)
         OnPropertyChanged(nameof(CollectionName));
     }
-  }
-
-  private CardCollectionViewModel.Factory CollectionViewModelFactory
-  {
-    get => field ??= new()
-    {
-      Worker = Worker,
-      Repository = Repository,
-      Notifier = Notifier,
-      Exporter = Exporter,
-      Importer = Importer,
-      CollectionConfirmers = Confirmers.CollectionConfirmers,
-      OnCollectionDeleted = OnCollectionDeleted,
-    };
   }
 
   [RelayCommand]
@@ -112,7 +100,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
   [RelayCommand]
   private async Task ChangeCollection(MTGCardCollection collection)
   {
-    CollectionViewModel = CollectionViewModelFactory.Build(collection);
+    CollectionViewModel = CreateCollectionViewModel(collection);
 
     await CollectionViewModel.ChangeListCommand.ExecuteAsync(CollectionViewModel.CollectionListViewModels.FirstOrDefault());
   }
@@ -126,4 +114,16 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
       case nameof(CardCollectionViewModel.CollectionName): OnPropertyChanged(nameof(CollectionName)); break;
     }
   }
+
+  private CardCollectionViewModel CreateCollectionViewModel(MTGCardCollection model) => new(model)
+  {
+    Worker = Worker,
+    Repository = Repository,
+    Notifier = Notifier,
+    Exporter = Exporter,
+    Importer = Importer,
+    NetworkService = NetworkService,
+    Confirmers = Confirmers.CollectionConfirmers,
+    OnDeleted = OnCollectionDeleted,
+  };
 }

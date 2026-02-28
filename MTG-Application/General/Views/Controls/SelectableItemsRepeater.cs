@@ -8,6 +8,9 @@ using System.Collections;
 
 namespace MTGApplication.General.Views.Controls;
 
+/// <summary>
+/// ItemsRepeater with selectable items
+/// </summary>
 public partial class SelectableItemsRepeater : ItemsRepeater
 {
   public static readonly DependencyProperty SelectionModeProperty =
@@ -51,9 +54,9 @@ public partial class SelectableItemsRepeater : ItemsRepeater
     }
   } = null;
 
-  // Tapped event will cause the element to lose focus,
-  //  so the item tapping needs to be done with pointer press events
-  // TODO: try tapped event with the refactored code
+  // This will raise the item click event,
+  //  Tapped event does not have a way to filter only left click taps,
+  //  so this will channel the pointer events as a click event.
   protected PointerClick PointerClick { get; } = new();
 
   public event EventHandler<DragStartingEventArgs>? DragItemsStarting;

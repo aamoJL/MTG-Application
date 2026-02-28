@@ -20,11 +20,6 @@ public abstract class UseCaseFunc<TArg, TReturn>
   public abstract TReturn Execute(TArg arg);
 }
 
-public abstract class UseCaseFunc<TArg, TArg2, TReturn>
-{
-  public abstract TReturn Execute(TArg arg, TArg2 arg2);
-}
-
 public abstract class UseCaseFunc<TArg, TArg2, TArg3, TReturn>
 {
   public abstract TReturn Execute(TArg arg, TArg2 arg2, TArg3 arg3);

@@ -5,11 +5,11 @@ using MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionList;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories;
-using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -30,39 +30,26 @@ public partial class CardCollectionViewModel : ViewModelBase
     Model.CollectionLists.CollectionChanged += Model_CollectionLists_CollectionChanged;
   }
 
-  public Worker Worker { get; init; } = new();
   public SaveStatus SaveStatus { get; init; } = new();
-  public IRepository<MTGCardCollectionDTO> Repository { private get; init; } = new CardCollectionDTORepository();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public Notifier Notifier { private get; init; } = new();
-  public IExporter<string> Exporter { private get; init; } = new ClipboardExporter();
-  public CollectionConfirmers Confirmers { private get; init; } = new();
+  public required Worker Worker { get; init; }
+  public required IRepository<MTGCardCollectionDTO> Repository { private get; init; }
+  public required IMTGCardImporter Importer { private get; init; }
+  public required Notifier Notifier { private get; init; }
+  public required INetworkService NetworkService { get; init; }
+  public required IExporter<string> Exporter { private get; init; }
+  public required CollectionConfirmers Confirmers { private get; init; }
 
   public string CollectionName => Model.Name;
-  public ObservableCollection<CardCollectionListViewModel> CollectionListViewModels => field ??= [.. Model.CollectionLists.Select(ListViewModelFactory.Build)];
+  public ObservableCollection<CardCollectionListViewModel> CollectionListViewModels => field ??= [.. Model.CollectionLists.Select(CreateListViewModel)];
   public CardCollectionListViewModel? ListViewModel
   {
     get;
     private set => SetProperty(ref field, value);
   }
 
-  public Func<Task>? OnDeleted { get; init; }
+  public required Func<Task> OnDeleted { get; init; }
 
   private MTGCardCollection Model { get; }
-  private CardCollectionListViewModel.Factory ListViewModelFactory
-  {
-    get => field ??= new()
-    {
-      Worker = Worker,
-      SaveStatus = SaveStatus,
-      Exporter = Exporter,
-      CollectionListConfirmers = Confirmers.CollectionListConfirmers,
-      Importer = Importer,
-      Notifier = Notifier,
-      NameValidator = (name) => Model.CollectionLists.Select(x => x.Name).Contains(name),
-      OnListDelete = OnListDelete
-    };
-  }
 
   [RelayCommand]
   private async Task SaveUnsavedChanges(SaveStatus.ConfirmArgs? args)
@@ -148,8 +135,7 @@ public partial class CardCollectionViewModel : ViewModelBase
 
       if (await Worker.DoWork(new DeleteCardCollection(Repository).Execute(Model)))
       {
-        if (OnDeleted != null)
-          await OnDeleted();
+        await OnDeleted();
 
         new ShowNotification(Notifier).Execute(Notifications.DeleteCollectionSuccess);
       }
@@ -228,7 +214,7 @@ public partial class CardCollectionViewModel : ViewModelBase
     if (e.NewItems?.OfType<MTGCardCollectionList>() is var newLists && newLists != null)
     {
       foreach (var item in newLists)
-        CollectionListViewModels.Add(ListViewModelFactory.Build(item));
+        CollectionListViewModels.Add(CreateListViewModel(item));
     }
     if (e.OldItems?.OfType<MTGCardCollectionList>() is var oldLists && oldLists != null)
     {
@@ -241,4 +227,17 @@ public partial class CardCollectionViewModel : ViewModelBase
 
     SaveStatus.HasUnsavedChanges = true;
   }
+
+  private CardCollectionListViewModel CreateListViewModel(MTGCardCollectionList model) => new(model)
+  {
+    Worker = Worker,
+    SaveStatus = SaveStatus,
+    Exporter = Exporter,
+    Importer = Importer,
+    Notifier = Notifier,
+    Confirmers = Confirmers.CollectionListConfirmers,
+    NetworkService = NetworkService,
+    NameValidator = (name) => Model.CollectionLists.Select(x => x.Name).Contains(name),
+    OnDelete = OnListDelete
+  };
 }

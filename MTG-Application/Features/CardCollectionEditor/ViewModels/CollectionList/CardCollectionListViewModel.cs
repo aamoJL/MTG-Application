@@ -7,6 +7,7 @@ using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.IOServices;
 using MTGApplication.General.Services.NotificationService.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
@@ -30,13 +31,14 @@ public partial class CardCollectionListViewModel : ViewModelBase
     Model.Cards.CollectionChanged += Cards_CollectionChanged;
   }
 
-  public Worker Worker { get; init; } = new();
-  public SaveStatus SaveStatus { get; init; } = new();
-  public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
-  public Notifier Notifier { private get; init; } = new();
-  public IExporter<string> Exporter { private get; init; } = new ClipboardExporter();
-  public CollectionListConfirmers Confirmers { private get; init; } = new();
-  public Func<string, bool> NameValidator { private get => field ?? throw new NotImplementedException(); init; }
+  public required Worker Worker { get; init; }
+  public required SaveStatus SaveStatus { get; init; }
+  public required IMTGCardImporter Importer { private get; init; }
+  public required Notifier Notifier { private get; init; }
+  public required IExporter<string> Exporter { private get; init; }
+  public required INetworkService NetworkService { get; init; }
+  public required CollectionListConfirmers Confirmers { private get; init; }
+  public required Func<string, bool> NameValidator { get; set; }
 
   public string Name => Model.Name;
   public string Query => Model.SearchQuery;
@@ -66,20 +68,9 @@ public partial class CardCollectionListViewModel : ViewModelBase
     }
   }
 
-  public Func<MTGCardCollectionList, Task>? OnDelete { get; init; }
+  public required Func<MTGCardCollectionList, Task>? OnDelete { get; init; }
 
   private MTGCardCollectionList Model { get; }
-  private CardCollectionMTGCardViewModel.Factory CardViewModelFactory
-  {
-    get => field ??= new()
-    {
-      Worker = Worker,
-      CardConfirmers = Confirmers.CardConfirmers,
-      Importer = Importer,
-      Notifier = Notifier,
-      IsOwned = (card) => Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) != null,
-    };
-  }
 
   [RelayCommand]
   private async Task EditList()
@@ -229,7 +220,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
           return;
 
         QueryCards = CreateQueryCollection(
-          cards: fetchResult.Found.Select(x => CardViewModelFactory.Build(new(x.Info))),
+          cards: fetchResult.Found.Select(x => CreateCardViewModel(new(x.Info))),
           nextPage: fetchResult.NextPageUri,
           totalCount: fetchResult.TotalCount);
       });
@@ -246,7 +237,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
     {
       Cards = [.. cards],
       NextPage = nextPage,
-      Converter = (item) => CardViewModelFactory.Build(new(item.Info)),
+      Converter = (item) => CreateCardViewModel(new(item.Info)),
       OnError = (e) => new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message)),
     };
 
@@ -291,4 +282,14 @@ public partial class CardCollectionListViewModel : ViewModelBase
         Model.Cards.RemoveAt(index);
     }
   }
+
+  private CardCollectionMTGCardViewModel CreateCardViewModel(MTGCard model) => new(model)
+  {
+    Worker = Worker,
+    Confirmers = Confirmers.CardConfirmers,
+    Importer = Importer,
+    Notifier = Notifier,
+    NetworkService = NetworkService,
+    IsOwned = Cards.FirstOrDefault(x => x.Info.ScryfallId == model.Info.ScryfallId) != null,
+  };
 }

@@ -11,7 +11,6 @@
   xmlns:localcontrols="using:MTGApplication.Features.DeckSelection.Views.Controls" 
   xmlns:selectionpage="using:MTGApplication.Features.DeckSelection.ViewModels.SelectionPage"
   mc:Ignorable="d"
-  d:DataContext="{d:DesignInstance Type=selectionpage:DeckSelectionPageViewModel}"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid Padding="10 10 10 10">
