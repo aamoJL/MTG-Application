@@ -26,7 +26,7 @@ public class DeckEditorMTGDeckToDTOConverterTests
 
     var result = await new DTOToDeckEditorDeckConverter(new TestMTGCardImporter()
     {
-      Result = TestMTGCardImporter.Success([.. cards.Select(x => new CardImportResult.Card(x.Info, x.Count))])
+      Result = TestMTGCardImporter.Success([.. cards.Select(x => new CardImportResult.Card(x.Info) { Count = x.Count })])
     }).Convert(DeckEditorMTGDeckToDTOConverter.Convert(deck));
 
     Assert.IsNotNull(result);

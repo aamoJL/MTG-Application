@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
+﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using System;
 using System.Collections.Generic;
@@ -39,10 +40,24 @@ public class DTOToDeckEditorDeckConverter(IMTGCardImporter importer)
       Name = dto.Name,
       Commander = commander != null ? new DeckEditorMTGCard(commander.Info) { Count = commander.Count } : null,
       CommanderPartner = partner != null ? new DeckEditorMTGCard(partner.Info) { Count = partner.Count } : null,
-      DeckCards = [.. deckCards.Select(x => new DeckEditorMTGCard(x.Info) { Count = x.Count, Group = x.Group, CardTag = x.CardTag })],
+      DeckCards = [.. deckCards.Select(x => GetDeckCard(x, dto.DeckCards))],
       Wishlist = [.. wishCards.Select(x => new DeckEditorMTGCard(x.Info) { Count = x.Count })],
       Maybelist = [.. maybeCards.Select(x => new DeckEditorMTGCard(x.Info) { Count = x.Count })],
       Removelist = [.. removeCards.Select(x => new DeckEditorMTGCard(x.Info) { Count = x.Count })],
     };
+  }
+
+  private DeckEditorMTGCard GetDeckCard(CardImportResult.Card importCard, IEnumerable<MTGCardDTO> dtoDeckCards)
+  {
+    if (dtoDeckCards.FirstOrDefault(x => x.Name == importCard.Info.Name) is MTGCardDTO deckCard)
+    {
+      return new(importCard.Info)
+      {
+        Count = importCard.Count,
+        Group = deckCard.Group,
+        CardTag = deckCard.Tag,
+      };
+    }
+    else return new(importCard.Info) { Count = importCard.Count };
   }
 }

@@ -304,12 +304,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
               {
                 var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo)) ?? new();
 
-                fetchedCards.Add(new(Info: cardInfo)
-                {
-                  Count = identifier.CardCount,
-                  Group = identifier.CardGroup,
-                  CardTag = identifier.CardTag,
-                });
+                fetchedCards.Add(new(Info: cardInfo) { Count = identifier.CardCount });
               }
             }
           }

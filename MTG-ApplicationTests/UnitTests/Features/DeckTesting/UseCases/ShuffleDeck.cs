@@ -17,7 +17,10 @@ public class ShuffleDeck
       DeckCards: [.. MTGCardMocker.Mock(count: 100)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     foreach (var item in deck.DeckCards)
       viewmodel.Library.Add(new(item.Info));

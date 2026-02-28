@@ -3,6 +3,7 @@ using MTGApplication.General.Services.Databases.Repositories.CardRepository.Mode
 using MTGApplicationTests.TestUtility.Mocker;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.ScryfallAPITests;
+
 public partial class ScryfallAPITests
 {
   [TestClass]

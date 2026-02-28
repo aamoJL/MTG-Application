@@ -1,30 +1,28 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MTGApplication.Features.DeckTesting.Models;
-using MTGApplication.Features.DeckTesting.UseCases;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.Features.DeckTesting.ViewModels;
+
 public partial class DeckTestingPageViewModel : ObservableObject
 {
-  public DeckTestingPageViewModel(DeckTestingDeck deck, IMTGCardImporter importer)
+  public DeckTestingPageViewModel(DeckTestingDeck deck)
   {
     Deck = deck;
-    Importer = importer;
 
-    _ = UpdateTokens();
+    Library.CollectionChanged += Library_CollectionChanged;
   }
 
   public DeckTestingDeck Deck { get; }
-  public IMTGCardImporter Importer { get; }
+  public IMTGCardImporter Importer { get; init; } = App.MTGCardImporter;
 
   public ObservableCollection<DeckTestingMTGCard> Library { get; } = [];
   public ObservableCollection<DeckTestingMTGCard> Graveyard { get; } = [];
@@ -40,19 +38,73 @@ public partial class DeckTestingPageViewModel : ObservableObject
   public event Action? NewGameStarted;
   public event Action? NewTurnStarted;
 
-  [NotNull] public IRelayCommand? StartNewGameCommand => field ??= new StartNewGame(this).Command;
-  [NotNull] public IRelayCommand? DrawCardCommand => field ??= new DrawCard(this).Command;
-  [NotNull] public IRelayCommand? StartNewTurnCommand => field ??= new StartNewTurn(this).Command;
-  [NotNull] public IRelayCommand? ShuffleDeckCommand => field ??= new ShuffleDeck(this).Command;
+  [RelayCommand]
+  private void StartNewGame()
+  {
+    Library.Clear();
+    Graveyard.Clear();
+    Exile.Clear();
+    Hand.Clear();
+    CommandZone.Clear();
 
-  public void RaiseNewGameStarted() => NewGameStarted?.Invoke();
+    TurnCount = 0;
+    PlayerHP = 40;
+    EnemyHP = 40;
 
-  public void RaiseNewTurnStarted() => NewTurnStarted?.Invoke();
+    // Reset library
+    foreach (var item in Deck.DeckCards)
+      Library.Add(new(item.Info));
 
-  /// <exception cref="InvalidOperationException"></exception>
-  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-  /// <exception cref="UriFormatException"></exception>
-  private async Task UpdateTokens()
+    ShuffleDeckCommand?.Execute(null);
+
+    // Add commanders to the command zone
+    if (Deck.Commander != null)
+      CommandZone.Add(new(Deck.Commander.Info));
+
+    if (Deck.Partner != null)
+      CommandZone.Add(new(Deck.Partner.Info));
+
+    // Draw 7 cards from library to hand
+    for (var i = 0; i < 7; i++)
+      DrawCardCommand?.Execute(null);
+
+    RaiseNewGameStarted();
+  }
+
+  [RelayCommand(CanExecute = nameof(CanDrawCard))]
+  private void DrawCard()
+  {
+    if (!CanDrawCard()) return;
+
+    var card = Library[0];
+    Library.RemoveAt(0);
+    Hand.Add(card);
+  }
+
+  [RelayCommand]
+  private void StartNewTurn()
+  {
+    TurnCount++;
+    DrawCard();
+    RaiseNewTurnStarted();
+  }
+
+  [RelayCommand]
+  private void ShuffleDeck()
+  {
+    var rng = new Random();
+    var list = Library;
+    var n = list.Count;
+    while (n > 1)
+    {
+      n--;
+      var k = rng.Next(n + 1);
+      (list[n], list[k]) = (list[k], list[n]);
+    }
+  }
+
+  [RelayCommand]
+  private async Task RefreshTokens()
   {
     var cards = new List<MTGCard?>(
       [.. Deck.DeckCards,
@@ -69,5 +121,13 @@ public partial class DeckTestingPageViewModel : ObservableObject
     }
     catch { }
   }
-}
 
+  public void RaiseNewGameStarted() => NewGameStarted?.Invoke();
+
+  public void RaiseNewTurnStarted() => NewTurnStarted?.Invoke();
+
+  private bool CanDrawCard() => Library.Count > 0;
+
+  private void Library_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    => DrawCardCommand.NotifyCanExecuteChanged();
+}

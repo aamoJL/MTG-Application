@@ -12,8 +12,7 @@
   xmlns:models="using:MTGApplication.Features.DeckTesting.Models" 
   xmlns:ui="using:CommunityToolkit.WinUI" 
   xmlns:cardview="using:MTGApplication.Features.DeckTesting.Views.Controls.CardView" 
-  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls" 
-  xmlns:cardlistview="using:MTGApplication.Features.DeckEditor.CardList.Views.Controls.CardListView"
+  xmlns:localcontrols="using:MTGApplication.Features.DeckTesting.Views.Controls"
   mc:Ignorable="d"
   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 

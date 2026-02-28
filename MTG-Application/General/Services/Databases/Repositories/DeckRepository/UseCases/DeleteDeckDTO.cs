@@ -3,6 +3,7 @@ using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
+
 public class DeleteDeckDTO(IRepository<MTGCardDeckDTO> repository) : UseCaseFunc<MTGCardDeckDTO, Task<bool>>
 {
   public override async Task<bool> Execute(MTGCardDeckDTO deck)

@@ -17,7 +17,10 @@ public class DrawCard
       DeckCards: [],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Clear();
 
@@ -31,7 +34,10 @@ public class DrawCard
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -45,7 +51,10 @@ public class DrawCard
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -63,7 +72,10 @@ public class DrawCard
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 

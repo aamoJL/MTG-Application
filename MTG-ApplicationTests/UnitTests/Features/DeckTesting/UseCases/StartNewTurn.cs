@@ -17,7 +17,7 @@ public class StartNewTurn
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     Assert.AreEqual(0, viewmodel.TurnCount);
 
@@ -33,7 +33,7 @@ public class StartNewTurn
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -51,7 +51,7 @@ public class StartNewTurn
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -70,7 +70,7 @@ public class StartNewTurn
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.NewTurnStarted += () =>
     {

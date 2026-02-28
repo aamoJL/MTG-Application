@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
+
 public class GetCardCollectionDTO(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<string, Task<MTGCardCollectionDTO?>>
 {
   Action<DbSet<MTGCardCollectionDTO>>? SetIncludes { get; init; }

@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml.Controls;
 using MTGApplication.General.Services.ConfirmationService;
 
 namespace MTGApplication.General.Views.Dialogs.Controls;
+
 public sealed partial class TwoButtonConfirmationDialog : ConfirmationDialog
 {
   public TwoButtonConfirmationDialog(string title, string message) : base(title)
