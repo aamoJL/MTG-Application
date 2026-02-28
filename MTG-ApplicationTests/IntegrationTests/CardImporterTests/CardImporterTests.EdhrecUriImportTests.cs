@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Services;
+﻿using MTGApplication.Features.DeckEditor.UseCases;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 
@@ -12,10 +12,10 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithValidUri_CardFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var uri = "https://edhrec.com/cards/sol-ring";
 
-      var result = await importer.Import(uri);
+      var result = await importer.Execute(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual("Sol Ring", result.Found.First().Info.Name);
@@ -24,10 +24,10 @@ public partial class CardImporterTests
     [TestMethod]
     public async Task Import_WithInvalidUri_NoCardFound()
     {
-      var importer = new DeckEditorCardImporter(new ScryfallAPI());
+      var importer = new ImportCards(new ScryfallAPI(), new EdhrecImporter(), new ScryfallAPI());
       var uri = "https://edhrec.com/cards/xxxxx";
 
-      var result = await importer.Import(uri);
+      var result = await importer.Execute(uri);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
       Assert.AreEqual(1, result.NotFoundCount);

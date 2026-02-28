@@ -13,9 +13,11 @@ public static partial class NotificationService
 
   public static event EventHandler<Notification>? OnShow;
 
-  public static void RegisterNotifications(Notifier notifier, object sender)
-    => notifier.OnNotify = (arg) => RaiseNotification(sender, arg);
-
+  /// <summary>
+  /// Raises UI notification
+  /// </summary>
+  /// <param name="sender">Page or other UI element that has a same XamlRoot as the window that will shot the notification</param>
+  /// <param name="notification">Notification information</param>
   public static void RaiseNotification(object sender, Notification notification)
     => OnShow?.Invoke(sender, notification);
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
 
-public class FetchCardsWithImportString(IMTGCardImporter importer) : UseCase<string, Task<CardImportResult>>
+public class FetchCardsWithImportString(IMTGCardImporter importer) : UseCaseFunc<string, Task<CardImportResult>>
 {
   /// <exception cref="Exception"></exception>
   public override async Task<CardImportResult> Execute(string importString)

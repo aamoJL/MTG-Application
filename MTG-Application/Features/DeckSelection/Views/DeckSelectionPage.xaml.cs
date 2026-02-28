@@ -1,18 +1,14 @@
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckSelection.Models;
-using MTGApplication.Features.DeckSelection.ViewModels;
-using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
-using MTGApplication.General.Services.NotificationService;
-using System.Windows.Input;
+using MTGApplication.Features.DeckSelection.ViewModels.SelectionPage;
+using System;
+using static MTGApplication.General.Services.NotificationService.NotificationService;
 
 namespace MTGApplication.Features.DeckSelection.Views;
+
 public sealed partial class DeckSelectionPage : Page
 {
-  public static readonly DependencyProperty DeckSelectedCommandProperty =
-      DependencyProperty.Register(nameof(DeckSelectedCommand), typeof(ICommand), typeof(DeckSelectionPage), new PropertyMetadata(null));
-
   public DeckSelectionPage()
   {
     InitializeComponent();
@@ -20,27 +16,34 @@ public sealed partial class DeckSelectionPage : Page
     Loaded += MTGDeckSelectorView_Loaded;
   }
 
-  public DeckSelectionViewModel ViewModel { get; } = new(new DeckDTORepository(new()), App.MTGCardImporter);
-
-  public ICommand DeckSelectedCommand
+  public DeckSelectionPageViewModel ViewModel => field ??= new()
   {
-    get => (ICommand)GetValue(DeckSelectedCommandProperty);
-    set => SetValue(DeckSelectedCommandProperty, value);
+    Notifier = Notifier,
+    OnSelected = deck => OnDeckSelected?.Invoke(deck)
+  };
+
+  private Notifier Notifier
+  {
+    get => field ??= Notifier = new();
+    set
+    {
+      if (field == value) return;
+      field?.OnNotifyEvent -= Notifier_OnNotifyEvent;
+      field = value;
+      field?.OnNotifyEvent += Notifier_OnNotifyEvent;
+    }
   }
 
-  [RelayCommand]
-  public void SelectDeck(DeckSelectionDeck item) => DeckSelectedCommand?.Execute(item?.Title ?? string.Empty);
+  public Action<DeckSelectionDeck>? OnDeckSelected { private get; set; } = null;
 
   private void MTGDeckSelectorView_Loaded(object sender, RoutedEventArgs e)
   {
     Loaded -= MTGDeckSelectorView_Loaded;
 
-    NotificationService.RegisterNotifications(ViewModel.Notifier, this);
-
-    // Workaround to notify user if the deck fetching sends a notification before the notifier has been registered to the view.
-    var deckUpdateTask = ViewModel.WaitForDeckUpdate();
-
-    if (deckUpdateTask.IsFaulted)
-      ViewModel.Notifier.Notify(new(NotificationService.NotificationType.Error, $"Error: {deckUpdateTask.Exception.Message}"));
+    if (ViewModel.RefreshDecksCommand.CanExecute(null))
+      _ = ViewModel.RefreshDecksCommand.ExecuteAsync(null);
   }
+
+  private void Notifier_OnNotifyEvent(object? _, Notification e)
+    => RaiseNotification(this, e);
 }

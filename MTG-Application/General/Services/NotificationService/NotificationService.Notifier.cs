@@ -6,9 +6,8 @@ public static partial class NotificationService
 {
   public class Notifier
   {
-    public Action<Notification>? OnNotify { private get; set; }
+    public event EventHandler<Notification>? OnNotifyEvent;
 
-    public void Notify(Notification notification)
-      => OnNotify?.Invoke(notification);
+    public virtual void Notify(Notification notification) => OnNotifyEvent?.Invoke(this, notification);
   }
 }

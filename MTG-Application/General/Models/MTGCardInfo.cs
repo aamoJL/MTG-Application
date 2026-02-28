@@ -24,7 +24,7 @@ public record MTGCardInfo
   [Serializable]
   public record CardFace
   {
-    public ColorTypes[] Colors { get; }
+    public ValueEqualityList<ColorTypes> Colors { get; }
     public string Name { get; }
     public string ImageUri { get; }
     public string ArtCropUri { get; }
@@ -32,9 +32,9 @@ public record MTGCardInfo
     public string OracleText { get; }
 
     [JsonConstructor]
-    public CardFace(ColorTypes[] colors, string name, string imageUri, Guid? illustrationId, string oracleText, string artCropUri)
+    public CardFace(ValueEqualityList<ColorTypes> colors, string name, string imageUri, Guid? illustrationId, string oracleText, string artCropUri)
     {
-      Colors = colors.Length == 0 ? [ColorTypes.C] : colors;
+      Colors = colors.Count == 0 ? [ColorTypes.C] : [.. colors];
       Name = name;
       ImageUri = imageUri;
       IllustrationId = illustrationId;
@@ -47,7 +47,7 @@ public record MTGCardInfo
   /// Constructor for JSON deserialization
   /// </summary>
   [JsonConstructor, Obsolete("This constructor should only be used by JSON deserializer")]
-  public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ColorTypes[] colors, ColorTypes[] colorIdentity, SpellType[] spellTypes, string cardMarketUri, ColorTypes[] producedMana, string printSearchUri, CardToken[] tokens, string importerName, Guid oracleId)
+  public MTGCardInfo(Guid scryfallId, string name, int cmc, string typeLine, string setCode, string setName, float price, string collectorNumber, string aPIWebsiteUri, string setIconUri, CardFace frontFace, CardFace? backFace, RarityTypes rarityType, ValueEqualityList<ColorTypes> colors, ValueEqualityList<ColorTypes> colorIdentity, ValueEqualityList<SpellType> spellTypes, string cardMarketUri, ValueEqualityList<ColorTypes> producedMana, string printSearchUri, ValueEqualityList<CardToken> tokens, string importerName, Guid oracleId)
   {
     ScryfallId = scryfallId;
     OracleId = oracleId;
@@ -63,13 +63,13 @@ public record MTGCardInfo
     FrontFace = frontFace;
     BackFace = backFace;
     RarityType = rarityType;
-    Colors = colors;
-    ColorIdentity = colorIdentity;
-    SpellTypes = spellTypes;
+    Colors = [.. colors];
+    ColorIdentity = [.. colorIdentity];
+    SpellTypes = [.. spellTypes];
     CardMarketUri = cardMarketUri;
-    ProducedMana = producedMana;
+    ProducedMana = [.. producedMana];
     PrintSearchUri = printSearchUri;
-    Tokens = tokens;
+    Tokens = [.. tokens];
     ImporterName = importerName;
   }
   public MTGCardInfo(Guid scryfallId, CardFace frontFace, CardFace? backFace, int cmc, string name, string typeLine, string setCode, string setName, float price, string collectorNumber, string apiWebsiteUri, string setIconUri, ColorTypes[] producedMana, ColorTypes[] colorIdentity, RarityTypes rarityType, string printSearchUri, string cardMarketUri, CardToken[] tokens, Guid oracleId, string importerName = "")
@@ -88,13 +88,13 @@ public record MTGCardInfo
     FrontFace = frontFace;
     BackFace = backFace;
     PrintSearchUri = printSearchUri;
-    Tokens = tokens;
+    Tokens = [.. tokens];
     RarityType = rarityType;
-    Colors = GetColors(FrontFace, BackFace);
-    ColorIdentity = colorIdentity;
-    SpellTypes = GetSpellTypes(TypeLine);
+    Colors = [.. GetColors(FrontFace, BackFace)];
+    ColorIdentity = [.. colorIdentity];
+    SpellTypes = [.. GetSpellTypes(TypeLine)];
     CardMarketUri = cardMarketUri;
-    ProducedMana = producedMana;
+    ProducedMana = [.. producedMana];
     ImporterName = importerName;
   }
 
@@ -112,13 +112,13 @@ public record MTGCardInfo
   public CardFace FrontFace { get; init; }
   public CardFace? BackFace { get; init; }
   public string PrintSearchUri { get; init; }
-  public CardToken[] Tokens { get; init; }
+  public ValueEqualityList<CardToken> Tokens { get; init; }
   public RarityTypes RarityType { get; init; }
-  public ColorTypes[] Colors { get; init; }
-  public ColorTypes[] ColorIdentity { get; init; }
-  public SpellType[] SpellTypes { get; init; }
+  public ValueEqualityList<ColorTypes> Colors { get; init; }
+  public ValueEqualityList<ColorTypes> ColorIdentity { get; init; }
+  public ValueEqualityList<SpellType> SpellTypes { get; init; }
   public string CardMarketUri { get; init; }
-  public ColorTypes[] ProducedMana { get; init; }
+  public ValueEqualityList<ColorTypes> ProducedMana { get; init; }
   public string ImporterName { get; init; }
 
   /// <summary>
@@ -131,10 +131,14 @@ public record MTGCardInfo
     foreach (var color in frontFace.Colors)
       if (!colors.Contains(color)) { colors.Add(color); }
 
-    if (backFace?.Colors is ColorTypes[] backColors)
+    if (backFace?.Colors is IList<ColorTypes> backColors)
+    {
       foreach (var color in backColors)
+      {
         if (!colors.Contains(color))
           colors.Add(color);
+      }
+    }
 
     return [.. colors];
   }

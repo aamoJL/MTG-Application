@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MTGApplication.General.Extensions;
@@ -28,12 +27,13 @@ public static class IEnumerableExtensions
         high = index;
 
       index = low + (high - low) / 2;
-    };
+    }
+    ;
 
     return index;
   }
 
-  public static bool TryFindIndex<T>(this ObservableCollection<T> self, Predicate<T> predicate, out int index)
+  public static bool TryFindIndex<T>(this IList<T> self, Predicate<T> predicate, out int index)
   {
     index = -1;
 
@@ -47,5 +47,18 @@ public static class IEnumerableExtensions
     }
 
     return false;
+  }
+
+  public static int[] FindItemIndices<T>(this IList<T> self, IList<T> items, Func<T, T, bool> predicate)
+  {
+    var indices = Enumerable.Repeat(-1, items.Count).ToArray();
+
+    for (var i = 0; i < items.Count; i++)
+    {
+      self.TryFindIndex(s => predicate(s, items[i]), out var foundIndex);
+      indices[i] = foundIndex;
+    }
+
+    return indices;
   }
 }

@@ -21,6 +21,6 @@ public static class MTGCardDeckDTOMocker
   {
     var list = new List<MTGCardDeckDTO>();
     list.AddRange(Enumerable.Range(1, count).Select(x => Mock($"Deck {x}")));
-    return list;
+    return [.. list];
   }
 }

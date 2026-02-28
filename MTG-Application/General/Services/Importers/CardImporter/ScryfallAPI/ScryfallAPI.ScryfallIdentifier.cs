@@ -23,16 +23,12 @@ public partial class ScryfallAPI
       ScryfallId = card.ScryfallId;
       Name = card.Name;
       CardCount = card.Count;
-      CardGroup = card.Group;
-      CardTag = card.Tag;
       SetCode = card.SetCode;
       CollectorNumber = card.CollectorNumber;
     }
 
     public Guid ScryfallId { get; init; } = Guid.Empty;
     public int CardCount { get; init; } = 1;
-    public string CardGroup { get; init; } = string.Empty;
-    public CardTag? CardTag { get; init; } = null;
     public string Name { get; init; } = string.Empty;
     public string SetCode { get; init; } = string.Empty;
     public string CollectorNumber { get; init; } = string.Empty;

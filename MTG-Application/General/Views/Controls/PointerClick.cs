@@ -4,6 +4,9 @@ using System;
 
 namespace MTGApplication.General.Views.Controls;
 
+/// <summary>
+/// This class can be used as a Tapped event with the ability to get the pressed button
+/// </summary>
 public class PointerClick
 {
   private object? PressedElement { get; set; }
@@ -39,7 +42,5 @@ public class PointerClick
       Clicked?.Invoke(sender, e);
 
     PressedElement = null;
-
-    e.Handled = true;
   }
 }

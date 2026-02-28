@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.WinUI.Helpers;
 using MTGApplication.General.Extensions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -10,85 +9,75 @@ using System.Linq;
 
 namespace MTGApplication.General.Views.Controls;
 
-public class FilterableAndSortableCollectionView
+public class FilterableAndSortableCollectionView<T>
 {
-  public IList Source
+  public FilterableAndSortableCollectionView(IList<T> source, IValueFilter<T> filters, IValueSorter<T> sorter)
+  {
+    Filter = filters;
+    Sorter = sorter;
+    Source = source;
+
+    ApplySort();
+    ApplyFilter();
+  }
+
+  public IList<T> Source
   {
     get;
-    set
-    {
-      if (field != value)
-      {
-        if (field is INotifyCollectionChanged observable)
-          foreach (var item in Source.OfType<INotifyPropertyChanged>())
-            item.PropertyChanged -= SourceItem_PropertyChanged;
-
-        field = value;
-
-        View.Clear();
-
-        field ??= Array.Empty<object>();
-
-        foreach (var item in field)
-        {
-          AddToView(item, sort: false);
-
-          if (item is INotifyPropertyChanged observableItem)
-            observableItem.PropertyChanged += SourceItem_PropertyChanged;
-        }
-
-        Sort();
-
-        SourceWeakEventListener?.Detach();
-
-        if (field is INotifyCollectionChanged observableCollection)
-        {
-          SourceWeakEventListener = new(this)
-          {
-            OnEventAction = (sender, _, e) => Source_CollectionChanged(sender, e),
-            OnDetachAction = (listener) => observableCollection.CollectionChanged -= SourceWeakEventListener!.OnEvent!
-          };
-
-          observableCollection.CollectionChanged += SourceWeakEventListener.OnEvent!;
-        }
-      }
-    }
-  } = new List<object>();
-  public Predicate<object>? Filter
-  {
-    get;
-    set
+    private init
     {
       field = value;
-      OnFilterChanged();
-    }
-  }
-  public IComparer<object>? SortComparer
-  {
-    get;
-    set
-    {
-      if (value != field)
+
+      foreach (var item in field)
       {
-        field = value;
-        OnSortComparerChanged();
+        AddToView(item, sort: false);
+
+        if (item is INotifyPropertyChanged observableItem)
+          observableItem.PropertyChanged += SourceItem_PropertyChanged;
+      }
+
+      if (field is INotifyCollectionChanged observableCollection)
+      {
+        SourceWeakEventListener = new(this)
+        {
+          OnEventAction = (sender, _, e) => Source_CollectionChanged(sender, e),
+          OnDetachAction = (listener) => observableCollection.CollectionChanged -= SourceWeakEventListener!.OnEvent!
+        };
+
+        observableCollection.CollectionChanged += SourceWeakEventListener.OnEvent!;
       }
     }
   }
+  public IValueFilter<T> Filter
+  {
+    get;
+    private init
+    {
+      field = value;
+      field.PropertyChanged += Filter_PropertyChanged;
+    }
+  }
+  public IValueSorter<T> Sorter
+  {
+    get;
+    private init
+    {
+      field = value;
+      field.PropertyChanged += Sorter_PropertyChanged;
+    }
+  }
 
-  public ObservableCollection<object> View { get; } = [];
+  public ObservableCollection<T> View { get; } = [];
 
-  private WeakEventListener<FilterableAndSortableCollectionView, object, NotifyCollectionChangedEventArgs>? SourceWeakEventListener { get; set; }
+  private WeakEventListener<FilterableAndSortableCollectionView<T>, object, NotifyCollectionChangedEventArgs>? SourceWeakEventListener { get; set; }
 
-  private void OnSortComparerChanged() => Sort();
-
-  private void OnFilterChanged()
+  private void ApplyFilter()
   {
     for (var i = 0; i < View.Count; i++)
     {
       var item = View[i];
 
-      if (Filter != null && !Filter(item))
+      if (!Filter.ValidationPredicate(item))
       {
         RemoveAtFromView(i);
         i--; // item at the current position was removed
@@ -99,13 +88,10 @@ public class FilterableAndSortableCollectionView
       AddToView(item);
   }
 
-  private void Sort()
+  private void ApplySort()
   {
-    if (SortComparer == null)
-      return;
-
     var temp = View.ToList();
-    temp.Sort(SortComparer);
+    temp.Sort(Sorter.Comparer);
 
     View.Clear();
 
@@ -113,15 +99,15 @@ public class FilterableAndSortableCollectionView
       View.Add(item);
   }
 
-  private bool AddToView(object item, bool sort = true)
+  private bool AddToView(T item, bool sort = true)
   {
     if (View.Contains(item))
       return false;
 
-    if (Filter == null || Filter(item))
+    if (Filter.ValidationPredicate(item))
     {
-      if (sort && SortComparer != null)
-        View.Insert(View.FindPosition(item, SortComparer), item);
+      if (sort && Sorter != null)
+        View.Insert(View.FindPosition(item, Sorter.Comparer), item);
       else
         View.Add(item);
 
@@ -130,7 +116,7 @@ public class FilterableAndSortableCollectionView
     return false;
   }
 
-  private bool RemoveFromView(object item)
+  private bool RemoveFromView(T item)
   {
     try
     {
@@ -155,38 +141,33 @@ public class FilterableAndSortableCollectionView
 
   private void Source_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
-    if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+    foreach (var item in e.AddedItems<T>())
     {
-      foreach (var item in e.NewItems)
-      {
-        if (item is INotifyPropertyChanged observableItem)
-          observableItem.PropertyChanged += SourceItem_PropertyChanged;
+      if (item is INotifyPropertyChanged observableItem)
+        observableItem.PropertyChanged += SourceItem_PropertyChanged;
 
-        AddToView(item);
-      }
+      AddToView(item);
     }
-    else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+    foreach (var item in e.RemovedItems<T>())
     {
-      foreach (var item in e.OldItems)
-      {
-        if (item is INotifyPropertyChanged observableItem)
-          observableItem.PropertyChanged -= SourceItem_PropertyChanged;
+      if (item is INotifyPropertyChanged observableItem)
+        observableItem.PropertyChanged -= SourceItem_PropertyChanged;
 
-        RemoveFromView(item);
-      }
+      RemoveFromView(item);
     }
-    else if (e.Action == NotifyCollectionChangedAction.Reset)
+
+    if (e.Action == NotifyCollectionChangedAction.Reset)
       View.Clear();
   }
 
-  private void SourceItem_PropertyChanged(object? item, PropertyChangedEventArgs e)
+  private void SourceItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
   {
-    if (item == null || !Source.Contains(item))
-      return;
+    if (sender is not T item) return;
+    if (!Source.Contains(item)) return;
 
-    if (AddToView(item, sort: true))
-      return;
-    else if (Filter?.Invoke(item) == false)
+    if (AddToView(item, sort: true)) return;
+
+    if (!Filter.ValidationPredicate(item))
     {
       RemoveFromView(item);
       return;
@@ -197,22 +178,44 @@ public class FilterableAndSortableCollectionView
     if (index == -1)
       return;
 
-    if (SortComparer != null)
+    if (Sorter != null)
     {
-      if ((index - 1 >= 0 && SortComparer.Compare(item, View[index - 1]) < 0))
+      if ((index - 1 >= 0 && Sorter.Comparer.Compare(item, View[index - 1]) < 0))
       {
         var tempList = View.Take(new Range(0, index));
-        var newIndex = tempList.FindPosition(item, SortComparer);
+        var newIndex = tempList.FindPosition(item, Sorter.Comparer);
 
         View.Move(index, newIndex);
       }
-      else if ((index + 1 < View.Count && SortComparer.Compare(item, View[index + 1]) > 0))
+      else if ((index + 1 < View.Count && Sorter.Comparer.Compare(item, View[index + 1]) > 0))
       {
         var tempList = View.Take(new Range(index + 1, View.Count));
-        var newIndex = index + tempList.FindPosition(item, SortComparer);
+        var newIndex = index + tempList.FindPosition(item, Sorter.Comparer);
 
         View.Move(index, newIndex);
       }
     }
   }
+
+  private void Sorter_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(Sorter.Comparer))
+      ApplySort();
+  }
+
+  private void Filter_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName == nameof(Filter.ValidationPredicate))
+      ApplyFilter();
+  }
+}
+
+public interface IValueFilter<T> : INotifyPropertyChanged
+{
+  public Predicate<T> ValidationPredicate { get; }
+}
+
+public interface IValueSorter<T> : INotifyPropertyChanged
+{
+  public IComparer<T> Comparer { get; }
 }

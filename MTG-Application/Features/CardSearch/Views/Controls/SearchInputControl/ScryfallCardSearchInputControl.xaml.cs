@@ -1,27 +1,49 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Text;
-using System.Windows.Input;
+using System.Threading.Tasks;
 
 namespace MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl;
 
 public sealed partial class ScryfallCardSearchInputControl : UserControl
 {
+  public static readonly DependencyProperty SubmitCommandProperty =
+      DependencyProperty.Register(nameof(SubmitCommand), typeof(IAsyncRelayCommand<string>), typeof(ScryfallCardSearchInputControl), new PropertyMetadata(null));
+
   public ScryfallCardSearchInputControl() => InitializeComponent();
 
-  public ScryfallCardSearchControlViewModel ViewModel { get; } = new();
-
-  public ICommand? Submit { get; set; }
-
-  private void SubmitButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+  public ScryfallCardSearchInputControlViewModel ViewModel
   {
-    // Select the search box text so the user doesn't need to click the search box again to write the next search.
-    SearchTextBox.Focus(Microsoft.UI.Xaml.FocusState.Programmatic);
-    SearchTextBox.SelectAll();
+    get => field ??= new()
+    {
+      OnSubmit = (query) =>
+      {
+        SubmitCommand?.Cancel();
+        SubmitCommand?.Execute(query);
+
+        // Select the search box text so the user doesn't need to click the search box again to write the next search.
+        SearchTextBox.Focus(FocusState.Programmatic);
+        SearchTextBox.SelectAll();
+      }
+    };
+  }
+
+  public IAsyncRelayCommand<string> SubmitCommand
+  {
+    get => (IAsyncRelayCommand<string>)GetValue(SubmitCommandProperty);
+    set => SetValue(SubmitCommandProperty, value);
   }
 }
 
-public partial class ScryfallCardSearchControlViewModel : ObservableObject
+public enum GameFormat { Any, Modern, Standard, Commander }
+public enum CardUniqueness { Cards, Prints, Art }
+public enum SearchOrderDirection { Asc, Desc }
+public enum SearchOrderProperty { Released, Set, CMC, Name, Rarity, Color, Eur }
+
+public partial class ScryfallCardSearchInputControlViewModel : ObservableObject
 {
   public string SearchQuery
   {
@@ -46,10 +68,14 @@ public partial class ScryfallCardSearchControlViewModel : ObservableObject
       return sb.ToString();
     }
   }
-
   [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial string SearchText { get; set; }
   [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial GameFormat SearchGameFormat { get; set; }
   [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial CardUniqueness SearchCardUniqueness { get; set; }
   [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial SearchOrderProperty SearchOrderProperty { get; set; }
   [ObservableProperty, NotifyPropertyChangedFor(nameof(SearchQuery))] public partial SearchOrderDirection SearchOrderDirection { get; set; }
+
+  public Action<string>? OnSubmit { get; init; }
+
+  [RelayCommand]
+  private async Task Submit() => OnSubmit?.Invoke(SearchQuery);
 }

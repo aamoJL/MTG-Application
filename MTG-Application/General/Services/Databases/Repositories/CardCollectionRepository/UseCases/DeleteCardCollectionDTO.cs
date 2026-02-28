@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 
-public class DeleteCardCollectionDTO(IRepository<MTGCardCollectionDTO> repository) : UseCase<MTGCardCollectionDTO, Task<bool>>
+public class DeleteCardCollectionDTO(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<MTGCardCollectionDTO, Task<bool>>
 {
   public override async Task<bool> Execute(MTGCardCollectionDTO collection) => await repository.Delete(collection);
 

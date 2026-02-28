@@ -4,68 +4,70 @@ using MTGApplicationTests.TestUtility.Mocker;
 using static MTGApplication.General.Services.Importers.CardImporter.CardImportResult;
 
 namespace MTGApplicationTests.TestUtility.Importers;
-public class TestMTGCardImporter(Card[] expectedCards = null, int notFoundCount = 0) : IMTGCardImporter
+
+public class TestMTGCardImporter : IMTGCardImporter
 {
-  public Card[] ExpectedCards { get; set; } = expectedCards;
-  public int NotFoundCount { get; set; } = notFoundCount;
-  public Exception Exception { get; set; } = null;
-  public TimeSpan Delay { get; set; } = TimeSpan.Zero;
+  public static CardImportResult Success(Card[] cards) => new(cards, 0, cards.Length, ImportSource.External);
+  public static CardImportResult Success() => new([new(MTGCardInfoMocker.MockInfo())], 0, 1, ImportSource.External);
+  public static CardImportResult Failure() => new([], 5, 0, ImportSource.External);
+  public static CardImportResult Partial(Card[] cards) => new(cards, 5, cards.Length + 5, ImportSource.External);
 
-  public int PageSize => 40;
-  public string Name => "Test Card API";
+  public string Name => throw new NotImplementedException();
 
-  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true)
+  public CardImportResult? Result { get; set; } = null;
+  /// <summary>
+  /// <para>If set, import tasks will halt for 5 seconds, or when this source's token has been cancelled.</para>
+  /// <para>Use this to unit test cancellable commands.</para>
+  /// <para>Cancelling this token will NOT throw <see cref="OperationCanceledException"/></para>
+  /// </summary>
+  public CancellationTokenSource? CancellationTokenSource { get; init; } = null;
+
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true, CancellationToken? cancellationToken = null)
   {
-    if (Exception != null)
-      throw Exception;
+    if (CancellationTokenSource != null)
+      await WaitForCancellation(CancellationTokenSource.Token);
 
-    await Task.Delay(Delay);
+    if (Result == null) throw new NotImplementedException($"ImportCardsWithSearchQuery {nameof(Result)}");
 
-    return string.IsNullOrEmpty(searchParams)
-      ? Empty(ImportSource.External)
-      : await Task.Run(() => ExpectedCards != null
-      ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External)
-      : Empty(ImportSource.External));
+    return Result;
   }
 
-  public async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtoArray)
+  public async Task<CardImportResult> ImportWithDTOs(IEnumerable<MTGCardDTO> dtos)
   {
-    if (Exception != null)
-      throw Exception;
+    if (CancellationTokenSource != null)
+      await WaitForCancellation(CancellationTokenSource.Token);
 
-    var cards = dtoArray.Select(x => new Card(MTGCardInfoMocker.FromDTO(x), x.Count)).ToArray();
+    if (Result == null) throw new NotImplementedException($"ImportWithDTOs {nameof(Result)}");
 
-    await Task.Delay(Delay);
-
-    if (ExpectedCards == null) { return await Task.Run(() => new CardImportResult(cards, 0, cards.Length, ImportSource.External)); }
-    else
-    {
-      var found = ExpectedCards!.Where(ex => cards.FirstOrDefault(x => x.Info.ScryfallId == ex.Info.ScryfallId) != null)?.ToList() ?? [];
-      var notFoundCount = ExpectedCards!.Length - found.Count;
-
-      return await Task.Run(() => new CardImportResult([.. found], notFoundCount, found.Count, ImportSource.External));
-    }
+    return Result;
   }
 
   public async Task<CardImportResult> ImportWithString(string importText)
   {
-    if (Exception != null)
-      throw Exception;
+    if (CancellationTokenSource != null)
+      await WaitForCancellation(CancellationTokenSource.Token);
 
-    await Task.Delay(Delay);
+    if (Result == null) throw new NotImplementedException($"ImportWithString {nameof(Result)}");
 
-    return await Task.Run(() => ExpectedCards != null ? new CardImportResult(ExpectedCards, NotFoundCount, ExpectedCards!.Length, ImportSource.External) : Empty());
+    return Result;
   }
 
-  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null)
   {
-    if (Exception != null)
-      throw Exception;
+    if (CancellationTokenSource != null)
+      await WaitForCancellation(CancellationTokenSource.Token);
 
-    var cards = string.IsNullOrEmpty(pageUri) ? [] : ExpectedCards ?? [];
+    if (Result == null) throw new NotImplementedException($"ImportWithUri {nameof(Result)}");
 
-    await Task.Delay(Delay);
+    return Result;
+  }
 
-    return await Task.Run(() => new CardImportResult(cards, NotFoundCount, cards.Length, ImportSource.External));
+  private static async Task WaitForCancellation(CancellationToken token)
+  {
+    try
+    {
+      await Task.Delay(5_000, token);
+    }
+    catch (OperationCanceledException) { }
   }
 }

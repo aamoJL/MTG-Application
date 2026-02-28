@@ -2,6 +2,7 @@
 using System;
 
 namespace MTGApplication.Features.DeckTesting.Services;
+
 public static class DeckTestingCardDrag
 {
   public static DeckTestingMTGCard? Item { get; private set; }

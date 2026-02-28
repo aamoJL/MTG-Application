@@ -12,20 +12,33 @@ namespace MTGApplication.Features.DeckTesting.Views;
 
 public sealed partial class DeckTestingPage : Page, INotifyPropertyChanged
 {
-  public DeckTestingPage() => InitializeComponent();
+  public DeckTestingPage()
+  {
+    InitializeComponent();
+
+    Loaded += DeckTestingPage_Loaded;
+  }
 
   protected override void OnNavigatedTo(NavigationEventArgs e)
   {
     base.OnNavigatedTo(e);
 
     if (e.Parameter is DeckTestingDeck deck)
-    {
-      ViewModel = new DeckTestingPageViewModel(deck, App.MTGCardImporter);
+      ViewModel = new DeckTestingPageViewModel(deck);
+  }
 
-      ViewModel.NewGameStarted += OnNewGameStarted;
-      ViewModel.NewTurnStarted += OnNewTurnStarted;
-      ViewModel.StartNewGameCommand?.Execute(null);
-    }
+  private void DeckTestingPage_Loaded(object sender, RoutedEventArgs e)
+  {
+    Loaded -= DeckTestingPage_Loaded;
+
+    if (ViewModel == null)
+      return;
+
+    _ = ViewModel.RefreshTokensCommand.ExecuteAsync(null);
+
+    ViewModel.NewGameStarted += OnNewGameStarted;
+    ViewModel.NewTurnStarted += OnNewTurnStarted;
+    ViewModel.StartNewGameCommand?.Execute(null);
   }
 
   public DeckTestingPageViewModel? ViewModel { get; set; }

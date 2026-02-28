@@ -9,6 +9,7 @@ using System.Linq;
 using Windows.Foundation;
 
 namespace MTGApplication.Features.DeckTesting.Views.Controls.CardView;
+
 public sealed partial class DeckTestingBattlefieldCardView : DeckTestingCardViewBase
 {
   public enum PointerButton { None, Left, Middle }

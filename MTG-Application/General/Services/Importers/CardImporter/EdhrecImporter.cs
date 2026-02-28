@@ -1,35 +1,40 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.IOServices;
 using System;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter;
 
-public partial class EdhrecImporter
+public partial class EdhrecImporter : IEdhrecImporter
 {
   private static readonly string WEBSITE_HOST = "edhrec.com";
   private static readonly string API_URI = "https://json.edhrec.com/pages/commanders";
   private static readonly string WEBSITE_BASE_URI = "https://edhrec.com/commanders";
 
-  /// <summary>
-  /// Tries to parse a card <paramref name="name"/> from the given <paramref name="data"/>
-  /// </summary>
-  /// <param name="data">EDHREC card Uri</param>
-  /// <param name="name">Parsed card name</param>
-  /// <returns><see langword="true"/> if the <paramref name="data"/> was successfully parsed; otherwise, <see langword="false"/></returns>
-  public static bool TryParseCardNameFromEdhrecUri(string data, out string? name)
+  /// <exception cref="InvalidOperationException"></exception>
+  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
+  /// <exception cref="UriFormatException"></exception>
+  /// <exception cref="System.Text.Json.JsonException"></exception>
+  public async Task<string[]> FetchNewCardNames(string uri)
   {
-    if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == WEBSITE_HOST)
-      name = uri.Segments[^1]; // Name is the last segment of the Uri
-    else
-      name = null;
+    try
+    {
+      var jsonString = await NetworkIO.GetJsonFromUrl(uri);
+      var json = JsonNode.Parse(jsonString);
 
-    return name != null;
+      var names = json?["container"]?["json_dict"]?["cardlists"]?.AsArray()
+        .FirstOrDefault(x => x?["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
+        .Select(x => x?["name"]?.GetValue<string>())
+        .Where(x => !string.IsNullOrEmpty(x))
+        .Select(x => x!).ToArray();
+
+      return names ?? [];
+    }
+    catch { throw; }
   }
 
   public static string GetCommanderWebsiteUri(DeckEditorMTGCard commander, DeckEditorMTGCard? partner, string themeSuffix = "")
@@ -52,7 +57,7 @@ public partial class EdhrecImporter
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
   /// <exception cref="UriFormatException"></exception>
   /// <exception cref="System.Text.Json.JsonException"></exception>
-  public static async Task<CommanderTheme[]> GetThemes(string commander, string? partner = null)
+  public async Task<CommanderTheme[]> GetThemes(string commander, string? partner = null)
   {
     var uri = GetApiUri(commander, partner);
 
@@ -61,7 +66,7 @@ public partial class EdhrecImporter
 
     try
     {
-      var json = JsonNode.Parse(await NetworkService.GetJsonFromUrl(uri));
+      var json = JsonNode.Parse(await NetworkIO.GetJsonFromUrl(uri));
       var themeNodes = json?["panels"]?["taglinks"]?.AsArray();
 
       /*
@@ -85,26 +90,20 @@ public partial class EdhrecImporter
     catch { throw; }
   }
 
-  /// <exception cref="InvalidOperationException"></exception>
-  /// <exception cref="System.Net.Http.HttpRequestException"></exception>
-  /// <exception cref="UriFormatException"></exception>
-  /// <exception cref="System.Text.Json.JsonException"></exception>
-  public static async Task<string[]> FetchNewCardNames(string uri)
+  /// <summary>
+  /// Tries to parse a card <paramref name="name"/> from the given <paramref name="data"/>
+  /// </summary>
+  /// <param name="data">EDHREC card Uri</param>
+  /// <param name="name">Parsed card name</param>
+  /// <returns><see langword="true"/> if the <paramref name="data"/> was successfully parsed; otherwise, <see langword="false"/></returns>
+  public bool TryParseCardNameFromEdhrecUri(string data, out string name)
   {
-    try
-    {
-      var jsonString = await NetworkService.GetJsonFromUrl(uri);
-      var json = JsonNode.Parse(jsonString);
+    if (Uri.TryCreate(data, UriKind.Absolute, out var uri) && uri.Host == WEBSITE_HOST)
+      name = uri.Segments[^1]; // Name is the last segment of the Uri
+    else
+      name = string.Empty;
 
-      var names = json?["container"]?["json_dict"]?["cardlists"]?.AsArray()
-        .FirstOrDefault(x => x?["tag"]?.GetValue<string>() == "newcards")?["cardviews"]?.AsArray()
-        .Select(x => x?["name"]?.GetValue<string>())
-        .Where(x => !string.IsNullOrEmpty(x))
-        .Select(x => x!).ToArray();
-
-      return names ?? [];
-    }
-    catch { throw; }
+    return !string.IsNullOrEmpty(name);
   }
 
   /// <summary>
@@ -131,7 +130,4 @@ public partial class EdhrecImporter
 
     return stringBuilder.ToString();
   }
-
-  [GeneratedRegex(@"^\/")]
-  private static partial Regex GetLeadingSlash();
 }

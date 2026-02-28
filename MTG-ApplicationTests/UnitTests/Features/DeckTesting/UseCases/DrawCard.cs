@@ -2,12 +2,11 @@
 using MTGApplication.Features.DeckTesting.ViewModels;
 using MTGApplicationTests.TestUtility.Importers;
 using MTGApplicationTests.TestUtility.Mocker;
-using MTGApplicationTests.TestUtility.ViewModel.TestInterfaces;
 
 namespace MTGApplicationTests.UnitTests.Features.DeckTesting.UseCases;
 
 [TestClass]
-public class DrawCard : ICanExecuteCommandTests
+public class DrawCard
 {
   private readonly TestMTGCardImporter _importer = new();
 
@@ -18,7 +17,10 @@ public class DrawCard : ICanExecuteCommandTests
       DeckCards: [],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Clear();
 
@@ -32,7 +34,10 @@ public class DrawCard : ICanExecuteCommandTests
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -46,7 +51,10 @@ public class DrawCard : ICanExecuteCommandTests
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 
@@ -64,7 +72,10 @@ public class DrawCard : ICanExecuteCommandTests
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck)
+    {
+      Importer = _importer
+    };
 
     viewmodel.Library.Add(new DeckTestingMTGCard(MTGCardInfoMocker.MockInfo()));
 

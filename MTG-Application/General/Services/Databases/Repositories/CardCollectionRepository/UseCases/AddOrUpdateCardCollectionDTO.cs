@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.UseCases;
 
-public class AddOrUpdateCardCollectionDTO(IRepository<MTGCardCollectionDTO> repository) : UseCase<(MTGCardCollectionDTO collection, string saveName), Task<bool>>
+public class AddOrUpdateCardCollectionDTO(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<(MTGCardCollectionDTO collection, string saveName), Task<bool>>
 {
   public override async Task<bool> Execute((MTGCardCollectionDTO collection, string saveName) args)
   {

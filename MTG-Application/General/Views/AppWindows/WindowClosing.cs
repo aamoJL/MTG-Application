@@ -11,7 +11,7 @@ public class WindowClosing(XamlRoot root)
   public class ClosingEventArgs(XamlRoot root) : EventArgs
   {
     public XamlRoot Root { get; } = root;
-    public List<Func<ISavable.ConfirmArgs, Task>> Tasks { get; } = [];
+    public List<Func<SaveStatus.ConfirmArgs, Task>> Tasks { get; } = [];
   };
   public class ClosedEventArgs(XamlRoot root) : EventArgs { public XamlRoot Root { get; } = root; }
 
@@ -26,7 +26,7 @@ public class WindowClosing(XamlRoot root)
 
     Closing?.Invoke(null, closingArgs);
 
-    var savableConfirmArgs = new ISavable.ConfirmArgs();
+    var savableConfirmArgs = new SaveStatus.ConfirmArgs();
 
     foreach (var task in closingArgs.Tasks)
     {

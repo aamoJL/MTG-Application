@@ -1,6 +1,7 @@
 ﻿using MTGApplication.General.Services.Importers.CardImporter;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.EdhrecAPITests;
+
 public partial class EdhrecAPITests
 {
   [TestClass]
@@ -11,7 +12,7 @@ public partial class EdhrecAPITests
     {
       var commander = "Atraxa, Praetors' Voice";
 
-      var result = await EdhrecImporter.GetThemes(commander);
+      var result = await new EdhrecImporter().GetThemes(commander);
 
       Assert.IsGreaterThan(1, result.Length);
       Assert.IsNotNull(result.FirstOrDefault(x => x.Name == "Infect"));
@@ -22,7 +23,7 @@ public partial class EdhrecAPITests
     {
       var commander = string.Empty;
 
-      var result = await EdhrecImporter.GetThemes(commander);
+      var result = await new EdhrecImporter().GetThemes(commander);
 
       Assert.IsEmpty(result);
     }
@@ -33,8 +34,8 @@ public partial class EdhrecAPITests
       var commander = "The Tenth Doctor";
       var partner = "Rose Tyler";
 
-      var resultWithoutPartner = await EdhrecImporter.GetThemes(commander);
-      var resultWithPartner = await EdhrecImporter.GetThemes(commander, partner);
+      var resultWithoutPartner = await new EdhrecImporter().GetThemes(commander);
+      var resultWithPartner = await new EdhrecImporter().GetThemes(commander, partner);
 
       CollectionAssert.AreNotEqual(
         resultWithoutPartner.Select(x => x.Name).ToArray(),

@@ -1,5 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
-using MTGApplication.General.Models;
+﻿using MTGApplication.General.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 

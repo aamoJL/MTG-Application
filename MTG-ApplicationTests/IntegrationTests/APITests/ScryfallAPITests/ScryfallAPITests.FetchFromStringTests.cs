@@ -1,6 +1,7 @@
 ﻿using MTGApplication.General.Services.API.CardAPI;
 
 namespace MTGApplicationTests.IntegrationTests.APITests.ScryfallAPITests;
+
 public partial class ScryfallAPITests
 {
   [TestClass]

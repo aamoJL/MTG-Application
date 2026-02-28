@@ -11,8 +11,8 @@ public class TestScryfallAPI() : ScryfallAPI
 
   public async Task<CardImportResult.Card[]> GetCardsFromSampleJSON()
   {
-    var jsonNode = JsonNode.Parse(File.ReadAllText(_apiSamplePath));
+    var jsonNode = JsonNode.Parse(File.ReadAllText(_apiSamplePath)) ?? throw new InvalidOperationException("Sample json was null");
 
-    return (await GetCardsFromJsonObject(jsonNode)).ToArray();
+    return [.. (await GetCardsFromJsonObject(jsonNode))];
   }
 }

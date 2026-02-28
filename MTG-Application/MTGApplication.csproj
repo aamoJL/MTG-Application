@@ -41,7 +41,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Remove="appsettings - Template.json" />
     <None Remove="appsettings.json" />
     <None Remove="Assets\CardmarketLogoBlack3.png" />
     <None Remove="Assets\ColorIcons\B.svg" />
@@ -53,13 +52,16 @@
     <None Remove="Assets\Icon.ico" />
     <None Remove="Assets\magic_logo.png" />
     <None Remove="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml" />
-    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml" />
-    <None Remove="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml" />
-    <None Remove="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml" />
-    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
-    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardListView\AdvancedAdaptiveCardGridViewStyle.xaml" />
-    <None Remove="Features\DeckEditor\CardList\Views\Controls\CardListView\DeckEditorListViewContainer.xaml" />
-    <None Remove="Features\DeckEditor\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
+    <None Remove="Features\AppWindows\DeckBuilderWindow\Views\Controls\TabHeader.xaml" />
+    <None Remove="Features\CardCollectionEditor\Views\Controls\CollectionListContentDialog.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\CardGroupViewExpander.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\CardListView\DeckCardListItemsRepeater.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\CardView\DeckCardImageViewContainer.xaml" />
+    <None Remove="Features\DeckEditor\Views\Controls\CommanderView\CommanderTextView.xaml" />
+    <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardGroupViewGroupHeader.xaml" />
+    <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardListView\AdvancedAdaptiveCardGridViewStyle.xaml" />
+    <None Remove="Features\DeckEditor\_CardList\Views\Controls\CardListView\DeckEditorListViewContainer.xaml" />
+    <None Remove="Features\DeckEditor\Views\Charts\Views\Controls\ColorDistributionChart\ManaDistributionChart.xaml" />
     <None Remove="Features\DeckSelection\Views\Controls\DeckSelectionDeckView.xaml" />
     <None Remove="Features\DeckTesting\DeckTestingPage.xaml" />
     <None Remove="Features\DeckTesting\Views\Controls\CardView\DeckTestingBattlefieldCardView.xaml" />
@@ -92,9 +94,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings - Template.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -117,15 +116,15 @@
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-rc4.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -221,8 +220,8 @@
     <PRIResource Remove="Windows\**" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\AppWindows\DeckBuilderWindow\VIews\" />
     <Folder Include="Features\CardSearch\Views\Controls\CardView\" />
-    <Folder Include="Features\DeckEditor\Commanders\Views\Controls\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\AppWindows\CardCollectionWindow\CardCollectionPage.xaml">
@@ -235,16 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="General\Views\Styles\Templates\MTGPrintGridViewItemTemplate.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\DeckSelectionAndEditorTabViewItem.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\AppWindows\DeckBuilderWindow\Controls\TabHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -309,6 +298,23 @@
     <Resource Remove="General\Views\Dialogs\Controls\CheckBoxDialog.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="appsettings - Template.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <Page Update="Features\DeckEditor\Views\Controls\CommanderView\CommanderTextView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Features\DeckEditor\Views\Controls\CardGroupViewExpander.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Features\DeckEditor\Views\Controls\CardView\DeckCardImageViewContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Features\DeckEditor\Views\Controls\CardListView\DeckCardListItemsRepeater.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Features\DeckEditor\CardList\Views\Controls\CardListView\DeckEditorListViewContainer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -330,11 +336,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Features\DeckSelection\Views\Controls\DeckSelectionDeckView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Features\CardCollectionEditor\CardCollectionList\Views\Controls\CollectionListContentDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

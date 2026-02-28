@@ -16,9 +16,4 @@ public static class VisibilityHelpers
   /// Returns <see cref="Visibility.Visible"/>, if the <paramref name="value"/> is true
   /// </summary>
   public static Visibility BooleanToVisibility(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
-
-  /// <summary>
-  /// Returns <see cref="Visibility.Visible"/>, if the <paramref name="value"/> equals <paramref name="comparison"/>
-  /// </summary>
-  public static Visibility IntToVisibility(int value, int comparison) => value == comparison ? Visibility.Visible : Visibility.Collapsed;
 }

@@ -7,7 +7,8 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:ui="using:CommunityToolkit.WinUI"
   xmlns:api="using:MTGApplication.General.Services.API.CardAPI"
-  xmlns:local="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl"
+  xmlns:local="using:MTGApplication.Features.CardSearch.Views.Controls.SearchInputControl" 
+  d:DataContext="{d:DesignInstance Type=local:ScryfallCardSearchInputControlViewModel}"
   mc:Ignorable="d">
 
   <Grid ColumnSpacing="0" VerticalAlignment="Top">
@@ -83,9 +84,7 @@
       CornerRadius="0 4 4 0" 
       BorderThickness="0 1 1 1" 
       Height="32"
-      Click="SubmitButton_Click"
-      Command="{x:Bind Submit, Mode=OneTime}"
-      CommandParameter="{x:Bind ViewModel.SearchQuery, Mode=OneWay}">
+      Command="{x:Bind ViewModel.SubmitCommand, Mode=OneTime}">
       <Button.KeyboardAccelerators>
         <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SearchTextBox, Mode=OneTime}"/>
       </Button.KeyboardAccelerators>

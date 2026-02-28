@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter.UseCases;
 
-public class FetchTokenCards(IMTGCardImporter importer) : UseCase<IEnumerable<MTGCard>, Task<CardImportResult>>
+public class FetchTokenCards(IMTGCardImporter importer) : UseCaseFunc<IEnumerable<MTGCard>, Task<CardImportResult>>
 {
   /// /// <inheritdoc cref="FetchCardsWithImportString.Execute(string)" path="/exception"/>
   public override async Task<CardImportResult> Execute(IEnumerable<MTGCard> cards)

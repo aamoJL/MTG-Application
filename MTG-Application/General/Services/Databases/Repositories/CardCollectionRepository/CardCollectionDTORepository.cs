@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository;
+
 public class CardCollectionDTORepository(CardDbContextFactory? dbContextFactory = null) : IRepository<MTGCardCollectionDTO>
 {
   public CardDbContextFactory DbContextFactory { get; } = dbContextFactory ?? new();

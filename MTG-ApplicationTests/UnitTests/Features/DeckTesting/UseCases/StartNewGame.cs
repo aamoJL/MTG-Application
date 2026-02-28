@@ -17,7 +17,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.Library.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -35,7 +35,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.Graveyard.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -53,7 +53,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.Exile.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -71,7 +71,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.Hand.Add(new(MTGCardInfoMocker.MockInfo()));
 
@@ -89,7 +89,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: MTGCardMocker.Mock(),
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     Assert.IsEmpty(viewmodel.CommandZone);
 
@@ -105,7 +105,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: MTGCardMocker.Mock());
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     Assert.IsEmpty(viewmodel.CommandZone);
 
@@ -121,8 +121,9 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer)
+    var viewmodel = new DeckTestingPageViewModel(deck)
     {
+      Importer = _importer,
       PlayerHP = 10,
       EnemyHP = 10
     };
@@ -143,8 +144,9 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer)
+    var viewmodel = new DeckTestingPageViewModel(deck)
     {
+      Importer = _importer,
       TurnCount = 2
     };
 
@@ -163,7 +165,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 10)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.NewGameStarted += () =>
     {
@@ -182,7 +184,7 @@ public class StartNewGame
       DeckCards: [.. MTGCardMocker.Mock(count: 100)],
       Commander: null,
       Partner: null);
-    var viewmodel = new DeckTestingPageViewModel(deck, _importer);
+    var viewmodel = new DeckTestingPageViewModel(deck) { Importer = _importer };
 
     viewmodel.StartNewGameCommand.Execute(null);
 

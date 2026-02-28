@@ -1,4 +1,4 @@
-﻿using MTGApplication.Features.DeckEditor.Editor.Models;
+﻿using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplicationTests.TestUtility.Mocker;
@@ -55,9 +55,11 @@ public class MTGCardTests
     var card = new CardImportResult.Card(MTGCardInfoMocker.MockInfo());
 
     JsonExtensions.TrySerializeObject(card, out var serialized);
-    JsonExtensions.TryDeserializeJson(serialized, out DeckEditorMTGCard deserialized);
+    Assert.IsNotNull(serialized);
 
+    JsonExtensions.TryDeserializeJson(serialized, out DeckEditorMTGCard? deserialized);
     Assert.IsNotNull(deserialized);
+
     Assert.AreEqual(card.Info.Name, deserialized.Info.Name);
     Assert.AreEqual(card.Count, deserialized.Count);
   }

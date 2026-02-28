@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
-public class GetDeckDTOs(IRepository<MTGCardDeckDTO> repository) : UseCase<Task<IEnumerable<MTGCardDeckDTO>>>
+
+public class GetDeckDTOs(IRepository<MTGCardDeckDTO> repository) : UseCaseFunc<Task<IEnumerable<MTGCardDeckDTO>>>
 {
   public Action<DbSet<MTGCardDeckDTO>>? SetIncludes { get; init; }
 

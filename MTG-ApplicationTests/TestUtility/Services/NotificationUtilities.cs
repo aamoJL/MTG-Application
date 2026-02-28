@@ -4,14 +4,28 @@ namespace MTGApplicationTests.TestUtility.Services;
 
 public class NotificationException(Notification notification) : UnitTestAssertException
 {
+  public override string Message => $"Exception: {Notification.NotificationType} notification was sent.\n Message: {Notification.Message}";
   public Notification Notification { get; } = notification;
 }
 
 public class TestNotifier : Notifier
 {
-  public TestNotifier() => OnNotify = (msg) => Notified = msg;
+  public virtual Notification? Notified { get; protected set; } = null;
+  public bool ThrowOnError { get; init; } = true;
 
-  public Notification Notified { get; private set; } = null;
+  public override void Notify(Notification notification)
+  {
+    if (ThrowOnError && notification.NotificationType == NotificationType.Error)
+      throw new NotificationException(notification);
+
+    Notified = notification;
+  }
+}
+
+public class NotImplementedNotifier : TestNotifier
+{
+  public override void Notify(Notification notification)
+    => Assert.Fail($"Notifier not implemented: {notification.Message}");
 }
 
 public static class NotificationAssert
@@ -33,7 +47,7 @@ public static class NotificationAssert
   }
 
   public static void NotificationNotSent(NotificationType type, TestNotifier notifier)
-    => Assert.AreNotEqual(notifier.Notified.NotificationType, type, $"Should not have been {notifier.Notified.NotificationType}");
+    => Assert.AreNotEqual(notifier.Notified?.NotificationType, type, $"Should not have been {notifier.Notified?.NotificationType}");
 
   public static void NotificationNotSent(TestNotifier notifier)
     => Assert.IsNull(notifier.Notified, "Notification should not have been sent");

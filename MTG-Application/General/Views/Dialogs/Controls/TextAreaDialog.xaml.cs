@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 
 namespace MTGApplication.General.Views.Dialogs.Controls;
+
 public sealed partial class TextAreaDialog : StringDialog
 {
   public TextAreaDialog(string title) : base(title)

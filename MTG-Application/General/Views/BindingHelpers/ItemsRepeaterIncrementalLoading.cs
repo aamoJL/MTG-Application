@@ -108,7 +108,7 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
 
     AssociatedObject.Loaded += AssociatedObject_Loaded;
 
-    _itemsSourceOnPropertyChangedToken = RegisterPropertyChangedCallback(ItemsRepeater.ItemsSourceProperty, ItemsSourceOnPropertyChanged);
+    _itemsSourceOnPropertyChangedToken = AssociatedObject.RegisterPropertyChangedCallback(ItemsRepeater.ItemsSourceProperty, ItemsSourceOnPropertyChanged);
   }
 
   /// <inheritdoc/>

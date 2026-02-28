@@ -1,4 +1,5 @@
 ﻿using MTGApplication.General.Models;
+using System.Text.Json.Serialization;
 
 namespace MTGApplication.General.Services.Importers.CardImporter;
 
@@ -11,11 +12,13 @@ public record CardImportResult(
 {
   public enum ImportSource { Internal, External }
 
-  public record Card(MTGCardInfo Info, int Count = 1)
+  public record Card
   {
-    // TODO: change so the result is only cardinfo
-    public string Group { get; init; } = string.Empty;
-    public CardTag? CardTag { get; init; } = null;
+    [JsonConstructor]
+    public Card(MTGCardInfo Info) => this.Info = Info;
+
+    public MTGCardInfo Info { get; init; }
+    public int Count { get; init; } = 1;
   };
 
   /// <summary>
