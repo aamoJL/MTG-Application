@@ -17,9 +17,9 @@
     <!--JsonSerializerIsReflectionEnabledByDefault needs to be true, if trim mode is enabled-->
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <AssemblyVersion>1.5</AssemblyVersion>
-    <FileVersion>1.5</FileVersion>
-    <Version>1.5</Version>
+    <AssemblyVersion>1.6</AssemblyVersion>
+    <FileVersion>1.6</FileVersion>
+    <Version>1.6</Version>
     <MvvmToolkitEnableINotifyPropertyChangingSupport>false</MvvmToolkitEnableINotifyPropertyChangingSupport>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
