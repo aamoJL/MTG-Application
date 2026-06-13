@@ -11,6 +11,9 @@ public partial class CardImporterTests
   [TestClass]
   public class InternalImportTests
   {
+    [TestCleanup]
+    public async Task CleanUp() => await Task.Delay(ScryfallAPI.FETCH_LIMIT_MILLIS);
+
     [TestMethod]
     public async Task Import_Serialized_CardFound()
     {

@@ -22,13 +22,13 @@ namespace MTGApplication.General.Services.API.CardAPI;
 /// </summary>
 public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
 {
-  private readonly static string API_URL = "https://api.scryfall.com";
-  private readonly static string SET_ICON_URL = "https://svgs.scryfall.io/sets";
-  private static string CARDS_URL => $"{API_URL}/cards";
-  private static string COLLECTION_URL => $"{CARDS_URL}/collection";
-  private static readonly string NAME_HOST = "scryfall.com";
-  private static readonly string IMAGE_HOST = $"cards.scryfall.io";
-  private static readonly int FETCH_LIMIT_MILLIS = 600;
+  public static readonly string API_URL = "https://api.scryfall.com";
+  public static readonly string SET_ICON_URL = "https://svgs.scryfall.io/sets";
+  public static string CARDS_URL => $"{API_URL}/cards";
+  public static string COLLECTION_URL => $"{CARDS_URL}/collection";
+  public static readonly string NAME_HOST = "scryfall.com";
+  public static readonly string IMAGE_HOST = $"cards.scryfall.io";
+  public static readonly int FETCH_LIMIT_MILLIS = 600;
 
   public readonly static string API_REFERENCE_URL = "https://scryfall.com/docs/syntax";
 

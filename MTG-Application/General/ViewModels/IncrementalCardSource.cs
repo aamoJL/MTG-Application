@@ -21,7 +21,7 @@ public class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(),
   {
     var startIndex = pageIndex * pageSize;
 
-    if (!string.IsNullOrEmpty(NextPage) && startIndex >= Cards.Count)
+    if (!string.IsNullOrEmpty(NextPage) && startIndex + pageSize >= Cards.Count)
     {
       // Load next page
       try
