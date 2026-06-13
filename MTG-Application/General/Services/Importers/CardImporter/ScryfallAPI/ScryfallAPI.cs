@@ -28,6 +28,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
   private static string COLLECTION_URL => $"{CARDS_URL}/collection";
   private static readonly string NAME_HOST = "scryfall.com";
   private static readonly string IMAGE_HOST = $"cards.scryfall.io";
+  private static readonly int FETCH_LIMIT_MILLIS = 600;
 
   public readonly static string API_REFERENCE_URL = "https://scryfall.com/docs/syntax";
 
@@ -75,7 +76,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
         currentPage = nextPage;
       }
       catch { throw; }
-    } while (cancellationToken?.IsCancellationRequested != true && fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
+    } while (cancellationToken?.IsCancellationRequested != true && fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri) && await WaitFetchDelay(FETCH_LIMIT_MILLIS));
 
     return pageResults.Count switch
     {
@@ -161,7 +162,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
       return [];
 
     var cards = new List<CardImportResult.Card>();
-    var cardNodes = jsonNode["data"]?.AsArray() ?? new JsonArray(jsonNode);
+    var cardNodes = jsonNode["data"]?.AsArray() ?? [with(jsonNode)];
 
     foreach (var itemInfo in await Task.WhenAll(cardNodes.Select(x => Task.Run(() => GetCardInfoFromJSON(x!, paperOnly)))))
       if (itemInfo != null)
@@ -213,7 +214,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
     CardFace? backFace = null;
 
     frontFace = new CardFace(
-      colors: [.. json["colors"] != null ? GetColors(json["colors"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray())
+      colors: [.. json["colors"] != null ? GetColors([.. json["colors"]!.AsArray().Select(x => x!.GetValue<string>())])
         : GetColors(json["card_faces"]?.AsArray()[0]?["colors"]?.AsArray().Select(x => x!.GetValue<string>()).ToArray() ?? [])],
       name: json["card_faces"]?.AsArray()[0]?["name"]?.GetValue<string>() ?? json["name"]?.GetValue<string>() ?? string.Empty,
       imageUri: json["card_faces"]?.AsArray()[0]?["image_uris"]?["normal"]?.GetValue<string>() ?? json["image_uris"]?["normal"]?.GetValue<string>() ?? string.Empty,
@@ -282,38 +283,45 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
   /// <exception cref="UriFormatException"></exception>
   private async Task<CardImportResult> FetchWithIdentifiers(ScryfallIdentifier[] identifiers)
   {
-    var fetchResults = await Task.WhenAll(identifiers.Chunk(MaxFetchIdentifierCount).Select(chunk => Task.Run(async () =>
+    var chunkEnumerator = identifiers.Chunk(MaxFetchIdentifierCount).GetEnumerator();
+    var fetchResults = new List<(List<CardImportResult.Card> Found, int NotFoundCount)>();
+
+    if (chunkEnumerator.MoveNext())
     {
-      var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(chunk);
-
-      var fetchedCards = new List<CardImportResult.Card>();
-      var notFoundCount = 0;
-
-      try
+      do
       {
-        // Fetch and covert the JSON to card objects
-        if (JsonNode.Parse(await NetworkIO.PostJsonFromUrl(COLLECTION_URL, identifiersJson)) is JsonNode rootNode)
+        var chunk = chunkEnumerator.Current;
+        var result = await Task.Run(async () =>
         {
-          notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
+          var identifiersJson = new ScryfallIdentifiersToJsonConverter().Execute(chunk);
+          var fetchedCards = new List<CardImportResult.Card>();
+          var notFoundCount = 0;
 
-          if (rootNode?["data"]?.AsArray() is JsonArray dataArray)
+          // Fetch and covert the JSON to card objects
+          if (JsonNode.Parse(await NetworkIO.PostJsonFromUrl(COLLECTION_URL, identifiersJson)) is JsonNode rootNode)
           {
-            foreach (var item in dataArray)
-            {
-              if (item != null && GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
-              {
-                var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo)) ?? new();
+            notFoundCount += rootNode?["not_found"]?.AsArray().Count ?? 0;
 
-                fetchedCards.Add(new(Info: cardInfo) { Count = identifier.CardCount });
+            if (rootNode?["data"]?.AsArray() is JsonArray dataArray)
+            {
+              foreach (var item in dataArray)
+              {
+                if (item != null && GetCardInfoFromJSON(item) is MTGCardInfo cardInfo)
+                {
+                  var identifier = chunk.FirstOrDefault(x => x.Compare(cardInfo)) ?? new();
+
+                  fetchedCards.Add(new(Info: cardInfo) { Count = identifier.CardCount });
+                }
               }
             }
           }
-        }
 
-        return (Found: fetchedCards, NotFoundCount: notFoundCount);
-      }
-      catch { throw; }
-    })));
+          return (Found: fetchedCards, NotFoundCount: notFoundCount);
+        });
+
+        fetchResults.AddRange(result);
+      } while (chunkEnumerator.MoveNext() && await WaitFetchDelay(FETCH_LIMIT_MILLIS));
+    }
 
     var found = fetchResults.SelectMany(x => x.Found).ToArray();
     var notFoundCount = fetchResults.Sum(x => x.NotFoundCount);
@@ -350,5 +358,11 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
     name = result ?? string.Empty;
 
     return result != null;
+  }
+
+  private static async Task<bool> WaitFetchDelay(int delay)
+  {
+    await Task.Delay(delay);
+    return true;
   }
 }
