@@ -52,7 +52,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     return Result;
   }
 
-  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null, int rateLimit = 500)
   {
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);

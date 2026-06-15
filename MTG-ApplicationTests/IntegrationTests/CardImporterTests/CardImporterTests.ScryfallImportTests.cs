@@ -9,9 +9,6 @@ public partial class CardImporterTests
   [TestClass]
   public class ScryfallImportTests
   {
-    [TestCleanup]
-    public async Task CleanUp() => await Task.Delay(ScryfallAPI.FETCH_LIMIT_MILLIS);
-
     [TestMethod]
     public async Task Import_WithValidIds_CardsFound()
     {
@@ -27,8 +24,7 @@ public partial class CardImporterTests
       var result = await importer.Execute(idListString);
 
       Assert.AreEqual(CardImportResult.ImportSource.External, result.Source);
-      Assert.AreEqual(idListString, string.Join(Environment.NewLine,
-        result.Found.Select(x => x.Info.ScryfallId)));
+      CollectionAssert.AreEquivalent(idListString.Split(Environment.NewLine), result.Found.Select(x => x.Info.ScryfallId.ToString()).ToArray());
     }
 
     [TestMethod]

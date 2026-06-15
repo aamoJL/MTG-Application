@@ -7,9 +7,6 @@ public partial class ScryfallAPITests
   [TestClass]
   public class FetchCardsWithSearchQueryTests
   {
-    [TestCleanup]
-    public async Task CleanUp() => await Task.Delay(ScryfallAPI.FETCH_LIMIT_MILLIS);
-
     [TestMethod]
     public async Task Fetch_WithEmptyQuery_NoCardsFound()
     {

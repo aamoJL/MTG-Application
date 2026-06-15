@@ -22,7 +22,7 @@ public partial interface ICardImporter
   /// Fetches cards from the given <paramref name="pageUri"/>
   /// </summary>
   /// <param name="paperOnly">Fetches only cards that are printed on paper</param>
-  public Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null);
+  public Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null, int rateLimit = 500);
 
   /// <summary>
   /// Fetch cards from the API using formatted text.
