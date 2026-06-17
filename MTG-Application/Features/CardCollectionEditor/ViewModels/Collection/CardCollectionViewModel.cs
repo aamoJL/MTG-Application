@@ -87,11 +87,8 @@ public partial class CardCollectionViewModel : ViewModelBase
 
       var saveName = await Confirmers.ConfirmCollectionSave(Confirmations.GetSaveCollectionConfirmation(oldName));
 
-      if (saveName == null)
-        return;
-
-      if (saveName == string.Empty)
-        throw new InvalidOperationException("Invalid name");
+      if (saveName == null) return;
+      if (saveName == string.Empty) throw new InvalidOperationException("Invalid name");
 
       // Override confirmation
       if (saveName != oldName && await new CardCollectionDTOExists(Repository).Execute(saveName))
@@ -155,7 +152,9 @@ public partial class CardCollectionViewModel : ViewModelBase
     {
       if (await Confirmers.ConfirmAddNewList(Confirmations.GetNewCollectionListConfirmation())
         is not (string name, string query))
+      {
         return; // Cancel
+      }
 
       if (string.IsNullOrEmpty(name)) throw new(Notifications.NewListNameError.Message);
       if (string.IsNullOrEmpty(query)) throw new(Notifications.NewListQueryError.Message);
@@ -179,6 +178,8 @@ public partial class CardCollectionViewModel : ViewModelBase
   [RelayCommand]
   private async Task ChangeList(CardCollectionListViewModel? list)
   {
+    if (list == ListViewModel) return;
+
     ListViewModel = list;
 
     if (ListViewModel != null)
@@ -211,18 +212,13 @@ public partial class CardCollectionViewModel : ViewModelBase
 
   private void Model_CollectionLists_CollectionChanged(object? _, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
   {
-    if (e.NewItems?.OfType<MTGCardCollectionList>() is var newLists && newLists != null)
+    foreach (var item in e.AddedItems<MTGCardCollectionList>())
+      CollectionListViewModels.Add(CreateListViewModel(item));
+
+    foreach (var item in e.RemovedItems<MTGCardCollectionList>())
     {
-      foreach (var item in newLists)
-        CollectionListViewModels.Add(CreateListViewModel(item));
-    }
-    if (e.OldItems?.OfType<MTGCardCollectionList>() is var oldLists && oldLists != null)
-    {
-      foreach (var item in oldLists)
-      {
-        if (CollectionListViewModels.TryFindIndex(x => x.Name == item.Name, out var index))
-          CollectionListViewModels.RemoveAt(index);
-      }
+      if (CollectionListViewModels.TryFindIndex(x => x.Name == item.Name, out var index))
+        CollectionListViewModels.RemoveAt(index);
     }
 
     SaveStatus.HasUnsavedChanges = true;
@@ -237,7 +233,7 @@ public partial class CardCollectionViewModel : ViewModelBase
     Notifier = Notifier,
     Confirmers = Confirmers.CollectionListConfirmers,
     NetworkService = NetworkService,
-    NameValidator = (name) => Model.CollectionLists.Select(x => x.Name).Contains(name),
+    NameValidator = (name) => !Model.CollectionLists.Select(x => x.Name).Contains(name),
     OnDelete = OnListDelete
   };
 }

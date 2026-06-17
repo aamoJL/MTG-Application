@@ -1,8 +1,6 @@
 ﻿using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.Features.CardCollectionEditor.Models.Converters;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
-using MTGApplication.General.Services.Importers.CardImporter;
-using MTGApplicationTests.TestUtility.Importers;
 
 namespace MTGApplicationTests.UnitTests.Features.CardCollectionEditor.Models.Converters;
 
@@ -16,10 +14,7 @@ public class DTOToCardCollectionConverterTests
       new MTGCardCollectionListDTO(name: "List", searchQuery: string.Empty, cards: [])
       ]);
 
-    var actual = await new DTOToCardCollectionConverter(new TestMTGCardImporter()
-    {
-      Result = CardImportResult.Empty()
-    }).Convert(dto);
+    var actual = await new DTOToCardCollectionConverter().Convert(dto);
     var expected = new MTGCardCollection()
     {
       CollectionLists = [new MTGCardCollectionList() { Name = "List" }],

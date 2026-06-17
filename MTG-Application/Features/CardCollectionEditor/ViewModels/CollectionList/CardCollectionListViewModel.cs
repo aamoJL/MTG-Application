@@ -5,6 +5,7 @@ using MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionCard;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Exporters;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.IOServices;
@@ -42,7 +43,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
 
   public string Name => Model.Name;
   public string Query => Model.SearchQuery;
-  public ReadOnlyObservableCollection<MTGCard> Cards => field ??= new(Model.Cards);
+  public ReadOnlyObservableCollection<MTGCardDTO> Cards => field ??= new(Model.Cards);
   public IncrementalLoadingCardCollection<CardCollectionMTGCardViewModel> QueryCards
   {
     get => field ??= QueryCards = CreateQueryCollection([], string.Empty, 0);
@@ -91,12 +92,13 @@ public partial class CardCollectionListViewModel : ViewModelBase
       {
         if (newQuery != Query)
         {
+
           // Fetch new query cards and remove cards that are not in the new query
           //  from the owned cards if the user accepts the conflict
-          var found = (await new FetchCardsWithQuery(Importer).Execute(Query)).Found;
+          var found = (await new FetchCardsWithQuery(Importer).Execute(newQuery)).Found;
 
           var excludedCards = Cards
-            .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.Info.ScryfallId)
+            .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.ScryfallId)
             .ToList();
 
           if (excludedCards.Count != 0 && await Confirmers.ConfirmEditQueryConflict(Confirmations.GetEditCollectionListQueryConflictConfirmation(excludedCards.Count))
@@ -107,9 +109,12 @@ public partial class CardCollectionListViewModel : ViewModelBase
 
           foreach (var item in excludedCards)
             Model.Cards.Remove(item);
+
+          Model.SearchQuery = newQuery;
+
+          await Refresh();
         }
 
-        Model.SearchQuery = newQuery;
         Model.Name = newName;
 
         new ShowNotification(Notifier).Execute(Notifications.EditListSuccess);
@@ -160,10 +165,10 @@ public partial class CardCollectionListViewModel : ViewModelBase
         if (importTask.IsFaulted) throw importTask.Exception;
         if (queryTask.IsFaulted) throw queryTask.Exception;
 
-        var addedCards = importTask.Result.Found.Select(f => new MTGCard(f.Info))
-          .IntersectBy(queryTask.Result.Found.Select(c => c.Info.ScryfallId), vm => vm.Info.ScryfallId)
-          .ExceptBy(Cards.Select(o => o.Info.ScryfallId), f => f.Info.ScryfallId)
-          .DistinctBy(x => x.Info.ScryfallId)
+        var addedCards = importTask.Result.Found.Select(f => new MTGCardDTO(f.Info))
+          .IntersectBy(queryTask.Result.Found.Select(c => c.Info.ScryfallId), vm => vm.ScryfallId)
+          .ExceptBy(Cards.Select(o => o.ScryfallId), f => f.ScryfallId)
+          .DistinctBy(x => x.ScryfallId)
           .ToList();
 
         return (importTask.Result, addedCards);
@@ -191,7 +196,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
   {
     try
     {
-      var exportString = string.Join(Environment.NewLine, Cards.Select(x => x.Info.ScryfallId));
+      var exportString = string.Join(Environment.NewLine, Cards.Select(x => x.ScryfallId));
 
       if (await Confirmers.ConfirmCardExport(Confirmations.GetExportCardsConfirmation(exportString))
         is not string response || string.IsNullOrEmpty(response))
@@ -276,9 +281,9 @@ public partial class CardCollectionListViewModel : ViewModelBase
 
     if (e.PropertyName == nameof(CardCollectionMTGCardViewModel.IsOwned))
     {
-      if (card.IsOwned && Cards.FirstOrDefault(x => x.Info.ScryfallId == card.Info.ScryfallId) == null)
+      if (card.IsOwned && Cards.FirstOrDefault(x => x.ScryfallId == card.Info.ScryfallId) == null)
         Model.Cards.Add(new(card.Info));
-      else if (!card.IsOwned && Model.Cards.TryFindIndex(x => x.Info.ScryfallId == card.Info.ScryfallId, out var index))
+      else if (!card.IsOwned && Model.Cards.TryFindIndex(x => x.ScryfallId == card.Info.ScryfallId, out var index))
         Model.Cards.RemoveAt(index);
     }
   }
@@ -290,6 +295,6 @@ public partial class CardCollectionListViewModel : ViewModelBase
     Importer = Importer,
     Notifier = Notifier,
     NetworkService = NetworkService,
-    IsOwned = Cards.FirstOrDefault(x => x.Info.ScryfallId == model.Info.ScryfallId) != null,
+    IsOwned = Cards.FirstOrDefault(x => x.ScryfallId == model.Info.ScryfallId) != null,
   };
 }

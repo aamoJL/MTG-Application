@@ -17,9 +17,9 @@ public class FetchLimiter
     var deltaMillis = (stamp - lastStamp).TotalMilliseconds;
     var remainingMillis = Math.Max(0, limitMillis - deltaMillis);
 
-    lastStamp = stamp.AddMilliseconds(remainingMillis);
-
     await Task.Delay((int)remainingMillis);
+
+    lastStamp = DateTime.Now;
 
     semaphore.Release();
   }

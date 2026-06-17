@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.CardCollectionEditor.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplicationTests.TestUtility.Importers;
@@ -124,9 +125,10 @@ public class ImportCards
   [TestMethod]
   public async Task Import_Success_NewCardsAdded()
   {
+    var cards = MTGCardMocker.Mock(5);
     var model = new MTGCardCollectionList()
     {
-      Cards = [.. MTGCardMocker.Mock(5)]
+      Cards = [.. cards.Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
@@ -135,7 +137,7 @@ public class ImportCards
       {
         Result = TestMTGCardImporter.Success([
           new(MTGCardInfoMocker.MockInfo()),
-          .. model.Cards.Take(2).Select(x => new CardImportResult.Card(x.Info))
+          .. cards.Take(2).Select(x => new CardImportResult.Card(x.Info))
           ])
       },
       CollectionListConfirmers = new()

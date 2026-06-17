@@ -1,6 +1,4 @@
 ﻿using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
-using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
-using System.Linq;
 
 namespace MTGApplication.Features.CardCollectionEditor.Models.Converters;
 
@@ -11,6 +9,6 @@ public class CollectionListToDTOConverter
     return new MTGCardCollectionListDTO(
       name: list.Name,
       searchQuery: list.SearchQuery,
-      cards: [.. list.Cards.Select(x => new MTGCardDTO(x.Info))]);
+      cards: [.. list.Cards]);
   }
 }

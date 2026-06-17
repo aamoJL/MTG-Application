@@ -17,7 +17,7 @@ public class CollectionListToDTOConverterTests
     {
       Name = "List",
       SearchQuery = "Query",
-      Cards = [.. cards]
+      Cards = [.. cards.Select(x => new MTGCardDTO(x.Info))]
     };
 
     var actual = CollectionListToDTOConverter.Convert(list);

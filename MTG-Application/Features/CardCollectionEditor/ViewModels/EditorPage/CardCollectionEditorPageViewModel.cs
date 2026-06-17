@@ -82,7 +82,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
         return; // Cancel
       }
 
-      if ((await Worker.DoWork(new FetchCardCollection(Repository, Importer).Execute(loadName))) is MTGCardCollection loadedCollection)
+      if ((await Worker.DoWork(new FetchCardCollection(Repository).Execute(loadName))) is MTGCardCollection loadedCollection)
       {
         await ChangeCollection(loadedCollection);
 

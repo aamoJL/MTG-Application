@@ -1,4 +1,5 @@
 ﻿using MTGApplication.Features.CardCollectionEditor.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplicationTests.TestUtility.Mocker;
 using MTGApplicationTests.TestUtility.Services;
@@ -41,7 +42,7 @@ public class ExportCards
   {
     var model = new MTGCardCollectionList()
     {
-      Cards = [.. MTGCardMocker.Mock(5)]
+      Cards = [.. MTGCardMocker.Mock(5).Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
@@ -65,7 +66,7 @@ public class ExportCards
   {
     var model = new MTGCardCollectionList()
     {
-      Cards = [.. MTGCardMocker.Mock(5)]
+      Cards = [.. MTGCardMocker.Mock(5).Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
@@ -89,7 +90,7 @@ public class ExportCards
   {
     var model = new MTGCardCollectionList()
     {
-      Cards = [.. MTGCardMocker.Mock(5)]
+      Cards = [.. MTGCardMocker.Mock(5).Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
@@ -115,7 +116,7 @@ public class ExportCards
   {
     var model = new MTGCardCollectionList()
     {
-      Cards = [.. MTGCardMocker.Mock(5)]
+      Cards = [.. MTGCardMocker.Mock(5).Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
@@ -138,7 +139,7 @@ public class ExportCards
   {
     var model = new MTGCardCollectionList()
     {
-      Cards = [.. MTGCardMocker.Mock(5)]
+      Cards = [.. MTGCardMocker.Mock(5).Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {

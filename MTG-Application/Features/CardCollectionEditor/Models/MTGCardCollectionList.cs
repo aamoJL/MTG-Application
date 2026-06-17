@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MTGApplication.General.Models;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using System.Collections.ObjectModel;
 
 namespace MTGApplication.Features.CardCollectionEditor.Models;
@@ -12,5 +12,5 @@ public partial class MTGCardCollectionList : ObservableObject
   [ObservableProperty] public partial string Name { get; set; } = string.Empty;
   [ObservableProperty] public partial string SearchQuery { get; set; } = string.Empty;
 
-  public ObservableCollection<MTGCard> Cards { get; set; } = [];
+  public ObservableCollection<MTGCardDTO> Cards { get; set; } = [];
 }

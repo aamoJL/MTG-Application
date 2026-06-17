@@ -9,11 +9,11 @@ public partial class CardCollectionListViewModel
   public static class Notifications
   {
     public static Notification EditListSuccess => new(NotificationType.Success, "The list was changed successfully.");
-    public static Notification EditListNameError => new(NotificationType.Error, "Error. Name can't be empty.");
-    public static Notification EditListQueryError => new(NotificationType.Error, "Error. Search query can't be empty.");
-    public static Notification EditListExistsError => new(NotificationType.Error, "Error. List already exists in the collection.");
+    public static Notification EditListNameError => new(NotificationType.Error, "Name can't be empty.");
+    public static Notification EditListQueryError => new(NotificationType.Error, "Search query can't be empty.");
+    public static Notification EditListExistsError => new(NotificationType.Error, "List already exists in the collection.");
 
-    public static Notification DeleteListError => new(NotificationType.Error, "Error. Could not delete list.");
+    public static Notification DeleteListError => new(NotificationType.Error, "Could not delete list.");
 
     public static Notification ImportCardsSuccessOrWarning(int added, int skipped, int notFound)
     {
@@ -27,6 +27,6 @@ public partial class CardCollectionListViewModel
 
       return new(notificationType, string.Join(Environment.NewLine, messages));
     }
-    public static Notification ImportCardsError => new(NotificationType.Error, $"Error. No cards were imported.");
+    public static Notification ImportCardsError => new(NotificationType.Error, $"No cards were imported.");
   }
 }

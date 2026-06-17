@@ -1,7 +1,6 @@
 ﻿using MTGApplication.Features.CardCollectionEditor.UseCases;
 using MTGApplication.General.Services.Databases.Repositories.CardCollectionRepository.Models;
 using MTGApplicationTests.TestUtility.Database;
-using MTGApplicationTests.TestUtility.Importers;
 
 namespace MTGApplicationTests.UnitTests.Features.CardCollectionEditor.UseCases;
 
@@ -15,9 +14,7 @@ public class FetchCardCollectionTests
       repository: new TestRepository<MTGCardCollectionDTO>()
       {
         GetResult = async (_) => await Task.FromResult<MTGCardCollectionDTO>(new("Collection", []))
-      },
-      importer: new TestMTGCardImporter()
-      ).Execute("Name");
+      }).Execute("Name");
     var expected = "Collection";
 
     Assert.AreEqual(expected, actual.Name);
@@ -30,8 +27,6 @@ public class FetchCardCollectionTests
       repository: new TestRepository<MTGCardCollectionDTO>()
       {
         GetResult = async (_) => await Task.FromResult<MTGCardCollectionDTO?>(null)
-      },
-      importer: new TestMTGCardImporter()
-      ).Execute("Name"));
+      }).Execute("Name"));
   }
 }

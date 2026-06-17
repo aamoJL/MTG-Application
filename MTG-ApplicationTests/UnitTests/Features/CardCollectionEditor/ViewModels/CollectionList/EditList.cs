@@ -1,5 +1,6 @@
 ﻿using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.General.Services.ConfirmationService;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.NotificationService;
 using MTGApplicationTests.TestUtility.Importers;
@@ -187,7 +188,7 @@ public class EditList
     var model = new MTGCardCollectionList()
     {
       Name = "Name",
-      Cards = [.. cards]
+      Cards = [.. cards.Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
@@ -216,7 +217,7 @@ public class EditList
     var model = new MTGCardCollectionList()
     {
       Name = "Name",
-      Cards = [.. cards]
+      Cards = [.. cards.Select(x => new MTGCardDTO(x.Info))]
     };
     var factory = new TestCollectionListViewModelFactory()
     {
