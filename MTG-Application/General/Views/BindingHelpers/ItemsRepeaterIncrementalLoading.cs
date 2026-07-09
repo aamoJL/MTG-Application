@@ -8,9 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.Xaml.Interactivity;
 using System;
-using System.Collections;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MTGApplication.General.Views.BindingHelpers;
@@ -116,12 +114,9 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
   {
     AssociatedObject.UnregisterPropertyChangedCallback(ItemsRepeater.ItemsSourceProperty, _itemsSourceOnPropertyChangedToken);
 
-    if (_lastObservableCollection is not null)
-      _lastObservableCollection.CollectionChanged -= TryRaiseLoadMoreRequested;
-    if (ItemsRepeater is not null)
-      ItemsRepeater.SizeChanged -= TryRaiseLoadMoreRequested;
-    if (ScrollViewer is not null)
-      ScrollViewer.ViewChanged -= TryRaiseLoadMoreRequested;
+    _lastObservableCollection?.CollectionChanged -= TryRaiseLoadMoreRequested;
+    ItemsRepeater?.SizeChanged -= TryRaiseLoadMoreRequested;
+    ScrollViewer?.ViewChanged -= TryRaiseLoadMoreRequested;
   }
 
   private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
@@ -131,9 +126,7 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
     if (ScrollViewer != null)
     {
       ScrollViewer.ViewChanged += TryRaiseLoadMoreRequested;
-
-      if (ItemsRepeater is not null)
-        ItemsRepeater.SizeChanged += TryRaiseLoadMoreRequested;
+      ItemsRepeater?.SizeChanged += TryRaiseLoadMoreRequested;
     }
   }
 
@@ -148,11 +141,10 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
     {
       if (sil is INotifyCollectionChanged ncc)
       {
-        if (_lastObservableCollection is not null)
-          _lastObservableCollection.CollectionChanged -= TryRaiseLoadMoreRequested;
+        _lastObservableCollection?.CollectionChanged -= TryRaiseLoadMoreRequested;
 
         _lastObservableCollection = ncc;
-        ncc.CollectionChanged += TryRaiseLoadMoreRequested;
+        _lastObservableCollection?.CollectionChanged += TryRaiseLoadMoreRequested;
       }
 
       // On the first load, the `ScrollViewer` is not yet initialized.
@@ -190,42 +182,16 @@ public class ItemsRepeaterIncrementalLoading : Behavior<ItemsRepeater>
       {
         IsLoadingMore = true;
 
-        var before = GetItemsCount();
-
         if (LoadMoreRequested is not null && await LoadMoreRequested(AssociatedObject, EventArgs.Empty))
-        {
-          var after = GetItemsCount();
-
-          // This can be set to the count of items in a row,
-          // so that it can continue to load even if the count of items loaded is too small.
-          // Generally, 20 items will be loaded at a time,
-          // and the count of items in a row is usually less than 10, so it is set to 10 here.
-          if (before + 10 <= after)
-            loadMore = false;
-        }
+          ScrollViewer.UpdateLayout(); // updates scrollviewer size
         else
-          // No more items or ItemsSource is null
           loadMore = false;
 
         IsLoadingMore = false;
       }
       else
-      {
-        // There is no need to continue loading if it fills up the view
         loadMore = false;
-      }
     }
-  }
-
-  private int GetItemsCount()
-  {
-    return AssociatedObject?.ItemsSource switch
-    {
-      ICollection list => list.Count,
-      IEnumerable enumerable => enumerable.Cast<object>().Count(),
-      null => 0,
-      _ => throw new ArgumentOutOfRangeException(nameof(AssociatedObject.ItemsSource))
-    };
   }
 }
 

@@ -5,7 +5,7 @@ namespace MTGApplication.General.ViewModels;
 
 public partial class IncrementalLoadingCardCollection<TCard>(IncrementalCardSource<TCard> source) : ObservableObject
 {
-  public IncrementalLoadingCollection<IncrementalCardSource<TCard>, TCard> Collection { get; private set; } = new(source: source);
+  public IncrementalLoadingCollection<IncrementalCardSource<TCard>, TCard> Collection { get; private set; } = new(source: source, itemsPerPage: 60);
 
   [ObservableProperty] public partial int TotalCardCount { get; set; }
 }
