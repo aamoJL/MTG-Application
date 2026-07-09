@@ -15,7 +15,8 @@ public class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(),
   public string NextPage { get; set; } = string.Empty;
   public required Func<CardImportResult.Card, TCard> Converter { private get; init; }
 
-  public Action<Exception> OnError { get; set; } = (_) => { };
+  public Action<Task>? OnLoading { get; set; }
+  public Action<Exception>? OnError { get; set; }
 
   public async Task<IEnumerable<TCard>> GetPagedItemsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
   {
@@ -26,7 +27,11 @@ public class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(),
       // Load next page
       try
       {
-        var result = await Importer.ImportWithUri(NextPage);
+        var task = Importer.ImportWithUri(NextPage);
+
+        OnLoading?.Invoke(task);
+
+        var result = await task;
         NextPage = result.NextPageUri;
         Cards.AddRange(result.Found.Select(Converter));
       }

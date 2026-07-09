@@ -5,8 +5,6 @@ namespace MTGApplicationTests.UnitTests.General.Services.Importers;
 [TestClass]
 public class FetchLimiterTests
 {
-  public TestContext TestContext { get; set; }
-
   [TestMethod]
   public async Task Limit()
   {
@@ -16,10 +14,10 @@ public class FetchLimiterTests
 
     var tasks = new Task[]
     {
-      limiter.Wait(limit), // = 1
-      limiter.Wait(limit * 2), // = 3
-      limiter.Wait(limit), // = 4
-      limiter.Wait(limit * 2), // = 6
+      limiter.Wait(limit), // first does not have to wait, if last fetch stamp is over the limit
+      limiter.Wait(limit * 2), // = 2
+      limiter.Wait(limit), // = 3
+      limiter.Wait(limit * 2), // = 5
     };
 
     await Task.WhenAll(tasks);
@@ -27,6 +25,6 @@ public class FetchLimiterTests
     var stop = DateTime.Now;
     var deltaMillis = (stop - start).TotalMilliseconds;
 
-    Assert.IsGreaterThanOrEqualTo(6 * limit, deltaMillis);
+    Assert.IsGreaterThanOrEqualTo(5 * limit, deltaMillis);
   }
 }

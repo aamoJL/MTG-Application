@@ -69,6 +69,7 @@ public partial class CardSearchPageViewModel : ViewModelBase
       Cards = [.. cards],
       NextPage = nextPage,
       Converter = (item) => CreateCardViewModel(new(item.Info)),
+      OnLoading = (task) => _ = Worker.DoWork(task),
       OnError = (e) => new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message)),
     };
 
