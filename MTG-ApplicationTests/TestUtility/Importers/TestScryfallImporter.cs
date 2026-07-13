@@ -20,4 +20,30 @@ public class TestScryfallImporter : IScryfallImporter
 
     return Result;
   }
+
+  public bool TryParseCardIdFromUri(string data, out Guid id)
+  {
+    Guid? result = (Uri.TryCreate(data, UriKind.Absolute, out var uri)
+      && uri.Host == "cards.scryfall.io"
+      && uri.Segments.LastOrDefault() is string imageFileName
+      && Path.GetFileNameWithoutExtension(imageFileName) is string idString
+      && Guid.TryParse(idString, out var parsedId))
+      ? parsedId : null;
+
+    id = result != null ? (Guid)result : default;
+
+    return result != null;
+  }
+
+  public bool TryParseCardNameFromUri(string data, out string name)
+  {
+    var result = (Uri.TryCreate(data, UriKind.Absolute, out var uri)
+      && uri.Host == "scryfall.com"
+      && uri.Segments.LastOrDefault() is string parsedName)
+      ? parsedName.Replace('-', ' ') : null;
+
+    name = result ?? string.Empty;
+
+    return result != null;
+  }
 }

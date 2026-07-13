@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.Features.DeckSelection.Models;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.UseCases;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,8 @@ namespace MTGApplication.Features.DeckSelection.UseCases;
 
 public class FetchDecks(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter importer) : UseCaseFunc<Task<IEnumerable<DeckSelectionDeck>>>
 {
+  public IMemoryCache? Cache { get; init; } = null;
+
   /// <exception cref="Exception"></exception>
   public override async Task<IEnumerable<DeckSelectionDeck>> Execute()
   {
@@ -26,14 +30,14 @@ public class FetchDecks(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter
         set.Include(x => x.Commander).Load();
         set.Include(x => x.CommanderPartner).Load();
       },
-    }.Execute()) ?? throw new Exception("Error: Could not get decks.");
+    }.Execute()) ?? throw new Exception("Could not get decks.");
 
     var commanderDTOs = new List<MTGCardDTO>([
       .. deckDTOs.Where(x => x.Commander != null).Select(x => x.Commander!),
       .. deckDTOs.Where(x => x.CommanderPartner != null).Select(x => x.CommanderPartner!)
       ]);
 
-    var commanders = (await importer.ImportWithDTOs(commanderDTOs)).Found;
+    var commanders = await GetCommanders(commanderDTOs);
 
     return deckDTOs
       .Select(dto => GetDeck(dto, commanders))
@@ -64,5 +68,28 @@ public class FetchDecks(IRepository<MTGCardDeckDTO> repository, IMTGCardImporter
       ImageUri = imageUri,
       Colors = [.. colors.Distinct()],
     };
+  }
+
+  private async Task<CardImportResult.Card[]> GetCommanders(IEnumerable<MTGCardDTO> dtos)
+  {
+    try
+    {
+      if (Cache != null)
+        return [.. dtos.Select(x => Cache.Get<CardImportResult.Card>(x.ScryfallId) ?? throw new KeyNotFoundException())];
+    }
+    catch
+    {
+      (Cache as MemoryCache)?.Clear();
+    }
+
+    var result = (await new FetchCardsWithDTOs(importer).Execute(dtos)).Found;
+
+    if (Cache != null)
+    {
+      foreach (var item in result)
+        Cache.Set(item.Info.ScryfallId, item);
+    }
+
+    return result;
   }
 }

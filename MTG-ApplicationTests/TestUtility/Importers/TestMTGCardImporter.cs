@@ -22,7 +22,7 @@ public class TestMTGCardImporter : IMTGCardImporter
   /// </summary>
   public CancellationTokenSource? CancellationTokenSource { get; init; } = null;
 
-  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true, CancellationToken? cancellationToken = null)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams)
   {
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);
@@ -52,7 +52,7 @@ public class TestMTGCardImporter : IMTGCardImporter
     return Result;
   }
 
-  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null, int rateLimit = 500)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, int rateLimit = 500)
   {
     if (CancellationTokenSource != null)
       await WaitForCancellation(CancellationTokenSource.Token);

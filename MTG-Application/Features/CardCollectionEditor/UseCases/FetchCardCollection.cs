@@ -11,11 +11,9 @@ namespace MTGApplication.Features.CardCollectionEditor.UseCases;
 
 public class FetchCardCollection(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<string, Task<MTGCardCollection>>
 {
-  public IRepository<MTGCardCollectionDTO> Repository { get; } = repository;
-
   public override async Task<MTGCardCollection> Execute(string name)
   {
-    return await new GetCardCollectionDTO(Repository).Execute(name) is MTGCardCollectionDTO dto
+    return await new GetCardCollectionDTO(repository).Execute(name) is MTGCardCollectionDTO dto
           ? await new DTOToCardCollectionConverter().Convert(dto)
           : throw new KeyNotFoundException();
   }

@@ -1,4 +1,5 @@
-﻿using MTGApplication.Features.DeckEditor.Models;
+﻿using Microsoft.Extensions.Caching.Memory;
+using MTGApplication.Features.DeckEditor.Models;
 using MTGApplication.Features.DeckEditor.Models.Converters;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
@@ -10,6 +11,8 @@ namespace MTGApplication.Features.DeckEditor.UseCases;
 
 public class SaveDeck(IRepository<MTGCardDeckDTO> repository) : UseCaseFunc<DeckEditorMTGDeck, string, bool, Task<bool>>
 {
+  public IMemoryCache? Cache { get; init; } = null;
+
   public override async Task<bool> Execute(DeckEditorMTGDeck deck, string name, bool overrideOld)
   {
     var dto = DeckEditorMTGDeckToDTOConverter.Convert(deck);
@@ -23,6 +26,9 @@ public class SaveDeck(IRepository<MTGCardDeckDTO> repository) : UseCaseFunc<Deck
 
     if (!string.IsNullOrEmpty(oldName) && oldName != name && await new DeckDTOExists(repository).Execute(oldName))
       await new DeleteDeckDTO(repository).Execute(oldName); // Delete old deck if it was renamed
+
+    Cache?.Remove(oldName);
+    Cache?.Remove(name);
 
     return true;
   }

@@ -23,4 +23,9 @@ public static partial class StringExtensions
 
     return value;
   }
+
+  extension(string)
+  {
+    public static char Space => ' ';
+  }
 }

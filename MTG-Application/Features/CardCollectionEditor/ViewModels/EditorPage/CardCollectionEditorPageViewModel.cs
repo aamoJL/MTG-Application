@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.Features.CardCollectionEditor.UseCases;
 using MTGApplication.Features.CardCollectionEditor.ViewModels.Collection;
@@ -26,6 +27,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
   public IExporter<string> Exporter { private get; init; } = new ClipboardExporter();
   public INetworkService NetworkService { get; init; } = new NetworkService();
   public CollectionEditorPageConfirmers Confirmers { private get; init; } = new();
+  public IMemoryCache? Cache { get; init; } = null;
 
   public string CollectionName => CollectionViewModel.CollectionName;
   public CardCollectionViewModel CollectionViewModel
@@ -122,6 +124,7 @@ public partial class CardCollectionEditorPageViewModel : ViewModelBase
     Notifier = Notifier,
     Exporter = Exporter,
     Importer = Importer,
+    Cache = Cache,
     NetworkService = NetworkService,
     Confirmers = Confirmers.CollectionConfirmers,
     OnDeleted = OnCollectionDeleted,

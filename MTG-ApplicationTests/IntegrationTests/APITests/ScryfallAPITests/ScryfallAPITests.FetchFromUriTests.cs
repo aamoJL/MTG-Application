@@ -29,7 +29,7 @@ public partial class ScryfallAPITests
     }
 
     [TestMethod]
-    public async Task Fetch_WithValidUri_Pagination_NextPageNotEmpty()
+    public async Task Fetch_WithValidUri_NextPageNotEmpty()
     {
       var api = new ScryfallAPI();
       var uri = "https://api.scryfall.com/cards/search?q=set:neo+order:Released+unique:Cards+direction:Asc+game:paper";
@@ -38,18 +38,6 @@ public partial class ScryfallAPITests
 
       Assert.IsGreaterThan(result.Found.Length, result.TotalCount);
       Assert.AreNotEqual(string.Empty, result.NextPageUri);
-    }
-
-    [TestMethod]
-    public async Task Fetch_WithValidUri_FetchAll_FoundCountSameAsTotalCount()
-    {
-      var api = new ScryfallAPI();
-      var uri = "https://api.scryfall.com/cards/search?q=set:neo+order:Released+unique:Cards+direction:Asc+game:paper";
-
-      var result = await api.ImportWithUri(uri, fetchAll: true);
-
-      Assert.HasCount(result.TotalCount, result.Found);
-      Assert.AreEqual(string.Empty, result.NextPageUri);
     }
   }
 }

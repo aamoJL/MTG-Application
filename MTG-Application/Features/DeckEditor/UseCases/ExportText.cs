@@ -6,7 +6,5 @@ namespace MTGApplication.Features.DeckEditor.UseCases;
 
 public class ExportText(IExporter<string> exporter) : UseCaseFunc<string, Task>
 {
-  public IExporter<string> Exporter { get; } = exporter;
-
-  public override async Task Execute(string text) => await Exporter.Export(text);
+  public override async Task Execute(string text) => await exporter.Export(text);
 }

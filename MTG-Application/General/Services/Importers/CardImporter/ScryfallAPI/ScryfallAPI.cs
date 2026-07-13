@@ -1,4 +1,5 @@
-﻿using MTGApplication.General.Models;
+﻿using MTGApplication.General.Extensions;
+using MTGApplication.General.Models;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Importers;
 using MTGApplication.General.Services.Importers.CardImporter;
@@ -12,7 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using static MTGApplication.General.Models.MTGCardInfo;
 
@@ -42,54 +42,36 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
   public static readonly string API_REFERENCE_URL = "https://scryfall.com/docs/syntax";
   public string Name => "Scryfall";
 
-  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true, CancellationToken? cancellationToken = null)
+  public async Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams)
   {
     if (string.IsNullOrEmpty(searchParams))
       return CardImportResult.Empty();
 
-    var uri = string.IsNullOrEmpty(searchParams) ? "" : $"{SEARCH_URL}?q={searchParams}+game:paper";
-    var result = await ImportWithUri(uri, fetchAll: !pagination, cancellationToken: cancellationToken);
-
-    cancellationToken?.ThrowIfCancellationRequested();
+    var uri = string.IsNullOrEmpty(searchParams) ? string.Empty : $"{SEARCH_URL}?q={searchParams}+game:paper";
+    var result = await ImportWithUri(uri);
 
     return result;
   }
 
-  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null, int rateLimit = (int)RateLimit.SEARCH)
+  public async Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, int rateLimit = (int)RateLimit.SEARCH)
   {
-    var pageResults = new List<CardImportResult>();
-    var currentPage = pageUri;
+    await FetchLimiter.Wait(rateLimit);
 
-    cancellationToken?.ThrowIfCancellationRequested();
+    if (await NetworkIO.GetJsonFromUrl(pageUri) is not string data || string.IsNullOrEmpty(data))
+      return CardImportResult.Empty();
 
-    do
-    {
-      await FetchLimiter.Wait(rateLimit);
+    if (JsonNode.Parse(data) is not JsonNode rootNode)
+      return CardImportResult.Empty();
 
-      if (await NetworkIO.GetJsonFromUrl(currentPage) is not string data || string.IsNullOrEmpty(data))
-        break;
+    List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
 
-      if (JsonNode.Parse(data) is not JsonNode rootNode)
-        break;
-
-      List<CardImportResult.Card> found = [.. await GetCardsFromJsonObject(rootNode, paperOnly)];
-      var nextPage = rootNode["has_more"]?.GetValue<bool>() is true ? rootNode["next_page"]?.GetValue<string>() ?? "" : "";
-      var totalCount = rootNode["total_cards"]?.GetValue<int>() ?? found.Count;
-      pageResults.Add(new CardImportResult([.. found], 0, totalCount, CardImportResult.ImportSource.External, nextPage));
-
-      currentPage = nextPage;
-    } while (cancellationToken?.IsCancellationRequested != true && fetchAll && !string.IsNullOrEmpty(pageResults.LastOrDefault()?.NextPageUri));
-
-    return pageResults.Count switch
-    {
-      0 => CardImportResult.Empty(),
-      1 => pageResults.First(),
-      _ => new(
-        Found: [.. pageResults.SelectMany(x => x.Found)],
-        NotFoundCount: pageResults.Sum(x => x.NotFoundCount),
-        TotalCount: pageResults.First().TotalCount,
-        Source: CardImportResult.ImportSource.External)
-    };
+    return new CardImportResult(
+      Found: [.. found],
+      NotFoundCount: 0,
+      TotalCount: rootNode["total_cards"]?.GetValue<int>() ?? found.Count,
+      Source: CardImportResult.ImportSource.External,
+      NextPageUri: rootNode["next_page"]?.GetValue<string>() ?? string.Empty
+    );
   }
 
   public async Task<CardImportResult> ImportWithString(string importText)
@@ -105,13 +87,13 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
     {
       // Format: {Count (optional)} {Name} OR {Count (optional)} {Scryfall Id}
       // Multiface cards will be formatted as {front} // {back}, so the name search will stop at '/' so only the first name will be used.
-      var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Name>[\\s\\S][^/]*))");
+      var regexGroups = new Regex("(?:^[\\s]*(?<Count>[0-9]*(?=\\s)){0,1}\\s*(?<Identifier>[\\s\\S][^/]*))");
       var match = regexGroups.Match(line);
 
       var countMatch = match.Groups["Count"]?.Value;
-      var nameMatch = match.Groups["Name"]?.Value;
+      var cardIdentifierMatch = match.Groups["Identifier"]?.Value;
 
-      if (Guid.TryParse(nameMatch, out var id))
+      if (Guid.TryParse(cardIdentifierMatch, out var id))
       {
         return new ScryfallIdentifier()
         {
@@ -123,7 +105,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
       {
         return new ScryfallIdentifier()
         {
-          Name = nameMatch?.Trim() ?? "",
+          Name = cardIdentifierMatch?.Trim() ?? "",
           CardCount = !string.IsNullOrEmpty(countMatch) ? int.Parse(countMatch) : 1,
         };
       }
@@ -136,7 +118,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
   {
     var searchType = fuzzy ? "fuzzy" : "exact";
 
-    return await ImportWithUri($"{NAMED_URL}?{searchType}={name.Replace(' ', '+')}", rateLimit: (int)RateLimit.NAMED);
+    return await ImportWithUri($"{NAMED_URL}?{searchType}={name.Replace(string.Space, '+')}", rateLimit: (int)RateLimit.NAMED);
   }
 
   public async Task<CardImportResult> ImportWithId(Guid id) => await ImportWithUri($"{CARDS_URL}/{id}", rateLimit: (int)RateLimit.OTHER);
@@ -323,7 +305,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
   }
 
   // Example id uri: https://cards.scryfall.io/large/front/8/0/80fc51aa-64ca-4236-8cdb-670533b75f59.jpg?1736467426
-  public static bool TryParseCardIdFromUri(string data, out Guid id)
+  public bool TryParseCardIdFromUri(string data, out Guid id)
   {
     Guid? result = (Uri.TryCreate(data, UriKind.Absolute, out var uri)
       && uri.Host == IMAGE_HOST
@@ -338,7 +320,7 @@ public partial class ScryfallAPI : IMTGCardImporter, IScryfallImporter
   }
 
   // Example name uri: https://scryfall.com/card/inr/2/decimator-of-the-provinces
-  public static bool TryParseCardNameFromUri(string data, out string name)
+  public bool TryParseCardNameFromUri(string data, out string name)
   {
     var result = (Uri.TryCreate(data, UriKind.Absolute, out var uri)
       && uri.Host == NAME_HOST

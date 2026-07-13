@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.Features.CardCollectionEditor.UseCases;
 using MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionList;
@@ -38,6 +39,7 @@ public partial class CardCollectionViewModel : ViewModelBase
   public required INetworkService NetworkService { get; init; }
   public required IExporter<string> Exporter { private get; init; }
   public required CollectionConfirmers Confirmers { private get; init; }
+  public IMemoryCache? Cache { get; init; } = null;
 
   public string CollectionName => Model.Name;
   public ObservableCollection<CardCollectionListViewModel> CollectionListViewModels => field ??= [.. Model.CollectionLists.Select(CreateListViewModel)];
@@ -231,6 +233,7 @@ public partial class CardCollectionViewModel : ViewModelBase
     Exporter = Exporter,
     Importer = Importer,
     Notifier = Notifier,
+    Cache = Cache,
     Confirmers = Confirmers.CollectionListConfirmers,
     NetworkService = NetworkService,
     NameValidator = (name) => !Model.CollectionLists.Select(x => x.Name).Contains(name),

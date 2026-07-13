@@ -10,21 +10,19 @@ namespace MTGApplication.Features.CardCollectionEditor.UseCases;
 
 public class SaveCardCollection(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<MTGCardCollection, string, bool, Task<bool>>
 {
-  public IRepository<MTGCardCollectionDTO> Repository { get; } = repository;
-
   public override async Task<bool> Execute(MTGCardCollection collection, string name, bool overrideOld)
   {
     var dto = CardCollectionToDTOConverter.Convert(collection);
     var oldName = dto.Name;
 
-    if (oldName != name && await new CardCollectionDTOExists(Repository).Execute(name) && !overrideOld)
+    if (oldName != name && await new CardCollectionDTOExists(repository).Execute(name) && !overrideOld)
       return false; // Cancel because overriding is not enabled
 
-    if (!await new AddOrUpdateCardCollectionDTO(Repository).Execute((dto, name)))
+    if (!await new AddOrUpdateCardCollectionDTO(repository).Execute((dto, name)))
       return false; // Cancel because was not saved
 
-    if (!string.IsNullOrEmpty(oldName) && oldName != name && await new CardCollectionDTOExists(Repository).Execute(oldName))
-      await new DeleteCardCollectionDTO(Repository).Execute(oldName); // Delete old collection if it was renamed
+    if (!string.IsNullOrEmpty(oldName) && oldName != name && await new CardCollectionDTOExists(repository).Execute(oldName))
+      await new DeleteCardCollectionDTO(repository).Execute(oldName); // Delete old collection if it was renamed
 
     return true;
   }

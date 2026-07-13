@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.Features.CardCollectionEditor.UseCases;
 using MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionCard;
@@ -40,6 +41,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
   public required INetworkService NetworkService { get; init; }
   public required CollectionListConfirmers Confirmers { private get; init; }
   public required Func<string, bool> NameValidator { get; set; }
+  public IMemoryCache? Cache { get; init; } = null;
 
   public string Name => Model.Name;
   public string Query => Model.SearchQuery;
@@ -95,7 +97,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
 
           // Fetch new query cards and remove cards that are not in the new query
           //  from the owned cards if the user accepts the conflict
-          var found = (await new FetchCardsWithQuery(Importer).Execute(newQuery)).Found;
+          var found = (await new FetchCardsWithQuery(Importer) { Cache = Cache }.Execute(newQuery)).Found;
 
           var excludedCards = Cards
             .ExceptBy(found.Select(f => f.Info.ScryfallId), o => o.ScryfallId)
@@ -158,7 +160,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
       {
         // Fetch imported cards and add the cards that are included in the query but not in the owned cards
         var importTask = Task.Run(() => new FetchCardsWithImportText(Importer).Execute(importText));
-        var queryTask = Task.Run(() => new FetchCardsWithQuery(Importer).Execute(Query));
+        var queryTask = Task.Run(() => new FetchCardsWithQuery(Importer) { Cache = Cache }.Execute(Query));
 
         await Task.WhenAll(importTask, queryTask);
 
@@ -221,7 +223,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
     {
       await Worker.DoWork(async () =>
       {
-        if ((await new FetchCardsWithQuery(Importer) { Pagination = true }.Execute(Query)) is not CardImportResult fetchResult)
+        if ((await new FetchCardsWithQuery(Importer) { Pagination = true, Cache = Cache }.Execute(Query)) is not CardImportResult fetchResult)
           return;
 
         QueryCards = CreateQueryCollection(

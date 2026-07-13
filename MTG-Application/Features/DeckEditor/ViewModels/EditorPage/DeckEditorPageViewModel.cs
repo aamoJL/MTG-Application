@@ -69,7 +69,7 @@ public partial class DeckEditorPageViewModel : ViewModelBase
       if (string.IsNullOrEmpty(loadName))
         return; // Cancel
 
-      if (await EditorDependencies.Worker.DoWork(new FetchDeck(EditorDependencies.Repository, EditorDependencies.Importer).Execute(loadName)) is DeckEditorMTGDeck deck)
+      if (await EditorDependencies.Worker.DoWork(new FetchDeck(EditorDependencies.Repository, EditorDependencies.Importer) { Cache = EditorDependencies.Cache }.Execute(loadName)) is DeckEditorMTGDeck deck)
       {
         await ChangeDeck(deck);
 

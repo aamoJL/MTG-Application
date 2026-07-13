@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace MTGApplication.General.Services.Importers.CardImporter;
 
@@ -16,13 +15,13 @@ public partial interface ICardImporter
   /// <summary>
   /// Fetch cards from the API using API search query
   /// </summary>
-  public Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams, bool pagination = true, CancellationToken? cancellationToken = null);
+  public Task<CardImportResult> ImportCardsWithSearchQuery(string searchParams);
 
   /// <summary>
   /// Fetches cards from the given <paramref name="pageUri"/>
   /// </summary>
   /// <param name="paperOnly">Fetches only cards that are printed on paper</param>
-  public Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, bool fetchAll = false, CancellationToken? cancellationToken = null, int rateLimit = 500);
+  public Task<CardImportResult> ImportWithUri(string pageUri, bool paperOnly = false, int rateLimit = 500);
 
   /// <summary>
   /// Fetch cards from the API using formatted text.

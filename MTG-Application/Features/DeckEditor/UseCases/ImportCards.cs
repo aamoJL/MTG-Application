@@ -1,7 +1,7 @@
 ﻿using MTGApplication.General.Extensions;
-using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Importers.CardImporter;
 using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI;
+using MTGApplication.General.Services.Importers.CardImporter.ScryfallAPI.UseCases;
 using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using MTGApplication.General.ViewModels;
 using System.Threading.Tasks;
@@ -40,10 +40,10 @@ public class ImportCards(IMTGCardImporter importer, IEdhrecImporter edhrecImport
   {
     var result = CardImportResult.Empty();
 
-    if (ScryfallAPI.TryParseCardIdFromUri(uri, out var id))
-      result = await scryfallImporter.ImportWithId(id);
-    else if (ScryfallAPI.TryParseCardNameFromUri(uri, out var name))
-      result = await scryfallImporter.ImportWithName(name, fuzzy: true);
+    if (scryfallImporter.TryParseCardIdFromUri(uri, out var id))
+      result = await new FetchCardWithId(scryfallImporter).Execute(id);
+    else if (scryfallImporter.TryParseCardNameFromUri(uri, out var name))
+      result = await new FetchCardWithName(scryfallImporter).Execute(name);
 
     return result.TotalCount > 0 ? result : null;
   }

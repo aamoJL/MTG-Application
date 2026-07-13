@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -20,6 +21,8 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
 {
   public enum CardViewType { Group, Image, Text }
 
+  private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+
   public DeckEditorPage() => InitializeComponent();
 
   public DeckEditorPageViewModel ViewModel => field ??= new()
@@ -27,6 +30,7 @@ public sealed partial class DeckEditorPage : Page, INotifyPropertyChanged
     EditorDependencies = new()
     {
       Notifier = Notifier,
+      Cache = _cache,
       PageConfirmers = new()
       {
         ConfirmDeckOpen = async msg => await new ShowOpenDialog(XamlRoot).Execute((msg.Title, msg.Message, [.. msg.Data])),

@@ -22,6 +22,6 @@ public class FetchCardsWithQueryTests
       Result = TestMTGCardImporter.Success(cards)
     }).Execute("query");
 
-    CollectionAssert.AreEquivalent(result.Found, cards);
+    Assert.AreSequenceEqual(result.Found, cards, SequenceOrder.InAnyOrder);
   }
 }

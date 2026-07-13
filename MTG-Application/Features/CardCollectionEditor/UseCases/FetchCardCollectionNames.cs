@@ -9,8 +9,6 @@ namespace MTGApplication.Features.CardCollectionEditor.UseCases;
 
 public class FetchCardCollectionNames(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<Task<IEnumerable<string>>>
 {
-  public IRepository<MTGCardCollectionDTO> Repository { get; } = repository;
-
   public override async Task<IEnumerable<string>> Execute()
-    => (await Repository.Get(setIncludes: (set) => { })).Select(x => x.Name).OrderBy(x => x);
+    => (await repository.Get(setIncludes: (set) => { })).Select(x => x.Name).Order();
 }

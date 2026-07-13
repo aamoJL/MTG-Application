@@ -1,6 +1,8 @@
-﻿using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
+﻿using Microsoft.Extensions.Caching.Memory;
+using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,8 @@ namespace MTGApplication.Features.DeckEditor.Models.Converters;
 
 public class DTOToDeckEditorDeckConverter(IMTGCardImporter importer)
 {
+  public IMemoryCache? Cache { get; init; } = null;
+
   /// <exception cref="ArgumentNullException"></exception>
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
@@ -25,14 +29,16 @@ public class DTOToDeckEditorDeckConverter(IMTGCardImporter importer)
     var maybeCards = new List<CardImportResult.Card>();
     var removeCards = new List<CardImportResult.Card>();
 
+    var deckCache = Cache?.GetOrCreate<IMemoryCache>(dto.Name, (_) => new MemoryCache(new MemoryCacheOptions()));
+
     await Task.WhenAll(
     [
-      Task.Run(async () => commander = dto.Commander != null ? (await importer.ImportWithDTOs([dto.Commander])).Found.FirstOrDefault() : null),
-      Task.Run(async () => partner = dto.CommanderPartner != null ? (await importer.ImportWithDTOs([dto.CommanderPartner])).Found.FirstOrDefault() : null),
-      Task.Run(async () => deckCards.AddRange((await importer.ImportWithDTOs([.. dto.DeckCards])).Found)),
-      Task.Run(async () => wishCards.AddRange((await importer.ImportWithDTOs([.. dto.WishlistCards])).Found)),
-      Task.Run(async () => maybeCards.AddRange((await importer.ImportWithDTOs([.. dto.MaybelistCards])).Found)),
-      Task.Run(async () => removeCards.AddRange((await importer.ImportWithDTOs([.. dto.RemovelistCards])).Found)),
+      Task.Run(async () => commander = dto.Commander == null ? null : (await FetchCards([dto.Commander], deckCache, DeckCacheKey.Commander)).FirstOrDefault()),
+      Task.Run(async () => partner = dto.CommanderPartner == null ? null : (await FetchCards([dto.CommanderPartner], deckCache, DeckCacheKey.Partner)).FirstOrDefault()),
+      Task.Run(async () => deckCards.AddRange((await FetchCards([.. dto.DeckCards], deckCache, DeckCacheKey.DeckCards)))),
+      Task.Run(async () => wishCards.AddRange((await FetchCards([.. dto.WishlistCards], deckCache, DeckCacheKey.Wishlist)))),
+      Task.Run(async () => maybeCards.AddRange((await FetchCards([.. dto.MaybelistCards], deckCache, DeckCacheKey.Maybelist)))),
+      Task.Run(async () => removeCards.AddRange((await FetchCards([.. dto.RemovelistCards], deckCache, DeckCacheKey.Removelist)))),
     ]);
 
     return new DeckEditorMTGDeck()
@@ -59,5 +65,17 @@ public class DTOToDeckEditorDeckConverter(IMTGCardImporter importer)
       };
     }
     else return new(importCard.Info) { Count = importCard.Count };
+  }
+
+  private async Task<IEnumerable<CardImportResult.Card>> FetchCards(IEnumerable<MTGCardDTO> cards, IMemoryCache? cache, DeckCacheKey cacheKey)
+  {
+    if (cache?.Get(cacheKey) is IEnumerable<CardImportResult.Card> cachedCards)
+      return cachedCards;
+
+    var result = (await new FetchCardsWithDTOs(importer).Execute(cards)).Found;
+
+    cache?.Set(cacheKey, result);
+
+    return result;
   }
 }

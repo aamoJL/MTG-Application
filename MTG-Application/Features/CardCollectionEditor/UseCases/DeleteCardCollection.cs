@@ -10,12 +10,10 @@ namespace MTGApplication.Features.CardCollectionEditor.UseCases;
 
 public class DeleteCardCollection(IRepository<MTGCardCollectionDTO> repository) : UseCaseFunc<MTGCardCollection, Task<bool>>
 {
-  public IRepository<MTGCardCollectionDTO> Repository { get; } = repository;
-
   public override async Task<bool> Execute(MTGCardCollection collection)
   {
     var dto = CardCollectionToDTOConverter.Convert(collection);
 
-    return await new DeleteCardCollectionDTO(Repository).Execute(dto);
+    return await new DeleteCardCollectionDTO(repository).Execute(dto);
   }
 }

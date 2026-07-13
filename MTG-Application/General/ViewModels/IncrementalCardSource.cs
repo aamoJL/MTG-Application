@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.WinUI.Collections;
+using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.General.Services.Importers.CardImporter;
+using MTGApplication.General.Services.Importers.CardImporter.UseCases;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,7 @@ public class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(),
   public IMTGCardImporter Importer { get; } = importer;
   public string NextPage { get; set; } = string.Empty;
   public required Func<CardImportResult.Card, TCard> Converter { private get; init; }
+  public IMemoryCache? Cache { get; init; } = null;
 
   public Action<Task>? OnLoading { get; set; }
   public Action<Exception>? OnError { get; set; }
@@ -27,7 +30,7 @@ public class IncrementalCardSource<TCard>(IMTGCardImporter importer) : object(),
       // Load next page
       try
       {
-        var task = Importer.ImportWithUri(NextPage);
+        var task = new FetchCardsWithUri(Importer) { FetchAll = false, Cache = Cache }.Execute(NextPage);
 
         OnLoading?.Invoke(task);
 

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardCollectionEditor.ViewModels.EditorPage;
@@ -16,6 +17,8 @@ namespace MTGApplication.Features.CardCollectionEditor.Views;
 
 public sealed partial class CardCollectionEditorPage : Page
 {
+  private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+
   public CardCollectionEditorPage()
   {
     InitializeComponent();
@@ -29,6 +32,7 @@ public sealed partial class CardCollectionEditorPage : Page
     get => field ??= new()
     {
       Notifier = Notifier,
+      Cache = _cache,
       Confirmers = new()
       {
         ConfirmCollectionOpen = async (msg) => await new ShowOpenDialog(XamlRoot).Execute((msg.Title, msg.Message, [.. msg.Data])),

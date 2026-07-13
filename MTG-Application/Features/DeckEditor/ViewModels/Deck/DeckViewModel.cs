@@ -115,7 +115,7 @@ public partial class DeckViewModel : ViewModelBase
         }
       }
 
-      if (await EditorDependencies.Worker.DoWork(new SaveDeck(EditorDependencies.Repository).Execute(Model, saveName, overrideOld)))
+      if (await EditorDependencies.Worker.DoWork(new SaveDeck(EditorDependencies.Repository) { Cache = EditorDependencies.Cache }.Execute(Model, saveName, overrideOld)))
       {
         Model.Name = saveName;
         SaveStatus.HasUnsavedChanges = false;
@@ -145,7 +145,7 @@ public partial class DeckViewModel : ViewModelBase
         default: return; // Cancel
       }
 
-      if (await EditorDependencies.Worker.DoWork(new DeleteDeck(EditorDependencies.Repository).Execute(Model)))
+      if (await EditorDependencies.Worker.DoWork(new DeleteDeck(EditorDependencies.Repository) { Cache = EditorDependencies.Cache }.Execute(Model)))
       {
         await OnDeleted();
 

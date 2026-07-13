@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.Features.DeckSelection.Models;
 using MTGApplication.Features.DeckSelection.UseCases;
 using MTGApplication.General.Services.Databases.Repositories;
@@ -21,6 +22,7 @@ public partial class DeckSelectionPageViewModel : ObservableObject
   public IRepository<MTGCardDeckDTO> Repository { private get; init; } = new DeckDTORepository();
   public IMTGCardImporter Importer { private get; init; } = App.MTGCardImporter;
   public Notifier Notifier { private get; init; } = new();
+  public IMemoryCache? Cache { get; init; } = null;
 
   public ObservableCollection<DeckSelectionDeck> DeckItems { get; } = [];
 
@@ -57,7 +59,7 @@ public partial class DeckSelectionPageViewModel : ObservableObject
   {
     try
     {
-      var decks = await Worker.DoWork(new FetchDecks(Repository, Importer).Execute());
+      var decks = await Worker.DoWork(new FetchDecks(Repository, Importer) { Cache = Cache }.Execute());
 
       DeckItems.Clear();
 
