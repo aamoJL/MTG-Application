@@ -25,7 +25,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     AddNewSeries(null);
   }
 
-  public IPolarAxis[] AngleAxes { get; } = [new PolarAxis() { Labels = _colorRange.Select(x => x.GetFullName()).ToList() }];
+  public IPolarAxis[] AngleAxes { get; } = [new PolarAxis() { Labels = [.. _colorRange.Select(x => x.GetFullName())] }];
   public IPolarAxis[] RadiusAxes { get; } = [new PolarAxis() { Labeler = value => value.ToString() }];
 
   protected override void AddToSeries(DeckEditorMTGCard card)
@@ -114,7 +114,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     return new PolarLineSeries<MTGCardChartSeriesItem>
     {
       Name = _costSeriesName,
-      Values = _colorRange.Select(x => new MTGCardChartSeriesItem()).ToArray(), // Series has permanent values
+      Values = [.. _colorRange.Select(x => new MTGCardChartSeriesItem())], // Series has permanent values
       LineSmoothness = 0,
       GeometrySize = 0,
       GeometryFill = new SolidColorPaint(ChartColorPalette.White),
@@ -131,7 +131,7 @@ public sealed partial class ManaDistributionChart : MTGCardChart
     return new PolarLineSeries<MTGCardChartSeriesItem>
     {
       Name = _productionSeriesName,
-      Values = _colorRange.Select(x => new MTGCardChartSeriesItem()).ToArray(), // Series has permanent values
+      Values = [.. _colorRange.Select(x => new MTGCardChartSeriesItem())], // Series has permanent values
       LineSmoothness = 0,
       GeometrySize = 0,
       GeometryFill = new SolidColorPaint(ChartColorPalette.Black),

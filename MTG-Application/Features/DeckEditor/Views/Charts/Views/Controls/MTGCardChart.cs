@@ -12,12 +12,6 @@ public abstract class MTGCardChart : UserControl
   public static readonly DependencyProperty CardsProperty =
       DependencyProperty.Register(nameof(Cards), typeof(ReadOnlyObservableCollection<DeckEditorMTGCard>), typeof(MTGCardChart), new PropertyMetadata(new ReadOnlyObservableCollection<DeckEditorMTGCard>([]), CardsPropertyChanged));
 
-  protected MTGCardChart()
-  {
-    Loaded += MTGCardChart_Loaded;
-    Unloaded += MTGCardChart_Unloaded;
-  }
-
   public ReadOnlyObservableCollection<DeckEditorMTGCard> Cards
   {
     get => (ReadOnlyObservableCollection<DeckEditorMTGCard>)GetValue(CardsProperty);
@@ -33,23 +27,6 @@ public abstract class MTGCardChart : UserControl
   protected abstract ISeries? AddNewSeries(object property);
 
   protected virtual void ResetSeries() => Series.Clear();
-
-  protected virtual void UpdateTheme() { }
-
-  private void MTGCardChart_Loaded(object sender, RoutedEventArgs e)
-  {
-    Loaded -= MTGCardChart_Loaded;
-
-    UpdateTheme();
-    AppConfig.LocalSettings.PropertyChanged += LocalSettings_PropertyChanged;
-  }
-
-  private void MTGCardChart_Unloaded(object sender, RoutedEventArgs e)
-  {
-    Unloaded -= MTGCardChart_Unloaded;
-
-    AppConfig.LocalSettings.PropertyChanged -= LocalSettings_PropertyChanged;
-  }
 
   protected void OnCardsChanged(ReadOnlyObservableCollection<DeckEditorMTGCard> oldValue)
   {
@@ -82,12 +59,6 @@ public abstract class MTGCardChart : UserControl
         break;
       case NotifyCollectionChangedAction.Reset: Series.Clear(); break;
     }
-  }
-
-  protected void LocalSettings_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
-  {
-    if (e.PropertyName == nameof(AppConfig.LocalSettings.AppTheme))
-      UpdateTheme();
   }
 
   protected static void CardsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)

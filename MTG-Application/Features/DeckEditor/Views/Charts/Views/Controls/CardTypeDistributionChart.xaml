@@ -10,6 +10,6 @@
   mc:Ignorable="d">
 
   <Grid>
-    <lvc:PieChart Series="{x:Bind Series, Mode=OneTime}"/>
+    <lvc:PieChart Series="{x:Bind Series, Mode=OneTime}" Background="Transparent"/>
   </Grid>
 </controls:MTGCardChart>

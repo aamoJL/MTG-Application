@@ -12,6 +12,7 @@
   <Grid>
     <lvc:PolarChart 
       Height="250"
+      Background="Transparent"
       Series="{x:Bind Series, Mode=OneTime}"
       AngleAxes="{x:Bind AngleAxes, Mode=OneTime}"
       RadiusAxes="{x:Bind RadiusAxes, Mode=OneTime}"/>

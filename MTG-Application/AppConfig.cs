@@ -101,6 +101,8 @@ public static partial class AppConfig
       {
         if (JsonNode.Parse(File.ReadAllText(_filePath)) is JsonNode json)
         {
+          // Application theme can't be changed after the app has been launched, so we need to use internal AppTheme
+          //  to handle RequestedThemes.
           AppTheme = (json[nameof(AppTheme)]?.GetValue<int>() ?? (int)ElementTheme.Default) switch
           {
             1 => ElementTheme.Light,

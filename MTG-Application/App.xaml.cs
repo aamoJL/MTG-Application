@@ -1,8 +1,13 @@
 ﻿using LiveChartsCore;
+using LiveChartsCore.Drawing;
+using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using LiveChartsCore.Themes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.Views;
+using MTGApplication.Features.DeckEditor.Views.Charts.Models;
 using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Importers.CardImporter;
@@ -36,7 +41,17 @@ public partial class App : Application
       db.Database.Migrate();
     }
 
-    LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
+    LiveCharts.Configure(config => config
+      .AddSkiaSharp()
+      .AddDefaultMappers()
+      .AddDefaultTheme(theme => theme
+        .HasRuleForAxes(axis =>
+        {
+          axis.LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
+          (axis as IPolarAxis)?.LabelsBackground = LvcColor.Empty;
+        })
+        .HasRuleForPieSeries(pie => pie.DataLabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor)))
+      );
 
     new DeckBuilderWindow().Activate();
   }

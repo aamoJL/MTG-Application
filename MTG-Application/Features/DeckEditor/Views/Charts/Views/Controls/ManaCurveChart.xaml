@@ -11,6 +11,7 @@
 
   <Grid>
     <lvc:CartesianChart 
+      Background="Transparent"
       Series="{x:Bind Series, Mode=OneTime}"
       XAxes="{x:Bind XAxes, Mode=OneTime}"
       YAxes="{x:Bind YAxes, Mode=OneTime}"/>

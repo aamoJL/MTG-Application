@@ -1,6 +1,5 @@
 using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
-using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MTGApplication.Features.DeckEditor.Models;
@@ -21,7 +20,6 @@ public sealed partial class ManaCurveChart : MTGCardChart
   public ICartesianAxis[] XAxes { get; set; } =
   [
     new Axis() {
-      LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       ForceStepToMin = true,
       MinStep = 1,
     }
@@ -29,7 +27,6 @@ public sealed partial class ManaCurveChart : MTGCardChart
   public ICartesianAxis[] YAxes { get; set; } =
   [
     new Axis() {
-      LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       ForceStepToMin = true,
       MinStep = 5,
       MinLimit = 0,
@@ -107,9 +104,6 @@ public sealed partial class ManaCurveChart : MTGCardChart
       },
       Padding = 0,
       MaxBarWidth = double.MaxValue,
-      DataLabelsPaint = new SolidColorPaint(ChartColorPalette.LightThemeText),
-      DataLabelsSize = 10,
-      DataLabelsPosition = DataLabelsPosition.Middle,
       Mapping = (value, _) => new(value.CMC, value.Count)
     };
 
@@ -125,16 +119,5 @@ public sealed partial class ManaCurveChart : MTGCardChart
 
     for (var i = 0; i < tempList.Count; i++)
       Series.Move(Series.IndexOf(tempList[i]), i);
-  }
-
-  /// <summary>
-  /// Sets Axis colors for the selected theme
-  /// </summary>
-  protected override void UpdateTheme()
-  {
-    if (XAxes[0] is Axis x)
-      x.LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
-    if (YAxes[0] is Axis y)
-      y.LabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor);
   }
 }

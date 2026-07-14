@@ -85,7 +85,6 @@ public sealed partial class CardTypeDistributionChart : MTGCardChart
         SpellType.Planeswalker => new SolidColorPaint(ChartColorPalette.Black),
         _ => new SolidColorPaint(SKColors.Pink),
       },
-      DataLabelsPaint = new SolidColorPaint(ChartColorPalette.ForegroundColor),
       DataLabelsSize = 10,
       DataLabelsPosition = PolarLabelsPosition.Outer,
       DataLabelsFormatter = p => p!.Context!.Series!.Name!,

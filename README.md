@@ -6,7 +6,7 @@ Card collection, deck building and testing application for MTG card game
 
 * [C# WinUI 3](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/) (UI using MVVM architecture)
 * [EntityFramework Core](https://learn.microsoft.com/en-us/ef/core/) (SQLite database)
-* [LiveCharts2](https://lvcharts.com/docs/winui/2.0.0-beta.700/gallery) (Chart visuals)
+* [LiveCharts2](https://github.com/Live-Charts/LiveCharts2) (Chart visuals)
 
 # Deck Building
 
