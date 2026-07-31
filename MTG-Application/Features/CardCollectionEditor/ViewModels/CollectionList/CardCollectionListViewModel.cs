@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Caching.Memory;
 using MTGApplication.Features.CardCollectionEditor.Models;
 using MTGApplication.Features.CardCollectionEditor.UseCases;
 using MTGApplication.Features.CardCollectionEditor.ViewModels.CollectionCard;
 using MTGApplication.General.Extensions;
 using MTGApplication.General.Models;
+using MTGApplication.General.Services.Cache;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Services.Databases.Repositories.CardRepository.Models;
 using MTGApplication.General.Services.Exporters;
@@ -41,7 +41,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
   public required INetworkService NetworkService { get; init; }
   public required CollectionListConfirmers Confirmers { private get; init; }
   public required Func<string, bool> NameValidator { get; set; }
-  public IMemoryCache? Cache { get; init; } = null;
+  public IMemoryCache<Caching.CacheKey>? Cache { get; init; } = null;
 
   public string Name => Model.Name;
   public string Query => Model.SearchQuery;
@@ -245,6 +245,7 @@ public partial class CardCollectionListViewModel : ViewModelBase
       Cards = [.. cards],
       NextPage = nextPage,
       Converter = (item) => CreateCardViewModel(new(item.Info)),
+      Cache = Cache,
       OnLoading = (task) => _ = Worker.DoWork(task),
       OnError = (e) => new ShowNotification(Notifier).Execute(new(NotificationType.Error, e.Message)),
     };

@@ -17,7 +17,7 @@ public class AddOrUpdateDeck
   public async Task Execute_Added_ReturnTrue()
   {
     var newDeck = new MTGCardDeckDTO(name: "New Deck");
-    var result = await new AddOrUpdateDeckDTO(Repository).Execute((newDeck, "Save Name"));
+    var result = await new AddOrUpdateDeckDTO(Repository).Execute(newDeck);
 
     Assert.IsTrue(result, "Should have returned true");
   }
@@ -28,7 +28,7 @@ public class AddOrUpdateDeck
     Repository.AddFailure = true;
 
     var newDeck = new MTGCardDeckDTO(name: "New Deck");
-    var result = await new AddOrUpdateDeckDTO(Repository).Execute((newDeck, "Save Name"));
+    var result = await new AddOrUpdateDeckDTO(Repository).Execute(newDeck);
 
     Assert.IsFalse(result, "Should have returned false");
   }
@@ -37,7 +37,7 @@ public class AddOrUpdateDeck
   public async Task Execute_Update_ReturnTrue()
   {
     var dto = DeckEditorMTGDeckToDTOConverter.Convert(_savedDeck);
-    var result = await new AddOrUpdateDeckDTO(Repository).Execute((dto, dto.Name));
+    var result = await new AddOrUpdateDeckDTO(Repository).Execute(dto);
 
     Assert.IsTrue(result, "Should have returned true");
   }
@@ -48,7 +48,7 @@ public class AddOrUpdateDeck
     Repository.UpdateFailure = true;
 
     var dto = DeckEditorMTGDeckToDTOConverter.Convert(_savedDeck);
-    var result = await new AddOrUpdateDeckDTO(Repository).Execute((dto, dto.Name));
+    var result = await new AddOrUpdateDeckDTO(Repository).Execute(dto);
 
     Assert.IsFalse(result, "Should have returned false");
   }

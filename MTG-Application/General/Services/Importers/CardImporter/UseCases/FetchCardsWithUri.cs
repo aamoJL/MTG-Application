@@ -1,5 +1,6 @@
 ﻿using ABI.System;
-using Microsoft.Extensions.Caching.Memory;
+using MTGApplication.General.Services.Cache;
+using MTGApplication.General.Services.Cache.Caches;
 using MTGApplication.General.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -14,21 +15,21 @@ public class FetchCardsWithUri(IMTGCardImporter importer) : UseCaseFunc<string, 
   public bool FetchAll { get; init; } = false;
   public bool PaperOnly { get; init; } = true;
   public CancellationToken? CancellationToken { get; init; } = null;
-  public IMemoryCache? Cache { get; init; } = null;
+  public IMemoryCache<Caching.CacheKey>? Cache { get; init; } = null;
 
   /// <exception cref="Exception"></exception>
   public override async Task<CardImportResult> Execute(string uri)
   {
     var results = new List<CardImportResult>();
 
-    if (Cache?.Get(uri) is CardImportResult cachedUri)
+    if (Cache?.TryGetImportResult(uri, out var cachedUri) is true)
       results.Add(cachedUri);
     else
     {
       var result = await importer.ImportWithUri(uri, paperOnly: PaperOnly);
 
       if (result.Found.Length != 0)
-        Cache?.Set(uri, result);
+        Cache?.CacheImportResult(uri, result);
 
       results.Add(result);
     }
@@ -37,14 +38,14 @@ public class FetchCardsWithUri(IMTGCardImporter importer) : UseCaseFunc<string, 
     {
       CancellationToken?.ThrowIfCancellationRequested();
 
-      if (Cache?.Get(uri) is CardImportResult cachedPage)
+      if (Cache?.TryGetImportResult(uri, out var cachedPage) is true)
         results.Add(cachedPage);
       else
       {
         var result = await importer.ImportWithUri(page, paperOnly: PaperOnly);
 
         if (result.Found.Length != 0)
-          Cache?.Set(page, result);
+          Cache?.CacheImportResult(page, result);
 
         results.Add(result);
       }
