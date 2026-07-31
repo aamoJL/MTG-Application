@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.CardCollectionEditor.ViewModels.EditorPage;
 using MTGApplication.Features.CardCollectionEditor.Views.Controls;
+using MTGApplication.General.Services.Cache.UseCases;
 using MTGApplication.General.Services.ConfirmationService;
 using MTGApplication.General.Views.AppWindows;
 using MTGApplication.General.Views.AppWindows.UseCases;
@@ -17,8 +17,6 @@ namespace MTGApplication.Features.CardCollectionEditor.Views;
 
 public sealed partial class CardCollectionEditorPage : Page
 {
-  private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-
   public CardCollectionEditorPage()
   {
     InitializeComponent();
@@ -32,7 +30,7 @@ public sealed partial class CardCollectionEditorPage : Page
     get => field ??= new()
     {
       Notifier = Notifier,
-      Cache = _cache,
+      Cache = App.Cache,
       Confirmers = new()
       {
         ConfirmCollectionOpen = async (msg) => await new ShowOpenDialog(XamlRoot).Execute((msg.Title, msg.Message, [.. msg.Data])),
@@ -106,6 +104,14 @@ public sealed partial class CardCollectionEditorPage : Page
 
   [RelayCommand]
   private void SwitchWindowTheme() => new ChangeWindowTheme().Execute(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark);
+
+  [RelayCommand]
+  private void InvalidateCache()
+  {
+    new InvalidateCache().Execute(App.Cache);
+
+    RaiseNotification(this, new(NotificationType.Info, "Cache cleared"));
+  }
 
   private void Notifier_OnNotifyEvent(object? _, Notification e)
     => RaiseNotification(this, e);

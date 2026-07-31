@@ -2,6 +2,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.UseCases;
+using MTGApplication.General.Services.Cache.UseCases;
+using MTGApplication.General.Services.NotificationService;
 using MTGApplication.General.Views.AppWindows;
 using MTGApplication.General.Views.AppWindows.UseCases;
 using System.Collections.ObjectModel;
@@ -61,6 +63,14 @@ public sealed partial class DeckBuilderPage : Page, INotifyPropertyChanged
 
   [RelayCommand]
   private void SwitchWindowTheme() => new ChangeWindowTheme().Execute(AppConfig.LocalSettings.AppTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark);
+
+  [RelayCommand]
+  private void InvalidateCache()
+  {
+    new InvalidateCache().Execute(App.Cache);
+
+    NotificationService.RaiseNotification(this, new(NotificationService.NotificationType.Info, "Cache cleared"));
+  }
 
   private void WindowClosing_Closing(object? sender, WindowClosing.ClosingEventArgs e)
   {

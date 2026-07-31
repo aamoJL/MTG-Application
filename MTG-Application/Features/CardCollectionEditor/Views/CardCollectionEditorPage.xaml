@@ -164,6 +164,14 @@
             <Button Command="{x:Bind SwitchWindowThemeCommand, Mode=OneTime}" ToolTipService.ToolTip="Switch theme">
               <FontIcon Glyph="&#xE793;"/>
             </Button>
+            <Button>
+              <Button.Flyout>
+                <MenuFlyout Placement="BottomEdgeAlignedRight">
+                  <MenuFlyoutItem Text="Clear cache" Command="{x:Bind InvalidateCacheCommand, Mode=OneTime}"/>
+                </MenuFlyout>
+              </Button.Flyout>
+              <FontIcon Glyph="&#xE712;"/>
+            </Button>
           </StackPanel>
 
           <TextBlock VerticalAlignment="Bottom">

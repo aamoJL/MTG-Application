@@ -5,10 +5,12 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.Themes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using MTGApplication.Features.AppWindows.DeckBuilderWindow.Views;
 using MTGApplication.Features.DeckEditor.Views.Charts.Models;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Cache;
 using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Importers.CardImporter;
 
@@ -20,6 +22,7 @@ namespace MTGApplication;
 public partial class App : Application
 {
   public static IMTGCardImporter MTGCardImporter { get; } = new ScryfallAPI();
+  public static MemoryCache<Caching.CacheKey> Cache { get; } = new MemoryCache<Caching.CacheKey>();
 
   /// <summary>
   /// Initializes the singleton application object.  This is the first line of authored code
@@ -34,7 +37,10 @@ public partial class App : Application
   /// <param name="args">Details about the launch request and process.</param>
   protected override void OnLaunched(LaunchActivatedEventArgs args)
   {
+    DispatcherQueue.GetForCurrentThread().ShutdownStarting += App_ShutdownStarting;
+
     AppConfig.Initialize();
+    Cache.LoadFromFile();
 
     using (var db = new CardDbContextFactory().CreateDbContext())
     {
@@ -54,5 +60,12 @@ public partial class App : Application
       );
 
     new DeckBuilderWindow().Activate();
+  }
+
+  private void App_ShutdownStarting(DispatcherQueue sender, DispatcherQueueShutdownStartingEventArgs args)
+  {
+    var def = args.GetDeferral();
+    Cache.SaveToFile();
+    def.Complete();
   }
 }

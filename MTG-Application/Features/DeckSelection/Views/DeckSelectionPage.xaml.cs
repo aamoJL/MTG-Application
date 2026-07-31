@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using MTGApplication.Features.DeckSelection.Models;
@@ -10,8 +9,6 @@ namespace MTGApplication.Features.DeckSelection.Views;
 
 public sealed partial class DeckSelectionPage : Page
 {
-  private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-
   public DeckSelectionPage()
   {
     InitializeComponent();
@@ -22,7 +19,7 @@ public sealed partial class DeckSelectionPage : Page
   public DeckSelectionPageViewModel ViewModel => field ??= new()
   {
     Notifier = Notifier,
-    Cache = _cache,
+    Cache = App.Cache,
     OnSelected = deck => OnDeckSelected?.Invoke(deck)
   };
 

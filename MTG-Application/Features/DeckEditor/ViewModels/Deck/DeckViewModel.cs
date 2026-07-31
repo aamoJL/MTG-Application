@@ -117,7 +117,6 @@ public partial class DeckViewModel : ViewModelBase
 
       if (await EditorDependencies.Worker.DoWork(new SaveDeck(EditorDependencies.Repository) { Cache = EditorDependencies.Cache }.Execute(Model, saveName, overrideOld)))
       {
-        Model.Name = saveName;
         SaveStatus.HasUnsavedChanges = false;
 
         new ShowNotification(EditorDependencies.Notifier).Execute(Notifications.SaveSuccess);

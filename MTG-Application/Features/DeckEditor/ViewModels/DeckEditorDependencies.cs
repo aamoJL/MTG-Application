@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using MTGApplication.Features.DeckEditor.ViewModels.Deck;
+﻿using MTGApplication.Features.DeckEditor.ViewModels.Deck;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCard;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.CardGroup;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardGroup.GroupedCardList;
 using MTGApplication.Features.DeckEditor.ViewModels.DeckCardList;
 using MTGApplication.General.Services.API.CardAPI;
+using MTGApplication.General.Services.Cache;
 using MTGApplication.General.Services.Databases.Repositories;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository;
 using MTGApplication.General.Services.Databases.Repositories.DeckRepository.Models;
@@ -34,5 +34,5 @@ public class DeckEditorDependencies
   public DeckCardViewModel.CardConfirmers CardConfirmers { get; init; } = new();
   public GroupedDeckCardListViewModel.GroupedCardListConfirmers GroupListConfirmers { get; init; } = new();
   public DeckCardGroupViewModel.GroupConfirmers GroupConfirmers { get; init; } = new();
-  public IMemoryCache? Cache { get; init; } = null;
+  public IMemoryCache<Caching.CacheKey>? Cache { get; init; } = null;
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using MTGApplication.General.Services.Cache;
+using MTGApplication.General.Services.Cache.Caches;
 using MTGApplication.General.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ public class FetchCardsWithSearchQuery(IMTGCardImporter importer) : UseCaseFunc<
 {
   public bool FetchAll { get; init; } = false;
   public CancellationToken? CancellationToken { get; init; } = null;
-  public IMemoryCache? Cache { get; init; } = null;
+  public IMemoryCache<Caching.CacheKey>? Cache { get; init; } = null;
 
   /// <exception cref="InvalidOperationException"></exception>
   /// <exception cref="System.Net.Http.HttpRequestException"></exception>
@@ -21,14 +22,14 @@ public class FetchCardsWithSearchQuery(IMTGCardImporter importer) : UseCaseFunc<
   {
     var results = new List<CardImportResult>();
 
-    if (Cache?.Get(query) is CardImportResult cachedQuery)
+    if (Cache?.TryGetImportResult(query, out var cachedQuery) is true)
       results.Add(cachedQuery);
     else
     {
       var result = await importer.ImportCardsWithSearchQuery(query);
 
       if (result.Found.Length != 0)
-        Cache?.Set(query, result);
+        Cache?.CacheImportResult(query, result);
 
       results.Add(result);
     }
@@ -37,14 +38,14 @@ public class FetchCardsWithSearchQuery(IMTGCardImporter importer) : UseCaseFunc<
     {
       CancellationToken?.ThrowIfCancellationRequested();
 
-      if (Cache?.Get(page) is CardImportResult cachedPage)
+      if (Cache?.TryGetImportResult(page, out var cachedPage) is true)
         results.Add(cachedPage);
       else
       {
         var result = await importer.ImportWithUri(page);
 
         if (result.Found.Length != 0)
-          Cache?.Set(page, result);
+          Cache?.CacheImportResult(page, result);
 
         results.Add(result);
       }
