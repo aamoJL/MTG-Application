@@ -35,7 +35,7 @@ public static class DeckSelectionCaching
     {
       var jsons = cache.Get<Dictionary<string, string>>(CacheKey.DeckSelection);
 
-      if (jsons?[name] is string json && JsonExtensions.TryDeserializeJson(json, out selectionDeck)) { }
+      if (jsons?.GetValueOrDefault(name) is string json && JsonExtensions.TryDeserializeJson(json, out selectionDeck)) { }
       else
         selectionDeck = null;
 
