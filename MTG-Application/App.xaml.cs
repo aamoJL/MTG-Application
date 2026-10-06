@@ -13,6 +13,7 @@ using MTGApplication.General.Services.API.CardAPI;
 using MTGApplication.General.Services.Cache;
 using MTGApplication.General.Services.Databases.Context;
 using MTGApplication.General.Services.Importers.CardImporter;
+using System.Runtime.InteropServices;
 
 namespace MTGApplication;
 
@@ -21,6 +22,12 @@ namespace MTGApplication;
 /// </summary>
 public partial class App : Application
 {
+  // TODO: remove if unnecessary.
+  // Workaround for Win10 WinUI 3 framerate bug.
+  // https://github.com/microsoft/microsoft-ui-xaml/issues/12073
+  [LibraryImport("winmm.dll", EntryPoint = "timeBeginPeriod")]
+  internal static partial uint TimeBeginPeriod(uint uPeriod);
+
   public static IMTGCardImporter MTGCardImporter { get; } = new ScryfallAPI();
   public static MemoryCache<Caching.CacheKey> Cache { get; } = new MemoryCache<Caching.CacheKey>();
 
@@ -28,7 +35,12 @@ public partial class App : Application
   /// Initializes the singleton application object.  This is the first line of authored code
   /// executed, and as such is the logical equivalent of main() or WinMain().
   /// </summary>
-  public App() => InitializeComponent();
+  public App()
+  {
+    InitializeComponent();
+
+    _ = TimeBeginPeriod(1); // Workaround for Win10 WinUI 3 framerate bug.
+  }
 
   /// <summary>
   /// Invoked when the application is launched normally by the end user.  Other entry points
